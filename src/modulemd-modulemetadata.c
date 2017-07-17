@@ -30,51 +30,58 @@ enum
 {
     MD_PROP_0,
 
+    MD_PROP_API,
+    MD_PROP_ARTIFACTS,
+    MD_PROP_BUILDOPTS,
+    MD_PROP_BUILDREQUIRES,
+    MD_PROP_COMMUNITY,
+    MD_PROP_COMPONENTS,
+    MD_PROP_CONTENT_LIC,
+    MD_PROP_DESC,
+    MD_PROP_DOCS,
+    MD_PROP_FILTER,
+    MD_PROP_MDVERSION,
+    MD_PROP_MODULE_LIC,
     MD_PROP_NAME,
+    MD_PROP_PROFILES,
+    MD_PROP_REQUIRES,
+    MD_PROP_STREAM,
+    MD_PROP_SUMMARY,
+    MD_PROP_TRACKER,
+    MD_PROP_VERSION,
+    MD_PROP_XMD,
 
     MD_N_PROPERTIES
 };
 
 static GParamSpec *md_properties[MD_N_PROPERTIES] = { NULL, };
 
-struct module_dep_ref {
-    char *name;
-    char *ref; /* the stream, git tag or other commit-ish */
-};
-
-struct modulemd_component {
-    gchar *rationale;
-    gchar *repository;
-    gchar *cache;
-    gchar *ref;
-    gchar **arches;
-    gchar **multilib;
-    guint buildorder;
-
-};
 
 struct _ModulemdModuleMetadata
 {
     GObject parent_instance;
 
+    /* == Members == */
+    // ModulemdModuleAPI *api;
+    // ModulemdModuleArtifacts *artifacts;
+    // ModulemdModuleBuildopts *buildopts;
+    // GHashTable *buildrequires;
+    // gchar *community;
+    // ModulemdModuleComponents *components;
+    // gchar **content_licenses;
+    // gchar *description;
+    // gchar *documentation;
+    // ModulemdModuleFilter *filter;
+    // gint mdversion;
+    // gchar **module_licenses;
     gchar *name;
-    gchar *stream;
-    gchar *version;
-    gchar *summary;
-    gchar *description;
-    gchar *community;
-    gchar *documentation;
-    gchar *tracker;
-    gchar **module_licenses;
-    gchar **content_licenses;
-    GHashTable *xmd;
-    struct module_dep_ref **build_deps;
-    struct module_dep_ref **runtime_deps;
-    GHashTable *profiles;
-    GHashTable *api;
-    GHashTable *filter;
-    GHashTable *buildopts;
-    GHashTable *components;
+    // GHashTable *profiles;
+    // GHashTable *requires;
+    // gchar *stream;
+    // gchar *summary;
+    // gchar *tracker;
+    // gint version;
+    // GHashTable *xmd;
 };
 
 G_DEFINE_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)

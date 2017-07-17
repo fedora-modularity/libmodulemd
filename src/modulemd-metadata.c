@@ -1,4 +1,4 @@
-/* modulemd-ModulemdMetadata.c
+/* modulemd-metadata.c
  *
  * Copyright (C) 2017 Stephen Gallagher
  *

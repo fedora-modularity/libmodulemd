@@ -1,11 +1,14 @@
 lib_LTLIBRARIES = libmodulemd-@API_VERSION@.la
 
-libmodulemd_@API_VERSION@_la_SOURCES = \
-	modulemd-version.h \
+MODULEMD_SOURCE_FILES = \
 	modulemd.h \
 	modulemd.c \
-	modulemd-metadata.h \
-	modulemd-metadata.c \
+	modulemd-modulemetadata.h \
+	modulemd-modulemetadata.c
+
+libmodulemd_@API_VERSION@_la_SOURCES = \
+	modulemd-version.h \
+	$(MODULEMD_SOURCE_FILES) \
 	$(NULL)
 
 libmodulemd_@API_VERSION@_la_CFLAGS = \
@@ -31,10 +34,7 @@ INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --warn-all
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
-introspection_sources = modulemd.h \
-			modulemd.c \
-			modulemd-metadata.h \
-			modulemd-metadata.c
+introspection_sources = $(MODULEMD_SOURCE_FILES)
 
 Modulemd-@API_VERSION@.gir: libmodulemd-@API_VERSION@.la
 Modulemd_@API_VERSION@_gir_INCLUDES = GObject-2.0

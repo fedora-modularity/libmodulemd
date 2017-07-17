@@ -105,6 +105,18 @@ modulemd_metadata_get_property (GObject *gobject,
                                       GValue *value,
                                       GParamSpec *pspec)
 {
+    ModulemdMetadata *self = MODULEMD_METADATA(gobject);
+
+    switch (property_id) {
+    case MD_PROP_NAME:
+        g_clear_pointer (&self->name, g_free);
+        self->name = g_value_dup_string (value);
+        break;
+
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+        break;
+    }
 }
 
 static void

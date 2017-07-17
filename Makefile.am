@@ -1,6 +1,9 @@
 SUBDIRS = data src po
 
-EXTRA_DIST = AUTHORS
+EXTRA_DIST = AUTHORS m4/introspection.m4
+
+DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 AUTHORS:
 	$(AM_V_GEN)if test -d "$(srcdir)/.git";                        \

@@ -93,8 +93,8 @@ AX_CHECK_COMPILE_FLAG([-std=gnu11],
 dnl ***********************************************************************
 dnl Check for required packages
 dnl ***********************************************************************
-PKG_CHECK_MODULES(MODULEMD, [gio-2.0 >= 2.42])
-
+PKG_CHECK_MODULES(YAML, [yaml-0.1])
+PKG_CHECK_MODULES(GOBJECT, [gio-2.0 >= 2.42 glib-2.0 >= 2.42 gobject-introspection-1.0])
 
 dnl ***********************************************************************
 dnl Initialize Libtool

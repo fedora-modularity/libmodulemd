@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd.c
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,19 +22,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
-
-#include <glib.h>
-
-G_BEGIN_DECLS
-
-#define MODULEMD_INSIDE
-# include "modulemd-version.h"
-#undef MODULEMD_INSIDE
+#include "modulemd.h"
 
 
-
-G_END_DECLS
-
-#endif /* MODULEMD_H */

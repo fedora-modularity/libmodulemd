@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-modulemetadata.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,19 +22,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_MODULEMETADATA_H
+#define MODULEMD_MODULEMETADATA_H
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define MODULEMD_INSIDE
-# include "modulemd-version.h"
-#undef MODULEMD_INSIDE
+#define MODULEMD_TYPE_MODULEMETADATA modulemd_modulemetadata_get_type ()
+G_DECLARE_FINAL_TYPE (ModuleMetadata, modulemd_modulemetadata, MODULEMD, MODULEMETADATA, GObject)
 
-
+ModuleMetadata *modulemd_modulemetadata_new (void);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* MODULEMD_MODULEMETADATA_H */

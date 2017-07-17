@@ -30,26 +30,26 @@ enum
 {
     MD_PROP_0,
 
-    MD_PROP_API,
-    MD_PROP_ARTIFACTS,
-    MD_PROP_BUILDOPTS,
-    MD_PROP_BUILDREQUIRES,
+    //MD_PROP_API,
+    //MD_PROP_ARTIFACTS,
+    //MD_PROP_BUILDOPTS,
+    //MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
-    MD_PROP_COMPONENTS,
-    MD_PROP_CONTENT_LIC,
+    //MD_PROP_COMPONENTS,
+    //MD_PROP_CONTENT_LIC,
     MD_PROP_DESC,
     MD_PROP_DOCS,
-    MD_PROP_FILTER,
-    MD_PROP_MDVERSION,
-    MD_PROP_MODULE_LIC,
+    //MD_PROP_FILTER,
+    //MD_PROP_MDVERSION,
+    //MD_PROP_MODULE_LIC,
     MD_PROP_NAME,
-    MD_PROP_PROFILES,
-    MD_PROP_REQUIRES,
+    //MD_PROP_PROFILES,
+    //MD_PROP_REQUIRES,
     MD_PROP_STREAM,
     MD_PROP_SUMMARY,
     MD_PROP_TRACKER,
-    MD_PROP_VERSION,
-    MD_PROP_XMD,
+    //MD_PROP_VERSION,
+    //MD_PROP_XMD,
 
     MD_N_PROPERTIES
 };
@@ -66,20 +66,20 @@ struct _ModulemdModuleMetadata
     // ModulemdModuleArtifacts *artifacts;
     // ModulemdModuleBuildopts *buildopts;
     // GHashTable *buildrequires;
-    // gchar *community;
+    gchar *community;
     // ModulemdModuleComponents *components;
     // gchar **content_licenses;
-    // gchar *description;
-    // gchar *documentation;
+    gchar *description;
+    gchar *documentation;
     // ModulemdModuleFilter *filter;
     // gint mdversion;
     // gchar **module_licenses;
     gchar *name;
     // GHashTable *profiles;
     // GHashTable *requires;
-    // gchar *stream;
-    // gchar *summary;
-    // gchar *tracker;
+    gchar *stream;
+    gchar *summary;
+    gchar *tracker;
     // gint version;
     // GHashTable *xmd;
 };
@@ -95,9 +95,34 @@ modulemd_modulemetadata_set_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
+    /* Simple string properties */
+    case MD_PROP_COMMUNITY:
+        g_clear_pointer (&self->community, g_free);
+        self->community = g_value_dup_string (value);
+        break;
+    case MD_PROP_DESC:
+        g_clear_pointer (&self->description, g_free);
+        self->description = g_value_dup_string (value);
+        break;
+    case MD_PROP_DOCS:
+        g_clear_pointer (&self->documentation, g_free);
+        self->documentation = g_value_dup_string (value);
+        break;
     case MD_PROP_NAME:
         g_clear_pointer (&self->name, g_free);
         self->name = g_value_dup_string (value);
+        break;
+    case MD_PROP_STREAM:
+        g_clear_pointer (&self->stream, g_free);
+        self->stream = g_value_dup_string (value);
+        break;
+    case MD_PROP_SUMMARY:
+        g_clear_pointer (&self->summary, g_free);
+        self->summary = g_value_dup_string (value);
+        break;
+    case MD_PROP_TRACKER:
+        g_clear_pointer (&self->tracker, g_free);
+        self->tracker = g_value_dup_string (value);
         break;
 
     default:
@@ -115,9 +140,33 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
+    /* Simple string properties */
+    case MD_PROP_COMMUNITY:
+        g_value_set_string (value, self->community);
+        break;
+
+    case MD_PROP_DESC:
+        g_value_set_string (value, self->description);
+        break;
+
+    case MD_PROP_DOCS:
+        g_value_set_string (value, self->documentation);
+        break;
+
     case MD_PROP_NAME:
-        g_clear_pointer (&self->name, g_free);
-        self->name = g_value_dup_string (value);
+        g_value_set_string (value, self->name);
+        break;
+
+    case MD_PROP_STREAM:
+        g_value_set_string (value, self->stream);
+        break;
+
+    case MD_PROP_SUMMARY:
+        g_value_set_string (value, self->summary);
+        break;
+
+    case MD_PROP_TRACKER:
+        g_value_set_string (value, self->tracker);
         break;
 
     default:
@@ -152,11 +201,59 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
     object_class->dispose = modulemd_modulemetadata_dispose;
     object_class->finalize = modulemd_modulemetadata_finalize;
 
+    md_properties[MD_PROP_COMMUNITY] =
+	    g_param_spec_string ("community",
+                             "Module Community",
+                             "A string property representing a link to the "
+                             "upstream community for this module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
+    md_properties[MD_PROP_DESC] =
+	    g_param_spec_string ("description",
+                             "Module Description",
+                             "A string property representing a detailed "
+                             "description of the module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
+    md_properties[MD_PROP_DOCS] =
+	    g_param_spec_string ("documentation",
+                             "Module Documentation",
+                             "A string property representing a link to the "
+                             "upstream documentation for this module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
     md_properties[MD_PROP_NAME] =
-	    g_param_spec_string ("name",
+        g_param_spec_string ("name",
                              "Module Name",
                              "A string property representing the name of "
                              "the module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
+    md_properties[MD_PROP_STREAM] =
+	    g_param_spec_string ("stream",
+                             "Module Stream",
+                             "A string property representing the stream name "
+                             "of the module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
+    md_properties[MD_PROP_SUMMARY] =
+	    g_param_spec_string ("summary",
+                             "Module Short Description",
+                             "A string property representing a short summary "
+                             "of the module.",
+                             "",
+                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
+    md_properties[MD_PROP_TRACKER] =
+	    g_param_spec_string ("tracker",
+                             "Module Bug Tracker",
+                             "A string property representing a link to the "
+                             "upstream bug tracker for this module.",
                              "",
                              G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
 

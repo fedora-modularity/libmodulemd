@@ -4,8 +4,8 @@ libmodulemd_@API_VERSION@_la_SOURCES = \
 	modulemd-version.h \
 	modulemd.h \
 	modulemd.c \
-	modulemd-modulemetadata.h \
-	modulemd-modulemetadata.c \
+	modulemd-metadata.h \
+	modulemd-metadata.c \
 	$(NULL)
 
 libmodulemd_@API_VERSION@_la_CFLAGS = \
@@ -33,15 +33,15 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 if HAVE_INTROSPECTION
 introspection_sources = modulemd.h \
 			modulemd.c \
-			modulemd-modulemetadata.h \
-			modulemd-modulemetadata.c
+			modulemd-metadata.h \
+			modulemd-metadata.c
 
-modulemd-@API_VERSION@.gir: libmodulemd-@API_VERSION@.la
-modulemd_@API_VERSION@_gir_INCLUDES = GObject-2.0
-modulemd_@API_VERSION@_gir_CFLAGS = $(INCLUDES)
-modulemd_@API_VERSION@_gir_LIBS = libmodulemd-@API_VERSION@.la
-modulemd_@API_VERSION@_gir_FILES = $(introspection_sources)
-INTROSPECTION_GIRS += modulemd-@API_VERSION@.gir
+Modulemd-@API_VERSION@.gir: libmodulemd-@API_VERSION@.la
+Modulemd_@API_VERSION@_gir_INCLUDES = GObject-2.0
+Modulemd_@API_VERSION@_gir_CFLAGS = $(INCLUDES)
+Modulemd_@API_VERSION@_gir_LIBS = libmodulemd-@API_VERSION@.la
+Modulemd_@API_VERSION@_gir_FILES = $(introspection_sources)
+INTROSPECTION_GIRS += Modulemd-@API_VERSION@.gir
 
 girdir = $(datadir)/gir-1.0
 gir_DATA = $(INTROSPECTION_GIRS)

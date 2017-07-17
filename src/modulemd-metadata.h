@@ -30,9 +30,9 @@
 G_BEGIN_DECLS
 
 #define MODULEMD_TYPE_MODULEMETADATA modulemd_modulemetadata_get_type ()
-G_DECLARE_FINAL_TYPE (ModuleMetadata, modulemd_modulemetadata, MODULEMD, MODULEMETADATA, GObject)
+G_DECLARE_FINAL_TYPE (ModulemdMetadata, modulemd_metadata, MODULEMD, METADATA, GObject)
 
-ModuleMetadata *modulemd_modulemetadata_new (void);
+ModulemdMetadata *modulemd_metadata_new (void);
 
 G_END_DECLS
 

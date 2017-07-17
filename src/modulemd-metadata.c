@@ -1,4 +1,4 @@
-/* modulemd-modulemetadata.c
+/* modulemd-ModulemdMetadata.c
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,7 +22,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "modulemd-modulemetadata.h"
+#include "modulemd-metadata.h"
 #include <glib.h>
 #include <yaml.h>
 
@@ -53,7 +53,7 @@ struct modulemd_component {
 
 };
 
-struct _ModuleMetadata
+struct _ModulemdMetadata
 {
     GObject parent_instance;
 
@@ -77,15 +77,15 @@ struct _ModuleMetadata
     GHashTable *components;
 };
 
-G_DEFINE_TYPE (ModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ModulemdMetadata, modulemd_metadata, G_TYPE_OBJECT)
 
 static void
-modulemd_modulemetadata_set_property (GObject *gobject,
+modulemd_metadata_set_property (GObject *gobject,
                                       guint property_id,
                                       const GValue *value,
                                       GParamSpec *pspec)
 {
-    ModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
+    ModulemdMetadata *self = MODULEMD_METADATA(gobject);
 
     switch (property_id) {
     case MD_PROP_NAME:
@@ -100,7 +100,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
 }
 
 static void
-modulemd_modulemetadata_get_property (GObject *gobject,
+modulemd_metadata_get_property (GObject *gobject,
                                       guint property_id,
                                       GValue *value,
                                       GParamSpec *pspec)
@@ -108,30 +108,30 @@ modulemd_modulemetadata_get_property (GObject *gobject,
 }
 
 static void
-modulemd_modulemetadata_dispose (GObject *gobject)
+modulemd_metadata_dispose (GObject *gobject)
 {
-    G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->dispose (gobject);
+    G_OBJECT_CLASS (modulemd_metadata_parent_class)->dispose (gobject);
 }
 
 static void
-modulemd_modulemetadata_finalize (GObject *gobject)
+modulemd_metadata_finalize (GObject *gobject)
 {
-    ModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
+    ModulemdMetadata *self = MODULEMD_METADATA(gobject);
     g_clear_pointer (&self->name, g_free);
 
-    G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->finalize (gobject);
+    G_OBJECT_CLASS (modulemd_metadata_parent_class)->finalize (gobject);
 }
 
 static void
-modulemd_modulemetadata_class_init (ModuleMetadataClass *klass)
+modulemd_metadata_class_init (ModulemdMetadataClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-    object_class->set_property = modulemd_modulemetadata_set_property;
-    object_class->get_property = modulemd_modulemetadata_get_property;
+    object_class->set_property = modulemd_metadata_set_property;
+    object_class->get_property = modulemd_metadata_get_property;
 
-    object_class->dispose = modulemd_modulemetadata_dispose;
-    object_class->finalize = modulemd_modulemetadata_finalize;
+    object_class->dispose = modulemd_metadata_dispose;
+    object_class->finalize = modulemd_metadata_finalize;
 
     md_properties[MD_PROP_NAME] =
 	    g_param_spec_string ("name",
@@ -148,22 +148,22 @@ modulemd_modulemetadata_class_init (ModuleMetadataClass *klass)
 }
 
 static void
-modulemd_modulemetadata_init (ModuleMetadata *self)
+modulemd_metadata_init (ModulemdMetadata *self)
 {
 }
 
 /**
- * modulemd_modulemetadata_new:
+ * modulemd_metadata_new:
  *
- * Allocates a new #ModuleMetadata.
+ * Allocates a new #ModulemdMetadata.
  *
- * Return value: a new #ModuleMetadata.
+ * Return value: a new #ModulemdMetadata.
  */
-ModuleMetadata *
-modulemd_modulemetadata_new (void)
+ModulemdMetadata *
+modulemd_metadata_new (void)
 {
-    ModuleMetadata *md;
+    ModulemdMetadata *md;
 
-    md = g_object_new (modulemd_modulemetadata_get_type(), NULL);
+    md = g_object_new (modulemd_metadata_get_type(), NULL);
     return md;
 }

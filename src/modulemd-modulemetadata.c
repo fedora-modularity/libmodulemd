@@ -207,7 +207,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a link to the "
                              "upstream community for this module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_DESC] =
 	    g_param_spec_string ("description",
@@ -215,7 +215,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a detailed "
                              "description of the module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_DOCS] =
 	    g_param_spec_string ("documentation",
@@ -223,7 +223,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a link to the "
                              "upstream documentation for this module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_NAME] =
         g_param_spec_string ("name",
@@ -231,7 +231,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing the name of "
                              "the module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_STREAM] =
 	    g_param_spec_string ("stream",
@@ -239,7 +239,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing the stream name "
                              "of the module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_SUMMARY] =
 	    g_param_spec_string ("summary",
@@ -247,7 +247,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a short summary "
                              "of the module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_TRACKER] =
 	    g_param_spec_string ("tracker",
@@ -255,7 +255,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a link to the "
                              "upstream bug tracker for this module.",
                              "",
-                             G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     g_object_class_install_properties (
         object_class,

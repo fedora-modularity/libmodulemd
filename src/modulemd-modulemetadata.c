@@ -316,3 +316,14 @@ modulemd_modulemetadata_new (void)
     md = g_object_new (modulemd_modulemetadata_get_type(), NULL);
     return md;
 }
+
+/**
+ * modulemd_modulemetadata_free:
+ *
+ * Frees a #ModulemdModuleMetadata.
+ */
+void
+modulemd_modulemetadata_free (ModulemdModuleMetadata *md)
+{
+    g_object_unref(md);
+}

@@ -34,6 +34,7 @@ G_DECLARE_FINAL_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata,
                       MODULEMD, MODULEMETADATA, GObject)
 
 ModulemdModuleMetadata *modulemd_modulemetadata_new (void);
+void modulemd_modulemetadata_free (ModulemdModuleMetadata *md);
 
 void
 modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,

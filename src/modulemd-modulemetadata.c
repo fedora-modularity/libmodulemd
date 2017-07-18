@@ -56,7 +56,6 @@ enum
 
 static GParamSpec *md_properties[MD_N_PROPERTIES] = { NULL, };
 
-
 struct _ModulemdModuleMetadata
 {
     GObject parent_instance;
@@ -86,6 +85,41 @@ struct _ModulemdModuleMetadata
 
 G_DEFINE_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)
 
+/**
+ * modulemd_module_set_community:
+ * @community: the module community.
+ *
+ * Sets the "community" property.
+ */
+void
+modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
+                                       const gchar *community)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (g_strcmp0(self->community, community) != 0) {
+        g_free (self->community);
+        self->community = g_strdup (community);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_COMMUNITY]);
+    }
+}
+
+/**
+ * modulemd_module_get_community:
+ *
+ * Retrieves the "community" for modulemd.
+ *
+ * Returns: A string containing the "community" property.
+ */
+const gchar *
+modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    return self->community;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -97,8 +131,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
     switch (property_id) {
     /* Simple string properties */
     case MD_PROP_COMMUNITY:
-        g_clear_pointer (&self->community, g_free);
-        self->community = g_value_dup_string (value);
+        modulemd_modulemetadata_set_community(self, g_value_get_string(value));
         break;
     case MD_PROP_DESC:
         g_clear_pointer (&self->description, g_free);
@@ -142,7 +175,7 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     switch (property_id) {
     /* Simple string properties */
     case MD_PROP_COMMUNITY:
-        g_value_set_string (value, self->community);
+        g_value_set_string (value, modulemd_modulemetadata_get_community(self));
         break;
 
     case MD_PROP_DESC:

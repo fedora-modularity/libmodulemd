@@ -35,6 +35,13 @@ G_DECLARE_FINAL_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata,
 
 ModulemdModuleMetadata *modulemd_modulemetadata_new (void);
 
+void
+modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
+                                       const gchar *community);
+
+const gchar *
+modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULEMETADATA_H */

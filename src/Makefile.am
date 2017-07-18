@@ -24,6 +24,23 @@ libmodulemd_@API_VERSION@_la_LDFLAGS = \
 	$(WARN_LDFLAGS) \
 	$(NULL)
 
+check_PROGRAMS = \
+	test_modulemd_modulemetadata
+
+test_modulemd_modulemetadata_SOURCES = \
+	test-modulemd-modulemetadata.c
+
+test_modulemd_modulemetadata_CFLAGS = \
+	$(GOBJECT_CFLAGS) \
+	$(WARN_CFLAGS) \
+	$(NULL)
+test_modulemd_modulemetadata_LDFLAGS = \
+	$(WARN_LDFLAGS) \
+	libmodulemd-@API_VERSION@.la \
+	$(NULL)
+
+TESTS = test_modulemd_modulemetadata
+
 -include $(top_srcdir)/git.mk
 
 CLEANFILES =

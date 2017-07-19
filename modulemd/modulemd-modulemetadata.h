@@ -71,6 +71,13 @@ modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
 const gchar *
 modulemd_modulemetadata_get_stream (ModulemdModuleMetadata *self);
 
+void
+modulemd_modulemetadata_set_summary (ModulemdModuleMetadata *self,
+                                     const gchar *summary);
+
+const gchar *
+modulemd_modulemetadata_get_summary (ModulemdModuleMetadata *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULEMETADATA_H */

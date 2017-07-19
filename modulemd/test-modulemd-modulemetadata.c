@@ -63,6 +63,24 @@ modulemd_modulemetadata_test_community(ModuleMetadataFixture *fixture,
     g_assert_cmpstr(modulemd_modulemetadata_get_community(md), ==, NULL);
 }
 
+static void
+modulemd_modulemetadata_test_description(ModuleMetadataFixture *fixture,
+                                         gconstpointer user_data)
+{
+    ModulemdModuleMetadata *md = fixture->md;
+
+    /* Should be initialized to NULL */
+    g_assert_cmpstr(modulemd_modulemetadata_get_description(md), ==, NULL);
+
+    /* Assign a valid string */
+    modulemd_modulemetadata_set_description(md, "ModuleDesc");
+    g_assert_cmpstr(modulemd_modulemetadata_get_description(md), ==, "ModuleDesc");
+
+    /* Reassign it to NULL */
+    modulemd_modulemetadata_set_description(md, NULL);
+    g_assert_cmpstr(modulemd_modulemetadata_get_description(md), ==, NULL);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -77,6 +95,11 @@ main (int argc, char *argv[])
               modulemd_modulemetadata_set_up,
               modulemd_modulemetadata_test_community,
               modulemd_modulemetadata_tear_down);
+  g_test_add ("/modulemd/modulemetadata/test_prop_description",
+          ModuleMetadataFixture, NULL,
+          modulemd_modulemetadata_set_up,
+          modulemd_modulemetadata_test_description,
+          modulemd_modulemetadata_tear_down);
 
   return g_test_run ();
 }

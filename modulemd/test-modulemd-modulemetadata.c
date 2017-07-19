@@ -102,28 +102,28 @@ modulemd_modulemetadata_test_documentation(ModuleMetadataFixture *fixture,
 int
 main (int argc, char *argv[])
 {
-  setlocale (LC_ALL, "");
+    setlocale (LC_ALL, "");
 
-  g_test_init (&argc, &argv, NULL);
-  g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
+    g_test_init (&argc, &argv, NULL);
+    g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
-  // Define the tests.
-  g_test_add ("/modulemd/modulemetadata/test_prop_community",
-              ModuleMetadataFixture, NULL,
-              modulemd_modulemetadata_set_up,
-              modulemd_modulemetadata_test_community,
-              modulemd_modulemetadata_tear_down);
-  g_test_add ("/modulemd/modulemetadata/test_prop_description",
-          ModuleMetadataFixture, NULL,
-          modulemd_modulemetadata_set_up,
-          modulemd_modulemetadata_test_description,
-          modulemd_modulemetadata_tear_down);
+    // Define the tests.
+    g_test_add ("/modulemd/modulemetadata/test_prop_community",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_community,
+                modulemd_modulemetadata_tear_down);
+    g_test_add ("/modulemd/modulemetadata/test_prop_description",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_description,
+                modulemd_modulemetadata_tear_down);
 
-  g_test_add ("/modulemd/modulemetadata/test_prop_documentation",
-      ModuleMetadataFixture, NULL,
-      modulemd_modulemetadata_set_up,
-      modulemd_modulemetadata_test_documentation,
-      modulemd_modulemetadata_tear_down);
+    g_test_add ("/modulemd/modulemetadata/test_prop_documentation",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_documentation,
+                modulemd_modulemetadata_tear_down);
 
-  return g_test_run ();
+    return g_test_run ();
 }

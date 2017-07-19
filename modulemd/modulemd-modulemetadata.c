@@ -190,6 +190,41 @@ modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self)
     return self->documentation;
 }
 
+/**
+ * modulemd_module_set_name:
+ * @community: the module name.
+ *
+ * Sets the "name" property.
+ */
+void
+modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
+                                  const gchar *name)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (g_strcmp0(self->name, name) != 0) {
+        g_free (self->name);
+        self->name = g_strdup (name);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_NAME]);
+    }
+}
+
+/**
+ * modulemd_module_get_name:
+ *
+ * Retrieves the "name" for modulemd.
+ *
+ * Returns: A string containing the "name" property.
+ */
+const gchar *
+modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    return self->name;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -210,8 +245,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
         modulemd_modulemetadata_set_documentation(self, g_value_get_string(value));
         break;
     case MD_PROP_NAME:
-        g_clear_pointer (&self->name, g_free);
-        self->name = g_value_dup_string (value);
+        modulemd_modulemetadata_set_name(self, g_value_get_string(value));
         break;
     case MD_PROP_STREAM:
         g_clear_pointer (&self->stream, g_free);
@@ -258,7 +292,8 @@ modulemd_modulemetadata_get_property (GObject *gobject,
         break;
 
     case MD_PROP_NAME:
-        g_value_set_string (value, self->name);
+        g_value_set_string (value,
+                            modulemd_modulemetadata_get_name(self));
         break;
 
     case MD_PROP_STREAM:

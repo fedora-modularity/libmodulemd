@@ -295,6 +295,41 @@ modulemd_modulemetadata_get_summary (ModulemdModuleMetadata *self)
     return self->summary;
 }
 
+/**
+ * modulemd_module_set_tracker:
+ * @community: the module tracker.
+ *
+ * Sets the "tracker" property.
+ */
+void
+modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
+                                     const gchar *tracker)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (g_strcmp0(self->tracker, tracker) != 0) {
+        g_free (self->tracker);
+        self->tracker = g_strdup (tracker);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_TRACKER]);
+    }
+}
+
+/**
+ * modulemd_module_get_tracker:
+ *
+ * Retrieves the "tracker" for modulemd.
+ *
+ * Returns: A string containing the "tracker" property.
+ */
+const gchar *
+modulemd_modulemetadata_get_tracker (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    return self->tracker;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -324,8 +359,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
         modulemd_modulemetadata_set_summary(self, g_value_get_string(value));
         break;
     case MD_PROP_TRACKER:
-        g_clear_pointer (&self->tracker, g_free);
-        self->tracker = g_value_dup_string (value);
+        modulemd_modulemetadata_set_tracker(self, g_value_get_string(value));
         break;
 
     default:
@@ -375,7 +409,8 @@ modulemd_modulemetadata_get_property (GObject *gobject,
         break;
 
     case MD_PROP_TRACKER:
-        g_value_set_string (value, self->tracker);
+        g_value_set_string (value,
+                            modulemd_modulemetadata_get_tracker(self));
         break;
 
     default:

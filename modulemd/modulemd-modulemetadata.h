@@ -78,6 +78,13 @@ modulemd_modulemetadata_set_summary (ModulemdModuleMetadata *self,
 const gchar *
 modulemd_modulemetadata_get_summary (ModulemdModuleMetadata *self);
 
+void
+modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
+                                     const gchar *tracker);
+
+const gchar *
+modulemd_modulemetadata_get_tracker (ModulemdModuleMetadata *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULEMETADATA_H */

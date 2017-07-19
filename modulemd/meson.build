@@ -12,6 +12,9 @@ modulemd_lib = library(
         gobject,
     ],
     install : true,
+    soversion: '0',
+    version: '0.1.0',
+
 )
 
 test_modulemd_modulemetadata = executable(

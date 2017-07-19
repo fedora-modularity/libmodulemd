@@ -155,6 +155,41 @@ modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self)
     return self->description;
 }
 
+/**
+ * modulemd_module_set_documentation:
+ * @community: the module documentation.
+ *
+ * Sets the "documentation" property.
+ */
+void
+modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
+                                           const gchar *documentation)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (g_strcmp0(self->documentation, documentation) != 0) {
+        g_free (self->documentation);
+        self->documentation = g_strdup (documentation);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_DOCS]);
+    }
+}
+
+/**
+ * modulemd_module_get_documentation:
+ *
+ * Retrieves the "documentation" for modulemd.
+ *
+ * Returns: A string containing the "documentation" property.
+ */
+const gchar *
+modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    return self->documentation;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -172,8 +207,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
         modulemd_modulemetadata_set_description(self, g_value_get_string(value));
         break;
     case MD_PROP_DOCS:
-        g_clear_pointer (&self->documentation, g_free);
-        self->documentation = g_value_dup_string (value);
+        modulemd_modulemetadata_set_documentation(self, g_value_get_string(value));
         break;
     case MD_PROP_NAME:
         g_clear_pointer (&self->name, g_free);
@@ -219,7 +253,8 @@ modulemd_modulemetadata_get_property (GObject *gobject,
         break;
 
     case MD_PROP_DOCS:
-        g_value_set_string (value, self->documentation);
+        g_value_set_string (value,
+                            modulemd_modulemetadata_get_documentation(self));
         break;
 
     case MD_PROP_NAME:

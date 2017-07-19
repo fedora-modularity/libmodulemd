@@ -29,11 +29,6 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_INSIDE
-# include "modulemd-version.h"
-#undef MODULEMD_INSIDE
-
-
 
 G_END_DECLS
 

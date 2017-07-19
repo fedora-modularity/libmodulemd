@@ -83,7 +83,7 @@ modulemd_modulemetadata_test_description(ModuleMetadataFixture *fixture,
 
 static void
 modulemd_modulemetadata_test_documentation(ModuleMetadataFixture *fixture,
-                                         gconstpointer user_data)
+                                           gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -101,7 +101,7 @@ modulemd_modulemetadata_test_documentation(ModuleMetadataFixture *fixture,
 
 static void
 modulemd_modulemetadata_test_name(ModuleMetadataFixture *fixture,
-                                         gconstpointer user_data)
+                                  gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -115,6 +115,24 @@ modulemd_modulemetadata_test_name(ModuleMetadataFixture *fixture,
     /* Reassign it to NULL */
     modulemd_modulemetadata_set_name(md, NULL);
     g_assert_cmpstr(modulemd_modulemetadata_get_name(md), ==, NULL);
+}
+
+static void
+modulemd_modulemetadata_test_stream(ModuleMetadataFixture *fixture,
+                                    gconstpointer user_data)
+{
+    ModulemdModuleMetadata *md = fixture->md;
+
+    /* Should be initialized to NULL */
+    g_assert_cmpstr(modulemd_modulemetadata_get_stream(md), ==, NULL);
+
+    /* Assign a valid string */
+    modulemd_modulemetadata_set_stream(md, "ModuleStream");
+    g_assert_cmpstr(modulemd_modulemetadata_get_stream(md), ==, "ModuleStream");
+
+    /* Reassign it to NULL */
+    modulemd_modulemetadata_set_stream(md, NULL);
+    g_assert_cmpstr(modulemd_modulemetadata_get_stream(md), ==, NULL);
 }
 
 int
@@ -147,6 +165,12 @@ main (int argc, char *argv[])
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_name,
+                modulemd_modulemetadata_tear_down);
+
+    g_test_add ("/modulemd/modulemetadata/test_prop_stream",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_stream,
                 modulemd_modulemetadata_tear_down);
 
     return g_test_run ();

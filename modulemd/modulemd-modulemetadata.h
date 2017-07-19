@@ -52,17 +52,24 @@ modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self);
 
 void
 modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
-                                         const gchar *documentation);
+                                           const gchar *documentation);
 
 const gchar *
 modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self);
 
 void
 modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
-                                         const gchar *name);
+                                  const gchar *name);
 
 const gchar *
 modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self);
+
+void
+modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
+                                    const gchar *stream);
+
+const gchar *
+modulemd_modulemetadata_get_stream (ModulemdModuleMetadata *self);
 
 G_END_DECLS
 

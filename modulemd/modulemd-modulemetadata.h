@@ -43,6 +43,13 @@ modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
 const gchar *
 modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self);
 
+void
+modulemd_modulemetadata_set_description (ModulemdModuleMetadata *self,
+                                         const gchar *description);
+
+const gchar *
+modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULEMETADATA_H */

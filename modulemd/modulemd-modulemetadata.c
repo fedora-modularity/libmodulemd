@@ -120,6 +120,41 @@ modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self)
     return self->community;
 }
 
+/**
+ * modulemd_module_set_description:
+ * @community: the module description.
+ *
+ * Sets the "description" property.
+ */
+void
+modulemd_modulemetadata_set_description (ModulemdModuleMetadata *self,
+                                         const gchar *description)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (g_strcmp0(self->description, description) != 0) {
+        g_free (self->description);
+        self->description = g_strdup (description);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_DESC]);
+    }
+}
+
+/**
+ * modulemd_module_get_description:
+ *
+ * Retrieves the "description" for modulemd.
+ *
+ * Returns: A string containing the "description" property.
+ */
+const gchar *
+modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    return self->description;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -134,8 +169,7 @@ modulemd_modulemetadata_set_property (GObject *gobject,
         modulemd_modulemetadata_set_community(self, g_value_get_string(value));
         break;
     case MD_PROP_DESC:
-        g_clear_pointer (&self->description, g_free);
-        self->description = g_value_dup_string (value);
+        modulemd_modulemetadata_set_description(self, g_value_get_string(value));
         break;
     case MD_PROP_DOCS:
         g_clear_pointer (&self->documentation, g_free);
@@ -175,11 +209,13 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     switch (property_id) {
     /* Simple string properties */
     case MD_PROP_COMMUNITY:
-        g_value_set_string (value, modulemd_modulemetadata_get_community(self));
+        g_value_set_string (value,
+                            modulemd_modulemetadata_get_community(self));
         break;
 
     case MD_PROP_DESC:
-        g_value_set_string (value, self->description);
+        g_value_set_string (value,
+                            modulemd_modulemetadata_get_description(self));
         break;
 
     case MD_PROP_DOCS:

@@ -86,7 +86,7 @@ struct _ModulemdModuleMetadata
 G_DEFINE_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)
 
 /**
- * modulemd_module_set_community:
+ * modulemd_modulemetadata_set_community:
  * @community: the module community.
  *
  * Sets the "community" property.
@@ -106,7 +106,7 @@ modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_community:
+ * modulemd_modulemetadata_get_community:
  *
  * Retrieves the "community" for modulemd.
  *
@@ -121,8 +121,8 @@ modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_description:
- * @community: the module description.
+ * modulemd_modulemetadata_set_description:
+ * @description: the module description.
  *
  * Sets the "description" property.
  */
@@ -141,7 +141,7 @@ modulemd_modulemetadata_set_description (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_description:
+ * modulemd_modulemetadata_get_description:
  *
  * Retrieves the "description" for modulemd.
  *
@@ -156,8 +156,8 @@ modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_documentation:
- * @community: the module documentation.
+ * modulemd_modulemetadata_set_documentation:
+ * @documentation: the module documentation.
  *
  * Sets the "documentation" property.
  */
@@ -176,7 +176,7 @@ modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_documentation:
+ * modulemd_modulemetadata_get_documentation:
  *
  * Retrieves the "documentation" for modulemd.
  *
@@ -191,8 +191,8 @@ modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_name:
- * @community: the module name.
+ * modulemd_modulemetadata_set_name:
+ * @name: the module name.
  *
  * Sets the "name" property.
  */
@@ -211,7 +211,7 @@ modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_name:
+ * modulemd_modulemetadata_get_name:
  *
  * Retrieves the "name" for modulemd.
  *
@@ -226,8 +226,8 @@ modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_stream:
- * @community: the module stream.
+ * modulemd_modulemetadata_set_stream:
+ * @stream: the module stream.
  *
  * Sets the "stream" property.
  */
@@ -246,7 +246,7 @@ modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_stream:
+ * modulemd_modulemetadata_get_stream:
  *
  * Retrieves the "stream" for modulemd.
  *
@@ -261,8 +261,8 @@ modulemd_modulemetadata_get_stream (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_summary:
- * @community: the module summary.
+ * modulemd_modulemetadata_set_summary:
+ * @summary: the module summary.
  *
  * Sets the "summary" property.
  */
@@ -281,7 +281,7 @@ modulemd_modulemetadata_set_summary (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_summary:
+ * modulemd_modulemetadata_get_summary:
  *
  * Retrieves the "summary" for modulemd.
  *
@@ -296,8 +296,8 @@ modulemd_modulemetadata_get_summary (ModulemdModuleMetadata *self)
 }
 
 /**
- * modulemd_module_set_tracker:
- * @community: the module tracker.
+ * modulemd_modulemetadata_set_tracker:
+ * @tracker: the module tracker.
  *
  * Sets the "tracker" property.
  */
@@ -316,7 +316,7 @@ modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
 }
 
 /**
- * modulemd_module_get_tracker:
+ * modulemd_modulemetadata_get_tracker:
  *
  * Retrieves the "tracker" for modulemd.
  *

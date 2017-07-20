@@ -48,7 +48,7 @@ enum
     MD_PROP_STREAM,
     MD_PROP_SUMMARY,
     MD_PROP_TRACKER,
-    //MD_PROP_VERSION,
+    MD_PROP_VERSION,
     //MD_PROP_XMD,
 
     MD_N_PROPERTIES
@@ -79,7 +79,7 @@ struct _ModulemdModuleMetadata
     gchar *stream;
     gchar *summary;
     gchar *tracker;
-    // gint version;
+    guint64 version;
     // GHashTable *xmd;
 };
 
@@ -198,7 +198,7 @@ modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self)
  */
 void
 modulemd_modulemetadata_set_mdversion (ModulemdModuleMetadata *self,
-                                            const guint64 mdversion)
+                                       const guint64 mdversion)
 {
     g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
     if (self->mdversion != mdversion) {
@@ -363,6 +363,39 @@ modulemd_modulemetadata_get_tracker (ModulemdModuleMetadata *self)
     return self->tracker;
 }
 
+/**
+ * modulemd_modulemetadata_set_version
+ * @version: the module version
+ *
+ * Sets the "version" property.
+ */
+void
+modulemd_modulemetadata_set_version (ModulemdModuleMetadata *self,
+                                     const guint64 version)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+    if (self->version != version) {
+        self->version = version;
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_VERSION]);
+    }
+}
+
+/**
+ * modulemd_modulemetadata_get_version:
+ *
+ * Retrieves the "version" for modulemd.
+ *
+ * Returns: A 64-bit unsigned integer containing the "version" property.
+ */
+const guint64
+modulemd_modulemetadata_get_version (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), 0);
+
+    return self->version;
+}
+
 static void
 modulemd_modulemetadata_set_property (GObject *gobject,
                                       guint property_id,
@@ -372,30 +405,40 @@ modulemd_modulemetadata_set_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
-    /* Simple string properties */
     case MD_PROP_COMMUNITY:
         modulemd_modulemetadata_set_community(self, g_value_get_string(value));
         break;
+
     case MD_PROP_DESC:
         modulemd_modulemetadata_set_description(self, g_value_get_string(value));
         break;
+
     case MD_PROP_DOCS:
         modulemd_modulemetadata_set_documentation(self, g_value_get_string(value));
         break;
+
     case MD_PROP_MDVERSION:
         modulemd_modulemetadata_set_mdversion(self, g_value_get_uint64(value));
         break;
+
     case MD_PROP_NAME:
         modulemd_modulemetadata_set_name(self, g_value_get_string(value));
         break;
+
     case MD_PROP_STREAM:
         modulemd_modulemetadata_set_stream(self, g_value_get_string(value));
         break;
+
     case MD_PROP_SUMMARY:
         modulemd_modulemetadata_set_summary(self, g_value_get_string(value));
         break;
+
     case MD_PROP_TRACKER:
         modulemd_modulemetadata_set_tracker(self, g_value_get_string(value));
+        break;
+
+    case MD_PROP_VERSION:
+        modulemd_modulemetadata_set_version(self, g_value_get_uint64(value));
         break;
 
     default:
@@ -413,7 +456,6 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
-    /* Simple string properties */
     case MD_PROP_COMMUNITY:
         g_value_set_string (value,
                             modulemd_modulemetadata_get_community(self));
@@ -451,6 +493,11 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     case MD_PROP_TRACKER:
         g_value_set_string (value,
                             modulemd_modulemetadata_get_tracker(self));
+        break;
+
+    case MD_PROP_VERSION:
+        g_value_set_uint64 (value,
+                            modulemd_modulemetadata_get_version(self));
         break;
 
     default:
@@ -547,6 +594,13 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a link to the "
                              "upstream bug tracker for this module.",
                              "",
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+    md_properties[MD_PROP_VERSION] =
+	    g_param_spec_uint64 ("version",
+                             "Module Version",
+                             "An integer property representing the version of "
+                             "the module.",
+                             0, G_MAXUINT64, 0,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     g_object_class_install_properties (

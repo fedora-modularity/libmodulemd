@@ -91,6 +91,13 @@ modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
 const gchar *
 modulemd_modulemetadata_get_tracker (ModulemdModuleMetadata *self);
 
+void
+modulemd_modulemetadata_set_version (ModulemdModuleMetadata *self,
+                                     const guint64 version);
+
+const guint64
+modulemd_modulemetadata_get_version (ModulemdModuleMetadata *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULEMETADATA_H */

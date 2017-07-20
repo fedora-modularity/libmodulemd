@@ -189,6 +189,24 @@ modulemd_modulemetadata_test_tracker(ModuleMetadataFixture *fixture,
     g_assert_cmpstr(modulemd_modulemetadata_get_tracker(md), ==, NULL);
 }
 
+static void
+modulemd_modulemetadata_test_version(ModuleMetadataFixture *fixture,
+                                     gconstpointer user_data)
+{
+    ModulemdModuleMetadata *md = fixture->md;
+
+    /* Should be initialized to 0 */
+    g_assert_cmpuint(modulemd_modulemetadata_get_version(md), ==, 0);
+
+    /* Assign a valid version */
+    modulemd_modulemetadata_set_version(md, 1);
+    g_assert_cmpuint(modulemd_modulemetadata_get_version(md), ==, 1);
+
+    /* Reassign it to 0 */
+    modulemd_modulemetadata_set_version(md, 0);
+    g_assert_cmpuint(modulemd_modulemetadata_get_version(md), ==, 0);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -242,6 +260,12 @@ main (int argc, char *argv[])
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_tracker,
+                modulemd_modulemetadata_tear_down);
+
+    g_test_add ("/modulemd/modulemetadata/test_prop_version",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_version,
                 modulemd_modulemetadata_tear_down);
 
     return g_test_run ();

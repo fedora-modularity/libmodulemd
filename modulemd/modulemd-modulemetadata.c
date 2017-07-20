@@ -40,7 +40,7 @@ enum
     MD_PROP_DESC,
     MD_PROP_DOCS,
     //MD_PROP_FILTER,
-    //MD_PROP_MDVERSION,
+    MD_PROP_MDVERSION,
     //MD_PROP_MODULE_LIC,
     MD_PROP_NAME,
     //MD_PROP_PROFILES,
@@ -71,7 +71,7 @@ struct _ModulemdModuleMetadata
     gchar *description;
     gchar *documentation;
     // ModulemdModuleFilter *filter;
-    // gint mdversion;
+    guint64 mdversion;
     // gchar **module_licenses;
     gchar *name;
     // GHashTable *profiles;
@@ -188,6 +188,39 @@ modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self)
     g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
 
     return self->documentation;
+}
+
+/**
+ * modulemd_modulemetadata_set_mdversion
+ * @mdversion: the metadata version
+ *
+ * Sets the "mdversion" property.
+ */
+void
+modulemd_modulemetadata_set_mdversion (ModulemdModuleMetadata *self,
+                                            const guint64 mdversion)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+    if (self->mdversion != mdversion) {
+        self->mdversion = mdversion;
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_MDVERSION]);
+    }
+}
+
+/**
+ * modulemd_modulemetadata_get_mdversion:
+ *
+ * Retrieves the "mdversion" for modulemd.
+ *
+ * Returns: A 64-bit unsigned integer containing the "mdversion" property.
+ */
+const guint64
+modulemd_modulemetadata_get_mdversion (ModulemdModuleMetadata *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), 0);
+
+    return self->mdversion;
 }
 
 /**
@@ -349,6 +382,9 @@ modulemd_modulemetadata_set_property (GObject *gobject,
     case MD_PROP_DOCS:
         modulemd_modulemetadata_set_documentation(self, g_value_get_string(value));
         break;
+    case MD_PROP_MDVERSION:
+        modulemd_modulemetadata_set_mdversion(self, g_value_get_uint64(value));
+        break;
     case MD_PROP_NAME:
         modulemd_modulemetadata_set_name(self, g_value_get_string(value));
         break;
@@ -391,6 +427,10 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     case MD_PROP_DOCS:
         g_value_set_string (value,
                             modulemd_modulemetadata_get_documentation(self));
+        break;
+    case MD_PROP_MDVERSION:
+        g_value_set_uint64 (value,
+                            modulemd_modulemetadata_get_mdversion(self));
         break;
 
     case MD_PROP_NAME:
@@ -467,6 +507,14 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "A string property representing a link to the "
                              "upstream documentation for this module.",
                              "",
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+    md_properties[MD_PROP_MDVERSION] =
+	    g_param_spec_uint64 ("mdversion",
+                             "Module Metadata Version",
+                             "An int property representing the metadata "
+                             "format version used.",
+                             0, G_MAXUINT64, 0,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_NAME] =

@@ -57,6 +57,12 @@ modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
 const gchar *
 modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self);
 
+void modulemd_modulemetadata_set_mdversion (ModulemdModuleMetadata *self,
+                                            const guint64 mdversion);
+
+const guint64
+modulemd_modulemetadata_get_mdversion (ModulemdModuleMetadata *self);
+
 void
 modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
                                   const gchar *name);

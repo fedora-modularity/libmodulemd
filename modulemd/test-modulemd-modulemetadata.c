@@ -85,8 +85,8 @@ modulemd_modulemetadata_test_string_prop(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_community(ModuleMetadataFixture *fixture,
-                                       gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_community(ModuleMetadataFixture *fixture,
+                                               gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -103,8 +103,8 @@ modulemd_modulemetadata_test_community(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_description(ModuleMetadataFixture *fixture,
-                                         gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_description(ModuleMetadataFixture *fixture,
+                                                 gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -121,8 +121,8 @@ modulemd_modulemetadata_test_description(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_documentation(ModuleMetadataFixture *fixture,
-                                           gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_documentation(ModuleMetadataFixture *fixture,
+                                                   gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -139,8 +139,8 @@ modulemd_modulemetadata_test_documentation(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_mdversion(ModuleMetadataFixture *fixture,
-                                       gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_mdversion(ModuleMetadataFixture *fixture,
+                                               gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -157,8 +157,8 @@ modulemd_modulemetadata_test_mdversion(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_name(ModuleMetadataFixture *fixture,
-                                  gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_name(ModuleMetadataFixture *fixture,
+                                          gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -175,8 +175,8 @@ modulemd_modulemetadata_test_name(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_stream(ModuleMetadataFixture *fixture,
-                                    gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_stream(ModuleMetadataFixture *fixture,
+                                            gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -193,8 +193,8 @@ modulemd_modulemetadata_test_stream(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_summary(ModuleMetadataFixture *fixture,
-                                     gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_summary(ModuleMetadataFixture *fixture,
+                                             gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -211,8 +211,8 @@ modulemd_modulemetadata_test_summary(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_tracker(ModuleMetadataFixture *fixture,
-                                     gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_tracker(ModuleMetadataFixture *fixture,
+                                             gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -229,8 +229,8 @@ modulemd_modulemetadata_test_tracker(ModuleMetadataFixture *fixture,
 }
 
 static void
-modulemd_modulemetadata_test_version(ModuleMetadataFixture *fixture,
-                                     gconstpointer user_data)
+modulemd_modulemetadata_test_get_set_version(ModuleMetadataFixture *fixture,
+                                             gconstpointer user_data)
 {
     ModulemdModuleMetadata *md = fixture->md;
 
@@ -257,10 +257,10 @@ main (int argc, char *argv[])
     g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
     // Define the tests.
-    g_test_add ("/modulemd/modulemetadata/test_prop_community",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_community",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_community,
+                modulemd_modulemetadata_test_get_set_community,
                 modulemd_modulemetadata_tear_down);
 
     prop_string.property_name = "community";
@@ -272,51 +272,51 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_tear_down);
 
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_description",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_description",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_description,
+                modulemd_modulemetadata_test_get_set_description,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_documentation",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_documentation",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_documentation,
+                modulemd_modulemetadata_test_get_set_documentation,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_mdversion",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_mdversion",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_mdversion,
+                modulemd_modulemetadata_test_get_set_mdversion,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_name",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_name",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_name,
+                modulemd_modulemetadata_test_get_set_name,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_stream",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_stream",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_stream,
+                modulemd_modulemetadata_test_get_set_stream,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_summary",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_summary",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_summary,
+                modulemd_modulemetadata_test_get_set_summary,
                 modulemd_modulemetadata_tear_down);
-    g_test_add ("/modulemd/modulemetadata/test_prop_tracker",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_tracker",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_tracker,
+                modulemd_modulemetadata_test_get_set_tracker,
                 modulemd_modulemetadata_tear_down);
 
-    g_test_add ("/modulemd/modulemetadata/test_prop_version",
+    g_test_add ("/modulemd/modulemetadata/test_get_set_version",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
-                modulemd_modulemetadata_test_version,
+                modulemd_modulemetadata_test_get_set_version,
                 modulemd_modulemetadata_tear_down);
 
     return g_test_run ();

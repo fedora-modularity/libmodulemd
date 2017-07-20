@@ -31,6 +31,11 @@ typedef struct _ModuleMetadataFixture {
     ModulemdModuleMetadata *md;
 } ModuleMetadataFixture;
 
+typedef struct _ModuleMetadataPropString {
+    const gchar *property_name;
+    const gchar *test_str;
+} ModuleMetadataPropString;
+
 static void
 modulemd_modulemetadata_set_up(ModuleMetadataFixture *fixture,
                                gconstpointer user_data)
@@ -43,6 +48,40 @@ modulemd_modulemetadata_tear_down(ModuleMetadataFixture *fixture,
                                   gconstpointer user_data)
 {
     modulemd_modulemetadata_free(fixture->md);
+}
+
+static void
+modulemd_modulemetadata_test_string_prop(ModuleMetadataFixture *fixture,
+                                         gconstpointer user_data)
+{
+    GValue value = G_VALUE_INIT;
+    GValue ref_value = G_VALUE_INIT;
+    ModulemdModuleMetadata *md = fixture->md;
+    ModuleMetadataPropString *prop_ctx =
+        (ModuleMetadataPropString *)user_data;
+
+    g_value_init(&value, G_TYPE_STRING);
+    g_value_init(&ref_value, G_TYPE_STRING);
+    g_value_set_string(&ref_value, prop_ctx->test_str);
+
+    g_object_get_property(G_OBJECT(md), prop_ctx->property_name, &value);
+
+    /* Initial state should be NULL */
+    g_assert_cmpstr(g_value_get_string(&value), ==, NULL);
+    g_value_reset(&value);
+
+    /* Assign the test value */
+    g_object_set_property(G_OBJECT(md), "community", &ref_value);
+    g_value_reset(&value);
+
+    /* Verify that the value is now set */
+    g_object_get_property(G_OBJECT(md), "community", &value);
+    g_assert_cmpstr(g_value_get_string(&value),
+                    ==,
+                    g_value_get_string(&ref_value));
+
+    g_value_unset(&ref_value);
+    g_value_unset(&value);
 }
 
 static void
@@ -210,6 +249,8 @@ modulemd_modulemetadata_test_version(ModuleMetadataFixture *fixture,
 int
 main (int argc, char *argv[])
 {
+    ModuleMetadataPropString prop_string;
+
     setlocale (LC_ALL, "");
 
     g_test_init (&argc, &argv, NULL);
@@ -221,6 +262,16 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_community,
                 modulemd_modulemetadata_tear_down);
+
+    prop_string.property_name = "community";
+    prop_string.test_str = "MyCommunity";
+    g_test_add ("/modulemd/modulemetadata/test_prop_community",
+                ModuleMetadataFixture, &prop_string,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
+                modulemd_modulemetadata_tear_down);
+
+
     g_test_add ("/modulemd/modulemetadata/test_prop_description",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,

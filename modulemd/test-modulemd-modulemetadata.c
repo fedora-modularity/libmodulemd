@@ -249,7 +249,6 @@ modulemd_modulemetadata_test_get_set_version(ModuleMetadataFixture *fixture,
 int
 main (int argc, char *argv[])
 {
-    ModuleMetadataPropString prop_string;
 
     setlocale (LC_ALL, "");
 
@@ -263,10 +262,11 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_test_get_set_community,
                 modulemd_modulemetadata_tear_down);
 
-    prop_string.property_name = "community";
-    prop_string.test_str = "MyCommunity";
+    ModuleMetadataPropString community;
+    community.property_name = "community";
+    community.test_str = "MyCommunity";
     g_test_add ("/modulemd/modulemetadata/test_prop_community",
-                ModuleMetadataFixture, &prop_string,
+                ModuleMetadataFixture, &community,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_string_prop,
                 modulemd_modulemetadata_tear_down);
@@ -278,10 +278,28 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_test_get_set_description,
                 modulemd_modulemetadata_tear_down);
 
+    ModuleMetadataPropString desc;
+    desc.property_name = "description";
+    desc.test_str = "MyDescription";
+    g_test_add ("/modulemd/modulemetadata/test_prop_description",
+                ModuleMetadataFixture, &desc,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
+                modulemd_modulemetadata_tear_down);
+
     g_test_add ("/modulemd/modulemetadata/test_get_set_documentation",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_get_set_documentation,
+                modulemd_modulemetadata_tear_down);
+
+    ModuleMetadataPropString doc;
+    doc.property_name = "documentation";
+    doc.test_str = "MyDocumentation";
+    g_test_add ("/modulemd/modulemetadata/test_prop_documentation",
+                ModuleMetadataFixture, &doc,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
                 modulemd_modulemetadata_tear_down);
 
     g_test_add ("/modulemd/modulemetadata/test_get_set_mdversion",
@@ -296,10 +314,28 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_test_get_set_name,
                 modulemd_modulemetadata_tear_down);
 
+    ModuleMetadataPropString name;
+    name.property_name = "name";
+    name.test_str = "MyName";
+    g_test_add ("/modulemd/modulemetadata/test_prop_name",
+                ModuleMetadataFixture, &name,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
+                modulemd_modulemetadata_tear_down);
+
     g_test_add ("/modulemd/modulemetadata/test_get_set_stream",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_get_set_stream,
+                modulemd_modulemetadata_tear_down);
+
+    ModuleMetadataPropString stream;
+    stream.property_name = "stream";
+    stream.test_str = "MyStream";
+    g_test_add ("/modulemd/modulemetadata/test_prop_stream",
+                ModuleMetadataFixture, &stream,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
                 modulemd_modulemetadata_tear_down);
 
     g_test_add ("/modulemd/modulemetadata/test_get_set_summary",
@@ -307,10 +343,29 @@ main (int argc, char *argv[])
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_get_set_summary,
                 modulemd_modulemetadata_tear_down);
+
+    ModuleMetadataPropString summary;
+    summary.property_name = "summary";
+    summary.test_str = "MySummary";
+    g_test_add ("/modulemd/modulemetadata/test_prop_summary",
+                ModuleMetadataFixture, &summary,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
+                modulemd_modulemetadata_tear_down);
+
     g_test_add ("/modulemd/modulemetadata/test_get_set_tracker",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_get_set_tracker,
+                modulemd_modulemetadata_tear_down);
+
+    ModuleMetadataPropString tracker;
+    tracker.property_name = "tracker";
+    tracker.test_str = "MyTracker";
+    g_test_add ("/modulemd/modulemetadata/test_prop_tracker",
+                ModuleMetadataFixture, &tracker,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_string_prop,
                 modulemd_modulemetadata_tear_down);
 
     g_test_add ("/modulemd/modulemetadata/test_get_set_version",

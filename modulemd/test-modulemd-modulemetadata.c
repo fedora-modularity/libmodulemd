@@ -71,17 +71,84 @@ modulemd_modulemetadata_test_string_prop(ModuleMetadataFixture *fixture,
     g_value_reset(&value);
 
     /* Assign the test value */
-    g_object_set_property(G_OBJECT(md), "community", &ref_value);
+    g_object_set_property(G_OBJECT(md), prop_ctx->property_name, &ref_value);
     g_value_reset(&value);
 
     /* Verify that the value is now set */
-    g_object_get_property(G_OBJECT(md), "community", &value);
+    g_object_get_property(G_OBJECT(md), prop_ctx->property_name, &value);
     g_assert_cmpstr(g_value_get_string(&value),
                     ==,
                     g_value_get_string(&ref_value));
 
     g_value_unset(&ref_value);
     g_value_unset(&value);
+}
+
+static void
+modulemd_modulemetadata_test_get_set_buildrequires(ModuleMetadataFixture *fixture,
+                                                   gconstpointer user_data)
+{
+    GValue value = G_VALUE_INIT;
+    GValue *set_value;
+    ModulemdModuleMetadata *md = fixture->md;
+    GHashTable *htable;
+
+    /* Should be initialized to an empty hash table */
+    GHashTable *buildrequires = modulemd_modulemetadata_get_buildrequires(md);
+    g_assert_cmpint(g_hash_table_size(buildrequires), ==, 0);
+
+    /* Add a key and value using set_buildrequires() */
+    g_hash_table_insert(buildrequires, g_strdup("MyKey"), g_strdup("MyValue"));
+    modulemd_modulemetadata_set_buildrequires(md, buildrequires);
+
+    /* Verify the key and value with get_buildrequires() */
+    buildrequires = modulemd_modulemetadata_get_buildrequires(md);
+    g_assert_cmpint(g_hash_table_size(buildrequires), ==, 1);
+    g_assert_true(g_hash_table_contains(buildrequires, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(buildrequires, "MyKey"), ==, "MyValue");
+
+    /* Verify the key and value with properties */
+    g_value_init(&value, G_TYPE_HASH_TABLE);
+    g_object_get_property(G_OBJECT(md), "buildrequires", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 1);
+    g_assert_true(g_hash_table_contains(htable, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey"), ==, "MyValue");
+
+    /* Add a second key and value using set_buildrequires() */
+    g_hash_table_insert(buildrequires, g_strdup("MyKey2"), g_strdup("MyValue2"));
+    modulemd_modulemetadata_set_buildrequires(md, buildrequires);
+
+    /* Verify the second key and value with properties */
+    g_object_get_property(G_OBJECT(md), "buildrequires", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 2);
+    g_assert_true(g_hash_table_contains(htable, "MyKey2"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey2"), ==, "MyValue2");
+
+
+    /* Add a third key using the properties interface */
+    g_hash_table_insert(htable,
+                        g_strdup("MyKey3"),
+                        g_strdup("MyValue3"));
+
+    set_value = g_new0(GValue, 1);
+    g_value_init(set_value, G_TYPE_HASH_TABLE);
+    g_value_set_boxed(set_value, htable);
+    modulemd_modulemetadata_set_buildrequires(md, htable);
+
+    g_object_set_property(G_OBJECT(md), "buildrequires", set_value);
+
+    /* Verify the third key and value with get_buildrequires() */
+    buildrequires = modulemd_modulemetadata_get_buildrequires(md);
+    g_assert_cmpint(g_hash_table_size(buildrequires), ==, 3);
+    g_assert_true(g_hash_table_contains(buildrequires, "MyKey3"));
+    g_assert_cmpstr(g_hash_table_lookup(buildrequires, "MyKey3"),
+                    ==, "MyValue3");
 }
 
 static void
@@ -256,6 +323,13 @@ main (int argc, char *argv[])
     g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
     // Define the tests.
+
+    g_test_add ("/modulemd/modulemetadata/test_get_set_buildrequires",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_get_set_buildrequires,
+                modulemd_modulemetadata_tear_down);
+
     g_test_add ("/modulemd/modulemetadata/test_get_set_community",
                 ModuleMetadataFixture, NULL,
                 modulemd_modulemetadata_set_up,

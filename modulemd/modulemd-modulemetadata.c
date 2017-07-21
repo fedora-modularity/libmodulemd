@@ -33,7 +33,7 @@ enum
     //MD_PROP_API,
     //MD_PROP_ARTIFACTS,
     //MD_PROP_BUILDOPTS,
-    //MD_PROP_BUILDREQUIRES,
+    MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
     //MD_PROP_COMPONENTS,
     //MD_PROP_CONTENT_LIC,
@@ -64,7 +64,7 @@ struct _ModulemdModuleMetadata
     // ModulemdModuleAPI *api;
     // ModulemdModuleArtifacts *artifacts;
     // ModulemdModuleBuildopts *buildopts;
-    // GHashTable *buildrequires;
+    GHashTable *buildrequires;
     gchar *community;
     // ModulemdModuleComponents *components;
     // gchar **content_licenses;
@@ -84,6 +84,70 @@ struct _ModulemdModuleMetadata
 };
 
 G_DEFINE_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)
+
+static void modulemd_copy_htable_strings_iterator (gpointer key,
+                                                   gpointer value,
+                                                   gpointer userdata)
+{
+    GHashTable *new_table = (GHashTable *) userdata;
+    g_hash_table_insert(new_table,
+                        g_strdup((const gchar *)key),
+                        g_strdup((const gchar *)value));
+}
+
+static void
+modulemd_copy_htable_strings (GHashTable *from,
+                              GHashTable **to)
+{
+    GHashTable *new_table =
+        g_hash_table_new_full(g_str_hash, g_str_equal,
+                              g_free, g_free);
+
+    g_hash_table_foreach(from,
+                         modulemd_copy_htable_strings_iterator,
+                         new_table);
+
+    *to = new_table;
+}
+
+/**
+ * modulemd_modulemetadata_set_buildrequires:
+ * @buildrequires: (element-type utf8 utf8): The requirements to build this module
+ *
+ * Sets the 'buildrequires' property.
+ */
+void
+modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
+                                           GHashTable *buildrequires)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (buildrequires != self->buildrequires) {
+        g_hash_table_destroy (self->buildrequires);
+        modulemd_copy_htable_strings(buildrequires, &self->buildrequires);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_BUILDREQUIRES]);
+    }
+}
+
+/**
+ * modulemd_modulemetadata_get_buildrequires:
+ *
+ * Retrieves the "buildrequires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer full): A hash table containing
+ * the "buildrequires" property.
+ */
+GHashTable *
+modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self)
+{
+    GHashTable *new_table;
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    modulemd_copy_htable_strings(self->buildrequires, &new_table);
+
+    return new_table;
+}
 
 /**
  * modulemd_modulemetadata_set_community:
@@ -405,6 +469,11 @@ modulemd_modulemetadata_set_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
+    case MD_PROP_BUILDREQUIRES:
+        modulemd_modulemetadata_set_buildrequires(self,
+                                                  g_value_get_boxed(value));
+        break;
+
     case MD_PROP_COMMUNITY:
         modulemd_modulemetadata_set_community(self, g_value_get_string(value));
         break;
@@ -456,6 +525,11 @@ modulemd_modulemetadata_get_property (GObject *gobject,
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
 
     switch (property_id) {
+    case MD_PROP_BUILDREQUIRES:
+        g_value_set_boxed (value,
+                           modulemd_modulemetadata_get_buildrequires(self));
+        break;
+
     case MD_PROP_COMMUNITY:
         g_value_set_string (value,
                             modulemd_modulemetadata_get_community(self));
@@ -517,6 +591,7 @@ modulemd_modulemetadata_finalize (GObject *gobject)
 {
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
     g_clear_pointer (&self->name, g_free);
+    g_hash_table_destroy(self->buildrequires);
 
     G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->finalize (gobject);
 }
@@ -531,6 +606,16 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
 
     object_class->dispose = modulemd_modulemetadata_dispose;
     object_class->finalize = modulemd_modulemetadata_finalize;
+
+    md_properties[MD_PROP_BUILDREQUIRES] =
+        g_param_spec_boxed ("buildrequires",
+                            "Module BuildRequires",
+                            "A dictionary property representing the required "
+                            "build dependencies of the module. Keys are the "
+                            "required module names (strings), values are their "
+                            "required stream names (also strings).",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_COMMUNITY] =
 	    g_param_spec_string ("community",
@@ -612,6 +697,9 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
 static void
 modulemd_modulemetadata_init (ModulemdModuleMetadata *self)
 {
+    /* Allocate the hash table members */
+    self->buildrequires = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                                g_free, g_free);
 }
 
 /**

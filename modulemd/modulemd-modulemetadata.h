@@ -37,6 +37,13 @@ ModulemdModuleMetadata *modulemd_modulemetadata_new (void);
 void modulemd_modulemetadata_free (ModulemdModuleMetadata *md);
 
 void
+modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
+                                           GHashTable *buildrequires);
+
+GHashTable *
+modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self);
+
+void
 modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
                                        const gchar *community);
 

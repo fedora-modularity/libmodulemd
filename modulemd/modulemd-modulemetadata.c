@@ -464,6 +464,12 @@ modulemd_modulemetadata_finalize (GObject *object)
   ModulemdModuleMetadata *self = (ModulemdModuleMetadata *)object;
 
   g_clear_pointer (&self->name, g_free);
+  g_clear_pointer (&self->stream, g_free);
+  g_clear_pointer (&self->summary, g_free);
+  g_clear_pointer (&self->description, g_free);
+  g_clear_pointer (&self->community, g_free);
+  g_clear_pointer (&self->documentation, g_free);
+  g_clear_pointer (&self->tracker, g_free);
   g_hash_table_destroy (self->buildrequires);
 
   G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->finalize (object);

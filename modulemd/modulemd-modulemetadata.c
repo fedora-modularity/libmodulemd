@@ -60,29 +60,6 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 
-static void
-modulemd_copy_htable_strings_iterator (gpointer key,
-                                       gpointer value,
-                                       gpointer userdata)
-{
-  GHashTable *new_table = (GHashTable *)userdata;
-  g_hash_table_insert (new_table,
-                       g_strdup ((const gchar *)key),
-                       g_strdup ((const gchar *)value));
-}
-
-static void
-modulemd_copy_htable_strings (GHashTable  *from,
-                              GHashTable **to)
-{
-  GHashTable *new_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                 g_free, g_free);
-
-  g_hash_table_foreach (from, modulemd_copy_htable_strings_iterator, new_table);
-
-  *to = new_table;
-}
-
 /**
  * modulemd_modulemetadata_get_mdversion:
  *
@@ -410,18 +387,15 @@ modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
  *
  * Retrieves the "buildrequires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer full): A hash table containing
- * the "buildrequires" property.
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "buildrequires" property.
  */
 GHashTable *
 modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self)
 {
-  GHashTable *new_table;
   g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
 
-  modulemd_copy_htable_strings (self->buildrequires, &new_table);
-
-  return new_table;
+  return g_hash_table_ref (self->buildrequires);
 }
 
 /**
@@ -435,11 +409,12 @@ modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
                                            GHashTable             *buildrequires)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (buildrequires);
 
-  if (buildrequires != self->buildrequires)
+  if (self->buildrequires != buildrequires)
     {
-      g_hash_table_destroy (self->buildrequires);
-      modulemd_copy_htable_strings (buildrequires, &self->buildrequires);
+      g_hash_table_unref (self->buildrequires);
+      self->buildrequires = g_hash_table_ref (buildrequires);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 properties [PROP_BUILDREQUIRES]);
     }

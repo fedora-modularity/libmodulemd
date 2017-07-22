@@ -470,7 +470,7 @@ modulemd_modulemetadata_finalize (GObject *object)
   g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->documentation, g_free);
   g_clear_pointer (&self->tracker, g_free);
-  g_hash_table_destroy (self->buildrequires);
+  g_clear_pointer (&self->buildrequires, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->finalize (object);
 }

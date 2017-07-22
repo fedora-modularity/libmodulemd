@@ -1,6 +1,7 @@
 /* modulemd.h
  *
  * Copyright (C) 2017 Stephen Gallagher
+ * Copyright (C) 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -29,6 +30,7 @@
 
 G_BEGIN_DECLS
 
+#include "modulemd-modulemetadata.h"
 
 G_END_DECLS
 

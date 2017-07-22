@@ -1,6 +1,7 @@
-/* modulemd-metadata.h
+/* modulemd-modulemetadata.h
  *
  * Copyright (C) 2017 Stephen Gallagher
+ * Copyright (C) 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -29,81 +30,42 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_TYPE_MODULEMETADATA modulemd_modulemetadata_get_type ()
+#define MODULEMD_TYPE_MODULEMETADATA (modulemd_modulemetadata_get_type ())
+
 G_DECLARE_FINAL_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata,
                       MODULEMD, MODULEMETADATA, GObject)
 
-ModulemdModuleMetadata *modulemd_modulemetadata_new (void);
-void modulemd_modulemetadata_free (ModulemdModuleMetadata *md);
-
-void
-modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
-                                           GHashTable *buildrequires);
-
-GHashTable *
-modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
-                                       const gchar *community);
-
-const gchar *
-modulemd_modulemetadata_get_community (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_description (ModulemdModuleMetadata *self,
-                                         const gchar *description);
-
-const gchar *
-modulemd_modulemetadata_get_description (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
-                                           const gchar *documentation);
-
-const gchar *
-modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self);
-
-void modulemd_modulemetadata_set_mdversion (ModulemdModuleMetadata *self,
-                                            const guint64 mdversion);
-
-const guint64
-modulemd_modulemetadata_get_mdversion (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
-                                  const gchar *name);
-
-const gchar *
-modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
-                                    const gchar *stream);
-
-const gchar *
-modulemd_modulemetadata_get_stream (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_summary (ModulemdModuleMetadata *self,
-                                     const gchar *summary);
-
-const gchar *
-modulemd_modulemetadata_get_summary (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
-                                     const gchar *tracker);
-
-const gchar *
-modulemd_modulemetadata_get_tracker (ModulemdModuleMetadata *self);
-
-void
-modulemd_modulemetadata_set_version (ModulemdModuleMetadata *self,
-                                     const guint64 version);
-
-const guint64
-modulemd_modulemetadata_get_version (ModulemdModuleMetadata *self);
+ModulemdModuleMetadata *modulemd_modulemetadata_new               (void);
+guint64                 modulemd_modulemetadata_get_mdversion     (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_mdversion     (ModulemdModuleMetadata *self,
+                                                                   guint64                 mdversion);
+const gchar            *modulemd_modulemetadata_get_name          (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_name          (ModulemdModuleMetadata *self,
+                                                                   const gchar            *name);
+const gchar            *modulemd_modulemetadata_get_stream        (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_stream        (ModulemdModuleMetadata *self,
+                                                                   const gchar            *stream);
+guint64                 modulemd_modulemetadata_get_version       (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_version       (ModulemdModuleMetadata *self,
+                                                                   guint64                 version);
+const gchar            *modulemd_modulemetadata_get_summary       (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_summary       (ModulemdModuleMetadata *self,
+                                                                   const gchar            *summary);
+const gchar            *modulemd_modulemetadata_get_description   (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_description   (ModulemdModuleMetadata *self,
+                                                                   const gchar            *description);
+const gchar            *modulemd_modulemetadata_get_community     (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_community     (ModulemdModuleMetadata *self,
+                                                                   const gchar            *description);
+const gchar            *modulemd_modulemetadata_get_documentation (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
+                                                                   const gchar            *documentation);
+const gchar            *modulemd_modulemetadata_get_tracker       (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_tracker       (ModulemdModuleMetadata *self,
+                                                                   const gchar            *tracker);
+GHashTable             *modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self);
+void                    modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
+                                                                   GHashTable             *buildrequires);
 
 G_END_DECLS
 

@@ -17,6 +17,11 @@ modulemd_lib = library(
   version: '0.0.0',
 )
 
+install_headers(
+  modulemd_hdrs,
+  subdir : 'modulemd',
+)
+
 #test_modulemd_modulemetadata = executable(
 #  'test_modulemd_modulemetadata',
 #  'test-modulemd-modulemetadata.c',

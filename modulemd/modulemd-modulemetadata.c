@@ -121,6 +121,7 @@ modulemd_modulemetadata_set_name (ModulemdModuleMetadata *self,
                                   const gchar            *name)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (name);
 
   if (g_strcmp0 (self->name, name))
     {
@@ -157,6 +158,7 @@ modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
                                     const gchar            *stream)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (stream);
 
   if (g_strcmp0 (self->stream, stream))
     {
@@ -228,6 +230,7 @@ modulemd_modulemetadata_set_summary (ModulemdModuleMetadata *self,
                                      const gchar            *summary)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (summary);
 
   if (g_strcmp0 (self->summary, summary))
     {
@@ -264,6 +267,7 @@ modulemd_modulemetadata_set_description (ModulemdModuleMetadata *self,
                                          const gchar            *description)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (description);
 
   if (g_strcmp0 (self->description, description))
     {
@@ -300,6 +304,7 @@ modulemd_modulemetadata_set_community (ModulemdModuleMetadata *self,
                                        const gchar            *community)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (community);
 
   if (g_strcmp0 (self->community, community))
     {
@@ -336,6 +341,7 @@ modulemd_modulemetadata_set_documentation (ModulemdModuleMetadata *self,
                                            const gchar            *documentation)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (documentation);
 
   if (g_strcmp0 (self->documentation, documentation))
     {
@@ -372,6 +378,7 @@ modulemd_modulemetadata_set_tracker (ModulemdModuleMetadata *self,
                                      const gchar            *tracker)
 {
   g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+  g_return_if_fail (tracker);
 
   if (g_strcmp0 (self->tracker, tracker))
     {

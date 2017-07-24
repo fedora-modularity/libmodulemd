@@ -380,6 +380,73 @@ modulemd_module_test_get_set_version(ModuleFixture *fixture,
     g_assert_cmpuint(modulemd_module_get_version(md), ==, 0);
 }
 
+static void
+modulemd_module_test_get_set_xmd(ModuleFixture *fixture,
+                                      gconstpointer user_data)
+{
+    GValue value = G_VALUE_INIT;
+    GValue *set_value;
+    ModulemdModule *md = fixture->md;
+    GHashTable *htable;
+
+    /* Should be initialized to an empty hash table */
+    GHashTable *xmd = modulemd_module_get_xmd(md);
+    g_assert_cmpint(g_hash_table_size(xmd), ==, 0);
+
+    /* Add a key and value using set_xmd() */
+    g_hash_table_insert(xmd, g_strdup("MyKey"), g_strdup("MyValue"));
+    modulemd_module_set_xmd(md, xmd);
+
+    /* Verify the key and value with get_xmd() */
+    xmd = modulemd_module_get_xmd(md);
+    g_assert_cmpint(g_hash_table_size(xmd), ==, 1);
+    g_assert_true(g_hash_table_contains(xmd, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(xmd, "MyKey"), ==, "MyValue");
+
+    /* Verify the key and value with properties */
+    g_value_init(&value, G_TYPE_HASH_TABLE);
+    g_object_get_property(G_OBJECT(md), "xmd", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 1);
+    g_assert_true(g_hash_table_contains(htable, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey"), ==, "MyValue");
+
+    /* Add a second key and value using set_xmd() */
+    g_hash_table_insert(xmd, g_strdup("MyKey2"), g_strdup("MyValue2"));
+    modulemd_module_set_xmd(md, xmd);
+
+    /* Verify the second key and value with properties */
+    g_object_get_property(G_OBJECT(md), "xmd", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 2);
+    g_assert_true(g_hash_table_contains(htable, "MyKey2"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey2"), ==, "MyValue2");
+
+
+    /* Add a third key using the properties interface */
+    g_hash_table_insert(htable,
+                        g_strdup("MyKey3"),
+                        g_strdup("MyValue3"));
+
+    set_value = g_new0(GValue, 1);
+    g_value_init(set_value, G_TYPE_HASH_TABLE);
+    g_value_set_boxed(set_value, htable);
+    modulemd_module_set_xmd(md, htable);
+
+    g_object_set_property(G_OBJECT(md), "xmd", set_value);
+
+    /* Verify the third key and value with get_xmd() */
+    xmd = modulemd_module_get_xmd(md);
+    g_assert_cmpint(g_hash_table_size(xmd), ==, 3);
+    g_assert_true(g_hash_table_contains(xmd, "MyKey3"));
+    g_assert_cmpstr(g_hash_table_lookup(xmd, "MyKey3"),
+                    ==, "MyValue3");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -519,6 +586,12 @@ main (int argc, char *argv[])
                 ModuleFixture, NULL,
                 modulemd_module_set_up,
                 modulemd_module_test_get_set_version,
+                modulemd_module_tear_down);
+
+    g_test_add ("/modulemd/module/test_get_set_xmd",
+                ModuleFixture, NULL,
+                modulemd_module_set_up,
+                modulemd_module_test_get_set_xmd,
                 modulemd_module_tear_down);
 
     return g_test_run ();

@@ -49,7 +49,7 @@ enum
     MD_PROP_SUMMARY,
     MD_PROP_TRACKER,
     MD_PROP_VERSION,
-    //MD_PROP_XMD,
+    MD_PROP_XMD,
 
     MD_N_PROPERTIES
 };
@@ -471,6 +471,43 @@ modulemd_module_get_version (ModulemdModule *self)
     return self->version;
 }
 
+/**
+ * modulemd_module_set_xmd:
+ * @xmd: (element-type utf8 utf8): Extensible metadata block
+ *
+ * Sets the 'xmd' property.
+ */
+void
+modulemd_module_set_xmd (ModulemdModule *self,
+                         GHashTable *xmd)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (xmd);
+
+    if (xmd != self->xmd) {
+        g_hash_table_unref (self->xmd);
+        self->xmd = g_hash_table_ref (xmd);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_XMD]);
+    }
+}
+
+/**
+ * modulemd_module_get_xmd:
+ *
+ * Retrieves the "xmd" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "xmd" property.
+ */
+GHashTable *
+modulemd_module_get_xmd (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_hash_table_ref(self->xmd);
+}
+
 static void
 modulemd_module_set_property (GObject *gobject,
                               guint property_id,
@@ -522,6 +559,10 @@ modulemd_module_set_property (GObject *gobject,
 
     case MD_PROP_VERSION:
         modulemd_module_set_version(self, g_value_get_uint64(value));
+        break;
+
+    case MD_PROP_XMD:
+        modulemd_module_set_xmd(self, g_value_get_boxed(value));
         break;
 
     default:
@@ -593,6 +634,11 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_version(self));
         break;
 
+    case MD_PROP_XMD:
+        g_value_set_boxed (value,
+                           modulemd_module_get_xmd(self));
+        break;
+
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
         break;
@@ -612,6 +658,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->tracker, g_free);
     g_clear_pointer (&self->buildrequires, g_hash_table_unref);
     g_clear_pointer (&self->requires, g_hash_table_unref);
+    g_clear_pointer (&self->xmd, g_hash_table_unref);
 
     G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }
@@ -723,6 +770,17 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              0, G_MAXUINT64, 0,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    /**
+     * ModulemdModule:xmd: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     */
+    md_properties[MD_PROP_XMD] =
+        g_param_spec_boxed ("xmd",
+                            "Extensible Metadata Block",
+                            "A dictionary of user-defined keys and values. "
+                            "Optional.  Defaults to an empty dictionary. ",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     g_object_class_install_properties (
         object_class,
         MD_N_PROPERTIES,
@@ -735,8 +793,12 @@ modulemd_module_init (ModulemdModule *self)
     /* Allocate the hash table members */
     self->buildrequires = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
+
     self->requires = g_hash_table_new_full (g_str_hash, g_str_equal,
                                             g_free, g_free);
+
+    self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                       g_free, g_free);
 }
 
 /**

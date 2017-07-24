@@ -111,6 +111,13 @@ modulemd_module_set_version (ModulemdModule *self,
 const guint64
 modulemd_module_get_version (ModulemdModule *self);
 
+void
+modulemd_module_set_xmd (ModulemdModule *self,
+                         GHashTable *xmd);
+
+GHashTable *
+modulemd_module_get_xmd (ModulemdModule *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULE_H */

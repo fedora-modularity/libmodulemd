@@ -44,7 +44,7 @@ enum
     //MD_PROP_MODULE_LIC,
     MD_PROP_NAME,
     //MD_PROP_PROFILES,
-    //MD_PROP_REQUIRES,
+    MD_PROP_REQUIRES,
     MD_PROP_STREAM,
     MD_PROP_SUMMARY,
     MD_PROP_TRACKER,
@@ -75,7 +75,7 @@ struct _ModulemdModuleMetadata
     // gchar **module_licenses;
     gchar *name;
     // GHashTable *profiles;
-    // GHashTable *requires;
+    GHashTable *requires;
     gchar *stream;
     gchar *summary;
     gchar *tracker;
@@ -323,6 +323,45 @@ modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self)
 }
 
 /**
+ * modulemd_modulemetadata_set_requires:
+ * @requires: (element-type utf8 utf8): The requirements to run this module
+ *
+ * Sets the 'requires' property.
+ */
+void
+modulemd_modulemetadata_set_requires (ModulemdModuleMetadata *self,
+                                      GHashTable *requires)
+{
+    g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+
+    if (requires != self->requires) {
+        g_hash_table_destroy (self->requires);
+        modulemd_copy_htable_strings(requires, &self->requires);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_REQUIRES]);
+    }
+}
+
+/**
+ * modulemd_modulemetadata_get_requires:
+ *
+ * Retrieves the "requires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer full): A hash table containing
+ * the "requires" property.
+ */
+GHashTable *
+modulemd_modulemetadata_get_requires (ModulemdModuleMetadata *self)
+{
+    GHashTable *new_table;
+    g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
+
+    modulemd_copy_htable_strings(self->requires, &new_table);
+
+    return new_table;
+}
+
+/**
  * modulemd_modulemetadata_set_stream:
  * @stream: the module stream.
  *
@@ -494,6 +533,11 @@ modulemd_modulemetadata_set_property (GObject *gobject,
         modulemd_modulemetadata_set_name(self, g_value_get_string(value));
         break;
 
+    case MD_PROP_REQUIRES:
+        modulemd_modulemetadata_set_requires(self,
+                                             g_value_get_boxed(value));
+        break;
+
     case MD_PROP_STREAM:
         modulemd_modulemetadata_set_stream(self, g_value_get_string(value));
         break;
@@ -554,6 +598,11 @@ modulemd_modulemetadata_get_property (GObject *gobject,
                             modulemd_modulemetadata_get_name(self));
         break;
 
+    case MD_PROP_REQUIRES:
+        g_value_set_boxed (value,
+                           modulemd_modulemetadata_get_requires(self));
+        break;
+
     case MD_PROP_STREAM:
         g_value_set_string (value,
                             modulemd_modulemetadata_get_stream(self));
@@ -598,6 +647,7 @@ modulemd_modulemetadata_finalize (GObject *gobject)
     g_clear_pointer (&self->documentation, g_free);
     g_clear_pointer (&self->tracker, g_free);
     g_clear_pointer (&self->buildrequires, g_hash_table_unref);
+    g_clear_pointer (&self->requires, g_hash_table_unref);
 
     G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->finalize (gobject);
 }
@@ -666,6 +716,19 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "",
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    /**
+     * ModulemdModuleMetadata:requires: (type GLib.HashTable(utf8,utf8)) (transfer full)
+     */
+    md_properties[MD_PROP_REQUIRES] =
+        g_param_spec_boxed ("requires",
+                            "Module Requires",
+                            "A dictionary property representing the required "
+                            "dependencies of the module. Keys are the "
+                            "required module names (strings), values are their "
+                            "required stream names (also strings).",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_STREAM] =
 	    g_param_spec_string ("stream",
                              "Module Stream",
@@ -709,6 +772,8 @@ modulemd_modulemetadata_init (ModulemdModuleMetadata *self)
     /* Allocate the hash table members */
     self->buildrequires = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
+    self->requires = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                            g_free, g_free);
 }
 
 /**

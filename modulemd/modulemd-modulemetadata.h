@@ -77,6 +77,13 @@ const gchar *
 modulemd_modulemetadata_get_name (ModulemdModuleMetadata *self);
 
 void
+modulemd_modulemetadata_set_requires (ModulemdModuleMetadata *self,
+                                           GHashTable *requires);
+
+GHashTable *
+modulemd_modulemetadata_get_requires (ModulemdModuleMetadata *self);
+
+void
 modulemd_modulemetadata_set_stream (ModulemdModuleMetadata *self,
                                     const gchar *stream);
 

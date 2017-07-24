@@ -242,6 +242,73 @@ modulemd_modulemetadata_test_get_set_name(ModuleMetadataFixture *fixture,
 }
 
 static void
+modulemd_modulemetadata_test_get_set_requires(ModuleMetadataFixture *fixture,
+                                              gconstpointer user_data)
+{
+    GValue value = G_VALUE_INIT;
+    GValue *set_value;
+    ModulemdModuleMetadata *md = fixture->md;
+    GHashTable *htable;
+
+    /* Should be initialized to an empty hash table */
+    GHashTable *requires = modulemd_modulemetadata_get_requires(md);
+    g_assert_cmpint(g_hash_table_size(requires), ==, 0);
+
+    /* Add a key and value using set_requires() */
+    g_hash_table_insert(requires, g_strdup("MyKey"), g_strdup("MyValue"));
+    modulemd_modulemetadata_set_requires(md, requires);
+
+    /* Verify the key and value with get_requires() */
+    requires = modulemd_modulemetadata_get_requires(md);
+    g_assert_cmpint(g_hash_table_size(requires), ==, 1);
+    g_assert_true(g_hash_table_contains(requires, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(requires, "MyKey"), ==, "MyValue");
+
+    /* Verify the key and value with properties */
+    g_value_init(&value, G_TYPE_HASH_TABLE);
+    g_object_get_property(G_OBJECT(md), "requires", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 1);
+    g_assert_true(g_hash_table_contains(htable, "MyKey"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey"), ==, "MyValue");
+
+    /* Add a second key and value using set_requires() */
+    g_hash_table_insert(requires, g_strdup("MyKey2"), g_strdup("MyValue2"));
+    modulemd_modulemetadata_set_requires(md, requires);
+
+    /* Verify the second key and value with properties */
+    g_object_get_property(G_OBJECT(md), "requires", &value);
+    htable = g_value_get_boxed(&value);
+    g_value_reset(&value);
+
+    g_assert_cmpint(g_hash_table_size(htable), ==, 2);
+    g_assert_true(g_hash_table_contains(htable, "MyKey2"));
+    g_assert_cmpstr(g_hash_table_lookup(htable, "MyKey2"), ==, "MyValue2");
+
+
+    /* Add a third key using the properties interface */
+    g_hash_table_insert(htable,
+                        g_strdup("MyKey3"),
+                        g_strdup("MyValue3"));
+
+    set_value = g_new0(GValue, 1);
+    g_value_init(set_value, G_TYPE_HASH_TABLE);
+    g_value_set_boxed(set_value, htable);
+    modulemd_modulemetadata_set_requires(md, htable);
+
+    g_object_set_property(G_OBJECT(md), "requires", set_value);
+
+    /* Verify the third key and value with get_requires() */
+    requires = modulemd_modulemetadata_get_requires(md);
+    g_assert_cmpint(g_hash_table_size(requires), ==, 3);
+    g_assert_true(g_hash_table_contains(requires, "MyKey3"));
+    g_assert_cmpstr(g_hash_table_lookup(requires, "MyKey3"),
+                    ==, "MyValue3");
+}
+
+static void
 modulemd_modulemetadata_test_get_set_stream(ModuleMetadataFixture *fixture,
                                             gconstpointer user_data)
 {
@@ -395,6 +462,12 @@ main (int argc, char *argv[])
                 ModuleMetadataFixture, &name,
                 modulemd_modulemetadata_set_up,
                 modulemd_modulemetadata_test_string_prop,
+                modulemd_modulemetadata_tear_down);
+
+    g_test_add ("/modulemd/modulemetadata/test_get_set_requires",
+                ModuleMetadataFixture, NULL,
+                modulemd_modulemetadata_set_up,
+                modulemd_modulemetadata_test_get_set_requires,
                 modulemd_modulemetadata_tear_down);
 
     g_test_add ("/modulemd/modulemetadata/test_get_set_stream",

@@ -1,10 +1,10 @@
 modulemd_srcs = [
-    'modulemd-modulemetadata.c',
+    'modulemd-module.c',
 ]
 
 modulemd_hdrs = [
     'modulemd.h',
-    'modulemd-modulemetadata.h',
+    'modulemd-module.h',
 ]
 
 modulemd_lib = library(
@@ -24,16 +24,16 @@ install_headers(
   subdir : 'modulemd',
 )
 
-test_modulemd_modulemetadata = executable(
-    'test_modulemd_modulemetadata',
-    'test-modulemd-modulemetadata.c',
+test_modulemd_module = executable(
+    'test_modulemd_module',
+    'test-modulemd-module.c',
     link_with : modulemd_lib,
         dependencies : [
         gobject,
     ],
     install : false,
 )
-test('test_modulemd_modulemetadata', test_modulemd_modulemetadata)
+test('test_modulemd_module', test_modulemd_module)
 
 gnome.generate_gir(
     modulemd_lib,

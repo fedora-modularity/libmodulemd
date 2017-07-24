@@ -29,6 +29,7 @@
 
 G_BEGIN_DECLS
 
+#include "modulemd-module.h"
 
 G_END_DECLS
 

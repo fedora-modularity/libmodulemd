@@ -603,7 +603,7 @@ modulemd_modulemetadata_get_property (GObject *gobject,
 static void
 modulemd_modulemetadata_finalize (GObject *gobject)
 {
-    ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
+    ModulemdModuleMetadata *self = (ModulemdModuleMetadata *)gobject;
     g_clear_pointer (&self->name, g_free);
     g_clear_pointer (&self->stream, g_free);
     g_clear_pointer (&self->summary, g_free);
@@ -750,9 +750,6 @@ modulemd_modulemetadata_init (ModulemdModuleMetadata *self)
 ModulemdModuleMetadata *
 modulemd_modulemetadata_new (void)
 {
-    ModulemdModuleMetadata *md;
-
-    md = g_object_new (modulemd_modulemetadata_get_type(), NULL);
-    return md;
+    return g_object_new (MODULEMD_TYPE_MODULEMETADATA, NULL);
 }
 

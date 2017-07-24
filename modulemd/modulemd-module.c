@@ -61,16 +61,16 @@ struct _ModulemdModule
     GObject parent_instance;
 
     /* == Members == */
-    // ModulemdModuleAPI *api;
-    // ModulemdModuleArtifacts *artifacts;
-    // ModulemdModuleBuildopts *buildopts;
+    // ModulemdAPI *api;
+    // ModulemdArtifacts *artifacts;
+    // ModulemdBuildopts *buildopts;
     GHashTable *buildrequires;
     gchar *community;
-    // ModulemdModuleComponents *components;
+    // ModulemdComponents *components;
     // gchar **content_licenses;
     gchar *description;
     gchar *documentation;
-    // ModulemdModuleFilter *filter;
+    // ModulemdFilter *filter;
     guint64 mdversion;
     // gchar **module_licenses;
     gchar *name;

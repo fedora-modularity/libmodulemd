@@ -613,6 +613,9 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
     object_class->dispose = modulemd_modulemetadata_dispose;
     object_class->finalize = modulemd_modulemetadata_finalize;
 
+    /**
+     * ModulemdModuleMetadata:buildrequires: (type GLib.HashTable(utf8,utf8)) (transfer full)
+     */
     md_properties[MD_PROP_BUILDREQUIRES] =
         g_param_spec_boxed ("buildrequires",
                             "Module BuildRequires",

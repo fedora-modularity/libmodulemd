@@ -652,7 +652,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Community",
                              "A string property representing a link to the "
                              "upstream community for this module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_DESC] =
@@ -660,7 +660,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Description",
                              "A string property representing a detailed "
                              "description of the module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_DOCS] =
@@ -668,7 +668,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Documentation",
                              "A string property representing a link to the "
                              "upstream documentation for this module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_MDVERSION] =
@@ -684,7 +684,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Name",
                              "A string property representing the name of "
                              "the module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     /**
@@ -705,7 +705,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Stream",
                              "A string property representing the stream name "
                              "of the module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_SUMMARY] =
@@ -713,7 +713,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Short Description",
                              "A string property representing a short summary "
                              "of the module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_TRACKER] =
@@ -721,7 +721,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              "Module Bug Tracker",
                              "A string property representing a link to the "
                              "upstream bug tracker for this module.",
-                             "",
+                             NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
     md_properties[MD_PROP_VERSION] =
 	    g_param_spec_uint64 ("version",

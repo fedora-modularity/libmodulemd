@@ -85,31 +85,6 @@ struct _ModulemdModuleMetadata
 
 G_DEFINE_TYPE (ModulemdModuleMetadata, modulemd_modulemetadata, G_TYPE_OBJECT)
 
-static void modulemd_copy_htable_strings_iterator (gpointer key,
-                                                   gpointer value,
-                                                   gpointer userdata)
-{
-    GHashTable *new_table = (GHashTable *) userdata;
-    g_hash_table_insert(new_table,
-                        g_strdup((const gchar *)key),
-                        g_strdup((const gchar *)value));
-}
-
-static void
-modulemd_copy_htable_strings (GHashTable *from,
-                              GHashTable **to)
-{
-    GHashTable *new_table =
-        g_hash_table_new_full(g_str_hash, g_str_equal,
-                              g_free, g_free);
-
-    g_hash_table_foreach(from,
-                         modulemd_copy_htable_strings_iterator,
-                         new_table);
-
-    *to = new_table;
-}
-
 /**
  * modulemd_modulemetadata_set_buildrequires:
  * @buildrequires: (element-type utf8 utf8): The requirements to build this module
@@ -121,10 +96,11 @@ modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
                                            GHashTable *buildrequires)
 {
     g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+    g_return_if_fail (buildrequires);
 
     if (buildrequires != self->buildrequires) {
-        g_hash_table_destroy (self->buildrequires);
-        modulemd_copy_htable_strings(buildrequires, &self->buildrequires);
+        g_hash_table_unref (self->buildrequires);
+        self->buildrequires = g_hash_table_ref (buildrequires);
         g_object_notify_by_pspec (G_OBJECT(self),
                                   md_properties [MD_PROP_BUILDREQUIRES]);
     }
@@ -135,18 +111,15 @@ modulemd_modulemetadata_set_buildrequires (ModulemdModuleMetadata *self,
  *
  * Retrieves the "buildrequires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer full): A hash table containing
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table containing
  * the "buildrequires" property.
  */
 GHashTable *
 modulemd_modulemetadata_get_buildrequires (ModulemdModuleMetadata *self)
 {
-    GHashTable *new_table;
     g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
 
-    modulemd_copy_htable_strings(self->buildrequires, &new_table);
-
-    return new_table;
+    return g_hash_table_ref(self->buildrequires);
 }
 
 /**
@@ -333,10 +306,11 @@ modulemd_modulemetadata_set_requires (ModulemdModuleMetadata *self,
                                       GHashTable *requires)
 {
     g_return_if_fail (MODULEMD_IS_MODULEMETADATA (self));
+    g_return_if_fail (requires);
 
     if (requires != self->requires) {
-        g_hash_table_destroy (self->requires);
-        modulemd_copy_htable_strings(requires, &self->requires);
+        g_hash_table_unref (self->requires);
+        self->requires = g_hash_table_ref (requires);
         g_object_notify_by_pspec (G_OBJECT(self),
                                   md_properties [MD_PROP_REQUIRES]);
     }
@@ -347,18 +321,15 @@ modulemd_modulemetadata_set_requires (ModulemdModuleMetadata *self,
  *
  * Retrieves the "requires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer full): A hash table containing
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table containing
  * the "requires" property.
  */
 GHashTable *
 modulemd_modulemetadata_get_requires (ModulemdModuleMetadata *self)
 {
-    GHashTable *new_table;
     g_return_val_if_fail (MODULEMD_IS_MODULEMETADATA (self), NULL);
 
-    modulemd_copy_htable_strings(self->requires, &new_table);
-
-    return new_table;
+    return self->requires;
 }
 
 /**
@@ -664,7 +635,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
     object_class->finalize = modulemd_modulemetadata_finalize;
 
     /**
-     * ModulemdModuleMetadata:buildrequires: (type GLib.HashTable(utf8,utf8)) (transfer full)
+     * ModulemdModuleMetadata:buildrequires: (type GLib.HashTable(utf8,utf8)) (transfer container)
      */
     md_properties[MD_PROP_BUILDREQUIRES] =
         g_param_spec_boxed ("buildrequires",
@@ -717,7 +688,7 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     /**
-     * ModulemdModuleMetadata:requires: (type GLib.HashTable(utf8,utf8)) (transfer full)
+     * ModulemdModuleMetadata:requires: (type GLib.HashTable(utf8,utf8)) (transfer container)
      */
     md_properties[MD_PROP_REQUIRES] =
         g_param_spec_boxed ("requires",

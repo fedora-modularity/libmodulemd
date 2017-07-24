@@ -47,7 +47,7 @@ static void
 modulemd_modulemetadata_tear_down(ModuleMetadataFixture *fixture,
                                   gconstpointer user_data)
 {
-    modulemd_modulemetadata_free(fixture->md);
+    g_object_unref (fixture->md);
 }
 
 static void

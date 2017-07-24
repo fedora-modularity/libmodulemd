@@ -601,12 +601,6 @@ modulemd_modulemetadata_get_property (GObject *gobject,
 }
 
 static void
-modulemd_modulemetadata_dispose (GObject *gobject)
-{
-    G_OBJECT_CLASS (modulemd_modulemetadata_parent_class)->dispose (gobject);
-}
-
-static void
 modulemd_modulemetadata_finalize (GObject *gobject)
 {
     ModulemdModuleMetadata *self = MODULEMD_MODULEMETADATA(gobject);
@@ -631,7 +625,6 @@ modulemd_modulemetadata_class_init (ModulemdModuleMetadataClass *klass)
     object_class->set_property = modulemd_modulemetadata_set_property;
     object_class->get_property = modulemd_modulemetadata_get_property;
 
-    object_class->dispose = modulemd_modulemetadata_dispose;
     object_class->finalize = modulemd_modulemetadata_finalize;
 
     /**

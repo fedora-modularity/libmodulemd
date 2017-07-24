@@ -80,14 +80,15 @@ struct _ModulemdModule
     gchar *summary;
     gchar *tracker;
     guint64 version;
-    // GHashTable *xmd;
+    GHashTable *xmd;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
 
 /**
  * modulemd_module_set_buildrequires:
- * @buildrequires: (element-type utf8 utf8): The requirements to build this module
+ * @buildrequires: (element-type utf8 utf8): The requirements to build this
+ * module.
  *
  * Sets the 'buildrequires' property.
  */
@@ -111,8 +112,8 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
  *
  * Retrieves the "buildrequires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table containing
- * the "buildrequires" property.
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "buildrequires" property.
  */
 GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
@@ -321,8 +322,8 @@ modulemd_module_set_requires (ModulemdModule *self,
  *
  * Retrieves the "requires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table containing
- * the "requires" property.
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "requires" property.
  */
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)

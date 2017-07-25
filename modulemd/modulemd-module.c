@@ -573,9 +573,9 @@ modulemd_module_set_property (GObject *gobject,
 
 static void
 modulemd_module_get_property (GObject *gobject,
-                                      guint property_id,
-                                      GValue *value,
-                                      GParamSpec *pspec)
+                              guint property_id,
+                              GValue *value,
+                              GParamSpec *pspec)
 {
     ModulemdModule *self = MODULEMD_MODULE(gobject);
 

@@ -1,10 +1,12 @@
 modulemd_srcs = [
     'modulemd-module.c',
+    'modulemd-simpleset.c',
 ]
 
 modulemd_hdrs = [
     'modulemd.h',
     'modulemd-module.h',
+    'modulemd-simpleset.h',
 ]
 
 modulemd_lib = library(
@@ -34,6 +36,17 @@ test_modulemd_module = executable(
     install : false,
 )
 test('test_modulemd_module', test_modulemd_module)
+
+test_modulemd_simpleset = executable(
+    'test_modulemd_simpleset',
+    'test-modulemd-simpleset.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+    ],
+    install : false,
+)
+test('test_modulemd_simpleset', test_modulemd_simpleset)
 
 gnome.generate_gir(
     modulemd_lib,

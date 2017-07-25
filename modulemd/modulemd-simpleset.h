@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-simpleset.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,16 +22,29 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_SIMPLESET_H
+#define MODULEMD_SIMPLESET_H
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#include "modulemd-module.h"
-#include "modulemd-simpleset.h"
+#define MODULEMD_TYPE_SIMPLESET modulemd_simpleset_get_type()
+G_DECLARE_FINAL_TYPE (ModulemdSimpleSet, modulemd_simpleset,
+                      MODULEMD, SIMPLESET, GObject)
+
+ModulemdSimpleSet *modulemd_simpleset_new (void);
+
+gboolean
+modulemd_simpleset_contains (ModulemdSimpleSet *self,
+                             const gchar       *value);
+
+void
+modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self,
+                                const gchar **strv);
+gchar **
+modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* MODULEMD_SIMPLESET_H */

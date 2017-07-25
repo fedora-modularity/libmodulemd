@@ -22,7 +22,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "modulemd-module.h"
+#include "modulemd.h"
 #include <glib.h>
 #include <yaml.h>
 

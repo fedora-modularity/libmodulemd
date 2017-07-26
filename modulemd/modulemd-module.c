@@ -30,7 +30,6 @@ enum
 {
     MD_PROP_0,
 
-    //MD_PROP_ARTIFACTS,
     //MD_PROP_BUILDOPTS,
     MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
@@ -44,6 +43,7 @@ enum
     MD_PROP_NAME,
     //MD_PROP_PROFILES,
     MD_PROP_RPM_API,
+    MD_PROP_RPM_ARTIFACTS,
     MD_PROP_REQUIRES,
     MD_PROP_STREAM,
     MD_PROP_SUMMARY,
@@ -61,7 +61,6 @@ struct _ModulemdModule
     GObject parent_instance;
 
     /* == Members == */
-    // ModulemdArtifacts *artifacts;
     // ModulemdBuildopts *buildopts;
     GHashTable *buildrequires;
     gchar *community;
@@ -76,6 +75,7 @@ struct _ModulemdModule
     // GHashTable *profiles;
     GHashTable *requires;
     ModulemdSimpleSet *rpm_api;
+    ModulemdSimpleSet *rpm_artifacts;
     gchar *stream;
     gchar *summary;
     gchar *tracker;
@@ -448,6 +448,44 @@ modulemd_module_get_rpm_api (ModulemdModule *self)
 }
 
 /**
+ * modulemd_module_set_rpm_artifacts:
+ * @artifacts: A #ModuleSimpleSet: The set of binary RPM packages that are
+ * contained in this module. Generally populated by the module build service.
+ *
+ * Sets the rpm_artifacts property.
+ */
+void
+modulemd_module_set_rpm_artifacts (ModulemdModule *self,
+                                   ModulemdSimpleSet *artifacts)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (MODULEMD_IS_SIMPLESET (artifacts));
+
+    /* TODO: Test for differences before replacing */
+    g_object_unref (self->rpm_artifacts);
+    self->rpm_artifacts = g_object_ref (artifacts);
+
+    g_object_notify_by_pspec (G_OBJECT(self),
+                              md_properties [MD_PROP_RPM_ARTIFACTS]);
+}
+
+/**
+ * modulemd_module_get_rpm_artifacts:
+ *
+ * Retrieves the "rpm_artifacts" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of binary RPMs
+ * contained in this module.
+ */
+ModulemdSimpleSet *
+modulemd_module_get_rpm_artifacts (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_object_ref(self->rpm_artifacts);
+}
+
+/**
  * modulemd_module_set_stream:
  * @stream: the module stream.
  *
@@ -672,6 +710,10 @@ modulemd_module_set_property (GObject *gobject,
         modulemd_module_set_rpm_api (self, g_value_get_object(value));
         break;
 
+    case MD_PROP_RPM_ARTIFACTS:
+        modulemd_module_set_rpm_artifacts (self, g_value_get_object(value));
+        break;
+
     case MD_PROP_STREAM:
         modulemd_module_set_stream (self, g_value_get_string(value));
         break;
@@ -756,6 +798,11 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_rpm_api(self));
         break;
 
+    case MD_PROP_RPM_ARTIFACTS:
+        g_value_set_object (value,
+                            modulemd_module_get_rpm_artifacts(self));
+        break;
+
     case MD_PROP_STREAM:
         g_value_set_string (value,
                             modulemd_module_get_stream(self));
@@ -804,6 +851,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->content_licenses, g_object_unref);
     g_clear_pointer (&self->module_licenses, g_object_unref);
     g_clear_pointer (&self->rpm_api, g_object_unref);
+    g_clear_pointer (&self->rpm_artifacts, g_object_unref);
 
     G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }
@@ -908,6 +956,14 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              MODULEMD_TYPE_SIMPLESET,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    md_properties[MD_PROP_RPM_ARTIFACTS] =
+        g_param_spec_object ("rpm-artifacts",
+                             "Module artifacts - RPMs",
+                             "The RPMs that make up the output artifacts for "
+                             "this module.",
+                             MODULEMD_TYPE_SIMPLESET,
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_STREAM] =
 	    g_param_spec_string ("stream",
                              "Module Stream",
@@ -970,6 +1026,7 @@ modulemd_module_init (ModulemdModule *self)
                                             g_free, g_free);
 
     self->rpm_api = modulemd_simpleset_new ();
+    self->rpm_artifacts = modulemd_simpleset_new ();
 
     self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal,
                                        g_free, g_free);

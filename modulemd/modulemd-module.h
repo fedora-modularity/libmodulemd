@@ -26,6 +26,7 @@
 #define MODULEMD_MODULE_H
 
 #include <glib-object.h>
+#include "modulemd-simpleset.h"
 
 G_BEGIN_DECLS
 
@@ -48,6 +49,13 @@ modulemd_module_set_community (ModulemdModule *self,
 
 const gchar *
 modulemd_module_get_community (ModulemdModule *self);
+
+void
+modulemd_module_set_content_licenses (ModulemdModule *self,
+                                      ModulemdSimpleSet *licenses);
+
+ModulemdSimpleSet *
+modulemd_module_get_content_licenses (ModulemdModule *self);
 
 void
 modulemd_module_set_description (ModulemdModule *self,

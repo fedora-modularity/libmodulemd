@@ -36,7 +36,7 @@ enum
     MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
     //MD_PROP_COMPONENTS,
-    //MD_PROP_CONTENT_LIC,
+    MD_PROP_CONTENT_LIC,
     MD_PROP_DESC,
     MD_PROP_DOCS,
     //MD_PROP_FILTER,
@@ -67,7 +67,7 @@ struct _ModulemdModule
     GHashTable *buildrequires;
     gchar *community;
     // ModulemdComponents *components;
-    // gchar **content_licenses;
+    ModulemdSimpleSet *content_licenses;
     gchar *description;
     gchar *documentation;
     // ModulemdFilter *filter;
@@ -156,6 +156,44 @@ modulemd_module_get_community (ModulemdModule *self)
     g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
     return self->community;
+}
+
+/**
+ * modulemd_module_set_content_licenses:
+ * @licenses: A #ModuleSimpleSet: The licenses under which the components of
+ * this module are released.
+ *
+ * Sets the content_licenses property.
+ */
+void
+modulemd_module_set_content_licenses (ModulemdModule *self,
+                                      ModulemdSimpleSet *licenses)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (MODULEMD_IS_SIMPLESET (licenses));
+
+    /* TODO: Test for differences before replacing */
+    g_object_unref (self->content_licenses);
+    self->content_licenses = g_object_ref (licenses);
+
+    g_object_notify_by_pspec (G_OBJECT(self),
+                              md_properties [MD_PROP_CONTENT_LIC]);
+}
+
+/**
+ * modulemd_module_get_content_licenses:
+ *
+ * Retrieves the "content_licenses" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of licenses in the
+ * "content_licenses" property.
+ */
+ModulemdSimpleSet *
+modulemd_module_get_content_licenses (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_object_ref(self->content_licenses);
 }
 
 /**
@@ -525,6 +563,11 @@ modulemd_module_set_property (GObject *gobject,
         modulemd_module_set_community(self, g_value_get_string(value));
         break;
 
+    case MD_PROP_CONTENT_LIC:
+        modulemd_module_set_content_licenses (self,
+                                              g_value_get_object(value));
+        break;
+
     case MD_PROP_DESC:
         modulemd_module_set_description(self, g_value_get_string(value));
         break;
@@ -588,6 +631,11 @@ modulemd_module_get_property (GObject *gobject,
     case MD_PROP_COMMUNITY:
         g_value_set_string (value,
                             modulemd_module_get_community(self));
+        break;
+
+    case MD_PROP_CONTENT_LIC:
+        g_value_set_object (value,
+                            modulemd_module_get_content_licenses(self));
         break;
 
     case MD_PROP_DESC:
@@ -659,6 +707,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->buildrequires, g_hash_table_unref);
     g_clear_pointer (&self->requires, g_hash_table_unref);
     g_clear_pointer (&self->xmd, g_hash_table_unref);
+    g_clear_pointer (&self->content_licenses, g_object_unref);
 
     G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }
@@ -692,6 +741,14 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              "A string property representing a link to the "
                              "upstream community for this module.",
                              NULL,
+                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+    md_properties[MD_PROP_CONTENT_LIC] =
+        g_param_spec_object ("content-licenses",
+                             "Module Content Licenses",
+                             "The set of licenses under which the contents "
+                             "of this module are released.",
+                             MODULEMD_TYPE_SIMPLESET,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     md_properties[MD_PROP_DESC] =
@@ -790,9 +847,11 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
 static void
 modulemd_module_init (ModulemdModule *self)
 {
-    /* Allocate the hash table members */
+    /* Allocate the members */
     self->buildrequires = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
+
+    self->content_licenses = modulemd_simpleset_new ();
 
     self->requires = g_hash_table_new_full (g_str_hash, g_str_equal,
                                             g_free, g_free);

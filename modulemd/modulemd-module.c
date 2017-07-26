@@ -594,11 +594,11 @@ modulemd_module_set_property (GObject *gobject,
 
     switch (property_id) {
     case MD_PROP_BUILDREQUIRES:
-        modulemd_module_set_buildrequires(self, g_value_get_boxed(value));
+        modulemd_module_set_buildrequires (self, g_value_get_boxed(value));
         break;
 
     case MD_PROP_COMMUNITY:
-        modulemd_module_set_community(self, g_value_get_string(value));
+        modulemd_module_set_community (self, g_value_get_string(value));
         break;
 
     case MD_PROP_CONTENT_LIC:
@@ -607,40 +607,39 @@ modulemd_module_set_property (GObject *gobject,
         break;
 
     case MD_PROP_DESC:
-        modulemd_module_set_description(self, g_value_get_string(value));
+        modulemd_module_set_description (self, g_value_get_string(value));
         break;
 
     case MD_PROP_DOCS:
-        modulemd_module_set_documentation(self, g_value_get_string(value));
+        modulemd_module_set_documentation (self, g_value_get_string(value));
         break;
 
     case MD_PROP_MDVERSION:
-        modulemd_module_set_mdversion(self, g_value_get_uint64(value));
+        modulemd_module_set_mdversion (self, g_value_get_uint64(value));
         break;
 
     case MD_PROP_MODULE_LIC:
-        modulemd_module_set_module_licenses (self,
-                                             g_value_get_object(value));
+        modulemd_module_set_module_licenses (self, g_value_get_object(value));
         break;
 
     case MD_PROP_NAME:
-        modulemd_module_set_name(self, g_value_get_string(value));
+        modulemd_module_set_name (self, g_value_get_string(value));
         break;
 
     case MD_PROP_REQUIRES:
-        modulemd_module_set_requires(self, g_value_get_boxed(value));
+        modulemd_module_set_requires (self, g_value_get_boxed(value));
         break;
 
     case MD_PROP_STREAM:
-        modulemd_module_set_stream(self, g_value_get_string(value));
+        modulemd_module_set_stream (self, g_value_get_string(value));
         break;
 
     case MD_PROP_SUMMARY:
-        modulemd_module_set_summary(self, g_value_get_string(value));
+        modulemd_module_set_summary (self, g_value_get_string(value));
         break;
 
     case MD_PROP_TRACKER:
-        modulemd_module_set_tracker(self, g_value_get_string(value));
+        modulemd_module_set_tracker (self, g_value_get_string(value));
         break;
 
     case MD_PROP_VERSION:
@@ -648,7 +647,7 @@ modulemd_module_set_property (GObject *gobject,
         break;
 
     case MD_PROP_XMD:
-        modulemd_module_set_xmd(self, g_value_get_boxed(value));
+        modulemd_module_set_xmd (self, g_value_get_boxed(value));
         break;
 
     default:

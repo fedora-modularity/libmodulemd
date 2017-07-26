@@ -78,6 +78,13 @@ const guint64
 modulemd_module_get_mdversion (ModulemdModule *self);
 
 void
+modulemd_module_set_module_licenses (ModulemdModule *self,
+                                      ModulemdSimpleSet *licenses);
+
+ModulemdSimpleSet *
+modulemd_module_get_module_licenses (ModulemdModule *self);
+
+void
 modulemd_module_set_name (ModulemdModule *self,
                           const gchar *name);
 

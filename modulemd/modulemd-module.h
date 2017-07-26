@@ -113,6 +113,13 @@ ModulemdSimpleSet *
 modulemd_module_get_rpm_artifacts (ModulemdModule *self);
 
 void
+modulemd_module_set_rpm_buildopts (ModulemdModule *self,
+                                   GHashTable *buildopts);
+
+GHashTable *
+modulemd_module_get_rpm_buildopts (ModulemdModule *self);
+
+void
 modulemd_module_set_rpm_filter (ModulemdModule *self,
                                 ModulemdSimpleSet *filter);
 

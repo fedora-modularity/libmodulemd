@@ -30,7 +30,6 @@ enum
 {
     MD_PROP_0,
 
-    //MD_PROP_BUILDOPTS,
     MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
     //MD_PROP_COMPONENTS,
@@ -43,6 +42,7 @@ enum
     //MD_PROP_PROFILES,
     MD_PROP_RPM_API,
     MD_PROP_RPM_ARTIFACTS,
+    MD_PROP_RPM_BUILDOPTS,
     MD_PROP_RPM_FILTER,
     MD_PROP_REQUIRES,
     MD_PROP_STREAM,
@@ -61,7 +61,6 @@ struct _ModulemdModule
     GObject parent_instance;
 
     /* == Members == */
-    // ModulemdBuildopts *buildopts;
     GHashTable *buildrequires;
     gchar *community;
     // ModulemdComponents *components;
@@ -75,6 +74,7 @@ struct _ModulemdModule
     GHashTable *requires;
     ModulemdSimpleSet *rpm_api;
     ModulemdSimpleSet *rpm_artifacts;
+    GHashTable *rpm_buildopts;
     ModulemdSimpleSet *rpm_filter;
     gchar *stream;
     gchar *summary;
@@ -485,6 +485,47 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
     return g_object_ref(self->rpm_artifacts);
 }
 
+
+/**
+ * modulemd_module_set_rpm_buildopts:
+ * @buildopts: (element-type utf8 utf8) (transfer container): A dictionary of
+ * build options to pass to rpmbuild. Currently the only recognized key is
+ * "macros".
+ *
+ * Sets the 'rpm-buildopts' property.
+ */
+void
+modulemd_module_set_rpm_buildopts (ModulemdModule *self,
+                                   GHashTable *buildopts)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (buildopts);
+
+    if (buildopts != self->rpm_buildopts) {
+        g_hash_table_unref (self->rpm_buildopts);
+        self->rpm_buildopts = g_hash_table_ref (buildopts);
+
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_RPM_BUILDOPTS]);
+    }
+}
+
+/**
+ * modulemd_module_get_rpm_buildopts:
+ *
+ * Retrieves the "rpm-buildopts" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "rpm-buildopts" property.
+ */
+GHashTable *
+modulemd_module_get_rpm_buildopts (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_hash_table_ref(self->rpm_buildopts);
+}
+
 /**
  * modulemd_module_set_rpm_filter:
  * @filter: A #ModuleSimpleSet: The set of binary RPM packages that are
@@ -752,6 +793,10 @@ modulemd_module_set_property (GObject *gobject,
         modulemd_module_set_rpm_artifacts (self, g_value_get_object(value));
         break;
 
+    case MD_PROP_RPM_BUILDOPTS:
+        modulemd_module_set_rpm_buildopts (self, g_value_get_boxed(value));
+        break;
+
     case MD_PROP_RPM_FILTER:
         modulemd_module_set_rpm_filter (self, g_value_get_object(value));
         break;
@@ -850,6 +895,11 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_rpm_filter(self));
         break;
 
+    case MD_PROP_RPM_BUILDOPTS:
+        g_value_set_boxed (value,
+                           modulemd_module_get_rpm_buildopts(self));
+        break;
+
     case MD_PROP_STREAM:
         g_value_set_string (value,
                             modulemd_module_get_stream(self));
@@ -900,6 +950,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->rpm_api, g_object_unref);
     g_clear_pointer (&self->rpm_artifacts, g_object_unref);
     g_clear_pointer (&self->rpm_filter, g_object_unref);
+    g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
 
     G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }
@@ -1012,6 +1063,19 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              MODULEMD_TYPE_SIMPLESET,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    /**
+     * ModulemdModule:rpm-buildopts: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     */
+    md_properties[MD_PROP_RPM_BUILDOPTS] =
+        g_param_spec_boxed ("rpm-buildopts",
+                            "RPM build options",
+                            "A dictionary of options to pass to RPM build. "
+                            "Currently the only supported key is \"macros\" "
+                            "which is used for specifying custom RPM build "
+                            "macros.",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_RPM_FILTER] =
         g_param_spec_object ("rpm-filter",
                              "Module filter - RPMs",
@@ -1083,6 +1147,8 @@ modulemd_module_init (ModulemdModule *self)
 
     self->rpm_api = modulemd_simpleset_new ();
     self->rpm_artifacts = modulemd_simpleset_new ();
+    self->rpm_buildopts = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                 g_free, g_free);
     self->rpm_filter = modulemd_simpleset_new ();
 
     self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal,

@@ -113,6 +113,13 @@ ModulemdSimpleSet *
 modulemd_module_get_rpm_artifacts (ModulemdModule *self);
 
 void
+modulemd_module_set_rpm_filter (ModulemdModule *self,
+                                ModulemdSimpleSet *filter);
+
+ModulemdSimpleSet *
+modulemd_module_get_rpm_filter (ModulemdModule *self);
+
+void
 modulemd_module_set_stream (ModulemdModule *self,
                             const gchar *stream);
 

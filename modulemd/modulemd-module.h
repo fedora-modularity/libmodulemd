@@ -99,6 +99,13 @@ GHashTable *
 modulemd_module_get_requires (ModulemdModule *self);
 
 void
+modulemd_module_set_rpm_api (ModulemdModule *self,
+                             ModulemdSimpleSet *apis);
+
+ModulemdSimpleSet *
+modulemd_module_get_rpm_api (ModulemdModule *self);
+
+void
 modulemd_module_set_stream (ModulemdModule *self,
                             const gchar *stream);
 

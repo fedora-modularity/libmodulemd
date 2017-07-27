@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-profile.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,17 +22,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_PROFILE_H
+#define MODULEMD_PROFILE_H
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#include "modulemd-module.h"
-#include "modulemd-profile.h"
-#include "modulemd-simpleset.h"
+#define MODULEMD_TYPE_PROFILE modulemd_profile_get_type()
+G_DECLARE_FINAL_TYPE (ModulemdProfile, modulemd_profile,
+                      MODULEMD, PROFILE, GObject)
+
+ModulemdProfile *modulemd_profile_new (void);
+
+void
+modulemd_profile_set_description (ModulemdProfile *self,
+                                  const gchar *description);
+
+const gchar *
+modulemd_profile_get_description (ModulemdProfile *self);
+
+void
+modulemd_profile_set_rpms (ModulemdProfile *self,
+                           ModulemdSimpleSet *rpms);
+
+ModulemdSimpleSet *
+modulemd_profile_get_rpms (ModulemdProfile *self);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* MODULEMD_PROFILE_H */

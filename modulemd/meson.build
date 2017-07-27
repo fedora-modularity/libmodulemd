@@ -1,11 +1,13 @@
 modulemd_srcs = [
     'modulemd-module.c',
+    'modulemd-profile.c',
     'modulemd-simpleset.c',
 ]
 
 modulemd_hdrs = [
     'modulemd.h',
     'modulemd-module.h',
+    'modulemd-profile.h',
     'modulemd-simpleset.h',
 ]
 

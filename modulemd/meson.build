@@ -1,4 +1,5 @@
 modulemd_srcs = [
+    'modulemd-component.c',
     'modulemd-module.c',
     'modulemd-profile.c',
     'modulemd-simpleset.c',
@@ -6,6 +7,7 @@ modulemd_srcs = [
 
 modulemd_hdrs = [
     'modulemd.h',
+    'modulemd-component.h',
     'modulemd-module.h',
     'modulemd-profile.h',
     'modulemd-simpleset.h',
@@ -27,6 +29,17 @@ install_headers(
   modulemd_hdrs,
   subdir : 'modulemd',
 )
+
+test_modulemd_component = executable(
+    'test_modulemd_component',
+    'test-modulemd-component.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+    ],
+    install : false,
+)
+test('test_modulemd_component', test_modulemd_component)
 
 test_modulemd_module = executable(
     'test_modulemd_module',

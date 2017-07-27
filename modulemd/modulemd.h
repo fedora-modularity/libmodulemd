@@ -29,6 +29,7 @@
 
 G_BEGIN_DECLS
 
+#include "modulemd-component.h"
 #include "modulemd-module.h"
 #include "modulemd-profile.h"
 #include "modulemd-simpleset.h"

@@ -211,7 +211,7 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
     object_class->finalize = modulemd_simpleset_finalize;
 
     /**
-     * ModulemdModule:strv: (type GLib.arrays(utf8)) (transfer container)
+     * SimpleSet:strv: (type GLib.arrays(utf8)) (transfer container)
      */
     set_properties[SET_PROP_STRV] =
         g_param_spec_boxed ("strv",

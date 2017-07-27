@@ -39,7 +39,7 @@ enum
     MD_PROP_MDVERSION,
     MD_PROP_MODULE_LIC,
     MD_PROP_NAME,
-    //MD_PROP_PROFILES,
+    MD_PROP_PROFILES,
     MD_PROP_RPM_API,
     MD_PROP_RPM_ARTIFACTS,
     MD_PROP_RPM_BUILDOPTS,
@@ -70,7 +70,7 @@ struct _ModulemdModule
     guint64 mdversion;
     ModulemdSimpleSet *module_licenses;
     gchar *name;
-    // GHashTable *profiles;
+    GHashTable *profiles;
     GHashTable *requires;
     ModulemdSimpleSet *rpm_api;
     ModulemdSimpleSet *rpm_artifacts;
@@ -370,6 +370,45 @@ modulemd_module_get_name (ModulemdModule *self)
     g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
     return self->name;
+}
+
+/**
+ * modulemd_module_set_profiles:
+ * @profiles: (element-type utf8 ModulemdProfile): The profiles avaiable for
+ * this module.
+ *
+ * Sets the 'profiles' property.
+ */
+
+void
+modulemd_module_set_profiles (ModulemdModule *self,
+                              GHashTable     *profiles)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (profiles);
+
+    if (profiles != self->profiles) {
+        g_hash_table_unref (self->profiles);
+        self->profiles = g_hash_table_ref (profiles);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_PROFILES]);
+    }
+}
+
+/**
+ * modulemd_module_get_profiles:
+ *
+ * Retrieves the "profiles" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdProfile) (transfer container): A hash
+ * table containing the "profiles" property.
+ */
+GHashTable *
+modulemd_module_get_profiles (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return self->profiles;
 }
 
 /**
@@ -781,6 +820,10 @@ modulemd_module_set_property (GObject *gobject,
         modulemd_module_set_name (self, g_value_get_string(value));
         break;
 
+    case MD_PROP_PROFILES:
+        modulemd_module_set_profiles (self, g_value_get_boxed(value));
+        break;
+
     case MD_PROP_REQUIRES:
         modulemd_module_set_requires (self, g_value_get_boxed(value));
         break;
@@ -875,6 +918,10 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_name(self));
         break;
 
+    case MD_PROP_PROFILES:
+        g_value_set_boxed (value, modulemd_module_get_profiles(self));
+        break;
+
     case MD_PROP_REQUIRES:
         g_value_set_boxed (value,
                            modulemd_module_get_requires(self));
@@ -943,6 +990,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->documentation, g_free);
     g_clear_pointer (&self->module_licenses, g_object_unref);
     g_clear_pointer (&self->name, g_free);
+    g_clear_pointer (&self->profiles, g_hash_table_unref);
     g_clear_pointer (&self->requires, g_hash_table_unref);
     g_clear_pointer (&self->rpm_api, g_object_unref);
     g_clear_pointer (&self->rpm_artifacts, g_object_unref);
@@ -1036,6 +1084,17 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
     /**
+     * ModulemdModule:profiles: (type GLib.HashTable(utf8,ModulemdProfile)) (transfer container)
+     */
+    md_properties[MD_PROP_PROFILES] =
+        g_param_spec_boxed ("profiles",
+                            "Module Profiles",
+                            "A dictionary property representing the module "
+                            "profiles.",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+    /**
      * ModulemdModule:requires: (type GLib.HashTable(utf8,utf8)) (transfer container)
      */
     md_properties[MD_PROP_REQUIRES] =
@@ -1108,6 +1167,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              "upstream bug tracker for this module.",
                              NULL,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_VERSION] =
 	    g_param_spec_uint64 ("version",
                              "Module Version",
@@ -1142,6 +1202,9 @@ modulemd_module_init (ModulemdModule *self)
 
     self->content_licenses = modulemd_simpleset_new ();
     self->module_licenses = modulemd_simpleset_new ();
+
+    self->profiles = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                            g_free, g_object_unref);
 
     self->requires = g_hash_table_new_full (g_str_hash, g_str_equal,
                                             g_free, g_free);

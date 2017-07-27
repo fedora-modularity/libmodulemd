@@ -92,6 +92,13 @@ const gchar *
 modulemd_module_get_name (ModulemdModule *self);
 
 void
+modulemd_module_set_profiles (ModulemdModule *self,
+                              GHashTable     *profiles);
+
+GHashTable *
+modulemd_module_get_profiles (ModulemdModule *self);
+
+void
 modulemd_module_set_requires (ModulemdModule *self,
                               GHashTable *requires);
 

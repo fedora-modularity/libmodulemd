@@ -935,22 +935,23 @@ static void
 modulemd_module_finalize (GObject *gobject)
 {
     ModulemdModule *self = (ModulemdModule *)gobject;
-    g_clear_pointer (&self->name, g_free);
-    g_clear_pointer (&self->stream, g_free);
-    g_clear_pointer (&self->summary, g_free);
-    g_clear_pointer (&self->description, g_free);
-    g_clear_pointer (&self->community, g_free);
-    g_clear_pointer (&self->documentation, g_free);
-    g_clear_pointer (&self->tracker, g_free);
+
     g_clear_pointer (&self->buildrequires, g_hash_table_unref);
-    g_clear_pointer (&self->requires, g_hash_table_unref);
-    g_clear_pointer (&self->xmd, g_hash_table_unref);
+    g_clear_pointer (&self->community, g_free);
     g_clear_pointer (&self->content_licenses, g_object_unref);
+    g_clear_pointer (&self->description, g_free);
+    g_clear_pointer (&self->documentation, g_free);
     g_clear_pointer (&self->module_licenses, g_object_unref);
+    g_clear_pointer (&self->name, g_free);
+    g_clear_pointer (&self->requires, g_hash_table_unref);
     g_clear_pointer (&self->rpm_api, g_object_unref);
     g_clear_pointer (&self->rpm_artifacts, g_object_unref);
-    g_clear_pointer (&self->rpm_filter, g_object_unref);
     g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
+    g_clear_pointer (&self->rpm_filter, g_object_unref);
+    g_clear_pointer (&self->stream, g_free);
+    g_clear_pointer (&self->summary, g_free);
+    g_clear_pointer (&self->tracker, g_free);
+    g_clear_pointer (&self->xmd, g_hash_table_unref);
 
     G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }

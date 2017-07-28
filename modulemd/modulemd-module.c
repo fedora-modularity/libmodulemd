@@ -326,8 +326,8 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
  *
  * Retrieves the "module_licenses" for modulemd
  *
- * Returns: (transfer full): a #SimpleSet containing the set of licenses in the
- * "module_licenses" property.
+ * Returns: (transfer full): a #ModulemdSimpleSet containing the set of
+ * licenses in the "module_licenses" property.
  */
 ModulemdSimpleSet *
 modulemd_module_get_module_licenses (ModulemdModule *self)

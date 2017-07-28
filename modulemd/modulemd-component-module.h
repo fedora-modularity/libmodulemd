@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-component-module.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,20 +22,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_COMPONENT_MODULE_H
+#define MODULEMD_COMPONENT_MODULE_H
 
-#include <glib.h>
+#include <glib-object.h>
+#include "modulemd-component.h"
+#include "modulemd-simpleset.h"
 
 G_BEGIN_DECLS
 
-#include "modulemd-component.h"
-#include "modulemd-component-module.h"
-#include "modulemd-component-rpm.h"
-#include "modulemd-module.h"
-#include "modulemd-profile.h"
-#include "modulemd-simpleset.h"
+#define MODULEMD_TYPE_COMPONENT_MODULE (modulemd_component_module_get_type())
 
-G_END_DECLS
+G_DECLARE_FINAL_TYPE (ModulemdComponentModule, modulemd_component_module,
+                      MODULEMD, COMPONENT_MODULE, ModulemdComponent)
 
-#endif /* MODULEMD_H */
+ModulemdComponentModule *modulemd_component_module_new (void);
+
+void
+modulemd_component_module_set_ref (ModulemdComponentModule *self,
+                                   const gchar          *ref);
+const gchar *
+modulemd_component_module_get_ref (ModulemdComponentModule *self);
+
+void
+modulemd_component_module_set_repository (ModulemdComponentModule *self,
+                                          const gchar          *repository);
+const gchar *
+modulemd_component_module_get_repository (ModulemdComponentModule *self);
+
+#endif /* MODULEMD_COMPONENT_MODULE_H */
+

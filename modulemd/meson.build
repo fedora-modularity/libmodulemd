@@ -1,5 +1,6 @@
 modulemd_srcs = [
     'modulemd-component.c',
+    'modulemd-component-module.c',
     'modulemd-component-rpm.c',
     'modulemd-module.c',
     'modulemd-profile.c',
@@ -9,6 +10,7 @@ modulemd_srcs = [
 modulemd_hdrs = [
     'modulemd.h',
     'modulemd-component.h',
+    'modulemd-component-module.h',
     'modulemd-component-rpm.h',
     'modulemd-module.h',
     'modulemd-profile.h',

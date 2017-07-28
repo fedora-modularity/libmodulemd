@@ -32,16 +32,17 @@ enum
 
     MD_PROP_BUILDREQUIRES,
     MD_PROP_COMMUNITY,
-    //MD_PROP_COMPONENTS,
     MD_PROP_CONTENT_LIC,
     MD_PROP_DESC,
     MD_PROP_DOCS,
     MD_PROP_MDVERSION,
     MD_PROP_MODULE_LIC,
+    MD_PROP_MODULE_COMPONENTS,
     MD_PROP_NAME,
     MD_PROP_PROFILES,
     MD_PROP_RPM_API,
     MD_PROP_RPM_ARTIFACTS,
+    MD_PROP_RPM_COMPONENTS,
     MD_PROP_RPM_BUILDOPTS,
     MD_PROP_RPM_FILTER,
     MD_PROP_REQUIRES,
@@ -63,11 +64,11 @@ struct _ModulemdModule
     /* == Members == */
     GHashTable *buildrequires;
     gchar *community;
-    // ModulemdComponents *components;
     ModulemdSimpleSet *content_licenses;
     gchar *description;
     gchar *documentation;
     guint64 mdversion;
+    GHashTable *module_components;
     ModulemdSimpleSet *module_licenses;
     gchar *name;
     GHashTable *profiles;
@@ -75,6 +76,7 @@ struct _ModulemdModule
     ModulemdSimpleSet *rpm_api;
     ModulemdSimpleSet *rpm_artifacts;
     GHashTable *rpm_buildopts;
+    GHashTable *rpm_components;
     ModulemdSimpleSet *rpm_filter;
     gchar *stream;
     gchar *summary;
@@ -297,6 +299,45 @@ modulemd_module_get_mdversion (ModulemdModule *self)
     g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
 
     return self->mdversion;
+}
+
+/**
+ * modulemd_module_set_module_components:
+ * @components: The hash table of module components that
+ * comprise this module. The keys are the module name, the values are a
+ * #ModulemdComponentModule containing information about that module.
+ *
+ * Sets the module_components property.
+ */
+void
+modulemd_module_set_module_components (ModulemdModule *self,
+                                       GHashTable     *components)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (components);
+
+    if (components != self->module_components) {
+        g_hash_table_unref (self->module_components);
+        self->module_components = g_hash_table_ref (components);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_MODULE_COMPONENTS]);
+    }
+}
+
+/**
+ * modulemd_module_get_module_components:
+ *
+ * Retrieves the "module-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentModule) (transfer container): A hash table
+ * containing the "module-components" property.
+ */
+GHashTable *
+modulemd_module_get_module_components (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_hash_table_ref(self->module_components);
 }
 
 /**
@@ -566,6 +607,45 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 }
 
 /**
+ * modulemd_module_set_rpm_components:
+ * @components: The hash table of module components that
+ * comprise this module. The keys are the module name, the values are a
+ * #ModulemdComponentRpm containing information about that module.
+ *
+ * Sets the rpm_components property.
+ */
+void
+modulemd_module_set_rpm_components (ModulemdModule *self,
+                                       GHashTable     *components)
+{
+    g_return_if_fail (MODULEMD_IS_MODULE (self));
+    g_return_if_fail (components);
+
+    if (components != self->rpm_components) {
+        g_hash_table_unref (self->rpm_components);
+        self->rpm_components = g_hash_table_ref (components);
+        g_object_notify_by_pspec (G_OBJECT(self),
+                                  md_properties [MD_PROP_RPM_COMPONENTS]);
+    }
+}
+
+/**
+ * modulemd_module_get_rpm_components:
+ *
+ * Retrieves the "rpm-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentRpm) (transfer container): A hash table
+ * containing the "rpm-components" property.
+ */
+GHashTable *
+modulemd_module_get_rpm_components (ModulemdModule *self)
+{
+    g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+    return g_hash_table_ref(self->rpm_components);
+}
+
+/**
  * modulemd_module_set_rpm_filter:
  * @filter: A #ModuleSimpleSet: The set of binary RPM packages that are
  * explicitly filtered out of this module.
@@ -812,6 +892,10 @@ modulemd_module_set_property (GObject *gobject,
         modulemd_module_set_mdversion (self, g_value_get_uint64(value));
         break;
 
+    case MD_PROP_MODULE_COMPONENTS:
+        modulemd_module_set_module_components (self, g_value_get_boxed(value));
+        break;
+
     case MD_PROP_MODULE_LIC:
         modulemd_module_set_module_licenses (self, g_value_get_object(value));
         break;
@@ -838,6 +922,10 @@ modulemd_module_set_property (GObject *gobject,
 
     case MD_PROP_RPM_BUILDOPTS:
         modulemd_module_set_rpm_buildopts (self, g_value_get_boxed(value));
+        break;
+
+    case MD_PROP_RPM_COMPONENTS:
+        modulemd_module_set_rpm_components (self, g_value_get_boxed(value));
         break;
 
     case MD_PROP_RPM_FILTER:
@@ -908,6 +996,11 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_mdversion(self));
         break;
 
+    case MD_PROP_MODULE_COMPONENTS:
+        g_value_set_boxed (value,
+                           modulemd_module_get_module_components (self));
+        break;
+
     case MD_PROP_MODULE_LIC:
         g_value_set_object (value,
                             modulemd_module_get_module_licenses(self));
@@ -937,14 +1030,19 @@ modulemd_module_get_property (GObject *gobject,
                             modulemd_module_get_rpm_artifacts(self));
         break;
 
-    case MD_PROP_RPM_FILTER:
-        g_value_set_object (value,
-                            modulemd_module_get_rpm_filter(self));
-        break;
-
     case MD_PROP_RPM_BUILDOPTS:
         g_value_set_boxed (value,
                            modulemd_module_get_rpm_buildopts(self));
+        break;
+
+    case MD_PROP_RPM_COMPONENTS:
+        g_value_set_boxed (value,
+                           modulemd_module_get_rpm_components (self));
+        break;
+
+    case MD_PROP_RPM_FILTER:
+        g_value_set_object (value,
+                            modulemd_module_get_rpm_filter(self));
         break;
 
     case MD_PROP_STREAM:
@@ -988,6 +1086,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->content_licenses, g_object_unref);
     g_clear_pointer (&self->description, g_free);
     g_clear_pointer (&self->documentation, g_free);
+    g_clear_pointer (&self->module_components, g_hash_table_unref);
     g_clear_pointer (&self->module_licenses, g_object_unref);
     g_clear_pointer (&self->name, g_free);
     g_clear_pointer (&self->profiles, g_hash_table_unref);
@@ -995,6 +1094,7 @@ modulemd_module_finalize (GObject *gobject)
     g_clear_pointer (&self->rpm_api, g_object_unref);
     g_clear_pointer (&self->rpm_artifacts, g_object_unref);
     g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
+    g_clear_pointer (&self->rpm_components, g_hash_table_unref);
     g_clear_pointer (&self->rpm_filter, g_object_unref);
     g_clear_pointer (&self->stream, g_free);
     g_clear_pointer (&self->summary, g_free);
@@ -1067,6 +1167,16 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                              0, G_MAXUINT64, 0,
                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    /**
+     * ModulemdModule:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule)) (transfer container)
+     */
+    md_properties [MD_PROP_MODULE_COMPONENTS] =
+        g_param_spec_boxed ("components-module",
+                            "Module Components",
+                            "The module components that define this module.",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_MODULE_LIC] =
         g_param_spec_object ("module-licenses",
                              "Module Licenses",
@@ -1136,6 +1246,16 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                             G_TYPE_HASH_TABLE,
                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+    /**
+     * ModulemdModule:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm)) (transfer container)
+     */
+    md_properties [MD_PROP_RPM_COMPONENTS] =
+        g_param_spec_boxed ("components-rpm",
+                            "RPM Components",
+                            "The RPM components that define this module.",
+                            G_TYPE_HASH_TABLE,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
     md_properties[MD_PROP_RPM_FILTER] =
         g_param_spec_object ("rpm-filter",
                              "Module filter - RPMs",
@@ -1199,6 +1319,11 @@ modulemd_module_init (ModulemdModule *self)
     /* Allocate the members */
     self->buildrequires = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
+
+    self->module_components = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                     g_free, g_object_unref);
+    self->rpm_components = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                  g_free, g_object_unref);
 
     self->content_licenses = modulemd_simpleset_new ();
     self->module_licenses = modulemd_simpleset_new ();

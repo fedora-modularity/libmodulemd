@@ -78,6 +78,13 @@ const guint64
 modulemd_module_get_mdversion (ModulemdModule *self);
 
 void
+modulemd_module_set_module_components (ModulemdModule *self,
+                                       GHashTable     *components);
+
+GHashTable *
+modulemd_module_get_module_components (ModulemdModule *self);
+
+void
 modulemd_module_set_module_licenses (ModulemdModule *self,
                                       ModulemdSimpleSet *licenses);
 
@@ -125,6 +132,13 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self,
 
 GHashTable *
 modulemd_module_get_rpm_buildopts (ModulemdModule *self);
+
+void
+modulemd_module_set_rpm_components (ModulemdModule *self,
+                                       GHashTable     *components);
+
+GHashTable *
+modulemd_module_get_rpm_components (ModulemdModule *self);
 
 void
 modulemd_module_set_rpm_filter (ModulemdModule *self,

@@ -31,6 +31,7 @@ foreach cflag: test_cflags
 endforeach
 
 gnome = import('gnome')
+pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
 
 subdir('modulemd')

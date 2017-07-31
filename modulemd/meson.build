@@ -29,9 +29,11 @@ modulemd_lib = library(
 
 )
 
+header_path = 'modulemd'
+
 install_headers(
   modulemd_hdrs,
-  subdir : 'modulemd',
+  subdir : header_path,
 )
 
 test_modulemd_component = executable(
@@ -80,4 +82,13 @@ gnome.generate_gir(
     install : true,
 )
 
+pkg.generate(
+    libraries : modulemd_lib,
+    subdirs : header_path,
+    version : '0.1',
+    name : 'modulemd',
+    filebase : 'modulemd',
+    description : 'Module metadata manipulation library',
+    requires: [ 'glib-2.0', 'gobject-2.0' ],
+)
 

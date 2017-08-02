@@ -33,5 +33,6 @@ endforeach
 gnome = import('gnome')
 pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
+yaml = dependency('yaml-0.1')
 
 subdir('modulemd')

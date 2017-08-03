@@ -30,29 +30,26 @@
 G_BEGIN_DECLS
 
 #define MODULEMD_TYPE_COMPONENT modulemd_component_get_type ()
-G_DECLARE_DERIVABLE_TYPE (ModulemdComponent, modulemd_component,
-                          MODULEMD, COMPONENT, GObject)
+G_DECLARE_DERIVABLE_TYPE (
+  ModulemdComponent, modulemd_component, MODULEMD, COMPONENT, GObject)
 
 struct _ModulemdComponentClass
 {
-    GObjectClass parent_instance;
+  GObjectClass parent_instance;
 
-    /* Virtual Public Members */
-    void (* set_buildorder) (ModulemdComponent *self,
-                             guint64            buildorder);
-    guint64 (* get_buildorder) (ModulemdComponent *self);
+  /* Virtual Public Members */
+  void (*set_buildorder) (ModulemdComponent *self, guint64 buildorder);
+  guint64 (*get_buildorder) (ModulemdComponent *self);
 
-    void (* set_name) (ModulemdComponent *self,
-                       const gchar       *name);
-    const gchar * (* get_name) (ModulemdComponent *self);
+  void (*set_name) (ModulemdComponent *self, const gchar *name);
+  const gchar *(*get_name) (ModulemdComponent *self);
 
-    void (* set_rationale) (ModulemdComponent *self,
-                            const gchar       *rationale);
-    const gchar * (* get_rationale) (ModulemdComponent *self);
+  void (*set_rationale) (ModulemdComponent *self, const gchar *rationale);
+  const gchar *(*get_rationale) (ModulemdComponent *self);
 
-    /* Padding to allow adding up to 12 new virtual functions without
+  /* Padding to allow adding up to 12 new virtual functions without
      * breaking ABI. */
-    gpointer padding[12];
+  gpointer padding[12];
 };
 
 ModulemdComponent *
@@ -60,19 +57,18 @@ modulemd_component_new (void);
 
 void
 modulemd_component_set_buildorder (ModulemdComponent *self,
-                                   guint64            buildorder);
+                                   guint64 buildorder);
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self);
 
 void
-modulemd_component_set_name (ModulemdComponent *self,
-                             const gchar       *name);
+modulemd_component_set_name (ModulemdComponent *self, const gchar *name);
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self);
 
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
-                                  const gchar       *rationale);
+                                  const gchar *rationale);
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
 

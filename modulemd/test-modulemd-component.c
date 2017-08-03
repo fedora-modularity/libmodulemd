@@ -29,46 +29,44 @@
 
 typedef struct _ComponentFixture
 {
-    ModulemdComponent *component;
+  ModulemdComponent *component;
 } ComponentFixture;
 
 static void
-modulemd_component_set_up (ComponentFixture *fixture,
-                           gconstpointer    user_data)
+modulemd_component_set_up (ComponentFixture *fixture, gconstpointer user_data)
 {
-    fixture->component = modulemd_component_new ();
+  fixture->component = modulemd_component_new ();
 }
 
 static void
 modulemd_component_tear_down (ComponentFixture *fixture,
-                              gconstpointer    user_data)
+                              gconstpointer user_data)
 {
-    g_object_unref (fixture->component);
+  g_object_unref (fixture->component);
 }
 
 static void
 modulemd_component_test_create (ComponentFixture *fixture,
-                                gconstpointer    user_data)
+                                gconstpointer user_data)
 {
-    g_assert_true (MODULEMD_IS_COMPONENT(fixture->component));
+  g_assert_true (MODULEMD_IS_COMPONENT (fixture->component));
 }
 
 int
 main (int argc, char *argv[])
 {
+  setlocale (LC_ALL, "");
 
-    setlocale (LC_ALL, "");
+  g_test_init (&argc, &argv, NULL);
+  g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
-    g_test_init (&argc, &argv, NULL);
-    g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
+  // Define the tests.
+  g_test_add ("/modulemd/component/test_create",
+              ComponentFixture,
+              NULL,
+              modulemd_component_set_up,
+              modulemd_component_test_create,
+              modulemd_component_tear_down);
 
-    // Define the tests.
-    g_test_add ("/modulemd/component/test_create",
-                ComponentFixture, NULL,
-                modulemd_component_set_up,
-                modulemd_component_test_create,
-                modulemd_component_tear_down);
-
-    return g_test_run ();
+  return g_test_run ();
 }
-

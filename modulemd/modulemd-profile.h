@@ -29,11 +29,12 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_TYPE_PROFILE modulemd_profile_get_type()
-G_DECLARE_FINAL_TYPE (ModulemdProfile, modulemd_profile,
-                      MODULEMD, PROFILE, GObject)
+#define MODULEMD_TYPE_PROFILE modulemd_profile_get_type ()
+G_DECLARE_FINAL_TYPE (
+  ModulemdProfile, modulemd_profile, MODULEMD, PROFILE, GObject)
 
-ModulemdProfile *modulemd_profile_new (void);
+ModulemdProfile *
+modulemd_profile_new (void);
 
 void
 modulemd_profile_set_description (ModulemdProfile *self,
@@ -43,8 +44,7 @@ const gchar *
 modulemd_profile_get_description (ModulemdProfile *self);
 
 void
-modulemd_profile_set_rpms (ModulemdProfile *self,
-                           ModulemdSimpleSet *rpms);
+modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self);

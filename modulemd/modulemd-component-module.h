@@ -31,24 +31,27 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_TYPE_COMPONENT_MODULE (modulemd_component_module_get_type())
+#define MODULEMD_TYPE_COMPONENT_MODULE (modulemd_component_module_get_type ())
 
-G_DECLARE_FINAL_TYPE (ModulemdComponentModule, modulemd_component_module,
-                      MODULEMD, COMPONENT_MODULE, ModulemdComponent)
+G_DECLARE_FINAL_TYPE (ModulemdComponentModule,
+                      modulemd_component_module,
+                      MODULEMD,
+                      COMPONENT_MODULE,
+                      ModulemdComponent)
 
-ModulemdComponentModule *modulemd_component_module_new (void);
+ModulemdComponentModule *
+modulemd_component_module_new (void);
 
 void
 modulemd_component_module_set_ref (ModulemdComponentModule *self,
-                                   const gchar          *ref);
+                                   const gchar *ref);
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self);
 
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
-                                          const gchar          *repository);
+                                          const gchar *repository);
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self);
 
 #endif /* MODULEMD_COMPONENT_MODULE_H */
-

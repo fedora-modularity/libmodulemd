@@ -29,19 +29,18 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_TYPE_SIMPLESET modulemd_simpleset_get_type()
-G_DECLARE_FINAL_TYPE (ModulemdSimpleSet, modulemd_simpleset,
-                      MODULEMD, SIMPLESET, GObject)
+#define MODULEMD_TYPE_SIMPLESET modulemd_simpleset_get_type ()
+G_DECLARE_FINAL_TYPE (
+  ModulemdSimpleSet, modulemd_simpleset, MODULEMD, SIMPLESET, GObject)
 
-ModulemdSimpleSet *modulemd_simpleset_new (void);
+ModulemdSimpleSet *
+modulemd_simpleset_new (void);
 
 gboolean
-modulemd_simpleset_contains (ModulemdSimpleSet *self,
-                             const gchar       *value);
+modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value);
 
 void
-modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self,
-                                const gchar **strv);
+modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv);
 gchar **
 modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self);
 

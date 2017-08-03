@@ -31,42 +31,44 @@
 
 G_BEGIN_DECLS
 
-#define MODULEMD_TYPE_COMPONENT_RPM (modulemd_component_rpm_get_type())
+#define MODULEMD_TYPE_COMPONENT_RPM (modulemd_component_rpm_get_type ())
 
-G_DECLARE_FINAL_TYPE (ModulemdComponentRpm, modulemd_component_rpm,
-                      MODULEMD, COMPONENT_RPM, ModulemdComponent)
+G_DECLARE_FINAL_TYPE (ModulemdComponentRpm,
+                      modulemd_component_rpm,
+                      MODULEMD,
+                      COMPONENT_RPM,
+                      ModulemdComponent)
 
-ModulemdComponentRpm *modulemd_component_rpm_new (void);
+ModulemdComponentRpm *
+modulemd_component_rpm_new (void);
 
 void
 modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
-                                   ModulemdSimpleSet    *arches);
+                                   ModulemdSimpleSet *arches);
 ModulemdSimpleSet *
 modulemd_component_rpm_get_arches (ModulemdComponentRpm *self);
 
 void
 modulemd_component_rpm_set_cache (ModulemdComponentRpm *self,
-                                  const gchar          *cache);
+                                  const gchar *cache);
 const gchar *
 modulemd_component_rpm_get_cache (ModulemdComponentRpm *self);
 
 void
 modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
-                                     ModulemdSimpleSet     *multilib);
+                                     ModulemdSimpleSet *multilib);
 ModulemdSimpleSet *
 modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self);
 
 void
-modulemd_component_rpm_set_ref (ModulemdComponentRpm *self,
-                                const gchar          *ref);
+modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref);
 const gchar *
 modulemd_component_rpm_get_ref (ModulemdComponentRpm *self);
 
 void
 modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
-                                       const gchar          *repository);
+                                       const gchar *repository);
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self);
 
 #endif /* MODULEMD_COMPONENT_RPM_H */
-

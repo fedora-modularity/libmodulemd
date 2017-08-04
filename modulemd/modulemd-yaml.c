@@ -102,6 +102,10 @@ static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
                           ModulemdSimpleSet **_set,
                           GError **error);
+static gboolean
+_hashtable_from_mapping (yaml_parser_t *parser,
+                         GHashTable **_htable,
+                         GError **error);
 
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error)
@@ -619,5 +623,74 @@ error:
     }
   *_set = set;
   g_debug ("TRACE: exiting _simpleset_from_sequence\n");
+  return TRUE;
+}
+
+static gboolean
+_hashtable_from_mapping (yaml_parser_t *parser,
+                         GHashTable **_htable,
+                         GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *htable = NULL;
+  gchar *name = NULL;
+  gchar *value = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _hashtable_from_mapping\n");
+
+  htable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* The dictionary has begun */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          name = g_strdup ((const gchar *)event.data.scalar.value);
+          YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+            parser, &event, error, "Parser error");
+          if (event.type != YAML_SCALAR_EVENT)
+            {
+              g_free (name);
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Non-scalar value for dictionary.");
+            }
+          value = g_strdup ((const gchar *)event.data.scalar.value);
+
+          /* Set this key and value to the hash table */
+          g_hash_table_insert (htable, name, value);
+
+          break;
+
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          break;
+        }
+    }
+  *_htable = g_hash_table_ref (htable);
+
+error:
+  g_hash_table_unref (htable);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _hashtable_from_mapping\n");
   return TRUE;
 }

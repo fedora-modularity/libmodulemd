@@ -52,7 +52,7 @@ enum ModulemdYamlError
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
           goto error;                                                         \
         }                                                                     \
-      fprintf (stderr, "Parsing %u\n", (event)->type);                        \
+      g_debug ("Parser event: %u\n", (event)->type);                          \
     }                                                                         \
   while (0)
 
@@ -96,6 +96,8 @@ parse_yaml_file (const gchar *path, GError **error)
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (path, NULL);
+
+  g_debug ("TRACE: entering parse_yaml_file\n");
 
   yaml_parser_initialize (&parser);
 
@@ -184,6 +186,7 @@ error:
         }
     }
 
+  g_debug ("TRACE: exiting parse_yaml_file\n");
   return modules;
 }
 
@@ -198,7 +201,7 @@ _parse_modulemd_root (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  fprintf (stderr, "TRACE: entering _parse_modulemd_root\n");
+  g_debug ("TRACE: entering _parse_modulemd_root\n");
 
   /* Parse until the end of this document */
   while (!done)
@@ -274,7 +277,7 @@ error:
       return FALSE;
     }
 
-  fprintf (stderr, "TRACE: exiting _parse_modulemd_root\n");
+  g_debug ("TRACE: exiting _parse_modulemd_root\n");
   return TRUE;
 }
 
@@ -288,7 +291,7 @@ _parse_modulemd_data (ModulemdModule *module,
   guint64 version;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  fprintf (stderr, "TRACE: entering _parse_modulemd_data\n");
+  g_debug ("TRACE: entering _parse_modulemd_data\n");
 
   while (!done)
     {
@@ -484,6 +487,6 @@ error:
     {
       return FALSE;
     }
-  fprintf (stderr, "TRACE: exiting _parse_modulemd_data\n");
+  g_debug ("TRACE: exiting _parse_modulemd_data\n");
   return TRUE;
 }

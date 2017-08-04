@@ -23,6 +23,7 @@ test_cflags = [
   '-Werror=return-type',
   '-Werror=array-bounds',
   '-Werror=write-strings',
+  '-DG_LOG_USE_STRUCTURED',
 ]
 foreach cflag: test_cflags
   if cc.has_argument(cflag)

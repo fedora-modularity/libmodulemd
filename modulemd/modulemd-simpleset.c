@@ -156,6 +156,17 @@ modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self)
   return strv;
 }
 
+void
+modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value)
+{
+  if (g_hash_table_add (self->set, g_strdup (value)))
+    {
+      /* This key didn't previously exist */
+      g_object_notify_by_pspec (G_OBJECT (self),
+                                set_properties[SET_PROP_STRV]);
+    }
+}
+
 
 static void
 modulemd_simpleset_set_property (GObject *gobject,

@@ -44,6 +44,9 @@ modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv);
 gchar **
 modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self);
 
+void
+modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value);
+
 G_END_DECLS
 
 #endif /* MODULEMD_SIMPLESET_H */

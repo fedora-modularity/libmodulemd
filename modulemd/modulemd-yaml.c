@@ -59,8 +59,10 @@ enum ModulemdYamlError
 #define MMD_YAML_ERROR_RETURN(error, msg)                                     \
   do                                                                          \
     {                                                                         \
+      g_message (msg);                                                        \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      g_debug ("Error occurred while parsing event %u", event.type);          \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -131,19 +133,8 @@ parse_yaml_file (const gchar *path, GError **error)
 
       switch (event.type)
         {
-        case YAML_NO_EVENT:
         case YAML_STREAM_START_EVENT:
-          /* No event requires no special handling */
-          break;
-
-        case YAML_ALIAS_EVENT:
-        case YAML_SCALAR_EVENT:
-        case YAML_SEQUENCE_START_EVENT:
-        case YAML_SEQUENCE_END_EVENT:
-        case YAML_MAPPING_START_EVENT:
-        case YAML_MAPPING_END_EVENT:
-          /* These events are not implemented at this level */
-          g_assert_not_reached ();
+          /* The start of the stream requires no action */
           break;
 
         case YAML_STREAM_END_EVENT:
@@ -172,8 +163,8 @@ parse_yaml_file (const gchar *path, GError **error)
           break;
 
         default:
-          /* Should never happen; all cases should be handled explicitly */
-          g_assert_not_reached ();
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event at toplevel");
           break;
         }
 
@@ -224,6 +215,11 @@ _parse_modulemd_root (ModulemdModule *module,
           /* This is the start of the main document content. */
           break;
 
+        case YAML_MAPPING_END_EVENT:
+          /* This is the end of the main document content. */
+          done = TRUE;
+          break;
+
         case YAML_SCALAR_EVENT:
 
           /* Handle "document: modulemd" */
@@ -268,14 +264,9 @@ _parse_modulemd_root (ModulemdModule *module,
             }
           break;
 
-        case YAML_MAPPING_END_EVENT:
-          /* This is the end of the main document content. */
-          done = TRUE;
-          break;
-
         default:
-          /* We should never see other events at this level */
-          g_assert_not_reached ();
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in root");
           break;
         }
     }
@@ -485,8 +476,8 @@ _parse_modulemd_data (ModulemdModule *module,
           break;
 
         default:
-          /* Any event not handled above is unexpected */
-          g_assert_not_reached ();
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in data");
           break;
         }
     }
@@ -554,8 +545,8 @@ _parse_modulemd_licenses (ModulemdModule *module,
           break;
 
         default:
-          /* Any event not handled above is unexpected */
-          g_assert_not_reached ();
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in licenses");
           break;
         }
     }
@@ -606,8 +597,8 @@ _simpleset_from_sequence (yaml_parser_t *parser,
           break;
 
         default:
-          /* Any event not handled above is unexpected */
-          g_assert_not_reached ();
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
           break;
         }
     }

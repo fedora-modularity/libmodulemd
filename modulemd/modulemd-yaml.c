@@ -93,7 +93,6 @@ parse_yaml_file (const gchar *path, GError **error)
   yaml_parser_t parser;
   yaml_event_t event;
   gboolean done = FALSE;
-  gboolean in_doc = FALSE;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (path, NULL);
@@ -142,13 +141,6 @@ parse_yaml_file (const gchar *path, GError **error)
           break;
 
         case YAML_DOCUMENT_START_EVENT:
-          if (in_doc)
-            {
-              /* A document must be closed before starting a new one */
-              MMD_YAML_ERROR_RETURN (
-                error, "New document without terminating previous");
-            }
-          in_doc = TRUE;
           count++;
           modules =
             g_realloc_n (modules, count + 1, sizeof (ModulemdModule *));
@@ -166,7 +158,6 @@ parse_yaml_file (const gchar *path, GError **error)
 
         case YAML_DOCUMENT_END_EVENT:
           /* This document is complete. */
-          in_doc = FALSE;
           break;
 
         default:

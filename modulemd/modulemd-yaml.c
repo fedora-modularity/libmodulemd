@@ -101,6 +101,10 @@ static gboolean
 _parse_modulemd_xmd (ModulemdModule *module,
                      yaml_parser_t *parser,
                      GError **error);
+static gboolean
+_parse_modulemd_deps (ModulemdModule *module,
+                      yaml_parser_t *parser,
+                      GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -430,7 +434,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "dependencies"))
             {
               /* Process the build and runtime dependencies of this module */
-              /* TODO _yaml_recurse_down (_parse_modulemd_deps); */
+              _yaml_recurse_down (_parse_modulemd_deps);
             }
 
           /* references */
@@ -603,6 +607,77 @@ error:
     }
 
   g_debug ("TRACE: exiting _parse_modulemd_xmd\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_deps (ModulemdModule *module,
+                      yaml_parser_t *parser,
+                      GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *reqs = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_deps\n");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the dependency content. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the dependency content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each scalar event represents a license type */
+          if (!_hashtable_from_mapping (parser, &reqs, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
+            }
+
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                          "buildrequires"))
+            {
+              modulemd_module_set_buildrequires (module, reqs);
+            }
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "requires"))
+            {
+              modulemd_module_set_requires (module, reqs);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown dependency type");
+            }
+
+          g_clear_pointer (&reqs, g_hash_table_unref);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          break;
+        }
+    }
+
+error:
+  g_clear_pointer (&reqs, g_hash_table_unref);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_deps\n");
   return TRUE;
 }
 

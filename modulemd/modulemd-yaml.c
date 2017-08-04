@@ -97,6 +97,10 @@ static gboolean
 _parse_modulemd_licenses (ModulemdModule *module,
                           yaml_parser_t *parser,
                           GError **error);
+static gboolean
+_parse_modulemd_xmd (ModulemdModule *module,
+                     yaml_parser_t *parser,
+                     GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -418,7 +422,7 @@ _parse_modulemd_data (ModulemdModule *module,
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "xmd"))
             {
               /* Process the extensible metadata block */
-              /* TODO _yaml_recurse_down (_parse_modulemd_xmd); */
+              _yaml_recurse_down (_parse_modulemd_xmd);
             }
 
           /* dependencies */
@@ -562,6 +566,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
           break;
         }
     }
+
 error:
   g_clear_pointer (&set, g_object_unref);
   if (*error)
@@ -569,6 +574,35 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_licenses\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_xmd (ModulemdModule *module,
+                     yaml_parser_t *parser,
+                     GError **error)
+{
+  GHashTable *xmd = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_modulemd_xmd\n");
+
+  if (!_hashtable_from_mapping (parser, &xmd, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
+    }
+
+  /* Save this hash table as the xmd property */
+  modulemd_module_set_xmd (module, xmd);
+
+error:
+  g_hash_table_unref (xmd);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _parse_modulemd_xmd\n");
   return TRUE;
 }
 

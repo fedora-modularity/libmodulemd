@@ -88,7 +88,7 @@ ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error)
 {
   FILE *yaml_file;
-  gsize count = -1;
+  gsize count = 0;
   ModulemdModule **modules = NULL;
   yaml_parser_t parser;
   yaml_event_t event;
@@ -152,12 +152,12 @@ parse_yaml_file (const gchar *path, GError **error)
           count++;
           modules =
             g_realloc_n (modules, count + 1, sizeof (ModulemdModule *));
-          modules[count + 1] = NULL;
+          modules[count] = NULL;
 
           /* New document; create a new ModulemdModule object */
-          modules[count] = modulemd_module_new ();
+          modules[count - 1] = modulemd_module_new ();
 
-          if (!_parse_modulemd_root (modules[count], &parser, error))
+          if (!_parse_modulemd_root (modules[count - 1], &parser, error))
             {
               goto error;
             }

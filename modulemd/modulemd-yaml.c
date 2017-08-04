@@ -83,6 +83,15 @@ static gboolean
 _parse_modulemd_data (ModulemdModule *module,
                       yaml_parser_t *parser,
                       GError **error);
+static gboolean
+_parse_modulemd_licenses (ModulemdModule *module,
+                          yaml_parser_t *parser,
+                          GError **error);
+
+static gboolean
+_simpleset_from_sequence (yaml_parser_t *parser,
+                          ModulemdSimpleSet **_set,
+                          GError **error);
 
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error)
@@ -399,7 +408,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "license"))
             {
               /* Process the module and content licenses */
-              /* TODO _yaml_recurse_down (_parse_modulemd_licenses); */
+              _yaml_recurse_down (_parse_modulemd_licenses);
             }
 
           /* xmd */
@@ -488,5 +497,128 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_data\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_licenses (ModulemdModule *module,
+                          yaml_parser_t *parser,
+                          GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdSimpleSet *set;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_licenses\n");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the license content. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the license content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each scalar event represents a license type */
+          if (!_simpleset_from_sequence (parser, &set, error))
+            {
+              MMD_YAML_ERROR_RETURN (error, "Invalid sequence");
+            }
+
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "module"))
+            {
+              modulemd_module_set_module_licenses (module, set);
+            }
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "content"))
+            {
+              modulemd_module_set_content_licenses (module, set);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown license type");
+            }
+
+          g_clear_pointer (&set, g_object_unref);
+          break;
+
+        default:
+          /* Any event not handled above is unexpected */
+          g_assert_not_reached ();
+          break;
+        }
+    }
+error:
+  g_clear_pointer (&set, g_object_unref);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_licenses\n");
+  return TRUE;
+}
+
+static gboolean
+_simpleset_from_sequence (yaml_parser_t *parser,
+                          ModulemdSimpleSet **_set,
+                          GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdSimpleSet *set = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _simpleset_from_sequence\n");
+
+  set = modulemd_simpleset_new ();
+
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_START_EVENT:
+          /* Sequence has begun */
+          break;
+
+        case YAML_SEQUENCE_END_EVENT:
+          /* Sequence has concluded. Return */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          modulemd_simpleset_add (set, (const gchar *)event.data.scalar.value);
+          break;
+
+        default:
+          /* Any event not handled above is unexpected */
+          g_assert_not_reached ();
+          break;
+        }
+    }
+
+error:
+  if (*error)
+    {
+      g_object_unref (set);
+      return FALSE;
+    }
+  *_set = set;
+  g_debug ("TRACE: exiting _simpleset_from_sequence\n");
   return TRUE;
 }

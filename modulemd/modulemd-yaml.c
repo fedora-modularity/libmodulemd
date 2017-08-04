@@ -67,6 +67,14 @@ enum ModulemdYamlError
     }                                                                         \
   while (0)
 
+#define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
 #define _yaml_recurse_down(fn)                                                \
   do                                                                          \
     {                                                                         \
@@ -524,7 +532,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
           /* Each scalar event represents a license type */
           if (!_simpleset_from_sequence (parser, &set, error))
             {
-              MMD_YAML_ERROR_RETURN (error, "Invalid sequence");
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid sequence");
             }
 
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "module"))

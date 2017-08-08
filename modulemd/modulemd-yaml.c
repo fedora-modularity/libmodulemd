@@ -130,6 +130,26 @@ _parse_modulemd_buildopts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error);
 static gboolean
+_parse_modulemd_components (ModulemdModule *module,
+                            yaml_parser_t *parser,
+                            GError **error);
+static gboolean
+_parse_modulemd_rpm_components (yaml_parser_t *parser,
+                                GHashTable **_components,
+                                GError **error);
+static gboolean
+_parse_modulemd_rpm_component (yaml_parser_t *parser,
+                               ModulemdComponentRpm **_components,
+                               GError **error);
+static gboolean
+_parse_modulemd_module_components (yaml_parser_t *parser,
+                                   GHashTable **_components,
+                                   GError **error);
+static gboolean
+_parse_modulemd_module_component (yaml_parser_t *parser,
+                                  ModulemdComponentModule **_components,
+                                  GError **error);
+static gboolean
 _parse_modulemd_artifacts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error);
@@ -516,7 +536,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "components"))
             {
               /* Process the components that comprise this module */
-              /* TODO _yaml_recurse_down (_parse_modulemd_components); */
+              _yaml_recurse_down (_parse_modulemd_components);
             }
 
           /* Artifacts */
@@ -1111,6 +1131,516 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_buildopts\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_components (ModulemdModule *module,
+                            yaml_parser_t *parser,
+                            GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *components = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_components\n");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the component content. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the component content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each key is a type of component */
+          g_debug ("Component type: %s",
+                   (const gchar *)event.data.scalar.value);
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              if (!_parse_modulemd_rpm_components (parser, &components, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Could not parse RPM components");
+                }
+              modulemd_module_set_rpm_components (module, components);
+              g_hash_table_unref (components);
+            }
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "modules"))
+            {
+              if (!_parse_modulemd_module_components (
+                    parser, &components, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Could not parse module components");
+                }
+              modulemd_module_set_module_components (module, components);
+              g_hash_table_unref (components);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown component type");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in components");
+          break;
+        }
+    }
+
+error:
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_components\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_rpm_components (yaml_parser_t *parser,
+                                GHashTable **_components,
+                                GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *components = NULL;
+  gchar *name = NULL;
+  ModulemdComponentRpm *component = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_modulemd_rpm_components\n");
+
+  components =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* The dictionary has begun */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          name = g_strdup ((const gchar *)event.data.scalar.value);
+          if (!_parse_modulemd_rpm_component (parser, &component, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                             "Parse error in RPM component");
+            }
+
+          /* Set this key and value to the hash table */
+          g_hash_table_insert (components, name, component);
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          break;
+        }
+    }
+  *_components = g_hash_table_ref (components);
+
+error:
+  g_hash_table_unref (components);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _parse_modulemd_rpm_components\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_rpm_component (yaml_parser_t *parser,
+                               ModulemdComponentRpm **_component,
+                               GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdComponentRpm *component = NULL;
+  ModulemdSimpleSet *set = NULL;
+  guint64 buildorder = 0;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_modulemd_rpm_component\n");
+
+  component = modulemd_component_rpm_new ();
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* The dictionary has begun */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                          "buildorder"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse buildorder value");
+                }
+
+              buildorder = g_ascii_strtoull (
+                (const gchar *)event.data.scalar.value, NULL, 10);
+              modulemd_component_set_buildorder (
+                MODULEMD_COMPONENT (component), buildorder);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "name"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse name value");
+                }
+
+              modulemd_component_set_name (
+                MODULEMD_COMPONENT (component),
+                (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "rationale"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse rationale value");
+                }
+
+              modulemd_component_set_rationale (
+                MODULEMD_COMPONENT (component),
+                (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "arches"))
+            {
+              if (!_simpleset_from_sequence (parser, &set, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Error parsing component arches");
+                }
+              modulemd_component_rpm_set_arches (component, set);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "cache"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse cache value");
+                }
+
+              modulemd_component_rpm_set_cache (
+                component, (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "multilib"))
+            {
+              if (!_simpleset_from_sequence (parser, &set, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Error parsing multilib arches");
+                }
+              modulemd_component_rpm_set_multilib (component, set);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "ref"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
+                }
+
+              modulemd_component_rpm_set_ref (
+                component, (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "repository"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse repository value");
+                }
+
+              modulemd_component_rpm_set_repository (
+                component, (const gchar *)event.data.scalar.value);
+            }
+
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unexpected key in component");
+            }
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
+          break;
+        }
+    }
+  *_component = g_object_ref (component);
+
+error:
+  g_object_unref (component);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _parse_modulemd_module_components\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_module_components (yaml_parser_t *parser,
+                                   GHashTable **_components,
+                                   GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *components = NULL;
+  gchar *name = NULL;
+  ModulemdComponentModule *component = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_modulemd_module_components\n");
+
+  components =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* The dictionary has begun */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          name = g_strdup ((const gchar *)event.data.scalar.value);
+          if (!_parse_modulemd_module_component (parser, &component, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Parse error in module component");
+            }
+
+          /* Set this key and value to the hash table */
+          g_hash_table_insert (components, name, component);
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          break;
+        }
+    }
+  *_components = g_hash_table_ref (components);
+
+error:
+  g_hash_table_unref (components);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _parse_modulemd_module_components\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_module_component (yaml_parser_t *parser,
+                                  ModulemdComponentModule **_component,
+                                  GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdComponentModule *component = NULL;
+  guint64 buildorder = 0;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_modulemd_rpm_component\n");
+
+  component = modulemd_component_module_new ();
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* The dictionary has begun */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                          "buildorder"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse buildorder value");
+                }
+
+              buildorder = g_ascii_strtoull (
+                (const gchar *)event.data.scalar.value, NULL, 10);
+              modulemd_component_set_buildorder (
+                MODULEMD_COMPONENT (component), buildorder);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "name"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse name value");
+                }
+
+              modulemd_component_set_name (
+                MODULEMD_COMPONENT (component),
+                (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "rationale"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse rationale value");
+                }
+
+              modulemd_component_set_rationale (
+                MODULEMD_COMPONENT (component),
+                (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "ref"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
+                }
+
+              modulemd_component_module_set_ref (
+                component, (const gchar *)event.data.scalar.value);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "repository"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse repository value");
+                }
+
+              modulemd_component_module_set_repository (
+                component, (const gchar *)event.data.scalar.value);
+            }
+
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unexpected key in component");
+            }
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
+          break;
+        }
+    }
+  *_component = g_object_ref (component);
+
+error:
+  g_object_unref (component);
+  if (*error)
+    {
+      return FALSE;
+    }
+
+  g_debug ("TRACE: exiting _parse_modulemd_module_component\n");
   return TRUE;
 }
 

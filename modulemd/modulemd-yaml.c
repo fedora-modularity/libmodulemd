@@ -109,6 +109,14 @@ static gboolean
 _parse_modulemd_refs (ModulemdModule *module,
                       yaml_parser_t *parser,
                       GError **error);
+static gboolean
+_parse_modulemd_profiles (ModulemdModule *module,
+                          yaml_parser_t *parser,
+                          GError **error);
+static gboolean
+_parse_modulemd_profile (yaml_parser_t *parser,
+                         ModulemdProfile **_profile,
+                         GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -454,7 +462,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "profiles"))
             {
               /* Process the install profiles for this module */
-              /* TODO _yaml_recurse_down (_parse_modulemd_profiles); */
+              _yaml_recurse_down (_parse_modulemd_profiles);
             }
 
           /* api */
@@ -737,6 +745,156 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_refs\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_profiles (ModulemdModule *module,
+                          yaml_parser_t *parser,
+                          GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *profiles = NULL;
+  gchar *name = NULL;
+  ModulemdProfile *profile = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_profiles\n");
+
+  profiles =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the profiles. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the profiles */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each entry is the key for a dictionary of ModulemdProfile
+           * objects
+           */
+          name = g_strdup ((const gchar *)event.data.scalar.value);
+          if (!_parse_modulemd_profile (parser, &profile, error))
+            {
+              g_free (name);
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid profile");
+            }
+          g_hash_table_insert (profiles, name, profile);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
+          break;
+        }
+    }
+  modulemd_module_set_profiles (module, profiles);
+
+error:
+  g_hash_table_unref (profiles);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_profiles\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_profile (yaml_parser_t *parser,
+                         ModulemdProfile **_profile,
+                         GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdSimpleSet *set = NULL;
+  ModulemdProfile *profile = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_profile\n");
+
+  profile = modulemd_profile_new ();
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the profile content. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the profile content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each entry must be one of "rpms" or "description" */
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              /* Get the set of RPMs */
+              if (!_simpleset_from_sequence (parser, &set, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Could not parse profile RPMs");
+                }
+              modulemd_profile_set_rpms (profile, set);
+              g_object_unref (set);
+            }
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "description"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "No value for description");
+                }
+
+              modulemd_profile_set_description (
+                profile, (const gchar *)event.data.scalar.value);
+            }
+          else
+            {
+              /* Unknown field in profile */
+              MMD_YAML_ERROR_RETURN (error, "Unknown key in profile body");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
+          break;
+        }
+    }
+
+  *_profile = g_object_ref (profile);
+
+error:
+  g_object_unref (profile);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_profile\n");
   return TRUE;
 }
 

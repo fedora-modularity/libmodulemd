@@ -53,6 +53,10 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   g_assert_false (modules[1]);
   g_assert_true (error == NULL);
   g_assert_cmpuint (modulemd_module_get_mdversion (modules[0]), ==, 1);
+  g_assert_cmpstr (modulemd_module_get_name (modules[0]), ==, "foo");
+  g_assert_cmpstr (modulemd_module_get_stream (modules[0]), ==, "stream-name");
+  g_assert_cmpstr (
+    modulemd_module_get_summary (modules[0]), ==, "An example module");
 
   modules = parse_yaml_file ("../test_data/bad-document.yaml", &error);
   g_assert_false (modules);

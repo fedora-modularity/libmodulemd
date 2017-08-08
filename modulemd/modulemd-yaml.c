@@ -299,8 +299,7 @@ _parse_modulemd_root (ModulemdModule *module,
                   g_strcmp0 ((const gchar *)event.data.scalar.value,
                              "modulemd"))
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Unknown document type");
+                  MMD_YAML_ERROR_RETURN (error, "Unknown document type");
                 }
             }
 

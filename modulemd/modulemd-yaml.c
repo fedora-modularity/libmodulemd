@@ -105,6 +105,10 @@ static gboolean
 _parse_modulemd_deps (ModulemdModule *module,
                       yaml_parser_t *parser,
                       GError **error);
+static gboolean
+_parse_modulemd_refs (ModulemdModule *module,
+                      yaml_parser_t *parser,
+                      GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -442,7 +446,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "references"))
             {
               /* Process the reference links for this module */
-              /* TODO _yaml_recurse_down (_parse_modulemd_refs); */
+              _yaml_recurse_down (_parse_modulemd_refs);
             }
 
           /* profiles */
@@ -678,6 +682,61 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_deps\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_refs (ModulemdModule *module,
+                      yaml_parser_t *parser,
+                      GError **error)
+{
+  yaml_event_t event;
+  GHashTable *refs = NULL;
+  gpointer value;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_refs\n");
+
+  /* This is a hack so we can use the MMD_YAML_ERROR_RETURN macro below */
+  event.type = YAML_SCALAR_EVENT;
+
+  if (!_hashtable_from_mapping (parser, &refs, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
+    }
+
+  if ((value = g_hash_table_lookup (refs, "community")))
+    {
+      modulemd_module_set_community (module, (const gchar *)value);
+      g_hash_table_remove (refs, "community");
+    }
+
+  if ((value = g_hash_table_lookup (refs, "documentation")))
+    {
+      modulemd_module_set_documentation (module, (const gchar *)value);
+      g_hash_table_remove (refs, "documentation");
+    }
+
+  if ((value = g_hash_table_lookup (refs, "tracker")))
+    {
+      modulemd_module_set_tracker (module, (const gchar *)value);
+      g_hash_table_remove (refs, "tracker");
+    }
+
+  /* Make sure there were no other entries */
+  if (g_hash_table_size (refs) > 0)
+    {
+      MMD_YAML_ERROR_RETURN (error, "Unexpected key found in references.");
+    }
+
+error:
+  g_clear_pointer (&refs, g_hash_table_unref);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_refs\n");
   return TRUE;
 }
 

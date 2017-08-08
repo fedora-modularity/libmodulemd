@@ -300,7 +300,7 @@ _parse_modulemd_root (ModulemdModule *module,
                              "modulemd"))
                 {
                   MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse document type");
+                                         "Unknown document type");
                 }
             }
 

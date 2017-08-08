@@ -121,6 +121,10 @@ static gboolean
 _parse_modulemd_api (ModulemdModule *module,
                      yaml_parser_t *parser,
                      GError **error);
+static gboolean
+_parse_modulemd_filters (ModulemdModule *module,
+                         yaml_parser_t *parser,
+                         GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -481,7 +485,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "filter"))
             {
               /* Process the filtered-out output components */
-              /* TODO _yaml_recurse_down (_parse_modulemd_filters); */
+              _yaml_recurse_down (_parse_modulemd_filters);
             }
 
           /* buildopts */
@@ -961,6 +965,69 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_api\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_filters (ModulemdModule *module,
+                         yaml_parser_t *parser,
+                         GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdSimpleSet *set = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_filters\n");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the filters. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the filters */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Currently, we only support "rpms" here */
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              if (!_simpleset_from_sequence (parser, &set, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                                 "Parse error in filters");
+                }
+              modulemd_module_set_rpm_filter (module, set);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown filter type");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in filters");
+          break;
+        }
+    }
+
+error:
+  g_object_unref (set);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_filters\n");
   return TRUE;
 }
 

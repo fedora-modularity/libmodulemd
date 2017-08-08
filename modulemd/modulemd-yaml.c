@@ -310,6 +310,13 @@ _parse_modulemd_root (ModulemdModule *module,
             {
               _yaml_recurse_down (_parse_modulemd_data);
             }
+
+          else
+            {
+              g_message ("Unexpected key in root: %s",
+                         (const gchar *)event.data.scalar.value);
+              MMD_YAML_ERROR_RETURN (error, "Unexpected key in root");
+            }
           break;
 
         default:
@@ -520,7 +527,12 @@ _parse_modulemd_data (ModulemdModule *module,
               _yaml_recurse_down (_parse_modulemd_artifacts);
             }
 
-
+          else
+            {
+              g_message ("Unexpected key in data: %s",
+                         (const gchar *)event.data.scalar.value);
+              MMD_YAML_ERROR_RETURN (error, "Unexpected key in data");
+            }
           break;
 
         default:

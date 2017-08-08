@@ -125,6 +125,10 @@ static gboolean
 _parse_modulemd_filters (ModulemdModule *module,
                          yaml_parser_t *parser,
                          GError **error);
+static gboolean
+_parse_modulemd_buildopts (ModulemdModule *module,
+                           yaml_parser_t *parser,
+                           GError **error);
 
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
@@ -493,7 +497,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "buildopts"))
             {
               /* Process special build options for this module */
-              /* TODO _yaml_recurse_down (_parse_modulemd_buildopts); */
+              _yaml_recurse_down (_parse_modulemd_buildopts);
             }
 
           /* Components */
@@ -1028,6 +1032,69 @@ error:
       return FALSE;
     }
   g_debug ("TRACE: exiting _parse_modulemd_filters\n");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_buildopts (ModulemdModule *module,
+                           yaml_parser_t *parser,
+                           GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *opts = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_buildopts\n");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the buildopts. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the buildopts */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Currently, we only support "rpms" here */
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              if (!_hashtable_from_mapping (parser, &opts, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                                 "Parse error in buildopts");
+                }
+              modulemd_module_set_rpm_buildopts (module, opts);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown filter type");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in buildopts");
+          break;
+        }
+    }
+
+error:
+  g_hash_table_unref (opts);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_buildopts\n");
   return TRUE;
 }
 

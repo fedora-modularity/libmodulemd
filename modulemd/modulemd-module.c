@@ -1477,3 +1477,50 @@ modulemd_module_load (ModulemdModule *self,
         }
     }
 }
+
+/**
+ * modulemd_module_loads:
+ * @self: The existing #ModulemdModule to be populated with data
+ * @yaml: A string containing a YAML document defining this module.
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules contained in this document.
+ *
+ * This function will read @yaml_file and populate this #ModulemdModule with
+ * content. If the string being read contains more than one document, they will
+ * be returned as a zero-terminated array @_modules.
+ */
+void
+modulemd_module_loads (ModulemdModule *self,
+                       const gchar *yaml,
+                       ModulemdModule ***_modules)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_string (yaml, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  modulemd_module_clone (self, modules[0]);
+
+  if (_modules)
+    {
+      /* Make sure element 0 is self, not a copy of self */
+      g_object_unref (modules[0]);
+      modules[0] = g_object_ref (self);
+
+      *_modules = modules;
+    }
+  else
+    {
+      /* Free all the other modules */
+      for (gsize i = 1; modules[i]; i++)
+        {
+          g_object_unref (modules[i]);
+        }
+    }
+}

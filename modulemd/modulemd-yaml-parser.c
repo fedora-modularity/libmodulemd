@@ -29,9 +29,7 @@
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 
-#define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
-
-static GQuark
+GQuark
 modulemd_yaml_error_quark (void)
 {
   return g_quark_from_static_string ("modulemd-yaml-error-quark");

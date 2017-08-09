@@ -34,19 +34,9 @@ modulemd_yaml_error_quark (void);
 enum ModulemdYamlError
 {
   MODULEMD_YAML_ERROR_OPEN,
-  MODULEMD_YAML_ERROR_PARSE
+  MODULEMD_YAML_ERROR_PARSE,
+  MODULEMD_YAML_ERROR_EMIT
 };
-
-#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
-  do                                                                          \
-    {                                                                         \
-      g_message (msg);                                                        \
-      g_set_error_literal (                                                   \
-        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
-      g_debug ("Error occurred while parsing event %u", event.type);          \
-      goto error;                                                             \
-    }                                                                         \
-  while (0)
 
 #define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
   do                                                                          \
@@ -62,5 +52,11 @@ parse_yaml_file (const gchar *path, GError **error);
 
 ModulemdModule **
 parse_yaml_string (const gchar *yaml, GError **error);
+
+gboolean
+emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error);
+
+gboolean
+emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error);
 
 #endif

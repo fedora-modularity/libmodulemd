@@ -64,6 +64,27 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   g_assert_cmpstr (error->message, ==, "Unknown document type");
 }
 
+static void
+modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
+{
+  gchar *yaml;
+  gboolean result;
+  GError *error = NULL;
+  ModulemdModule **modules;
+
+  modules = g_malloc0_n (2, sizeof (ModulemdModule *));
+  modules[0] = modulemd_module_new ();
+  modules[1] = NULL;
+
+  modulemd_module_load (modules[0], "../test_data/good.yaml", &modules);
+
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_true (yaml);
+  g_message ("YAML:\n%s", yaml);
+  g_clear_pointer (&modules[0], g_object_unref);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -78,6 +99,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_yaml_set_up,
               modulemd_yaml_test_parse_file,
+              modulemd_yaml_tear_down);
+
+  g_test_add ("/modulemd/yaml/test_emit_string",
+              YamlFixture,
+              NULL,
+              modulemd_yaml_set_up,
+              modulemd_yaml_test_emit_string,
               modulemd_yaml_tear_down);
 
   return g_test_run ();

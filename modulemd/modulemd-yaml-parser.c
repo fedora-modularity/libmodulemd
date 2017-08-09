@@ -48,6 +48,16 @@ modulemd_yaml_error_quark (void)
     }                                                                         \
   while (0)
 
+#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      g_debug ("Error occurred while parsing event %u", event.type);          \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
 
 #define _yaml_parser_recurse_down(fn)                                         \
   do                                                                          \

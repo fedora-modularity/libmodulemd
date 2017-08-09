@@ -1339,3 +1339,92 @@ modulemd_module_new (void)
 {
   return g_object_new (MODULEMD_TYPE_MODULE, NULL);
 }
+
+/**
+ * modulemd_module_clone:
+ * @self: The existing #ModulemdModule to be cloned
+ * @orig: The destination #ModulemdModule.
+ *
+ * Assign all the member values of @orig to @self
+ */
+void
+modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig)
+{
+  GHashTable *buildrequires = modulemd_module_get_buildrequires (orig);
+  const gchar *community = modulemd_module_get_community (orig);
+  ModulemdSimpleSet *content_licenses =
+    modulemd_module_get_content_licenses (orig);
+  const gchar *desc = modulemd_module_get_description (orig);
+  const gchar *docs = modulemd_module_get_documentation (orig);
+  const guint64 mdversion = modulemd_module_get_mdversion (orig);
+  GHashTable *module_components = modulemd_module_get_module_components (orig);
+  ModulemdSimpleSet *module_licenses =
+    modulemd_module_get_module_licenses (orig);
+  const gchar *name = modulemd_module_get_name (orig);
+  GHashTable *profiles = modulemd_module_get_profiles (orig);
+  GHashTable *requires = modulemd_module_get_requires (orig);
+  ModulemdSimpleSet *rpm_api = modulemd_module_get_rpm_api (orig);
+  ModulemdSimpleSet *rpm_artifacts = modulemd_module_get_rpm_artifacts (orig);
+  GHashTable *rpm_buildopts = modulemd_module_get_rpm_buildopts (orig);
+  GHashTable *rpm_components = modulemd_module_get_rpm_components (orig);
+  ModulemdSimpleSet *rpm_filter = modulemd_module_get_rpm_filter (orig);
+  const gchar *stream = modulemd_module_get_stream (orig);
+  const gchar *summary = modulemd_module_get_summary (orig);
+  const gchar *tracker = modulemd_module_get_tracker (orig);
+  const guint64 version = modulemd_module_get_version (orig);
+  GHashTable *xmd = modulemd_module_get_xmd (orig);
+
+  modulemd_module_set_buildrequires (self, buildrequires);
+  g_hash_table_unref (buildrequires);
+
+  modulemd_module_set_community (self, community);
+
+  modulemd_module_set_content_licenses (self, content_licenses);
+  g_object_unref (content_licenses);
+
+  modulemd_module_set_description (self, desc);
+
+  modulemd_module_set_documentation (self, docs);
+
+  modulemd_module_set_mdversion (self, mdversion);
+
+  modulemd_module_set_module_components (self, module_components);
+  g_hash_table_unref (module_components);
+
+  modulemd_module_set_module_licenses (self, module_licenses);
+  g_object_unref (module_licenses);
+
+  modulemd_module_set_name (self, name);
+
+  modulemd_module_set_profiles (self, profiles);
+  g_hash_table_unref (profiles);
+
+  modulemd_module_set_requires (self, requires);
+  g_hash_table_unref (requires);
+
+  modulemd_module_set_rpm_api (self, rpm_api);
+  g_object_unref (rpm_api);
+
+  modulemd_module_set_rpm_artifacts (self, rpm_artifacts);
+  g_object_unref (rpm_artifacts);
+
+  modulemd_module_set_rpm_buildopts (self, rpm_buildopts);
+  g_hash_table_unref (rpm_buildopts);
+
+  modulemd_module_set_rpm_components (self, rpm_components);
+  g_hash_table_unref (rpm_components);
+
+  modulemd_module_set_rpm_filter (self, rpm_filter);
+  g_object_unref (rpm_filter);
+
+  modulemd_module_set_stream (self, stream);
+
+  modulemd_module_set_summary (self, summary);  g_free ((gpointer)summary);
+
+  modulemd_module_set_tracker (self, tracker);
+
+  modulemd_module_set_version (self, version);
+
+  modulemd_module_set_xmd (self, xmd);
+  g_hash_table_unref (xmd);
+}

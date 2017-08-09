@@ -38,6 +38,9 @@ ModulemdModule *
 modulemd_module_new (void);
 
 void
+modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig);
+
+void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires);
 

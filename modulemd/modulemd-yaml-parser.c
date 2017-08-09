@@ -50,7 +50,7 @@ enum ModulemdYamlError
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
           goto error;                                                         \
         }                                                                     \
-      g_debug ("Parser event: %u\n", (event)->type);                          \
+      g_debug ("Parser event: %u", (event)->type);                            \
     }                                                                         \
   while (0)
 
@@ -156,7 +156,7 @@ parse_yaml_file (const gchar *path, GError **error)
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (path, NULL);
 
-  g_debug ("TRACE: entering parse_yaml_file\n");
+  g_debug ("TRACE: entering parse_yaml_file");
 
   yaml_parser_initialize (&parser);
 
@@ -178,7 +178,7 @@ parse_yaml_file (const gchar *path, GError **error)
 
 error:
   fclose (yaml_file);
-  g_debug ("TRACE: exiting parse_yaml_file\n");
+  g_debug ("TRACE: exiting parse_yaml_file");
   return modules;
 }
 
@@ -191,7 +191,7 @@ parse_yaml_string (const gchar *yaml, GError **error)
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (yaml, NULL);
 
-  g_debug ("TRACE: entering parse_yaml_string\n");
+  g_debug ("TRACE: entering parse_yaml_string");
 
   yaml_parser_initialize (&parser);
 
@@ -200,7 +200,7 @@ parse_yaml_string (const gchar *yaml, GError **error)
 
   modules = _parse_yaml (&parser, error);
 
-  g_debug ("TRACE: exiting parse_yaml_string\n");
+  g_debug ("TRACE: exiting parse_yaml_string");
   return modules;
 }
 
@@ -212,7 +212,7 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
   yaml_event_t event;
   gboolean done = FALSE;
 
-  g_debug ("TRACE: entering _parse_yaml\n");
+  g_debug ("TRACE: entering _parse_yaml");
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_ERROR_RETURN (
@@ -273,7 +273,7 @@ error:
         }
     }
 
-  g_debug ("TRACE: exiting _parse_yaml\n");
+  g_debug ("TRACE: exiting _parse_yaml");
   return modules;
 }
 
@@ -288,7 +288,7 @@ _parse_modulemd_root (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_root\n");
+  g_debug ("TRACE: entering _parse_modulemd_root");
 
   /* Parse until the end of this document */
   while (!done)
@@ -370,7 +370,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_root\n");
+  g_debug ("TRACE: exiting _parse_modulemd_root");
   return TRUE;
 }
 
@@ -384,7 +384,7 @@ _parse_modulemd_data (ModulemdModule *module,
   guint64 version;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_data\n");
+  g_debug ("TRACE: entering _parse_modulemd_data");
 
   while (!done)
     {
@@ -585,7 +585,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_data\n");
+  g_debug ("TRACE: exiting _parse_modulemd_data");
   return TRUE;
 }
 
@@ -600,7 +600,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_licenses\n");
+  g_debug ("TRACE: entering _parse_modulemd_licenses");
 
   while (!done)
     {
@@ -655,7 +655,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_licenses\n");
+  g_debug ("TRACE: exiting _parse_modulemd_licenses");
   return TRUE;
 }
 
@@ -667,7 +667,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
   GHashTable *xmd = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_xmd\n");
+  g_debug ("TRACE: entering _parse_modulemd_xmd");
 
   if (!_hashtable_from_mapping (parser, &xmd, error))
     {
@@ -684,7 +684,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_xmd\n");
+  g_debug ("TRACE: exiting _parse_modulemd_xmd");
   return TRUE;
 }
 
@@ -699,7 +699,7 @@ _parse_modulemd_deps (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_deps\n");
+  g_debug ("TRACE: entering _parse_modulemd_deps");
 
   while (!done)
     {
@@ -755,7 +755,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_deps\n");
+  g_debug ("TRACE: exiting _parse_modulemd_deps");
   return TRUE;
 }
 
@@ -770,7 +770,7 @@ _parse_modulemd_refs (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_refs\n");
+  g_debug ("TRACE: entering _parse_modulemd_refs");
 
   /* This is a hack so we can use the MMD_YAML_ERROR_RETURN macro below */
   event.type = YAML_SCALAR_EVENT;
@@ -810,7 +810,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_refs\n");
+  g_debug ("TRACE: exiting _parse_modulemd_refs");
   return TRUE;
 }
 
@@ -827,7 +827,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_profiles\n");
+  g_debug ("TRACE: entering _parse_modulemd_profiles");
 
   profiles =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
@@ -875,7 +875,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_profiles\n");
+  g_debug ("TRACE: exiting _parse_modulemd_profiles");
   return TRUE;
 }
 
@@ -891,7 +891,7 @@ _parse_modulemd_profile (yaml_parser_t *parser,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_profile\n");
+  g_debug ("TRACE: entering _parse_modulemd_profile");
 
   profile = modulemd_profile_new ();
 
@@ -960,7 +960,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_profile\n");
+  g_debug ("TRACE: exiting _parse_modulemd_profile");
   return TRUE;
 }
 
@@ -975,7 +975,7 @@ _parse_modulemd_api (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_api\n");
+  g_debug ("TRACE: entering _parse_modulemd_api");
 
   while (!done)
     {
@@ -1022,7 +1022,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_api\n");
+  g_debug ("TRACE: exiting _parse_modulemd_api");
   return TRUE;
 }
 
@@ -1037,7 +1037,7 @@ _parse_modulemd_filters (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_filters\n");
+  g_debug ("TRACE: entering _parse_modulemd_filters");
 
   while (!done)
     {
@@ -1085,7 +1085,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_filters\n");
+  g_debug ("TRACE: exiting _parse_modulemd_filters");
   return TRUE;
 }
 
@@ -1100,7 +1100,7 @@ _parse_modulemd_buildopts (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_buildopts\n");
+  g_debug ("TRACE: entering _parse_modulemd_buildopts");
 
   while (!done)
     {
@@ -1148,7 +1148,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_buildopts\n");
+  g_debug ("TRACE: exiting _parse_modulemd_buildopts");
   return TRUE;
 }
 
@@ -1163,7 +1163,7 @@ _parse_modulemd_components (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_components\n");
+  g_debug ("TRACE: entering _parse_modulemd_components");
 
   while (!done)
     {
@@ -1225,7 +1225,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_components\n");
+  g_debug ("TRACE: exiting _parse_modulemd_components");
   return TRUE;
 }
 
@@ -1241,7 +1241,7 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
   ModulemdComponentRpm *component = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_rpm_components\n");
+  g_debug ("TRACE: entering _parse_modulemd_rpm_components");
 
   components =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
@@ -1290,7 +1290,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_rpm_components\n");
+  g_debug ("TRACE: exiting _parse_modulemd_rpm_components");
   return TRUE;
 }
 
@@ -1306,7 +1306,7 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
   guint64 buildorder = 0;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_rpm_component\n");
+  g_debug ("TRACE: entering _parse_modulemd_rpm_component");
 
   component = modulemd_component_rpm_new ();
 
@@ -1460,7 +1460,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_components\n");
+  g_debug ("TRACE: exiting _parse_modulemd_module_components");
   return TRUE;
 }
 
@@ -1476,7 +1476,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
   ModulemdComponentModule *component = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_module_components\n");
+  g_debug ("TRACE: entering _parse_modulemd_module_components");
 
   components =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
@@ -1525,7 +1525,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_components\n");
+  g_debug ("TRACE: exiting _parse_modulemd_module_components");
   return TRUE;
 }
 
@@ -1540,7 +1540,7 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
   guint64 buildorder = 0;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_rpm_component\n");
+  g_debug ("TRACE: entering _parse_modulemd_rpm_component");
 
   component = modulemd_component_module_new ();
 
@@ -1658,7 +1658,7 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_component\n");
+  g_debug ("TRACE: exiting _parse_modulemd_module_component");
   return TRUE;
 }
 
@@ -1673,7 +1673,7 @@ _parse_modulemd_artifacts (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_artifacts\n");
+  g_debug ("TRACE: entering _parse_modulemd_artifacts");
 
   while (!done)
     {
@@ -1721,7 +1721,7 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_artifacts\n");
+  g_debug ("TRACE: exiting _parse_modulemd_artifacts");
   return TRUE;
 }
 
@@ -1736,7 +1736,7 @@ _simpleset_from_sequence (yaml_parser_t *parser,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _simpleset_from_sequence\n");
+  g_debug ("TRACE: entering _simpleset_from_sequence");
 
   set = modulemd_simpleset_new ();
 
@@ -1775,7 +1775,7 @@ error:
       return FALSE;
     }
   *_set = set;
-  g_debug ("TRACE: exiting _simpleset_from_sequence\n");
+  g_debug ("TRACE: exiting _simpleset_from_sequence");
   return TRUE;
 }
 
@@ -1791,7 +1791,7 @@ _hashtable_from_mapping (yaml_parser_t *parser,
   gchar *value = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _hashtable_from_mapping\n");
+  g_debug ("TRACE: entering _hashtable_from_mapping");
 
   htable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
@@ -1844,6 +1844,6 @@ error:
       return FALSE;
     }
 
-  g_debug ("TRACE: exiting _hashtable_from_mapping\n");
+  g_debug ("TRACE: exiting _hashtable_from_mapping");
   return TRUE;
 }

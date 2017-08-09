@@ -85,7 +85,8 @@ test_modulemd_yaml = executable(
     ],
     install : false,
 )
-test('test_modulemd_yaml', test_modulemd_yaml)
+test('test_modulemd_yaml', test_modulemd_yaml,
+     env : ['G_MESSAGES_DEBUG=all'])
 
 gnome.generate_gir(
     modulemd_lib,

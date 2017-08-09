@@ -5,7 +5,7 @@ modulemd_srcs = [
     'modulemd-module.c',
     'modulemd-profile.c',
     'modulemd-simpleset.c',
-    'modulemd-yaml.c',
+    'modulemd-yaml-parser.c',
 ]
 
 modulemd_hdrs = [

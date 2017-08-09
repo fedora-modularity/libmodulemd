@@ -27,6 +27,36 @@
 
 #include "modulemd.h"
 
+#define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
+GQuark
+modulemd_yaml_error_quark (void);
+
+enum ModulemdYamlError
+{
+  MODULEMD_YAML_ERROR_OPEN,
+  MODULEMD_YAML_ERROR_PARSE
+};
+
+#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      g_debug ("Error occurred while parsing event %u", event.type);          \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
+#define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
+
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error);
 

@@ -1,4 +1,4 @@
-/* modulemd-yaml.c
+/* modulemd-yaml-parser.c
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -56,24 +56,6 @@ enum ModulemdYamlError
     }                                                                         \
   while (0)
 
-#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
-  do                                                                          \
-    {                                                                         \
-      g_message (msg);                                                        \
-      g_set_error_literal (                                                   \
-        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
-      g_debug ("Error occurred while parsing event %u", event.type);          \
-      goto error;                                                             \
-    }                                                                         \
-  while (0)
-
-#define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
-  do                                                                          \
-    {                                                                         \
-      g_message (msg);                                                        \
-      goto error;                                                             \
-    }                                                                         \
-  while (0)
 
 #define _yaml_recurse_down(fn)                                                \
   do                                                                          \

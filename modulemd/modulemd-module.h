@@ -38,6 +38,11 @@ ModulemdModule *
 modulemd_module_new (void);
 
 void
+modulemd_module_load (ModulemdModule *self,
+                      const gchar *yaml_file,
+                      ModulemdModule ***_modules);
+
+void
 modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig);
 
 void

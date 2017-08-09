@@ -23,6 +23,7 @@
  */
 
 #include "modulemd.h"
+#include "modulemd-yaml.h"
 #include <glib.h>
 #include <yaml.h>
 
@@ -1419,7 +1420,8 @@ modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig)
 
   modulemd_module_set_stream (self, stream);
 
-  modulemd_module_set_summary (self, summary);  g_free ((gpointer)summary);
+  modulemd_module_set_summary (self, summary);
+  g_free ((gpointer)summary);
 
   modulemd_module_set_tracker (self, tracker);
 
@@ -1427,4 +1429,51 @@ modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig)
 
   modulemd_module_set_xmd (self, xmd);
   g_hash_table_unref (xmd);
+}
+
+/**
+ * modulemd_module_load:
+ * @self: The existing #ModulemdModule to be populated with data
+ * @yaml_file: A path to a YAML document defining this module.
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules contained in this document.
+ *
+ * This function will read @yaml_file and populate this #ModulemdModule with
+ * content. If the file being read contains more than one document, they will
+ * be returned as a zero-terminated array @_modules.
+ */
+void
+modulemd_module_load (ModulemdModule *self,
+                      const gchar *yaml_file,
+                      ModulemdModule ***_modules)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_file (yaml_file, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  modulemd_module_clone (self, modules[0]);
+
+  if (_modules)
+    {
+      /* Make sure element 0 is self, not a copy of self */
+      g_object_unref (modules[0]);
+      modules[0] = g_object_ref (self);
+
+      *_modules = modules;
+    }
+  else
+    {
+      /* Free all the other modules */
+      for (gsize i = 1; modules[i]; i++)
+        {
+          g_object_unref (modules[i]);
+        }
+    }
 }

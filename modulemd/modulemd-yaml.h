@@ -30,4 +30,7 @@
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error);
 
+ModulemdModule **
+parse_yaml_string (const gchar *yaml, GError **error);
+
 #endif

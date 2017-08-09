@@ -85,6 +85,9 @@ enum ModulemdYamlError
     }                                                                         \
   while (0)
 
+static ModulemdModule **
+_parse_yaml (yaml_parser_t *parser, GError **error);
+
 static gboolean
 _parse_modulemd_root (ModulemdModule *module,
                       yaml_parser_t *parser,
@@ -166,12 +169,9 @@ _hashtable_from_mapping (yaml_parser_t *parser,
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error)
 {
-  FILE *yaml_file;
-  gsize count = 0;
+  FILE *yaml_file = NULL;
   ModulemdModule **modules = NULL;
   yaml_parser_t parser;
-  yaml_event_t event;
-  gboolean done = FALSE;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (path, NULL);
@@ -194,10 +194,49 @@ parse_yaml_file (const gchar *path, GError **error)
 
   yaml_parser_set_input_file (&parser, yaml_file);
 
+  modules = _parse_yaml (&parser, error);
+
+error:
+  fclose (yaml_file);
+  g_debug ("TRACE: exiting parse_yaml_file\n");
+  return modules;
+}
+
+ModulemdModule **
+parse_yaml_string (const gchar *yaml, GError **error)
+{
+  ModulemdModule **modules = NULL;
+  yaml_parser_t parser;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (yaml, NULL);
+
+  g_debug ("TRACE: entering parse_yaml_string\n");
+
+  yaml_parser_initialize (&parser);
+
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml, strlen (yaml));
+
+  modules = _parse_yaml (&parser, error);
+
+  g_debug ("TRACE: exiting parse_yaml_string\n");
+  return modules;
+}
+
+static ModulemdModule **
+_parse_yaml (yaml_parser_t *parser, GError **error)
+{
+  gsize count = 0;
+  ModulemdModule **modules = NULL;
+  yaml_event_t event;
+  gboolean done = FALSE;
+
+  g_debug ("TRACE: entering _parse_yaml\n");
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-        &parser, &event, error, "Parser error");
+        parser, &event, error, "Parser error");
 
       switch (event.type)
         {
@@ -219,7 +258,7 @@ parse_yaml_file (const gchar *path, GError **error)
           /* New document; create a new ModulemdModule object */
           modules[count - 1] = modulemd_module_new ();
 
-          if (!_parse_modulemd_root (modules[count - 1], &parser, error))
+          if (!_parse_modulemd_root (modules[count - 1], parser, error))
             {
               goto error;
             }
@@ -254,7 +293,7 @@ error:
         }
     }
 
-  g_debug ("TRACE: exiting parse_yaml_file\n");
+  g_debug ("TRACE: exiting _parse_yaml\n");
   return modules;
 }
 

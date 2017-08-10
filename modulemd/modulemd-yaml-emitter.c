@@ -115,10 +115,18 @@ static gboolean
 _emit_modulemd_licenses (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error);
+static gboolean
+_emit_modulemd_xmd (yaml_emitter_t *emitter,
+                    ModulemdModule *module,
+                    GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
+                          GError **error);
+static gboolean
+_emit_modulemd_hashtable (yaml_emitter_t *emitter,
+                          GHashTable *set,
                           GError **error);
 
 gboolean
@@ -420,7 +428,14 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   /* Module Licenses */
   if (!_emit_modulemd_licenses (emitter, module, error))
     {
-      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit data");
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit licenses");
+    }
+
+
+  /* Extensible Metadata Block */
+  if (!_emit_modulemd_xmd (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit xmd");
     }
 
 
@@ -446,7 +461,6 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
   yaml_event_t event;
   gchar *name = NULL;
   ModulemdSimpleSet *set = NULL;
-  guint64 version = 0;
 
   g_debug ("TRACE: entering _emit_modulemd_licenses");
 
@@ -512,6 +526,43 @@ error:
 }
 
 static gboolean
+_emit_modulemd_xmd (yaml_emitter_t *emitter,
+                    ModulemdModule *module,
+                    GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *htable = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_xmd");
+
+  htable = modulemd_module_get_xmd (module);
+  if (htable)
+    {
+      name = g_strdup ("xmd");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_hashtable (emitter, htable, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module xmd");
+        }
+      g_clear_pointer (&htable, g_hash_table_unref);
+
+    }
+  ret = TRUE;
+error:
+  g_free (name);
+  if (htable)
+    {
+      g_hash_table_unref (htable);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_xmd");
+  return ret;
+}
+
+static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
                           GError **error)
@@ -533,6 +584,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
       MMD_YAML_EMIT_SCALAR (&event, strv[i], YAML_PLAIN_SCALAR_STYLE);
     }
 
+  g_debug ("GOT HERE");
   yaml_sequence_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending simpleset sequence");
@@ -546,5 +598,57 @@ error:
   g_free (strv);
 
   g_debug ("TRACE: exiting _emit_modulemd_simpleset");
+  return ret;
+}
+
+typedef struct _hash_entry_s
+{
+  yaml_emitter_t *emitter;
+  GError **error;
+} hash_entry_ctx;
+
+static void
+_emit_hash_entries (gpointer _key, gpointer _value, gpointer user_data)
+{
+  yaml_event_t event;
+  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
+  GError **error = ((hash_entry_ctx *)user_data)->error;
+
+  gchar *name = g_strdup (_key);
+  gchar *value = g_strdup (_value);
+
+  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+
+error:
+  g_free (name);
+  g_free (value);
+}
+
+static gboolean
+_emit_modulemd_hashtable (yaml_emitter_t *emitter,
+                          GHashTable *htable,
+                          GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  hash_entry_ctx hctx = { emitter, error };
+
+  g_debug ("TRACE: entering _emit_modulemd_hashtable");
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting hashtable mapping");
+
+  g_hash_table_foreach (htable, _emit_hash_entries, &hctx);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending hashtable mapping");
+
+  ret = TRUE;
+error:
+
+  g_debug ("TRACE: exiting _emit_modulemd_hashtable");
   return ret;
 }

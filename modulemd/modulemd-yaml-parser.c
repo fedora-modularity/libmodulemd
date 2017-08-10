@@ -35,12 +35,6 @@ modulemd_yaml_error_quark (void)
   return g_quark_from_static_string ("modulemd-yaml-error-quark");
 }
 
-enum ModulemdYamlError
-{
-  MODULEMD_YAML_ERROR_OPEN,
-  MODULEMD_YAML_ERROR_PARSE
-};
-
 #define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \
   do                                                                          \
     {                                                                         \
@@ -55,7 +49,7 @@ enum ModulemdYamlError
   while (0)
 
 
-#define _yaml_recurse_down(fn)                                                \
+#define _yaml_parser_recurse_down(fn)                                         \
   do                                                                          \
     {                                                                         \
       if (!fn (module, parser, error))                                        \
@@ -177,6 +171,7 @@ parse_yaml_file (const gchar *path, GError **error)
   modules = _parse_yaml (&parser, error);
 
 error:
+  yaml_parser_delete (&parser);
   fclose (yaml_file);
   g_debug ("TRACE: exiting parse_yaml_file");
   return modules;
@@ -199,6 +194,7 @@ parse_yaml_string (const gchar *yaml, GError **error)
     &parser, (const unsigned char *)yaml, strlen (yaml));
 
   modules = _parse_yaml (&parser, error);
+  yaml_parser_delete (&parser);
 
   g_debug ("TRACE: exiting parse_yaml_string");
   return modules;
@@ -346,7 +342,7 @@ _parse_modulemd_root (ModulemdModule *module,
           /* Process the data section */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "data"))
             {
-              _yaml_recurse_down (_parse_modulemd_data);
+              _yaml_parser_recurse_down (_parse_modulemd_data);
             }
 
           else
@@ -492,14 +488,14 @@ _parse_modulemd_data (ModulemdModule *module,
                                "license"))
             {
               /* Process the module and content licenses */
-              _yaml_recurse_down (_parse_modulemd_licenses);
+              _yaml_parser_recurse_down (_parse_modulemd_licenses);
             }
 
           /* xmd */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "xmd"))
             {
               /* Process the extensible metadata block */
-              _yaml_recurse_down (_parse_modulemd_xmd);
+              _yaml_parser_recurse_down (_parse_modulemd_xmd);
             }
 
           /* dependencies */
@@ -507,7 +503,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "dependencies"))
             {
               /* Process the build and runtime dependencies of this module */
-              _yaml_recurse_down (_parse_modulemd_deps);
+              _yaml_parser_recurse_down (_parse_modulemd_deps);
             }
 
           /* references */
@@ -515,7 +511,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "references"))
             {
               /* Process the reference links for this module */
-              _yaml_recurse_down (_parse_modulemd_refs);
+              _yaml_parser_recurse_down (_parse_modulemd_refs);
             }
 
           /* profiles */
@@ -523,14 +519,14 @@ _parse_modulemd_data (ModulemdModule *module,
                                "profiles"))
             {
               /* Process the install profiles for this module */
-              _yaml_recurse_down (_parse_modulemd_profiles);
+              _yaml_parser_recurse_down (_parse_modulemd_profiles);
             }
 
           /* api */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "api"))
             {
               /* Process the API list */
-              _yaml_recurse_down (_parse_modulemd_api);
+              _yaml_parser_recurse_down (_parse_modulemd_api);
             }
 
           /* filter */
@@ -538,7 +534,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "filter"))
             {
               /* Process the filtered-out output components */
-              _yaml_recurse_down (_parse_modulemd_filters);
+              _yaml_parser_recurse_down (_parse_modulemd_filters);
             }
 
           /* buildopts */
@@ -546,7 +542,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "buildopts"))
             {
               /* Process special build options for this module */
-              _yaml_recurse_down (_parse_modulemd_buildopts);
+              _yaml_parser_recurse_down (_parse_modulemd_buildopts);
             }
 
           /* Components */
@@ -554,7 +550,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "components"))
             {
               /* Process the components that comprise this module */
-              _yaml_recurse_down (_parse_modulemd_components);
+              _yaml_parser_recurse_down (_parse_modulemd_components);
             }
 
           /* Artifacts */
@@ -562,7 +558,7 @@ _parse_modulemd_data (ModulemdModule *module,
                                "artifacts"))
             {
               /* Process the output artifacts of this module */
-              _yaml_recurse_down (_parse_modulemd_artifacts);
+              _yaml_parser_recurse_down (_parse_modulemd_artifacts);
             }
 
           else

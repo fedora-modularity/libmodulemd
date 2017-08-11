@@ -144,6 +144,10 @@ static gboolean
 _emit_modulemd_buildopts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error);
+static gboolean
+_emit_modulemd_artifacts (yaml_emitter_t *emitter,
+                          ModulemdModule *module,
+                          GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
@@ -510,6 +514,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
   /* Build options */
   if (!_emit_modulemd_buildopts (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
+    }
+
+
+  /* Artifacts */
+  if (!_emit_modulemd_artifacts (emitter, module, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
     }
@@ -1051,6 +1062,53 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_artifacts (yaml_emitter_t *emitter,
+                          ModulemdModule *module,
+                          GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  ModulemdSimpleSet *artifacts = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_artifacts");
+
+  artifacts = modulemd_module_get_rpm_artifacts (module);
+  name = g_strdup ("artifacts");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting artifact mapping");
+
+  name = g_strdup ("rpms");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  if (!_emit_modulemd_simpleset (emitter, artifacts, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing artifact rpms");
+    }
+  g_clear_pointer (&artifacts, g_object_unref);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending artifact mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (artifacts)
+    {
+      g_object_unref (artifacts);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_artifacts");
   return ret;
 }
 

@@ -46,6 +46,7 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
 {
   GError *error = NULL;
   ModulemdModule **modules;
+  ModulemdSimpleSet *set = NULL;
 
   modules = parse_yaml_file ("../test_data/good.yaml", &error);
   g_assert_true (modules);
@@ -57,6 +58,9 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   g_assert_cmpstr (modulemd_module_get_stream (modules[0]), ==, "stream-name");
   g_assert_cmpstr (
     modulemd_module_get_summary (modules[0]), ==, "An example module");
+  set = modulemd_module_get_rpm_artifacts (modules[0]);
+  g_assert_true (set);
+  g_assert_true (modulemd_simpleset_contains(set, "bar-0:1.23-1.module_deadbeef.x86_64"));
 
   modules = parse_yaml_file ("../test_data/bad-document.yaml", &error);
   g_assert_false (modules);

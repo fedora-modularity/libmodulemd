@@ -132,6 +132,14 @@ static gboolean
 _emit_modulemd_profiles (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error);
+static gboolean
+_emit_modulemd_api (yaml_emitter_t *emitter,
+                    ModulemdModule *module,
+                    GError **error);
+static gboolean
+_emit_modulemd_filters (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
@@ -477,6 +485,20 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   if (!_emit_modulemd_profiles (emitter, module, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
+    }
+
+
+  /* API */
+  if (!_emit_modulemd_api (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit API");
+    }
+
+
+  /* API */
+  if (!_emit_modulemd_filters (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit filters");
     }
 
   yaml_mapping_end_event_initialize (&event);
@@ -865,6 +887,100 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_profiles");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_api (yaml_emitter_t *emitter,
+                    ModulemdModule *module,
+                    GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  ModulemdSimpleSet *api = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_api");
+  api = modulemd_module_get_rpm_api (module);
+
+  name = g_strdup ("api");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting API mapping");
+
+  name = g_strdup ("rpms");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  if (!_emit_modulemd_simpleset (emitter, api, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing API rpms");
+    }
+  g_clear_pointer (&api, g_object_unref);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending API mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (api)
+    {
+      g_object_unref (api);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_api");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_filters (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  ModulemdSimpleSet *filters = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_filters");
+  filters = modulemd_module_get_rpm_filter (module);
+
+  name = g_strdup ("filter");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting filter mapping");
+
+  name = g_strdup ("rpms");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  if (!_emit_modulemd_simpleset (emitter, filters, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing filter rpms");
+    }
+  g_clear_pointer (&filters, g_object_unref);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending filter mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (filters)
+    {
+      g_object_unref (filters);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_filters");
   return ret;
 }
 

@@ -65,6 +65,45 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
 }
 
 static void
+modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
+{
+  ModulemdModule *module = NULL;
+  ModulemdModule **modules = NULL;
+  GHashTable *buildrequires = NULL;
+  gchar *value = NULL;
+
+  module = modulemd_module_new_from_file ("../test_data/good.yaml");
+
+  g_assert_true (module);
+
+  buildrequires = modulemd_module_get_buildrequires (module);
+  g_assert_true (buildrequires);
+
+  value = g_hash_table_lookup (buildrequires, "platform");
+  g_assert_cmpstr (value, ==, "and-its-stream-name");
+
+  g_hash_table_unref (buildrequires);
+  g_object_unref (module);
+
+  modulemd_module_new_all_from_file ("../test_data/good.yaml", &modules);
+
+  g_assert_true (modules);
+  g_assert_true (modules[0]);
+
+  buildrequires = modulemd_module_get_buildrequires (modules[0]);
+  g_assert_true (buildrequires);
+
+  value = g_hash_table_lookup (buildrequires, "platform");
+  g_assert_cmpstr (value, ==, "and-its-stream-name");
+  g_hash_table_unref (buildrequires);
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+  g_free (modules);
+}
+
+static void
 modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
 {
   gchar *yaml;
@@ -72,17 +111,17 @@ modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
   GError *error = NULL;
   ModulemdModule **modules;
 
-  modules = g_malloc0_n (2, sizeof (ModulemdModule *));
-  modules[0] = modulemd_module_new ();
-  modules[1] = NULL;
-
-  modulemd_module_load (modules[0], "../test_data/good.yaml", &modules);
+  modulemd_module_new_all_from_file ("../test_data/good.yaml", &modules);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
   g_assert_true (yaml);
   g_message ("YAML:\n%s", yaml);
-  g_clear_pointer (&modules[0], g_object_unref);
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+  g_free (modules);
 }
 
 int
@@ -94,6 +133,7 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
+
   g_test_add ("/modulemd/yaml/test_parse_file",
               YamlFixture,
               NULL,
@@ -108,5 +148,11 @@ main (int argc, char *argv[])
               modulemd_yaml_test_emit_string,
               modulemd_yaml_tear_down);
 
+  g_test_add ("/modulemd/yaml/test_load",
+              YamlFixture,
+              NULL,
+              modulemd_yaml_set_up,
+              modulemd_yaml_test_load,
+              modulemd_yaml_tear_down);
   return g_test_run ();
 }

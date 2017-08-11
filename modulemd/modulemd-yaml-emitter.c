@@ -549,7 +549,6 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module xmd");
         }
       g_clear_pointer (&htable, g_hash_table_unref);
-
     }
   ret = TRUE;
 error:
@@ -585,7 +584,6 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
       MMD_YAML_EMIT_SCALAR (&event, strv[i], YAML_PLAIN_SCALAR_STYLE);
     }
 
-  g_debug ("GOT HERE");
   yaml_sequence_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending simpleset sequence");

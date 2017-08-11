@@ -112,6 +112,10 @@ data:
         srpm-buildroot:
             rpms:
                 - bar-extras
+        # Test for unusual cases
+        unusual:
+            rpms: []
+        moreunusual: {}
     # Module API
     # Optional, defaults to no API.
     api:

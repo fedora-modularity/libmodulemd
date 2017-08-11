@@ -128,11 +128,22 @@ static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error);
+static gboolean
+_emit_modulemd_profiles (yaml_emitter_t *emitter,
+                         ModulemdModule *module,
+                         GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
                           GError **error);
+
+typedef struct _hash_entry_s
+{
+  yaml_emitter_t *emitter;
+  GError **error;
+} hash_entry_ctx;
+
 static gboolean
 _emit_modulemd_hashtable (yaml_emitter_t *emitter,
                           GHashTable *set,
@@ -454,12 +465,19 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
     }
 
+
   /* References */
   if (!_emit_modulemd_refs (emitter, module, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
     }
 
+
+  /* Profiles */
+  if (!_emit_modulemd_profiles (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
+    }
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -732,6 +750,124 @@ error:
   return ret;
 }
 
+static void
+_emit_profile_entries (gpointer _key, gpointer _value, gpointer user_data)
+{
+  yaml_event_t event;
+  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
+  GError **error = ((hash_entry_ctx *)user_data)->error;
+
+  if (error && *error)
+    {
+      /* Don't continue */
+      return;
+    }
+
+  gchar *name = NULL;
+  gchar *description = NULL;
+  ModulemdProfile *profile = g_object_ref (MODULEMD_PROFILE (_value));
+  ModulemdSimpleSet *rpms = NULL;
+
+  name = g_strdup (_key);
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting profile inner mapping");
+
+  /* Description */
+  description = g_strdup (modulemd_profile_get_description (profile));
+  if (description)
+    {
+      name = g_strdup ("description");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, description, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* RPMs */
+  rpms = modulemd_profile_get_rpms (profile);
+  if (rpms && modulemd_simpleset_size (rpms) > 0)
+    {
+      name = g_strdup ("rpms");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_simpleset (emitter, rpms, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing profile rpms");
+        }
+      g_clear_pointer (&rpms, g_object_unref);
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending profile inner mapping");
+
+error:
+  g_free (name);
+  g_free (description);
+  g_object_unref (profile);
+
+  if (rpms)
+    {
+      g_object_unref (rpms);
+    }
+}
+
+static gboolean
+_emit_modulemd_profiles (yaml_emitter_t *emitter,
+                         ModulemdModule *module,
+                         GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *profiles = NULL;
+  hash_entry_ctx hctx = { emitter, error };
+
+  g_debug ("TRACE: entering _emit_modulemd_profiles");
+
+  profiles = modulemd_module_get_profiles (module);
+
+  if (!(profiles || g_hash_table_size (profiles) > 0))
+    {
+      /* No profiles for this module. */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("profiles");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting profile mapping");
+
+  g_hash_table_foreach (profiles, _emit_profile_entries, &hctx);
+  if (error && *error)
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                     "Error processing profile entries");
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending reference mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (profiles)
+    {
+      g_hash_table_unref (profiles);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_profiles");
+  return ret;
+}
+
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
@@ -769,12 +905,6 @@ error:
   g_debug ("TRACE: exiting _emit_modulemd_simpleset");
   return ret;
 }
-
-typedef struct _hash_entry_s
-{
-  yaml_emitter_t *emitter;
-  GError **error;
-} hash_entry_ctx;
 
 static void
 _emit_hash_entries (gpointer _key, gpointer _value, gpointer user_data)

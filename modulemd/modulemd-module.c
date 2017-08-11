@@ -1341,6 +1341,121 @@ modulemd_module_new (void)
   return g_object_new (MODULEMD_TYPE_MODULE, NULL);
 }
 
+
+/**
+ * modulemd_module_new_from_file:
+ * @yaml_file: A YAML file containing the module metadata. If this file
+ * contains more than one module, only the first will be loaded.
+ *
+ * Allocates a new #ModulemdModule from a file.
+ *
+ * Return value: a new #ModulemdModule.
+ */
+ModulemdModule *
+modulemd_module_new_from_file (const gchar *yaml_file)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_file (yaml_file, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return NULL;
+    }
+
+  for (gsize i = 1; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  return modules[0];
+}
+
+/**
+ * modulemd_module_new_all_from_file:
+ * @yaml_file: A YAML file containing the module metadata.
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules contained in this document.
+ *
+ * Allocates a list of new #ModulemdModule from a file.
+ */
+void
+modulemd_module_new_all_from_file (const gchar *yaml_file,
+                                   ModulemdModule ***_modules)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_file (yaml_file, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  *_modules = modules;
+}
+
+/**
+ * modulemd_module_new_from_string:
+ * @yaml_string: A YAML string containing the module metadata. If this string
+ * contains more than one module, only the first will be loaded.
+ *
+ * Allocates a new #ModulemdModule from a string.
+ *
+ * Return value: a new #ModulemdModule.
+ */
+ModulemdModule *
+modulemd_module_new_from_string (const gchar *yaml_string)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_string (yaml_string, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return NULL;
+    }
+
+  for (gsize i = 1; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  return modules[0];
+}
+
+/**
+ * modulemd_module_new_all_from_string:
+ * @yaml_string: A YAML string containing the module metadata.
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules contained in this document.
+ *
+ * Allocates a list of new #ModulemdModule from a string.
+ */
+void
+modulemd_module_new_all_from_string (const gchar *yaml_string,
+                                     ModulemdModule ***_modules)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = NULL;
+
+  modules = parse_yaml_string (yaml_string, &error);
+  if (!modules)
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  *_modules = modules;
+}
+
 /**
  * modulemd_module_clone:
  * @self: The existing #ModulemdModule to be cloned

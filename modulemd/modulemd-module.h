@@ -37,6 +37,20 @@ G_DECLARE_FINAL_TYPE (
 ModulemdModule *
 modulemd_module_new (void);
 
+ModulemdModule *
+modulemd_module_new_from_file (const gchar *yaml_file);
+
+void
+modulemd_module_new_all_from_file (const gchar *yaml_file,
+                                   ModulemdModule ***_modules);
+
+ModulemdModule *
+modulemd_module_new_from_string (const gchar *yaml_string);
+
+void
+modulemd_module_new_all_from_string (const gchar *yaml_string,
+                                     ModulemdModule ***_modules);
+
 void
 modulemd_module_load (ModulemdModule *self,
                       const gchar *yaml_file,

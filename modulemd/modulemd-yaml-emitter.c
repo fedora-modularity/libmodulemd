@@ -26,6 +26,7 @@
 #include <glib/gstdio.h>
 #include <yaml.h>
 #include <errno.h>
+#include <inttypes.h>
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 
@@ -314,7 +315,7 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
 
   /* The modulemd version */
   name = g_strdup ("version");
-  value = g_strdup_printf ("%llu", modulemd_module_get_mdversion (module));
+  value = g_strdup_printf ("%" PRIu64, modulemd_module_get_mdversion (module));
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
 
@@ -396,7 +397,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   if (version)
     {
       name = g_strdup ("version");
-      value = g_strdup_printf ("%llu", version);
+      value = g_strdup_printf ("%" PRIu64, version);
       MMD_YAML_EMIT_STR_STR_DICT (
         &event, name, value, YAML_PLAIN_SCALAR_STYLE);
     }

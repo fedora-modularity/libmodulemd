@@ -145,6 +145,10 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error);
 static gboolean
+_emit_modulemd_components (yaml_emitter_t *emitter,
+                           ModulemdModule *module,
+                           GError **error);
+static gboolean
 _emit_modulemd_artifacts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error);
@@ -515,6 +519,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
   /* Build options */
   if (!_emit_modulemd_buildopts (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
+    }
+
+
+  /* Components */
+  if (!_emit_modulemd_components (emitter, module, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
     }
@@ -1068,6 +1079,292 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
+  return ret;
+}
+
+static void
+_emit_rpm_components (gpointer _key, gpointer _value, gpointer user_data)
+{
+  yaml_event_t event;
+  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
+  GError **error = ((hash_entry_ctx *)user_data)->error;
+  gchar *value = NULL;
+  guint64 buildorder;
+  ModulemdSimpleSet *set = NULL;
+
+  if (error && *error)
+    {
+      /* Don't proceed if we failed earlier */
+      return;
+    }
+
+  gchar *name = g_strdup (_key);
+  ModulemdComponentRpm *rpm_component =
+    g_object_ref (MODULEMD_COMPONENT_RPM (_value));
+
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting RPM component inner mapping");
+
+  /* Rationale */
+  value = g_strdup (
+    modulemd_component_get_rationale ((MODULEMD_COMPONENT (rpm_component))));
+  if (!value)
+    {
+      MMD_YAML_EMITTER_ERROR_RETURN (error,
+                                     "Missing required option: rationale");
+    }
+  name = g_strdup ("rationale");
+  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+
+  /* Repository */
+  value = g_strdup (modulemd_component_rpm_get_repository (rpm_component));
+  if (value)
+    {
+      name = g_strdup ("repository");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Cache */
+  value = g_strdup (modulemd_component_rpm_get_cache (rpm_component));
+  if (value)
+    {
+      name = g_strdup ("cache");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Ref */
+  value = g_strdup (modulemd_component_rpm_get_ref (rpm_component));
+  if (value)
+    {
+      name = g_strdup ("ref");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Buildorder */
+  buildorder =
+    modulemd_component_get_buildorder (MODULEMD_COMPONENT (rpm_component));
+  if (buildorder)
+    {
+      name = g_strdup ("buildorder");
+      value = g_strdup_printf ("%" PRIu64, buildorder);
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Arches */
+  set = modulemd_component_rpm_get_arches (rpm_component);
+  if (set && modulemd_simpleset_size (set) > 0)
+    {
+      name = g_strdup ("arches");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_simpleset (
+            emitter, set, YAML_FLOW_SEQUENCE_STYLE, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Error writing RPM component arches");
+        }
+    }
+
+
+  /* Multilib */
+  set = modulemd_component_rpm_get_multilib (rpm_component);
+  if (set && modulemd_simpleset_size (set) > 0)
+    {
+      name = g_strdup ("multilib");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_simpleset (
+            emitter, set, YAML_FLOW_SEQUENCE_STYLE, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (
+            error, "Error writing RPM component multilib");
+        }
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending RPM component inner mapping");
+
+error:
+  g_free (name);
+  g_free (value);
+  g_object_unref (rpm_component);
+  if (set)
+    {
+      g_object_unref (set);
+    }
+}
+
+static void
+_emit_module_components (gpointer _key, gpointer _value, gpointer user_data)
+{
+  yaml_event_t event;
+  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
+  GError **error = ((hash_entry_ctx *)user_data)->error;
+  gchar *value = NULL;
+  guint64 buildorder;
+
+  gchar *name = g_strdup (_key);
+  ModulemdComponentModule *module_component =
+    g_object_ref (MODULEMD_COMPONENT_MODULE (_value));
+
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting module component inner mapping");
+
+  /* Rationale */
+  value = g_strdup (modulemd_component_get_rationale (
+    (MODULEMD_COMPONENT (module_component))));
+  if (!value)
+    {
+      MMD_YAML_EMITTER_ERROR_RETURN (error,
+                                     "Missing required option: rationale");
+    }
+  name = g_strdup ("rationale");
+  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+
+  /* Repository */
+  value =
+    g_strdup (modulemd_component_module_get_repository (module_component));
+  if (value)
+    {
+      name = g_strdup ("repository");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Ref */
+  value =
+    g_strdup (modulemd_component_module_get_repository (module_component));
+  if (value)
+    {
+      name = g_strdup ("ref");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  /* Buildorder */
+  buildorder =
+    modulemd_component_get_buildorder (MODULEMD_COMPONENT (module_component));
+  if (buildorder)
+    {
+      name = g_strdup ("buildorder");
+      value = g_strdup_printf ("%" PRIu64, buildorder);
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending module component inner mapping");
+
+error:
+  g_free (value);
+  g_object_unref (module_component);
+}
+
+static gboolean
+_emit_modulemd_components (yaml_emitter_t *emitter,
+                           ModulemdModule *module,
+                           GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *rpm_components;
+  GHashTable *module_components;
+  hash_entry_ctx hctx = { emitter, error, YAML_PLAIN_SCALAR_STYLE };
+
+  g_debug ("TRACE: entering _emit_modulemd_components");
+
+  rpm_components = modulemd_module_get_rpm_components (module);
+  module_components = modulemd_module_get_module_components (module);
+
+  if (!(rpm_components || module_components))
+    {
+      /* Omit this section */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("components");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting component mapping");
+
+  if (rpm_components)
+    {
+      name = g_strdup ("rpms");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      yaml_mapping_start_event_initialize (
+        &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error starting RPM component mapping");
+      g_hash_table_foreach (rpm_components, _emit_rpm_components, &hctx);
+      if (error && *error)
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Could not process RPM components");
+        }
+
+      yaml_mapping_end_event_initialize (&event);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error ending RPM component mapping");
+    }
+
+  if (module_components)
+    {
+      name = g_strdup ("modules");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      yaml_mapping_start_event_initialize (
+        &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error starting module component mapping");
+      g_hash_table_foreach (module_components, _emit_module_components, &hctx);
+
+      yaml_mapping_end_event_initialize (&event);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error ending module component mapping");
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending component mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (rpm_components)
+    {
+      g_hash_table_unref (rpm_components);
+    }
+  if (module_components)
+    {
+      g_hash_table_unref (module_components);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_components");
   return ret;
 }
 

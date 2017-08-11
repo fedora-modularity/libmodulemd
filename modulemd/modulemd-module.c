@@ -453,7 +453,7 @@ modulemd_module_get_profiles (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->profiles;
+  return g_hash_table_ref (self->profiles);
 }
 
 /**
@@ -490,7 +490,7 @@ modulemd_module_get_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->requires;
+  return g_hash_table_ref (self->requires);
 }
 
 /**

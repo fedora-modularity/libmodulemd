@@ -150,11 +150,13 @@ typedef struct _hash_entry_s
 {
   yaml_emitter_t *emitter;
   GError **error;
+  yaml_scalar_style_t style;
 } hash_entry_ctx;
 
 static gboolean
 _emit_modulemd_hashtable (yaml_emitter_t *emitter,
-                          GHashTable *set,
+                          GHashTable *htable,
+                          yaml_scalar_style_t style,
                           GError **error);
 
 gboolean
@@ -605,7 +607,8 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
       name = g_strdup ("xmd");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_hashtable (emitter, htable, error))
+      if (!_emit_modulemd_hashtable (
+            emitter, htable, YAML_PLAIN_SCALAR_STYLE, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module xmd");
         }
@@ -661,7 +664,8 @@ _emit_modulemd_deps (yaml_emitter_t *emitter,
       name = g_strdup ("buildrequires");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_hashtable (emitter, buildrequires, error))
+      if (!_emit_modulemd_hashtable (
+            emitter, buildrequires, YAML_PLAIN_SCALAR_STYLE, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module build deps");
@@ -674,7 +678,8 @@ _emit_modulemd_deps (yaml_emitter_t *emitter,
       name = g_strdup ("requires");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_hashtable (emitter, requires, error))
+      if (!_emit_modulemd_hashtable (
+            emitter, requires, YAML_PLAIN_SCALAR_STYLE, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module runtime deps");
@@ -1028,11 +1033,12 @@ _emit_hash_entries (gpointer _key, gpointer _value, gpointer user_data)
   yaml_event_t event;
   yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
   GError **error = ((hash_entry_ctx *)user_data)->error;
+  yaml_scalar_style_t style = ((hash_entry_ctx *)user_data)->style;
 
   gchar *name = g_strdup (_key);
   gchar *value = g_strdup (_value);
 
-  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, style);
 
 error:
   g_free (name);
@@ -1042,11 +1048,12 @@ error:
 static gboolean
 _emit_modulemd_hashtable (yaml_emitter_t *emitter,
                           GHashTable *htable,
+                          yaml_scalar_style_t style,
                           GError **error)
 {
   gboolean ret = FALSE;
   yaml_event_t event;
-  hash_entry_ctx hctx = { emitter, error };
+  hash_entry_ctx hctx = { emitter, error, style };
 
   g_debug ("TRACE: entering _emit_modulemd_hashtable");
 

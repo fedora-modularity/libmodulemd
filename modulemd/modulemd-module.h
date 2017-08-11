@@ -52,19 +52,6 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
                                      ModulemdModule ***_modules);
 
 void
-modulemd_module_load (ModulemdModule *self,
-                      const gchar *yaml_file,
-                      ModulemdModule ***_modules);
-
-void
-modulemd_module_loads (ModulemdModule *self,
-                       const gchar *yaml,
-                       ModulemdModule ***_modules);
-
-void
-modulemd_module_clone (ModulemdModule *self, ModulemdModule *orig);
-
-void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires);
 

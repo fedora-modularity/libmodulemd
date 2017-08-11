@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>Modulemd Reference Manual</title>
+    <releaseinfo>
+      for Modulemd &version;
+    </releaseinfo>
+    <authorgroup>
+      <author>
+        <firstname>Stephen</firstname>
+        <surname>Gallagher</surname>
+        <affiliation>
+          <address>
+            <email>sgallagh@redhat.com</email>
+          </address>
+        </affiliation>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>2017</year>
+      <holder>Stephen Gallagher</holder>
+    </copyright>
+  </bookinfo>
+
+  <reference id="modulemd">
+    <title>Modulemd library</title>
+    <partintro>
+      <para>
+        This part documents the Modulemd library.
+      </para>
+    </partintro>
+    <xi:include href="xml/modulemd-component.xml"/>
+    <xi:include href="xml/modulemd-component-module.xml"/>
+    <xi:include href="xml/modulemd-component-rpm.xml"/>
+    <xi:include href="xml/modulemd-module.xml"/>
+    <xi:include href="xml/modulemd-profile.xml"/>
+    <xi:include href="xml/modulemd-servicelevel.xml"/>
+    <xi:include href="xml/modulemd-simpleset.xml"/>
+  </reference>
+
+</book>

@@ -109,6 +109,18 @@ gnome.generate_gir(
     install : true,
 )
 
+cdata = configuration_data()
+cdata.set('VERSION', '0.1.0')
+configure_file(input : 'version.xml.in',
+  output : 'version.xml',
+  configuration : cdata)
+
+gnome.gtkdoc(
+    'modulemd',
+    src_dir : './',
+    main_xml : 'modulemd-docs.xml',
+    install : true)
+
 pkg.generate(
     libraries : modulemd_lib,
     subdirs : header_path,

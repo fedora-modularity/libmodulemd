@@ -120,6 +120,10 @@ static gboolean
 _emit_modulemd_xmd (yaml_emitter_t *emitter,
                     ModulemdModule *module,
                     GError **error);
+static gboolean
+_emit_modulemd_deps (yaml_emitter_t *emitter,
+                     ModulemdModule *module,
+                     GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
@@ -440,6 +444,12 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
     }
 
 
+  /* Dependencies */
+  if (!_emit_modulemd_deps (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
+    }
+
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending data mapping");
@@ -559,6 +569,85 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_xmd");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_deps (yaml_emitter_t *emitter,
+                     ModulemdModule *module,
+                     GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *requires = NULL;
+  GHashTable *buildrequires = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_deps");
+
+  buildrequires = modulemd_module_get_buildrequires (module);
+  requires = modulemd_module_get_requires (module);
+  if (!(buildrequires || requires))
+    {
+      /* No dependencies for this module.
+       * Unlikely, but not impossible
+       */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("dependencies");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting dependency mapping");
+
+  if (buildrequires)
+    {
+      name = g_strdup ("buildrequires");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_hashtable (emitter, buildrequires, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Error writing module build deps");
+        }
+      g_clear_pointer (&buildrequires, g_hash_table_unref);
+    }
+
+  if (requires)
+    {
+      name = g_strdup ("requires");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_hashtable (emitter, requires, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Error writing module runtime deps");
+        }
+      g_clear_pointer (&requires, g_hash_table_unref);
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending dependency mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (buildrequires)
+    {
+      g_hash_table_unref (buildrequires);
+    }
+  if (requires)
+    {
+      g_hash_table_unref (requires);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_deps");
   return ret;
 }
 

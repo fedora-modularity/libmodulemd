@@ -124,6 +124,10 @@ static gboolean
 _emit_modulemd_deps (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error);
+static gboolean
+_emit_modulemd_refs (yaml_emitter_t *emitter,
+                     ModulemdModule *module,
+                     GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
@@ -450,6 +454,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
     }
 
+  /* References */
+  if (!_emit_modulemd_refs (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
+    }
+
+
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending data mapping");
@@ -648,6 +659,76 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_deps");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_refs (yaml_emitter_t *emitter,
+                     ModulemdModule *module,
+                     GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  gchar *community = NULL;
+  gchar *documentation = NULL;
+  gchar *tracker = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_refs");
+
+  community = g_strdup (modulemd_module_get_community (module));
+  documentation = g_strdup (modulemd_module_get_documentation (module));
+  tracker = g_strdup (modulemd_module_get_tracker (module));
+
+  if (!(community || documentation || tracker))
+    {
+      /* No references for this module. */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("references");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting reference mapping");
+
+  if (community)
+    {
+      name = g_strdup ("community");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, community, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  if (documentation)
+    {
+      name = g_strdup ("documentation");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, documentation, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  if (tracker)
+    {
+      name = g_strdup ("tracker");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, tracker, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending reference mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  g_free (community);
+  g_free (documentation);
+  g_free (tracker);
+
+  g_debug ("TRACE: exiting _emit_modulemd_refs");
   return ret;
 }
 

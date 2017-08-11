@@ -53,6 +53,12 @@ modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value)
   return g_hash_table_contains (self->set, value);
 }
 
+guint
+modulemd_simpleset_size (ModulemdSimpleSet *self)
+{
+  return g_hash_table_size (self->set);
+}
+
 static gboolean
 modulemd_simpleset_remove_from_strv (gpointer key,
                                      gpointer value,

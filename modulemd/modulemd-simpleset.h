@@ -38,6 +38,8 @@ modulemd_simpleset_new (void);
 
 gboolean
 modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value);
+guint
+modulemd_simpleset_size (ModulemdSimpleSet *self);
 
 void
 modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv);

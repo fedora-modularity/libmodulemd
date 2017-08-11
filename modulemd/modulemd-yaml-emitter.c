@@ -140,6 +140,10 @@ static gboolean
 _emit_modulemd_filters (yaml_emitter_t *emitter,
                         ModulemdModule *module,
                         GError **error);
+static gboolean
+_emit_modulemd_buildopts (yaml_emitter_t *emitter,
+                          ModulemdModule *module,
+                          GError **error);
 
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
@@ -502,6 +506,14 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit filters");
     }
+
+
+  /* Build options */
+  if (!_emit_modulemd_buildopts (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
+    }
+
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -986,6 +998,59 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_filters");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_buildopts (yaml_emitter_t *emitter,
+                          ModulemdModule *module,
+                          GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *buildopts = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_buildopts");
+  buildopts = modulemd_module_get_rpm_buildopts (module);
+  if (!(buildopts || g_hash_table_size (buildopts) > 0))
+    {
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("buildopts");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting buildopt mapping");
+
+  name = g_strdup ("rpms");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  if (!_emit_modulemd_hashtable (
+        emitter, buildopts, YAML_LITERAL_SCALAR_STYLE, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing buildopts");
+    }
+  g_clear_pointer (&buildopts, g_hash_table_unref);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending buildopt mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (buildopts)
+    {
+      g_hash_table_unref (buildopts);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_buildopts");
   return ret;
 }
 

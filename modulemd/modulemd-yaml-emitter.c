@@ -152,6 +152,7 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
+                          yaml_sequence_style_t style,
                           GError **error);
 
 typedef struct _hash_entry_s
@@ -572,7 +573,8 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
   name = g_strdup ("module");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-  if (!_emit_modulemd_simpleset (emitter, set, error))
+  if (!_emit_modulemd_simpleset (
+        emitter, set, YAML_BLOCK_SEQUENCE_STYLE, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module licenses");
     }
@@ -587,7 +589,8 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
       name = g_strdup ("content");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_simpleset (emitter, set, error))
+      if (!_emit_modulemd_simpleset (
+            emitter, set, YAML_BLOCK_SEQUENCE_STYLE, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module licenses");
@@ -842,7 +845,8 @@ _emit_profile_entries (gpointer _key, gpointer _value, gpointer user_data)
       name = g_strdup ("rpms");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_simpleset (emitter, rpms, error))
+      if (!_emit_modulemd_simpleset (
+            emitter, rpms, YAML_BLOCK_SEQUENCE_STYLE, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing profile rpms");
         }
@@ -943,7 +947,8 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
   name = g_strdup ("rpms");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-  if (!_emit_modulemd_simpleset (emitter, api, error))
+  if (!_emit_modulemd_simpleset (
+        emitter, api, YAML_BLOCK_SEQUENCE_STYLE, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing API rpms");
     }
@@ -990,7 +995,8 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
   name = g_strdup ("rpms");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-  if (!_emit_modulemd_simpleset (emitter, filters, error))
+  if (!_emit_modulemd_simpleset (
+        emitter, filters, YAML_BLOCK_SEQUENCE_STYLE, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing filter rpms");
     }
@@ -1090,7 +1096,8 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
   name = g_strdup ("rpms");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-  if (!_emit_modulemd_simpleset (emitter, artifacts, error))
+  if (!_emit_modulemd_simpleset (
+        emitter, artifacts, YAML_BLOCK_SEQUENCE_STYLE, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing artifact rpms");
     }
@@ -1115,6 +1122,7 @@ error:
 static gboolean
 _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           ModulemdSimpleSet *set,
+                          yaml_sequence_style_t style,
                           GError **error)
 {
   gboolean ret = FALSE;
@@ -1124,8 +1132,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
 
   g_debug ("TRACE: entering _emit_modulemd_simpleset");
 
-  yaml_sequence_start_event_initialize (
-    &event, NULL, NULL, 1, YAML_BLOCK_SEQUENCE_STYLE);
+  yaml_sequence_start_event_initialize (&event, NULL, NULL, 1, style);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting simpleset sequence");
 

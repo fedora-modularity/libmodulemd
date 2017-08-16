@@ -182,7 +182,10 @@ parse_yaml_file (const gchar *path, GError **error)
 
 error:
   yaml_parser_delete (&parser);
-  fclose (yaml_file);
+  if (yaml_file)
+    {
+      fclose (yaml_file);
+    }
   g_debug ("TRACE: exiting parse_yaml_file");
   return modules;
 }

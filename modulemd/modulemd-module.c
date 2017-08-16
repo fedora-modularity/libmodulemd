@@ -24,6 +24,7 @@
 
 #include "modulemd.h"
 #include "modulemd-yaml.h"
+#include "modulemd-util.h"
 #include <glib.h>
 #include <yaml.h>
 
@@ -107,7 +108,7 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
   if (buildrequires != self->buildrequires)
     {
       g_hash_table_unref (self->buildrequires);
-      self->buildrequires = g_hash_table_ref (buildrequires);
+      self->buildrequires = _modulemd_hash_table_deep_str_copy (buildrequires);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_BUILDREQUIRES]);
     }
@@ -471,7 +472,7 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
   if (requires != self->requires)
     {
       g_hash_table_unref (self->requires);
-      self->requires = g_hash_table_ref (requires);
+      self->requires = _modulemd_hash_table_deep_str_copy (requires);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_REQUIRES]);
     }
@@ -585,7 +586,7 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
   if (buildopts != self->rpm_buildopts)
     {
       g_hash_table_unref (self->rpm_buildopts);
-      self->rpm_buildopts = g_hash_table_ref (buildopts);
+      self->rpm_buildopts = _modulemd_hash_table_deep_str_copy (buildopts);
 
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_RPM_BUILDOPTS]);
@@ -839,7 +840,7 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
   if (xmd != self->xmd)
     {
       g_hash_table_unref (self->xmd);
-      self->xmd = g_hash_table_ref (xmd);
+      self->xmd = _modulemd_hash_table_deep_str_copy (xmd);
       g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_XMD]);
     }
 }

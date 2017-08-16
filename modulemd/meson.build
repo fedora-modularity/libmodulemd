@@ -5,6 +5,7 @@ modulemd_srcs = [
     'modulemd-module.c',
     'modulemd-profile.c',
     'modulemd-simpleset.c',
+    'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-parser.c',
 ]
@@ -20,6 +21,7 @@ modulemd_hdrs = [
 ]
 
 modulemd_priv_hdrs = [
+    'modulemd-util.h',
     'modulemd-yaml.h',
 ]
 

@@ -308,9 +308,10 @@ modulemd_module_get_mdversion (ModulemdModule *self)
 
 /**
  * modulemd_module_set_module_components:
- * @components: The hash table of module components that
- * comprise this module. The keys are the module name, the values are a
- * #ModulemdComponentModule containing information about that module.
+ * @components: (element-type utf8 ModulemdComponentModule): The hash table of
+ * module components that comprise this module. The keys are the module name,
+ * the values are a #ModulemdComponentModule containing information about that
+ * module.
  *
  * Sets the module_components property.
  */
@@ -324,7 +325,8 @@ modulemd_module_set_module_components (ModulemdModule *self,
   if (components != self->module_components)
     {
       g_hash_table_unref (self->module_components);
-      self->module_components = g_hash_table_ref (components);
+      self->module_components =
+        _modulemd_hash_table_deep_obj_copy (components);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_MODULE_COMPONENTS]);
     }
@@ -435,7 +437,7 @@ modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
   if (profiles != self->profiles)
     {
       g_hash_table_unref (self->profiles);
-      self->profiles = g_hash_table_ref (profiles);
+      self->profiles = _modulemd_hash_table_deep_obj_copy (profiles);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_PROFILES]);
     }
@@ -611,9 +613,10 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_components:
- * @components: The hash table of module components that
- * comprise this module. The keys are the module name, the values are a
- * #ModulemdComponentRpm containing information about that module.
+ * @components: (element-type utf8 ModulemdComponentRpm): The hash table of
+ * module components that comprise this module. The keys are the module name,
+ * the values are a #ModulemdComponentRpm containing information about that
+ * module.
  *
  * Sets the rpm_components property.
  */
@@ -627,7 +630,7 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
   if (components != self->rpm_components)
     {
       g_hash_table_unref (self->rpm_components);
-      self->rpm_components = g_hash_table_ref (components);
+      self->rpm_components = _modulemd_hash_table_deep_obj_copy (components);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_RPM_COMPONENTS]);
     }

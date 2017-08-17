@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include "modulemd.h"
 #include "modulemd-yaml.h"
+#include "modulemd-util.h"
 
 #define YAML_EMITTER_EMIT_WITH_ERROR_RETURN(emitter, event, error, msg)       \
   do                                                                          \
@@ -1452,23 +1453,6 @@ error:
   return ret;
 }
 
-static void
-_emit_hash_entries (gpointer _key, gpointer _value, gpointer user_data)
-{
-  yaml_event_t event;
-  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
-  GError **error = ((hash_entry_ctx *)user_data)->error;
-  yaml_scalar_style_t style = ((hash_entry_ctx *)user_data)->style;
-
-  gchar *name = g_strdup (_key);
-  gchar *value = g_strdup (_value);
-
-  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, style);
-
-error:
-  g_free (name);
-  g_free (value);
-}
 
 static gboolean
 _emit_modulemd_hashtable (yaml_emitter_t *emitter,
@@ -1478,7 +1462,11 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
 {
   gboolean ret = FALSE;
   yaml_event_t event;
-  hash_entry_ctx hctx = { emitter, error, style };
+  GPtrArray *keys;
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *name;
+  gchar *val;
 
   g_debug ("TRACE: entering _emit_modulemd_hashtable");
 
@@ -1487,7 +1475,23 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting hashtable mapping");
 
-  g_hash_table_foreach (htable, _emit_hash_entries, &hctx);
+  keys = g_ptr_array_new_full (g_hash_table_size (htable), g_free);
+
+  g_hash_table_iter_init (&iter, htable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_ptr_array_add (keys, g_strdup ((const gchar *)key));
+    }
+  g_ptr_array_sort (keys, _modulemd_strcmp_sort);
+
+
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      name = g_strdup (g_ptr_array_index (keys, i));
+      val = g_strdup (g_hash_table_lookup (htable, name));
+      MMD_YAML_EMIT_STR_STR_DICT (&event, name, val, style);
+    }
+  g_ptr_array_unref (keys);
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (

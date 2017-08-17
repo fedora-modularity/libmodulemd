@@ -32,3 +32,6 @@ _modulemd_hash_table_deep_obj_copy (GHashTable *orig);
 
 gint
 _modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
+
+GPtrArray *
+_modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);

@@ -143,26 +143,9 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set)
 GPtrArray *
 modulemd_simpleset_get (ModulemdSimpleSet *self)
 {
-  GPtrArray *array;
-  GHashTableIter iter;
-  gpointer key, value;
-  gchar *set_value;
-
   g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), NULL);
 
-  /* Create an array of strings with space for a NULL at the end */
-  array = g_ptr_array_new_full (g_hash_table_size (self->set) + 1, g_free);
-
-  g_hash_table_iter_init (&iter, self->set);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      set_value = g_strdup ((gchar *)key);
-      g_ptr_array_add (array, set_value);
-    }
-
-  g_ptr_array_sort (array, _modulemd_strcmp_sort);
-
-  return array;
+  return _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
 }
 
 void

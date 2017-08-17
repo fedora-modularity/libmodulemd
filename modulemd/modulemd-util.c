@@ -72,3 +72,22 @@ _modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
 {
   return g_strcmp0 (*(const gchar **)a, *(const gchar **)b);
 }
+
+GPtrArray *
+_modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func)
+{
+  GPtrArray *keys;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  keys = g_ptr_array_new_full (g_hash_table_size (htable), g_free);
+
+  g_hash_table_iter_init (&iter, htable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_ptr_array_add (keys, g_strdup ((const gchar *)key));
+    }
+  g_ptr_array_sort (keys, compare_func);
+
+  return keys;
+}

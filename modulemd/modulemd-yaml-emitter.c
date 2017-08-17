@@ -815,25 +815,21 @@ error:
   return ret;
 }
 
-static void
-_emit_profile_entries (gpointer _key, gpointer _value, gpointer user_data)
+static gboolean
+_emit_modulemd_profile_entry (yaml_emitter_t *emitter,
+                              ModulemdModule *module,
+                              gchar *key,
+                              ModulemdProfile *profile,
+                              GError **error)
 {
+  gboolean ret = FALSE;
   yaml_event_t event;
-  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
-  GError **error = ((hash_entry_ctx *)user_data)->error;
-
-  if (error && *error)
-    {
-      /* Don't continue */
-      return;
-    }
 
   gchar *name = NULL;
   gchar *description = NULL;
-  ModulemdProfile *profile = g_object_ref (MODULEMD_PROFILE (_value));
   ModulemdSimpleSet *rpms = NULL;
 
-  name = g_strdup (_key);
+  name = g_strdup (key);
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
   yaml_mapping_start_event_initialize (
@@ -869,15 +865,16 @@ _emit_profile_entries (gpointer _key, gpointer _value, gpointer user_data)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending profile inner mapping");
 
+  ret = TRUE;
 error:
   g_free (name);
   g_free (description);
-  g_object_unref (profile);
 
   if (rpms)
     {
       g_object_unref (rpms);
     }
+  return ret;
 }
 
 static gboolean
@@ -888,8 +885,10 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
   gboolean ret = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
+  gchar *key;
   GHashTable *profiles = NULL;
-  hash_entry_ctx hctx = { emitter, error };
+  ModulemdProfile *profile = NULL;
+  GPtrArray *keys = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_profiles");
 
@@ -911,11 +910,15 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting profile mapping");
 
-  g_hash_table_foreach (profiles, _emit_profile_entries, &hctx);
-  if (error && *error)
+  keys = _modulemd_ordered_str_keys (profiles, _modulemd_strcmp_sort);
+  for (gsize i = 0; i < keys->len; i++)
     {
-      MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                     "Error processing profile entries");
+      key = g_ptr_array_index (keys, i);
+      profile = g_hash_table_lookup (profiles, key);
+      if (!_emit_modulemd_profile_entry (emitter, module, key, profile, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not process profiles");
+        }
     }
 
   yaml_mapping_end_event_initialize (&event);

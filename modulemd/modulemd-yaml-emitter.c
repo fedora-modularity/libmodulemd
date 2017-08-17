@@ -160,13 +160,6 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           yaml_sequence_style_t style,
                           GError **error);
 
-typedef struct _hash_entry_s
-{
-  yaml_emitter_t *emitter;
-  GError **error;
-  yaml_scalar_style_t style;
-} hash_entry_ctx;
-
 static gboolean
 _emit_modulemd_hashtable (yaml_emitter_t *emitter,
                           GHashTable *htable,

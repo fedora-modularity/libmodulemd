@@ -29,3 +29,6 @@ _modulemd_hash_table_deep_str_copy (GHashTable *orig);
 
 GHashTable *
 _modulemd_hash_table_deep_obj_copy (GHashTable *orig);
+
+gint
+_modulemd_strcmp_sort (gconstpointer a, gconstpointer b);

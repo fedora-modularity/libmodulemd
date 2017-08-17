@@ -46,11 +46,11 @@ modulemd_simpleset_tear_down (SimpleSetFixture *fixture,
 }
 
 static gboolean
-_strv_contains (const gchar **strv, const gchar *value)
+_array_contains (GPtrArray *array, const gchar *value)
 {
-  for (gsize i = 0; strv[i]; i++)
+  for (gsize i = 0; i < array->len; i++)
     {
-      if (g_strcmp0 (strv[i], value) == 0)
+      if (g_strcmp0 (g_ptr_array_index (array, i), value) == 0)
         {
           return TRUE;
         }
@@ -59,39 +59,45 @@ _strv_contains (const gchar **strv, const gchar *value)
 }
 
 static void
-modulemd_simpleset_test_get_set_strv (SimpleSetFixture *fixture,
-                                      gconstpointer user_data)
+modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
+                                 gconstpointer user_data)
 {
   gsize i = 0;
-  gchar **strv = g_malloc0_n (sizeof (gchar *), 4);
-  gchar **strv2;
-  strv[0] = g_strdup ("a");
-  strv[1] = g_strdup ("b");
+  GPtrArray *array = g_ptr_array_new_full (3, g_free);
+  GPtrArray *array2;
+  gchar *entry;
+
+  entry = g_strdup ("a");
+  g_ptr_array_add (array, entry);
+
+  entry = g_strdup ("b");
+  g_ptr_array_add (array, entry);
+
   /* Add duplicate value to ensure uniqueness of resulting set */
-  strv[2] = g_strdup ("a");
-  strv[3] = NULL;
+  entry = g_strdup ("a");
+  g_ptr_array_add (array, entry);
 
   /* Create the set from a strv */
-  modulemd_simpleset_set_by_strv (fixture->set, (const gchar **)strv);
+  modulemd_simpleset_set (fixture->set, array);
 
-  for (i = 0; strv[i]; i++)
+  for (i = 0; i < array->len; i++)
     {
-      g_assert_true (modulemd_simpleset_contains (fixture->set, strv[i]));
+      g_assert_true (modulemd_simpleset_contains (
+        fixture->set, g_ptr_array_index (array, i)));
     }
 
-  strv2 = modulemd_simpleset_get_as_strv (fixture->set);
-  for (i = 0; strv[i]; i++)
+  array2 = modulemd_simpleset_get (fixture->set);
+
+  for (i = 0; i < array->len; i++)
     {
-      g_assert_true (_strv_contains ((const gchar **)strv2, strv[i]));
+      g_assert_true (_array_contains (array2, g_ptr_array_index (array, i)));
     }
+
 
   /* The size of the resulting set should only be two entries,
      * since one of them was a duplicate.
      */
-  for (i = 0; strv2[i]; i++)
-    {
-    }
-  g_assert_cmpint (i, ==, 2);
+  g_assert_cmpint (array2->len, ==, 2);
 }
 
 int
@@ -103,11 +109,11 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/simpleset/test_get_set_strv",
+  g_test_add ("/modulemd/simpleset/test_get_set",
               SimpleSetFixture,
               NULL,
               modulemd_simpleset_set_up,
-              modulemd_simpleset_test_get_set_strv,
+              modulemd_simpleset_test_get_set,
               modulemd_simpleset_tear_down);
 
   return g_test_run ();

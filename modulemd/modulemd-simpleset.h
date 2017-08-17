@@ -42,9 +42,9 @@ guint
 modulemd_simpleset_size (ModulemdSimpleSet *self);
 
 void
-modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv);
-gchar **
-modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self);
+modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set);
+GPtrArray *
+modulemd_simpleset_get (ModulemdSimpleSet *self);
 
 void
 modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value);

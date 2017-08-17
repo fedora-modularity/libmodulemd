@@ -23,13 +23,15 @@
  */
 
 #include <glib.h>
+#include <string.h>
 #include "modulemd-simpleset.h"
+#include "modulemd-util.h"
 
 enum
 {
   SET_PROP_0,
 
-  SET_PROP_STRV,
+  SET_PROP_SET,
 
   SET_N_PROPERTIES
 };
@@ -60,50 +62,53 @@ modulemd_simpleset_size (ModulemdSimpleSet *self)
 }
 
 static gboolean
-modulemd_simpleset_remove_from_strv (gpointer key,
-                                     gpointer value,
-                                     gpointer user_data)
+modulemd_simpleset_remove_from_array (gpointer key,
+                                      gpointer value,
+                                      gpointer user_data)
 {
-  const gchar **strv;
+  GPtrArray *array;
+  gchar *item;
   g_return_val_if_fail (key, FALSE);
   g_return_val_if_fail (user_data, FALSE);
 
-  strv = *(const gchar ***)user_data;
+  array = (GPtrArray *)user_data;
 
-  for (gsize i = 0; strv[i]; i++)
+  for (gsize i = 0; i < array->len; i++)
     {
-      if (g_strcmp0 ((gchar *)key, strv[i]) == 0)
+      item = g_ptr_array_index (array, i);
+      if (g_strcmp0 ((gchar *)key, item) == 0)
         {
           /* This value should stay in the set */
           return FALSE;
         }
     }
 
-  /* This value wasn't in the strv, so remove it */
+  /* This value wasn't in the array, so remove it */
   return TRUE;
 }
 
 
 /**
- * modulemd_simpleset_set_by_strv:
- * @strv: (array zero-terminated=1) (element-type utf8): Extensible metadata block
+ * modulemd_simpleset_set:
+ * @set: (array zero-terminated=0) (element-type utf8): Extensible metadata block
  *
  * Make the contents of the set equal to an array of strings. This function
  * will trigger a signal only if the resulting set is different. It does not
  * guarantee any order to the resulting set, only that it will be unique.
  */
 void
-modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv)
+modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set)
 {
   gboolean do_notify = FALSE;
   guint num_removed;
+  gchar *item;
 
   g_return_if_fail (MODULEMD_IS_SIMPLESET (self));
-  g_return_if_fail (strv);
+  g_return_if_fail (set);
 
   /* Remove any values that are not part of the new set */
   num_removed = g_hash_table_foreach_remove (
-    self->set, modulemd_simpleset_remove_from_strv, &strv);
+    self->set, modulemd_simpleset_remove_from_array, set);
   if (num_removed > 0)
     {
       /* At least one value was removed, so we will need to notify */
@@ -111,9 +116,10 @@ modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv)
     }
 
   /* Add in the whole new set to make sure we have everything */
-  for (gsize i = 0; strv[i]; i++)
+  for (gsize i = 0; i < set->len; i++)
     {
-      if (g_hash_table_add (self->set, g_strdup (strv[i])))
+      item = g_ptr_array_index (set, i);
+      if (g_hash_table_add (self->set, g_strdup (item)))
         {
           /* This key didn't previously exist */
           do_notify = TRUE;
@@ -122,44 +128,41 @@ modulemd_simpleset_set_by_strv (ModulemdSimpleSet *self, const gchar **strv)
 
   if (do_notify)
     {
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                set_properties[SET_PROP_STRV]);
+      g_object_notify_by_pspec (G_OBJECT (self), set_properties[SET_PROP_SET]);
     }
 }
 
 /**
- * modulemd_simpleset_get_as_strv:
+ * modulemd_simpleset_get:
  *
- * Retrieves the set as an array of strings
+ * Retrieves the set as a #GPtrArray of strings
  *
- * Returns: (array zero-terminated=1) (element-type utf8) (transfer full): A list representing
- * a set of values.
+ * Returns: (array zero-terminated=0) (element-type utf8) (transfer container):
+ * A list representing a set of string values.
  */
-gchar **
-modulemd_simpleset_get_as_strv (ModulemdSimpleSet *self)
+GPtrArray *
+modulemd_simpleset_get (ModulemdSimpleSet *self)
 {
-  gchar **strv;
+  GPtrArray *array;
   GHashTableIter iter;
-  guint i, set_size;
   gpointer key, value;
+  gchar *set_value;
 
   g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), NULL);
 
   /* Create an array of strings with space for a NULL at the end */
-  set_size = g_hash_table_size (self->set);
-  strv = g_malloc0_n (set_size + 1, sizeof (char *));
+  array = g_ptr_array_new_full (g_hash_table_size (self->set) + 1, g_free);
 
-  i = 0;
   g_hash_table_iter_init (&iter, self->set);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      strv[i] = g_strdup ((gchar *)key);
-      i++;
+      set_value = g_strdup ((gchar *)key);
+      g_ptr_array_add (array, set_value);
     }
 
-  strv[set_size] = NULL;
+  g_ptr_array_sort (array, _modulemd_strcmp_sort);
 
-  return strv;
+  return array;
 }
 
 void
@@ -168,8 +171,7 @@ modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value)
   if (g_hash_table_add (self->set, g_strdup (value)))
     {
       /* This key didn't previously exist */
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                set_properties[SET_PROP_STRV]);
+      g_object_notify_by_pspec (G_OBJECT (self), set_properties[SET_PROP_SET]);
     }
 }
 
@@ -184,9 +186,8 @@ modulemd_simpleset_set_property (GObject *gobject,
 
   switch (property_id)
     {
-    case SET_PROP_STRV:
-      /* TODO */
-      modulemd_simpleset_set_by_strv (self, g_value_get_boxed (value));
+    case SET_PROP_SET:
+      modulemd_simpleset_set (self, g_value_get_boxed (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -204,8 +205,8 @@ modulemd_simpleset_get_property (GObject *gobject,
 
   switch (property_id)
     {
-    case SET_PROP_STRV:
-      g_value_set_boxed (value, modulemd_simpleset_get_as_strv (self));
+    case SET_PROP_SET:
+      g_value_set_boxed (value, modulemd_simpleset_get (self));
       break;
 
     default:
@@ -235,13 +236,13 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
   object_class->finalize = modulemd_simpleset_finalize;
 
   /**
-     * ModulemdSimpleSet:strv:
+     * ModulemdSimpleSet:set: (type GLib.PtrArray(utf8)) (transfer container)
      */
-  set_properties[SET_PROP_STRV] =
-    g_param_spec_boxed ("strv",
+  set_properties[SET_PROP_SET] =
+    g_param_spec_boxed ("set",
                         "The set represented as an array of strings.",
-                        "An unordered list of unique strings in this set",
-                        G_TYPE_STRV,
+                        "An ordered list of unique strings in this set",
+                        G_TYPE_ARRAY,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (

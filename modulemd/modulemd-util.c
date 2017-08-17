@@ -66,3 +66,9 @@ _modulemd_hash_table_deep_obj_copy (GHashTable *orig)
 
   return new;
 }
+
+gint
+_modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
+{
+  return g_strcmp0 (*(const gchar **)a, *(const gchar **)b);
+}

@@ -1083,25 +1083,20 @@ error:
   return ret;
 }
 
-static void
-_emit_rpm_components (gpointer _key, gpointer _value, gpointer user_data)
+static gboolean
+_emit_modulemd_rpm_components (yaml_emitter_t *emitter,
+                               ModulemdModule *module,
+                               gchar *key,
+                               ModulemdComponentRpm *rpm_component,
+                               GError **error)
 {
+  gboolean ret = FALSE;
   yaml_event_t event;
-  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
-  GError **error = ((hash_entry_ctx *)user_data)->error;
   gchar *value = NULL;
   guint64 buildorder;
   ModulemdSimpleSet *set = NULL;
 
-  if (error && *error)
-    {
-      /* Don't proceed if we failed earlier */
-      return;
-    }
-
-  gchar *name = g_strdup (_key);
-  ModulemdComponentRpm *rpm_component =
-    g_object_ref (MODULEMD_COMPONENT_RPM (_value));
+  gchar *name = g_strdup (key);
 
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -1195,28 +1190,30 @@ _emit_rpm_components (gpointer _key, gpointer _value, gpointer user_data)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending RPM component inner mapping");
 
+  ret = TRUE;
 error:
   g_free (name);
   g_free (value);
-  g_object_unref (rpm_component);
   if (set)
     {
       g_object_unref (set);
     }
+  return ret;
 }
 
-static void
-_emit_module_components (gpointer _key, gpointer _value, gpointer user_data)
+static gboolean
+_emit_modulemd_module_components (yaml_emitter_t *emitter,
+                                  ModulemdModule *module,
+                                  gchar *key,
+                                  ModulemdComponentModule *module_component,
+                                  GError **error)
 {
+  gboolean ret = FALSE;
   yaml_event_t event;
-  yaml_emitter_t *emitter = ((hash_entry_ctx *)user_data)->emitter;
-  GError **error = ((hash_entry_ctx *)user_data)->error;
   gchar *value = NULL;
   guint64 buildorder;
 
-  gchar *name = g_strdup (_key);
-  ModulemdComponentModule *module_component =
-    g_object_ref (MODULEMD_COMPONENT_MODULE (_value));
+  gchar *name = g_strdup (key);
 
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -1272,9 +1269,11 @@ _emit_module_components (gpointer _key, gpointer _value, gpointer user_data)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending module component inner mapping");
 
+  ret = TRUE;
 error:
   g_free (value);
-  g_object_unref (module_component);
+
+  return ret;
 }
 
 static gboolean
@@ -1285,9 +1284,14 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   gboolean ret = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
+  gchar *key;
+  ModulemdComponentRpm *rpm_component;
+  ModulemdComponentModule *module_component;
   GHashTable *rpm_components;
   GHashTable *module_components;
-  hash_entry_ctx hctx = { emitter, error, YAML_PLAIN_SCALAR_STYLE };
+  GPtrArray *rpm_keys = NULL;
+  GPtrArray *module_keys = NULL;
+  gsize i;
 
   g_debug ("TRACE: entering _emit_modulemd_components");
 
@@ -1320,11 +1324,19 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
 
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
         emitter, &event, error, "Error starting RPM component mapping");
-      g_hash_table_foreach (rpm_components, _emit_rpm_components, &hctx);
-      if (error && *error)
+
+      rpm_keys =
+        _modulemd_ordered_str_keys (rpm_components, _modulemd_strcmp_sort);
+      for (i = 0; i < rpm_keys->len; i++)
         {
-          MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                         "Could not process RPM components");
+          key = g_ptr_array_index (rpm_keys, i);
+          rpm_component = g_hash_table_lookup (rpm_components, key);
+          if (!_emit_modulemd_rpm_components (
+                emitter, module, key, rpm_component, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Could not process RPM components");
+            }
         }
 
       yaml_mapping_end_event_initialize (&event);
@@ -1342,7 +1354,20 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
 
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
         emitter, &event, error, "Error starting module component mapping");
-      g_hash_table_foreach (module_components, _emit_module_components, &hctx);
+
+      module_keys =
+        _modulemd_ordered_str_keys (module_components, _modulemd_strcmp_sort);
+      for (i = 0; i < module_keys->len; i++)
+        {
+          key = g_ptr_array_index (module_keys, i);
+          module_component = g_hash_table_lookup (module_components, key);
+          if (!_emit_modulemd_module_components (
+                emitter, module, key, module_component, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Could not process module components");
+            }
+        }
 
       yaml_mapping_end_event_initialize (&event);
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -1363,6 +1388,14 @@ error:
   if (module_components)
     {
       g_hash_table_unref (module_components);
+    }
+  if (rpm_keys)
+    {
+      g_ptr_array_unref (rpm_keys);
+    }
+  if (module_keys)
+    {
+      g_ptr_array_unref (module_keys);
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_components");

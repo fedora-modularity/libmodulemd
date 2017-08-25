@@ -42,6 +42,22 @@ data:
     # Optional.  Defaults to an empty dictionary.
     xmd:
         some_key: some_data
+        some_list:
+            - a
+            - b
+        some_dict:
+            a: alpha
+            b: beta
+            some_other_list:
+                - c
+                - d
+            some_other_dict:
+                another_key: more_data
+                yet_another_key:
+                    - this
+                    - is
+                    - getting
+                    - silly
     # Module dependencies, if any.  Optional.
     # TODO: Provides, conflicts, obsoletes, recommends, etc.
     #       Do we even need those?

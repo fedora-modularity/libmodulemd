@@ -830,7 +830,7 @@ modulemd_module_get_version (ModulemdModule *self)
 
 /**
  * modulemd_module_set_xmd:
- * @xmd: (element-type utf8 utf8): Extensible metadata block
+ * @xmd: (element-type utf8 GVariant): Extensible metadata block
  *
  * Sets the 'xmd' property.
  */
@@ -843,7 +843,7 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
   if (xmd != self->xmd)
     {
       g_hash_table_unref (self->xmd);
-      self->xmd = _modulemd_hash_table_deep_str_copy (xmd);
+      self->xmd = _modulemd_hash_table_deep_variant_copy (xmd);
       g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_XMD]);
     }
 }
@@ -853,7 +853,7 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
  *
  * Retrieves the "xmd" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * Returns: (element-type utf8 GVariant) (transfer container): A hash table
  * containing the "xmd" property.
  */
 GHashTable *
@@ -1288,7 +1288,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:xmd: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     * ModulemdModule:xmd: (type GLib.HashTable(utf8,GVariant)) (transfer container)
      */
   md_properties[MD_PROP_XMD] =
     g_param_spec_boxed ("xmd",
@@ -1329,7 +1329,7 @@ modulemd_module_init (ModulemdModule *self)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->rpm_filter = modulemd_simpleset_new ();
 
-  self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
 }
 
 /**

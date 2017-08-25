@@ -25,6 +25,7 @@
 #ifndef MODULEMD_YAML_H
 #define MODULEMD_YAML_H
 
+#include <yaml.h>
 #include "modulemd.h"
 
 #define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
@@ -38,6 +39,19 @@ enum ModulemdYamlError
   MODULEMD_YAML_ERROR_EMIT
 };
 
+#define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \
+  do                                                                          \
+    {                                                                         \
+      if (!yaml_parser_parse (parser, event))                                 \
+        {                                                                     \
+          g_set_error_literal (                                               \
+            error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
+          goto error;                                                         \
+        }                                                                     \
+      g_debug ("Parser event: %u", (event)->type);                            \
+    }                                                                         \
+  while (0)
+
 #define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
   do                                                                          \
     {                                                                         \
@@ -46,6 +60,16 @@ enum ModulemdYamlError
     }                                                                         \
   while (0)
 
+#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      g_debug ("Error occurred while parsing event %u", event.type);          \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
 
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error);
@@ -58,5 +82,15 @@ emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error);
 
 gboolean
 emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error);
+
+gboolean
+parse_raw_yaml_mapping (yaml_parser_t *parser,
+                        GVariant **variant,
+                        GError **error);
+
+gboolean
+parse_raw_yaml_sequence (yaml_parser_t *parser,
+                         GVariant **variant,
+                         GError **error);
 
 #endif

@@ -8,6 +8,7 @@ modulemd_srcs = [
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-parser.c',
+    'modulemd-yaml-utils.c'
 ]
 
 modulemd_hdrs = [

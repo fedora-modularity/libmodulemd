@@ -67,6 +67,28 @@ _modulemd_hash_table_deep_obj_copy (GHashTable *orig)
   return new;
 }
 
+GHashTable *
+_modulemd_hash_table_deep_variant_copy (GHashTable *orig)
+{
+  GHashTable *new;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_return_val_if_fail (orig, NULL);
+
+  new = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
+
+  g_hash_table_iter_init (&iter, orig);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_insert (
+        new, g_strdup ((const gchar *)key), g_variant_ref ((GVariant *)value));
+    }
+
+  return new;
+}
+
 gint
 _modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
 {
@@ -90,4 +112,10 @@ _modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func)
   g_ptr_array_sort (keys, compare_func);
 
   return keys;
+}
+
+void
+modulemd_variant_unref (void *ptr)
+{
+  g_variant_unref ((GVariant *)ptr);
 }

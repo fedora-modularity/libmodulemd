@@ -28,36 +28,13 @@
 #include <errno.h>
 #include "modulemd.h"
 #include "modulemd-yaml.h"
+#include "modulemd-util.h"
 
 GQuark
 modulemd_yaml_error_quark (void)
 {
   return g_quark_from_static_string ("modulemd-yaml-error-quark");
 }
-
-#define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \
-  do                                                                          \
-    {                                                                         \
-      if (!yaml_parser_parse (parser, event))                                 \
-        {                                                                     \
-          g_set_error_literal (                                               \
-            error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
-          goto error;                                                         \
-        }                                                                     \
-      g_debug ("Parser event: %u", (event)->type);                            \
-    }                                                                         \
-  while (0)
-
-#define MMD_YAML_ERROR_RETURN(error, msg)                                     \
-  do                                                                          \
-    {                                                                         \
-      g_message (msg);                                                        \
-      g_set_error_literal (                                                   \
-        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
-      g_debug ("Error occurred while parsing event %u", event.type);          \
-      goto error;                                                             \
-    }                                                                         \
-  while (0)
 
 #define _yaml_parser_recurse_down(fn)                                         \
   do                                                                          \
@@ -674,13 +651,40 @@ _parse_modulemd_xmd (ModulemdModule *module,
                      GError **error)
 {
   GHashTable *xmd = NULL;
+  yaml_event_t event;
+  GVariant *variant;
+  GVariantIter iter;
+  gchar *key;
+  GVariant *value;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_debug ("TRACE: entering _parse_modulemd_xmd");
 
-  if (!_hashtable_from_mapping (parser, &xmd, error))
+  YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
+  if (!(event.type == YAML_MAPPING_START_EVENT))
     {
-      MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
+      MMD_YAML_ERROR_RETURN (error, "Invalid mapping");
+    }
+
+  if (!parse_raw_yaml_mapping (parser, &variant, error))
+    {
+      MMD_YAML_ERROR_RETURN (error, "Invalid raw mapping");
+    }
+
+  if (!g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
+    {
+      MMD_YAML_ERROR_RETURN (error, "XMD wasn't a dictionary");
+    }
+
+  xmd = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
+  g_variant_iter_init (&iter, variant);
+  while (g_variant_iter_next (&iter, "{sv}", &key, &value))
+    {
+      g_hash_table_insert (xmd, g_strdup (key), g_variant_ref (value));
+
+      g_variant_unref (value);
+      g_free (key);
     }
 
   /* Save this hash table as the xmd property */

@@ -16,6 +16,21 @@ data:
     # timestamp.  Module version defines upgrade path for the particular
     # update stream.
     version: 20160927144203
+    # Module context flag, optional
+    # The context flag serves to distinguish module builds with the
+    # same name, stream and version and plays an important role in
+    # future automatic module stream name expansion.
+    # Filled in by the buildsystem.  A short hash of the module's name,
+    # stream, version and its expanded runtime dependencies.
+    context: c0ffee43
+    # Module artifact architecture, optional
+    # Contains a string describing the module's artifacts' main hardware
+    # architecture compatibility, distinguishing the module artifact,
+    # e.g. a repository, from others with the same name, stream, version and
+    # context.  This is not a generic hardware family (i.e. basearch).
+    # Examples: i386, i486, armv7hl, x86_64
+    # Filled in by the buildsystem during the compose stage.
+    arch: x86_64
     # A short summary describing the module, required
     summary: An example module
     # A verbose description of the module, required

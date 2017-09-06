@@ -32,9 +32,11 @@ enum
 {
   MD_PROP_0,
 
+  MD_PROP_ARCH,
   MD_PROP_BUILDREQUIRES,
   MD_PROP_COMMUNITY,
   MD_PROP_CONTENT_LIC,
+  MD_PROP_CONTEXT,
   MD_PROP_DESC,
   MD_PROP_DOCS,
   MD_PROP_MDVERSION,
@@ -66,9 +68,11 @@ struct _ModulemdModule
   GObject parent_instance;
 
   /* == Members == */
+  gchar *arch;
   GHashTable *buildrequires;
   gchar *community;
   ModulemdSimpleSet *content_licenses;
+  gchar *context;
   gchar *description;
   gchar *documentation;
   guint64 mdversion;
@@ -90,6 +94,40 @@ struct _ModulemdModule
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
+
+/**
+ * modulemd_module_set_arch:
+ * @arch: the module artifact architecture.
+ *
+ * Sets the "arch" property.
+ */
+void
+modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  if (g_strcmp0 (self->arch, arch) != 0)
+    {
+      g_free (self->arch);
+      self->arch = g_strdup (arch);
+      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_ARCH]);
+    }
+}
+
+/**
+ * modulemd_module_get_arch:
+ *
+ * Retrieves the "arch" for modulemd.
+ *
+ * Returns: A string containing the "arch" property.
+ */
+const gchar *
+modulemd_module_get_arch (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return self->arch;
+}
 
 /**
  * modulemd_module_set_buildrequires:
@@ -201,6 +239,41 @@ modulemd_module_get_content_licenses (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return g_object_ref (self->content_licenses);
+}
+
+/**
+ * modulemd_module_set_context:
+ * @context: the module artifact architecture.
+ *
+ * Sets the "context" property.
+ */
+void
+modulemd_module_set_context (ModulemdModule *self, const gchar *context)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  if (g_strcmp0 (self->context, context) != 0)
+    {
+      g_free (self->context);
+      self->context = g_strdup (context);
+      g_object_notify_by_pspec (G_OBJECT (self),
+                                md_properties[MD_PROP_CONTEXT]);
+    }
+}
+
+/**
+ * modulemd_module_get_context:
+ *
+ * Retrieves the "context" for modulemd.
+ *
+ * Returns: A string containing the "context" property.
+ */
+const gchar *
+modulemd_module_get_context (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return self->context;
 }
 
 /**
@@ -874,6 +947,10 @@ modulemd_module_set_property (GObject *gobject,
 
   switch (property_id)
     {
+    case MD_PROP_ARCH:
+      modulemd_module_set_arch (self, g_value_get_string (value));
+      break;
+
     case MD_PROP_BUILDREQUIRES:
       modulemd_module_set_buildrequires (self, g_value_get_boxed (value));
       break;
@@ -884,6 +961,10 @@ modulemd_module_set_property (GObject *gobject,
 
     case MD_PROP_CONTENT_LIC:
       modulemd_module_set_content_licenses (self, g_value_get_object (value));
+      break;
+
+    case MD_PROP_CONTEXT:
+      modulemd_module_set_context (self, g_value_get_string (value));
       break;
 
     case MD_PROP_DESC:
@@ -974,6 +1055,10 @@ modulemd_module_get_property (GObject *gobject,
 
   switch (property_id)
     {
+    case MD_PROP_ARCH:
+      g_value_set_string (value, modulemd_module_get_arch (self));
+      break;
+
     case MD_PROP_BUILDREQUIRES:
       g_value_set_boxed (value, modulemd_module_get_buildrequires (self));
       break;
@@ -984,6 +1069,10 @@ modulemd_module_get_property (GObject *gobject,
 
     case MD_PROP_CONTENT_LIC:
       g_value_set_object (value, modulemd_module_get_content_licenses (self));
+      break;
+
+    case MD_PROP_CONTEXT:
+      g_value_set_string (value, modulemd_module_get_context (self));
       break;
 
     case MD_PROP_DESC:
@@ -1068,9 +1157,11 @@ modulemd_module_finalize (GObject *gobject)
 {
   ModulemdModule *self = (ModulemdModule *)gobject;
 
+  g_clear_pointer (&self->arch, g_free);
   g_clear_pointer (&self->buildrequires, g_hash_table_unref);
   g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->content_licenses, g_object_unref);
+  g_clear_pointer (&self->context, g_free);
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->documentation, g_free);
   g_clear_pointer (&self->module_components, g_hash_table_unref);
@@ -1101,6 +1192,20 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
 
   object_class->finalize = modulemd_module_finalize;
 
+  md_properties[MD_PROP_ARCH] =
+    g_param_spec_string ("arch",
+                         "Module Artifact Architecture",
+                         "Contains a string describing the module's "
+                         "artifacts' main hardware architecture "
+                         "compatibility, distinguishing the module artifact, "
+                         "e.g. a repository, from others with the same name, "
+                         "stream, version and context. This is not a generic "
+                         "hardware family (i.e. basearch). Examples: i386, "
+                         "i486, armv7hl, x86_64. Filled in by the buildsystem "
+                         "during the compose stage.",
+                         NULL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
   /**
      * ModulemdModule:buildrequires: (type GLib.HashTable(utf8,utf8)) (transfer container)
      */
@@ -1128,6 +1233,19 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          "The set of licenses under which the contents "
                          "of this module are released.",
                          MODULEMD_TYPE_SIMPLESET,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  md_properties[MD_PROP_CONTEXT] =
+    g_param_spec_string ("context",
+                         "Module Context",
+                         "The context flag serves to distinguish module "
+                         "builds with the same name, stream and version and "
+                         "plays an important role in future automatic module "
+                         "stream name expansion. Filled in by the "
+                         "buildsystem. A short hash of the module's name, "
+                         "stream, version and its expanded runtime "
+                         "dependencies.",
+                         NULL,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   md_properties[MD_PROP_DESC] =
@@ -1329,7 +1447,8 @@ modulemd_module_init (ModulemdModule *self)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->rpm_filter = modulemd_simpleset_new ();
 
-  self->xmd = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
+  self->xmd = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
 }
 
 /**

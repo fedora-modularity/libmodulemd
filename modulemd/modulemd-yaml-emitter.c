@@ -372,6 +372,25 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
         &event, name, value, YAML_PLAIN_SCALAR_STYLE);
     }
 
+  /* Module Context */
+  value = g_strdup (modulemd_module_get_context (module));
+  if (value)
+    {
+      name = g_strdup ("context");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+
+  /* Module Artifact Architecture */
+  value = g_strdup (modulemd_module_get_arch (module));
+  if (value)
+    {
+      name = g_strdup ("arch");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
 
   /* Module summary */
   value = g_strdup (modulemd_module_get_summary (module));

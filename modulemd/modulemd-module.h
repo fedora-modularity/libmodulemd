@@ -52,6 +52,12 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
                                      ModulemdModule ***_modules);
 
 void
+modulemd_module_set_arch (ModulemdModule *self, const gchar *arch);
+
+const gchar *
+modulemd_module_get_arch (ModulemdModule *self);
+
+void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires);
 
@@ -70,6 +76,12 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
 
 ModulemdSimpleSet *
 modulemd_module_get_content_licenses (ModulemdModule *self);
+
+void
+modulemd_module_set_context (ModulemdModule *self, const gchar *context);
+
+const gchar *
+modulemd_module_get_context (ModulemdModule *self);
 
 void
 modulemd_module_set_description (ModulemdModule *self,

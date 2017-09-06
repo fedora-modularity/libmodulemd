@@ -441,6 +441,38 @@ _parse_modulemd_data (ModulemdModule *module,
               modulemd_module_set_version (module, version);
             }
 
+          /* Module Context */
+
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "context"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Failed to parse module context");
+                }
+
+              modulemd_module_set_context (
+                module, (const gchar *)event.data.scalar.value);
+            }
+
+          /* Module Artifact Architecture */
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "arch"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (
+                    error, "Failed to parse module artifact architecture");
+                }
+
+              modulemd_module_set_arch (
+                module, (const gchar *)event.data.scalar.value);
+            }
+
           /* Module summary */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "summary"))

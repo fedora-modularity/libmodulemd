@@ -187,3 +187,95 @@ error:
   g_debug ("TRACE: exiting parse_raw_yaml_sequence");
   return ret;
 }
+
+gboolean
+emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *scalar = NULL;
+  GVariantIter iter;
+  GVariant *value = NULL;
+
+  if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING))
+    {
+      /* Print the string as a scalar */
+      scalar = g_strdup (g_variant_get_string (variant, NULL));
+      g_debug ("Printing scalar: %s", scalar);
+      MMD_YAML_EMIT_SCALAR (&event, scalar, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
+    {
+      /* Start the YAML mapping */
+      yaml_mapping_start_event_initialize (
+        &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error starting variant mapping");
+
+      g_variant_iter_init (&iter, variant);
+      while (g_variant_iter_next (&iter, "{sv}", &scalar, &value))
+        {
+          /* Loop through all entries in this dictionary and parse them
+           * recursively through this function again
+           */
+
+          /* Print the key as a scalar */
+          g_debug ("Printing scalar key: %s", scalar);
+          MMD_YAML_EMIT_SCALAR (&event, scalar, YAML_PLAIN_SCALAR_STYLE);
+
+          /* Recurse into the value */
+          emit_yaml_variant (emitter, value, error);
+
+          g_clear_pointer (&value, g_variant_unref);
+        }
+
+      /* Terminate the YAML mapping */
+      yaml_mapping_end_event_initialize (&event);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error ending variant mapping");
+    }
+
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_ARRAY))
+    {
+      /* Start the YAML sequence */
+      yaml_sequence_start_event_initialize (
+        &event, NULL, NULL, 1, YAML_BLOCK_SEQUENCE_STYLE);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error starting variant sequence");
+
+      g_variant_iter_init (&iter, variant);
+      while (g_variant_iter_next (&iter, "v", &value))
+        {
+          /* Loop through all entries in this array and parse them
+           * recursively through this function again
+           */
+          emit_yaml_variant (emitter, value, error);
+
+          g_clear_pointer (&value, g_variant_unref);
+        }
+
+      /* Terminate the YAML sequence */
+      yaml_sequence_end_event_initialize (&event);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error ending variant sequence");
+    }
+
+  else
+    {
+      g_debug ("Unhandled variant type: %s",
+               g_variant_get_type_string (variant));
+      MMD_YAML_ERROR_RETURN (error, "Unhandled variant type");
+    }
+
+  ret = TRUE;
+
+error:
+  g_free (scalar);
+  if (value)
+    {
+      g_variant_unref (value);
+    }
+
+  return ret;
+}

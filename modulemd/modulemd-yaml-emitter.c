@@ -31,76 +31,6 @@
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 
-#define YAML_EMITTER_EMIT_WITH_ERROR_RETURN(emitter, event, error, msg)       \
-  do                                                                          \
-    {                                                                         \
-      if (!yaml_emitter_emit (emitter, event))                                \
-        {                                                                     \
-          g_debug ("Error: %s", msg);                                         \
-          g_set_error_literal (                                               \
-            error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);       \
-          goto error;                                                         \
-        }                                                                     \
-      g_debug ("Emitter event: %u", (event)->type);                           \
-    }                                                                         \
-  while (0)
-
-#define MMD_YAML_EMITTER_ERROR_RETURN(error, msg)                             \
-  do                                                                          \
-    {                                                                         \
-      g_message (msg);                                                        \
-      g_set_error_literal (                                                   \
-        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);           \
-      goto error;                                                             \
-    }                                                                         \
-  while (0)
-
-#define MMD_YAML_EMIT_SCALAR(event, scalar, style)                            \
-  do                                                                          \
-    {                                                                         \
-      yaml_scalar_event_initialize (event,                                    \
-                                    NULL,                                     \
-                                    NULL,                                     \
-                                    (yaml_char_t *)scalar,                    \
-                                    (int)strlen (scalar),                     \
-                                    1,                                        \
-                                    1,                                        \
-                                    style);                                   \
-      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
-        emitter, event, error, "Error writing scalar");                       \
-      g_clear_pointer (&scalar, g_free);                                      \
-    }                                                                         \
-  while (0)
-
-#define MMD_YAML_EMIT_STR_STR_DICT(event, name, value, style)                 \
-  do                                                                          \
-    {                                                                         \
-      yaml_scalar_event_initialize (event,                                    \
-                                    NULL,                                     \
-                                    NULL,                                     \
-                                    (yaml_char_t *)name,                      \
-                                    (int)strlen (name),                       \
-                                    1,                                        \
-                                    1,                                        \
-                                    YAML_PLAIN_SCALAR_STYLE);                 \
-      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
-        emitter, event, error, "Error writing name");                         \
-      g_clear_pointer (&name, g_free);                                        \
-                                                                              \
-      yaml_scalar_event_initialize (event,                                    \
-                                    NULL,                                     \
-                                    NULL,                                     \
-                                    (yaml_char_t *)value,                     \
-                                    (int)strlen (value),                      \
-                                    1,                                        \
-                                    1,                                        \
-                                    style);                                   \
-      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
-        emitter, event, error, "Error writing value");                        \
-      g_clear_pointer (&value, g_free);                                       \
-    }                                                                         \
-  while (0)
-
 static gboolean
 _emit_modulemd_document (yaml_emitter_t *emitter,
                          ModulemdModule *module,
@@ -165,6 +95,10 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
                           GHashTable *htable,
                           yaml_scalar_style_t style,
                           GError **error);
+static gboolean
+_emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
+                                  GHashTable *htable,
+                                  GError **error);
 
 gboolean
 emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
@@ -638,11 +572,13 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
       name = g_strdup ("xmd");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
-      if (!_emit_modulemd_hashtable (
-            emitter, htable, YAML_PLAIN_SCALAR_STYLE, error))
+      /* Start the YAML mapping */
+      if (!_emit_modulemd_variant_hashtable (emitter, htable, error))
         {
-          MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module xmd");
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Error emitting variant hashtable");
         }
+
       g_clear_pointer (&htable, g_hash_table_unref);
     }
   ret = TRUE;
@@ -1530,5 +1466,62 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
 error:
 
   g_debug ("TRACE: exiting _emit_modulemd_hashtable");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
+                                  GHashTable *htable,
+                                  GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  GPtrArray *keys;
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *name;
+  GVariant *val;
+
+  g_debug ("TRACE: entering _emit_modulemd_variant_hashtable");
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting variant hashtable mapping");
+
+  keys = g_ptr_array_new_full (g_hash_table_size (htable), g_free);
+
+  g_hash_table_iter_init (&iter, htable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_ptr_array_add (keys, g_strdup ((const gchar *)key));
+    }
+  g_ptr_array_sort (keys, _modulemd_strcmp_sort);
+
+
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      /* Write out the key as a scalar */
+      name = g_strdup (g_ptr_array_index (keys, i));
+      val = g_hash_table_lookup (htable, name);
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      /* Write out the values as a variant, recursing as needed */
+      if (!emit_yaml_variant (emitter, val, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Error writing arbitrary mapping");
+        }
+    }
+  g_ptr_array_unref (keys);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending variant hashtable mapping");
+
+  ret = TRUE;
+error:
+
+  g_debug ("TRACE: exiting _emit_modulemd_variant_hashtable");
   return ret;
 }

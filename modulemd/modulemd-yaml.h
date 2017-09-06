@@ -71,6 +71,76 @@ enum ModulemdYamlError
     }                                                                         \
   while (0)
 
+#define YAML_EMITTER_EMIT_WITH_ERROR_RETURN(emitter, event, error, msg)       \
+  do                                                                          \
+    {                                                                         \
+      if (!yaml_emitter_emit (emitter, event))                                \
+        {                                                                     \
+          g_debug ("Error: %s", msg);                                         \
+          g_set_error_literal (                                               \
+            error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);       \
+          goto error;                                                         \
+        }                                                                     \
+      g_debug ("Emitter event: %u", (event)->type);                           \
+    }                                                                         \
+  while (0)
+
+#define MMD_YAML_EMITTER_ERROR_RETURN(error, msg)                             \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);           \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
+#define MMD_YAML_EMIT_SCALAR(event, scalar, style)                            \
+  do                                                                          \
+    {                                                                         \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)scalar,                    \
+                                    (int)strlen (scalar),                     \
+                                    1,                                        \
+                                    1,                                        \
+                                    style);                                   \
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
+        emitter, event, error, "Error writing scalar");                       \
+      g_clear_pointer (&scalar, g_free);                                      \
+    }                                                                         \
+  while (0)
+
+#define MMD_YAML_EMIT_STR_STR_DICT(event, name, value, style)                 \
+  do                                                                          \
+    {                                                                         \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)name,                      \
+                                    (int)strlen (name),                       \
+                                    1,                                        \
+                                    1,                                        \
+                                    YAML_PLAIN_SCALAR_STYLE);                 \
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
+        emitter, event, error, "Error writing name");                         \
+      g_clear_pointer (&name, g_free);                                        \
+                                                                              \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)value,                     \
+                                    (int)strlen (value),                      \
+                                    1,                                        \
+                                    1,                                        \
+                                    style);                                   \
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
+        emitter, event, error, "Error writing value");                        \
+      g_clear_pointer (&value, g_free);                                       \
+    }                                                                         \
+  while (0)
+
 ModulemdModule **
 parse_yaml_file (const gchar *path, GError **error);
 
@@ -92,5 +162,8 @@ gboolean
 parse_raw_yaml_sequence (yaml_parser_t *parser,
                          GVariant **variant,
                          GError **error);
+
+gboolean
+emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error);
 
 #endif

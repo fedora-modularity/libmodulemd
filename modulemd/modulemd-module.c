@@ -39,6 +39,7 @@ enum
   MD_PROP_CONTEXT,
   MD_PROP_DESC,
   MD_PROP_DOCS,
+  MD_PROP_EOL,
   MD_PROP_MDVERSION,
   MD_PROP_MODULE_LIC,
   MD_PROP_MODULE_COMPONENTS,
@@ -75,6 +76,7 @@ struct _ModulemdModule
   gchar *context;
   gchar *description;
   gchar *documentation;
+  GDate *eol;
   guint64 mdversion;
   GHashTable *module_components;
   ModulemdSimpleSet *module_licenses;
@@ -344,6 +346,49 @@ modulemd_module_get_documentation (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->documentation;
+}
+
+/**
+ * modulemd_module_set_eol:
+ * @date: The end-of-life date of the module
+ *
+ * Sets the "eol" property.
+ *
+ * Note: This property is obsolete. Use "servicelevels" instead.
+ */
+void
+modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (g_date_valid (date));
+
+  if (!g_date_valid (self->eol) || g_date_compare (date, self->eol) != 0)
+    {
+      /* Date is changing. Update it */
+      g_date_set_year (self->eol, g_date_get_year (date));
+      g_date_set_month (self->eol, g_date_get_month (date));
+      g_date_set_day (self->eol, g_date_get_day (date));
+
+      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_EOL]);
+    }
+}
+
+/**
+ * modulemd_module_get_eol:
+ *
+ * Retrieves the "eol" property.
+ *
+ * Note: This property is obsolete. Use "servicelevels" instead.
+ *
+ * Returns: A #GDate containing the "EOL" date
+ */
+const GDate *
+modulemd_module_get_eol (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (g_date_valid (self->eol), NULL);
+
+  return self->eol;
 }
 
 /**
@@ -975,6 +1020,10 @@ modulemd_module_set_property (GObject *gobject,
       modulemd_module_set_documentation (self, g_value_get_string (value));
       break;
 
+    case MD_PROP_EOL:
+      modulemd_module_set_eol (self, g_value_get_boxed (value));
+      break;
+
     case MD_PROP_MDVERSION:
       modulemd_module_set_mdversion (self, g_value_get_uint64 (value));
       break;
@@ -1082,6 +1131,11 @@ modulemd_module_get_property (GObject *gobject,
     case MD_PROP_DOCS:
       g_value_set_string (value, modulemd_module_get_documentation (self));
       break;
+
+    case MD_PROP_EOL:
+      g_value_set_boxed (value, modulemd_module_get_eol (self));
+      break;
+
     case MD_PROP_MDVERSION:
       g_value_set_uint64 (value, modulemd_module_get_mdversion (self));
       break;
@@ -1164,6 +1218,7 @@ modulemd_module_finalize (GObject *gobject)
   g_clear_pointer (&self->context, g_free);
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->documentation, g_free);
+  g_clear_pointer (&self->eol, g_date_free);
   g_clear_pointer (&self->module_components, g_hash_table_unref);
   g_clear_pointer (&self->module_licenses, g_object_unref);
   g_clear_pointer (&self->name, g_free);
@@ -1263,6 +1318,18 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          "upstream documentation for this module.",
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  /**
+     * ModulemdModule:eol: (type GLib.Date)
+     */
+  md_properties[MD_PROP_EOL] =
+    g_param_spec_boxed ("eol",
+                        "End of Life",
+                        "An ISO-8601 compatible YYYY-MM-DD value representing "
+                        "the end-of-life date of this module. This field is "
+                        "obsolete; use 'servicelevels' instead.",
+                        G_TYPE_DATE,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   md_properties[MD_PROP_MDVERSION] =
     g_param_spec_uint64 ("mdversion",
@@ -1431,6 +1498,8 @@ modulemd_module_init (ModulemdModule *self)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
   self->rpm_components =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  self->eol = g_date_new ();
 
   self->content_licenses = modulemd_simpleset_new ();
   self->module_licenses = modulemd_simpleset_new ();

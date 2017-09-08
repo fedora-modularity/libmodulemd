@@ -332,6 +332,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   gchar *name = NULL;
   gchar *value = NULL;
   guint64 version = 0;
+  const GDate *eol;
 
   g_debug ("TRACE: entering _emit_modulemd_data");
 
@@ -415,6 +416,19 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   name = g_strdup ("description");
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_FOLDED_SCALAR_STYLE);
 
+  /* Module EOL (obsolete */
+  eol = modulemd_module_get_eol (module);
+  if (eol)
+    {
+      name = g_strdup ("eol");
+      value = g_strdup_printf ("%.2u-%.2u-%.2u",
+                               g_date_get_year (eol),
+                               g_date_get_month (eol),
+                               g_date_get_day (eol));
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
   /* Module Licenses */
   if (!_emit_modulemd_licenses (emitter, module, error))
     {
@@ -457,7 +471,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
     }
 
 
-  /* API */
+  /* Filters */
   if (!_emit_modulemd_filters (emitter, module, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit filters");

@@ -368,6 +368,8 @@ _parse_modulemd_data (ModulemdModule *module,
   yaml_event_t event;
   gboolean done = FALSE;
   guint64 version;
+  gchar **strv;
+  GDate *eol = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_debug ("TRACE: entering _parse_modulemd_data");
@@ -505,6 +507,33 @@ _parse_modulemd_data (ModulemdModule *module,
                 module, (const gchar *)event.data.scalar.value);
             }
 
+          /* Module EOL (obsolete) */
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &event, error, "Parser error");
+              if (event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse module EOL");
+                }
+
+              strv =
+                g_strsplit ((const gchar *)event.data.scalar.value, "-", 4);
+
+              if (!strv[0] || !strv[1] || !strv[2])
+                {
+                  MMD_YAML_ERROR_RETURN (
+                    error, "EOL date not in the form YYYY-MM-DD");
+                }
+
+              eol = g_date_new_dmy (
+                g_ascii_strtoull (strv[2], NULL, 10), /* Day */
+                g_ascii_strtoull (strv[1], NULL, 10), /* Month */
+                g_ascii_strtoull (strv[0], NULL, 10)); /* Year */
+
+              modulemd_module_set_eol (module, eol);
+            }
+
           /* licenses */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "license"))
@@ -602,6 +631,10 @@ error:
   if (*error)
     {
       return FALSE;
+    }
+  if (eol)
+    {
+      g_date_free (eol);
     }
   g_debug ("TRACE: exiting _parse_modulemd_data");
   return TRUE;

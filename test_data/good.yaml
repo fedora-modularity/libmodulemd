@@ -37,6 +37,13 @@ data:
     description: >-
         A module for the demonstration of the metadata format. Also,
         the obligatory lorem ipsum dolor sit amet goes right here.
+    # The end of life, aka Best Before, optional.
+    # A UTC date in the ISO 8601 format signifying the day when this
+    # module goes EOL, i.e. starting the day below, this module won't
+    # receive any more updates.  Typically defined in an external data
+    # source and filled in by the buildsystem.
+    # Obsolete: use servicelevels instead
+    eol: 2077-10-03
     # Module and content licenses in the Fedora license identifier
     # format, required
     license:

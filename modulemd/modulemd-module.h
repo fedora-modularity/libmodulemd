@@ -98,6 +98,12 @@ const gchar *
 modulemd_module_get_documentation (ModulemdModule *self);
 
 void
+modulemd_module_set_eol (ModulemdModule *self, const GDate *date);
+
+const GDate *
+modulemd_module_get_eol (ModulemdModule *self);
+
+void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion);
 
 const guint64

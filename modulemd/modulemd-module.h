@@ -176,6 +176,13 @@ ModulemdSimpleSet *
 modulemd_module_get_rpm_filter (ModulemdModule *self);
 
 void
+modulemd_module_set_servicelevels (ModulemdModule *self,
+                                   GHashTable *servicelevels);
+
+GHashTable *
+modulemd_module_get_servicelevels (ModulemdModule *self);
+
+void
 modulemd_module_set_stream (ModulemdModule *self, const gchar *stream);
 
 const gchar *

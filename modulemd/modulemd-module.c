@@ -51,6 +51,7 @@ enum
   MD_PROP_RPM_BUILDOPTS,
   MD_PROP_RPM_FILTER,
   MD_PROP_REQUIRES,
+  MD_PROP_SL,
   MD_PROP_STREAM,
   MD_PROP_SUMMARY,
   MD_PROP_TRACKER,
@@ -88,6 +89,7 @@ struct _ModulemdModule
   GHashTable *rpm_buildopts;
   GHashTable *rpm_components;
   ModulemdSimpleSet *rpm_filter;
+  GHashTable *servicelevels;
   gchar *stream;
   gchar *summary;
   gchar *tracker;
@@ -809,6 +811,44 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
 }
 
 /**
+ * modulemd_module_set_servicelevels:
+ * @servicelevels: (element-type utf8 ModulemdServiceLevel): A hash table of #ServiceLevel objects
+ *
+ * Sets the service levels for the module.
+ */
+void
+modulemd_module_set_servicelevels (ModulemdModule *self,
+                                   GHashTable *servicelevels)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (servicelevels);
+
+  if (servicelevels != self->servicelevels)
+    {
+      g_hash_table_unref (self->servicelevels);
+      self->servicelevels = _modulemd_hash_table_deep_obj_copy (servicelevels);
+      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
+    }
+}
+
+/**
+ * modulemd_module_get_servicelevels:
+ *
+ * Retrieves the service levels for the module
+ *
+ * Returns: (element-type utf8 ModulemdServiceLevel) (transfer container): A
+ * hash table containing the service levels.
+ */
+GHashTable *
+modulemd_module_get_servicelevels (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_hash_table_ref (self->servicelevels);
+}
+
+
+/**
  * modulemd_module_set_stream:
  * @stream: the module stream.
  *
@@ -1068,6 +1108,10 @@ modulemd_module_set_property (GObject *gobject,
       modulemd_module_set_rpm_filter (self, g_value_get_object (value));
       break;
 
+    case MD_PROP_SL:
+      modulemd_module_set_servicelevels (self, g_value_get_boxed (value));
+      break;
+
     case MD_PROP_STREAM:
       modulemd_module_set_stream (self, g_value_get_string (value));
       break;
@@ -1180,6 +1224,10 @@ modulemd_module_get_property (GObject *gobject,
       g_value_set_object (value, modulemd_module_get_rpm_filter (self));
       break;
 
+    case MD_PROP_SL:
+      g_value_set_boxed (value, modulemd_module_get_servicelevels (self));
+      break;
+
     case MD_PROP_STREAM:
       g_value_set_string (value, modulemd_module_get_stream (self));
       break;
@@ -1229,6 +1277,7 @@ modulemd_module_finalize (GObject *gobject)
   g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
   g_clear_pointer (&self->rpm_components, g_hash_table_unref);
   g_clear_pointer (&self->rpm_filter, g_object_unref);
+  g_clear_pointer (&self->servicelevels, g_hash_table_unref);
   g_clear_pointer (&self->stream, g_free);
   g_clear_pointer (&self->summary, g_free);
   g_clear_pointer (&self->tracker, g_free);
@@ -1438,6 +1487,17 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          MODULEMD_TYPE_SIMPLESET,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+  /**
+     * ModulemdModule:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel)) (transfer container)
+     */
+  md_properties[MD_PROP_SL] =
+    g_param_spec_boxed ("servicelevels",
+                        "Service Levels",
+                        "A dictionary of service levels that apply to this "
+                        "module.",
+                        G_TYPE_HASH_TABLE,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
   md_properties[MD_PROP_STREAM] =
     g_param_spec_string ("stream",
                          "Module Stream",
@@ -1515,6 +1575,9 @@ modulemd_module_init (ModulemdModule *self)
   self->rpm_buildopts =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->rpm_filter = modulemd_simpleset_new ();
+
+  self->servicelevels =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   self->xmd = g_hash_table_new_full (
     g_str_hash, g_str_equal, g_free, modulemd_variant_unref);

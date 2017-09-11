@@ -44,6 +44,16 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error);
 static gboolean
+_emit_modulemd_servicelevels (yaml_emitter_t *emitter,
+                              ModulemdModule *module,
+                              GError **error);
+static gboolean
+_emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
+                                   ModulemdModule *module,
+                                   gchar *key,
+                                   ModulemdServiceLevel *sl,
+                                   GError **error);
+static gboolean
 _emit_modulemd_licenses (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error);
@@ -429,6 +439,12 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
         &event, name, value, YAML_PLAIN_SCALAR_STYLE);
     }
 
+  /* Module Service Levels */
+  if (!_emit_modulemd_servicelevels (emitter, module, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit service levels");
+    }
+
   /* Module Licenses */
   if (!_emit_modulemd_licenses (emitter, module, error))
     {
@@ -509,6 +525,120 @@ error:
   g_free (value);
 
   g_debug ("TRACE: exiting _emit_modulemd_data");
+  return ret;
+}
+
+static gboolean
+_emit_modulemd_servicelevels (yaml_emitter_t *emitter,
+                              ModulemdModule *module,
+                              GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  gchar *key;
+  GHashTable *servicelevels = NULL;
+  ModulemdServiceLevel *sl = NULL;
+  GPtrArray *keys = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_servicelevels");
+
+  servicelevels = modulemd_module_get_servicelevels (module);
+
+  if (!(servicelevels || g_hash_table_size (servicelevels) > 0))
+    {
+      /* No profiles for this module. */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("servicelevels");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting servicelevel mapping");
+
+  keys = _modulemd_ordered_str_keys (servicelevels, _modulemd_strcmp_sort);
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      key = g_ptr_array_index (keys, i);
+      sl = g_hash_table_lookup (servicelevels, key);
+      if (!_emit_modulemd_servicelevel_entry (emitter, module, key, sl, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Could not process service levels");
+        }
+    }
+  g_clear_pointer (&keys, g_ptr_array_unref);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending reference mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (keys)
+    {
+      g_ptr_array_unref (keys);
+    }
+  if (servicelevels)
+    {
+      g_hash_table_unref (servicelevels);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_servicelevels");
+  return ret;
+}
+
+
+static gboolean
+_emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
+                                   ModulemdModule *module,
+                                   gchar *key,
+                                   ModulemdServiceLevel *sl,
+                                   GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+
+  gchar *name = NULL;
+  gchar *value = NULL;
+  const GDate *eol = modulemd_servicelevel_get_eol (sl);
+
+  if (!eol || !g_date_valid (eol))
+    {
+      MMD_YAML_ERROR_RETURN (error, "Invalid EOL date");
+    }
+
+  name = g_strdup (key);
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting servicelevel inner mapping");
+
+  /* EOL */
+  name = g_strdup ("eol");
+  value = g_strdup_printf ("%.2u-%.2u-%.2u",
+                           g_date_get_year (eol),
+                           g_date_get_month (eol),
+                           g_date_get_day (eol));
+  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending servicelevel inner mapping");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  g_free (value);
+
   return ret;
 }
 

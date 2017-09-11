@@ -44,6 +44,16 @@ data:
     # source and filled in by the buildsystem.
     # Obsolete: use servicelevels instead
     eol: 2077-10-03
+    # Service levels, optional
+    # This is a dictionary of important dates (and possibly supplementary data
+    # in the future) that describes the end point of certain functionality,
+    # such as the date when the module will transition to "security fixes only"
+    # or go completely end-of-life
+    servicelevels:
+        security:
+            eol: 2019-03-30
+        features:
+            eol: 2018-12-31
     # Module and content licenses in the Fedora license identifier
     # format, required
     license:

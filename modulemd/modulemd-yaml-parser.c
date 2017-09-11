@@ -117,7 +117,16 @@ static gboolean
 _parse_modulemd_artifacts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error);
-
+static gboolean
+_parse_modulemd_servicelevels (ModulemdModule *module,
+                               yaml_parser_t *parser,
+                               GError **error);
+static gboolean
+_parse_modulemd_servicelevel (yaml_parser_t *parser,
+                              ModulemdServiceLevel **_profile,
+                              GError **error);
+static gboolean
+_parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error);
 static gboolean
 _simpleset_from_sequence (yaml_parser_t *parser,
                           ModulemdSimpleSet **_set,
@@ -368,7 +377,6 @@ _parse_modulemd_data (ModulemdModule *module,
   yaml_event_t event;
   gboolean done = FALSE;
   guint64 version;
-  gchar **strv;
   GDate *eol = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -510,28 +518,22 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
-              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+              /* Get the EOL date */
+              if (!_parse_modulemd_date (parser, &eol, error))
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse module EOL");
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Failed to parse module EOL date");
                 }
-
-              strv =
-                g_strsplit ((const gchar *)event.data.scalar.value, "-", 4);
-
-              if (!strv[0] || !strv[1] || !strv[2])
-                {
-                  MMD_YAML_ERROR_RETURN (
-                    error, "EOL date not in the form YYYY-MM-DD");
-                }
-
-              eol = g_date_new_dmy (
-                g_ascii_strtoull (strv[2], NULL, 10), /* Day */
-                g_ascii_strtoull (strv[1], NULL, 10), /* Month */
-                g_ascii_strtoull (strv[0], NULL, 10)); /* Year */
 
               modulemd_module_set_eol (module, eol);
+              g_date_free (eol);
+            }
+
+          /* Service Levels */
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "servicelevels"))
+            {
+              _yaml_parser_recurse_down (_parse_modulemd_servicelevels);
             }
 
           /* licenses */
@@ -631,10 +633,6 @@ error:
   if (*error)
     {
       return FALSE;
-    }
-  if (eol)
-    {
-      g_date_free (eol);
     }
   g_debug ("TRACE: exiting _parse_modulemd_data");
   return TRUE;
@@ -1801,6 +1799,177 @@ error:
     }
   g_debug ("TRACE: exiting _parse_modulemd_artifacts");
   return TRUE;
+}
+
+static gboolean
+_parse_modulemd_servicelevels (ModulemdModule *module,
+                               yaml_parser_t *parser,
+                               GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *servicelevels = NULL;
+  gchar *name = NULL;
+  ModulemdServiceLevel *sl = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_servicelevels");
+
+  servicelevels =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the service levels. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the service levels. */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each entry is the key for a dictionary of ModulemdServiceLevel
+           * objects
+           */
+          name = g_strdup ((const gchar *)event.data.scalar.value);
+          if (!_parse_modulemd_servicelevel (parser, &sl, error))
+            {
+              g_free (name);
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid service level");
+            }
+          g_hash_table_insert (servicelevels, name, sl);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event in service levels");
+          break;
+        }
+    }
+  modulemd_module_set_servicelevels (module, servicelevels);
+
+error:
+  g_hash_table_unref (servicelevels);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_servicelevels");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_servicelevel (yaml_parser_t *parser,
+                              ModulemdServiceLevel **_servicelevel,
+                              GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  ModulemdServiceLevel *sl = NULL;
+  GDate *eol = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_profile");
+
+  sl = modulemd_servicelevel_new ();
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the service level content. */
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the service level content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* Only "eol" is supported right now */
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
+            {
+              /* Get the EOL date */
+              if (!_parse_modulemd_date (parser, &eol, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Failed to parse EOL date in service level");
+                }
+
+              modulemd_servicelevel_set_eol (sl, eol);
+              g_date_free (eol);
+            }
+
+          else
+            {
+              /* Unknown field in service level */
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Unknown key in service level body");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event in service level");
+          break;
+        }
+    }
+
+  *_servicelevel = g_object_ref (sl);
+
+error:
+  g_object_unref (sl);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_servicelevel");
+  return TRUE;
+}
+
+static gboolean
+_parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
+{
+  gboolean ret = FALSE;
+  gchar **strv = NULL;
+  yaml_event_t event;
+
+  YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_RETURN (error, "Failed to parse date");
+    }
+
+  strv = g_strsplit ((const gchar *)event.data.scalar.value, "-", 4);
+
+  if (!strv[0] || !strv[1] || !strv[2])
+    {
+      MMD_YAML_ERROR_RETURN (error, "Date not in the form YYYY-MM-DD");
+    }
+
+  *_date = g_date_new_dmy (g_ascii_strtoull (strv[2], NULL, 10), /* Day */
+                           g_ascii_strtoull (strv[1], NULL, 10), /* Month */
+                           g_ascii_strtoull (strv[0], NULL, 10)); /* Year */
+
+  ret = TRUE;
+
+error:
+  return ret;
 }
 
 static gboolean

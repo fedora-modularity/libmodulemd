@@ -5,6 +5,7 @@ modulemd_srcs = [
     'modulemd-module.c',
     'modulemd-profile.c',
     'modulemd-simpleset.c',
+    'modulemd-servicelevel.c',
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-parser.c',
@@ -19,6 +20,7 @@ modulemd_hdrs = [
     'modulemd-module.h',
     'modulemd-profile.h',
     'modulemd-simpleset.h',
+    'modulemd-servicelevel.h',
 ]
 
 modulemd_priv_hdrs = [

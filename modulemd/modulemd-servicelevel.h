@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-servicelevel.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,21 +22,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef _MODULEMD_SERVICELEVEL_H
+#define _MODULEMD_SERVICELEVEL_H
 
 #include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#include "modulemd-component.h"
-#include "modulemd-component-module.h"
-#include "modulemd-component-rpm.h"
-#include "modulemd-module.h"
-#include "modulemd-profile.h"
-#include "modulemd-simpleset.h"
-#include "modulemd-servicelevel.h"
+#define MODULEMD_TYPE_SERVICELEVEL modulemd_servicelevel_get_type ()
+G_DECLARE_FINAL_TYPE (
+  ModulemdServiceLevel, modulemd_servicelevel, MODULEMD, SERVICELEVEL, GObject)
+
+ModulemdServiceLevel *
+modulemd_servicelevel_new (void);
+
+void
+modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date);
+
+const GDate *
+modulemd_servicelevel_get_eol (ModulemdServiceLevel *self);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* _MODULEMD_SERVICELEVEL_H */

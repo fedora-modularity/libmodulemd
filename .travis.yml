@@ -1,7 +1,7 @@
 language: c
 compiler: gcc
 before_script: meson --buildtype=debug travis
-script: ninja -C travis
+script: ninja -C travis check
 sudo: required
 dist: trusty
 

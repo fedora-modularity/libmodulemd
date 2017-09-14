@@ -161,6 +161,7 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
             {
               MMD_YAML_ERROR_RETURN (error, "Failed to parse sequence value");
             }
+          break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */

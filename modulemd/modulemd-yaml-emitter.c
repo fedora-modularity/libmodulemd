@@ -614,6 +614,7 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
 
   if (!eol || !g_date_valid (eol))
     {
+      event.type = YAML_NO_EVENT;
       MMD_YAML_ERROR_RETURN (error, "Invalid EOL date");
     }
 

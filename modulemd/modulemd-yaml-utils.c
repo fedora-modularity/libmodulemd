@@ -266,6 +266,7 @@ emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
     {
       g_debug ("Unhandled variant type: %s",
                g_variant_get_type_string (variant));
+      event.type = YAML_NO_EVENT;
       MMD_YAML_ERROR_RETURN (error, "Unhandled variant type");
     }
 

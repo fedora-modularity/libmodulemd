@@ -160,7 +160,10 @@ emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
 
 error:
   yaml_emitter_delete (&emitter);
-  fclose (yaml_file);
+  if (yaml_file)
+    {
+      fclose (yaml_file);
+    }
 
   g_debug ("TRACE: exiting emit_yaml_file");
   return ret;

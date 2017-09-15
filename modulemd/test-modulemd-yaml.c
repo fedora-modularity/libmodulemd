@@ -76,6 +76,14 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   g_assert_false (modules);
   g_assert_true (error);
   g_assert_cmpstr (error->message, ==, "Unknown document type");
+  g_clear_error (&error);
+
+  /* Validate the official reference YAML */
+  g_info ("Reference YAML");
+  yaml_path =
+    g_strdup_printf ("%s/spec.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  modules = parse_yaml_file (yaml_path, &error);
+  g_assert_true (modules);
 }
 
 static void

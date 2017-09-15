@@ -91,8 +91,11 @@ test_modulemd_yaml = executable(
     ],
     install : false,
 )
+yaml_test_env = environment()
+yaml_test_env.set('G_MESSAGES_DEBUG', 'all')
+yaml_test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test('test_modulemd_yaml', test_modulemd_yaml,
-     env : ['G_MESSAGES_DEBUG=all'])
+     env : yaml_test_env)
 
 gnome.generate_gir(
     modulemd_lib,

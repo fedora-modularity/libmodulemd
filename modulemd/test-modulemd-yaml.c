@@ -47,8 +47,13 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   GError *error = NULL;
   ModulemdModule **modules;
   ModulemdSimpleSet *set = NULL;
+  gchar *yaml_path = NULL;
 
-  modules = parse_yaml_file ("../test_data/good.yaml", &error);
+  yaml_path =
+    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  modules = parse_yaml_file (yaml_path, &error);
+  g_clear_pointer (&yaml_path, g_free);
+
   g_assert_true (modules);
   g_assert_true (modules[0]);
   g_assert_false (modules[1]);
@@ -63,7 +68,11 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   g_assert_true (
     modulemd_simpleset_contains (set, "bar-0:1.23-1.module_deadbeef.x86_64"));
 
-  modules = parse_yaml_file ("../test_data/bad-document.yaml", &error);
+  yaml_path = g_strdup_printf ("%s/test_data/bad-document.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  modules = parse_yaml_file (yaml_path, &error);
+  g_clear_pointer (&yaml_path, g_free);
+
   g_assert_false (modules);
   g_assert_true (error);
   g_assert_cmpstr (error->message, ==, "Unknown document type");
@@ -74,10 +83,14 @@ modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
 {
   ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
+  gchar *yaml_path = NULL;
   GHashTable *buildrequires = NULL;
   gchar *value = NULL;
 
-  module = modulemd_module_new_from_file ("../test_data/good.yaml");
+
+  yaml_path =
+    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
 
   g_assert_true (module);
 
@@ -90,7 +103,8 @@ modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
   g_hash_table_unref (buildrequires);
   g_object_unref (module);
 
-  modulemd_module_new_all_from_file ("../test_data/good.yaml", &modules);
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+  g_clear_pointer (&yaml_path, g_free);
 
   g_assert_true (modules);
   g_assert_true (modules[0]);
@@ -115,8 +129,12 @@ modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
   gboolean result;
   GError *error = NULL;
   ModulemdModule **modules;
+  gchar *yaml_path = NULL;
 
-  modulemd_module_new_all_from_file ("../test_data/good.yaml", &modules);
+  yaml_path =
+    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+  g_clear_pointer (&yaml_path, g_free);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);

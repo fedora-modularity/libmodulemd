@@ -37,8 +37,7 @@ modulemd_lib = library(
     ],
     install : true,
     soversion: '0',
-    version: '0.1.0',
-
+    version: '0.1.1',
 )
 
 header_path = 'modulemd'

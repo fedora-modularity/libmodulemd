@@ -43,6 +43,22 @@ data:
     # receive any more updates.  Typically defined in an external data
     # source and filled in by the buildsystem.
     eol: 2077-10-23
+    # Service levels, optional
+    # This is a dictionary of important dates (and possibly supplementary data
+    # in the future) that describes the end point of certain functionality,
+    # such as the date when the module will transition to "security fixes only"
+    # or go completely end-of-life.
+    # Filled in by the buildsystem.  Service level names might have special
+    # meaning to other systems.  Defined externally.
+    servicelevels:
+        rawhide:
+            eol: 2077-10-23
+        stable_api:
+            eol: 2077-10-23
+        bug_fixes:
+            eol: 2077-10-23
+        security_fixes:
+            eol: 2077-10-23
     # Module and content licenses in the Fedora license identifier
     # format, required
     license:

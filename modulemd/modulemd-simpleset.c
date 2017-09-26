@@ -164,6 +164,21 @@ modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value)
     }
 }
 
+/**
+ * modulemd_simpleset_remove
+ * @value: A string to remove from the set
+ *
+ * This routine will remove a value from the set if it is present.
+ */
+void
+modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value)
+{
+  if (g_hash_table_remove (self->set, g_strdup (value)))
+    {
+      /* This key existed */
+      g_object_notify_by_pspec (G_OBJECT (self), set_properties[SET_PROP_SET]);
+    }
+}
 
 static void
 modulemd_simpleset_set_property (GObject *gobject,

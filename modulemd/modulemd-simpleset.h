@@ -49,6 +49,9 @@ modulemd_simpleset_get (ModulemdSimpleSet *self);
 void
 modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value);
 
+void
+modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value);
+
 G_END_DECLS
 
 #endif /* MODULEMD_SIMPLESET_H */

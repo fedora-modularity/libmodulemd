@@ -148,6 +148,12 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
   return _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
 }
 
+/**
+ * modulemd_simpleset_add
+ * @value: A new string to add to the set
+ *
+ * This routine will add a new value to the set if it is not already present.
+ */
 void
 modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value)
 {

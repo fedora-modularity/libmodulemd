@@ -29,6 +29,7 @@ addons:
     - ninja-build
     - gcc-6
     - gcc
+    - gtk-doc-tools
     sources:
     - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ zesty main universe'
     - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ zesty-security main universe'

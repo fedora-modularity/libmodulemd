@@ -246,7 +246,7 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
     g_param_spec_boxed ("set",
                         "The set represented as an array of strings.",
                         "An ordered list of unique strings in this set",
-                        G_TYPE_ARRAY,
+                        G_TYPE_PTR_ARRAY,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (

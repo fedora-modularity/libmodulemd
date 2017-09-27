@@ -52,6 +52,18 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
                                      ModulemdModule ***_modules);
 
 void
+modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file);
+
+gchar *
+modulemd_module_dumps (ModulemdModule *self);
+
+void
+modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file);
+
+gchar *
+modulemd_module_dumps_all (GPtrArray *module_array);
+
+void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch);
 
 const gchar *

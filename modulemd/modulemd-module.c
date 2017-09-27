@@ -1710,3 +1710,115 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
 
   *_modules = modules;
 }
+
+/**
+ * modulemd_module_dump:
+ * @yaml_file: A string containing the path to the output file
+ *
+ * Writes this module out to a YAML document on disk.
+ */
+void
+modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = g_malloc0_n (2, sizeof (ModulemdModule *));
+
+  modules[0] = self;
+  modules[1] = NULL;
+
+  if (!emit_yaml_file (modules, yaml_file, &error))
+    {
+      g_message ("Error emitting YAML file: %s", error->message);
+      g_error_free (error);
+    }
+
+  g_free (modules);
+}
+
+/**
+ * modulemd_module_dumps:
+ *
+ * Writes this module out to a YAML document string.
+ *
+ * Return value: A string containing a YAML representation of this module.
+ */
+gchar *
+modulemd_module_dumps (ModulemdModule *self)
+{
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  ModulemdModule **modules = g_malloc0_n (2, sizeof (ModulemdModule *));
+
+  modules[0] = self;
+  modules[1] = NULL;
+
+  if (!emit_yaml_string (modules, &yaml, &error))
+    {
+      g_message ("Error emitting YAML string: %s", error->message);
+      g_error_free (error);
+      yaml = NULL;
+    }
+
+  g_free (modules);
+  return yaml;
+}
+
+/**
+ * modulemd_module_dump_all:
+ * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules to be output
+ *
+ * This function writes out a file containing one or more YAML documents
+ * generated from the supplied modules.
+ */
+void
+modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
+{
+  GError *error = NULL;
+  ModulemdModule **modules = g_malloc0_n (module_array->len + 1, sizeof(ModulemdModule *));
+
+  for (gsize i = 0; i < module_array->len; i++)
+    {
+      modules[i] = g_ptr_array_index(module_array, i);
+    }
+  modules[module_array->len] = NULL;
+
+  if (!emit_yaml_file (modules, yaml_file, &error))
+    {
+      g_message ("Error emitting YAML file: %s", error->message);
+      g_error_free (error);
+    }
+}
+
+/**
+ * modulemd_module_dumps_all:
+ * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * A zero-terminated array of modules to be output
+ *
+ * This function returns an allocated string containing one or more YAML
+ * documents generated from the supplied modules.
+ *
+ * Return value: A string containing a YAML representation of all provided modules.
+ */
+gchar *
+modulemd_module_dumps_all (GPtrArray *module_array)
+{
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  ModulemdModule **modules = g_malloc0_n (module_array->len + 1, sizeof(ModulemdModule *));
+
+  for (gsize i = 0; i < module_array->len; i++)
+    {
+      modules[i] = g_ptr_array_index(module_array, i);
+    }
+  modules[module_array->len] = NULL;
+
+  if (!emit_yaml_string (modules, &yaml, &error))
+    {
+      g_message ("Error emitting YAML string: %s", error->message);
+      g_error_free (error);
+      return NULL;
+    }
+
+  return yaml;
+}

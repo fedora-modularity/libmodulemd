@@ -388,7 +388,11 @@ const GDate *
 modulemd_module_get_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (g_date_valid (self->eol), NULL);
+
+  if (!g_date_valid (self->eol))
+    {
+      return NULL;
+    }
 
   return self->eol;
 }

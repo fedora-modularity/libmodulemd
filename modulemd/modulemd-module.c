@@ -1779,11 +1779,12 @@ void
 modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
 {
   GError *error = NULL;
-  ModulemdModule **modules = g_malloc0_n (module_array->len + 1, sizeof(ModulemdModule *));
+  ModulemdModule **modules =
+    g_malloc0_n (module_array->len + 1, sizeof (ModulemdModule *));
 
   for (gsize i = 0; i < module_array->len; i++)
     {
-      modules[i] = g_ptr_array_index(module_array, i);
+      modules[i] = g_ptr_array_index (module_array, i);
     }
   modules[module_array->len] = NULL;
 
@@ -1809,11 +1810,12 @@ modulemd_module_dumps_all (GPtrArray *module_array)
 {
   GError *error = NULL;
   gchar *yaml = NULL;
-  ModulemdModule **modules = g_malloc0_n (module_array->len + 1, sizeof(ModulemdModule *));
+  ModulemdModule **modules =
+    g_malloc0_n (module_array->len + 1, sizeof (ModulemdModule *));
 
   for (gsize i = 0; i < module_array->len; i++)
     {
-      modules[i] = g_ptr_array_index(module_array, i);
+      modules[i] = g_ptr_array_index (module_array, i);
     }
   modules[module_array->len] = NULL;
 

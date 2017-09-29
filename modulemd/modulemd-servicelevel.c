@@ -84,7 +84,7 @@ modulemd_servicelevel_get_eol (ModulemdServiceLevel *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
 
-  if (!g_date_valid(self->eol))
+  if (!g_date_valid (self->eol))
     {
       return NULL;
     }

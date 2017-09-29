@@ -49,6 +49,12 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self);
 
+void
+modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm);
+
+void
+modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
+
 G_END_DECLS
 
 #endif /* MODULEMD_PROFILE_H */

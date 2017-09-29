@@ -123,6 +123,28 @@ modulemd_profile_get_rpms (ModulemdProfile *self)
   return g_object_ref (self->rpms);
 }
 
+void
+modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+
+  modulemd_simpleset_add (self->rpms, rpm);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            profile_properties[PROFILE_PROP_RPMS]);
+}
+
+void
+modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+
+  modulemd_simpleset_remove (self->rpms, rpm);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            profile_properties[PROFILE_PROP_RPMS]);
+}
+
 static void
 modulemd_profile_set_property (GObject *gobject,
                                guint property_id,

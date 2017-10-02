@@ -103,6 +103,7 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
                                 GError **error);
 static gboolean
 _parse_modulemd_rpm_component (yaml_parser_t *parser,
+                               const gchar *name,
                                ModulemdComponentRpm **_components,
                                GError **error);
 static gboolean
@@ -111,6 +112,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
                                    GError **error);
 static gboolean
 _parse_modulemd_module_component (yaml_parser_t *parser,
+                                  const gchar *name,
                                   ModulemdComponentModule **_components,
                                   GError **error);
 static gboolean
@@ -1340,7 +1342,7 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_rpm_component (parser, &component, error))
+          if (!_parse_modulemd_rpm_component (parser, name, &component, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (error,
                                              "Parse error in RPM component");
@@ -1372,6 +1374,7 @@ error:
 
 static gboolean
 _parse_modulemd_rpm_component (yaml_parser_t *parser,
+                               const gchar *name,
                                ModulemdComponentRpm **_component,
                                GError **error)
 {
@@ -1385,6 +1388,7 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
   g_debug ("TRACE: entering _parse_modulemd_rpm_component");
 
   component = modulemd_component_rpm_new ();
+  modulemd_component_set_name (MODULEMD_COMPONENT (component), name);
 
   while (!done)
     {
@@ -1418,20 +1422,6 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 (const gchar *)event.data.scalar.value, NULL, 10);
               modulemd_component_set_buildorder (
                 MODULEMD_COMPONENT (component), buildorder);
-            }
-
-          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "name"))
-            {
-              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
-                {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse name value");
-                }
-
-              modulemd_component_set_name (
-                MODULEMD_COMPONENT (component),
-                (const gchar *)event.data.scalar.value);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -1575,7 +1565,8 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_module_component (parser, &component, error))
+          if (!_parse_modulemd_module_component (
+                parser, name, &component, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Parse error in module component");
@@ -1607,6 +1598,7 @@ error:
 
 static gboolean
 _parse_modulemd_module_component (yaml_parser_t *parser,
+                                  const gchar *name,
                                   ModulemdComponentModule **_component,
                                   GError **error)
 {
@@ -1619,6 +1611,7 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
   g_debug ("TRACE: entering _parse_modulemd_rpm_component");
 
   component = modulemd_component_module_new ();
+  modulemd_component_set_name (MODULEMD_COMPONENT (component), name);
 
   while (!done)
     {
@@ -1652,20 +1645,6 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
                 (const gchar *)event.data.scalar.value, NULL, 10);
               modulemd_component_set_buildorder (
                 MODULEMD_COMPONENT (component), buildorder);
-            }
-
-          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "name"))
-            {
-              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
-                {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse name value");
-                }
-
-              modulemd_component_set_name (
-                MODULEMD_COMPONENT (component),
-                (const gchar *)event.data.scalar.value);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,

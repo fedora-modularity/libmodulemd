@@ -68,7 +68,7 @@ modulemd_component_module_finalize (GObject *object)
 
 /**
  * modulemd_component_module_set_ref
- * @ref: A string: The particular repository commit hash, branch or tag name
+ * @ref: (nullable): A string: The particular repository commit hash, branch or tag name
  * used in this module.
  */
 void
@@ -103,7 +103,7 @@ modulemd_component_module_get_ref (ModulemdComponentModule *self)
 
 /**
  * modulemd_component_module_set_repository
- * @repository: A string: The VCS repository with the modulemd file, and other
+ * @repository: (nullable): A string: The VCS repository with the modulemd file, and other
  * module data.
  */
 void

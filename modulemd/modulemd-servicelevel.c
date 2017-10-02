@@ -49,7 +49,7 @@ G_DEFINE_TYPE (ModulemdServiceLevel, modulemd_servicelevel, G_TYPE_OBJECT)
 
 /**
  * modulemd_servicelevel_set_eol:
- * @date: The date this service level ends
+ * @date: (nullable): The date this service level ends
  *
  * Sets the end date of the service level.
  */
@@ -57,7 +57,12 @@ void
 modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
 {
   g_return_if_fail (MODULEMD_IS_SERVICELEVEL (self));
-  g_return_if_fail (g_date_valid (date));
+  g_return_if_fail (!date || g_date_valid (date));
+
+  if (!date)
+    {
+      g_date_clear (self->eol, 1);
+    }
 
   if (!g_date_valid (self->eol) || g_date_compare (date, self->eol) != 0)
     {

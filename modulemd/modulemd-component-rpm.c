@@ -77,7 +77,7 @@ modulemd_component_rpm_finalize (GObject *object)
 
 /**
  * modulemd_component_rpm_set_arches:
- * @arches: a #ModuleSimpleSet: A set of architectures on which this RPM
+ * @arches: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
  * package should be available. An empty set means  the package is available
  * on all supported architectures.
  */
@@ -86,11 +86,22 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
                                    ModulemdSimpleSet *arches)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (arches));
+  g_return_if_fail (!arches || MODULEMD_IS_SIMPLESET (arches));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->arches);
-  self->arches = g_object_ref (arches);
+  if (self->arches)
+    {
+      g_object_unref (self->arches);
+    }
+
+  if (arches)
+    {
+      self->arches = g_object_ref (arches);
+    }
+  else
+    {
+      self->arches = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
@@ -113,7 +124,7 @@ modulemd_component_rpm_get_arches (ModulemdComponentRpm *self)
 
 /**
  * modulemd_component_rpm_set_cache
- * @cache: A string: The URL of the lookaside cache where this package's
+ * @cache: (nullable): A string: The URL of the lookaside cache where this package's
  * sources are stored.
  */
 void
@@ -148,7 +159,7 @@ modulemd_component_rpm_get_cache (ModulemdComponentRpm *self)
 
 /**
  * modulemd_component_rpm_set_multilib:
- * @multilib: a #ModuleSimpleSet: A set of architectures on which this RPM
+ * @multilib: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
  * package should be available as multilib. An empty set means the package is
  * not available as multilib on any architecture.
  */
@@ -157,11 +168,22 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
                                      ModulemdSimpleSet *multilib)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (multilib));
+  g_return_if_fail (!multilib || MODULEMD_IS_SIMPLESET (multilib));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->multilib);
-  self->multilib = g_object_ref (multilib);
+  if (self->multilib)
+    {
+      g_object_unref (self->multilib);
+    }
+
+  if (multilib)
+    {
+      self->multilib = g_object_ref (multilib);
+    }
+  else
+    {
+      self->multilib = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
@@ -184,7 +206,7 @@ modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self)
 
 /**
  * modulemd_component_rpm_set_ref
- * @ref: A string: The particular repository commit hash, branch or tag name
+ * @ref: (nullable): A string: The particular repository commit hash, branch or tag name
  * used in this module.
  */
 void
@@ -218,7 +240,7 @@ modulemd_component_rpm_get_ref (ModulemdComponentRpm *self)
 
 /**
  * modulemd_component_rpm_set_repository
- * @repository: A string: The VCS repository with the RPM SPEC file, patches and other
+ * @repository: (nullable): A string: The VCS repository with the RPM SPEC file, patches and other
  * package data.
  */
 void

@@ -101,7 +101,7 @@ G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
 
 /**
  * modulemd_module_set_arch:
- * @arch: the module artifact architecture.
+ * @arch: (nullable): the module artifact architecture.
  *
  * Sets the "arch" property.
  */
@@ -135,7 +135,7 @@ modulemd_module_get_arch (ModulemdModule *self)
 
 /**
  * modulemd_module_set_buildrequires:
- * @buildrequires: (element-type utf8 utf8): The requirements to build this
+ * @buildrequires: (nullable) (element-type utf8 utf8): The requirements to build this
  * module.
  *
  * Sets the 'buildrequires' property.
@@ -145,12 +145,23 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (buildrequires);
 
   if (buildrequires != self->buildrequires)
     {
-      g_hash_table_unref (self->buildrequires);
-      self->buildrequires = _modulemd_hash_table_deep_str_copy (buildrequires);
+      if (self->buildrequires)
+        {
+          g_hash_table_unref (self->buildrequires);
+        }
+
+      if (buildrequires)
+        {
+          self->buildrequires =
+            _modulemd_hash_table_deep_str_copy (buildrequires);
+        }
+      else
+        {
+          self->buildrequires = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_BUILDREQUIRES]);
     }
@@ -174,7 +185,7 @@ modulemd_module_get_buildrequires (ModulemdModule *self)
 
 /**
  * modulemd_module_set_community:
- * @community: the module community.
+ * @community: (nullable): the module community.
  *
  * Sets the "community" property.
  */
@@ -209,7 +220,7 @@ modulemd_module_get_community (ModulemdModule *self)
 
 /**
  * modulemd_module_set_content_licenses:
- * @licenses: A #ModuleSimpleSet: The licenses under which the components of
+ * @licenses: (nullable): A #ModuleSimpleSet: The licenses under which the components of
  * this module are released.
  *
  * Sets the content_licenses property.
@@ -219,11 +230,22 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
                                       ModulemdSimpleSet *licenses)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (licenses));
+  g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->content_licenses);
-  self->content_licenses = g_object_ref (licenses);
+  if (self->content_licenses)
+    {
+      g_object_unref (self->content_licenses);
+    }
+
+  if (licenses)
+    {
+      self->content_licenses = g_object_ref (licenses);
+    }
+  else
+    {
+      self->content_licenses = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_CONTENT_LIC]);
@@ -247,7 +269,7 @@ modulemd_module_get_content_licenses (ModulemdModule *self)
 
 /**
  * modulemd_module_set_context:
- * @context: the module artifact architecture.
+ * @context: (nullable): the module artifact architecture.
  *
  * Sets the "context" property.
  */
@@ -282,7 +304,7 @@ modulemd_module_get_context (ModulemdModule *self)
 
 /**
  * modulemd_module_set_description:
- * @description: the module description.
+ * @description: (nullable): the module description.
  *
  * Sets the "description" property.
  */
@@ -317,7 +339,7 @@ modulemd_module_get_description (ModulemdModule *self)
 
 /**
  * modulemd_module_set_documentation:
- * @documentation: the module documentation.
+ * @documentation: (nullable): the module documentation.
  *
  * Sets the "documentation" property.
  */
@@ -352,7 +374,7 @@ modulemd_module_get_documentation (ModulemdModule *self)
 
 /**
  * modulemd_module_set_eol:
- * @date: The end-of-life date of the module
+ * @date: (nullable): The end-of-life date of the module
  *
  * Sets the "eol" property.
  *
@@ -362,6 +384,12 @@ void
 modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  if (!date)
+    {
+      g_date_clear (self->eol, 1);
+    }
+
   g_return_if_fail (g_date_valid (date));
 
   if (!g_date_valid (self->eol) || g_date_compare (date, self->eol) != 0)
@@ -432,7 +460,7 @@ modulemd_module_get_mdversion (ModulemdModule *self)
 
 /**
  * modulemd_module_set_module_components:
- * @components: (element-type utf8 ModulemdComponentModule): The hash table of
+ * @components: (nullable) (element-type utf8 ModulemdComponentModule): The hash table of
  * module components that comprise this module. The keys are the module name,
  * the values are a #ModulemdComponentModule containing information about that
  * module.
@@ -444,13 +472,23 @@ modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (components);
 
   if (components != self->module_components)
     {
-      g_hash_table_unref (self->module_components);
-      self->module_components =
-        _modulemd_hash_table_deep_obj_copy (components);
+      if (self->module_components)
+        {
+          g_hash_table_unref (self->module_components);
+        }
+
+      if (components)
+        {
+          self->module_components =
+            _modulemd_hash_table_deep_obj_copy (components);
+        }
+      else
+        {
+          self->module_components = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_MODULE_COMPONENTS]);
     }
@@ -474,7 +512,7 @@ modulemd_module_get_module_components (ModulemdModule *self)
 
 /**
  * modulemd_module_set_module_licenses:
- * @licenses: A #ModuleSimpleSet: The licenses under which the components of
+ * @licenses: (nullable): A #ModuleSimpleSet: The licenses under which the components of
  * this module are released.
  *
  * Sets the module_licenses property.
@@ -484,11 +522,22 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
                                      ModulemdSimpleSet *licenses)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (licenses));
+  g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->module_licenses);
-  self->module_licenses = g_object_ref (licenses);
+  if (self->module_licenses)
+    {
+      g_object_unref (self->module_licenses);
+    }
+
+  if (licenses)
+    {
+      self->module_licenses = g_object_ref (licenses);
+    }
+  else
+    {
+      self->module_licenses = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_LIC]);
@@ -512,7 +561,7 @@ modulemd_module_get_module_licenses (ModulemdModule *self)
 
 /**
  * modulemd_module_set_name:
- * @name: the module name.
+ * @name: (nullable): the module name.
  *
  * Sets the "name" property.
  */
@@ -546,7 +595,7 @@ modulemd_module_get_name (ModulemdModule *self)
 
 /**
  * modulemd_module_set_profiles:
- * @profiles: (element-type utf8 ModulemdProfile): The profiles avaiable for
+ * @profiles: (nullable) (element-type utf8 ModulemdProfile): The profiles avaiable for
  * this module.
  *
  * Sets the 'profiles' property.
@@ -556,12 +605,22 @@ void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (profiles);
 
   if (profiles != self->profiles)
     {
-      g_hash_table_unref (self->profiles);
-      self->profiles = _modulemd_hash_table_deep_obj_copy (profiles);
+      if (self->profiles)
+        {
+          g_hash_table_unref (self->profiles);
+        }
+
+      if (profiles)
+        {
+          self->profiles = _modulemd_hash_table_deep_obj_copy (profiles);
+        }
+      else
+        {
+          self->profiles = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_PROFILES]);
     }
@@ -585,7 +644,7 @@ modulemd_module_get_profiles (ModulemdModule *self)
 
 /**
  * modulemd_module_set_requires:
- * @requires: (element-type utf8 utf8): The requirements to run this module
+ * @requires: (nullable) (element-type utf8 utf8): The requirements to run this module
  *
  * Sets the 'requires' property.
  */
@@ -593,12 +652,22 @@ void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (requires);
 
   if (requires != self->requires)
     {
-      g_hash_table_unref (self->requires);
-      self->requires = _modulemd_hash_table_deep_str_copy (requires);
+      if (self->requires)
+        {
+          g_hash_table_unref (self->requires);
+        }
+
+      if (requires)
+        {
+          self->requires = _modulemd_hash_table_deep_str_copy (requires);
+        }
+      else
+        {
+          self->requires = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_REQUIRES]);
     }
@@ -622,7 +691,7 @@ modulemd_module_get_requires (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_api:
- * @apis: A #ModuleSimpleSet: The set of binary RPM packages that form the
+ * @apis: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that form the
  * public API for this module.
  *
  * Sets the rpm_api property.
@@ -631,11 +700,22 @@ void
 modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (apis));
+  g_return_if_fail (!apis || MODULEMD_IS_SIMPLESET (apis));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->rpm_api);
-  self->rpm_api = g_object_ref (apis);
+  if (self->rpm_api)
+    {
+      g_object_unref (self->rpm_api);
+    }
+
+  if (apis)
+    {
+      self->rpm_api = g_object_ref (apis);
+    }
+  else
+    {
+      self->rpm_api = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_RPM_API]);
 }
@@ -658,7 +738,7 @@ modulemd_module_get_rpm_api (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_artifacts:
- * @artifacts: A #ModuleSimpleSet: The set of binary RPM packages that are
+ * @artifacts: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that are
  * contained in this module. Generally populated by the module build service.
  *
  * Sets the rpm_artifacts property.
@@ -668,11 +748,22 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
                                    ModulemdSimpleSet *artifacts)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (artifacts));
+  g_return_if_fail (!artifacts || MODULEMD_IS_SIMPLESET (artifacts));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->rpm_artifacts);
-  self->rpm_artifacts = g_object_ref (artifacts);
+  if (self->rpm_artifacts)
+    {
+      g_object_unref (self->rpm_artifacts);
+    }
+
+  if (artifacts)
+    {
+      self->rpm_artifacts = g_object_ref (artifacts);
+    }
+  else
+    {
+      self->rpm_artifacts = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_ARTIFACTS]);
@@ -697,7 +788,7 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_buildopts:
- * @buildopts: (element-type utf8 utf8) (transfer container): A dictionary of
+ * @buildopts: (nullable) (element-type utf8 utf8) (transfer container): A dictionary of
  * build options to pass to rpmbuild. Currently the only recognized key is
  * "macros".
  *
@@ -707,12 +798,22 @@ void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (buildopts);
 
   if (buildopts != self->rpm_buildopts)
     {
-      g_hash_table_unref (self->rpm_buildopts);
-      self->rpm_buildopts = _modulemd_hash_table_deep_str_copy (buildopts);
+      if (self->rpm_buildopts)
+        {
+          g_hash_table_unref (self->rpm_buildopts);
+        }
+
+      if (buildopts)
+        {
+          self->rpm_buildopts = _modulemd_hash_table_deep_str_copy (buildopts);
+        }
+      else
+        {
+          self->rpm_buildopts = NULL;
+        }
 
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_RPM_BUILDOPTS]);
@@ -737,7 +838,7 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_components:
- * @components: (element-type utf8 ModulemdComponentRpm): The hash table of
+ * @components: (nullable) (element-type utf8 ModulemdComponentRpm): The hash table of
  * module components that comprise this module. The keys are the module name,
  * the values are a #ModulemdComponentRpm containing information about that
  * module.
@@ -749,12 +850,23 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
                                     GHashTable *components)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (components);
 
   if (components != self->rpm_components)
     {
-      g_hash_table_unref (self->rpm_components);
-      self->rpm_components = _modulemd_hash_table_deep_obj_copy (components);
+      if (self->rpm_components)
+        {
+          g_hash_table_unref (self->rpm_components);
+        }
+
+      if (components)
+        {
+          self->rpm_components =
+            _modulemd_hash_table_deep_obj_copy (components);
+        }
+      else
+        {
+          self->rpm_components = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self),
                                 md_properties[MD_PROP_RPM_COMPONENTS]);
     }
@@ -778,7 +890,7 @@ modulemd_module_get_rpm_components (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_filter:
- * @filter: A #ModuleSimpleSet: The set of binary RPM packages that are
+ * @filter: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that are
  * explicitly filtered out of this module.
  *
  * Sets the rpm_artifacts property.
@@ -788,11 +900,22 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
                                 ModulemdSimpleSet *filter)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (filter));
+  g_return_if_fail (!filter || MODULEMD_IS_SIMPLESET (filter));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->rpm_filter);
-  self->rpm_filter = g_object_ref (filter);
+  if (self->rpm_filter)
+    {
+      g_object_unref (self->rpm_filter);
+    }
+
+  if (filter)
+    {
+      self->rpm_filter = g_object_ref (filter);
+    }
+  else
+    {
+      self->rpm_filter = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_FILTER]);
@@ -816,7 +939,7 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
 
 /**
  * modulemd_module_set_servicelevels:
- * @servicelevels: (element-type utf8 ModulemdServiceLevel): A hash table of #ServiceLevel objects
+ * @servicelevels: (nullable) (element-type utf8 ModulemdServiceLevel): A hash table of #ServiceLevel objects
  *
  * Sets the service levels for the module.
  */
@@ -825,12 +948,23 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (servicelevels);
 
   if (servicelevels != self->servicelevels)
     {
-      g_hash_table_unref (self->servicelevels);
-      self->servicelevels = _modulemd_hash_table_deep_obj_copy (servicelevels);
+      if (self->servicelevels)
+        {
+          g_hash_table_unref (self->servicelevels);
+        }
+
+      if (servicelevels)
+        {
+          self->servicelevels =
+            _modulemd_hash_table_deep_obj_copy (servicelevels);
+        }
+      else
+        {
+          self->servicelevels = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
     }
 }
@@ -854,7 +988,7 @@ modulemd_module_get_servicelevels (ModulemdModule *self)
 
 /**
  * modulemd_module_set_stream:
- * @stream: the module stream.
+ * @stream: (nullable): the module stream.
  *
  * Sets the "stream" property.
  */
@@ -889,7 +1023,7 @@ modulemd_module_get_stream (ModulemdModule *self)
 
 /**
  * modulemd_module_set_summary:
- * @summary: the module summary.
+ * @summary: (nullable): the module summary.
  *
  * Sets the "summary" property.
  */
@@ -924,7 +1058,7 @@ modulemd_module_get_summary (ModulemdModule *self)
 
 /**
  * modulemd_module_set_tracker:
- * @tracker: the module tracker.
+ * @tracker: (nullable): the module tracker.
  *
  * Sets the "tracker" property.
  */
@@ -992,7 +1126,7 @@ modulemd_module_get_version (ModulemdModule *self)
 
 /**
  * modulemd_module_set_xmd:
- * @xmd: (element-type utf8 GVariant): Extensible metadata block
+ * @xmd: (nullable) (element-type utf8 GVariant): Extensible metadata block
  *
  * Sets the 'xmd' property.
  */
@@ -1000,12 +1134,22 @@ void
 modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (xmd);
 
   if (xmd != self->xmd)
     {
-      g_hash_table_unref (self->xmd);
-      self->xmd = _modulemd_hash_table_deep_variant_copy (xmd);
+      if (self->xmd)
+        {
+          g_hash_table_unref (self->xmd);
+        }
+
+      if (xmd)
+        {
+          self->xmd = _modulemd_hash_table_deep_variant_copy (xmd);
+        }
+      else
+        {
+          self->xmd = NULL;
+        }
       g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_XMD]);
     }
 }

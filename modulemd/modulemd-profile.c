@@ -52,7 +52,7 @@ G_DEFINE_TYPE (ModulemdProfile, modulemd_profile, G_TYPE_OBJECT)
 
 /**
  * modulemd_profile_set_description:
- * @description: the profile description.
+ * @description: (nullable): the profile description.
  *
  * Sets the "description" property.
  */
@@ -88,7 +88,7 @@ modulemd_profile_get_description (ModulemdProfile *self)
 
 /**
  * modulemd_profile_set_rpms:
- * @rpms: A #ModuleSimpleSet: The rpms to be installed by this profile.
+ * @rpms: (nullable): A #ModuleSimpleSet: The rpms to be installed by this profile.
  *
  * Assigns the set of RPMs that will be installed when this profile is
  * activated.
@@ -97,11 +97,22 @@ void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
 {
   g_return_if_fail (MODULEMD_IS_PROFILE (self));
-  g_return_if_fail (MODULEMD_IS_SIMPLESET (rpms));
+  g_return_if_fail (!rpms || MODULEMD_IS_SIMPLESET (rpms));
 
   /* TODO: Test for differences before replacing */
-  g_object_unref (self->rpms);
-  self->rpms = g_object_ref (rpms);
+  if (self->rpms)
+    {
+      g_object_unref (self->rpms);
+    }
+
+  if (rpms)
+    {
+      self->rpms = g_object_ref (rpms);
+    }
+  else
+    {
+      self->rpms = NULL;
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             profile_properties[PROFILE_PROP_RPMS]);

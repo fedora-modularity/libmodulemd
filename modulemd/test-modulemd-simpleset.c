@@ -46,11 +46,11 @@ modulemd_simpleset_tear_down (SimpleSetFixture *fixture,
 }
 
 static gboolean
-_array_contains (GPtrArray *array, const gchar *value)
+_array_contains (gchar **array, const gchar *value)
 {
-  for (gsize i = 0; i < array->len; i++)
+  for (gsize i = 0; array[i]; i++)
     {
-      if (g_strcmp0 (g_ptr_array_index (array, i), value) == 0)
+      if (g_strcmp0 (array[i], value) == 0)
         {
           return TRUE;
         }
@@ -63,41 +63,40 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
                                  gconstpointer user_data)
 {
   gsize i = 0;
-  GPtrArray *array = g_ptr_array_new_full (3, g_free);
-  GPtrArray *array2;
-  gchar *entry;
+  gchar **array = g_malloc0_n (4, sizeof(gchar *));
+  gchar **array2;
 
-  entry = g_strdup ("a");
-  g_ptr_array_add (array, entry);
-
-  entry = g_strdup ("b");
-  g_ptr_array_add (array, entry);
+  array[0] = g_strdup ("alpha");
+  array[1] = g_strdup ("bravo");
+  array[2] = NULL;
 
   /* Add duplicate value to ensure uniqueness of resulting set */
-  entry = g_strdup ("a");
-  g_ptr_array_add (array, entry);
+  array[3] = g_strdup ("alpha");
 
   /* Create the set from a strv */
   modulemd_simpleset_set (fixture->set, array);
 
-  for (i = 0; i < array->len; i++)
+  for (i = 0; array[i]; i++)
     {
       g_assert_true (modulemd_simpleset_contains (
-        fixture->set, g_ptr_array_index (array, i)));
+        fixture->set, array[i]));
     }
 
   array2 = modulemd_simpleset_get (fixture->set);
 
-  for (i = 0; i < array->len; i++)
+  for (i = 0; array[i]; i++)
     {
-      g_assert_true (_array_contains (array2, g_ptr_array_index (array, i)));
+      g_assert_true (_array_contains (array2, array[i]));
     }
 
+  /* Verify order */
+  g_assert_cmpstr(array2[0], ==, "alpha");
+  g_assert_cmpstr(array2[1], ==, "bravo");
 
   /* The size of the resulting set should only be two entries,
      * since one of them was a duplicate.
      */
-  g_assert_cmpint (array2->len, ==, 2);
+  g_assert_cmpint (g_strv_length(array2), ==, 2);
 }
 
 int

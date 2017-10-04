@@ -42,8 +42,8 @@ guint
 modulemd_simpleset_size (ModulemdSimpleSet *self);
 
 void
-modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set);
-GPtrArray *
+modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set);
+gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self);
 
 void

@@ -66,17 +66,15 @@ modulemd_simpleset_remove_from_array (gpointer key,
                                       gpointer value,
                                       gpointer user_data)
 {
-  GPtrArray *array;
-  gchar *item;
+  gchar **array;
   g_return_val_if_fail (key, FALSE);
   g_return_val_if_fail (user_data, FALSE);
 
-  array = (GPtrArray *)user_data;
+  array = (gchar **)user_data;
 
-  for (gsize i = 0; i < array->len; i++)
+  for (gsize i = 0; array[i]; i++)
     {
-      item = g_ptr_array_index (array, i);
-      if (g_strcmp0 ((gchar *)key, item) == 0)
+      if (g_strcmp0 ((gchar *)key, array[i]) == 0)
         {
           /* This value should stay in the set */
           return FALSE;
@@ -90,18 +88,17 @@ modulemd_simpleset_remove_from_array (gpointer key,
 
 /**
  * modulemd_simpleset_set:
- * @set: (array zero-terminated=0) (element-type utf8): Extensible metadata block
+ * @set: (array zero-terminated=1): Extensible metadata block
  *
  * Make the contents of the set equal to an array of strings. This function
  * will trigger a signal only if the resulting set is different. It does not
  * guarantee any order to the resulting set, only that it will be unique.
  */
 void
-modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set)
+modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
 {
   gboolean do_notify = FALSE;
   guint num_removed;
-  gchar *item;
 
   g_return_if_fail (MODULEMD_IS_SIMPLESET (self));
   g_return_if_fail (set);
@@ -116,10 +113,9 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set)
     }
 
   /* Add in the whole new set to make sure we have everything */
-  for (gsize i = 0; i < set->len; i++)
+  for (gsize i = 0; set[i]; i++)
     {
-      item = g_ptr_array_index (set, i);
-      if (g_hash_table_add (self->set, g_strdup (item)))
+      if (g_hash_table_add (self->set, g_strdup (set[i])))
         {
           /* This key didn't previously exist */
           do_notify = TRUE;
@@ -137,15 +133,30 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, GPtrArray *set)
  *
  * Retrieves the set as a #GPtrArray of strings
  *
- * Returns: (array zero-terminated=0) (element-type utf8) (transfer container):
+ * Returns: (array zero-terminated=1) (transfer container):
  * A list representing a set of string values.
  */
-GPtrArray *
+gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self)
 {
+  GPtrArray *sorted_keys = NULL;
+  gchar **keys = NULL;
   g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), NULL);
 
-  return _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
+  /* FIXME: Sort this */
+  /* return (gchar **)g_hash_table_get_keys_as_array(self->set, NULL); */
+
+  sorted_keys = _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
+
+  keys = g_malloc0_n (sorted_keys->len + 1, sizeof(char *));
+  for (gsize i = 0; i < sorted_keys->len; i++)
+    {
+      keys[i] = g_strdup (g_ptr_array_index (sorted_keys, i));
+    }
+  keys[sorted_keys->len] = NULL;
+  g_ptr_array_unref (sorted_keys);
+
+  return keys;
 }
 
 /**
@@ -240,13 +251,13 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
   object_class->finalize = modulemd_simpleset_finalize;
 
   /**
-     * ModulemdSimpleSet:set: (type GLib.PtrArray(utf8)) (transfer container)
+     * ModulemdSimpleSet:set: (transfer container)
      */
   set_properties[SET_PROP_SET] =
     g_param_spec_boxed ("set",
                         "The set represented as an array of strings.",
                         "An ordered list of unique strings in this set",
-                        G_TYPE_PTR_ARRAY,
+                        G_TYPE_STRV,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (

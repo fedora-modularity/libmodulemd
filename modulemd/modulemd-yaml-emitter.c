@@ -1558,7 +1558,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
   gboolean ret = FALSE;
   gsize i;
   yaml_event_t event;
-  GPtrArray *array = modulemd_simpleset_get (set);
+  gchar **array = modulemd_simpleset_get (set);
   gchar *item;
 
   g_debug ("TRACE: entering _emit_modulemd_simpleset");
@@ -1567,9 +1567,9 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting simpleset sequence");
 
-  for (i = 0; i < array->len; i++)
+  for (i = 0; array[i]; i++)
     {
-      item = g_strdup (g_ptr_array_index (array, i));
+      item = g_strdup (array[i]);
       MMD_YAML_EMIT_SCALAR (&event, item, YAML_PLAIN_SCALAR_STYLE);
     }
 
@@ -1579,7 +1579,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
 
   ret = TRUE;
 error:
-  g_ptr_array_unref (array);
+  g_free (array);
 
   g_debug ("TRACE: exiting _emit_modulemd_simpleset");
   return ret;

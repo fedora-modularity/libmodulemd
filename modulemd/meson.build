@@ -37,7 +37,7 @@ modulemd_lib = library(
     ],
     install : true,
     soversion: '0',
-    version: '0.1.1',
+    version: '0.2.0',
 )
 
 header_path = 'modulemd'
@@ -99,7 +99,7 @@ test('test_modulemd_yaml', test_modulemd_yaml,
 gnome.generate_gir(
     modulemd_lib,
     sources : modulemd_srcs + modulemd_hdrs,
-    nsversion : '0.1',
+    nsversion : '0.2',
     namespace : 'Modulemd',
     symbol_prefix : 'modulemd_',
     identifier_prefix : 'Modulemd',
@@ -110,7 +110,7 @@ gnome.generate_gir(
 )
 
 cdata = configuration_data()
-cdata.set('VERSION', '0.1.0')
+cdata.set('VERSION', '0.2.0')
 configure_file(input : 'version.xml.in',
   output : 'version.xml',
   configuration : cdata)
@@ -124,7 +124,7 @@ gnome.gtkdoc(
 pkg.generate(
     libraries : modulemd_lib,
     subdirs : header_path,
-    version : '0.1',
+    version : '0.2',
     name : 'modulemd',
     filebase : 'modulemd',
     description : 'Module metadata manipulation library',

@@ -29,6 +29,7 @@ enum
 {
   PROFILE_PROP_0,
 
+  PROFILE_PROP_NAME,
   PROFILE_PROP_DESC,
   PROFILE_PROP_RPMS,
 
@@ -44,6 +45,7 @@ struct _ModulemdProfile
   GObject parent_instance;
 
   gchar *description;
+  gchar *name;
 
   ModulemdSimpleSet *rpms;
 };
@@ -84,6 +86,41 @@ modulemd_profile_get_description (ModulemdProfile *self)
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return self->description;
+}
+
+/**
+ * modulemd_profile_set_name:
+ * @name: (nullable): the profile name.
+ *
+ * Sets the "name" property.
+ */
+void
+modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+
+  if (g_strcmp0 (self->name, name) != 0)
+    {
+      g_free (self->description);
+      self->name = g_strdup (name);
+      g_object_notify_by_pspec (G_OBJECT (self),
+                                profile_properties[PROFILE_PROP_NAME]);
+    }
+}
+
+/**
+ * modulemd_profile_get_name:
+ *
+ * Retrieves the profile name.
+ *
+ * Returns: A string containing the "name" property.
+ */
+const gchar *
+modulemd_profile_get_name (ModulemdProfile *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  return self->name;
 }
 
 /**
@@ -170,6 +207,10 @@ modulemd_profile_set_property (GObject *gobject,
       modulemd_profile_set_description (self, g_value_get_string (value));
       break;
 
+    case PROFILE_PROP_NAME:
+      modulemd_profile_set_name (self, g_value_get_string (value));
+      break;
+
     case PROFILE_PROP_RPMS:
       modulemd_profile_set_rpms (self, g_value_get_object (value));
       break;
@@ -194,6 +235,10 @@ modulemd_profile_get_property (GObject *gobject,
       g_value_set_string (value, modulemd_profile_get_description (self));
       break;
 
+    case PROFILE_PROP_NAME:
+      g_value_set_string (value, modulemd_profile_get_name (self));
+      break;
+
     case PROFILE_PROP_RPMS:
       g_value_set_object (value, modulemd_profile_get_rpms (self));
       break;
@@ -210,6 +255,7 @@ modulemd_profile_finalize (GObject *gobject)
   ModulemdProfile *self = (ModulemdProfile *)gobject;
 
   g_clear_pointer (&self->description, g_free);
+  g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->rpms, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_profile_parent_class)->finalize (gobject);
@@ -229,6 +275,14 @@ modulemd_profile_class_init (ModulemdProfileClass *klass)
                          "Profile description",
                          "A string property representing a detailed "
                          "description of the profile.",
+                         NULL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  profile_properties[PROFILE_PROP_NAME] =
+    g_param_spec_string ("name",
+                         "Profile name",
+                         "A string property representing a short name of the "
+                         "profile.",
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 

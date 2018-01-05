@@ -44,6 +44,11 @@ const gchar *
 modulemd_profile_get_description (ModulemdProfile *self);
 
 void
+modulemd_profile_set_name (ModulemdProfile *self, const gchar *name);
+const gchar *
+modulemd_profile_get_name (ModulemdProfile *self);
+
+void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 
 ModulemdSimpleSet *

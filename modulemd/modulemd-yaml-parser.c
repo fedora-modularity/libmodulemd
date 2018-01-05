@@ -79,6 +79,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
                           GError **error);
 static gboolean
 _parse_modulemd_profile (yaml_parser_t *parser,
+                         const gchar *name,
                          ModulemdProfile **_profile,
                          GError **error);
 static gboolean
@@ -931,7 +932,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
            * objects
            */
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_profile (parser, &profile, error))
+          if (!_parse_modulemd_profile (parser, name, &profile, error))
             {
               g_free (name);
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid profile");
@@ -959,6 +960,7 @@ error:
 
 static gboolean
 _parse_modulemd_profile (yaml_parser_t *parser,
+                         const gchar *name,
                          ModulemdProfile **_profile,
                          GError **error)
 {
@@ -972,6 +974,7 @@ _parse_modulemd_profile (yaml_parser_t *parser,
   g_debug ("TRACE: entering _parse_modulemd_profile");
 
   profile = modulemd_profile_new ();
+  modulemd_profile_set_name (profile, name);
 
   while (!done)
     {

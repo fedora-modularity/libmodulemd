@@ -63,7 +63,7 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
                                  gconstpointer user_data)
 {
   gsize i = 0;
-  gchar **array = g_malloc0_n (4, sizeof(gchar *));
+  gchar **array = g_malloc0_n (4, sizeof (gchar *));
   gchar **array2;
 
   array[0] = g_strdup ("alpha");
@@ -78,8 +78,7 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
 
   for (i = 0; array[i]; i++)
     {
-      g_assert_true (modulemd_simpleset_contains (
-        fixture->set, array[i]));
+      g_assert_true (modulemd_simpleset_contains (fixture->set, array[i]));
     }
 
   array2 = modulemd_simpleset_get (fixture->set);
@@ -90,13 +89,13 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
     }
 
   /* Verify order */
-  g_assert_cmpstr(array2[0], ==, "alpha");
-  g_assert_cmpstr(array2[1], ==, "bravo");
+  g_assert_cmpstr (array2[0], ==, "alpha");
+  g_assert_cmpstr (array2[1], ==, "bravo");
 
   /* The size of the resulting set should only be two entries,
      * since one of them was a duplicate.
      */
-  g_assert_cmpint (g_strv_length(array2), ==, 2);
+  g_assert_cmpint (g_strv_length (array2), ==, 2);
 }
 
 int

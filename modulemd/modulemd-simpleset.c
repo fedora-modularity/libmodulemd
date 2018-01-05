@@ -148,7 +148,7 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
 
   sorted_keys = _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
 
-  keys = g_malloc0_n (sorted_keys->len + 1, sizeof(char *));
+  keys = g_malloc0_n (sorted_keys->len + 1, sizeof (char *));
   for (gsize i = 0; i < sorted_keys->len; i++)
     {
       keys[i] = g_strdup (g_ptr_array_index (sorted_keys, i));

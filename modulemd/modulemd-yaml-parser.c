@@ -1858,7 +1858,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_profile");
+  g_debug ("TRACE: entering _parse_modulemd_servicelevel");
 
   sl = modulemd_servicelevel_new ();
 

@@ -28,6 +28,9 @@ modulemd_priv_hdrs = [
     'modulemd-yaml.h',
 ]
 
+libmodulemd_version = meson.project_version()
+libmodulemd_version_array = libmodulemd_version.split('.')
+
 modulemd_lib = library(
     'modulemd',
     sources : modulemd_srcs,
@@ -36,8 +39,8 @@ modulemd_lib = library(
         yaml,
     ],
     install : true,
-    soversion: '0',
-    version: '0.2.0',
+    soversion: libmodulemd_version_array[0],
+    version: libmodulemd_version,
 )
 
 header_path = 'modulemd'
@@ -99,7 +102,7 @@ test('test_modulemd_yaml', test_modulemd_yaml,
 gnome.generate_gir(
     modulemd_lib,
     sources : modulemd_srcs + modulemd_hdrs,
-    nsversion : '0.2',
+    nsversion : '.'.join([libmodulemd_version_array[0], libmodulemd_version_array[1]]),
     namespace : 'Modulemd',
     symbol_prefix : 'modulemd_',
     identifier_prefix : 'Modulemd',
@@ -110,7 +113,7 @@ gnome.generate_gir(
 )
 
 cdata = configuration_data()
-cdata.set('VERSION', '0.2.0')
+cdata.set('VERSION', libmodulemd_version)
 configure_file(input : 'version.xml.in',
   output : 'version.xml',
   configuration : cdata)
@@ -124,7 +127,7 @@ gnome.gtkdoc(
 pkg.generate(
     libraries : modulemd_lib,
     subdirs : header_path,
-    version : '0.2',
+    version : '.'.join([libmodulemd_version_array[0], libmodulemd_version_array[1]]),
     name : 'modulemd',
     filebase : 'modulemd',
     description : 'Module metadata manipulation library',

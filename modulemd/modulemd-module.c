@@ -387,7 +387,16 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
 
   if (!date)
     {
+      gboolean previously_valid = g_date_valid(self->eol);
+
       g_date_clear (self->eol, 1);
+
+      if (previously_valid)
+        {
+          g_object_notify_by_pspec (G_OBJECT (self),
+                                    md_properties[MD_PROP_EOL]);
+        }
+
       return;
     }
 

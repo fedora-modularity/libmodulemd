@@ -388,6 +388,7 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
   if (!date)
     {
       g_date_clear (self->eol, 1);
+      return;
     }
 
   g_return_if_fail (g_date_valid (date));

@@ -1979,8 +1979,9 @@ modulemd_module_dumps_all (GPtrArray *module_array)
     {
       g_message ("Error emitting YAML string: %s", error->message);
       g_error_free (error);
-      return NULL;
+      yaml = NULL;
     }
 
+  g_free (modules);
   return yaml;
 }

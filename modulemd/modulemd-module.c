@@ -1947,6 +1947,8 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
       g_message ("Error emitting YAML file: %s", error->message);
       g_error_free (error);
     }
+
+  g_free (modules);
 }
 
 /**

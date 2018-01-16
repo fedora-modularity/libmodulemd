@@ -54,6 +54,12 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
   modules = parse_yaml_file (yaml_path, &error);
   g_clear_pointer (&yaml_path, g_free);
 
+  if (!modules)
+    {
+      fprintf (stderr, "Failed to parse: %s\n", error->message);
+      g_error_free (error);
+    }
+
   g_assert_true (modules);
   g_assert_true (modules[0]);
   g_assert_false (modules[1]);

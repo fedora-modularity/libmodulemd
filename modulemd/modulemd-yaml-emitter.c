@@ -197,13 +197,14 @@ emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
   gboolean ret = FALSE;
   yaml_emitter_t emitter;
   yaml_event_t event;
-  struct modulemd_yaml_string *yaml_string =
-    g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
+  struct modulemd_yaml_string *yaml_string = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (modules, FALSE);
 
   g_debug ("TRACE: entering emit_yaml_string");
+
+  yaml_string = g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
 
   yaml_emitter_initialize (&emitter);
 

@@ -31,9 +31,9 @@ addons:
     - gcc
     - gtk-doc-tools
     sources:
-    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ zesty main universe'
-    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ zesty-security main universe'
-    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ zesty-updates main universe'
+    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ artful main universe'
+    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ artful-security main universe'
+    - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu/ artful-updates main universe'
 
   coverity_scan:
     project:

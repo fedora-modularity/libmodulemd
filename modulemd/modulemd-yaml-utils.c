@@ -180,10 +180,10 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
     }
 
   *variant = g_variant_new_array (G_VARIANT_TYPE_VARIANT, array, count);
-  g_free (array);
 
   ret = TRUE;
 error:
+  g_free (array);
   g_free (key);
 
   g_debug ("TRACE: exiting parse_raw_yaml_sequence");

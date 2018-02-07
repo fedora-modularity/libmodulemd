@@ -138,13 +138,15 @@ modulemd_module_get_arch (ModulemdModule *self)
  * @buildrequires: (nullable) (element-type utf8 utf8): The requirements to build this
  * module.
  *
- * Sets the 'buildrequires' property.
+ * Sets the 'buildrequires' property. This function was deprecated and is not
+ * valid for modulemd files of version 2 or later.
  */
 void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
 
   if (buildrequires != self->buildrequires)
     {
@@ -179,6 +181,7 @@ GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
 
   return g_hash_table_ref (self->buildrequires);
 }
@@ -378,12 +381,14 @@ modulemd_module_get_documentation (ModulemdModule *self)
  *
  * Sets the "eol" property.
  *
- * Note: This property is obsolete. Use "servicelevels" instead.
+ * Note: This property is obsolete. Use "servicelevels" instead.  This will fail
+ * on modulemd files using the version 2 or later formats.
  */
 void
 modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
 
   if (!date)
     {
@@ -418,7 +423,8 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
  *
  * Retrieves the "eol" property.
  *
- * Note: This property is obsolete. Use "servicelevels" instead.
+ * Note: This property is obsolete. Use "servicelevels" instead. This will fail
+ * on modulemd files using the version 2 or later formats.
  *
  * Returns: A #GDate containing the "EOL" date
  */
@@ -426,6 +432,7 @@ const GDate *
 modulemd_module_get_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
 
   if (!g_date_valid (self->eol))
     {
@@ -656,12 +663,14 @@ modulemd_module_get_profiles (ModulemdModule *self)
  * modulemd_module_set_requires:
  * @requires: (nullable) (element-type utf8 utf8): The requirements to run this module
  *
- * Sets the 'requires' property.
+ * Sets the 'requires' property. This function was deprecated and is not
+ * valid for modulemd files of version 2 or later.
  */
 void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
 
   if (requires != self->requires)
     {
@@ -689,12 +698,14 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
  * Retrieves the "requires" for modulemd.
  *
  * Returns: (element-type utf8 utf8) (transfer container): A hash table
- * containing the "requires" property.
+ * containing the "requires" property. This function was deprecated and is not
+ * valid for modulemd files of version 2 or later.
  */
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
 
   return g_hash_table_ref (self->requires);
 }

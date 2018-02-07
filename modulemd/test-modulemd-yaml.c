@@ -42,15 +42,16 @@ modulemd_yaml_tear_down (YamlFixture *fixture, gconstpointer user_data)
 }
 
 static void
-modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
+modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
+                                  gconstpointer user_data)
 {
   GError *error = NULL;
   ModulemdModule **modules;
   ModulemdSimpleSet *set = NULL;
   gchar *yaml_path = NULL;
 
-  yaml_path =
-    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   modules = parse_yaml_file (yaml_path, &error);
   g_clear_pointer (&yaml_path, g_free);
 
@@ -93,7 +94,7 @@ modulemd_yaml_test_parse_file (YamlFixture *fixture, gconstpointer user_data)
 }
 
 static void
-modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
+modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
 {
   ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
@@ -102,8 +103,8 @@ modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
   gchar *value = NULL;
 
 
-  yaml_path =
-    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   module = modulemd_module_new_from_file (yaml_path);
 
   g_assert_true (module);
@@ -137,7 +138,8 @@ modulemd_yaml_test_load (YamlFixture *fixture, gconstpointer user_data)
 }
 
 static void
-modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
+modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
+                                   gconstpointer user_data)
 {
   gchar *yaml;
   gboolean result;
@@ -145,8 +147,8 @@ modulemd_yaml_test_emit_string (YamlFixture *fixture, gconstpointer user_data)
   ModulemdModule **modules;
   gchar *yaml_path = NULL;
 
-  yaml_path =
-    g_strdup_printf ("%s/test_data/good.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   modulemd_module_new_all_from_file (yaml_path, &modules);
   g_clear_pointer (&yaml_path, g_free);
 
@@ -171,25 +173,25 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/yaml/test_parse_file",
+  g_test_add ("/modulemd/yaml/test_parse_v1_file",
               YamlFixture,
               NULL,
               modulemd_yaml_set_up,
-              modulemd_yaml_test_parse_file,
+              modulemd_yaml_test_parse_v1_file,
               modulemd_yaml_tear_down);
 
-  g_test_add ("/modulemd/yaml/test_emit_string",
+  g_test_add ("/modulemd/yaml/test_emit_v1_string",
               YamlFixture,
               NULL,
               modulemd_yaml_set_up,
-              modulemd_yaml_test_emit_string,
+              modulemd_yaml_test_emit_v1_string,
               modulemd_yaml_tear_down);
 
-  g_test_add ("/modulemd/yaml/test_load",
+  g_test_add ("/modulemd/yaml/test_v1_load",
               YamlFixture,
               NULL,
               modulemd_yaml_set_up,
-              modulemd_yaml_test_load,
+              modulemd_yaml_test_v1_load,
               modulemd_yaml_tear_down);
   return g_test_run ();
 }

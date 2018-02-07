@@ -48,6 +48,97 @@ enum
 
 static GParamSpec *deps_properties[DEPS_N_PROPS];
 
+
+static void
+_modulemd_dependencies_add_streams (GHashTable *reqs,
+                                    const gchar *module,
+                                    const gchar **streams)
+{
+  ModulemdSimpleSet *streamset =
+    MODULEMD_SIMPLESET (g_hash_table_lookup (reqs, module));
+  gsize i = 0;
+
+  if (streamset == NULL)
+    {
+      streamset = modulemd_simpleset_new ();
+    }
+  else
+    {
+      g_object_ref (streamset);
+    }
+
+  for (i = 0; streams[i]; i++)
+    {
+      modulemd_simpleset_add (streamset, streams[i]);
+    }
+
+  g_hash_table_replace (reqs, g_strdup (module), streamset);
+}
+
+static void
+_modulemd_dependencies_add_stream (GHashTable *reqs,
+                                   const gchar *module,
+                                   const gchar *stream)
+{
+  const gchar **streams = g_new0 (const gchar *, 2);
+  streams[0] = g_strdup (stream);
+
+  _modulemd_dependencies_add_streams (reqs, module, streams);
+}
+
+
+/**
+ * modulemd_dependencies_add_buildrequires:
+ * @module: The module name
+ * @streams: (array zero-terminated): The list of streams for this module
+ *
+ * Add a set of modules and their streams that are required to build another
+ * dependent module. The matrix of streams and module names will be calculated
+ * by the build-system. If the listed provided module name is already present,
+ * the streams will be added (with deduplication).
+ */
+void
+modulemd_dependencies_add_buildrequires (ModulemdDependencies *self,
+                                         const gchar *module,
+                                         const gchar **streams)
+{
+  GHashTable *br = modulemd_dependencies_get_buildrequires (self);
+
+  _modulemd_dependencies_add_streams (br, module, streams);
+
+  g_hash_table_unref (br);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            deps_properties[DEPS_PROP_BUILDREQUIRES]);
+}
+
+
+/**
+ * modulemd_dependencies_add_buildrequires_single:
+ * @module: The module name
+ * @stream: The stream for this module
+ *
+ * Add a single stream of a module that is required to build another dependent
+ * module. The matrix of streams and module names will be calculated by the
+ * build-system. If the listed provided module name is already present, the
+ * streams will be added (with deduplication).
+ */
+void
+modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
+                                                const gchar *module,
+                                                const gchar *stream)
+{
+  GHashTable *br = modulemd_dependencies_get_buildrequires (self);
+
+  _modulemd_dependencies_add_stream (br, module, stream);
+
+  g_hash_table_unref (br);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            deps_properties[DEPS_PROP_BUILDREQUIRES]);
+}
+
+
 /**
  * modulemd_dependencies_set_buildrequires:
  * @buildrequires: (nullable) (element-type utf8 ModulemdSimpleSet): The
@@ -96,6 +187,58 @@ modulemd_dependencies_get_buildrequires (ModulemdDependencies *self)
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
   return g_hash_table_ref (self->buildrequires);
+}
+
+
+/**
+ * modulemd_dependencies_add_requires:
+ * @module: The module name
+ * @streams: (array zero-terminated=1): The list of streams for this module
+ *
+ * Add a single stream of a module that is required to build another dependent
+ * module. The matrix of streams and module names will be calculated by the
+ * build-system. If the listed provided module name is already present, the
+ * streams will be added (with deduplication).
+ */
+void
+modulemd_dependencies_add_requires (ModulemdDependencies *self,
+                                    const gchar *module,
+                                    const gchar **streams)
+{
+  GHashTable *r = modulemd_dependencies_get_requires (self);
+
+  _modulemd_dependencies_add_streams (r, module, streams);
+
+  g_hash_table_unref (r);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            deps_properties[DEPS_PROP_REQUIRES]);
+}
+
+
+/**
+ * modulemd_dependencies_add_requires_single:
+ * @module: The module name
+ * @stream: The stream for this module
+ *
+ * Add a set of modules and their streams that are required at runtime by a
+ * dependent module. The matrix of streams and module names will be calculated
+ * by the build-system. If the listed provided module name is already present,
+ * the streams will be added (with deduplication).
+ */
+void
+modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
+                                           const gchar *module,
+                                           const gchar *stream)
+{
+  GHashTable *r = modulemd_dependencies_get_requires (self);
+
+  _modulemd_dependencies_add_stream (r, module, stream);
+
+  g_hash_table_unref (r);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            deps_properties[DEPS_PROP_REQUIRES]);
 }
 
 

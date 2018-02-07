@@ -38,11 +38,31 @@ ModulemdDependencies *
 modulemd_dependencies_new (void);
 
 void
+modulemd_dependencies_add_buildrequires (ModulemdDependencies *self,
+                                         const gchar *module,
+                                         const gchar **streams);
+
+void
+modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
+                                                const gchar *module,
+                                                const gchar *stream);
+
+void
 modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
                                          GHashTable *buildrequires);
 
 GHashTable *
 modulemd_dependencies_get_buildrequires (ModulemdDependencies *self);
+
+void
+modulemd_dependencies_add_requires (ModulemdDependencies *self,
+                                    const gchar *module,
+                                    const gchar **streams);
+
+void
+modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
+                                           const gchar *module,
+                                           const gchar *stream);
 
 void
 modulemd_dependencies_set_requires (ModulemdDependencies *self,

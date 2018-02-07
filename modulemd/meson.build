@@ -63,6 +63,17 @@ test_modulemd_component = executable(
 )
 test('test_modulemd_component', test_modulemd_component)
 
+test_modulemd_dependencies = executable(
+    'test_modulemd_dependencies',
+    'test-modulemd-dependencies.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+    ],
+    install : false,
+)
+test('test_modulemd_dependencies', test_modulemd_dependencies)
+
 test_modulemd_module = executable(
     'test_modulemd_module',
     'test-modulemd-module.c',

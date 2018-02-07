@@ -1,4 +1,4 @@
-/* modulemd.h
+/* modulemd-dependencies.h
  *
  * Copyright (C) 2017 Stephen Gallagher
  *
@@ -22,22 +22,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_DEPENDENCIES_H
+#define MODULEMD_DEPENDENCIES_H
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#include "modulemd-component.h"
-#include "modulemd-component-module.h"
-#include "modulemd-component-rpm.h"
-#include "modulemd-dependencies.h"
-#include "modulemd-module.h"
-#include "modulemd-profile.h"
-#include "modulemd-simpleset.h"
-#include "modulemd-servicelevel.h"
+#define MODULEMD_TYPE_DEPENDENCIES (modulemd_dependencies_get_type ())
+
+G_DECLARE_FINAL_TYPE (
+  ModulemdDependencies, modulemd_dependencies, MODULEMD, DEPENDENCIES, GObject)
+
+ModulemdDependencies *
+modulemd_dependencies_new (void);
+
+void
+modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
+                                         GHashTable *buildrequires);
+
+GHashTable *
+modulemd_dependencies_get_buildrequires (ModulemdDependencies *self);
+
+void
+modulemd_dependencies_set_requires (ModulemdDependencies *self,
+                                    GHashTable *requires);
+
+GHashTable *
+modulemd_dependencies_get_requires (ModulemdDependencies *self);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* MODULEMD_DEPENDENCIES_H */

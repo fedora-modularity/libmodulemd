@@ -282,3 +282,35 @@ error:
 
   return ret;
 }
+
+const gchar *
+mmd_yaml_get_event_name (yaml_event_type_t type)
+{
+  switch (type)
+    {
+    case YAML_NO_EVENT: return "YAML_NO_EVENT";
+
+    case YAML_STREAM_START_EVENT: return "YAML_STREAM_START_EVENT";
+
+    case YAML_STREAM_END_EVENT: return "YAML_STREAM_END_EVENT";
+
+    case YAML_DOCUMENT_START_EVENT: return "YAML_DOCUMENT_START_EVENT";
+
+    case YAML_DOCUMENT_END_EVENT: return "YAML_DOCUMENT_END_EVENT";
+
+    case YAML_ALIAS_EVENT: return "YAML_ALIAS_EVENT";
+
+    case YAML_SCALAR_EVENT: return "YAML_SCALAR_EVENT";
+
+    case YAML_SEQUENCE_START_EVENT: return "YAML_SEQUENCE_START_EVENT";
+
+    case YAML_SEQUENCE_END_EVENT: return "YAML_SEQUENCE_END_EVENT";
+
+    case YAML_MAPPING_START_EVENT: return "YAML_MAPPING_START_EVENT";
+
+    case YAML_MAPPING_END_EVENT: return "YAML_MAPPING_END_EVENT";
+    }
+
+  /* Should be unreachable */
+  return "Unknown YAML Event";
+}

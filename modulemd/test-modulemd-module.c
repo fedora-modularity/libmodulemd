@@ -460,7 +460,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   modulemd_module_set_description (fixture->md, "The description");
 
   /* Dump it to YAML to validate it */
-  modules = g_new0(ModulemdModule *, 1);
+  modules = g_new0 (ModulemdModule *, 1);
   g_assert_nonnull (modules);
   modules[0] = fixture->md;
 

@@ -87,7 +87,8 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
 
   /* Validate the official reference YAML */
   g_info ("Reference YAML");
-  yaml_path = g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path =
+    g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   modules = parse_yaml_file (yaml_path, &error);
   g_free (yaml_path);
   g_assert_true (modules);
@@ -106,7 +107,6 @@ modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
   yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   module = modulemd_module_new_from_file (yaml_path);
-
   g_assert_true (module);
 
   buildrequires = modulemd_module_get_buildrequires (module);
@@ -135,6 +135,34 @@ modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
       g_object_unref (modules[i]);
     }
   g_free (modules);
+}
+
+static void
+modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
+{
+  ModulemdModule *module = NULL;
+  ModulemdModule **modules = NULL;
+  gchar *yaml_path = NULL;
+
+
+  yaml_path = g_strdup_printf ("%s/test_data/good-v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_true (module);
+  g_object_unref (module);
+
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+
+  g_assert_true (modules);
+  g_assert_true (modules[0]);
+
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_free (modules);
+  g_free (yaml_path);
 }
 
 static void
@@ -193,5 +221,13 @@ main (int argc, char *argv[])
               modulemd_yaml_set_up,
               modulemd_yaml_test_v1_load,
               modulemd_yaml_tear_down);
+
+  g_test_add ("/modulemd/yaml/test_v2_load",
+              YamlFixture,
+              NULL,
+              modulemd_yaml_set_up,
+              modulemd_yaml_test_v2_load,
+              modulemd_yaml_tear_down);
+
   return g_test_run ();
 }

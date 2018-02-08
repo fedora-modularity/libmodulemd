@@ -62,9 +62,9 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
                     ModulemdModule *module,
                     GError **error);
 static gboolean
-_emit_modulemd_deps (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
-                     GError **error);
+_emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error);
 static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,
                      ModulemdModule *module,
@@ -431,16 +431,21 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_FOLDED_SCALAR_STYLE);
 
   /* Module EOL (obsolete */
-  eol = modulemd_module_get_eol (module);
-  if (eol)
+
+  if (modulemd_module_get_mdversion (module) == 1)
     {
-      name = g_strdup ("eol");
-      value = g_strdup_printf ("%.2u-%.2u-%.2u",
-                               g_date_get_year (eol),
-                               g_date_get_month (eol),
-                               g_date_get_day (eol));
-      MMD_YAML_EMIT_STR_STR_DICT (
-        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+      /* EOL is removed from mdversion 2+ */
+      eol = modulemd_module_get_eol (module);
+      if (eol)
+        {
+          name = g_strdup ("eol");
+          value = g_strdup_printf ("%.2u-%.2u-%.2u",
+                                   g_date_get_year (eol),
+                                   g_date_get_month (eol),
+                                   g_date_get_day (eol));
+          MMD_YAML_EMIT_STR_STR_DICT (
+            &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+        }
     }
 
   /* Module Service Levels */
@@ -464,11 +469,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Dependencies */
-  if (!_emit_modulemd_deps (emitter, module, error))
+  if (modulemd_module_get_mdversion (module) == 1)
     {
-      MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
+      if (!_emit_modulemd_deps_v1 (emitter, module, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
+        }
     }
-
 
   /* References */
   if (!_emit_modulemd_refs (emitter, module, error))
@@ -762,9 +769,9 @@ error:
 }
 
 static gboolean
-_emit_modulemd_deps (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
-                     GError **error)
+_emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error)
 {
   gboolean ret = FALSE;
   yaml_event_t event;
@@ -772,7 +779,7 @@ _emit_modulemd_deps (yaml_emitter_t *emitter,
   GHashTable *requires = NULL;
   GHashTable *buildrequires = NULL;
 
-  g_debug ("TRACE: entering _emit_modulemd_deps");
+  g_debug ("TRACE: entering _emit_modulemd_deps_v1");
 
   buildrequires = modulemd_module_get_buildrequires (module);
   requires = modulemd_module_get_requires (module);
@@ -838,7 +845,7 @@ error:
       g_hash_table_unref (requires);
     }
 
-  g_debug ("TRACE: exiting _emit_modulemd_deps");
+  g_debug ("TRACE: exiting _emit_modulemd_deps_v1");
   return ret;
 }
 

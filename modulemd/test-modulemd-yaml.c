@@ -87,7 +87,7 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
 
   /* Validate the official reference YAML */
   g_info ("Reference YAML");
-  yaml_path = g_strdup_printf ("%s/spec.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   modules = parse_yaml_file (yaml_path, &error);
   g_free (yaml_path);
   g_assert_true (modules);

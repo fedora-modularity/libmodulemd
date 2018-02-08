@@ -339,6 +339,30 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 
 
 /**
+ * modulemd_module_add_dependencies:
+ * @dep: A dependency object to add to this module
+ *
+ * Helper function to populate the dependencies list
+ */
+void
+modulemd_module_add_dependencies (ModulemdModule *self,
+                                  ModulemdDependencies *dep)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
+  g_return_if_fail (MODULEMD_IS_DEPENDENCIES (dep));
+
+  if (!self->dependencies)
+    {
+      self->dependencies = g_ptr_array_new_with_free_func (g_object_unref);
+    }
+
+  g_ptr_array_add (self->dependencies, g_object_ref (dep));
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
+}
+
+
+/**
  * modulemd_module_get_dependencies
  *
  * Returns: (element-type ModulemdDependencies) (transfer container): The list

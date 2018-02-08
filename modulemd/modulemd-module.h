@@ -100,6 +100,9 @@ modulemd_module_set_description (ModulemdModule *self,
                                  const gchar *description);
 void
 modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps);
+void
+modulemd_module_add_dependencies (ModulemdModule *self,
+                                  ModulemdDependencies *dep);
 GPtrArray *
 modulemd_module_get_dependencies (ModulemdModule *self);
 const gchar *

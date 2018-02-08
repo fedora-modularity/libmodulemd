@@ -66,6 +66,11 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
                         ModulemdModule *module,
                         GError **error);
 static gboolean
+_emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error);
+
+static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error);
@@ -476,6 +481,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
         }
     }
+  else
+    {
+      if (!_emit_modulemd_deps_v2 (emitter, module, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
+        }
+    }
 
   /* References */
   if (!_emit_modulemd_refs (emitter, module, error))
@@ -848,6 +860,145 @@ error:
   g_debug ("TRACE: exiting _emit_modulemd_deps_v1");
   return ret;
 }
+
+static gboolean
+_modulemd_emit_dep_stream_mapping (yaml_emitter_t *emitter,
+                                   GHashTable *reqs,
+                                   GError **error);
+static gboolean
+_emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
+                        ModulemdModule *module,
+                        GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GPtrArray *dependencies = NULL;
+  ModulemdDependencies *dep = NULL;
+  GHashTable *reqs = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_deps_v2");
+
+  dependencies = modulemd_module_get_dependencies (module);
+  if (!dependencies)
+    {
+      /* Unlikely, but not impossible */
+      ret = TRUE;
+      goto error;
+    }
+
+  name = g_strdup ("dependencies");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_sequence_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_SEQUENCE_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting dependency sequence");
+
+
+  for (gsize i = 0; i < dependencies->len; i++)
+    {
+      yaml_mapping_start_event_initialize (
+        &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error starting internal dependency mapping");
+
+      dep = MODULEMD_DEPENDENCIES (g_ptr_array_index (dependencies, i));
+
+      /* Write out the BuildRequires first */
+      name = g_strdup ("buildrequires");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      reqs = modulemd_dependencies_get_buildrequires (dep);
+      if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Could not parse stream mapping");
+        }
+      g_clear_pointer (&reqs, g_hash_table_unref);
+
+      /* Then write out the Requires */
+      name = g_strdup ("requires");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      reqs = modulemd_dependencies_get_requires (dep);
+      if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Could not parse stream mapping");
+        }
+      g_clear_pointer (&reqs, g_hash_table_unref);
+
+      yaml_mapping_end_event_initialize (&event);
+      YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+        emitter, &event, error, "Error ending internal dependency mapping");
+    }
+
+  yaml_sequence_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending dependency sequence");
+
+  ret = TRUE;
+error:
+  g_free (name);
+  if (dependencies)
+    {
+      g_ptr_array_unref (dependencies);
+    }
+
+  g_debug ("TRACE: exiting _emit_modulemd_deps_v2");
+  return ret;
+}
+
+static gboolean
+_modulemd_emit_dep_stream_mapping (yaml_emitter_t *emitter,
+                                   GHashTable *reqs,
+                                   GError **error)
+{
+  gboolean ret = FALSE;
+  yaml_event_t event;
+  GPtrArray *keys;
+  gchar *name;
+  ModulemdSimpleSet *val;
+
+  g_debug ("TRACE: entering _modulemd_emit_dep_stream_mapping");
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting dep stream mapping");
+
+  keys = _modulemd_ordered_str_keys (reqs, _modulemd_strcmp_sort);
+
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      name = g_strdup (g_ptr_array_index (keys, i));
+      val = g_object_ref (g_hash_table_lookup (reqs, name));
+
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_modulemd_simpleset (
+            emitter, val, YAML_FLOW_SEQUENCE_STYLE, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                         "Could not parse stream simpleset");
+        }
+      g_object_unref (val);
+    }
+  g_ptr_array_unref (keys);
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending dep stream mapping");
+
+  ret = TRUE;
+error:
+
+  g_debug ("TRACE: exiting _modulemd_emit_dep_stream_mapping");
+  return ret;
+}
+
 
 static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,

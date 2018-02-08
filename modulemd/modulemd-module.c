@@ -37,6 +37,7 @@ enum
   MD_PROP_COMMUNITY,
   MD_PROP_CONTENT_LIC,
   MD_PROP_CONTEXT,
+  MD_PROP_DEPS,
   MD_PROP_DESC,
   MD_PROP_DOCS,
   MD_PROP_EOL,
@@ -76,6 +77,7 @@ struct _ModulemdModule
   ModulemdSimpleSet *content_licenses;
   gchar *context;
   gchar *description;
+  GPtrArray *dependencies;
   gchar *documentation;
   GDate *eol;
   guint64 mdversion;
@@ -304,6 +306,58 @@ modulemd_module_get_context (ModulemdModule *self)
 
   return self->context;
 }
+
+
+/**
+ * modulemd_module_set_dependencies:
+ * @deps: (array zero-terminated=1) (element-type ModulemdDependencies) (transfer container) (nullable):
+ * The NULL-terminated list of dependencies.
+ *
+ * Sets the list of dependency objects for this module.
+ */
+void
+modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
+
+  if (self->dependencies != deps)
+    {
+      if (self->dependencies)
+        {
+          g_ptr_array_unref (self->dependencies);
+          self->dependencies = NULL;
+        }
+
+      if (deps)
+        {
+          self->dependencies = g_ptr_array_ref (deps);
+        }
+      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
+    }
+}
+
+
+/**
+ * modulemd_module_get_dependencies
+ *
+ * Returns: (element-type ModulemdDependencies) (transfer container): The list
+ * of dependency objects for this module.
+ */
+GPtrArray *
+modulemd_module_get_dependencies (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_get_mdversion (self) >= 2, NULL);
+
+  if (self->dependencies == NULL)
+    {
+      return NULL;
+    }
+
+  return g_ptr_array_ref (self->dependencies);
+}
+
 
 /**
  * modulemd_module_set_description:
@@ -1221,6 +1275,10 @@ modulemd_module_set_property (GObject *gobject,
       modulemd_module_set_context (self, g_value_get_string (value));
       break;
 
+    case MD_PROP_DEPS:
+      modulemd_module_set_dependencies (self, g_value_get_boxed (value));
+      break;
+
     case MD_PROP_DESC:
       modulemd_module_set_description (self, g_value_get_string (value));
       break;
@@ -1335,6 +1393,10 @@ modulemd_module_get_property (GObject *gobject,
 
     case MD_PROP_CONTEXT:
       g_value_set_string (value, modulemd_module_get_context (self));
+      break;
+
+    case MD_PROP_DEPS:
+      g_value_set_boxed (value, modulemd_module_get_description (self));
       break;
 
     case MD_PROP_DESC:
@@ -1520,6 +1582,17 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          "dependencies.",
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  /**
+   * ModulemdModule:dependencies: (type GLib.PtrArray(ModulemdDependencies)) (transfer container)
+   */
+  md_properties[MD_PROP_DEPS] =
+    g_param_spec_boxed ("dependencies",
+                        "Module Dependencies",
+                        "A list of build and runtime requirements needed by "
+                        "this module.",
+                        G_TYPE_PTR_ARRAY,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   md_properties[MD_PROP_DESC] =
     g_param_spec_string ("description",

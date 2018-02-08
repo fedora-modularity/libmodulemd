@@ -26,7 +26,7 @@
 #define MODULEMD_MODULE_H
 
 #include <glib-object.h>
-#include "modulemd-simpleset.h"
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 
@@ -98,7 +98,10 @@ modulemd_module_get_context (ModulemdModule *self);
 void
 modulemd_module_set_description (ModulemdModule *self,
                                  const gchar *description);
-
+void
+modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps);
+GPtrArray *
+modulemd_module_get_dependencies (ModulemdModule *self);
 const gchar *
 modulemd_module_get_description (ModulemdModule *self);
 

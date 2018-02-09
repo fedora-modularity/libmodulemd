@@ -471,6 +471,38 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   g_free (modules);
 }
 
+
+static void
+modulemd_module_test_construct_v2 (ModuleFixture *fixture,
+                                   gconstpointer user_data)
+{
+  ModulemdModule **modules = NULL;
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  gboolean result;
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 2);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Dump it to YAML to validate it */
+  modules = g_new0 (ModulemdModule *, 1);
+  g_assert_nonnull (modules);
+  modules[0] = fixture->md;
+
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml);
+
+  g_free (modules);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -641,6 +673,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_module_set_up,
               modulemd_module_test_construct_v1,
+              modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/test_construct_v2",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_construct_v2,
               modulemd_module_tear_down);
 
   return g_test_run ();

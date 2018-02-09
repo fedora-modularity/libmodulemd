@@ -1067,6 +1067,35 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
     }
 }
 
+
+/**
+ * modulemd_module_add_servicelevel:
+ * @sl_name: The name of the service level to add
+ * @servicelevel: A #ServiceLevel object to add to the hash table
+ *
+ * Adds a service levels to the module. If sl_name already exists, it will be
+ * replaced by this entry.
+ */
+void
+modulemd_module_add_servicelevels (ModulemdModule *self,
+                                   const gchar *sl_name,
+                                   ModulemdServiceLevel *servicelevel)
+{
+  gchar *name;
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  if (!(servicelevel || sl_name))
+    {
+      return;
+    }
+
+  name = g_strdup (sl_name);
+  g_hash_table_replace (self->servicelevels, name, servicelevel);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
+}
+
+
 /**
  * modulemd_module_get_servicelevels:
  *

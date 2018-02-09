@@ -2122,3 +2122,83 @@ modulemd_module_dumps_all (GPtrArray *module_array)
   g_free (modules);
   return yaml;
 }
+
+static gboolean
+_modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
+{
+  const GDate *eol = NULL;
+  ModulemdServiceLevel *sl = NULL;
+  GHashTable *buildrequires = NULL;
+  GHashTable *requires = NULL;
+  ModulemdDependencies *v2_dep = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  GPtrArray *deps = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  /* Upgrade the EOL field to a "rawhide" servicelevel*/
+  eol = modulemd_module_get_eol (self);
+  if (g_date_valid (eol))
+    {
+      sl = modulemd_servicelevel_new ();
+      modulemd_servicelevel_set_eol (sl, eol);
+
+      modulemd_module_add_servicelevels (self, "rawhide", sl);
+    }
+
+  /* Upgrade the build and runtime requirements */
+  v2_dep = modulemd_dependencies_new ();
+
+
+  /* First do BuildRequires */
+  buildrequires = modulemd_module_get_buildrequires (self);
+  g_hash_table_iter_init (&iter, buildrequires);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      modulemd_dependencies_add_buildrequires_single (
+        v2_dep, g_strdup (key), g_strdup (value));
+    }
+
+  /* Now add runtime Requires */
+  requires = modulemd_module_get_requires (self);
+  g_hash_table_iter_init (&iter, requires);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      modulemd_dependencies_add_requires_single (
+        v2_dep, g_strdup (key), g_strdup (value));
+    }
+
+  deps = g_ptr_array_new ();
+  g_ptr_array_add (deps, v2_dep);
+
+  modulemd_module_set_mdversion (self, 2);
+  modulemd_module_set_dependencies (self, deps);
+
+  return TRUE;
+}
+
+gboolean
+modulemd_module_upgrade (ModulemdModule *self)
+{
+  gboolean result = FALSE;
+  guint64 mdversion;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  mdversion = modulemd_module_get_mdversion (self);
+
+  /* Upgrade from v1 to v2 */
+  if (mdversion < 2)
+    {
+      result = _modulemd_upgrade_v1_to_v2 (self);
+      if (!result)
+        goto done;
+    }
+
+  /* Future upgrades go here */
+
+  result = TRUE;
+done:
+  return result;
+}

@@ -65,6 +65,9 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file);
 gchar *
 modulemd_module_dumps_all (GPtrArray *module_array);
 
+gboolean
+modulemd_module_upgrade (ModulemdModule *self);
+
 void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch);
 

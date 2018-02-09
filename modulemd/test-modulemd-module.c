@@ -502,6 +502,78 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_free (modules);
 }
 
+static void
+modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
+                                 gconstpointer user_data)
+{
+  ModulemdModule **modules = NULL;
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  gboolean result = FALSE;
+  GDate *eol = NULL;
+  GHashTable *servicelevels = NULL;
+  GHashTable *v1_deps = NULL;
+  GPtrArray *v2_deps = NULL;
+
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 1);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Add EOL value */
+  eol = g_date_new_dmy (3, 10, 2077);
+  modulemd_module_set_eol (fixture->md, eol);
+
+  /* There should be no "rawhide" service level yet */
+  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  g_assert_false (g_hash_table_contains (servicelevels, "rawhide"));
+  g_clear_pointer (&servicelevels, g_hash_table_unref);
+
+  v1_deps = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  g_hash_table_insert (v1_deps, g_strdup ("platform"), g_strdup ("f28"));
+
+  /* Add a BuildRequires */
+  modulemd_module_set_buildrequires (fixture->md, v1_deps);
+
+  /* Add a runtime Requires */
+  modulemd_module_set_requires (fixture->md, v1_deps);
+
+  /* Upgrade to v2 */
+  result = modulemd_module_upgrade (fixture->md);
+  g_assert_true (result);
+
+  g_assert_cmpuint (modulemd_module_get_mdversion (fixture->md), ==, 2);
+
+  /* The module should now contain an entry for rawhide */
+  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  g_assert_true (g_hash_table_contains (servicelevels, "rawhide"));
+  g_clear_pointer (&servicelevels, g_hash_table_unref);
+
+
+  /* The module should now contain a single entry in the dependencies array */
+  v2_deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (v2_deps);
+  g_assert_cmpuint (v2_deps->len, ==, 1);
+
+  /* Dump it to YAML to validate it */
+  modules = g_new0 (ModulemdModule *, 1);
+  g_assert_nonnull (modules);
+  modules[0] = fixture->md;
+
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml);
+
+  g_message ("YAML:\n%s", yaml);
+
+  g_free (modules);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -681,6 +753,14 @@ main (int argc, char *argv[])
               modulemd_module_set_up,
               modulemd_module_test_construct_v2,
               modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/modulemd_module_test_upgrade_v2",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_upgrade_v2,
+              modulemd_module_tear_down);
+
 
   return g_test_run ();
 }

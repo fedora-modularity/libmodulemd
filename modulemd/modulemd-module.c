@@ -325,8 +325,7 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
     {
       if (self->dependencies)
         {
-          g_ptr_array_unref (self->dependencies);
-          self->dependencies = NULL;
+          g_clear_pointer (&self->dependencies, g_ptr_array_unref);
         }
 
       if (deps)

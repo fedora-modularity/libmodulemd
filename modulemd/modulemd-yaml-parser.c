@@ -671,7 +671,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
 {
   yaml_event_t event;
   gboolean done = FALSE;
-  ModulemdSimpleSet *set;
+  ModulemdSimpleSet *set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 

@@ -45,6 +45,17 @@ modulemd_lib = library(
     version: libmodulemd_version,
 )
 
+modulemd_validator = executable(
+    'modulemd-validator',
+    'modulemd-validator.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+        popt,
+    ],
+    install : true,
+)
+
 header_path = 'modulemd'
 
 install_headers(

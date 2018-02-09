@@ -86,7 +86,7 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
   g_clear_error (&error);
 
   /* Validate the official reference YAML */
-  g_info ("Reference YAML");
+  g_info ("Reference YAML v1");
   yaml_path =
     g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   modules = parse_yaml_file (yaml_path, &error);
@@ -143,6 +143,7 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
   gchar *yaml_path = NULL;
+  GError *error = NULL;
 
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v2.yaml",
@@ -163,6 +164,14 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
 
   g_free (modules);
   g_free (yaml_path);
+
+  /* Validate the official reference YAML */
+  g_info ("Reference YAML v2");
+  yaml_path =
+    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  modules = parse_yaml_file (yaml_path, &error);
+  g_free (yaml_path);
+  g_assert_true (modules);
 }
 
 static void

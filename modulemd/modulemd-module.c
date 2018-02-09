@@ -1547,6 +1547,7 @@ modulemd_module_finalize (GObject *gobject)
   g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->content_licenses, g_object_unref);
   g_clear_pointer (&self->context, g_free);
+  g_clear_pointer (&self->dependencies, g_ptr_array_unref);
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->documentation, g_free);
   g_clear_pointer (&self->eol, g_date_free);

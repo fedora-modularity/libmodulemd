@@ -606,27 +606,37 @@ void
 modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components)
 {
+  GHashTableIter iter;
+  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (components != self->module_components)
+  if ((!components || g_hash_table_size (components) == 0) &&
+      g_hash_table_size (self->module_components) == 0)
     {
-      if (self->module_components)
-        {
-          g_hash_table_unref (self->module_components);
-        }
-
-      if (components)
-        {
-          self->module_components =
-            _modulemd_hash_table_deep_obj_copy (components);
-        }
-      else
-        {
-          self->module_components = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_MODULE_COMPONENTS]);
+      /* Nothing to do; don't send notification */
+      return;
     }
+
+  /* For any other case, we'll assume a full replacement */
+  modulemd_module_clear_module_components (self);
+
+  if (components)
+    {
+      g_hash_table_iter_init (&iter, components);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          /* Throw an error if the name of the key and the name the component
+           * has internally are different.
+           */
+          g_hash_table_replace (
+            self->module_components,
+            g_strdup (
+              modulemd_component_get_name ((ModulemdComponent *)value)),
+            g_object_ref ((ModulemdComponentModule *)value));
+        }
+    }
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_MODULE_COMPONENTS]);
 }
 
 /**
@@ -1029,27 +1039,36 @@ void
 modulemd_module_set_rpm_components (ModulemdModule *self,
                                     GHashTable *components)
 {
+  GHashTableIter iter;
+  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (components != self->rpm_components)
+  if ((!components || g_hash_table_size (components) == 0) &&
+      g_hash_table_size (self->rpm_components) == 0)
     {
-      if (self->rpm_components)
-        {
-          g_hash_table_unref (self->rpm_components);
-        }
-
-      if (components)
-        {
-          self->rpm_components =
-            _modulemd_hash_table_deep_obj_copy (components);
-        }
-      else
-        {
-          self->rpm_components = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_RPM_COMPONENTS]);
+      /* Nothing to do; don't send notification */
+      return;
     }
+
+  /* For any other case, we'll assume a full replacement */
+  modulemd_module_clear_rpm_components (self);
+
+  if (components)
+    {
+      g_hash_table_iter_init (&iter, components);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          /* Throw an error if the name of the key and the name the component
+           * has internally are different.
+           */
+          g_hash_table_replace (self->rpm_components,
+                                g_strdup (modulemd_component_get_name (
+                                  (ModulemdComponent *)value)),
+                                g_object_ref ((ModulemdComponentRpm *)value));
+        }
+    }
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_RPM_COMPONENTS]);
 }
 
 /**

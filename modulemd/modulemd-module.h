@@ -26,6 +26,8 @@
 #define MODULEMD_MODULE_H
 
 #include <glib-object.h>
+#include "modulemd-component-module.h"
+#include "modulemd-component-rpm.h"
 #include "modulemd-dependencies.h"
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
@@ -133,6 +135,13 @@ const guint64
 modulemd_module_get_mdversion (ModulemdModule *self);
 
 void
+modulemd_module_add_module_component (ModulemdModule *self,
+                                      ModulemdComponentModule *component);
+
+void
+modulemd_module_clear_module_components (ModulemdModule *self);
+
+void
 modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components);
 
@@ -183,6 +192,13 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self,
 
 GHashTable *
 modulemd_module_get_rpm_buildopts (ModulemdModule *self);
+
+void
+modulemd_module_add_rpm_component (ModulemdModule *self,
+                                   ModulemdComponentRpm *component);
+
+void
+modulemd_module_clear_rpm_components (ModulemdModule *self);
 
 void
 modulemd_module_set_rpm_components (ModulemdModule *self,

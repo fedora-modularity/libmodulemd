@@ -552,6 +552,47 @@ modulemd_module_get_mdversion (ModulemdModule *self)
   return self->mdversion;
 }
 
+
+/**
+ * modulemd_module_add_module_component:
+ * @component: A #ModulemdComponentModule
+ *
+ * Adds a #ModulemdComponentModule to the "module_components" hash table.
+ */
+void
+modulemd_module_add_module_component (ModulemdModule *self,
+                                      ModulemdComponentModule *component)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (MODULEMD_IS_COMPONENT_MODULE (component));
+
+  g_hash_table_replace (
+    self->module_components,
+    g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
+    g_object_ref (component));
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_MODULE_COMPONENTS]);
+}
+
+
+/**
+ * modulemd_module_clear_module_components:
+ *
+ * Remove all entries from the "module_components" hash table.
+ */
+void
+modulemd_module_clear_module_components (ModulemdModule *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  g_hash_table_remove_all (self->module_components);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_MODULE_COMPONENTS]);
+}
+
+
 /**
  * modulemd_module_set_module_components:
  * @components: (nullable) (element-type utf8 ModulemdComponentModule): The hash table of
@@ -933,6 +974,47 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 
   return g_hash_table_ref (self->rpm_buildopts);
 }
+
+
+/**
+ * modulemd_module_add_rpm_component:
+ * @component: A #ModulemdComponentRpm
+ *
+ * Adds a #ModulemdComponentRpm to the "rpm_components" hash table.
+ */
+void
+modulemd_module_add_rpm_component (ModulemdModule *self,
+                                   ModulemdComponentRpm *component)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (component));
+
+  g_hash_table_replace (
+    self->rpm_components,
+    g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
+    g_object_ref (component));
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_RPM_COMPONENTS]);
+}
+
+
+/**
+ * modulemd_module_clear_rpm_components:
+ *
+ * Remove all entries from the "rpm_components" hash table.
+ */
+void
+modulemd_module_clear_rpm_components (ModulemdModule *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  g_hash_table_remove_all (self->rpm_components);
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_RPM_COMPONENTS]);
+}
+
 
 /**
  * modulemd_module_set_rpm_components:

@@ -98,6 +98,63 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
   g_assert_cmpint (g_strv_length (array2), ==, 2);
 }
 
+static void
+modulemd_simpleset_test_copy (SimpleSetFixture *fixture,
+                              gconstpointer user_data)
+{
+  ModulemdSimpleSet *copy = NULL;
+
+  modulemd_simpleset_add (fixture->set, "alpha");
+  modulemd_simpleset_add (fixture->set, "bravo");
+
+  g_assert_cmpint (modulemd_simpleset_size (fixture->set), ==, 2);
+  g_assert_true (modulemd_simpleset_contains (fixture->set, "alpha"));
+  g_assert_true (modulemd_simpleset_contains (fixture->set, "bravo"));
+
+  /* Test that we can copy and allocate at the same time */
+  modulemd_simpleset_copy (fixture->set, &copy);
+
+  g_assert_nonnull (copy);
+  g_assert_nonnull (modulemd_simpleset_get (copy));
+  g_assert_cmpint (modulemd_simpleset_size (copy), ==, 2);
+  g_assert_true (modulemd_simpleset_contains (copy, "alpha"));
+  g_assert_true (modulemd_simpleset_contains (copy, "bravo"));
+
+  /* Remove "alpha" and "bravo" and add "Mickey" and "Minnie" */
+  modulemd_simpleset_add (fixture->set, "Mickey");
+  modulemd_simpleset_add (fixture->set, "Minnie");
+  modulemd_simpleset_remove (fixture->set, "alpha");
+  modulemd_simpleset_remove (fixture->set, "bravo");
+
+  g_assert_cmpint (modulemd_simpleset_size (fixture->set), ==, 2);
+  g_assert_true (modulemd_simpleset_contains (fixture->set, "Mickey"));
+  g_assert_true (modulemd_simpleset_contains (fixture->set, "Minnie"));
+  g_assert_false (modulemd_simpleset_contains (fixture->set, "alpha"));
+  g_assert_false (modulemd_simpleset_contains (fixture->set, "bravo"));
+
+  /* Overwrite the contents of "copy" */
+  modulemd_simpleset_copy (fixture->set, &copy);
+
+  g_assert_cmpint (modulemd_simpleset_size (copy), ==, 2);
+  g_assert_cmpint (modulemd_simpleset_size (copy), ==, 2);
+  g_assert_true (modulemd_simpleset_contains (copy, "Mickey"));
+  g_assert_true (modulemd_simpleset_contains (copy, "Minnie"));
+  g_assert_false (modulemd_simpleset_contains (copy, "alpha"));
+  g_assert_false (modulemd_simpleset_contains (copy, "bravo"));
+
+
+  /* Copy a NULL SimpleSet */
+  modulemd_simpleset_copy (NULL, &copy);
+
+  g_assert_cmpint (modulemd_simpleset_size (copy), ==, 0);
+  g_assert_false (modulemd_simpleset_contains (copy, "Mickey"));
+  g_assert_false (modulemd_simpleset_contains (copy, "Minnie"));
+  g_assert_false (modulemd_simpleset_contains (copy, "alpha"));
+  g_assert_false (modulemd_simpleset_contains (copy, "bravo"));
+
+  g_clear_pointer (&copy, g_object_unref);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -112,6 +169,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_simpleset_set_up,
               modulemd_simpleset_test_get_set,
+              modulemd_simpleset_tear_down);
+
+  g_test_add ("/modulemd/simpleset/test_copy",
+              SimpleSetFixture,
+              NULL,
+              modulemd_simpleset_set_up,
+              modulemd_simpleset_test_copy,
               modulemd_simpleset_tear_down);
 
   return g_test_run ();

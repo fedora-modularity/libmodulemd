@@ -191,6 +191,56 @@ modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value)
     }
 }
 
+
+/**
+ * modulemd_simpleset_copy
+ * @dest: (out): A reference to the destination #ModulemdSimpleSet
+ *
+ * This function will copy the contents of this #ModulemdSimpleSet to @dest.
+ * If the dereferenced pointer is NULL, a new #ModulemdSimpleSet will be
+ * allocated.
+ *
+ * If the dereferenced pointer is not NULL, it will replace the contents of
+ * @dest. All existing values in the set will be freed.
+ *
+ * In either case, the caller is responsible for calling g_object_unref()
+ * later to free it.
+ */
+
+void
+modulemd_simpleset_copy (ModulemdSimpleSet *self, ModulemdSimpleSet **dest)
+{
+  gchar **keys = NULL;
+
+  g_return_if_fail (!self || MODULEMD_IS_SIMPLESET (self));
+  g_return_if_fail (dest);
+  g_return_if_fail (*dest == NULL ||
+                    (*dest != NULL && MODULEMD_IS_SIMPLESET (*dest)));
+
+  /* Allocate a SimpleSet if needed */
+  if (*dest == NULL)
+    {
+      *dest = modulemd_simpleset_new ();
+    }
+
+  if (self)
+    {
+      /* Get the set of keys so we can just use the set() function */
+      keys = (gchar **)g_hash_table_get_keys_as_array (self->set, NULL);
+    }
+  else
+    {
+      /* If the source is NULL, treat it as empty */
+      keys = g_new0 (gchar *, 1);
+    }
+
+  /* set() them. This will also handle the object notification */
+  modulemd_simpleset_set (*dest, keys);
+
+  g_free (keys);
+}
+
+
 static void
 modulemd_simpleset_set_property (GObject *gobject,
                                  guint property_id,

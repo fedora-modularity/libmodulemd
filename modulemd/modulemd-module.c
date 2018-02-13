@@ -738,6 +738,44 @@ modulemd_module_get_name (ModulemdModule *self)
   return self->name;
 }
 
+
+/**
+ * modulemd_module_add_profile:
+ * @profile: A #ModulemdProfile
+ *
+ * Adds a #ModulemdProfile definition to this module.
+ */
+void
+modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (MODULEMD_IS_PROFILE (profile));
+
+  g_hash_table_replace (
+    self->profiles,
+    g_strdup (modulemd_profile_get_name ((ModulemdProfile *)profile)),
+    g_object_ref (profile));
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
+}
+
+
+/**
+ * modulemd_module_clear_profiles:
+ *
+ * Remove all entries from the "profiles" hash table.
+ */
+void
+modulemd_module_clear_profiles (ModulemdModule *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  g_hash_table_remove_all (self->profiles);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
+}
+
+
 /**
  * modulemd_module_set_profiles:
  * @profiles: (nullable) (element-type utf8 ModulemdProfile): The profiles avaiable for
@@ -749,26 +787,34 @@ modulemd_module_get_name (ModulemdModule *self)
 void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
 {
+  GHashTableIter iter;
+  gpointer key, value;
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (profiles != self->profiles)
+  if ((!profiles || g_hash_table_size (profiles) == 0) &&
+      g_hash_table_size (self->profiles) == 0)
     {
-      if (self->profiles)
-        {
-          g_hash_table_unref (self->profiles);
-        }
-
-      if (profiles)
-        {
-          self->profiles = _modulemd_hash_table_deep_obj_copy (profiles);
-        }
-      else
-        {
-          self->profiles = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_PROFILES]);
+      /* Nothing to do; don't send notification */
+      return;
     }
+
+  /* For any other case, we'll assume a full replacement */
+  modulemd_module_clear_profiles (self);
+
+  if (profiles)
+    {
+      g_hash_table_iter_init (&iter, profiles);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_hash_table_replace (
+            self->profiles,
+            g_strdup (modulemd_profile_get_name ((ModulemdProfile *)value)),
+            g_object_ref ((ModulemdProfile *)value));
+        }
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
 }
 
 /**

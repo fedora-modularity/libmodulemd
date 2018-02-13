@@ -29,6 +29,7 @@
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
 #include "modulemd-dependencies.h"
+#include "modulemd-profile.h"
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
 
@@ -160,6 +161,12 @@ modulemd_module_set_name (ModulemdModule *self, const gchar *name);
 
 const gchar *
 modulemd_module_get_name (ModulemdModule *self);
+
+void
+modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile);
+
+void
+modulemd_module_clear_profiles (ModulemdModule *self);
 
 void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles);

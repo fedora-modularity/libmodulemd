@@ -135,6 +135,11 @@ modulemd_servicelevel_get_name (ModulemdServiceLevel *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
 
+  if (!self->name)
+    {
+      g_warning ("Servicelevel name requested, but has not been set");
+    }
+
   return self->name;
 }
 

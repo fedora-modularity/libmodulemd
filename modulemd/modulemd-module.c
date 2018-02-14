@@ -1117,6 +1117,23 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
   return g_object_ref (self->rpm_filter);
 }
 
+
+/**
+ * modulemd_module_clear_servicelevels:
+ *
+ * Remove all entries from the "servicelevels" hash table
+ */
+void
+modulemd_module_clear_servicelevels (ModulemdModule *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  g_hash_table_remove_all (self->servicelevels);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
+}
+
+
 /**
  * modulemd_module_set_servicelevels:
  * @servicelevels: (nullable) (element-type utf8 ModulemdServiceLevel): A hash table of #ServiceLevel objects
@@ -1127,26 +1144,32 @@ void
 modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels)
 {
+  GHashTableIter iter;
+  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (servicelevels != self->servicelevels)
+  if ((!servicelevels || g_hash_table_size (servicelevels) == 0) &&
+      g_hash_table_size (self->servicelevels))
     {
-      if (self->servicelevels)
-        {
-          g_hash_table_unref (self->servicelevels);
-        }
-
-      if (servicelevels)
-        {
-          self->servicelevels =
-            _modulemd_hash_table_deep_obj_copy (servicelevels);
-        }
-      else
-        {
-          self->servicelevels = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
+      /* Nothing to do; don't send notification */
+      return;
     }
+
+  /* For any other case, we'll assume a full replacement */
+  modulemd_module_clear_servicelevels (self);
+
+  if (servicelevels)
+    {
+      g_hash_table_iter_init (&iter, servicelevels);
+
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_hash_table_replace (self->servicelevels,
+                                g_strdup ((const gchar *)key),
+                                g_object_ref ((ModulemdServiceLevel *)value));
+        }
+    }
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
 }
 
 

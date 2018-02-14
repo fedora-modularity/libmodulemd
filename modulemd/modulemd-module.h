@@ -222,6 +222,9 @@ ModulemdSimpleSet *
 modulemd_module_get_rpm_filter (ModulemdModule *self);
 
 void
+modulemd_module_clear_servicelevels (ModulemdModule *self);
+
+void
 modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels);
 

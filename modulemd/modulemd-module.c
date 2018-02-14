@@ -237,20 +237,7 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
-  /* TODO: Test for differences before replacing */
-  if (self->content_licenses)
-    {
-      g_object_unref (self->content_licenses);
-    }
-
-  if (licenses)
-    {
-      self->content_licenses = g_object_ref (licenses);
-    }
-  else
-    {
-      self->content_licenses = NULL;
-    }
+  modulemd_simpleset_copy (licenses, &self->content_licenses);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_CONTENT_LIC]);
@@ -669,20 +656,7 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
-  /* TODO: Test for differences before replacing */
-  if (self->module_licenses)
-    {
-      g_object_unref (self->module_licenses);
-    }
-
-  if (licenses)
-    {
-      self->module_licenses = g_object_ref (licenses);
-    }
-  else
-    {
-      self->module_licenses = NULL;
-    }
+  modulemd_simpleset_copy (licenses, &self->module_licenses);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_LIC]);
@@ -897,20 +871,7 @@ modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!apis || MODULEMD_IS_SIMPLESET (apis));
 
-  /* TODO: Test for differences before replacing */
-  if (self->rpm_api)
-    {
-      g_object_unref (self->rpm_api);
-    }
-
-  if (apis)
-    {
-      self->rpm_api = g_object_ref (apis);
-    }
-  else
-    {
-      self->rpm_api = NULL;
-    }
+  modulemd_simpleset_copy (apis, &self->rpm_api);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_RPM_API]);
 }
@@ -945,20 +906,7 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!artifacts || MODULEMD_IS_SIMPLESET (artifacts));
 
-  /* TODO: Test for differences before replacing */
-  if (self->rpm_artifacts)
-    {
-      g_object_unref (self->rpm_artifacts);
-    }
-
-  if (artifacts)
-    {
-      self->rpm_artifacts = g_object_ref (artifacts);
-    }
-  else
-    {
-      self->rpm_artifacts = NULL;
-    }
+  modulemd_simpleset_copy (artifacts, &self->rpm_artifacts);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_ARTIFACTS]);
@@ -1147,20 +1095,7 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!filter || MODULEMD_IS_SIMPLESET (filter));
 
-  /* TODO: Test for differences before replacing */
-  if (self->rpm_filter)
-    {
-      g_object_unref (self->rpm_filter);
-    }
-
-  if (filter)
-    {
-      self->rpm_filter = g_object_ref (filter);
-    }
-  else
-    {
-      self->rpm_filter = NULL;
-    }
+  modulemd_simpleset_copy (filter, &self->rpm_filter);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_FILTER]);

@@ -88,20 +88,7 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
   g_return_if_fail (!arches || MODULEMD_IS_SIMPLESET (arches));
 
-  /* TODO: Test for differences before replacing */
-  if (self->arches)
-    {
-      g_object_unref (self->arches);
-    }
-
-  if (arches)
-    {
-      self->arches = g_object_ref (arches);
-    }
-  else
-    {
-      self->arches = NULL;
-    }
+  modulemd_simpleset_copy (arches, &self->arches);
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
@@ -170,20 +157,7 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
   g_return_if_fail (!multilib || MODULEMD_IS_SIMPLESET (multilib));
 
-  /* TODO: Test for differences before replacing */
-  if (self->multilib)
-    {
-      g_object_unref (self->multilib);
-    }
-
-  if (multilib)
-    {
-      self->multilib = g_object_ref (multilib);
-    }
-  else
-    {
-      self->multilib = NULL;
-    }
+  modulemd_simpleset_copy (multilib, &self->multilib);
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }

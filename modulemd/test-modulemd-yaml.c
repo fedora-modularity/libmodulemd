@@ -178,10 +178,12 @@ static void
 modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
                                    gconstpointer user_data)
 {
-  gchar *yaml;
+  gchar *yaml = NULL;
+  gchar *yaml2 = NULL;
   gboolean result;
   GError *error = NULL;
-  ModulemdModule **modules;
+  ModulemdModule **modules = NULL;
+  ModulemdModule **reloaded_modules = NULL;
   gchar *yaml_path = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
@@ -193,6 +195,15 @@ modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
   g_assert_true (result);
   g_assert_true (yaml);
   g_message ("YAML:\n%s", yaml);
+
+  /* Load this string and emit it again. It must produce the same output. */
+  modulemd_module_new_all_from_string (yaml, &reloaded_modules);
+  result = emit_yaml_string (modules, &yaml2, &error);
+  g_assert_true (result);
+  g_assert_true (yaml2);
+  g_assert_cmpstr (yaml, ==, yaml2);
+
+
   for (gsize i = 0; modules[i]; i++)
     {
       g_object_unref (modules[i]);
@@ -204,10 +215,12 @@ static void
 modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
                                    gconstpointer user_data)
 {
-  gchar *yaml;
+  gchar *yaml = NULL;
+  gchar *yaml2 = NULL;
   gboolean result;
   GError *error = NULL;
-  ModulemdModule **modules;
+  ModulemdModule **modules = NULL;
+  ModulemdModule **reloaded_modules = NULL;
   gchar *yaml_path = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v2.yaml",
@@ -219,6 +232,14 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
   g_assert_true (result);
   g_assert_true (yaml);
   g_message ("YAML:\n%s", yaml);
+
+  /* Load this string and emit it again. It must produce the same output. */
+  modulemd_module_new_all_from_string (yaml, &reloaded_modules);
+  result = emit_yaml_string (modules, &yaml2, &error);
+  g_assert_true (result);
+  g_assert_true (yaml2);
+  g_assert_cmpstr (yaml, ==, yaml2);
+
   for (gsize i = 0; modules[i]; i++)
     {
       g_object_unref (modules[i]);

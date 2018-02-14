@@ -23,6 +23,7 @@
  */
 
 #include "modulemd-module.h"
+#include "modulemd-simpleset.h"
 #include "modulemd-yaml.h"
 
 #include <glib.h>
@@ -446,6 +447,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
   ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
   gboolean result;
@@ -458,6 +460,11 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
 
   /* Add description (required) */
   modulemd_module_set_description (fixture->md, "The description");
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
 
   /* Dump it to YAML to validate it */
   modules = g_new0 (ModulemdModule *, 1);
@@ -477,29 +484,60 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
   ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
   gboolean result;
 
-  /* Add mdversion (required) */
-  modulemd_module_set_mdversion (fixture->md, 2);
-
-  /* Add summary (required) */
-  modulemd_module_set_summary (fixture->md, "The summary");
-
-  /* Add description (required) */
-  modulemd_module_set_description (fixture->md, "The description");
-
-  /* Dump it to YAML to validate it */
   modules = g_new0 (ModulemdModule *, 1);
   g_assert_nonnull (modules);
   modules[0] = fixture->md;
 
+  /* Verify that it fails when mdversion is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 2);
+
+  /* Verify that it fails when summary is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Verify that it fails when description is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Verify that it fails when module license is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
+
+  /* Dump it to YAML to validate it */
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
   g_free (modules);
+  g_clear_pointer (&yaml, g_free);
 }
 
 static void
@@ -507,6 +545,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
                                  gconstpointer user_data)
 {
   ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
   gboolean result = FALSE;
@@ -524,6 +563,11 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
 
   /* Add description (required) */
   modulemd_module_set_description (fixture->md, "The description");
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
 
   /* Add EOL value */
   eol = g_date_new_dmy (3, 10, 2077);

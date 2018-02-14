@@ -284,10 +284,19 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
 {
   gboolean ret = FALSE;
   yaml_event_t event;
+  guint64 mdversion = modulemd_module_get_mdversion (module);
   gchar *name = NULL;
   gchar *value = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_root");
+  if (mdversion < 1)
+    {
+      /* The mdversion is required and has not been specified.
+       * This module is invalid
+       */
+      MMD_YAML_EMITTER_ERROR_RETURN (
+        error, "Module Metadata version unspecified. Module is invalid.");
+    }
 
   yaml_mapping_start_event_initialize (
     &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
@@ -304,7 +313,7 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
 
   /* The modulemd version */
   name = g_strdup ("version");
-  value = g_strdup_printf ("%" PRIu64, modulemd_module_get_mdversion (module));
+  value = g_strdup_printf ("%" PRIu64, mdversion);
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
 

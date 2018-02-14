@@ -63,6 +63,11 @@ install_headers(
   subdir : header_path,
 )
 
+test_env = environment()
+test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+test_env.set('G_MESSAGES_DEBUG', 'all')
+test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+
 test_modulemd_component = executable(
     'test_modulemd_component',
     'test-modulemd-component.c',
@@ -72,7 +77,8 @@ test_modulemd_component = executable(
     ],
     install : false,
 )
-test('test_modulemd_component', test_modulemd_component)
+test('test_modulemd_component', test_modulemd_component,
+     env : test_env)
 
 test_modulemd_dependencies = executable(
     'test_modulemd_dependencies',
@@ -83,7 +89,8 @@ test_modulemd_dependencies = executable(
     ],
     install : false,
 )
-test('test_modulemd_dependencies', test_modulemd_dependencies)
+test('test_modulemd_dependencies', test_modulemd_dependencies,
+     env : test_env)
 
 test_modulemd_module = executable(
     'test_modulemd_module',
@@ -94,7 +101,8 @@ test_modulemd_module = executable(
     ],
     install : false,
 )
-test('test_modulemd_module', test_modulemd_module)
+test('test_modulemd_module', test_modulemd_module,
+     env : test_env)
 
 test_modulemd_simpleset = executable(
     'test_modulemd_simpleset',
@@ -105,7 +113,8 @@ test_modulemd_simpleset = executable(
     ],
     install : false,
 )
-test('test_modulemd_simpleset', test_modulemd_simpleset)
+test('test_modulemd_simpleset', test_modulemd_simpleset,
+     env : test_env)
 
 test_modulemd_yaml = executable(
     'test_modulemd_yaml',
@@ -117,11 +126,9 @@ test_modulemd_yaml = executable(
     ],
     install : false,
 )
-yaml_test_env = environment()
-yaml_test_env.set('G_MESSAGES_DEBUG', 'all')
-yaml_test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+
 test('test_modulemd_yaml', test_modulemd_yaml,
-     env : yaml_test_env)
+     env : test_env)
 
 gnome.generate_gir(
     modulemd_lib,

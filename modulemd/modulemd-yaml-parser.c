@@ -142,7 +142,8 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
                                GError **error);
 static gboolean
 _parse_modulemd_servicelevel (yaml_parser_t *parser,
-                              ModulemdServiceLevel **_profile,
+                              const gchar *name,
+                              ModulemdServiceLevel **_servicelevel,
                               GError **error);
 static gboolean
 _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error);
@@ -2101,7 +2102,7 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
            * objects
            */
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_servicelevel (parser, &sl, error))
+          if (!_parse_modulemd_servicelevel (parser, name, &sl, error))
             {
               g_free (name);
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid service level");
@@ -2130,6 +2131,7 @@ error:
 
 static gboolean
 _parse_modulemd_servicelevel (yaml_parser_t *parser,
+                              const gchar *name,
                               ModulemdServiceLevel **_servicelevel,
                               GError **error)
 {
@@ -2143,6 +2145,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
   g_debug ("TRACE: entering _parse_modulemd_servicelevel");
 
   sl = modulemd_servicelevel_new ();
+  modulemd_servicelevel_set_name (sl, name);
 
   while (!done)
     {

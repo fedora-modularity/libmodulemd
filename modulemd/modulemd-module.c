@@ -1146,6 +1146,7 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
 {
   GHashTableIter iter;
   gpointer key, value;
+  const gchar *name = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
   if ((!servicelevels || g_hash_table_size (servicelevels) == 0) &&
@@ -1164,8 +1165,26 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
 
       while (g_hash_table_iter_next (&iter, &key, &value))
         {
+          /* Always use the servicelevel object's name property for the key.
+           * This will protect against coding mistakes where the hash table and
+           * its entries have different views of the name.
+           */
+          name =
+            modulemd_servicelevel_get_name ((ModulemdServiceLevel *)value);
+          if (!name)
+            {
+              /* Uh oh; this servicelevel is missing its name.
+               * We will have to skip it
+               */
+              g_warning (
+                "Attempted to add a servicelevel with a NULL name. "
+                "The hashtable had key '%s'\n",
+                (const gchar *)key);
+              continue;
+            }
+
           g_hash_table_replace (self->servicelevels,
-                                g_strdup ((const gchar *)key),
+                                g_strdup (name),
                                 g_object_ref ((ModulemdServiceLevel *)value));
         }
     }
@@ -1175,27 +1194,35 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
 
 /**
  * modulemd_module_add_servicelevel:
- * @sl_name: The name of the service level to add
  * @servicelevel: A #ServiceLevel object to add to the hash table
  *
- * Adds a service levels to the module. If sl_name already exists, it will be
- * replaced by this entry.
+ * Adds a service levels to the module. If the name already exists, it will be
+ * replaced by this entry and will release a reference on the previous entry.
  */
 void
-modulemd_module_add_servicelevels (ModulemdModule *self,
-                                   const gchar *sl_name,
-                                   ModulemdServiceLevel *servicelevel)
+modulemd_module_add_servicelevel (ModulemdModule *self,
+                                  ModulemdServiceLevel *servicelevel)
 {
-  gchar *name;
+  const gchar *name = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (!(servicelevel || sl_name))
+  if (!servicelevel)
     {
       return;
     }
 
-  name = g_strdup (sl_name);
-  g_hash_table_replace (self->servicelevels, name, servicelevel);
+  name = modulemd_servicelevel_get_name (servicelevel);
+  if (!name)
+    {
+      /* Uh oh; this servicelevel is missing its name.
+       * We will log a warning when those are enabled and then skip it.
+       */
+      g_warning ("Attempted to add a servicelevel with a NULL name");
+      return;
+    }
+
+  g_hash_table_replace (
+    self->servicelevels, g_strdup (name), g_object_ref (servicelevel));
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
 }
@@ -2248,8 +2275,9 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
     {
       sl = modulemd_servicelevel_new ();
       modulemd_servicelevel_set_eol (sl, eol);
+      modulemd_servicelevel_set_name (sl, "rawhide");
 
-      modulemd_module_add_servicelevels (self, "rawhide", sl);
+      modulemd_module_add_servicelevel (self, sl);
     }
 
   /* Upgrade the build and runtime requirements */

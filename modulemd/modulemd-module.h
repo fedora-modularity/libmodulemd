@@ -229,9 +229,8 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels);
 
 void
-modulemd_module_add_servicelevels (ModulemdModule *self,
-                                   const gchar *sl_name,
-                                   ModulemdServiceLevel *servicelevel);
+modulemd_module_add_servicelevel (ModulemdModule *self,
+                                  ModulemdServiceLevel *servicelevel);
 
 GHashTable *
 modulemd_module_get_servicelevels (ModulemdModule *self);

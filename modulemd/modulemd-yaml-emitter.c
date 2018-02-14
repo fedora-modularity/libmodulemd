@@ -577,7 +577,7 @@ _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
 
   servicelevels = modulemd_module_get_servicelevels (module);
 
-  if (!(servicelevels || g_hash_table_size (servicelevels) > 0))
+  if (!servicelevels || g_hash_table_size (servicelevels) < 1)
     {
       /* No profiles for this module. */
       ret = TRUE;
@@ -699,7 +699,7 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
 
   /* Module Licenses */
   set = modulemd_module_get_module_licenses (module);
-  if (!set)
+  if (!set || modulemd_simpleset_size (set) < 1)
     {
       /* Module license is mandatory */
       MMD_YAML_EMITTER_ERROR_RETURN (
@@ -718,7 +718,7 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
 
   /* Content licenses */
   set = modulemd_module_get_content_licenses (module);
-  if (set)
+  if (set && modulemd_simpleset_size (set) > 0)
     {
       /* Content licenses are optional */
       name = g_strdup ("content");
@@ -763,7 +763,7 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
   g_debug ("TRACE: entering _emit_modulemd_xmd");
 
   htable = modulemd_module_get_xmd (module);
-  if (htable)
+  if (htable && g_hash_table_size (htable) > 0)
     {
       name = g_strdup ("xmd");
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
@@ -804,7 +804,8 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
 
   buildrequires = modulemd_module_get_buildrequires (module);
   requires = modulemd_module_get_requires (module);
-  if (!(buildrequires || requires))
+  if (!(buildrequires && g_hash_table_size (buildrequires) > 0) &&
+      !(requires && g_hash_table_size (requires) > 0))
     {
       /* No dependencies for this module.
        * Unlikely, but not impossible
@@ -889,7 +890,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   g_debug ("TRACE: entering _emit_modulemd_deps_v2");
 
   dependencies = modulemd_module_get_dependencies (module);
-  if (!dependencies)
+  if (!(dependencies && dependencies->len > 0))
     {
       /* Unlikely, but not impossible */
       ret = TRUE;
@@ -916,29 +917,33 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
       dep = MODULEMD_DEPENDENCIES (g_ptr_array_index (dependencies, i));
 
       /* Write out the BuildRequires first */
-      name = g_strdup ("buildrequires");
-      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
-
       reqs = modulemd_dependencies_get_buildrequires (dep);
-      if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+      if (reqs && g_hash_table_size (reqs) > 0)
         {
-          MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                         "Could not parse stream mapping");
+          name = g_strdup ("buildrequires");
+          MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+          if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                             "Could not parse stream mapping");
+            }
+          g_clear_pointer (&reqs, g_hash_table_unref);
         }
-      g_clear_pointer (&reqs, g_hash_table_unref);
 
       /* Then write out the Requires */
-      name = g_strdup ("requires");
-      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
-
       reqs = modulemd_dependencies_get_requires (dep);
-      if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+      if (reqs && g_hash_table_size (reqs) > 0)
         {
-          MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                         "Could not parse stream mapping");
-        }
-      g_clear_pointer (&reqs, g_hash_table_unref);
+          name = g_strdup ("requires");
+          MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
+          if (!_modulemd_emit_dep_stream_mapping (emitter, reqs, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                             "Could not parse stream mapping");
+            }
+          g_clear_pointer (&reqs, g_hash_table_unref);
+        }
       yaml_mapping_end_event_initialize (&event);
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
         emitter, &event, error, "Error ending internal dependency mapping");
@@ -951,10 +956,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (dependencies)
-    {
-      g_ptr_array_unref (dependencies);
-    }
+  g_clear_pointer (&dependencies, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_modulemd_deps_v2");
   return ret;
@@ -1158,7 +1160,7 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
 
   profiles = modulemd_module_get_profiles (module);
 
-  if (!(profiles || g_hash_table_size (profiles) > 0))
+  if (!(profiles && g_hash_table_size (profiles) > 0))
     {
       /* No profiles for this module. */
       ret = TRUE;
@@ -1214,6 +1216,13 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
   g_debug ("TRACE: entering _emit_modulemd_api");
   api = modulemd_module_get_rpm_api (module);
 
+  if (!(api && modulemd_simpleset_size (api) > 0))
+    {
+      /* No API for this module */
+      ret = TRUE;
+      goto error;
+    }
+
   name = g_strdup ("api");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -1262,6 +1271,13 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
   g_debug ("TRACE: entering _emit_modulemd_filters");
   filters = modulemd_module_get_rpm_filter (module);
 
+  if (!(filters && modulemd_simpleset_size (filters) > 0))
+    {
+      /* No filters for this module */
+      ret = TRUE;
+      goto error;
+    }
+
   name = g_strdup ("filter");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -1309,7 +1325,7 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
 
   g_debug ("TRACE: entering _emit_modulemd_buildopts");
   buildopts = modulemd_module_get_rpm_buildopts (module);
-  if (!(buildopts || g_hash_table_size (buildopts) > 0))
+  if (!(buildopts && g_hash_table_size (buildopts) > 0))
     {
       ret = TRUE;
       goto error;
@@ -1679,6 +1695,13 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
   g_debug ("TRACE: entering _emit_modulemd_artifacts");
 
   artifacts = modulemd_module_get_rpm_artifacts (module);
+  if (!(artifacts && modulemd_simpleset_size (artifacts) > 0))
+    {
+      /* No artifacts for this module */
+      ret = TRUE;
+      goto error;
+    }
+
   name = g_strdup ("artifacts");
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 

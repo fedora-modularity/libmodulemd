@@ -475,6 +475,8 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
+  g_message ("v1 YAML:\n%s", yaml);
+
   g_free (modules);
 }
 
@@ -535,6 +537,8 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
   g_assert_nonnull (yaml);
+
+  g_message ("v2 YAML:\n%s", yaml);
 
   g_free (modules);
   g_clear_pointer (&yaml, g_free);
@@ -613,7 +617,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
-  g_message ("YAML:\n%s", yaml);
+  g_message ("Upgraded YAML:\n%s", yaml);
 
   g_free (modules);
 }

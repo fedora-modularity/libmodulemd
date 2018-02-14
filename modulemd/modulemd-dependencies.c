@@ -102,7 +102,7 @@ modulemd_dependencies_add_buildrequires (ModulemdDependencies *self,
                                          const gchar *module,
                                          const gchar **streams)
 {
-  GHashTable *br = modulemd_dependencies_get_buildrequires (self);
+  GHashTable *br = g_hash_table_ref (self->buildrequires);
 
   _modulemd_dependencies_add_streams (br, module, streams);
 
@@ -128,7 +128,7 @@ modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
                                                 const gchar *module,
                                                 const gchar *stream)
 {
-  GHashTable *br = modulemd_dependencies_get_buildrequires (self);
+  GHashTable *br = g_hash_table_ref (self->buildrequires);
 
   _modulemd_dependencies_add_stream (br, module, stream);
 
@@ -179,7 +179,8 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
  * Retrieves the "buildrequires" for these dependencies.
  *
  * Returns: (element-type utf8 ModulemdSimpleSet) (transfer container): A hash
- * table containing the "buildrequires" property.
+ * table containing the "buildrequires" property. Returns NULL if there are no
+ * buildrequires set.
  */
 GHashTable *
 modulemd_dependencies_get_buildrequires (ModulemdDependencies *self)
@@ -205,7 +206,7 @@ modulemd_dependencies_add_requires (ModulemdDependencies *self,
                                     const gchar *module,
                                     const gchar **streams)
 {
-  GHashTable *r = modulemd_dependencies_get_requires (self);
+  GHashTable *r = g_hash_table_ref (self->requires);
 
   _modulemd_dependencies_add_streams (r, module, streams);
 
@@ -231,7 +232,7 @@ modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
                                            const gchar *module,
                                            const gchar *stream)
 {
-  GHashTable *r = modulemd_dependencies_get_requires (self);
+  GHashTable *r = g_hash_table_ref (self->requires);
 
   _modulemd_dependencies_add_stream (r, module, stream);
 

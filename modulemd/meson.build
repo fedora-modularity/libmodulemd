@@ -104,6 +104,17 @@ test_modulemd_module = executable(
 test('test_modulemd_module', test_modulemd_module,
      env : test_env)
 
+test_modulemd_servicelevel = executable(
+    'test_modulemd_servicelevel',
+    'test-modulemd-servicelevel.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+    ],
+    install : false,
+)
+test('test_modulemd_servicelevel', test_modulemd_servicelevel)
+
 test_modulemd_simpleset = executable(
     'test_modulemd_simpleset',
     'test-modulemd-simpleset.c',

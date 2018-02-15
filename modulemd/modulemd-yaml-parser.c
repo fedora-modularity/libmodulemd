@@ -255,7 +255,17 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
 
           if (!_parse_modulemd_root (modules[count - 1], parser, error))
             {
-              goto error;
+              /* This document was invalid, so we'll skip it. The parser
+               * should now be at the YAML_DOCUMENT_END_EVENT, so we'll
+               * delete the module in-progress, decrement the count and
+               * continue the loop in case there are other documents to be
+               * processed.
+               */
+              g_message ("Invalid document [%s]. Skipping it.", (*error)->message);
+              g_clear_pointer (&modules[count - 1], g_object_unref);
+              g_clear_error (error);
+              count --;
+              continue;
             }
 
           break;
@@ -382,6 +392,12 @@ _parse_modulemd_root (ModulemdModule *module,
 error:
   if (*error)
     {
+      /* Move the parser to the end of the mapping */
+      do
+        {
+          YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+            parser, &event, error, "Parser error");
+        } while (event.type != YAML_DOCUMENT_END_EVENT);
       return FALSE;
     }
 

@@ -80,10 +80,8 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
   modules = parse_yaml_file (yaml_path, &error);
   g_clear_pointer (&yaml_path, g_free);
 
-  g_assert_false (modules);
-  g_assert_true (error);
-  g_assert_cmpstr (error->message, ==, "Unknown document type");
-  g_clear_error (&error);
+  g_assert_nonnull (modules);
+  g_assert_null (modules[0]);
 
   /* Validate the official reference YAML */
   g_info ("Reference YAML v1");
@@ -154,8 +152,10 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
 
   modulemd_module_new_all_from_file (yaml_path, &modules);
 
-  g_assert_true (modules);
-  g_assert_true (modules[0]);
+  g_assert_nonnull (modules);
+  g_assert_nonnull (modules[0]);
+  g_assert_nonnull (modules[1]);
+  g_assert_null (modules[2]);
 
   for (gsize i = 0; modules[i]; i++)
     {
@@ -165,13 +165,31 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   g_free (modules);
   g_free (yaml_path);
 
+    yaml_path = g_strdup_printf ("%s/test_data/mixed-v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+
+  g_assert_nonnull (modules);
+  g_assert_nonnull (modules[0]);
+  g_assert_nonnull (modules[1]);
+  g_assert_null (modules[2]);
+
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_free (modules);
+  g_free (yaml_path);
+
+
   /* Validate the official reference YAML */
   g_info ("Reference YAML v2");
   yaml_path =
     g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   modules = parse_yaml_file (yaml_path, &error);
   g_free (yaml_path);
-  g_assert_true (modules);
+  g_assert_nonnull (modules);
 }
 
 static void

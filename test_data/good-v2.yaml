@@ -1,3 +1,4 @@
+---
 # Document type identifier
 document: modulemd
 # Module metadata format version
@@ -339,3 +340,13 @@ data:
             - xxx-0:1-1.module_deadbeef.x86_64
             - xxx-0:1-1.module_deadbeef.i686
             - xyz-0:1-1.module_deadbeef.x86_64
+---
+document: modulemd
+version: 2
+data:
+    summary: Foo
+    description: >
+        Bar
+    license:
+        module:
+        - MIT

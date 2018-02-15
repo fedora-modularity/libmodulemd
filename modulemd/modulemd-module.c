@@ -1412,7 +1412,7 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
  *
  * Retrieves the "xmd" for modulemd.
  *
- * Returns: (element-type utf8 GVariant) (transfer container): A hash table
+ * Returns: (element-type utf8 GVariant) (transfer none): A hash table
  * containing the "xmd" property.
  */
 GHashTable *
@@ -1420,7 +1420,7 @@ modulemd_module_get_xmd (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->xmd);
+  return self->xmd;
 }
 
 static void

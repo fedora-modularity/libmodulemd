@@ -764,16 +764,10 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error emitting variant hashtable");
         }
-
-      g_clear_pointer (&htable, g_hash_table_unref);
     }
   ret = TRUE;
 error:
   g_free (name);
-  if (htable)
-    {
-      g_hash_table_unref (htable);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_xmd");
   return ret;

@@ -2054,7 +2054,7 @@ modulemd_module_new_from_file (const gchar *yaml_file)
 /**
  * modulemd_module_new_all_from_file:
  * @yaml_file: A YAML file containing the module metadata.
- * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer full):
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a file.
@@ -2111,7 +2111,7 @@ modulemd_module_new_from_string (const gchar *yaml_string)
 /**
  * modulemd_module_new_all_from_string:
  * @yaml_string: A YAML string containing the module metadata.
- * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer full):
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a string.
@@ -2188,7 +2188,7 @@ modulemd_module_dumps (ModulemdModule *self)
 
 /**
  * modulemd_module_dump_all:
- * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer none):
  * A zero-terminated array of modules to be output
  *
  * This function writes out a file containing one or more YAML documents
@@ -2218,7 +2218,7 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
 
 /**
  * modulemd_module_dumps_all:
- * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
+ * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer none):
  * A zero-terminated array of modules to be output
  *
  * This function returns an allocated string containing one or more YAML

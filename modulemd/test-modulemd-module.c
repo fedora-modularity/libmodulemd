@@ -379,6 +379,37 @@ modulemd_module_test_get_set_version (ModuleFixture *fixture,
 }
 
 static void
+modulemd_module_test_get_set_dependencies (ModuleFixture *fixture,
+                                           gconstpointer user_data)
+{
+  ModulemdDependencies *dep = NULL;
+  const GPtrArray *deps = NULL;
+  const gchar **platforms = g_new0 (const gchar *, 3);
+  platforms[0] = "f27";
+  platforms[1] = "f28";
+
+  modulemd_module_set_mdversion (fixture->md, 2);
+
+  dep = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildrequires (dep, "platform", platforms);
+  modulemd_dependencies_add_requires (dep, "platform", platforms);
+
+  modulemd_module_add_dependencies (fixture->md, dep);
+  modulemd_module_add_dependencies (fixture->md, dep);
+
+  deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (deps);
+  g_assert_cmpint (deps->len, ==, 2);
+
+  /* We've previously had a bug where repeated get() calls were unrefing
+   * values, so make sure that doesn't reappear
+   */
+  deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (deps);
+  g_assert_cmpint (deps->len, ==, 2);
+}
+
+static void
 modulemd_module_test_get_set_xmd (ModuleFixture *fixture,
                                   gconstpointer user_data)
 {
@@ -786,6 +817,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_module_set_up,
               modulemd_module_test_get_set_xmd,
+              modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/test_get_set_dependencies",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_get_set_dependencies,
               modulemd_module_tear_down);
 
   g_test_add ("/modulemd/module/test_construct_v1",

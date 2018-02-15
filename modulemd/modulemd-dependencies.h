@@ -71,6 +71,10 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
 GHashTable *
 modulemd_dependencies_get_requires (ModulemdDependencies *self);
 
+void
+modulemd_dependencies_copy (ModulemdDependencies *self,
+                            ModulemdDependencies **dest);
+
 G_END_DECLS
 
 #endif /* MODULEMD_DEPENDENCIES_H */

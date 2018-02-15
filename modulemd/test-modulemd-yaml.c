@@ -230,14 +230,23 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
-  g_assert_true (yaml);
+  g_assert_nonnull (yaml);
   g_message ("YAML:\n%s", yaml);
+
+  /* Emit the same string again to confirm that we haven't screwed up any of
+   * the memory management.
+   */
+  result = emit_yaml_string (modules, &yaml2, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml2);
+  g_assert_cmpstr (yaml, ==, yaml2);
+  g_clear_pointer (&yaml2, g_free);
 
   /* Load this string and emit it again. It must produce the same output. */
   modulemd_module_new_all_from_string (yaml, &reloaded_modules);
-  result = emit_yaml_string (modules, &yaml2, &error);
+  result = emit_yaml_string (reloaded_modules, &yaml2, &error);
   g_assert_true (result);
-  g_assert_true (yaml2);
+  g_assert_nonnull (yaml2);
   g_assert_cmpstr (yaml, ==, yaml2);
 
   for (gsize i = 0; modules[i]; i++)

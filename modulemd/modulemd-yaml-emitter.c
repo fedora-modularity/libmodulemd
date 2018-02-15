@@ -883,7 +883,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   gboolean ret = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  GPtrArray *dependencies = NULL;
+  const GPtrArray *dependencies = NULL;
   ModulemdDependencies *dep = NULL;
   GHashTable *reqs = NULL;
 
@@ -927,7 +927,6 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
               MMD_YAML_ERROR_RETURN_RETHROW (error,
                                              "Could not parse stream mapping");
             }
-          g_clear_pointer (&reqs, g_hash_table_unref);
         }
 
       /* Then write out the Requires */
@@ -942,7 +941,6 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
               MMD_YAML_ERROR_RETURN_RETHROW (error,
                                              "Could not parse stream mapping");
             }
-          g_clear_pointer (&reqs, g_hash_table_unref);
         }
       yaml_mapping_end_event_initialize (&event);
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -956,7 +954,6 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  g_clear_pointer (&dependencies, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_modulemd_deps_v2");
   return ret;

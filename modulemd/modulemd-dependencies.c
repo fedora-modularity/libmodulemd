@@ -164,16 +164,15 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
         {
           modulemd_simpleset_copy ((ModulemdSimpleSet *)value, &copy);
 
-          g_hash_table_replace (self->buildrequires,
-                                g_strdup ((gchar *)key),
-                                g_object_ref (copy));
+          g_hash_table_replace (
+            self->buildrequires, g_strdup ((gchar *)key), g_object_ref (copy));
 
           g_clear_pointer (&copy, g_object_unref);
         }
     }
 
   g_object_notify_by_pspec (G_OBJECT (self),
-                                deps_properties[DEPS_PROP_BUILDREQUIRES]);
+                            deps_properties[DEPS_PROP_BUILDREQUIRES]);
 }
 
 /**
@@ -271,16 +270,15 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
         {
           modulemd_simpleset_copy ((ModulemdSimpleSet *)value, &copy);
 
-          g_hash_table_replace (self->requires,
-                                g_strdup ((gchar *)key),
-                                g_object_ref (copy));
+          g_hash_table_replace (
+            self->requires, g_strdup ((gchar *)key), g_object_ref (copy));
 
           g_clear_pointer (&copy, g_object_unref);
         }
     }
 
   g_object_notify_by_pspec (G_OBJECT (self),
-                                deps_properties[DEPS_PROP_REQUIRES]);
+                            deps_properties[DEPS_PROP_REQUIRES]);
 }
 
 
@@ -299,6 +297,41 @@ modulemd_dependencies_get_requires (ModulemdDependencies *self)
 
   return self->requires;
 }
+
+
+/**
+ * modulemd_dependencies_copy:
+ * @dest: (out): A reference to the destination #ModulemdDependencies
+ *
+ * This function will copy the contents of this #ModulemdDependencies to @dest.
+ * If the dereferenced pointer is NULL, a new #ModulemdDependencies will be
+ * allocated.
+ *
+ * If the dereferenced pointer is not NULL, it will replace the contents of
+ * @dest. All existing internal variables will be freed.
+ *
+ * In either case, the caller is responsible for calling g_object_unref() later
+ * to free it.
+ */
+void
+modulemd_dependencies_copy (ModulemdDependencies *self,
+                            ModulemdDependencies **dest)
+{
+  g_return_if_fail (self && MODULEMD_IS_DEPENDENCIES (self));
+  g_return_if_fail (dest);
+  g_return_if_fail (*dest == NULL ||
+                    (*dest != NULL && MODULEMD_IS_DEPENDENCIES (*dest)));
+
+  /* Allocate a Modulemd.Dependencies if needed */
+  if (*dest == NULL)
+    {
+      *dest = modulemd_dependencies_new ();
+    }
+
+  modulemd_dependencies_set_buildrequires (*dest, self->buildrequires);
+  modulemd_dependencies_set_requires (*dest, self->requires);
+}
+
 
 ModulemdDependencies *
 modulemd_dependencies_new (void)

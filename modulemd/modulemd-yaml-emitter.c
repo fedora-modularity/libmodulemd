@@ -1309,7 +1309,6 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing buildopts");
     }
-  g_clear_pointer (&buildopts, g_hash_table_unref);
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -1318,10 +1317,6 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (buildopts)
-    {
-      g_hash_table_unref (buildopts);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
   return ret;

@@ -936,27 +936,25 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
 void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
 {
+  GHashTableIter iter;
+  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (self->rpm_buildopts != buildopts);
 
-  if (buildopts != self->rpm_buildopts)
+  g_hash_table_remove_all (self->rpm_buildopts);
+  if (buildopts)
     {
-      if (self->rpm_buildopts)
+      g_hash_table_iter_init (&iter, buildopts);
+      while (g_hash_table_iter_next (&iter, &key, &value))
         {
-          g_hash_table_unref (self->rpm_buildopts);
+          g_hash_table_replace (self->rpm_buildopts,
+                                g_strdup ((const gchar *)key),
+                                g_strdup ((const gchar *)value));
         }
-
-      if (buildopts)
-        {
-          self->rpm_buildopts = _modulemd_hash_table_deep_str_copy (buildopts);
-        }
-      else
-        {
-          self->rpm_buildopts = NULL;
-        }
-
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_RPM_BUILDOPTS]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_RPM_BUILDOPTS]);
 }
 
 /**
@@ -964,7 +962,7 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
  *
  * Retrieves the "rpm-buildopts" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * Returns: (element-type utf8 utf8) (transfer none): A hash table
  * containing the "rpm-buildopts" property.
  */
 GHashTable *
@@ -972,7 +970,7 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->rpm_buildopts);
+  return self->rpm_buildopts;
 }
 
 

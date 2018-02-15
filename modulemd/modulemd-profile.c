@@ -147,7 +147,7 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
  *
  * Retrieves the "rpms" for this profile
  *
- * Returns: (transfer full): a #SimpleSet containing the set of RPMs in the
+ * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
  * "rpms" property.
  */
 ModulemdSimpleSet *
@@ -155,7 +155,7 @@ modulemd_profile_get_rpms (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
-  return g_object_ref (self->rpms);
+  return self->rpms;
 }
 
 void

@@ -1121,7 +1121,6 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing profile rpms");
         }
-      g_clear_pointer (&rpms, g_object_unref);
     }
 
   yaml_mapping_end_event_initialize (&event);
@@ -1132,11 +1131,6 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
 error:
   g_free (name);
   g_free (description);
-
-  if (rpms)
-    {
-      g_object_unref (rpms);
-    }
   return ret;
 }
 

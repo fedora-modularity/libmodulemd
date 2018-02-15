@@ -141,7 +141,7 @@ modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_buildrequires:
- * @buildrequires: (nullable) (element-type utf8 ModulemdSimpleSet): The
+ * @buildrequires: (nullable) (element-type utf8 ModulemdSimpleSet) (transfer none): The
  * requirements to build this module.
  *
  * Sets the 'buildrequires' property.
@@ -150,27 +150,30 @@ void
 modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
                                          GHashTable *buildrequires)
 {
+  GHashTableIter iter;
+  gpointer key, value;
+  ModulemdSimpleSet *copy = NULL;
   g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
 
-  if (buildrequires != self->buildrequires)
-    {
-      if (self->buildrequires)
-        {
-          g_hash_table_unref (self->buildrequires);
-        }
+  g_hash_table_remove_all (self->buildrequires);
 
-      if (buildrequires)
+  if (buildrequires)
+    {
+      g_hash_table_iter_init (&iter, buildrequires);
+      while (g_hash_table_iter_next (&iter, &key, &value))
         {
-          self->buildrequires =
-            _modulemd_hash_table_deep_obj_copy (buildrequires);
+          modulemd_simpleset_copy ((ModulemdSimpleSet *)value, &copy);
+
+          g_hash_table_replace (self->buildrequires,
+                                g_strdup ((gchar *)key),
+                                g_object_ref (copy));
+
+          g_clear_pointer (&copy, g_object_unref);
         }
-      else
-        {
-          self->buildrequires = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                deps_properties[DEPS_PROP_BUILDREQUIRES]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                                deps_properties[DEPS_PROP_BUILDREQUIRES]);
 }
 
 /**
@@ -178,7 +181,7 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
  *
  * Retrieves the "buildrequires" for these dependencies.
  *
- * Returns: (element-type utf8 ModulemdSimpleSet) (transfer container): A hash
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
  * table containing the "buildrequires" property. Returns NULL if there are no
  * buildrequires set.
  */
@@ -187,7 +190,7 @@ modulemd_dependencies_get_buildrequires (ModulemdDependencies *self)
 {
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
-  return g_hash_table_ref (self->buildrequires);
+  return self->buildrequires;
 }
 
 
@@ -245,8 +248,8 @@ modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_requires:
- * @requires: (nullable) (element-type utf8 ModulemdSimpleSet): The runtime
- * requirements of this module.
+ * @requires: (nullable) (element-type utf8 ModulemdSimpleSet) (transfer none):
+ * The runtime requirements for this module.
  *
  * Sets the 'requires' property.
  */
@@ -254,26 +257,30 @@ void
 modulemd_dependencies_set_requires (ModulemdDependencies *self,
                                     GHashTable *requires)
 {
+  GHashTableIter iter;
+  gpointer key, value;
+  ModulemdSimpleSet *copy = NULL;
   g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
 
-  if (requires != self->requires)
-    {
-      if (self->requires)
-        {
-          g_hash_table_unref (self->requires);
-        }
+  g_hash_table_remove_all (self->requires);
 
-      if (requires)
+  if (requires)
+    {
+      g_hash_table_iter_init (&iter, requires);
+      while (g_hash_table_iter_next (&iter, &key, &value))
         {
-          self->requires = _modulemd_hash_table_deep_obj_copy (requires);
+          modulemd_simpleset_copy ((ModulemdSimpleSet *)value, &copy);
+
+          g_hash_table_replace (self->requires,
+                                g_strdup ((gchar *)key),
+                                g_object_ref (copy));
+
+          g_clear_pointer (&copy, g_object_unref);
         }
-      else
-        {
-          self->requires = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                deps_properties[DEPS_PROP_REQUIRES]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                                deps_properties[DEPS_PROP_REQUIRES]);
 }
 
 
@@ -282,7 +289,7 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
  *
  * Retrieves the "requires" for these dependencies.
  *
- * Returns: (element-type utf8 ModulemdSimpleSet) (transfer container): A hash
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
  * table containing the "requires" property.
  */
 GHashTable *
@@ -290,7 +297,7 @@ modulemd_dependencies_get_requires (ModulemdDependencies *self)
 {
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
-  return g_hash_table_ref (self->requires);
+  return self->requires;
 }
 
 ModulemdDependencies *
@@ -366,7 +373,7 @@ modulemd_dependencies_class_init (ModulemdDependenciesClass *klass)
   object_class->set_property = modulemd_dependencies_set_property;
 
   /**
-     * ModulemdDependencies:buildrequires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer container)
+     * ModulemdDependencies:buildrequires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
      */
   deps_properties[DEPS_PROP_BUILDREQUIRES] = g_param_spec_boxed (
     "buildrequires",
@@ -378,7 +385,7 @@ modulemd_dependencies_class_init (ModulemdDependenciesClass *klass)
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdDependencies:requires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer container)
+     * ModulemdDependencies:requires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
      */
   deps_properties[DEPS_PROP_REQUIRES] = g_param_spec_boxed (
     "requires",

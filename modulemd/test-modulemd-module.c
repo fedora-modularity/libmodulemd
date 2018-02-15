@@ -23,6 +23,9 @@
  */
 
 #include "modulemd-module.h"
+#include "modulemd-simpleset.h"
+#include "modulemd-util.h"
+#include "modulemd-yaml.h"
 
 #include <glib.h>
 #include <locale.h>
@@ -87,12 +90,17 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
                                             gconstpointer user_data)
 {
   GValue value = G_VALUE_INIT;
-  GValue *set_value;
+  GValue set_value = G_VALUE_INIT;
   ModulemdModule *md = fixture->md;
-  GHashTable *htable;
+  GHashTable *htable = NULL;
+  GHashTable *htable2 = NULL;
+  GHashTable *buildrequires = NULL;
 
   /* Should be initialized to an empty hash table */
-  GHashTable *buildrequires = modulemd_module_get_buildrequires (md);
+
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 0);
 
   /* Add a key and value using set_buildrequires() */
@@ -101,7 +109,9 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
   modulemd_module_set_buildrequires (md, buildrequires);
 
   /* Verify the key and value with get_buildrequires() */
-  buildrequires = modulemd_module_get_buildrequires (md);
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 1);
   g_assert_true (g_hash_table_contains (buildrequires, "MyKey"));
   g_assert_cmpstr (
@@ -124,8 +134,10 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "buildrequires", &value);
-  htable = g_value_get_boxed (&value);
+  htable2 = g_value_dup_boxed (&value);
   g_value_reset (&value);
+  htable = _modulemd_hash_table_deep_str_copy (htable2);
+  htable2 = NULL;
 
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
@@ -134,16 +146,17 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
 
-  set_value = g_new0 (GValue, 1);
-  g_value_init (set_value, G_TYPE_HASH_TABLE);
-  g_value_set_boxed (set_value, htable);
-  modulemd_module_set_buildrequires (md, htable);
+  g_value_init (&set_value, G_TYPE_HASH_TABLE);
+  g_value_take_boxed (&set_value, htable);
 
-  g_object_set_property (G_OBJECT (md), "buildrequires", set_value);
+  g_object_set_property (G_OBJECT (md), "buildrequires", &set_value);
 
   /* Verify the third key and value with get_buildrequires() */
-  buildrequires = modulemd_module_get_buildrequires (md);
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 3);
   g_assert_true (g_hash_table_contains (buildrequires, "MyKey3"));
   g_assert_cmpstr (
@@ -245,12 +258,17 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
                                        gconstpointer user_data)
 {
   GValue value = G_VALUE_INIT;
-  GValue *set_value;
+  GValue set_value = G_VALUE_INIT;
   ModulemdModule *md = fixture->md;
-  GHashTable *htable;
+  GHashTable *htable = NULL;
+  GHashTable *htable2 = NULL;
+  GHashTable *requires = NULL;
 
   /* Should be initialized to an empty hash table */
-  GHashTable *requires = modulemd_module_get_requires (md);
+
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 0);
 
   /* Add a key and value using set_requires() */
@@ -258,7 +276,9 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
   modulemd_module_set_requires (md, requires);
 
   /* Verify the key and value with get_requires() */
-  requires = modulemd_module_get_requires (md);
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 1);
   g_assert_true (g_hash_table_contains (requires, "MyKey"));
   g_assert_cmpstr (g_hash_table_lookup (requires, "MyKey"), ==, "MyValue");
@@ -279,8 +299,10 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "requires", &value);
-  htable = g_value_get_boxed (&value);
+  htable2 = g_value_dup_boxed (&value);
   g_value_reset (&value);
+  htable = _modulemd_hash_table_deep_str_copy (htable2);
+  htable2 = NULL;
 
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
@@ -289,16 +311,17 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
 
-  set_value = g_new0 (GValue, 1);
-  g_value_init (set_value, G_TYPE_HASH_TABLE);
-  g_value_set_boxed (set_value, htable);
-  modulemd_module_set_requires (md, htable);
+  g_value_init (&set_value, G_TYPE_HASH_TABLE);
+  g_value_take_boxed (&set_value, htable);
 
-  g_object_set_property (G_OBJECT (md), "requires", set_value);
+  g_object_set_property (G_OBJECT (md), "requires", &set_value);
 
   /* Verify the third key and value with get_requires() */
-  requires = modulemd_module_get_requires (md);
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 3);
   g_assert_true (g_hash_table_contains (requires, "MyKey3"));
   g_assert_cmpstr (g_hash_table_lookup (requires, "MyKey3"), ==, "MyValue3");
@@ -377,6 +400,37 @@ modulemd_module_test_get_set_version (ModuleFixture *fixture,
 }
 
 static void
+modulemd_module_test_get_set_dependencies (ModuleFixture *fixture,
+                                           gconstpointer user_data)
+{
+  ModulemdDependencies *dep = NULL;
+  const GPtrArray *deps = NULL;
+  const gchar **platforms = g_new0 (const gchar *, 3);
+  platforms[0] = "f27";
+  platforms[1] = "f28";
+
+  modulemd_module_set_mdversion (fixture->md, 2);
+
+  dep = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildrequires (dep, "platform", platforms);
+  modulemd_dependencies_add_requires (dep, "platform", platforms);
+
+  modulemd_module_add_dependencies (fixture->md, dep);
+  modulemd_module_add_dependencies (fixture->md, dep);
+
+  deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (deps);
+  g_assert_cmpint (deps->len, ==, 2);
+
+  /* We've previously had a bug where repeated get() calls were unrefing
+   * values, so make sure that doesn't reappear
+   */
+  deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (deps);
+  g_assert_cmpint (deps->len, ==, 2);
+}
+
+static void
 modulemd_module_test_get_set_xmd (ModuleFixture *fixture,
                                   gconstpointer user_data)
 {
@@ -439,6 +493,187 @@ modulemd_module_test_get_set_xmd (ModuleFixture *fixture,
   g_assert_true (g_hash_table_contains (xmd, "MyKey3"));
   g_assert_cmpstr (g_hash_table_lookup (xmd, "MyKey3"), ==, "MyValue3");
 }
+
+static void
+modulemd_module_test_construct_v1 (ModuleFixture *fixture,
+                                   gconstpointer user_data)
+{
+  ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  gboolean result;
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 1);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
+
+  /* Dump it to YAML to validate it */
+  modules = g_new0 (ModulemdModule *, 1);
+  g_assert_nonnull (modules);
+  modules[0] = fixture->md;
+
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml);
+
+  g_message ("v1 YAML:\n%s", yaml);
+
+  g_free (modules);
+}
+
+
+static void
+modulemd_module_test_construct_v2 (ModuleFixture *fixture,
+                                   gconstpointer user_data)
+{
+  ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  gboolean result;
+
+  modules = g_new0 (ModulemdModule *, 1);
+  g_assert_nonnull (modules);
+  modules[0] = fixture->md;
+
+  /* Verify that it fails when mdversion is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 2);
+
+  /* Verify that it fails when summary is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Verify that it fails when description is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Verify that it fails when module license is unset */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_false (result);
+  g_clear_pointer (&yaml, g_free);
+  g_clear_error (&error);
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
+
+  /* Dump it to YAML to validate it */
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml);
+
+  g_message ("v2 YAML:\n%s", yaml);
+
+  g_free (modules);
+  g_clear_pointer (&yaml, g_free);
+}
+
+static void
+modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
+                                 gconstpointer user_data)
+{
+  ModulemdModule **modules = NULL;
+  ModulemdSimpleSet *licenses = NULL;
+  GError *error = NULL;
+  gchar *yaml = NULL;
+  gboolean result = FALSE;
+  GDate *eol = NULL;
+  GHashTable *servicelevels = NULL;
+  GHashTable *v1_deps = NULL;
+  GPtrArray *v2_deps = NULL;
+
+
+  /* Add mdversion (required) */
+  modulemd_module_set_mdversion (fixture->md, 1);
+
+  /* Add summary (required) */
+  modulemd_module_set_summary (fixture->md, "The summary");
+
+  /* Add description (required) */
+  modulemd_module_set_description (fixture->md, "The description");
+
+  /* Add module license (required) */
+  licenses = modulemd_simpleset_new ();
+  modulemd_simpleset_add (licenses, "MIT");
+  modulemd_module_set_module_licenses (fixture->md, licenses);
+
+  /* Add EOL value */
+  eol = g_date_new_dmy (3, 10, 2077);
+  modulemd_module_set_eol (fixture->md, eol);
+
+  /* There should be no "rawhide" service level yet */
+  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  g_assert_false (g_hash_table_contains (servicelevels, "rawhide"));
+  servicelevels = NULL;
+
+  v1_deps = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  g_hash_table_insert (v1_deps, g_strdup ("platform"), g_strdup ("f28"));
+
+  /* Add a BuildRequires */
+  modulemd_module_set_buildrequires (fixture->md, v1_deps);
+
+  /* Add a runtime Requires */
+  modulemd_module_set_requires (fixture->md, v1_deps);
+
+  /* Upgrade to v2 */
+  result = modulemd_module_upgrade (fixture->md);
+  g_assert_true (result);
+
+  g_assert_cmpuint (modulemd_module_get_mdversion (fixture->md), ==, 2);
+
+  /* The module should now contain an entry for rawhide */
+  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  g_assert_true (g_hash_table_contains (servicelevels, "rawhide"));
+  servicelevels = NULL;
+
+
+  /* The module should now contain a single entry in the dependencies array */
+  v2_deps = modulemd_module_get_dependencies (fixture->md);
+  g_assert_nonnull (v2_deps);
+  g_assert_cmpuint (v2_deps->len, ==, 1);
+
+  /* Dump it to YAML to validate it */
+  modules = g_new0 (ModulemdModule *, 1);
+  g_assert_nonnull (modules);
+  modules[0] = fixture->md;
+
+  result = emit_yaml_string (modules, &yaml, &error);
+  g_assert_true (result);
+  g_assert_nonnull (yaml);
+
+  g_message ("Upgraded YAML:\n%s", yaml);
+
+  g_free (modules);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -604,6 +839,35 @@ main (int argc, char *argv[])
               modulemd_module_set_up,
               modulemd_module_test_get_set_xmd,
               modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/test_get_set_dependencies",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_get_set_dependencies,
+              modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/test_construct_v1",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_construct_v1,
+              modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/test_construct_v2",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_construct_v2,
+              modulemd_module_tear_down);
+
+  g_test_add ("/modulemd/module/modulemd_module_test_upgrade_v2",
+              ModuleFixture,
+              NULL,
+              modulemd_module_set_up,
+              modulemd_module_test_upgrade_v2,
+              modulemd_module_tear_down);
+
 
   return g_test_run ();
 }

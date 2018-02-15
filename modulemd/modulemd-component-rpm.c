@@ -88,20 +88,7 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
   g_return_if_fail (!arches || MODULEMD_IS_SIMPLESET (arches));
 
-  /* TODO: Test for differences before replacing */
-  if (self->arches)
-    {
-      g_object_unref (self->arches);
-    }
-
-  if (arches)
-    {
-      self->arches = g_object_ref (arches);
-    }
-  else
-    {
-      self->arches = NULL;
-    }
+  modulemd_simpleset_copy (arches, &self->arches);
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
@@ -111,7 +98,7 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
  *
  * Retrieves the set of arches for this component.
  *
- * Returns: (transfer full): A #ModulemdSimpleSet containing the set of
+ * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
  * supported architectures for this component.
  */
 ModulemdSimpleSet *
@@ -119,7 +106,7 @@ modulemd_component_rpm_get_arches (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
-  return g_object_ref (self->arches);
+  return self->arches;
 }
 
 /**
@@ -170,20 +157,7 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
   g_return_if_fail (!multilib || MODULEMD_IS_SIMPLESET (multilib));
 
-  /* TODO: Test for differences before replacing */
-  if (self->multilib)
-    {
-      g_object_unref (self->multilib);
-    }
-
-  if (multilib)
-    {
-      self->multilib = g_object_ref (multilib);
-    }
-  else
-    {
-      self->multilib = NULL;
-    }
+  modulemd_simpleset_copy (multilib, &self->multilib);
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
@@ -193,7 +167,7 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
  *
  * Retrieves the set of multilib for this component.
  *
- * Returns: (transfer full): A #ModulemdSimpleSet containing the set of
+ * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
  * supported multilib architectures for this component.
  */
 ModulemdSimpleSet *
@@ -201,7 +175,7 @@ modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
-  return g_object_ref (self->multilib);
+  return self->multilib;
 }
 
 /**

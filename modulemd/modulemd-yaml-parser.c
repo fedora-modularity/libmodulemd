@@ -36,6 +36,16 @@ modulemd_yaml_error_quark (void)
   return g_quark_from_static_string ("modulemd-yaml-error-quark");
 }
 
+#define MMD_YAML_NOEVENT_ERROR_RETURN(error, msg)                             \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
 #define _yaml_parser_recurse_down(fn)                                         \
   do                                                                          \
     {                                                                         \
@@ -45,6 +55,12 @@ modulemd_yaml_error_quark (void)
         }                                                                     \
     }                                                                         \
   while (0)
+
+enum ModulemdReqType
+{
+  MODULEMD_REQ_REQUIRES,
+  MODULEMD_REQ_BUILDREQUIRES
+};
 
 static ModulemdModule **
 _parse_yaml (yaml_parser_t *parser, GError **error);
@@ -126,7 +142,8 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
                                GError **error);
 static gboolean
 _parse_modulemd_servicelevel (yaml_parser_t *parser,
-                              ModulemdServiceLevel **_profile,
+                              const gchar *name,
+                              ModulemdServiceLevel **_servicelevel,
                               GError **error);
 static gboolean
 _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error);
@@ -521,6 +538,13 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
+              if (modulemd_module_get_mdversion (module) > 1)
+                {
+                  /* EOL is not supported in v2 or later; use servicelevel */
+                  MMD_YAML_ERROR_RETURN (
+                    error,
+                    "EOL is not supported in v2 or later; use servicelevel");
+                }
               /* Get the EOL date */
               if (!_parse_modulemd_date (parser, &eol, error))
                 {
@@ -648,7 +672,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
 {
   yaml_event_t event;
   gboolean done = FALSE;
-  ModulemdSimpleSet *set;
+  ModulemdSimpleSet *set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -767,10 +791,11 @@ error:
   return TRUE;
 }
 
+
 static gboolean
-_parse_modulemd_deps (ModulemdModule *module,
-                      yaml_parser_t *parser,
-                      GError **error)
+_parse_modulemd_deps_v1 (ModulemdModule *module,
+                         yaml_parser_t *parser,
+                         GError **error)
 {
   yaml_event_t event;
   gboolean done = FALSE;
@@ -778,7 +803,7 @@ _parse_modulemd_deps (ModulemdModule *module,
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_deps");
+  g_debug ("TRACE: entering _parse_modulemd_deps_v1");
 
   while (!done)
     {
@@ -797,7 +822,6 @@ _parse_modulemd_deps (ModulemdModule *module,
           break;
 
         case YAML_SCALAR_EVENT:
-          /* Each scalar event represents a license type */
           if (!_hashtable_from_mapping (parser, &reqs, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
@@ -834,9 +858,265 @@ error:
     {
       return FALSE;
     }
-  g_debug ("TRACE: exiting _parse_modulemd_deps");
+  g_debug ("TRACE: exiting _parse_modulemd_deps_v1");
   return TRUE;
 }
+
+
+static gboolean
+_parse_modulemd_v2_dep (ModulemdModule *module,
+                        yaml_parser_t *parser,
+                        GError **error);
+
+static gboolean
+_parse_modulemd_deps_v2 (ModulemdModule *module,
+                         yaml_parser_t *parser,
+                         GError **error)
+{
+  yaml_event_t event;
+  gboolean done = FALSE;
+  GHashTable *reqs = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_deps_v2");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_START_EVENT:
+          /* This is the start of the dependency content. */
+          break;
+
+        case YAML_SEQUENCE_END_EVENT:
+          /* We're done processing the dependency content */
+          done = TRUE;
+          break;
+
+        case YAML_MAPPING_START_EVENT:
+          if (!_parse_modulemd_v2_dep (module, parser, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Failed to parse requires/buildrequires");
+              break;
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          break;
+        }
+    }
+
+error:
+  g_clear_pointer (&reqs, g_hash_table_unref);
+  if (*error)
+    {
+      return FALSE;
+    }
+  g_debug ("TRACE: exiting _parse_modulemd_deps_v2");
+  return TRUE;
+}
+
+
+static gboolean
+_parse_modulemd_v2_dep_map (ModulemdModule *module,
+                            yaml_parser_t *parser,
+                            enum ModulemdReqType reqtype,
+                            ModulemdDependencies *dep,
+                            GError **error);
+
+static gboolean
+_parse_modulemd_v2_dep (ModulemdModule *module,
+                        yaml_parser_t *parser,
+                        GError **error)
+{
+  gboolean ret = FALSE;
+  gboolean done = FALSE;
+  yaml_event_t event;
+  enum ModulemdReqType reqtype;
+  ModulemdDependencies *dep = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_v2_dep");
+
+  dep = modulemd_dependencies_new ();
+  if (dep == NULL)
+    {
+      MMD_YAML_ERROR_RETURN (
+        error, "Could not allocate new Modulemd.Dependencies object");
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole map */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_strcmp0 ((const gchar *)event.data.scalar.value,
+                         "buildrequires") == 0)
+            {
+              reqtype = MODULEMD_REQ_BUILDREQUIRES;
+            }
+          else if (g_strcmp0 ((const gchar *)event.data.scalar.value,
+                              "requires") == 0)
+            {
+              reqtype = MODULEMD_REQ_REQUIRES;
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Dependency map had key other than "
+                                     "'requires' or 'buildrequires'");
+            }
+
+          if (!_parse_modulemd_v2_dep_map (
+                module, parser, reqtype, dep, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Error processing dependency map.");
+            }
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep");
+          break;
+        }
+    }
+
+  modulemd_module_add_dependencies (module, dep);
+  g_object_unref (dep);
+
+
+  ret = TRUE;
+error:
+  g_debug ("TRACE: exiting _parse_modulemd_v2_dep");
+  return ret;
+}
+
+
+static gboolean
+_parse_modulemd_v2_dep_map (ModulemdModule *module,
+                            yaml_parser_t *parser,
+                            enum ModulemdReqType reqtype,
+                            ModulemdDependencies *dep,
+                            GError **error)
+{
+  gboolean ret = FALSE;
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  yaml_event_t event;
+  gchar *module_name = NULL;
+  ModulemdSimpleSet *set = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_v2_dep_map");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* Start processing the available modules and streams */
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We've received them all */
+          done = TRUE;
+          in_map = FALSE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Unexpected YAML event in v2_dep_map");
+            }
+
+          module_name = g_strdup ((const gchar *)event.data.scalar.value);
+
+          if (!_simpleset_from_sequence (parser, &set, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                             "Could not parse set of streams");
+            }
+
+          switch (reqtype)
+            {
+            case MODULEMD_REQ_BUILDREQUIRES:
+              modulemd_dependencies_add_buildrequires (
+                dep,
+                module_name,
+                (const gchar **)modulemd_simpleset_get (set));
+              break;
+            case MODULEMD_REQ_REQUIRES:
+              modulemd_dependencies_add_requires (
+                dep,
+                module_name,
+                (const gchar **)modulemd_simpleset_get (set));
+              break;
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep_map");
+          break;
+        }
+    }
+
+  ret = TRUE;
+error:
+  g_debug ("TRACE: exiting _parse_modulemd_v2_dep_map");
+  return ret;
+}
+
+
+static gboolean
+_parse_modulemd_deps (ModulemdModule *module,
+                      yaml_parser_t *parser,
+                      GError **error)
+{
+  gboolean result = FALSE;
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_deps");
+
+  switch (modulemd_module_get_mdversion (module))
+    {
+    case 1: result = _parse_modulemd_deps_v1 (module, parser, error); break;
+
+    case 2: result = _parse_modulemd_deps_v2 (module, parser, error); break;
+
+    default:
+      MMD_YAML_NOEVENT_ERROR_RETURN (error, "Unknown modulemd version");
+      break;
+    }
+
+error:
+  g_debug ("TRACE: exiting _parse_modulemd_deps");
+  return result;
+}
+
 
 static gboolean
 _parse_modulemd_refs (ModulemdModule *module,
@@ -1822,7 +2102,7 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
            * objects
            */
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_servicelevel (parser, &sl, error))
+          if (!_parse_modulemd_servicelevel (parser, name, &sl, error))
             {
               g_free (name);
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid service level");
@@ -1851,6 +2131,7 @@ error:
 
 static gboolean
 _parse_modulemd_servicelevel (yaml_parser_t *parser,
+                              const gchar *name,
                               ModulemdServiceLevel **_servicelevel,
                               GError **error)
 {
@@ -1864,6 +2145,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
   g_debug ("TRACE: entering _parse_modulemd_servicelevel");
 
   sl = modulemd_servicelevel_new ();
+  modulemd_servicelevel_set_name (sl, name);
 
   while (!done)
     {

@@ -39,6 +39,9 @@ enum ModulemdYamlError
   MODULEMD_YAML_ERROR_EMIT
 };
 
+const gchar *
+mmd_yaml_get_event_name (yaml_event_type_t type);
+
 #define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \
   do                                                                          \
     {                                                                         \
@@ -48,7 +51,7 @@ enum ModulemdYamlError
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
           goto error;                                                         \
         }                                                                     \
-      g_debug ("Parser event: %u", (event)->type);                            \
+      g_debug ("Parser event: %s", mmd_yaml_get_event_name ((event)->type));  \
     }                                                                         \
   while (0)
 
@@ -66,7 +69,8 @@ enum ModulemdYamlError
       g_message (msg);                                                        \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
-      g_debug ("Error occurred while parsing event %u", event.type);          \
+      g_debug ("Error occurred while parsing event %s",                       \
+               mmd_yaml_get_event_name (event.type));                         \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -81,7 +85,7 @@ enum ModulemdYamlError
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);       \
           goto error;                                                         \
         }                                                                     \
-      g_debug ("Emitter event: %u", (event)->type);                           \
+      g_debug ("Emitter event: %s", mmd_yaml_get_event_name ((event)->type)); \
     }                                                                         \
   while (0)
 

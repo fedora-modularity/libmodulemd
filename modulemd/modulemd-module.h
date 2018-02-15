@@ -26,6 +26,11 @@
 #define MODULEMD_MODULE_H
 
 #include <glib-object.h>
+#include "modulemd-component-module.h"
+#include "modulemd-component-rpm.h"
+#include "modulemd-dependencies.h"
+#include "modulemd-profile.h"
+#include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
 
 G_BEGIN_DECLS
@@ -63,6 +68,9 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file);
 gchar *
 modulemd_module_dumps_all (GPtrArray *module_array);
 
+gboolean
+modulemd_module_upgrade (ModulemdModule *self);
+
 void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch);
 
@@ -98,7 +106,13 @@ modulemd_module_get_context (ModulemdModule *self);
 void
 modulemd_module_set_description (ModulemdModule *self,
                                  const gchar *description);
-
+void
+modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps);
+void
+modulemd_module_add_dependencies (ModulemdModule *self,
+                                  ModulemdDependencies *dep);
+GPtrArray *
+modulemd_module_get_dependencies (ModulemdModule *self);
 const gchar *
 modulemd_module_get_description (ModulemdModule *self);
 
@@ -122,6 +136,13 @@ const guint64
 modulemd_module_get_mdversion (ModulemdModule *self);
 
 void
+modulemd_module_add_module_component (ModulemdModule *self,
+                                      ModulemdComponentModule *component);
+
+void
+modulemd_module_clear_module_components (ModulemdModule *self);
+
+void
 modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components);
 
@@ -140,6 +161,12 @@ modulemd_module_set_name (ModulemdModule *self, const gchar *name);
 
 const gchar *
 modulemd_module_get_name (ModulemdModule *self);
+
+void
+modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile);
+
+void
+modulemd_module_clear_profiles (ModulemdModule *self);
 
 void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles);
@@ -174,6 +201,13 @@ GHashTable *
 modulemd_module_get_rpm_buildopts (ModulemdModule *self);
 
 void
+modulemd_module_add_rpm_component (ModulemdModule *self,
+                                   ModulemdComponentRpm *component);
+
+void
+modulemd_module_clear_rpm_components (ModulemdModule *self);
+
+void
 modulemd_module_set_rpm_components (ModulemdModule *self,
                                     GHashTable *components);
 
@@ -188,8 +222,15 @@ ModulemdSimpleSet *
 modulemd_module_get_rpm_filter (ModulemdModule *self);
 
 void
+modulemd_module_clear_servicelevels (ModulemdModule *self);
+
+void
 modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels);
+
+void
+modulemd_module_add_servicelevel (ModulemdModule *self,
+                                  ModulemdServiceLevel *servicelevel);
 
 GHashTable *
 modulemd_module_get_servicelevels (ModulemdModule *self);

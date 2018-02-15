@@ -136,20 +136,7 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
   g_return_if_fail (MODULEMD_IS_PROFILE (self));
   g_return_if_fail (!rpms || MODULEMD_IS_SIMPLESET (rpms));
 
-  /* TODO: Test for differences before replacing */
-  if (self->rpms)
-    {
-      g_object_unref (self->rpms);
-    }
-
-  if (rpms)
-    {
-      self->rpms = g_object_ref (rpms);
-    }
-  else
-    {
-      self->rpms = NULL;
-    }
+  modulemd_simpleset_copy (rpms, &self->rpms);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             profile_properties[PROFILE_PROP_RPMS]);
@@ -160,7 +147,7 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
  *
  * Retrieves the "rpms" for this profile
  *
- * Returns: (transfer full): a #SimpleSet containing the set of RPMs in the
+ * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
  * "rpms" property.
  */
 ModulemdSimpleSet *
@@ -168,7 +155,7 @@ modulemd_profile_get_rpms (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
-  return g_object_ref (self->rpms);
+  return self->rpms;
 }
 
 void

@@ -1,5 +1,5 @@
 project('modulemd', 'c',
-        version : '0.2.2',
+        version : '0.2.91',
         default_options : [
           'buildtype=debugoptimized',
           'c_std=c11',
@@ -36,5 +36,6 @@ pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
 yaml = dependency('yaml-0.1')
 gtkdoc = dependency('gtk-doc')
+popt = dependency('popt')
 
 subdir('modulemd')

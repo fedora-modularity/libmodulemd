@@ -30,6 +30,7 @@ enum
   SL_PROP_0,
 
   SL_PROP_EOL,
+  SL_PROP_NAME,
 
   SL_N_PROPERTIES
 };
@@ -43,6 +44,7 @@ struct _ModulemdServiceLevel
   GObject parent_instance;
 
   GDate *eol;
+  gchar *name;
 };
 
 G_DEFINE_TYPE (ModulemdServiceLevel, modulemd_servicelevel, G_TYPE_OBJECT)
@@ -98,6 +100,50 @@ modulemd_servicelevel_get_eol (ModulemdServiceLevel *self)
 }
 
 
+/**
+ * modulemd_servicelevel_set_name:
+ * @name: (nullable): The name of this servicelevel
+ *
+ * Set the name of this service level.
+ */
+void
+modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name)
+{
+  g_return_if_fail (MODULEMD_IS_SERVICELEVEL (self));
+
+  g_clear_pointer (&self->name, g_free);
+  if (name)
+    {
+      self->name = g_strdup (name);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            servicelevel_properties[SL_PROP_NAME]);
+}
+
+
+/**
+ * modulemd_servicelevel_get_name:
+ *
+ * Retrieves the name of this service level
+ *
+ * Returns: a string representing the name of the service level or NULL if not
+ * set.
+ */
+const gchar *
+modulemd_servicelevel_get_name (ModulemdServiceLevel *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
+
+  if (!self->name)
+    {
+      g_warning ("Servicelevel name requested, but has not been set");
+    }
+
+  return self->name;
+}
+
+
 static void
 modulemd_servicelevel_set_property (GObject *gobject,
                                     guint property_id,
@@ -110,6 +156,10 @@ modulemd_servicelevel_set_property (GObject *gobject,
     {
     case SL_PROP_EOL:
       modulemd_servicelevel_set_eol (self, g_value_get_boxed (value));
+      break;
+
+    case SL_PROP_NAME:
+      modulemd_servicelevel_set_name (self, g_value_get_string (value));
       break;
 
     default:
@@ -130,6 +180,10 @@ modulemd_servicelevel_get_property (GObject *gobject,
     {
     case SL_PROP_EOL:
       g_value_set_boxed (value, modulemd_servicelevel_get_eol (self));
+      break;
+
+    case SL_PROP_NAME:
+      g_value_set_string (value, modulemd_servicelevel_get_name (self));
       break;
 
     default:
@@ -165,6 +219,13 @@ modulemd_servicelevel_class_init (ModulemdServiceLevelClass *klass)
                         "level.",
                         G_TYPE_DATE,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  servicelevel_properties[SL_PROP_NAME] =
+    g_param_spec_string ("name",
+                         "Name",
+                         "A human-readable name for this servicelevel",
+                         NULL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (
     object_class, SL_N_PROPERTIES, servicelevel_properties);

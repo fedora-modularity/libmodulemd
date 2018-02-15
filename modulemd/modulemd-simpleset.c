@@ -52,12 +52,16 @@ G_DEFINE_TYPE (ModulemdSimpleSet, modulemd_simpleset, G_TYPE_OBJECT)
 gboolean
 modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value)
 {
+  g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), 0);
+
   return g_hash_table_contains (self->set, value);
 }
 
 guint
 modulemd_simpleset_size (ModulemdSimpleSet *self)
 {
+  g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), 0);
+
   return g_hash_table_size (self->set);
 }
 
@@ -88,7 +92,7 @@ modulemd_simpleset_remove_from_array (gpointer key,
 
 /**
  * modulemd_simpleset_set:
- * @set: (array zero-terminated=1): Extensible metadata block
+ * @set: (array zero-terminated=1) (transfer none): Extensible metadata block
  *
  * Make the contents of the set equal to an array of strings. This function
  * will trigger a signal only if the resulting set is different. It does not
@@ -133,7 +137,7 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
  *
  * Retrieves the set as a #GPtrArray of strings
  *
- * Returns: (array zero-terminated=1) (transfer container):
+ * Returns: (array zero-terminated=1) (transfer full):
  * A list representing a set of string values.
  */
 gchar **
@@ -142,9 +146,6 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
   GPtrArray *sorted_keys = NULL;
   gchar **keys = NULL;
   g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), NULL);
-
-  /* FIXME: Sort this */
-  /* return (gchar **)g_hash_table_get_keys_as_array(self->set, NULL); */
 
   sorted_keys = _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
 
@@ -191,6 +192,56 @@ modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value)
     }
 }
 
+
+/**
+ * modulemd_simpleset_copy
+ * @dest: (out) (transfer full): A reference to the destination #ModulemdSimpleSet
+ *
+ * This function will copy the contents of this #ModulemdSimpleSet to @dest.
+ * If the dereferenced pointer is NULL, a new #ModulemdSimpleSet will be
+ * allocated.
+ *
+ * If the dereferenced pointer is not NULL, it will replace the contents of
+ * @dest. All existing values in the set will be freed.
+ *
+ * In either case, the caller is responsible for calling g_object_unref()
+ * later to free it.
+ */
+
+void
+modulemd_simpleset_copy (ModulemdSimpleSet *self, ModulemdSimpleSet **dest)
+{
+  gchar **keys = NULL;
+
+  g_return_if_fail (!self || MODULEMD_IS_SIMPLESET (self));
+  g_return_if_fail (dest);
+  g_return_if_fail (*dest == NULL ||
+                    (*dest != NULL && MODULEMD_IS_SIMPLESET (*dest)));
+
+  /* Allocate a SimpleSet if needed */
+  if (*dest == NULL)
+    {
+      *dest = modulemd_simpleset_new ();
+    }
+
+  if (self)
+    {
+      /* Get the set of keys so we can just use the set() function */
+      keys = (gchar **)g_hash_table_get_keys_as_array (self->set, NULL);
+    }
+  else
+    {
+      /* If the source is NULL, treat it as empty */
+      keys = g_new0 (gchar *, 1);
+    }
+
+  /* set() them. This will also handle the object notification */
+  modulemd_simpleset_set (*dest, keys);
+
+  g_free (keys);
+}
+
+
 static void
 modulemd_simpleset_set_property (GObject *gobject,
                                  guint property_id,
@@ -221,7 +272,7 @@ modulemd_simpleset_get_property (GObject *gobject,
   switch (property_id)
     {
     case SET_PROP_SET:
-      g_value_set_boxed (value, modulemd_simpleset_get (self));
+      g_value_take_boxed (value, modulemd_simpleset_get (self));
       break;
 
     default:
@@ -250,9 +301,6 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
 
   object_class->finalize = modulemd_simpleset_finalize;
 
-  /**
-     * ModulemdSimpleSet:set: (transfer container)
-     */
   set_properties[SET_PROP_SET] =
     g_param_spec_boxed ("set",
                         "The set represented as an array of strings.",

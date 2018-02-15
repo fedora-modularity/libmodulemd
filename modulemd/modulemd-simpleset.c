@@ -194,7 +194,7 @@ modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value)
 
 /**
  * modulemd_simpleset_copy
- * @dest: (out): A reference to the destination #ModulemdSimpleSet
+ * @dest: (out) (transfer full): A reference to the destination #ModulemdSimpleSet
  *
  * This function will copy the contents of this #ModulemdSimpleSet to @dest.
  * If the dereferenced pointer is NULL, a new #ModulemdSimpleSet will be

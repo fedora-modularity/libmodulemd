@@ -428,6 +428,8 @@ modulemd_module_test_get_set_dependencies (ModuleFixture *fixture,
   deps = modulemd_module_get_dependencies (fixture->md);
   g_assert_nonnull (deps);
   g_assert_cmpint (deps->len, ==, 2);
+
+  g_free (platforms);
 }
 
 static void

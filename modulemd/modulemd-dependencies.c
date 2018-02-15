@@ -84,6 +84,8 @@ _modulemd_dependencies_add_stream (GHashTable *reqs,
   streams[0] = g_strdup (stream);
 
   _modulemd_dependencies_add_streams (reqs, module, streams);
+  g_free(streams);
+
 }
 
 

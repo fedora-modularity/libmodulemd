@@ -1225,7 +1225,6 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing API rpms");
     }
-  g_clear_pointer (&api, g_object_unref);
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -1234,10 +1233,6 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (api)
-    {
-      g_object_unref (api);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_api");
   return ret;
@@ -1280,7 +1275,6 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing filter rpms");
     }
-  g_clear_pointer (&filters, g_object_unref);
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -1289,10 +1283,6 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (filters)
-    {
-      g_object_unref (filters);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_filters");
   return ret;
@@ -1700,7 +1690,6 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing artifact rpms");
     }
-  g_clear_pointer (&artifacts, g_object_unref);
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -1709,10 +1698,6 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (artifacts)
-    {
-      g_object_unref (artifacts);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_artifacts");
   return ret;

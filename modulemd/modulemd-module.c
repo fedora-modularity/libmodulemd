@@ -878,7 +878,7 @@ modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
  *
  * Retrieves the "rpm_api" for modulemd
  *
- * Returns: (transfer full): a #SimpleSet containing the set of binary RPM
+ * Returns: (transfer none): a #SimpleSet containing the set of binary RPM
  * packages in the "rpm_api" property.
  */
 ModulemdSimpleSet *
@@ -886,7 +886,7 @@ modulemd_module_get_rpm_api (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_object_ref (self->rpm_api);
+  return self->rpm_api;
 }
 
 /**
@@ -914,7 +914,7 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
  *
  * Retrieves the "rpm_artifacts" for modulemd
  *
- * Returns: (transfer full): a #SimpleSet containing the set of binary RPMs
+ * Returns: (transfer none): a #SimpleSet containing the set of binary RPMs
  * contained in this module.
  */
 ModulemdSimpleSet *
@@ -922,13 +922,13 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_object_ref (self->rpm_artifacts);
+  return self->rpm_artifacts;
 }
 
 
 /**
  * modulemd_module_set_rpm_buildopts:
- * @buildopts: (nullable) (element-type utf8 utf8) (transfer container): A dictionary of
+ * @buildopts: (nullable) (element-type utf8 utf8): A dictionary of
  * build options to pass to rpmbuild. Currently the only recognized key is
  * "macros".
  *
@@ -1103,7 +1103,7 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
  *
  * Retrieves the "rpm_filter" for modulemd
  *
- * Returns: (transfer full): a #SimpleSet containing the set of binary RPMs
+ * Returns: (transfer none): a #SimpleSet containing the set of binary RPMs
  * filtered out of this module.
  */
 ModulemdSimpleSet *
@@ -1111,7 +1111,7 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_object_ref (self->rpm_filter);
+  return self->rpm_filter;
 }
 
 

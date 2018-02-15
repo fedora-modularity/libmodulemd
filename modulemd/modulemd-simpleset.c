@@ -52,12 +52,16 @@ G_DEFINE_TYPE (ModulemdSimpleSet, modulemd_simpleset, G_TYPE_OBJECT)
 gboolean
 modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value)
 {
+  g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), 0);
+
   return g_hash_table_contains (self->set, value);
 }
 
 guint
 modulemd_simpleset_size (ModulemdSimpleSet *self)
 {
+  g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), 0);
+
   return g_hash_table_size (self->set);
 }
 

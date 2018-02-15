@@ -1721,7 +1721,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:buildrequires: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     * ModulemdModule:buildrequires: (type GLib.HashTable(utf8,utf8))
      */
   md_properties[MD_PROP_BUILDREQUIRES] =
     g_param_spec_boxed ("buildrequires",
@@ -1763,7 +1763,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-   * ModulemdModule:dependencies: (type GLib.PtrArray(ModulemdDependencies)) (transfer container)
+   * ModulemdModule:dependencies: (type GLib.PtrArray(ModulemdDependencies))
    */
   md_properties[MD_PROP_DEPS] =
     g_param_spec_boxed ("dependencies",
@@ -1812,7 +1812,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule)) (transfer container)
+     * ModulemdModule:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule))
      */
   md_properties[MD_PROP_MODULE_COMPONENTS] =
     g_param_spec_boxed ("components-module",
@@ -1838,7 +1838,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:profiles: (type GLib.HashTable(utf8,ModulemdProfile)) (transfer container)
+     * ModulemdModule:profiles: (type GLib.HashTable(utf8,ModulemdProfile))
      */
   md_properties[MD_PROP_PROFILES] =
     g_param_spec_boxed ("profiles",
@@ -1849,7 +1849,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:requires: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     * ModulemdModule:requires: (type GLib.HashTable(utf8,utf8))
      */
   md_properties[MD_PROP_REQUIRES] =
     g_param_spec_boxed ("requires",
@@ -1878,7 +1878,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:rpm-buildopts: (type GLib.HashTable(utf8,utf8)) (transfer container)
+     * ModulemdModule:rpm-buildopts: (type GLib.HashTable(utf8,utf8))
      */
   md_properties[MD_PROP_RPM_BUILDOPTS] =
     g_param_spec_boxed ("rpm-buildopts",
@@ -1891,7 +1891,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm)) (transfer container)
+     * ModulemdModule:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm))
      */
   md_properties[MD_PROP_RPM_COMPONENTS] =
     g_param_spec_boxed ("components-rpm",
@@ -1909,7 +1909,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel)) (transfer container)
+     * ModulemdModule:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel))
      */
   md_properties[MD_PROP_SL] =
     g_param_spec_boxed ("servicelevels",
@@ -1954,7 +1954,7 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:xmd: (type GLib.HashTable(utf8,GVariant)) (transfer container)
+     * ModulemdModule:xmd: (type GLib.HashTable(utf8,GVariant))
      */
   md_properties[MD_PROP_XMD] =
     g_param_spec_boxed ("xmd",

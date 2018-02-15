@@ -628,7 +628,7 @@ modulemd_module_set_module_components (ModulemdModule *self,
  *
  * Retrieves the "module-components" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdComponentModule) (transfer container): A hash table
+ * Returns: (element-type utf8 ModulemdComponentModule) (transfer none): A hash table
  * containing the "module-components" property.
  */
 GHashTable *
@@ -636,7 +636,7 @@ modulemd_module_get_module_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->module_components);
+  return self->module_components;
 }
 
 /**
@@ -1066,7 +1066,7 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
  *
  * Retrieves the "rpm-components" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdComponentRpm) (transfer container): A hash table
+ * Returns: (element-type utf8 ModulemdComponentRpm) (transfer none): A hash table
  * containing the "rpm-components" property.
  */
 GHashTable *
@@ -1074,7 +1074,7 @@ modulemd_module_get_rpm_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->rpm_components);
+  return self->rpm_components;
 }
 
 /**

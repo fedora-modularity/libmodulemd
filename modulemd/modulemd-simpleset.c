@@ -92,7 +92,7 @@ modulemd_simpleset_remove_from_array (gpointer key,
 
 /**
  * modulemd_simpleset_set:
- * @set: (array zero-terminated=1): Extensible metadata block
+ * @set: (array zero-terminated=1) (transfer none): Extensible metadata block
  *
  * Make the contents of the set equal to an array of strings. This function
  * will trigger a signal only if the resulting set is different. It does not
@@ -137,7 +137,7 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
  *
  * Retrieves the set as a #GPtrArray of strings
  *
- * Returns: (array zero-terminated=1) (transfer container):
+ * Returns: (array zero-terminated=1) (transfer full):
  * A list representing a set of string values.
  */
 gchar **
@@ -146,9 +146,6 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
   GPtrArray *sorted_keys = NULL;
   gchar **keys = NULL;
   g_return_val_if_fail (MODULEMD_IS_SIMPLESET (self), NULL);
-
-  /* FIXME: Sort this */
-  /* return (gchar **)g_hash_table_get_keys_as_array(self->set, NULL); */
 
   sorted_keys = _modulemd_ordered_str_keys (self->set, _modulemd_strcmp_sort);
 
@@ -275,7 +272,7 @@ modulemd_simpleset_get_property (GObject *gobject,
   switch (property_id)
     {
     case SET_PROP_SET:
-      g_value_set_boxed (value, modulemd_simpleset_get (self));
+      g_value_take_boxed (value, modulemd_simpleset_get (self));
       break;
 
     default:
@@ -304,9 +301,6 @@ modulemd_simpleset_class_init (ModulemdSimpleSetClass *klass)
 
   object_class->finalize = modulemd_simpleset_finalize;
 
-  /**
-     * ModulemdSimpleSet:set: (transfer container)
-     */
   set_properties[SET_PROP_SET] =
     g_param_spec_boxed ("set",
                         "The set represented as an array of strings.",

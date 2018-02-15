@@ -248,7 +248,7 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
  *
  * Retrieves the "content_licenses" for modulemd
  *
- * Returns: (transfer full): a #SimpleSet containing the set of licenses in the
+ * Returns: (transfer none): a #SimpleSet containing the set of licenses in the
  * "content_licenses" property.
  */
 ModulemdSimpleSet *
@@ -256,7 +256,7 @@ modulemd_module_get_content_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_object_ref (self->content_licenses);
+  return self->content_licenses;
 }
 
 /**
@@ -664,7 +664,7 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
  *
  * Retrieves the "module_licenses" for modulemd
  *
- * Returns: (transfer full): a #ModulemdSimpleSet containing the set of
+ * Returns: (transfer none): a #ModulemdSimpleSet containing the set of
  * licenses in the "module_licenses" property.
  */
 ModulemdSimpleSet *
@@ -672,7 +672,7 @@ modulemd_module_get_module_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_object_ref (self->module_licenses);
+  return self->module_licenses;
 }
 
 /**

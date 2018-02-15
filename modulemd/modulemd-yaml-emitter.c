@@ -713,7 +713,6 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module licenses");
     }
-  g_clear_pointer (&set, g_object_unref);
 
 
   /* Content licenses */
@@ -730,7 +729,6 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module licenses");
         }
-      g_clear_pointer (&set, g_object_unref);
     }
 
 
@@ -741,10 +739,6 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (set)
-    {
-      g_object_unref (set);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_licenses");
   return ret;

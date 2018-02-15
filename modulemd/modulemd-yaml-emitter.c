@@ -1474,10 +1474,6 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
 error:
   g_free (name);
   g_free (value);
-  if (set)
-    {
-      g_object_unref (set);
-    }
   return ret;
 }
 

@@ -1542,13 +1542,13 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   rpm_components = modulemd_module_get_rpm_components (module);
   if (rpm_components && g_hash_table_size (rpm_components) < 1)
     {
-      g_clear_pointer (&rpm_components, g_hash_table_unref);
+      rpm_components = NULL;
     }
 
   module_components = modulemd_module_get_module_components (module);
   if (module_components && g_hash_table_size (module_components) < 1)
     {
-      g_clear_pointer (&module_components, g_hash_table_unref);
+      rpm_components = NULL;
     }
 
   if (!(rpm_components || module_components))
@@ -1634,8 +1634,6 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  g_clear_pointer (&rpm_components, g_hash_table_unref);
-  g_clear_pointer (&module_components, g_hash_table_unref);
   g_clear_pointer (&rpm_keys, g_ptr_array_unref);
   g_clear_pointer (&module_keys, g_ptr_array_unref);
 

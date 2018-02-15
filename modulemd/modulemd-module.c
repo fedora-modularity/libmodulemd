@@ -147,28 +147,28 @@ void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires)
 {
+  GHashTableIter iter;
+  gpointer module_name, stream_name;
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
+  g_return_if_fail (self->buildrequires != buildrequires);
 
-  if (buildrequires != self->buildrequires)
+  g_hash_table_remove_all (self->buildrequires);
+
+  if (buildrequires)
     {
-      if (self->buildrequires)
+      g_hash_table_iter_init (&iter, buildrequires);
+      while (g_hash_table_iter_next (&iter, &module_name, &stream_name))
         {
-          g_hash_table_unref (self->buildrequires);
+          g_hash_table_replace (self->buildrequires,
+                                g_strdup ((const gchar *)module_name),
+                                g_strdup ((const gchar *)stream_name));
         }
-
-      if (buildrequires)
-        {
-          self->buildrequires =
-            _modulemd_hash_table_deep_str_copy (buildrequires);
-        }
-      else
-        {
-          self->buildrequires = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_BUILDREQUIRES]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            md_properties[MD_PROP_BUILDREQUIRES]);
 }
 
 /**
@@ -176,7 +176,7 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
  *
  * Retrieves the "buildrequires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * Returns: (element-type utf8 utf8) (transfer none): A hash table
  * containing the "buildrequires" property.
  */
 GHashTable *
@@ -185,7 +185,7 @@ modulemd_module_get_buildrequires (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
   g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
 
-  return g_hash_table_ref (self->buildrequires);
+  return self->buildrequires;
 }
 
 /**
@@ -814,27 +814,26 @@ modulemd_module_get_profiles (ModulemdModule *self)
 void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
+  GHashTableIter iter;
+  gpointer module_name, stream_name;
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
+  g_return_if_fail (self->requires != requires);
 
-  if (requires != self->requires)
+  g_hash_table_remove_all (self->requires);
+
+  if (requires)
     {
-      if (self->requires)
+      g_hash_table_iter_init (&iter, requires);
+      while (g_hash_table_iter_next (&iter, &module_name, &stream_name))
         {
-          g_hash_table_unref (self->requires);
+          g_hash_table_replace (self->requires,
+                                g_strdup ((const gchar *)module_name),
+                                g_strdup ((const gchar *)stream_name));
         }
-
-      if (requires)
-        {
-          self->requires = _modulemd_hash_table_deep_str_copy (requires);
-        }
-      else
-        {
-          self->requires = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_REQUIRES]);
     }
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_REQUIRES]);
 }
 
 /**
@@ -842,7 +841,7 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
  *
  * Retrieves the "requires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * Returns: (element-type utf8 utf8) (transfer none): A hash table
  * containing the "requires" property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later.
  */
@@ -852,7 +851,7 @@ modulemd_module_get_requires (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
   g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
 
-  return g_hash_table_ref (self->requires);
+  return self->requires;
 }
 
 /**

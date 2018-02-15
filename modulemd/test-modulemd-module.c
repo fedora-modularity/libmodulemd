@@ -24,6 +24,7 @@
 
 #include "modulemd-module.h"
 #include "modulemd-simpleset.h"
+#include "modulemd-util.h"
 #include "modulemd-yaml.h"
 
 #include <glib.h>
@@ -89,12 +90,17 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
                                             gconstpointer user_data)
 {
   GValue value = G_VALUE_INIT;
-  GValue *set_value;
+  GValue set_value = G_VALUE_INIT;
   ModulemdModule *md = fixture->md;
-  GHashTable *htable;
+  GHashTable *htable = NULL;
+  GHashTable *htable2 = NULL;
+  GHashTable *buildrequires = NULL;
 
   /* Should be initialized to an empty hash table */
-  GHashTable *buildrequires = modulemd_module_get_buildrequires (md);
+
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 0);
 
   /* Add a key and value using set_buildrequires() */
@@ -103,7 +109,9 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
   modulemd_module_set_buildrequires (md, buildrequires);
 
   /* Verify the key and value with get_buildrequires() */
-  buildrequires = modulemd_module_get_buildrequires (md);
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 1);
   g_assert_true (g_hash_table_contains (buildrequires, "MyKey"));
   g_assert_cmpstr (
@@ -126,8 +134,10 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "buildrequires", &value);
-  htable = g_value_get_boxed (&value);
+  htable2 = g_value_dup_boxed (&value);
   g_value_reset (&value);
+  htable = _modulemd_hash_table_deep_str_copy (htable2);
+  htable2 = NULL;
 
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
@@ -136,16 +146,17 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
 
-  set_value = g_new0 (GValue, 1);
-  g_value_init (set_value, G_TYPE_HASH_TABLE);
-  g_value_set_boxed (set_value, htable);
-  modulemd_module_set_buildrequires (md, htable);
+  g_value_init (&set_value, G_TYPE_HASH_TABLE);
+  g_value_take_boxed (&set_value, htable);
 
-  g_object_set_property (G_OBJECT (md), "buildrequires", set_value);
+  g_object_set_property (G_OBJECT (md), "buildrequires", &set_value);
 
   /* Verify the third key and value with get_buildrequires() */
-  buildrequires = modulemd_module_get_buildrequires (md);
+  htable = modulemd_module_get_buildrequires (md);
+  buildrequires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (buildrequires), ==, 3);
   g_assert_true (g_hash_table_contains (buildrequires, "MyKey3"));
   g_assert_cmpstr (
@@ -247,12 +258,17 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
                                        gconstpointer user_data)
 {
   GValue value = G_VALUE_INIT;
-  GValue *set_value;
+  GValue set_value = G_VALUE_INIT;
   ModulemdModule *md = fixture->md;
-  GHashTable *htable;
+  GHashTable *htable = NULL;
+  GHashTable *htable2 = NULL;
+  GHashTable *requires = NULL;
 
   /* Should be initialized to an empty hash table */
-  GHashTable *requires = modulemd_module_get_requires (md);
+
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 0);
 
   /* Add a key and value using set_requires() */
@@ -260,7 +276,9 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
   modulemd_module_set_requires (md, requires);
 
   /* Verify the key and value with get_requires() */
-  requires = modulemd_module_get_requires (md);
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 1);
   g_assert_true (g_hash_table_contains (requires, "MyKey"));
   g_assert_cmpstr (g_hash_table_lookup (requires, "MyKey"), ==, "MyValue");
@@ -281,8 +299,10 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "requires", &value);
-  htable = g_value_get_boxed (&value);
+  htable2 = g_value_dup_boxed (&value);
   g_value_reset (&value);
+  htable = _modulemd_hash_table_deep_str_copy (htable2);
+  htable2 = NULL;
 
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
@@ -291,16 +311,17 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
 
-  set_value = g_new0 (GValue, 1);
-  g_value_init (set_value, G_TYPE_HASH_TABLE);
-  g_value_set_boxed (set_value, htable);
-  modulemd_module_set_requires (md, htable);
+  g_value_init (&set_value, G_TYPE_HASH_TABLE);
+  g_value_take_boxed (&set_value, htable);
 
-  g_object_set_property (G_OBJECT (md), "requires", set_value);
+  g_object_set_property (G_OBJECT (md), "requires", &set_value);
 
   /* Verify the third key and value with get_requires() */
-  requires = modulemd_module_get_requires (md);
+  htable = modulemd_module_get_requires (md);
+  requires = _modulemd_hash_table_deep_str_copy (htable);
+  htable = NULL;
   g_assert_cmpint (g_hash_table_size (requires), ==, 3);
   g_assert_true (g_hash_table_contains (requires, "MyKey3"));
   g_assert_cmpstr (g_hash_table_lookup (requires, "MyKey3"), ==, "MyValue3");

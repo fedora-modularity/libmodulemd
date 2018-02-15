@@ -828,7 +828,6 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module build deps");
         }
-      g_clear_pointer (&buildrequires, g_hash_table_unref);
     }
 
   if (requires)
@@ -842,7 +841,6 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Error writing module runtime deps");
         }
-      g_clear_pointer (&requires, g_hash_table_unref);
     }
 
   yaml_mapping_end_event_initialize (&event);
@@ -852,14 +850,6 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (buildrequires)
-    {
-      g_hash_table_unref (buildrequires);
-    }
-  if (requires)
-    {
-      g_hash_table_unref (requires);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_deps_v1");
   return ret;

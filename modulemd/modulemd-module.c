@@ -1227,7 +1227,7 @@ modulemd_module_add_servicelevel (ModulemdModule *self,
  *
  * Retrieves the service levels for the module
  *
- * Returns: (element-type utf8 ModulemdServiceLevel) (transfer container): A
+ * Returns: (element-type utf8 ModulemdServiceLevel) (transfer none): A
  * hash table containing the service levels.
  */
 GHashTable *
@@ -1235,7 +1235,7 @@ modulemd_module_get_servicelevels (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->servicelevels);
+  return self->servicelevels;
 }
 
 

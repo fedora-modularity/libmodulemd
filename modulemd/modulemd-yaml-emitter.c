@@ -617,10 +617,6 @@ error:
     {
       g_ptr_array_unref (keys);
     }
-  if (servicelevels)
-    {
-      g_hash_table_unref (servicelevels);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_servicelevels");
   return ret;

@@ -632,7 +632,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   /* There should be no "rawhide" service level yet */
   servicelevels = modulemd_module_get_servicelevels (fixture->md);
   g_assert_false (g_hash_table_contains (servicelevels, "rawhide"));
-  g_clear_pointer (&servicelevels, g_hash_table_unref);
+  servicelevels = NULL;
 
   v1_deps = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   g_hash_table_insert (v1_deps, g_strdup ("platform"), g_strdup ("f28"));
@@ -652,7 +652,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   /* The module should now contain an entry for rawhide */
   servicelevels = modulemd_module_get_servicelevels (fixture->md);
   g_assert_true (g_hash_table_contains (servicelevels, "rawhide"));
-  g_clear_pointer (&servicelevels, g_hash_table_unref);
+  servicelevels = NULL;
 
 
   /* The module should now contain a single entry in the dependencies array */

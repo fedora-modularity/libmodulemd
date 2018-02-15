@@ -297,7 +297,7 @@ modulemd_module_get_context (ModulemdModule *self)
 
 /**
  * modulemd_module_set_dependencies:
- * @deps: (array zero-terminated=1) (element-type ModulemdDependencies) (transfer container) (nullable):
+ * @deps: (array zero-terminated=1) (element-type ModulemdDependencies) (transfer none) (nullable):
  * The NULL-terminated list of dependencies.
  *
  * Sets the list of dependency objects for this module.
@@ -305,22 +305,24 @@ modulemd_module_get_context (ModulemdModule *self)
 void
 modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 {
+  gsize i = 0;
+  ModulemdDependencies *copy = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
 
-  if (self->dependencies != deps)
-    {
-      if (self->dependencies)
-        {
-          g_clear_pointer (&self->dependencies, g_ptr_array_unref);
-        }
+  g_ptr_array_set_size (self->dependencies, 0);
 
-      if (deps)
+  if (deps)
+    {
+      for (i = 0; i < deps->len; i++)
         {
-          self->dependencies = g_ptr_array_ref (deps);
+          modulemd_dependencies_copy (g_ptr_array_index (deps, i), &copy);
+          g_ptr_array_add (self->dependencies, g_object_ref (copy));
+          g_clear_pointer (&copy, g_object_unref);
         }
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
 }
 
 
@@ -334,16 +336,16 @@ void
 modulemd_module_add_dependencies (ModulemdModule *self,
                                   ModulemdDependencies *dep)
 {
+  ModulemdDependencies *copy = NULL;
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
   g_return_if_fail (MODULEMD_IS_DEPENDENCIES (dep));
 
-  if (!self->dependencies)
-    {
-      self->dependencies = g_ptr_array_new_with_free_func (g_object_unref);
-    }
+  modulemd_dependencies_copy (dep, &copy);
+  g_ptr_array_add (self->dependencies, g_object_ref (copy));
+  g_clear_pointer (&copy, g_object_unref);
 
-  g_ptr_array_add (self->dependencies, g_object_ref (dep));
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
 }
 
@@ -351,7 +353,7 @@ modulemd_module_add_dependencies (ModulemdModule *self,
 /**
  * modulemd_module_get_dependencies
  *
- * Returns: (element-type ModulemdDependencies) (transfer container): The list
+ * Returns: (element-type ModulemdDependencies) (transfer none): The list
  * of dependency objects for this module.
  */
 GPtrArray *
@@ -360,12 +362,7 @@ modulemd_module_get_dependencies (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
   g_return_val_if_fail (modulemd_module_get_mdversion (self) >= 2, NULL);
 
-  if (self->dependencies == NULL)
-    {
-      return NULL;
-    }
-
-  return g_ptr_array_ref (self->dependencies);
+  return self->dependencies;
 }
 
 
@@ -1986,6 +1983,8 @@ modulemd_module_init (ModulemdModule *self)
   self->rpm_components =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
+  self->dependencies = g_ptr_array_new_with_free_func (g_object_unref);
+
   self->eol = g_date_new ();
 
   self->content_licenses = modulemd_simpleset_new ();
@@ -2290,7 +2289,7 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
       modulemd_dependencies_add_buildrequires_single (
-        v2_dep, g_strdup (key), g_strdup (value));
+        v2_dep, (const gchar *)key, (const gchar *)value);
     }
 
   /* Now add runtime Requires */
@@ -2299,7 +2298,7 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
       modulemd_dependencies_add_requires_single (
-        v2_dep, g_strdup (key), g_strdup (value));
+        v2_dep, (const gchar *)key, (const gchar *)value);
     }
 
   deps = g_ptr_array_new ();

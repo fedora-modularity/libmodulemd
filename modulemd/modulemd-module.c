@@ -793,7 +793,7 @@ modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
  *
  * Retrieves the "profiles" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdProfile) (transfer container): A hash
+ * Returns: (element-type utf8 ModulemdProfile) (transfer none): A hash
  * table containing the "profiles" property.
  */
 GHashTable *
@@ -801,7 +801,7 @@ modulemd_module_get_profiles (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_hash_table_ref (self->profiles);
+  return self->profiles;
 }
 
 /**

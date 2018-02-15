@@ -1169,10 +1169,6 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
   ret = TRUE;
 error:
   g_free (name);
-  if (profiles)
-    {
-      g_hash_table_unref (profiles);
-    }
 
   g_debug ("TRACE: exiting _emit_modulemd_profiles");
   return ret;

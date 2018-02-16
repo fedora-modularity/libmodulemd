@@ -165,7 +165,7 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   g_free (modules);
   g_free (yaml_path);
 
-    yaml_path = g_strdup_printf ("%s/test_data/mixed-v2.yaml",
+  yaml_path = g_strdup_printf ("%s/test_data/mixed-v2.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   modulemd_module_new_all_from_file (yaml_path, &modules);
 

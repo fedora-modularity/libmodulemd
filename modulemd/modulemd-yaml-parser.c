@@ -2322,6 +2322,7 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GError **error)
 {
   yaml_event_t event;
+  gboolean started = FALSE;
   gboolean done = FALSE;
   GHashTable *htable = NULL;
   gchar *name = NULL;
@@ -2341,6 +2342,7 @@ _hashtable_from_mapping (yaml_parser_t *parser,
         {
         case YAML_MAPPING_START_EVENT:
           /* The dictionary has begun */
+          started = TRUE;
           break;
 
         case YAML_MAPPING_END_EVENT:
@@ -2349,6 +2351,11 @@ _hashtable_from_mapping (yaml_parser_t *parser,
           break;
 
         case YAML_SCALAR_EVENT:
+          if (!started)
+            {
+              MMD_YAML_ERROR_RETURN (
+                error, "Received scalar where mapping expected");
+            }
           name = g_strdup ((const gchar *)event.data.scalar.value);
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (
             parser, &event, error, "Parser error");

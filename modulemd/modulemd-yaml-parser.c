@@ -965,6 +965,7 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
   dep = modulemd_dependencies_new ();
   if (dep == NULL)
     {
+      event.type = YAML_NO_EVENT;
       MMD_YAML_ERROR_RETURN (
         error, "Could not allocate new Modulemd.Dependencies object");
     }

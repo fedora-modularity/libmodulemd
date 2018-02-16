@@ -2259,6 +2259,7 @@ _simpleset_from_sequence (yaml_parser_t *parser,
                           GError **error)
 {
   yaml_event_t event;
+  gboolean started = FALSE;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
 
@@ -2278,6 +2279,7 @@ _simpleset_from_sequence (yaml_parser_t *parser,
         {
         case YAML_SEQUENCE_START_EVENT:
           /* Sequence has begun */
+          started = TRUE;
           break;
 
         case YAML_SEQUENCE_END_EVENT:
@@ -2286,6 +2288,11 @@ _simpleset_from_sequence (yaml_parser_t *parser,
           break;
 
         case YAML_SCALAR_EVENT:
+          if (!started)
+            {
+              MMD_YAML_ERROR_RETURN (
+                error, "Received scalar where sequence expected");
+            }
           modulemd_simpleset_add (set, (const gchar *)event.data.scalar.value);
           break;
 

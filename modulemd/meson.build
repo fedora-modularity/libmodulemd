@@ -51,7 +51,6 @@ modulemd_validator = executable(
     link_with : modulemd_lib,
         dependencies : [
         gobject,
-        popt,
     ],
     install : true,
 )

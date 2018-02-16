@@ -27,7 +27,6 @@
 
 #include <glib.h>
 #include <locale.h>
-#include <popt.h>
 
 /* TODO: implement internationalization */
 
@@ -50,69 +49,78 @@ enum mmd_verbosity
 struct validator_options
 {
   enum mmd_verbosity verbosity;
+  gchar **filenames;
+};
+
+struct validator_options options = { 0, NULL };
+
+static gboolean
+set_verbosity (const gchar  *option_name,
+               const gchar  *value,
+               gpointer      data,
+               GError      **error)
+{
+  if (g_strcmp0 ("-v", option_name) == 0 || g_strcmp0 ("--verbose", option_name) == 0)
+    {
+      if (options.verbosity < MMD_VERBOSE)
+        {
+          options.verbosity = MMD_VERBOSE;
+        }
+    }
+  else if (g_strcmp0 ("--debug", option_name) == 0)
+    {
+      if (options.verbosity < MMD_DEBUG)
+        {
+          options.verbosity = MMD_DEBUG;
+        }
+    }
+  else
+    {
+      /* We shouldn't be called under any other circumstance */
+      g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED,
+                   "Called for unknown option \"%s\"", option_name);
+      return FALSE;
+    }
+  return TRUE;
+}
+
+static GOptionEntry entries[] =
+{
+  { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
+  { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
+  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, "Files to be validated", NULL },
+  { NULL }
 };
 
 int
-main (int argc, const char *argv[])
+main (int argc, char *argv[])
 {
-  int opt;
-  poptContext pc;
-  struct validator_options *options;
   const char *filename;
+  GOptionContext *context;
   GError *error = NULL;
   ModulemdModule **modules = NULL;
   gboolean all_valid = TRUE;
   setlocale (LC_ALL, "");
 
-  options = g_malloc0 (sizeof (struct validator_options));
-
-  struct poptOption long_options[] = {
-    { "verbose",
-      'v',
-      POPT_ARG_VAL,
-      &options->verbosity,
-      MMD_VERBOSE,
-      _ ("Display progress messages."),
-      NULL },
-    { "debug",
-      '\0',
-      POPT_ARG_VAL,
-      &options->verbosity,
-      MMD_DEBUG,
-      _ ("Display progress and debug messages."),
-      NULL },
-    POPT_AUTOHELP{ NULL, 0, 0, NULL, 0 },
-    POPT_TABLEEND
-  };
-
-  pc = poptGetContext (argv[0], argc, argv, long_options, 0);
-  poptSetOtherOptionHelp (pc,
-                          "[OPTION...] <modulemd_file> [<modulemd_file> ...]");
-
-  while ((opt = poptGetNextOpt (pc)) != -1)
+  context = g_option_context_new ("FILES - Simple modulemd YAML validator");
+  g_option_context_add_main_entries (context, entries, "modulemd-validator");
+  if (!g_option_context_parse (context, &argc, &argv, &error))
     {
-      switch (opt)
-        {
-        default:
-          fprintf (stderr,
-                   "\nInvalid option %s: %s\n\n",
-                   poptBadOption (pc, 0),
-                   poptStrerror (opt));
-          poptPrintUsage (pc, stderr, 0);
-          return EXIT_FAILURE;
-        }
+      g_print ("option parsing failed: %s\n", error->message);
+      exit (1);
     }
 
-  if (!poptPeekArg (pc))
+  if (!(options.filenames && options.filenames[0]))
     {
       fprintf (stderr,
                "At least one file must be specified on the command-line\n");
       return EXIT_FAILURE;
     }
 
-  while ((filename = poptGetArg (pc)))
+  for (gsize i = 1; options.filenames[i]; i++)
     {
-      if (options->verbosity >= MMD_VERBOSE)
+      filename = options.filenames[i];
+      if (options.verbosity >= MMD_VERBOSE)
         {
           fprintf (stdout, "Validating %s\n", filename);
         }
@@ -122,7 +130,7 @@ main (int argc, const char *argv[])
       if (error)
         {
           fprintf (stderr, "%s failed to validate\n", filename);
-          if (options->verbosity >= MMD_VERBOSE)
+          if (options.verbosity >= MMD_VERBOSE)
             {
               fprintf (stdout, "ERROR: %s\n", error->message);
             }

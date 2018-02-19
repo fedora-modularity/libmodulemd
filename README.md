@@ -4,6 +4,18 @@
 # libmodulemd
 C Library for manipulating module metadata files
 
+## Using libmodulemd from Python
+
+Using libmodulemd from Python is possible thanks to gobject-introspection
+project. Following is example code how to do that:
+
+```
+import gi
+gi.require_version('Modulemd', '1.0')
+from gi.repository import Modulemd
+help(Modulemd.Module)
+```
+
 # Authors:
 * Stephen Gallagher <sgallagh@redhat.com>
 * Igor Gnatenko <ignatenkobrain@fedoraproject.org>

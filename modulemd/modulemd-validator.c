@@ -60,7 +60,8 @@ set_verbosity (const gchar  *option_name,
                gpointer      data,
                GError      **error)
 {
-  if (g_strcmp0 ("-v", option_name) == 0 || g_strcmp0 ("--verbose", option_name) == 0)
+  if (g_strcmp0 ("-v", option_name) == 0 ||
+      g_strcmp0 ("--verbose", option_name) == 0)
     {
       if (options.verbosity < MMD_VERBOSE)
         {

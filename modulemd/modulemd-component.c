@@ -355,7 +355,6 @@ modulemd_component_init (ModulemdComponent *self)
  *
  * Return value: a new #ModulemdComponent
  */
-
 ModulemdComponent *
 modulemd_component_new (void)
 {

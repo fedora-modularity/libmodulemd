@@ -1721,8 +1721,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:buildrequires: (type GLib.HashTable(utf8,utf8))
-     */
+   * ModulemdModule:buildrequires: (type GLib.HashTable(utf8,utf8))
+   */
   md_properties[MD_PROP_BUILDREQUIRES] =
     g_param_spec_boxed ("buildrequires",
                         "Module BuildRequires",
@@ -1790,8 +1790,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:eol: (type GLib.Date)
-     */
+   * ModulemdModule:eol: (type GLib.Date)
+   */
   md_properties[MD_PROP_EOL] =
     g_param_spec_boxed ("eol",
                         "End of Life",
@@ -1812,8 +1812,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule))
-     */
+   * ModulemdModule:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule))
+   */
   md_properties[MD_PROP_MODULE_COMPONENTS] =
     g_param_spec_boxed ("components-module",
                         "Module Components",
@@ -1838,8 +1838,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:profiles: (type GLib.HashTable(utf8,ModulemdProfile))
-     */
+   * ModulemdModule:profiles: (type GLib.HashTable(utf8,ModulemdProfile))
+   */
   md_properties[MD_PROP_PROFILES] =
     g_param_spec_boxed ("profiles",
                         "Module Profiles",
@@ -1849,8 +1849,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:requires: (type GLib.HashTable(utf8,utf8))
-     */
+   * ModulemdModule:requires: (type GLib.HashTable(utf8,utf8))
+   */
   md_properties[MD_PROP_REQUIRES] =
     g_param_spec_boxed ("requires",
                         "Module Requires",
@@ -1878,8 +1878,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:rpm-buildopts: (type GLib.HashTable(utf8,utf8))
-     */
+   * ModulemdModule:rpm-buildopts: (type GLib.HashTable(utf8,utf8))
+   */
   md_properties[MD_PROP_RPM_BUILDOPTS] =
     g_param_spec_boxed ("rpm-buildopts",
                         "RPM build options",
@@ -1891,8 +1891,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm))
-     */
+   * ModulemdModule:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm))
+   */
   md_properties[MD_PROP_RPM_COMPONENTS] =
     g_param_spec_boxed ("components-rpm",
                         "RPM Components",
@@ -1909,8 +1909,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel))
-     */
+   * ModulemdModule:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel))
+   */
   md_properties[MD_PROP_SL] =
     g_param_spec_boxed ("servicelevels",
                         "Service Levels",
@@ -1954,8 +1954,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdModule:xmd: (type GLib.HashTable(utf8,GVariant))
-     */
+   * ModulemdModule:xmd: (type GLib.HashTable(utf8,GVariant))
+   */
   md_properties[MD_PROP_XMD] =
     g_param_spec_boxed ("xmd",
                         "Extensible Metadata Block",

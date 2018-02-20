@@ -2353,8 +2353,8 @@ _hashtable_from_mapping (yaml_parser_t *parser,
         case YAML_SCALAR_EVENT:
           if (!started)
             {
-              MMD_YAML_ERROR_RETURN (
-                error, "Received scalar where mapping expected");
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Received scalar where mapping expected");
             }
           name = g_strdup ((const gchar *)event.data.scalar.value);
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (

@@ -407,8 +407,8 @@ modulemd_dependencies_class_init (ModulemdDependenciesClass *klass)
   object_class->set_property = modulemd_dependencies_set_property;
 
   /**
-     * ModulemdDependencies:buildrequires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
-     */
+   * ModulemdDependencies:buildrequires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
+   */
   deps_properties[DEPS_PROP_BUILDREQUIRES] = g_param_spec_boxed (
     "buildrequires",
     "Build dependencies",
@@ -419,8 +419,8 @@ modulemd_dependencies_class_init (ModulemdDependenciesClass *klass)
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
-     * ModulemdDependencies:requires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
-     */
+   * ModulemdDependencies:requires: (type GLib.HashTable(utf8,ModulemdSimpleSet)) (transfer none)
+   */
   deps_properties[DEPS_PROP_REQUIRES] = g_param_spec_boxed (
     "requires",
     "Runtime dependencies",

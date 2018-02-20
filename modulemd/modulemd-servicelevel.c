@@ -85,7 +85,6 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
  *
  * Returns: a #GDate representing the end-of-life date of the service level.
  */
-
 const GDate *
 modulemd_servicelevel_get_eol (ModulemdServiceLevel *self)
 {

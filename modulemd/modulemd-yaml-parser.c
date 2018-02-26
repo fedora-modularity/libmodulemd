@@ -27,6 +27,7 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
+#include "modulemd-private.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 
@@ -311,6 +312,7 @@ _parse_modulemd_root (ModulemdModule *module,
   yaml_event_t event;
   gboolean done = FALSE;
   guint64 version;
+  guint64 assumed_mdversion;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -366,6 +368,18 @@ _parse_modulemd_root (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
+              /* Check whether we have an assumed mdversion and if they match
+               * This is fragile and will need to be changed if and when a
+               * modulemd v3 is released
+               */
+              assumed_mdversion =
+                modulemd_module_get_assumed_mdversion (module);
+              if (assumed_mdversion && version != assumed_mdversion)
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "Module is using features from "
+                                         "mismatched modulemd formats");
+                }
               modulemd_module_set_mdversion (module, version);
             }
 
@@ -556,6 +570,14 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
+              if (modulemd_module_get_mdversion (module) == 0)
+                {
+                  /* The version hasn't been explicitly set yet, so assume
+                   * it must be v1, since this misfeature was removed in v2
+                   */
+                  modulemd_module_set_assumed_mdversion (module, 1);
+                }
+
               if (modulemd_module_get_mdversion (module) > 1)
                 {
                   /* EOL is not supported in v2 or later; use servicelevel */
@@ -1116,12 +1138,49 @@ _parse_modulemd_deps (ModulemdModule *module,
                       GError **error)
 {
   gboolean result = FALSE;
+  guint64 mdversion = 0;
+  yaml_event_t event;
+
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   g_debug ("TRACE: entering _parse_modulemd_deps");
 
-  switch (modulemd_module_get_mdversion (module))
+  mdversion = modulemd_module_get_mdversion (module);
+  if (!mdversion)
     {
+      /* Check to see if we have an *assumed* mdversion */
+      mdversion = modulemd_module_get_assumed_mdversion (module);
+    }
+
+  switch (mdversion)
+    {
+    case 0:
+      /* We will have to guess and set the assumed mdversion based on the next
+       * parser event. Whee!
+       */
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This must be a v1 dependency */
+          modulemd_module_set_assumed_mdversion (module, 1);
+          result = _parse_modulemd_deps_v1 (module, parser, error);
+          break;
+
+        case YAML_SEQUENCE_START_EVENT:
+          /* This must be a v2 dependency */
+          modulemd_module_set_assumed_mdversion (module, 2);
+          result = _parse_modulemd_deps_v2 (module, parser, error);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          break;
+        }
+      break;
+
     case 1: result = _parse_modulemd_deps_v1 (module, parser, error); break;
 
     case 2: result = _parse_modulemd_deps_v2 (module, parser, error); break;

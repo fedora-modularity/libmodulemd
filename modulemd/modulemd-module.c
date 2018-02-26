@@ -23,6 +23,7 @@
  */
 
 #include "modulemd.h"
+#include "modulemd-private.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 #include <glib.h>
@@ -97,6 +98,8 @@ struct _ModulemdModule
   gchar *tracker;
   guint64 version;
   GHashTable *xmd;
+
+  guint64 assumed_mdversion;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
@@ -149,10 +152,19 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
 {
   GHashTableIter iter;
   gpointer module_name, stream_name;
+  guint64 version, assumed_version;
+
+  version = modulemd_module_get_mdversion (self);
+  assumed_version = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
+  g_return_if_fail (version < 2 && assumed_version < 2);
   g_return_if_fail (self->buildrequires != buildrequires);
+
+  if (version == 0 && assumed_version == 0)
+    {
+      modulemd_module_set_assumed_mdversion (self, 1);
+    }
 
   g_hash_table_remove_all (self->buildrequires);
 
@@ -182,8 +194,13 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
 GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
 {
+  guint64 version, assumed_version;
+
+  version = modulemd_module_get_mdversion (self);
+  assumed_version = modulemd_module_get_assumed_mdversion (self);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
+  g_return_val_if_fail (version < 2 && assumed_version < 2, NULL);
 
   return self->buildrequires;
 }
@@ -307,8 +324,18 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 {
   gsize i = 0;
   ModulemdDependencies *copy = NULL;
+  guint64 mdversion, assumed_mdversion;
+
+  mdversion = modulemd_module_get_mdversion (self);
+  assumed_mdversion = modulemd_module_get_assumed_mdversion (self);
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
+  g_return_if_fail (mdversion != 1 && assumed_mdversion != 1);
+
+  if (mdversion == 0)
+    {
+      modulemd_module_set_assumed_mdversion (self, 2);
+    }
 
   g_ptr_array_set_size (self->dependencies, 0);
 
@@ -338,9 +365,18 @@ modulemd_module_add_dependencies (ModulemdModule *self,
 {
   ModulemdDependencies *copy = NULL;
 
+  guint64 mdversion, assumed_mdversion;
+
+  mdversion = modulemd_module_get_mdversion (self);
+  assumed_mdversion = modulemd_module_get_assumed_mdversion (self);
+
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (modulemd_module_get_mdversion (self) >= 2);
-  g_return_if_fail (MODULEMD_IS_DEPENDENCIES (dep));
+  g_return_if_fail (mdversion != 1 && assumed_mdversion != 1);
+
+  if (mdversion == 0)
+    {
+      modulemd_module_set_assumed_mdversion (self, 2);
+    }
 
   modulemd_dependencies_copy (dep, &copy);
   g_ptr_array_add (self->dependencies, g_object_ref (copy));
@@ -513,6 +549,9 @@ void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (
+    !(self->assumed_mdversion && mdversion != self->assumed_mdversion));
+
   if (self->mdversion != mdversion)
     {
       self->mdversion = mdversion;
@@ -534,6 +573,22 @@ modulemd_module_get_mdversion (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
 
   return self->mdversion;
+}
+
+
+/* Private functions. Do not export */
+void
+modulemd_module_set_assumed_mdversion (ModulemdModule *self, guint64 version)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  self->assumed_mdversion = version;
+}
+
+guint64
+modulemd_module_get_assumed_mdversion (ModulemdModule *self)
+{
+  return self->assumed_mdversion;
 }
 
 
@@ -816,10 +871,19 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
   GHashTableIter iter;
   gpointer module_name, stream_name;
+  guint64 version, assumed_version;
+
+  version = modulemd_module_get_mdversion (self);
+  assumed_version = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (modulemd_module_get_mdversion (self) < 2);
+  g_return_if_fail (version < 2 && assumed_version < 2);
   g_return_if_fail (self->requires != requires);
+
+  if (version == 0 && assumed_version == 0)
+    {
+      modulemd_module_set_assumed_mdversion (self, 1);
+    }
 
   g_hash_table_remove_all (self->requires);
 
@@ -848,8 +912,13 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)
 {
+  guint64 version, assumed_version;
+
+  version = modulemd_module_get_mdversion (self);
+  assumed_version = modulemd_module_get_assumed_mdversion (self);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_get_mdversion (self) < 2, NULL);
+  g_return_val_if_fail (version < 2 && assumed_version < 2, NULL);
 
   return self->requires;
 }
@@ -2004,6 +2073,9 @@ modulemd_module_init (ModulemdModule *self)
 
   self->xmd = g_hash_table_new_full (
     g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
+
+  /* Ensure the modulemd version is unset */
+  self->mdversion = self->assumed_mdversion = 0;
 }
 
 /**

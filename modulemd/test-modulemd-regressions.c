@@ -60,6 +60,48 @@ modulemd_regressions_issue16 (RegressionFixture *fixture,
   g_clear_pointer (&module, g_object_unref);
 }
 
+static void
+modulemd_regressions_issue14_v1 (RegressionFixture *fixture,
+                                 gconstpointer user_data)
+{
+  gchar *yaml_path = NULL;
+  ModulemdModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue14-v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_nonnull (module);
+  g_clear_pointer (&module, g_object_unref);
+}
+
+static void
+modulemd_regressions_issue14_v2 (RegressionFixture *fixture,
+                                 gconstpointer user_data)
+{
+  gchar *yaml_path = NULL;
+  ModulemdModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue14-v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_nonnull (module);
+  g_clear_pointer (&module, g_object_unref);
+}
+
+static void
+modulemd_regressions_issue14_mismatch (RegressionFixture *fixture,
+                                       gconstpointer user_data)
+{
+  gchar *yaml_path = NULL;
+  ModulemdModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue14-mismatch.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_null (module);
+  g_clear_pointer (&module, g_object_unref);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -76,5 +118,25 @@ main (int argc, char *argv[])
               modulemd_regressions_issue16,
               NULL);
 
+  g_test_add ("/modulemd/regressions/issue14_v1",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue14_v1,
+              NULL);
+
+  g_test_add ("/modulemd/regressions/issue14_v2",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue14_v2,
+              NULL);
+
+  g_test_add ("/modulemd/regressions/issue14_mismatch",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue14_mismatch,
+              NULL);
   return g_test_run ();
 }

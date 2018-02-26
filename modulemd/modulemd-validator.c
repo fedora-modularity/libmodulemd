@@ -55,10 +55,10 @@ struct validator_options
 struct validator_options options = { 0, NULL };
 
 static gboolean
-set_verbosity (const gchar  *option_name,
-               const gchar  *value,
-               gpointer      data,
-               GError      **error)
+set_verbosity (const gchar *option_name,
+               const gchar *value,
+               gpointer data,
+               GError **error)
 {
   if (g_strcmp0 ("-v", option_name) == 0 ||
       g_strcmp0 ("--verbose", option_name) == 0)
@@ -78,20 +78,38 @@ set_verbosity (const gchar  *option_name,
   else
     {
       /* We shouldn't be called under any other circumstance */
-      g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED,
-                   "Called for unknown option \"%s\"", option_name);
+      g_set_error (error,
+                   G_OPTION_ERROR,
+                   G_OPTION_ERROR_FAILED,
+                   "Called for unknown option \"%s\"",
+                   option_name);
       return FALSE;
     }
   return TRUE;
 }
 
-static GOptionEntry entries[] =
-{
-  { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
-  { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
-  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, "Files to be validated", NULL },
-  { NULL }
-};
+static GOptionEntry entries[] = { { "verbose",
+                                    'v',
+                                    G_OPTION_FLAG_NO_ARG,
+                                    G_OPTION_ARG_CALLBACK,
+                                    set_verbosity,
+                                    "Be verbose",
+                                    NULL },
+                                  { "debug",
+                                    0,
+                                    G_OPTION_FLAG_NO_ARG,
+                                    G_OPTION_ARG_CALLBACK,
+                                    set_verbosity,
+                                    "Output debugging messages",
+                                    NULL },
+                                  { G_OPTION_REMAINING,
+                                    0,
+                                    0,
+                                    G_OPTION_ARG_FILENAME_ARRAY,
+                                    &options.filenames,
+                                    "Files to be validated",
+                                    NULL },
+                                  { NULL } };
 
 int
 main (int argc, char *argv[])

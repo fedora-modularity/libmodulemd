@@ -1529,7 +1529,7 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   module_components = modulemd_module_get_module_components (module);
   if (module_components && g_hash_table_size (module_components) < 1)
     {
-      rpm_components = NULL;
+      module_components = NULL;
     }
 
   if (!(rpm_components || module_components))

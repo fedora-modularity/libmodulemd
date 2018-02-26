@@ -103,6 +103,18 @@ test_modulemd_module = executable(
 test('test_modulemd_module', test_modulemd_module,
      env : test_env)
 
+test_modulemd_regressions = executable(
+    'test_modulemd_regressions',
+    'test-modulemd-regressions.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+    ],
+    install : false,
+)
+test('test_modulemd_regressions', test_modulemd_regressions,
+    env : test_env)
+
 test_modulemd_servicelevel = executable(
     'test_modulemd_servicelevel',
     'test-modulemd-servicelevel.c',
@@ -136,7 +148,6 @@ test_modulemd_yaml = executable(
     ],
     install : false,
 )
-
 test('test_modulemd_yaml', test_modulemd_yaml,
      env : test_env)
 

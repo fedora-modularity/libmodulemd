@@ -27,10 +27,21 @@
 
 #include "modulemd.h"
 
-void
-modulemd_module_set_assumed_mdversion (ModulemdModule *self, guint64 version);
+gboolean
+modulemd_module_set_mdversion_range (ModulemdModule *self,
+                                     const guint64 min_mdversion,
+                                     const guint64 max_mdversion);
 
-guint64
-modulemd_module_get_assumed_mdversion (ModulemdModule *self);
+gboolean
+modulemd_module_check_mdversion_range_is_set (ModulemdModule *self);
+
+gboolean
+modulemd_module_check_mdversion_range (ModulemdModule *self,
+                                       const guint64 version);
+
+gboolean
+modulemd_module_check_mdversion_range_full (ModulemdModule *self,
+                                            const guint64 min_version,
+                                            const guint64 max_version);
 
 #endif /* MODULEMD_PRIVATE_H */

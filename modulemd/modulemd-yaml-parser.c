@@ -312,7 +312,6 @@ _parse_modulemd_root (ModulemdModule *module,
   yaml_event_t event;
   gboolean done = FALSE;
   guint64 version;
-  guint64 assumed_mdversion;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -368,13 +367,8 @@ _parse_modulemd_root (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
-              /* Check whether we have an assumed mdversion and if they match
-               * This is fragile and will need to be changed if and when a
-               * modulemd v3 is released
-               */
-              assumed_mdversion =
-                modulemd_module_get_assumed_mdversion (module);
-              if (assumed_mdversion && version != assumed_mdversion)
+
+              if (!modulemd_module_check_mdversion_range (module, version))
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Module is using features from "
@@ -570,21 +564,15 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
-              if (modulemd_module_get_mdversion (module) == 0)
-                {
-                  /* The version hasn't been explicitly set yet, so assume
-                   * it must be v1, since this misfeature was removed in v2
-                   */
-                  modulemd_module_set_assumed_mdversion (module, 1);
-                }
-
-              if (modulemd_module_get_mdversion (module) > 1)
+              if (!modulemd_module_check_mdversion_range (module,
+                                                          MD_VERSION_1))
                 {
                   /* EOL is not supported in v2 or later; use servicelevel */
                   MMD_YAML_ERROR_RETURN (
                     error,
                     "EOL is not supported in v2 or later; use servicelevel");
                 }
+
               /* Get the EOL date */
               if (!_parse_modulemd_date (parser, &eol, error))
                 {
@@ -1138,23 +1126,14 @@ _parse_modulemd_deps (ModulemdModule *module,
                       GError **error)
 {
   gboolean result = FALSE;
-  guint64 mdversion = 0;
   yaml_event_t event;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   g_debug ("TRACE: entering _parse_modulemd_deps");
 
-  mdversion = modulemd_module_get_mdversion (module);
-  if (!mdversion)
+  if (!modulemd_module_check_mdversion_range_is_set (module))
     {
-      /* Check to see if we have an *assumed* mdversion */
-      mdversion = modulemd_module_get_assumed_mdversion (module);
-    }
-
-  switch (mdversion)
-    {
-    case 0:
       /* We will have to guess and set the assumed mdversion based on the next
        * parser event. Whee!
        */
@@ -1164,13 +1143,15 @@ _parse_modulemd_deps (ModulemdModule *module,
         {
         case YAML_MAPPING_START_EVENT:
           /* This must be a v1 dependency */
-          modulemd_module_set_assumed_mdversion (module, 1);
+          modulemd_module_set_mdversion_range (
+            module, MD_VERSION_1, MD_VERSION_1);
           result = _parse_modulemd_deps_v1 (module, parser, error);
           break;
 
         case YAML_SEQUENCE_START_EVENT:
           /* This must be a v2 dependency */
-          modulemd_module_set_assumed_mdversion (module, 2);
+          modulemd_module_set_mdversion_range (
+            module, MD_VERSION_2, MD_VERSION_MAX);
           result = _parse_modulemd_deps_v2 (module, parser, error);
           break;
 
@@ -1179,15 +1160,24 @@ _parse_modulemd_deps (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
           break;
         }
-      break;
+      /* Processing is done, go to the end */
+      goto error;
+    }
 
-    case 1: result = _parse_modulemd_deps_v1 (module, parser, error); break;
-
-    case 2: result = _parse_modulemd_deps_v2 (module, parser, error); break;
-
-    default:
-      MMD_YAML_NOEVENT_ERROR_RETURN (error, "Unknown modulemd version");
-      break;
+  if (modulemd_module_check_mdversion_range (module, MD_VERSION_1))
+    {
+      result = _parse_modulemd_deps_v1 (module, parser, error);
+      goto error;
+    }
+  else if (modulemd_module_check_mdversion_range_full (
+             module, MD_VERSION_2, MD_VERSION_MAX))
+    {
+      result = _parse_modulemd_deps_v2 (module, parser, error);
+      goto error;
+    }
+  else
+    {
+      MMD_YAML_NOEVENT_ERROR_RETURN (error, "Incompatible modulemd version");
     }
 
 error:

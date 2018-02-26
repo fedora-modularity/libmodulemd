@@ -99,10 +99,16 @@ struct _ModulemdModule
   guint64 version;
   GHashTable *xmd;
 
-  guint64 assumed_mdversion;
+  guint64 min_mdversion;
+  guint64 max_mdversion;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
+
+
+static gboolean
+modulemd_module_upgrade_full (ModulemdModule *self, guint64 version);
+
 
 /**
  * modulemd_module_set_arch:
@@ -152,18 +158,30 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
 {
   GHashTableIter iter;
   gpointer module_name, stream_name;
-  guint64 version, assumed_version;
+  guint64 version;
 
   version = modulemd_module_get_mdversion (self);
-  assumed_version = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (version < 2 && assumed_version < 2);
   g_return_if_fail (self->buildrequires != buildrequires);
 
-  if (version == 0 && assumed_version == 0)
+  if (version > MD_VERSION_1)
     {
-      modulemd_module_set_assumed_mdversion (self, 1);
+      g_message ("Incompatible modulemd version");
+      return;
+    }
+
+  if (version == MD_VERSION_UNSET)
+    {
+      /* We don't yet have an explicit version, so we'll set an acceptable
+       * range
+       */
+      if (!modulemd_module_set_mdversion_range (
+            self, MD_VERSION_1, MD_VERSION_1))
+        {
+          g_message ("Incompatible modulemd version");
+          return;
+        }
     }
 
   g_hash_table_remove_all (self->buildrequires);
@@ -194,13 +212,10 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
 GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
 {
-  guint64 version, assumed_version;
-
-  version = modulemd_module_get_mdversion (self);
-  assumed_version = modulemd_module_get_assumed_mdversion (self);
-
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (version < 2 && assumed_version < 2, NULL);
+  g_return_val_if_fail (modulemd_module_check_mdversion_range_full (
+                          self, MD_VERSION_1, MD_VERSION_1),
+                        NULL);
 
   return self->buildrequires;
 }
@@ -324,17 +339,29 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 {
   gsize i = 0;
   ModulemdDependencies *copy = NULL;
-  guint64 mdversion, assumed_mdversion;
+  guint64 mdversion;
 
   mdversion = modulemd_module_get_mdversion (self);
-  assumed_mdversion = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (mdversion != 1 && assumed_mdversion != 1);
 
-  if (mdversion == 0)
+  if (mdversion && mdversion < MD_VERSION_2)
     {
-      modulemd_module_set_assumed_mdversion (self, 2);
+      g_message ("Incompatible modulemd version");
+      return;
+    }
+
+  if (mdversion == MD_VERSION_UNSET)
+    {
+      /* We don't yet have an explicit version, so we'll set an acceptable
+       * range
+       */
+      if (!modulemd_module_set_mdversion_range (
+            self, MD_VERSION_2, MD_VERSION_MAX))
+        {
+          g_message ("Incompatible modulemd version");
+          return;
+        }
     }
 
   g_ptr_array_set_size (self->dependencies, 0);
@@ -365,17 +392,29 @@ modulemd_module_add_dependencies (ModulemdModule *self,
 {
   ModulemdDependencies *copy = NULL;
 
-  guint64 mdversion, assumed_mdversion;
+  guint64 mdversion;
 
   mdversion = modulemd_module_get_mdversion (self);
-  assumed_mdversion = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (mdversion != 1 && assumed_mdversion != 1);
 
-  if (mdversion == 0)
+  if (mdversion && mdversion < MD_VERSION_2)
     {
-      modulemd_module_set_assumed_mdversion (self, 2);
+      g_message ("Incompatible modulemd version");
+      return;
+    }
+
+  if (mdversion == MD_VERSION_UNSET)
+    {
+      /* We don't yet have an explicit version, so we'll set an acceptable
+       * range
+       */
+      if (!modulemd_module_set_mdversion_range (
+            self, MD_VERSION_2, MD_VERSION_MAX))
+        {
+          g_message ("Incompatible modulemd version");
+          return;
+        }
     }
 
   modulemd_dependencies_copy (dep, &copy);
@@ -396,7 +435,11 @@ GPtrArray *
 modulemd_module_get_dependencies (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_get_mdversion (self) >= 2, NULL);
+  if (!modulemd_module_check_mdversion_range_full (
+        self, MD_VERSION_2, MD_VERSION_MAX))
+    {
+      return NULL;
+    }
 
   return self->dependencies;
 }
@@ -539,6 +582,7 @@ modulemd_module_get_eol (ModulemdModule *self)
   return self->eol;
 }
 
+
 /**
  * modulemd_module_set_mdversion
  * @mdversion: the metadata version
@@ -549,8 +593,13 @@ void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (
-    !(self->assumed_mdversion && mdversion != self->assumed_mdversion));
+
+  if (!modulemd_module_set_mdversion_range (self, mdversion, mdversion))
+    {
+      g_message ("Modulemd YAML contains content incompatible with version %d",
+                 mdversion);
+      return;
+    }
 
   if (self->mdversion != mdversion)
     {
@@ -559,6 +608,100 @@ modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
                                 md_properties[MD_PROP_MDVERSION]);
     }
 }
+
+
+static void
+modulemd_module_unset_mdversion_range (ModulemdModule *self)
+{
+  /* Unset the mdversion range to avoid issues during upgrades */
+  self->min_mdversion = MD_VERSION_UNSET;
+  self->max_mdversion = MD_VERSION_UNSET;
+}
+
+
+gboolean
+modulemd_module_set_mdversion_range (ModulemdModule *self,
+                                     const guint64 min_mdversion,
+                                     const guint64 max_mdversion)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+  g_return_val_if_fail (min_mdversion && max_mdversion, FALSE);
+
+  if (!modulemd_module_check_mdversion_range_full (
+        self, min_mdversion, max_mdversion))
+    {
+      /* Mismatch between auto-detected features */
+      g_message (
+        "Modulemd YAML contains content incompatible with this version");
+      return FALSE;
+    }
+
+  if (min_mdversion > self->min_mdversion)
+    {
+      self->min_mdversion = min_mdversion;
+    }
+
+  if (!self->max_mdversion || max_mdversion < self->max_mdversion)
+    {
+      self->max_mdversion = max_mdversion;
+    }
+
+  if (self->max_mdversion < self->min_mdversion)
+    {
+      g_message (
+        "Modulemd YAML contains content incompatible with this version");
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_module_check_mdversion_range_is_set (ModulemdModule *self)
+{
+  /* If min has been set, so has max, so no need to check both.
+   * This is enforced by modulemd_module_set_mdversion_range
+   */
+  if (self->min_mdversion == MD_VERSION_UNSET)
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+gboolean
+modulemd_module_check_mdversion_range (ModulemdModule *self,
+                                       const guint64 version)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  return modulemd_module_check_mdversion_range_full (self, version, version);
+}
+
+
+gboolean
+modulemd_module_check_mdversion_range_full (ModulemdModule *self,
+                                            const guint64 min_version,
+                                            const guint64 max_version)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  if (!modulemd_module_check_mdversion_range_is_set (self))
+    {
+      /* No assumptions have been made yet, so we default to true */
+      return TRUE;
+    }
+
+  if (max_version < self->min_mdversion || min_version > self->max_mdversion)
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 
 /**
  * modulemd_module_get_mdversion:
@@ -573,22 +716,6 @@ modulemd_module_get_mdversion (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
 
   return self->mdversion;
-}
-
-
-/* Private functions. Do not export */
-void
-modulemd_module_set_assumed_mdversion (ModulemdModule *self, guint64 version)
-{
-  g_return_if_fail (MODULEMD_IS_MODULE (self));
-
-  self->assumed_mdversion = version;
-}
-
-guint64
-modulemd_module_get_assumed_mdversion (ModulemdModule *self)
-{
-  return self->assumed_mdversion;
 }
 
 
@@ -871,18 +998,30 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
   GHashTableIter iter;
   gpointer module_name, stream_name;
-  guint64 version, assumed_version;
+  guint64 version;
 
   version = modulemd_module_get_mdversion (self);
-  assumed_version = modulemd_module_get_assumed_mdversion (self);
 
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (version < 2 && assumed_version < 2);
   g_return_if_fail (self->requires != requires);
 
-  if (version == 0 && assumed_version == 0)
+  if (version > MD_VERSION_1)
     {
-      modulemd_module_set_assumed_mdversion (self, 1);
+      g_message ("Incompatible modulemd version");
+      return;
+    }
+
+  if (version == MD_VERSION_UNSET)
+    {
+      /* We don't yet have an explicit version, so we'll set an acceptable
+       * range
+       */
+      if (!modulemd_module_set_mdversion_range (
+            self, MD_VERSION_1, MD_VERSION_1))
+        {
+          g_message ("Incompatible modulemd version");
+          return;
+        }
     }
 
   g_hash_table_remove_all (self->requires);
@@ -912,13 +1051,10 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)
 {
-  guint64 version, assumed_version;
-
-  version = modulemd_module_get_mdversion (self);
-  assumed_version = modulemd_module_get_assumed_mdversion (self);
-
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (version < 2 && assumed_version < 2, NULL);
+  g_return_val_if_fail (modulemd_module_check_mdversion_range_full (
+                          self, MD_VERSION_1, MD_VERSION_1),
+                        NULL);
 
   return self->requires;
 }
@@ -2075,7 +2211,7 @@ modulemd_module_init (ModulemdModule *self)
     g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
 
   /* Ensure the modulemd version is unset */
-  self->mdversion = self->assumed_mdversion = 0;
+  self->mdversion = self->min_mdversion = self->max_mdversion = 0;
 }
 
 /**
@@ -2339,7 +2475,7 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
 
   /* Upgrade the EOL field to a "rawhide" servicelevel*/
   eol = modulemd_module_get_eol (self);
-  if (g_date_valid (eol))
+  if (eol && g_date_valid (eol))
     {
       sl = modulemd_servicelevel_new ();
       modulemd_servicelevel_set_eol (sl, eol);
@@ -2373,7 +2509,9 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
   deps = g_ptr_array_new ();
   g_ptr_array_add (deps, v2_dep);
 
-  modulemd_module_set_mdversion (self, 2);
+  /* Unset the version range to avoid upgrade issues */
+  modulemd_module_unset_mdversion_range (self);
+  modulemd_module_set_mdversion (self, MD_VERSION_2);
   modulemd_module_set_dependencies (self, deps);
 
   return TRUE;
@@ -2383,21 +2521,46 @@ gboolean
 modulemd_module_upgrade (ModulemdModule *self)
 {
   gboolean result = FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  result = modulemd_module_upgrade_full (self, MD_VERSION_LATEST);
+
+  return result;
+}
+
+static gboolean
+modulemd_module_upgrade_full (ModulemdModule *self, guint64 version)
+{
+  gboolean result = FALSE;
   guint64 mdversion;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
 
   mdversion = modulemd_module_get_mdversion (self);
 
-  /* Upgrade from v1 to v2 */
-  if (mdversion < 2)
+  while (mdversion < version)
     {
-      result = _modulemd_upgrade_v1_to_v2 (self);
-      if (!result)
-        goto done;
-    }
+      switch (mdversion + 1)
+        {
+        case MD_VERSION_1:
+          /* No upgrade needed for v1 */
+          break;
 
-  /* Future upgrades go here */
+        case MD_VERSION_2:
+          result = _modulemd_upgrade_v1_to_v2 (self);
+          if (!result)
+            goto done;
+          break;
+
+          /* Future upgrades go here */
+
+        default:
+          g_error ("Programming error: no such version %d", version);
+          result = FALSE;
+        }
+      mdversion++;
+    }
 
   result = TRUE;
 done:

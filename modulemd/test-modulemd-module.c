@@ -224,15 +224,11 @@ modulemd_module_test_get_set_mdversion (ModuleFixture *fixture,
   ModulemdModule *md = fixture->md;
 
   /* Should be initialized to 0 */
-  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, 0);
+  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, MD_VERSION_UNSET);
 
   /* Assign a valid version */
-  modulemd_module_set_mdversion (md, 1);
-  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, 1);
-
-  /* Reassign it to 0 */
-  modulemd_module_set_mdversion (md, 0);
-  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, 0);
+  modulemd_module_set_mdversion (md, MD_VERSION_1);
+  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, MD_VERSION_1);
 }
 
 static void

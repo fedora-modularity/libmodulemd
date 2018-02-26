@@ -2339,7 +2339,7 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
 
   /* Upgrade the EOL field to a "rawhide" servicelevel*/
   eol = modulemd_module_get_eol (self);
-  if (g_date_valid (eol))
+  if (eol)
     {
       sl = modulemd_servicelevel_new ();
       modulemd_servicelevel_set_eol (sl, eol);

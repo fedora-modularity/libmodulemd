@@ -35,6 +35,7 @@ modulemd_yaml_error_quark (void);
 enum ModulemdYamlError
 {
   MODULEMD_YAML_ERROR_OPEN,
+  MODULEMD_YAML_ERROR_UNPARSEABLE,
   MODULEMD_YAML_ERROR_PARSE,
   MODULEMD_YAML_ERROR_EMIT
 };
@@ -47,8 +48,11 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     {                                                                         \
       if (!yaml_parser_parse (parser, event))                                 \
         {                                                                     \
-          g_set_error_literal (                                               \
-            error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);      \
+          g_debug (msg);                                                      \
+          g_set_error_literal (error,                                         \
+                               MODULEMD_YAML_ERROR,                           \
+                               MODULEMD_YAML_ERROR_UNPARSEABLE,               \
+                               msg);                                          \
           goto error;                                                         \
         }                                                                     \
       g_debug ("Parser event: %s", mmd_yaml_get_event_name ((event)->type));  \

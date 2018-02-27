@@ -102,6 +102,19 @@ modulemd_regressions_issue14_mismatch (RegressionFixture *fixture,
   g_clear_pointer (&module, g_object_unref);
 }
 
+static void
+modulemd_regressions_issue18 (RegressionFixture *fixture,
+                              gconstpointer user_data)
+{
+  gchar *yaml_content = NULL;
+  ModulemdModule *module = NULL;
+
+  yaml_content = g_strdup ("document: modulemd\nBad YAML");
+  module = modulemd_module_new_from_string (yaml_content);
+  g_assert_null (module);
+  g_clear_pointer (&module, g_object_unref);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -138,5 +151,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_regressions_issue14_mismatch,
               NULL);
+
+  g_test_add ("/modulemd/regressions/issue18",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue18,
+              NULL);
+
   return g_test_run ();
 }

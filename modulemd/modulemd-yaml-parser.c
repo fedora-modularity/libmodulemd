@@ -256,10 +256,25 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
 
           if (!_parse_modulemd_root (modules[count - 1], parser, error))
             {
-              /* This document was invalid, so we'll skip it. The parser
-               * should now be at the YAML_DOCUMENT_END_EVENT, so we'll
-               * delete the module in-progress, decrement the count and
-               * continue the loop in case there are other documents to be
+              /* We must have an error value here */
+              g_return_val_if_fail (error, NULL);
+
+              if ((*error)->code == MODULEMD_YAML_ERROR_UNPARSEABLE)
+                {
+                  /* The document contained invalid YAML structure, which means
+                   * that there's no way to determine where the next
+                   * sub-document will begin. We have to abort processing
+                   * entirely and return zero results.
+                   */
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "YAML was unparseable. Aborting");
+                  break;
+                }
+
+              /* This sub-document was invalid, so we'll attempt to skip it.
+               * The parser should now be at the YAML_DOCUMENT_END_EVENT
+               * so we'll delete the module in-progress, decrement the count
+               * and continue the loop in case there are other documents to be
                * processed.
                */
               g_message ("Invalid document [%s]. Skipping it.",
@@ -311,6 +326,7 @@ _parse_modulemd_root (ModulemdModule *module,
 {
   yaml_event_t event;
   gboolean done = FALSE;
+  gboolean result = FALSE;
   guint64 version;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -339,6 +355,7 @@ _parse_modulemd_root (ModulemdModule *module,
           /* Handle "document: modulemd" */
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "document"))
             {
+              g_debug ("TRACE: root entry [document]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
                 parser, &event, error, "Parser error");
               if (event.type != YAML_SCALAR_EVENT ||
@@ -353,6 +370,7 @@ _parse_modulemd_root (ModulemdModule *module,
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "version"))
             {
+              g_debug ("TRACE: root entry [mdversion]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
                 parser, &event, error, "Parser error");
               if (event.type != YAML_SCALAR_EVENT)
@@ -380,6 +398,7 @@ _parse_modulemd_root (ModulemdModule *module,
           /* Process the data section */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "data"))
             {
+              g_debug ("TRACE: root entry [data]");
               _yaml_parser_recurse_down (_parse_modulemd_data);
             }
 
@@ -398,21 +417,24 @@ _parse_modulemd_root (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
 error:
   if (*error)
     {
       /* Move the parser to the end of the mapping */
+      g_debug ("TRACE: Error encountered; skipping to end of document.");
       do
         {
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (
             parser, &event, error, "Parser error");
         }
-      while (event.type != YAML_DOCUMENT_END_EVENT);
-      return FALSE;
+      while (event.type != YAML_DOCUMENT_END_EVENT &&
+             event.type != YAML_NO_EVENT);
+      result = FALSE;
     }
 
   g_debug ("TRACE: exiting _parse_modulemd_root");
-  return TRUE;
+  return result;
 }
 
 static gboolean

@@ -43,11 +43,17 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date);
 const GDate *
 modulemd_servicelevel_get_eol (ModulemdServiceLevel *self);
 
+const GDate *
+modulemd_servicelevel_peek_eol (ModulemdServiceLevel *self);
+
 void
 modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name);
 
 const gchar *
 modulemd_servicelevel_get_name (ModulemdServiceLevel *self);
+
+const gchar *
+modulemd_servicelevel_peek_name (ModulemdServiceLevel *self);
 
 G_END_DECLS
 

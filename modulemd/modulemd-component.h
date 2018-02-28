@@ -39,13 +39,13 @@ struct _ModulemdComponentClass
 
   /* Virtual Public Members */
   void (*set_buildorder) (ModulemdComponent *self, guint64 buildorder);
-  guint64 (*get_buildorder) (ModulemdComponent *self);
+  guint64 (*peek_buildorder) (ModulemdComponent *self);
 
   void (*set_name) (ModulemdComponent *self, const gchar *name);
-  const gchar *(*get_name) (ModulemdComponent *self);
+  const gchar *(*peek_name) (ModulemdComponent *self);
 
   void (*set_rationale) (ModulemdComponent *self, const gchar *rationale);
-  const gchar *(*get_rationale) (ModulemdComponent *self);
+  const gchar *(*peek_rationale) (ModulemdComponent *self);
 
   /* Padding to allow adding up to 12 new virtual functions without
      * breaking ABI. */
@@ -61,16 +61,23 @@ modulemd_component_set_buildorder (ModulemdComponent *self,
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self);
 
+guint64
+modulemd_component_peek_buildorder (ModulemdComponent *self);
+
 void
 modulemd_component_set_name (ModulemdComponent *self, const gchar *name);
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self);
+const gchar *
+modulemd_component_peek_name (ModulemdComponent *self);
 
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
                                   const gchar *rationale);
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
+const gchar *
+modulemd_component_peek_rationale (ModulemdComponent *self);
 
 G_END_DECLS
 

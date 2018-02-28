@@ -78,15 +78,36 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
     }
 }
 
+
 /**
  * modulemd_servicelevel_get_eol:
  *
  * Retrieves the end-of-life date of this service level.
  *
  * Returns: a #GDate representing the end-of-life date of the service level.
+ *
+ * Deprecated: 1.1
+ * Use peek_eol() instead.
  */
+G_DEPRECATED_FOR (modulemd_servicelevel_peek_eol)
 const GDate *
 modulemd_servicelevel_get_eol (ModulemdServiceLevel *self)
+{
+  return modulemd_servicelevel_peek_eol (self);
+}
+
+
+/**
+ * modulemd_servicelevel_peek_eol:
+ *
+ * Retrieves the end-of-life date of this service level.
+ *
+ * Returns: a #GDate representing the end-of-life date of the service level.
+ *
+ * Since: 1.1
+ */
+const GDate *
+modulemd_servicelevel_peek_eol (ModulemdServiceLevel *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
 
@@ -128,9 +149,30 @@ modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name)
  *
  * Returns: a string representing the name of the service level or NULL if not
  * set.
+ *
+ * Deprecated: 1.1
+ * Use peek_name() instead.
  */
+G_DEPRECATED_FOR (modulemd_servicelevel_peek_name)
 const gchar *
 modulemd_servicelevel_get_name (ModulemdServiceLevel *self)
+{
+  return modulemd_servicelevel_peek_name (self);
+}
+
+
+/**
+ * modulemd_servicelevel_peek_name:
+ *
+ * Retrieves the name of this service level
+ *
+ * Returns: a string representing the name of the service level or NULL if not
+ * set.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_servicelevel_peek_name (ModulemdServiceLevel *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
 
@@ -178,11 +220,11 @@ modulemd_servicelevel_get_property (GObject *gobject,
   switch (property_id)
     {
     case SL_PROP_EOL:
-      g_value_set_boxed (value, modulemd_servicelevel_get_eol (self));
+      g_value_set_boxed (value, modulemd_servicelevel_peek_eol (self));
       break;
 
     case SL_PROP_NAME:
-      g_value_set_string (value, modulemd_servicelevel_get_name (self));
+      g_value_set_string (value, modulemd_servicelevel_peek_name (self));
       break;
 
     default:

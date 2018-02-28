@@ -176,6 +176,7 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
                             deps_properties[DEPS_PROP_BUILDREQUIRES]);
 }
 
+
 /**
  * modulemd_dependencies_get_buildrequires:
  *
@@ -184,9 +185,31 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
  * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
  * table containing the "buildrequires" property. Returns NULL if there are no
  * buildrequires set.
+ *
+ * Deprecated: 1.1
+ * Use peek_buildrequires() instead.
  */
+G_DEPRECATED_FOR (modulemd_dependencies_peek_buildrequires)
 GHashTable *
 modulemd_dependencies_get_buildrequires (ModulemdDependencies *self)
+{
+  return modulemd_dependencies_peek_buildrequires (self);
+}
+
+
+/**
+ * modulemd_dependencies_peek_buildrequires:
+ *
+ * Retrieves the "buildrequires" for these dependencies.
+ *
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
+ * table containing the "buildrequires" property. Returns NULL if there are no
+ * buildrequires set.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_dependencies_peek_buildrequires (ModulemdDependencies *self)
 {
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
@@ -290,9 +313,29 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
  *
  * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
  * table containing the "requires" property.
+ *
+ * Deprecated: 1.1
  */
+G_DEPRECATED_FOR (modulemd_dependencies_peek_requires)
 GHashTable *
 modulemd_dependencies_get_requires (ModulemdDependencies *self)
+{
+  return modulemd_dependencies_peek_requires (self);
+}
+
+
+/**
+ * modulemd_dependencies_peek_requires:
+ *
+ * Retrieves the "requires" for these dependencies.
+ *
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer none): A hash
+ * table containing the "requires" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_dependencies_peek_requires (ModulemdDependencies *self)
 {
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
@@ -363,11 +406,11 @@ modulemd_dependencies_get_property (GObject *object,
     {
     case DEPS_PROP_BUILDREQUIRES:
       g_value_set_boxed (value,
-                         modulemd_dependencies_get_buildrequires (self));
+                         modulemd_dependencies_peek_buildrequires (self));
       break;
 
     case DEPS_PROP_REQUIRES:
-      g_value_set_boxed (value, modulemd_dependencies_get_requires (self));
+      g_value_set_boxed (value, modulemd_dependencies_peek_requires (self));
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); break;

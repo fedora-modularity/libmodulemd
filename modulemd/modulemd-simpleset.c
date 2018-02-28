@@ -139,9 +139,32 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
  *
  * Returns: (array zero-terminated=1) (transfer full):
  * A list representing a set of string values.
+ *
+ * Deprecated: 1.1
+ * Use dup() instead.
+ * This function was inconsistent with the other get() methods in libmodulemd
+ * and should have been called dup() all along.
  */
+G_DEPRECATED_FOR (modulemd_simpleset_dup)
 gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self)
+{
+  return modulemd_simpleset_dup (self);
+}
+
+
+/**
+ * modulemd_simpleset_dup:
+ *
+ * Retrieves the set as a #GPtrArray of strings
+ *
+ * Returns: (array zero-terminated=1) (transfer full):
+ * A list representing a set of string values.
+ *
+ * Since: 1.1
+ */
+gchar **
+modulemd_simpleset_dup (ModulemdSimpleSet *self)
 {
   GPtrArray *sorted_keys = NULL;
   gchar **keys = NULL;
@@ -159,6 +182,7 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
 
   return keys;
 }
+
 
 /**
  * modulemd_simpleset_add
@@ -272,7 +296,7 @@ modulemd_simpleset_get_property (GObject *gobject,
   switch (property_id)
     {
     case SET_PROP_SET:
-      g_value_take_boxed (value, modulemd_simpleset_get (self));
+      g_value_take_boxed (value, modulemd_simpleset_dup (self));
       break;
 
     default:

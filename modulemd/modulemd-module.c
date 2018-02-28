@@ -2558,6 +2558,7 @@ modulemd_module_upgrade_full (ModulemdModule *self, guint64 version)
         default:
           g_error ("Programming error: no such version %d", version);
           result = FALSE;
+          goto done;
         }
       mdversion++;
     }

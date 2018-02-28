@@ -47,11 +47,16 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
                                    const gchar *ref);
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self);
+const gchar *
+modulemd_component_module_peek_ref (ModulemdComponentModule *self);
 
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
                                           const gchar *repository);
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self);
+
+const gchar *
+modulemd_component_module_peek_repository (ModulemdComponentModule *self);
 
 #endif /* MODULEMD_COMPONENT_MODULE_H */

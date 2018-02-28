@@ -43,16 +43,24 @@ modulemd_profile_set_description (ModulemdProfile *self,
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self);
 
+const gchar *
+modulemd_profile_peek_description (ModulemdProfile *self);
+
 void
 modulemd_profile_set_name (ModulemdProfile *self, const gchar *name);
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self);
+const gchar *
+modulemd_profile_peek_name (ModulemdProfile *self);
 
 void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self);
+
+ModulemdSimpleSet *
+modulemd_profile_peek_rpms (ModulemdProfile *self);
 
 void
 modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm);

@@ -73,20 +73,42 @@ modulemd_profile_set_description (ModulemdProfile *self,
     }
 }
 
+
 /**
  * modulemd_profile_get_description:
  *
  * Retrieves the profile description.
  *
  * Returns: A string containing the "description" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_description() instead.
  */
+G_DEPRECATED_FOR (modulemd_profile_peek_description)
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self)
+{
+  return modulemd_profile_peek_description (self);
+}
+
+
+/**
+ * modulemd_profile_peek_description:
+ *
+ * Retrieves the profile description.
+ *
+ * Returns: A string containing the "description" property.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_profile_peek_description (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return self->description;
 }
+
 
 /**
  * modulemd_profile_set_name:
@@ -108,20 +130,42 @@ modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
     }
 }
 
+
 /**
  * modulemd_profile_get_name:
  *
  * Retrieves the profile name.
  *
  * Returns: A string containing the "name" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_name() instead.
  */
+G_DEPRECATED_FOR (modulemd_profile_peek_name)
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self)
+{
+  return modulemd_profile_peek_name (self);
+}
+
+
+/**
+ * modulemd_profile_peek_name:
+ *
+ * Retrieves the profile name.
+ *
+ * Returns: A string containing the "name" property.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_profile_peek_name (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return self->name;
 }
+
 
 /**
  * modulemd_profile_set_rpms:
@@ -142,6 +186,7 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
                             profile_properties[PROFILE_PROP_RPMS]);
 }
 
+
 /**
  * modulemd_profile_get_rpms:
  *
@@ -149,14 +194,36 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
  *
  * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
  * "rpms" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_rpms() instead.
  */
+G_DEPRECATED_FOR (modulemd_profile_peek_rpms)
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self)
+{
+  return modulemd_profile_peek_rpms (self);
+}
+
+
+/**
+ * modulemd_profile_peek_rpms:
+ *
+ * Retrieves the "rpms" for this profile
+ *
+ * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
+ * "rpms" property.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_profile_peek_rpms (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return self->rpms;
 }
+
 
 void
 modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm)
@@ -219,15 +286,15 @@ modulemd_profile_get_property (GObject *gobject,
   switch (property_id)
     {
     case PROFILE_PROP_DESC:
-      g_value_set_string (value, modulemd_profile_get_description (self));
+      g_value_set_string (value, modulemd_profile_peek_description (self));
       break;
 
     case PROFILE_PROP_NAME:
-      g_value_set_string (value, modulemd_profile_get_name (self));
+      g_value_set_string (value, modulemd_profile_peek_name (self));
       break;
 
     case PROFILE_PROP_RPMS:
-      g_value_set_object (value, modulemd_profile_get_rpms (self));
+      g_value_set_object (value, modulemd_profile_peek_rpms (self));
       break;
 
     default:

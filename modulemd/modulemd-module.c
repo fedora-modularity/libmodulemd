@@ -2517,6 +2517,18 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
   return TRUE;
 }
 
+/**
+ * modulemd_module_upgrade:
+ * Upgrade the module to the latest supported version
+ *
+ * This function takes content imported from earlier versions of the modulemd
+ * format and upgrades it into the most recent version.
+ *
+ * Return value: TRUE if the upgrade was performed successfully. If this
+ * function returns FALSE, the internal state of the data is undefined and
+ * should not be used further.
+ */
+
 gboolean
 modulemd_module_upgrade (ModulemdModule *self)
 {

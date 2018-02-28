@@ -45,6 +45,8 @@ void
 modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set);
 gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self);
+gchar **
+modulemd_simpleset_dup (ModulemdSimpleSet *self);
 
 void
 modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value);

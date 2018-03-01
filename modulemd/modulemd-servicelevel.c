@@ -121,6 +121,31 @@ modulemd_servicelevel_peek_eol (ModulemdServiceLevel *self)
 
 
 /**
+ * modulemd_servicelevel_dup_eol:
+ *
+ * Retrieves a copy of the end-of-life date of this service level.
+ *
+ * Returns: a #GDate representing the end-of-life date of the service level.
+ *
+ * Since: 1.1
+ */
+GDate *
+modulemd_servicelevel_dup_eol (ModulemdServiceLevel *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
+
+  if (!g_date_valid (self->eol))
+    {
+      return NULL;
+    }
+
+  return g_date_new_dmy (g_date_get_day (self->eol),
+                         g_date_get_month (self->eol),
+                         g_date_get_year (self->eol));
+}
+
+
+/**
  * modulemd_servicelevel_set_name:
  * @name: (nullable): The name of this servicelevel
  *
@@ -182,6 +207,57 @@ modulemd_servicelevel_peek_name (ModulemdServiceLevel *self)
     }
 
   return self->name;
+}
+
+
+/**
+ * modulemd_servicelevel_dup_name:
+ *
+ * Retrieves a copy of the name of this service level
+ *
+ * Returns: a copy of the string representing the name of the service level or
+ * NULL if not set.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_servicelevel_dup_name (ModulemdServiceLevel *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
+
+  if (!self->name)
+    {
+      g_warning ("Servicelevel name requested, but has not been set");
+      return NULL;
+    }
+
+  return g_strdup (self->name);
+}
+
+
+/**
+ * modulemd_servicelevel_copy:
+ *
+ * Create a copy of this #ModulemdServiceLevel object.
+ *
+ * Returns: (transfer full): a copied #ModulemdServiceLevel object
+ *
+ * Since: 1.1
+ */
+ModulemdServiceLevel *
+modulemd_servicelevel_copy (ModulemdServiceLevel *self)
+{
+  ModulemdServiceLevel *new_sl = NULL;
+  g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
+
+  new_sl = modulemd_servicelevel_new ();
+
+  modulemd_servicelevel_set_eol (new_sl,
+                                 modulemd_servicelevel_peek_eol (self));
+  modulemd_servicelevel_set_name (new_sl,
+                                  modulemd_servicelevel_peek_name (self));
+
+  return new_sl;
 }
 
 

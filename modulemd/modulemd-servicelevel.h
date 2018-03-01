@@ -46,6 +46,9 @@ modulemd_servicelevel_get_eol (ModulemdServiceLevel *self);
 const GDate *
 modulemd_servicelevel_peek_eol (ModulemdServiceLevel *self);
 
+GDate *
+modulemd_servicelevel_dup_eol (ModulemdServiceLevel *self);
+
 void
 modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name);
 
@@ -54,6 +57,12 @@ modulemd_servicelevel_get_name (ModulemdServiceLevel *self);
 
 const gchar *
 modulemd_servicelevel_peek_name (ModulemdServiceLevel *self);
+
+gchar *
+modulemd_servicelevel_dup_name (ModulemdServiceLevel *self);
+
+ModulemdServiceLevel *
+modulemd_servicelevel_copy (ModulemdServiceLevel *self);
 
 G_END_DECLS
 

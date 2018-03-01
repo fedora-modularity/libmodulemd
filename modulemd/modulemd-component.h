@@ -43,13 +43,18 @@ struct _ModulemdComponentClass
 
   void (*set_name) (ModulemdComponent *self, const gchar *name);
   const gchar *(*peek_name) (ModulemdComponent *self);
+  gchar *(*dup_name) (ModulemdComponent *self);
 
   void (*set_rationale) (ModulemdComponent *self, const gchar *rationale);
   const gchar *(*peek_rationale) (ModulemdComponent *self);
+  gchar *(*dup_rationale) (ModulemdComponent *self);
 
-  /* Padding to allow adding up to 12 new virtual functions without
-     * breaking ABI. */
-  gpointer padding[12];
+  /* Pure Virtual Public Members */
+  ModulemdComponent *(*copy) (ModulemdComponent *self);
+
+  /* Padding to allow adding up to 11 new virtual functions without
+   * breaking ABI. */
+  gpointer padding[9];
 };
 
 ModulemdComponent *
@@ -70,6 +75,8 @@ const gchar *
 modulemd_component_get_name (ModulemdComponent *self);
 const gchar *
 modulemd_component_peek_name (ModulemdComponent *self);
+gchar *
+modulemd_component_dup_name (ModulemdComponent *self);
 
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
@@ -78,6 +85,11 @@ const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
 const gchar *
 modulemd_component_peek_rationale (ModulemdComponent *self);
+gchar *
+modulemd_component_dup_rationale (ModulemdComponent *self);
+
+ModulemdComponent *
+modulemd_component_copy (ModulemdComponent *self);
 
 G_END_DECLS
 

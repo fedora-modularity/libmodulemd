@@ -94,6 +94,16 @@ modulemd_component_default_peek_name (ModulemdComponent *self)
   return priv->name;
 }
 
+static gchar *
+modulemd_component_default_dup_name (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return g_strdup (priv->name);
+}
+
 static void
 modulemd_component_default_set_rationale (ModulemdComponent *self,
                                           const gchar *rationale)
@@ -113,6 +123,16 @@ modulemd_component_default_peek_rationale (ModulemdComponent *self)
     modulemd_component_get_instance_private (self);
 
   return priv->rationale;
+}
+
+static gchar *
+modulemd_component_default_dup_rationale (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return g_strdup (priv->rationale);
 }
 
 /**
@@ -228,6 +248,27 @@ modulemd_component_peek_name (ModulemdComponent *self)
   return klass->peek_name (self);
 }
 
+/**
+ * modulemd_component_dup_name:
+ *
+ * Returns a copy of the 'name' property;
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_dup_name (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->dup_name, NULL);
+
+
+  return klass->dup_name (self);
+}
+
 
 /**
  * modulemd_component_set_rationale:
@@ -285,6 +326,51 @@ modulemd_component_peek_rationale (ModulemdComponent *self)
 
 
   return klass->peek_rationale (self);
+}
+
+/**
+ * modulemd_component_dup_rationale:
+ *
+ * Returns a copy of the 'rationale' property;
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_dup_rationale (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->peek_rationale, NULL);
+
+
+  return klass->dup_rationale (self);
+}
+
+
+/**
+ * modulemd_component_copy:
+ *
+ * Returns a complete copy of this Component.
+ *
+ * Returns: (transfer full): A copy of this Component.
+ *
+ * Since: 1.1
+ */
+ModulemdComponent *
+modulemd_component_copy (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->copy, NULL);
+
+
+  return klass->copy (self);
 }
 
 
@@ -370,9 +456,14 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
 
   klass->set_name = modulemd_component_default_set_name;
   klass->peek_name = modulemd_component_default_peek_name;
+  klass->dup_name = modulemd_component_default_dup_name;
 
   klass->set_rationale = modulemd_component_default_set_rationale;
   klass->peek_rationale = modulemd_component_default_peek_rationale;
+  klass->dup_rationale = modulemd_component_default_dup_rationale;
+
+  /* copy() is pure-virtual */
+  klass->copy = NULL;
 
   component_properties[COMPONENT_PROP_BUILDORDER] =
     g_param_spec_uint64 ("buildorder",

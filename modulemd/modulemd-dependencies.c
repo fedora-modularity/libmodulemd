@@ -217,6 +217,51 @@ modulemd_dependencies_peek_buildrequires (ModulemdDependencies *self)
 }
 
 
+static GHashTable *
+modulemd_dependencies_dup_requires_common (GHashTable *requires)
+{
+  GHashTable *new_requires = NULL;
+  ModulemdSimpleSet *set = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_return_val_if_fail (requires, NULL);
+
+  new_requires =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  g_hash_table_iter_init (&iter, requires);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      set = NULL;
+      modulemd_simpleset_copy (MODULEMD_SIMPLESET (value), &set);
+      g_hash_table_replace (
+        new_requires, g_strdup ((gchar *)key), (gpointer)set);
+    }
+
+  return new_requires;
+}
+
+
+/**
+ * modulemd_dependencies_dup_buildrequires:
+ *
+ * Retrieves a copy of the "buildrequires" for these dependencies.
+ *
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer container): A hash
+ * table containing the "buildrequires" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_dependencies_dup_buildrequires (ModulemdDependencies *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
+
+  return modulemd_dependencies_dup_requires_common (self->buildrequires);
+}
+
+
 /**
  * modulemd_dependencies_add_requires:
  * @module: The module name
@@ -340,6 +385,25 @@ modulemd_dependencies_peek_requires (ModulemdDependencies *self)
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
 
   return self->requires;
+}
+
+
+/**
+ * modulemd_dependencies_dup_requires:
+ *
+ * Retrieves a copy of the "requires" for these dependencies.
+ *
+ * Returns: (element-type utf8 ModulemdSimpleSet) (transfer container): A hash
+ * table containing the "requires" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_dependencies_dup_requires (ModulemdDependencies *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self), NULL);
+
+  return modulemd_dependencies_dup_requires_common (self->requires);
 }
 
 

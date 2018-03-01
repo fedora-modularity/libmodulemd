@@ -56,6 +56,8 @@ modulemd_dependencies_get_buildrequires (ModulemdDependencies *self);
 
 GHashTable *
 modulemd_dependencies_peek_buildrequires (ModulemdDependencies *self);
+GHashTable *
+modulemd_dependencies_dup_buildrequires (ModulemdDependencies *self);
 
 void
 modulemd_dependencies_add_requires (ModulemdDependencies *self,
@@ -76,6 +78,9 @@ modulemd_dependencies_get_requires (ModulemdDependencies *self);
 
 GHashTable *
 modulemd_dependencies_peek_requires (ModulemdDependencies *self);
+
+GHashTable *
+modulemd_dependencies_dup_requires (ModulemdDependencies *self);
 
 void
 modulemd_dependencies_copy (ModulemdDependencies *self,

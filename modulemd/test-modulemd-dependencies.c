@@ -148,6 +148,31 @@ modulemd_dependencies_test_get_set_requires (DependenciesFixture *fixture,
 }
 
 
+static void
+modulemd_dependencies_test_dup_set_buildrequires (DependenciesFixture *fixture,
+                                                  gconstpointer user_data)
+{
+  _modulemd_dependencies_test_get_set (
+    fixture,
+    user_data,
+    modulemd_dependencies_add_buildrequires_single,
+    modulemd_dependencies_add_buildrequires,
+    modulemd_dependencies_dup_buildrequires);
+}
+
+static void
+modulemd_dependencies_test_dup_set_requires (DependenciesFixture *fixture,
+                                             gconstpointer user_data)
+{
+  _modulemd_dependencies_test_get_set (
+    fixture,
+    user_data,
+    modulemd_dependencies_add_requires_single,
+    modulemd_dependencies_add_requires,
+    modulemd_dependencies_dup_requires);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -168,6 +193,18 @@ main (int argc, char *argv[])
               NULL,
               modulemd_dependencies_set_up,
               modulemd_dependencies_test_get_set_requires,
+              modulemd_dependencies_tear_down);
+  g_test_add ("/modulemd/dependencies/test_dependencies_buildrequires_dup",
+              DependenciesFixture,
+              NULL,
+              modulemd_dependencies_set_up,
+              modulemd_dependencies_test_dup_set_buildrequires,
+              modulemd_dependencies_tear_down);
+  g_test_add ("/modulemd/dependencies/test_dependencies_requires_dup",
+              DependenciesFixture,
+              NULL,
+              modulemd_dependencies_set_up,
+              modulemd_dependencies_test_dup_set_requires,
               modulemd_dependencies_tear_down);
 
   return g_test_run ();

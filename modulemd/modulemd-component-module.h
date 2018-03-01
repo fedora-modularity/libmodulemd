@@ -49,6 +49,8 @@ const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self);
 const gchar *
 modulemd_component_module_peek_ref (ModulemdComponentModule *self);
+gchar *
+modulemd_component_module_dup_ref (ModulemdComponentModule *self);
 
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
@@ -58,5 +60,7 @@ modulemd_component_module_get_repository (ModulemdComponentModule *self);
 
 const gchar *
 modulemd_component_module_peek_repository (ModulemdComponentModule *self);
+gchar *
+modulemd_component_module_dup_repository (ModulemdComponentModule *self);
 
 #endif /* MODULEMD_COMPONENT_MODULE_H */

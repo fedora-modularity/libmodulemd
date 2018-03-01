@@ -111,6 +111,24 @@ modulemd_profile_peek_description (ModulemdProfile *self)
 
 
 /**
+ * modulemd_profile_dup_description:
+ *
+ * Retrieves a copy of the profile description.
+ *
+ * Returns: A copy of the string containing the "description" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_profile_dup_description (ModulemdProfile *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  return g_strdup (self->description);
+}
+
+
+/**
  * modulemd_profile_set_name:
  * @name: (nullable): the profile name.
  *
@@ -164,6 +182,24 @@ modulemd_profile_peek_name (ModulemdProfile *self)
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return self->name;
+}
+
+
+/**
+ * modulemd_profile_dup_name:
+ *
+ * Retrieves a copy of the profile name.
+ *
+ * Returns: A copy of string containing the "name" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_profile_dup_name (ModulemdProfile *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  return g_strdup (self->name);
 }
 
 
@@ -225,6 +261,28 @@ modulemd_profile_peek_rpms (ModulemdProfile *self)
 }
 
 
+/**
+ * modulemd_profile_dup_rpms:
+ *
+ * Retrieves a copy of the "rpms" for this profile
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of RPMs in the
+ * "rpms" property.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_profile_dup_rpms (ModulemdProfile *self)
+{
+  ModulemdSimpleSet *rpms = NULL;
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  modulemd_simpleset_copy (self->rpms, &rpms);
+
+  return rpms;
+}
+
+
 void
 modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm)
 {
@@ -246,6 +304,33 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm)
   g_object_notify_by_pspec (G_OBJECT (self),
                             profile_properties[PROFILE_PROP_RPMS]);
 }
+
+
+/**
+ * modulemd_profile_copy:
+ *
+ * Creates a copy of this profile
+ *
+ * Returns: (transfer full): a copy of this #ModulemdProfile
+ *
+ * Since: 1.1
+ */
+ModulemdProfile *
+modulemd_profile_copy (ModulemdProfile *self)
+{
+  ModulemdProfile *new_profile = NULL;
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  new_profile = modulemd_profile_new ();
+
+  modulemd_profile_set_description (new_profile,
+                                    modulemd_profile_peek_description (self));
+  modulemd_profile_set_name (new_profile, modulemd_profile_peek_name (self));
+  modulemd_profile_set_rpms (new_profile, modulemd_profile_peek_rpms (self));
+
+  return new_profile;
+}
+
 
 static void
 modulemd_profile_set_property (GObject *gobject,

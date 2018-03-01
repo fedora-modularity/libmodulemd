@@ -496,6 +496,7 @@ static void
 modulemd_module_test_construct_v1 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
+  ModulemdModule *copy = NULL;
   ModulemdModule **modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
@@ -525,6 +526,11 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
+  /* Make sure no errors occur when copying it */
+  copy = modulemd_module_copy (fixture->md);
+  g_assert_nonnull (copy);
+  g_assert_cmpuint (modulemd_module_peek_mdversion(copy), ==, 1);
+
   g_message ("v1 YAML:\n%s", yaml);
 
   g_free (modules);
@@ -535,6 +541,7 @@ static void
 modulemd_module_test_construct_v2 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
+  ModulemdModule *copy = NULL;
   ModulemdModule **modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
@@ -587,6 +594,11 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
   g_assert_nonnull (yaml);
+
+  /* Make sure no errors occur when copying it */
+  copy = modulemd_module_copy (fixture->md);
+  g_assert_nonnull (copy);
+  g_assert_cmpuint (modulemd_module_peek_mdversion(copy), ==, 2);
 
   g_message ("v2 YAML:\n%s", yaml);
 

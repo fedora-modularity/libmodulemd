@@ -163,6 +163,25 @@ modulemd_module_peek_arch (ModulemdModule *self)
   return self->arch;
 }
 
+
+/**
+ * modulemd_module_dup_arch:
+ *
+ * Retrieves a copy of the "arch" for modulemd.
+ *
+ * Returns: A copy of the string containing the "arch" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_arch (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->arch);
+}
+
+
 /**
  * modulemd_module_set_buildrequires:
  * @buildrequires: (nullable) (element-type utf8 utf8): The requirements to build this
@@ -259,6 +278,29 @@ modulemd_module_peek_buildrequires (ModulemdModule *self)
   return self->buildrequires;
 }
 
+
+/**
+ * modulemd_module_dup_buildrequires:
+ *
+ * Retrieves the "buildrequires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "buildrequires" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_buildrequires (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_check_mdversion_range_full (
+                          self, MD_VERSION_1, MD_VERSION_1),
+                        NULL);
+
+  return _modulemd_hash_table_deep_str_copy (self->buildrequires);
+}
+
+
 /**
  * modulemd_module_set_community:
  * @community: (nullable): the module community.
@@ -312,6 +354,24 @@ modulemd_module_peek_community (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->community;
+}
+
+
+/**
+ * modulemd_module_dup_community:
+ *
+ * Retrieves a copy of the "community" for modulemd.
+ *
+ * Returns: A copy of string containing the "community" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_community (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->community);
 }
 
 
@@ -377,6 +437,28 @@ modulemd_module_peek_content_licenses (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_content_licenses:
+ *
+ * Retrieves the "content_licenses" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of licenses in the
+ * "content_licenses" property.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_module_dup_content_licenses (ModulemdModule *self)
+{
+  ModulemdSimpleSet *set = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  modulemd_simpleset_copy (self->content_licenses, &set);
+
+  return set;
+}
+
+
+/**
  * modulemd_module_set_context:
  * @context: (nullable): the module artifact architecture.
  *
@@ -429,6 +511,24 @@ modulemd_module_peek_context (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->context;
+}
+
+
+/**
+ * modulemd_module_dup_context:
+ *
+ * Retrieves a copy of the "context" for modulemd.
+ *
+ * Returns: A copy of the string containing the "context" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_context (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->context);
 }
 
 
@@ -570,6 +670,41 @@ modulemd_module_peek_dependencies (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_dependencies
+ *
+ * Returns: (element-type ModulemdDependencies) (transfer container): The list
+ * of dependency objects for this module.
+ *
+ * Since: 1.1
+ */
+GPtrArray *
+modulemd_module_dup_dependencies (ModulemdModule *self)
+{
+  GPtrArray *dependencies = NULL;
+  ModulemdDependencies *copy = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  if (!modulemd_module_check_mdversion_range_full (
+        self, MD_VERSION_2, MD_VERSION_MAX))
+    {
+      return NULL;
+    }
+
+  dependencies = g_ptr_array_new_with_free_func (g_object_unref);
+
+  for (gsize i = 0; i < self->dependencies->len; i++)
+    {
+      copy = NULL;
+      modulemd_dependencies_copy (g_ptr_array_index (self->dependencies, i),
+                                  &copy);
+      g_ptr_array_add (dependencies, copy);
+    }
+
+  return dependencies;
+}
+
+
+/**
  * modulemd_module_set_description:
  * @description: (nullable): the module description.
  *
@@ -626,6 +761,24 @@ modulemd_module_peek_description (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_description:
+ *
+ * Retrieves a copy of the "description" for modulemd.
+ *
+ * Returns: A copy of the string containing the "description" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_description (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->description);
+}
+
+
+/**
  * modulemd_module_set_documentation:
  * @documentation: (nullable): the module documentation.
  *
@@ -678,6 +831,24 @@ modulemd_module_peek_documentation (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->documentation;
+}
+
+
+/**
+ * modulemd_module_dup_documentation:
+ *
+ * Retrieves a copy of the "documentation" for modulemd.
+ *
+ * Returns: A copy of the string containing the "documentation" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_documentation (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->documentation);
 }
 
 
@@ -770,6 +941,35 @@ modulemd_module_peek_eol (ModulemdModule *self)
     }
 
   return self->eol;
+}
+
+
+/**
+ * modulemd_module_dup_eol:
+ *
+ * Retrieves a copy of the "eol" property.
+ *
+ * Note: This property is obsolete. Use "servicelevels" instead. This will fail
+ * on modulemd files using the version 2 or later formats.
+ *
+ * Returns: A #GDate containing a copy of the "EOL" date
+ *
+ * Since: 1.1
+ */
+GDate *
+modulemd_module_dup_eol (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_peek_mdversion (self) < 2, NULL);
+
+  if (!g_date_valid (self->eol))
+    {
+      return NULL;
+    }
+
+  return g_date_new_dmy (g_date_get_day (self->eol),
+                         g_date_get_month (self->eol),
+                         g_date_get_year (self->eol));
 }
 
 
@@ -918,7 +1118,7 @@ modulemd_module_get_mdversion (ModulemdModule *self)
  *
  * Returns: A 64-bit unsigned integer containing the "mdversion" property.
  */
-const guint64
+guint64
 modulemd_module_peek_mdversion (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
@@ -1052,6 +1252,39 @@ modulemd_module_peek_module_components (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_module_components:
+ *
+ * Retrieves the "module-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentModule) (transfer container):
+ * A copy of the hash table containing the "module-components" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_module_components (ModulemdModule *self)
+{
+  GHashTable *components = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  components =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  g_hash_table_iter_init (&iter, self->module_components);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_replace (
+        components,
+        g_strdup ((gchar *)key),
+        modulemd_component_copy (MODULEMD_COMPONENT (value)));
+    }
+
+  return components;
+}
+
+
+/**
  * modulemd_module_set_module_licenses:
  * @licenses: (nullable): A #ModuleSimpleSet: The licenses under which the components of
  * this module are released.
@@ -1110,6 +1343,28 @@ modulemd_module_peek_module_licenses (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_module_licenses:
+ *
+ * Retrieves a copy of the "module_licenses" for modulemd
+ *
+ * Returns: (transfer full): a #ModulemdSimpleSet containing the set of
+ * licenses in the "module_licenses" property.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_module_dup_module_licenses (ModulemdModule *self)
+{
+  ModulemdSimpleSet *licenses = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  modulemd_simpleset_copy (self->module_licenses, &licenses);
+
+  return licenses;
+}
+
+
+/**
  * modulemd_module_set_name:
  * @name: (nullable): the module name.
  *
@@ -1163,6 +1418,24 @@ modulemd_module_peek_name (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->name;
+}
+
+
+/**
+ * modulemd_module_dup_name:
+ *
+ * Retrieves a copy of the "name" for modulemd.
+ *
+ * Returns: A copy of the string containing the "name" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_name (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->name);
 }
 
 
@@ -1271,6 +1544,8 @@ modulemd_module_get_profiles (ModulemdModule *self)
  *
  * Returns: (element-type utf8 ModulemdProfile) (transfer none): A hash
  * table containing the "profiles" property.
+ *
+ * Since: 1.1
  */
 GHashTable *
 modulemd_module_peek_profiles (ModulemdModule *self)
@@ -1278,6 +1553,38 @@ modulemd_module_peek_profiles (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->profiles;
+}
+
+
+/**
+ * modulemd_module_dup_profiles:
+ *
+ * Retrieves a copy of the "profiles" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdProfile) (transfer container): A hash
+ * table containing a copy of the "profiles" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_profiles (ModulemdModule *self)
+{
+  GHashTable *profiles = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  profiles =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  g_hash_table_iter_init (&iter, self->profiles);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_replace (profiles,
+                            g_strdup ((gchar *)key),
+                            modulemd_profile_copy (MODULEMD_PROFILE (value)));
+    }
+
+  return profiles;
 }
 
 
@@ -1379,6 +1686,28 @@ modulemd_module_peek_requires (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_requires:
+ *
+ * Retrieves a copy of  the "requires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing a copy of the "buildrequires" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_requires (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_check_mdversion_range_full (
+                          self, MD_VERSION_1, MD_VERSION_1),
+                        NULL);
+
+  return _modulemd_hash_table_deep_str_copy (self->requires);
+}
+
+
+/**
  * modulemd_module_set_rpm_api:
  * @apis: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that form the
  * public API for this module.
@@ -1432,6 +1761,27 @@ modulemd_module_peek_rpm_api (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->rpm_api;
+}
+
+
+/**
+ * modulemd_module_dup_rpm_api:
+ *
+ * Retrieves a copy of the "rpm_api" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of binary RPM
+ * packages in the "rpm_api" property.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_module_dup_rpm_api (ModulemdModule *self)
+{
+  ModulemdSimpleSet *api = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  modulemd_simpleset_copy (self->rpm_api, &api);
+  return api;
 }
 
 
@@ -1493,6 +1843,28 @@ modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->rpm_artifacts;
+}
+
+
+/**
+ * modulemd_module_dup_rpm_artifacts:
+ *
+ * Retrieves a copy of the "rpm_artifacts" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of binary RPMs
+ * contained in this module.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
+{
+  ModulemdSimpleSet *artifacts = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  modulemd_simpleset_copy (self->rpm_artifacts, &artifacts);
+
+  return artifacts;
 }
 
 
@@ -1563,6 +1935,26 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->rpm_buildopts;
+}
+
+
+/**
+ * modulemd_module_dup_rpm_buildopts:
+ *
+ * Retrieves a copy of the "rpm-buildopts" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
+ * containing the "rpm-buildopts" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return _modulemd_hash_table_deep_str_copy (self->rpm_buildopts);
+  ;
 }
 
 
@@ -1693,6 +2085,39 @@ modulemd_module_peek_rpm_components (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_rpm_components:
+ *
+ * Retrieves the "rpm-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentRpm) (transfer container):
+ * A hash table containing the "rpm-components" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_rpm_components (ModulemdModule *self)
+{
+  GHashTable *components = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  components =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  g_hash_table_iter_init (&iter, self->rpm_components);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_replace (
+        components,
+        g_strdup ((gchar *)key),
+        modulemd_component_copy (MODULEMD_COMPONENT (value)));
+    }
+
+  return components;
+}
+
+
+/**
  * modulemd_module_set_rpm_filter:
  * @filter: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that are
  * explicitly filtered out of this module.
@@ -1748,6 +2173,28 @@ modulemd_module_peek_rpm_filter (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->rpm_filter;
+}
+
+
+/**
+ * modulemd_module_dup_rpm_filter:
+ *
+ * Retrieves a copy of the "rpm_filter" for modulemd
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of binary RPMs
+ * filtered out of this module.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_module_dup_rpm_filter (ModulemdModule *self)
+{
+  ModulemdSimpleSet *filters = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  modulemd_simpleset_copy (self->rpm_filter, &filters);
+
+  return filters;
 }
 
 
@@ -1900,6 +2347,39 @@ modulemd_module_peek_servicelevels (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_servicelevels:
+ *
+ * Retrieves the service levels for the module
+ *
+ * Returns: (element-type utf8 ModulemdServiceLevel) (transfer container): A
+ * hash table containing the service levels.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_servicelevels (ModulemdModule *self)
+{
+  GHashTable *servicelevels = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  servicelevels =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  g_hash_table_iter_init (&iter, self->servicelevels);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_replace (
+        servicelevels,
+        g_strdup ((gchar *)key),
+        modulemd_servicelevel_copy (MODULEMD_SERVICELEVEL (value)));
+    }
+
+  return servicelevels;
+}
+
+
+/**
  * modulemd_module_set_stream:
  * @stream: (nullable): the module stream.
  *
@@ -1953,6 +2433,24 @@ modulemd_module_peek_stream (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->stream;
+}
+
+
+/**
+ * modulemd_module_dup_stream:
+ *
+ * Retrieves a copy of the "stream" for modulemd.
+ *
+ * Returns: A copy of the string containing the "stream" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_stream (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->stream);
 }
 
 
@@ -2014,6 +2512,24 @@ modulemd_module_peek_summary (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_summary:
+ *
+ * Retrieves a copy of the "summary" for modulemd.
+ *
+ * Returns: A copy of the string containing the "summary" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_summary (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->summary);
+}
+
+
+/**
  * modulemd_module_set_tracker:
  * @tracker: (nullable): the module tracker.
  *
@@ -2071,6 +2587,24 @@ modulemd_module_peek_tracker (ModulemdModule *self)
 
 
 /**
+ * modulemd_module_dup_tracker:
+ *
+ * Retrieves a copy of the "tracker" for modulemd.
+ *
+ * Returns: A copy of the string containing the "tracker" property.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_module_dup_tracker (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return g_strdup (self->tracker);
+}
+
+
+/**
  * modulemd_module_set_version
  * @version: the module version
  *
@@ -2118,7 +2652,7 @@ modulemd_module_get_version (ModulemdModule *self)
  *
  * Since: 1.1
  */
-const guint64
+guint64
 modulemd_module_peek_version (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
@@ -2193,6 +2727,109 @@ modulemd_module_peek_xmd (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return self->xmd;
+}
+
+
+/**
+ * modulemd_module_dup_xmd:
+ *
+ * Retrieves a copy of the "xmd" for modulemd.
+ *
+ * Returns: (element-type utf8 GVariant) (transfer container): A hash table
+ * containing the "xmd" property.
+ *
+ * Since: 1.1
+ */
+GHashTable *
+modulemd_module_dup_xmd (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return _modulemd_hash_table_deep_variant_copy (self->xmd);
+}
+
+
+/**
+ * modulemd_module_copy:
+ *
+ * Make a copy of the current module
+ *
+ * Returns: (transfer full): A deep copy of this #ModulemdModule
+ *
+ * Since: 1.1
+ */
+ModulemdModule *
+modulemd_module_copy (ModulemdModule *self)
+{
+  ModulemdModule *copy = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (modulemd_module_peek_mdversion(self), NULL);
+
+  copy = modulemd_module_new ();
+
+  /* Set mdversion first */
+  modulemd_module_set_mdversion (copy, self->mdversion);
+
+  modulemd_module_set_arch (copy, self->arch);
+
+  modulemd_module_set_buildrequires (copy, self->buildrequires);
+
+  modulemd_module_set_community (copy, self->community);
+
+  modulemd_module_set_content_licenses (copy, self->content_licenses);
+
+  modulemd_module_set_context (copy, self->context);
+
+  modulemd_module_set_description (copy, self->description);
+
+  modulemd_module_set_documentation (copy, self->documentation);
+
+  modulemd_module_set_module_components (copy, self->module_components);
+
+  modulemd_module_set_module_licenses (copy, self->module_licenses);
+
+  modulemd_module_set_name (copy, self->name);
+
+  modulemd_module_set_profiles (copy, self->profiles);
+
+  modulemd_module_set_requires (copy, self->requires);
+
+  modulemd_module_set_rpm_api (copy, self->rpm_api);
+
+  modulemd_module_set_rpm_artifacts (copy, self->rpm_artifacts);
+
+  modulemd_module_set_rpm_components (copy, self->rpm_components);
+
+  modulemd_module_set_rpm_filter (copy, self->rpm_filter);
+
+  modulemd_module_set_servicelevels (copy, self->servicelevels);
+
+  modulemd_module_set_stream (copy, self->stream);
+
+  modulemd_module_set_summary (copy, self->summary);
+
+  modulemd_module_set_tracker (copy, self->tracker);
+
+  modulemd_module_set_version (copy, self->version);
+
+  modulemd_module_set_xmd (copy, self->xmd);
+
+
+  /* Version-specific content */
+  if (modulemd_module_peek_mdversion (copy) == 1)
+    {
+      if (modulemd_module_peek_eol (self))
+        {
+          modulemd_module_set_eol (copy, self->eol);
+        }
+    }
+  else if (modulemd_module_peek_mdversion (copy) >= 2)
+    {
+      modulemd_module_set_dependencies (copy, self->dependencies);
+    }
+
+
+  return copy;
 }
 
 

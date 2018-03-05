@@ -211,7 +211,7 @@ data:
                 # build system configuration.
                 # Optional.
                 cache: https://example.com/cache
-                # Use this specific commit has, branch name or tag for
+                # Use this specific commit hash, branch name or tag for
                 # the build.  If ref is a branch name, the branch HEAD
                 # will be used.  If no ref is given, the master branch
                 # is assumed.

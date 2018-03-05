@@ -35,6 +35,7 @@ modulemd_yaml_error_quark (void);
 enum ModulemdYamlError
 {
   MODULEMD_YAML_ERROR_OPEN,
+  MODULEMD_YAML_ERROR_PROGRAMMING,
   MODULEMD_YAML_ERROR_UNPARSEABLE,
   MODULEMD_YAML_ERROR_PARSE,
   MODULEMD_YAML_ERROR_EMIT
@@ -63,6 +64,15 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   do                                                                          \
     {                                                                         \
       g_message (msg);                                                        \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
+#define MMD_ERROR_RETURN_FULL(error, type, msg)                               \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (error, MODULEMD_YAML_ERROR, type, msg);            \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -149,11 +159,18 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
-ModulemdModule **
-parse_yaml_file (const gchar *path, GError **error);
+gboolean
+parse_yaml_file (const gchar *path,
+                 ModulemdModule ***_modules,
+                 GPtrArray **extra_data,
+                 GError **error);
 
-ModulemdModule **
-parse_yaml_string (const gchar *yaml, GError **error);
+gboolean
+parse_yaml_string (const gchar *yaml,
+                   ModulemdModule ***modules,
+                   GPtrArray **extra_data,
+                   GError **error);
+
 
 gboolean
 emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error);

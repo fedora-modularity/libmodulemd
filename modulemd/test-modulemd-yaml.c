@@ -45,15 +45,18 @@ static void
 modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
                                   gconstpointer user_data)
 {
+  gboolean result;
   GError *error = NULL;
-  ModulemdModule **modules;
+  ModulemdModule **modules = NULL;
+  GPtrArray *extra_data = NULL;
   ModulemdSimpleSet *set = NULL;
   gchar *yaml_path = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
-  modules = parse_yaml_file (yaml_path, &error);
+  result = parse_yaml_file (yaml_path, &modules, &extra_data, &error);
   g_clear_pointer (&yaml_path, g_free);
+  g_assert_true (result);
 
   if (!modules)
     {
@@ -61,10 +64,10 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
       g_error_free (error);
     }
 
-  g_assert_true (modules);
-  g_assert_true (modules[0]);
-  g_assert_false (modules[1]);
-  g_assert_true (error == NULL);
+  g_assert_nonnull (modules);
+  g_assert_nonnull (modules[0]);
+  g_assert_null (modules[1]);
+  g_assert_null (error);
   g_assert_cmpuint (modulemd_module_get_mdversion (modules[0]), ==, 1);
   g_assert_cmpstr (modulemd_module_get_name (modules[0]), ==, "foo");
   g_assert_cmpstr (modulemd_module_get_stream (modules[0]), ==, "stream-name");
@@ -75,21 +78,44 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
   g_assert_true (
     modulemd_simpleset_contains (set, "bar-0:1.23-1.module_deadbeef.x86_64"));
 
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+  g_clear_pointer (&modules, g_free);
+  g_clear_pointer (&extra_data, g_ptr_array_free);
+
+
   yaml_path = g_strdup_printf ("%s/test_data/bad-document.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
-  modules = parse_yaml_file (yaml_path, &error);
+  result = parse_yaml_file (yaml_path, &modules, &extra_data, &error);
   g_clear_pointer (&yaml_path, g_free);
 
   g_assert_nonnull (modules);
   g_assert_null (modules[0]);
 
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+  g_clear_pointer (&modules, g_free);
+  g_clear_pointer (&extra_data, g_ptr_array_free);
+
   /* Validate the official reference YAML */
   g_info ("Reference YAML v1");
   yaml_path =
     g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
-  modules = parse_yaml_file (yaml_path, &error);
+  result = parse_yaml_file (yaml_path, &modules, &extra_data, &error);
   g_free (yaml_path);
-  g_assert_true (modules);
+  g_assert_true (result);
+  g_assert_nonnull (modules);
+
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+  g_clear_pointer (&modules, g_free);
+  g_clear_pointer (&extra_data, g_ptr_array_free);
 }
 
 static void
@@ -145,9 +171,11 @@ modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
 static void
 modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
 {
+  gboolean result;
   ModulemdModule *module = NULL;
   ModulemdModule *copy = NULL;
   ModulemdModule **modules = NULL;
+  GPtrArray *extra_data = NULL;
   gchar *yaml_path = NULL;
   GError *error = NULL;
 
@@ -200,8 +228,9 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   g_info ("Reference YAML v2");
   yaml_path =
     g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
-  modules = parse_yaml_file (yaml_path, &error);
+  result = parse_yaml_file (yaml_path, &modules, &extra_data, &error);
   g_free (yaml_path);
+  g_assert_true (result);
   g_assert_nonnull (modules);
 }
 

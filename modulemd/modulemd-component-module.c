@@ -86,20 +86,58 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
     }
 }
 
+
 /**
  * modulemd_component_module_get_ref:
  *
  * Retrieves the repository ref.
  *
  * Returns: A string containing the repository ref.
+ *
+ * Deprecated: 1.1
+ * Use peek_ref() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_module_peek_ref)
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self)
+{
+  return modulemd_component_module_peek_ref (self);
+}
+
+
+/**
+ * modulemd_component_module_peek_ref:
+ *
+ * Retrieves the repository ref.
+ *
+ * Returns: A string containing the repository ref.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_module_peek_ref (ModulemdComponentModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self), NULL);
 
   return self->ref;
 }
+
+
+/**
+ * modulemd_component_module_dup_ref:
+ *
+ * Retrieves a copy of the repository ref.
+ *
+ * Returns: A copy of the string containing the repository ref.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_module_dup_ref (ModulemdComponentModule *self)
+{
+  return g_strdup (modulemd_component_module_peek_ref (self));
+}
+
 
 /**
  * modulemd_component_module_set_repository
@@ -121,13 +159,18 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
     }
 }
 
+
 /**
  * modulemd_component_module_get_repository:
  *
  * Retrieves the repository location.
  *
  * Returns: A string containing the repository location.
+ *
+ * Deprecated: 1.1
+ * Use peek_repository() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_module_peek_repository)
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self)
 {
@@ -135,6 +178,74 @@ modulemd_component_module_get_repository (ModulemdComponentModule *self)
 
   return self->repo;
 }
+
+
+/**
+ * modulemd_component_module_peek_repository:
+ *
+ * Retrieves the repository location.
+ *
+ * Returns: A string containing the repository location.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_module_peek_repository (ModulemdComponentModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self), NULL);
+
+  return self->repo;
+}
+
+
+/**
+ * modulemd_component_module_dup_repository:
+ *
+ * Retrieves a copy of the repository location.
+ *
+ * Returns: A copy of the string containing the repository location.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_module_dup_repository (ModulemdComponentModule *self)
+{
+  return g_strdup (modulemd_component_module_peek_repository (self));
+}
+
+
+static ModulemdComponent *
+modulemd_component_module_copy (ModulemdComponent *self)
+{
+  ModulemdComponentModule *old_component = NULL;
+  ModulemdComponentModule *new_component = NULL;
+
+  g_return_val_if_fail (self, NULL);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self), NULL);
+
+  old_component = MODULEMD_COMPONENT_MODULE (self);
+
+  new_component = modulemd_component_module_new ();
+
+  modulemd_component_set_buildorder (
+    MODULEMD_COMPONENT (new_component),
+    modulemd_component_peek_buildorder (self));
+
+  modulemd_component_set_name (MODULEMD_COMPONENT (new_component),
+                               modulemd_component_peek_name (self));
+
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (new_component),
+                                    modulemd_component_peek_rationale (self));
+
+  modulemd_component_module_set_ref (
+    new_component, modulemd_component_module_peek_ref (old_component));
+
+  modulemd_component_module_set_repository (
+    new_component, modulemd_component_module_peek_repository (old_component));
+
+  return MODULEMD_COMPONENT (new_component);
+}
+
 
 static void
 modulemd_component_module_set_property (GObject *object,
@@ -170,12 +281,12 @@ modulemd_component_module_get_property (GObject *object,
   switch (prop_id)
     {
     case PROP_REF:
-      g_value_set_string (value, modulemd_component_module_get_ref (self));
+      g_value_set_string (value, modulemd_component_module_peek_ref (self));
       break;
 
     case PROP_REPO:
       g_value_set_string (value,
-                          modulemd_component_module_get_repository (self));
+                          modulemd_component_module_peek_repository (self));
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); break;
@@ -186,10 +297,13 @@ static void
 modulemd_component_module_class_init (ModulemdComponentModuleClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ModulemdComponentClass *parent_class = MODULEMD_COMPONENT_CLASS (klass);
 
   object_class->finalize = modulemd_component_module_finalize;
   object_class->get_property = modulemd_component_module_get_property;
   object_class->set_property = modulemd_component_module_set_property;
+
+  parent_class->copy = modulemd_component_module_copy;
 
   properties[PROP_REF] =
     g_param_spec_string ("ref",

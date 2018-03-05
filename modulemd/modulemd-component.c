@@ -64,7 +64,7 @@ modulemd_component_default_set_buildorder (ModulemdComponent *self,
 }
 
 static guint64
-modulemd_component_default_get_buildorder (ModulemdComponent *self)
+modulemd_component_default_peek_buildorder (ModulemdComponent *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
   ModulemdComponentPrivate *priv =
@@ -85,13 +85,23 @@ modulemd_component_default_set_name (ModulemdComponent *self,
 }
 
 static const gchar *
-modulemd_component_default_get_name (ModulemdComponent *self)
+modulemd_component_default_peek_name (ModulemdComponent *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
 
   return priv->name;
+}
+
+static gchar *
+modulemd_component_default_dup_name (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return g_strdup (priv->name);
 }
 
 static void
@@ -106,13 +116,23 @@ modulemd_component_default_set_rationale (ModulemdComponent *self,
 }
 
 static const gchar *
-modulemd_component_default_get_rationale (ModulemdComponent *self)
+modulemd_component_default_peek_rationale (ModulemdComponent *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
 
   return priv->rationale;
+}
+
+static gchar *
+modulemd_component_default_dup_rationale (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return g_strdup (priv->rationale);
 }
 
 /**
@@ -138,19 +158,38 @@ modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
  * modulemd_component_get_buildorder:
  *
  * Returns the 'buildorder' property
+ *
+ * Deprecated: 1.1
+ * Use peek_buildorder() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_peek_buildorder)
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self)
+{
+  return modulemd_component_peek_buildorder (self);
+}
+
+
+/**
+ * modulemd_component_peek_buildorder:
+ *
+ * Returns the 'buildorder' property
+ *
+ * Since: 1.1
+ */
+guint64
+modulemd_component_peek_buildorder (ModulemdComponent *self)
 {
   ModulemdComponentClass *klass;
 
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
 
   klass = MODULEMD_COMPONENT_GET_CLASS (self);
-  g_return_val_if_fail (klass->get_buildorder, 0);
+  g_return_val_if_fail (klass->peek_buildorder, 0);
 
-  return klass->get_buildorder (self);
+  return klass->peek_buildorder (self);
 }
+
 
 /**
  * modulemd_component_set_name:
@@ -171,24 +210,65 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
   klass->set_name (self, name);
 }
 
+
 /**
  * modulemd_component_get_name:
  *
  * Returns the 'name' property;
+ *
+ * Deprecated: 1.1
+ * Use peek_name() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_peek_name)
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self)
+{
+  return modulemd_component_peek_name (self);
+}
+
+
+/**
+ * modulemd_component_peek_name:
+ *
+ * Returns the 'name' property;
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_peek_name (ModulemdComponent *self)
 {
   ModulemdComponentClass *klass;
 
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
 
   klass = MODULEMD_COMPONENT_GET_CLASS (self);
-  g_return_val_if_fail (klass->get_name, NULL);
+  g_return_val_if_fail (klass->peek_name, NULL);
 
 
-  return klass->get_name (self);
+  return klass->peek_name (self);
 }
+
+/**
+ * modulemd_component_dup_name:
+ *
+ * Returns a copy of the 'name' property;
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_dup_name (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->dup_name, NULL);
+
+
+  return klass->dup_name (self);
+}
+
 
 /**
  * modulemd_component_set_rationale:
@@ -210,24 +290,89 @@ modulemd_component_set_rationale (ModulemdComponent *self,
   klass->set_rationale (self, rationale);
 }
 
+
 /**
  * modulemd_component_get_rationale:
  *
  * Returns the 'rationale' property;
+ *
+ * Deprecated: 1.1
+ * Use peek_rationale() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_peek_rationale)
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self)
+{
+  return modulemd_component_peek_rationale (self);
+}
+
+
+/**
+ * modulemd_component_peek_rationale:
+ *
+ * Returns the 'rationale' property;
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_peek_rationale (ModulemdComponent *self)
 {
   ModulemdComponentClass *klass;
 
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
 
   klass = MODULEMD_COMPONENT_GET_CLASS (self);
-  g_return_val_if_fail (klass->get_rationale, NULL);
+  g_return_val_if_fail (klass->peek_rationale, NULL);
 
 
-  return klass->get_rationale (self);
+  return klass->peek_rationale (self);
 }
+
+/**
+ * modulemd_component_dup_rationale:
+ *
+ * Returns a copy of the 'rationale' property;
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_dup_rationale (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->peek_rationale, NULL);
+
+
+  return klass->dup_rationale (self);
+}
+
+
+/**
+ * modulemd_component_copy:
+ *
+ * Returns a complete copy of this Component.
+ *
+ * Returns: (transfer full): A copy of this Component.
+ *
+ * Since: 1.1
+ */
+ModulemdComponent *
+modulemd_component_copy (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->copy, NULL);
+
+
+  return klass->copy (self);
+}
+
 
 static void
 modulemd_component_set_property (GObject *gobject,
@@ -268,15 +413,15 @@ modulemd_component_get_property (GObject *gobject,
   switch (property_id)
     {
     case COMPONENT_PROP_BUILDORDER:
-      g_value_set_uint64 (value, modulemd_component_get_buildorder (self));
+      g_value_set_uint64 (value, modulemd_component_peek_buildorder (self));
       break;
 
     case COMPONENT_PROP_NAME:
-      g_value_set_string (value, modulemd_component_get_name (self));
+      g_value_set_string (value, modulemd_component_peek_name (self));
       break;
 
     case COMPONENT_PROP_RATIONALE:
-      g_value_set_string (value, modulemd_component_get_rationale (self));
+      g_value_set_string (value, modulemd_component_peek_rationale (self));
       break;
 
     default:
@@ -307,13 +452,18 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->finalize = modulemd_component_finalize;
 
   klass->set_buildorder = modulemd_component_default_set_buildorder;
-  klass->get_buildorder = modulemd_component_default_get_buildorder;
+  klass->peek_buildorder = modulemd_component_default_peek_buildorder;
 
   klass->set_name = modulemd_component_default_set_name;
-  klass->get_name = modulemd_component_default_get_name;
+  klass->peek_name = modulemd_component_default_peek_name;
+  klass->dup_name = modulemd_component_default_dup_name;
 
   klass->set_rationale = modulemd_component_default_set_rationale;
-  klass->get_rationale = modulemd_component_default_get_rationale;
+  klass->peek_rationale = modulemd_component_default_peek_rationale;
+  klass->dup_rationale = modulemd_component_default_dup_rationale;
+
+  /* copy() is pure-virtual */
+  klass->copy = NULL;
 
   component_properties[COMPONENT_PROP_BUILDORDER] =
     g_param_spec_uint64 ("buildorder",

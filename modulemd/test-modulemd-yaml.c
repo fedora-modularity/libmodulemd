@@ -96,6 +96,7 @@ static void
 modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
 {
   ModulemdModule *module = NULL;
+  ModulemdModule *copy = NULL;
   ModulemdModule **modules = NULL;
   gchar *yaml_path = NULL;
   GHashTable *buildrequires = NULL;
@@ -128,6 +129,12 @@ modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
   value = g_hash_table_lookup (buildrequires, "platform");
   g_assert_cmpstr (value, ==, "and-its-stream-name");
   g_hash_table_unref (buildrequires);
+
+  /* Copy this module */
+  copy = modulemd_module_copy (modules[0]);
+  g_assert_nonnull (copy);
+  g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 1);
+
   for (gsize i = 0; modules[i]; i++)
     {
       g_object_unref (modules[i]);
@@ -139,6 +146,7 @@ static void
 modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
 {
   ModulemdModule *module = NULL;
+  ModulemdModule *copy = NULL;
   ModulemdModule **modules = NULL;
   gchar *yaml_path = NULL;
   GError *error = NULL;
@@ -156,6 +164,11 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (modules[0]);
   g_assert_nonnull (modules[1]);
   g_assert_null (modules[2]);
+
+  /* Copy this module */
+  copy = modulemd_module_copy (modules[0]);
+  g_assert_nonnull (copy);
+  g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 2);
 
   for (gsize i = 0; modules[i]; i++)
     {

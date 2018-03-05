@@ -93,6 +93,7 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
 
+
 /**
  * modulemd_component_rpm_get_arches:
  *
@@ -100,14 +101,57 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
  *
  * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
  * supported architectures for this component.
+ *
+ * Deprecated: 1.1
+ * Use peek_arches() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_rpm_peek_arches)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_arches (ModulemdComponentRpm *self)
+{
+  return modulemd_component_rpm_peek_arches (self);
+}
+
+
+/**
+ * modulemd_component_rpm_peek_arches:
+ *
+ * Retrieves the set of arches for this component.
+ *
+ * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
+ * supported architectures for this component.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_component_rpm_peek_arches (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   return self->arches;
 }
+
+
+/**
+ * modulemd_component_rpm_dup_arches:
+ *
+ * Retrieves a copy of the set of arches for this component.
+ *
+ * Returns: (transfer full): A #ModulemdSimpleSet containing the set of
+ * supported architectures for this component.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_component_rpm_dup_arches (ModulemdComponentRpm *self)
+{
+  ModulemdSimpleSet *arches = NULL;
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  modulemd_simpleset_copy (self->arches, &arches);
+  return arches;
+}
+
 
 /**
  * modulemd_component_rpm_set_cache
@@ -129,20 +173,59 @@ modulemd_component_rpm_set_cache (ModulemdComponentRpm *self,
     }
 }
 
+
 /**
  * modulemd_component_rpm_get_cache:
  *
  * Retrieves the lookaside cache URL.
  *
  * Returns: A string containing the URL to the lookaside cache.
+ *
+ * Deprecated: 1.1
+ * Use peek_cache() instead.
  */
 const gchar *
 modulemd_component_rpm_get_cache (ModulemdComponentRpm *self)
+{
+  return modulemd_component_rpm_peek_cache (self);
+}
+
+
+/**
+ * modulemd_component_rpm_peek_cache:
+ *
+ * Retrieves the lookaside cache URL.
+ *
+ * Returns: A string containing the URL to the lookaside cache.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_rpm_peek_cache (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   return self->cache;
 }
+
+
+/**
+ * modulemd_component_rpm_dup_cache:
+ *
+ * Retrieves a copy of the lookaside cache URL.
+ *
+ * Returns: A copy of the string containing the URL to the lookaside cache.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_rpm_dup_cache (ModulemdComponentRpm *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  return g_strdup (self->cache);
+}
+
 
 /**
  * modulemd_component_rpm_set_multilib:
@@ -162,6 +245,7 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCHES]);
 }
 
+
 /**
  * modulemd_component_rpm_get_multilib:
  *
@@ -169,14 +253,58 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
  *
  * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
  * supported multilib architectures for this component.
+ *
+ * Deprecated: 1.1
+ * Use peek_multilib() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_rpm_peek_multilib)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self)
+{
+  return modulemd_component_rpm_peek_multilib (self);
+}
+
+
+/**
+ * modulemd_component_rpm_peek_multilib:
+ *
+ * Retrieves the set of multilib for this component.
+ *
+ * Returns: (transfer none): A #ModulemdSimpleSet containing the set of
+ * supported multilib architectures for this component.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_component_rpm_peek_multilib (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   return self->multilib;
 }
+
+
+/**
+ * modulemd_component_rpm_dup_multilib:
+ *
+ * Retrieves a copy of the set of multilib for this component.
+ *
+ * Returns: (transfer full): A #ModulemdSimpleSet containing the set of
+ * supported multilib architectures for this component.
+ *
+ * Since: 1.1
+ */
+ModulemdSimpleSet *
+modulemd_component_rpm_dup_multilib (ModulemdComponentRpm *self)
+{
+  ModulemdSimpleSet *multilib = NULL;
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  modulemd_simpleset_copy (self->multilib, &multilib);
+
+  return multilib;
+}
+
 
 /**
  * modulemd_component_rpm_set_ref
@@ -203,14 +331,53 @@ modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref)
  * Retrieves the repository ref.
  *
  * Returns: A string containing the repository ref.
+ *
+ * Deprecated: 1.1
+ * Use peek_ref() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_rpm_peek_ref)
 const gchar *
 modulemd_component_rpm_get_ref (ModulemdComponentRpm *self)
+{
+  return modulemd_component_rpm_peek_ref (self);
+}
+
+
+/**
+ * modulemd_component_rpm_peek_ref:
+ *
+ * Retrieves the repository ref.
+ *
+ * Returns: A string containing the repository ref.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_rpm_peek_ref (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   return self->ref;
 }
+
+
+/**
+ * modulemd_component_rpm_dup_ref:
+ *
+ * Retrieves a copy of the repository ref.
+ *
+ * Returns: A copy of the string containing the repository ref.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_rpm_dup_ref (ModulemdComponentRpm *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  return g_strdup (self->ref);
+}
+
 
 /**
  * modulemd_component_rpm_set_repository
@@ -232,20 +399,102 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
     }
 }
 
+
 /**
  * modulemd_component_rpm_get_repository:
  *
  * Retrieves the repository location.
  *
  * Returns: A string containing the repository location.
+ *
+ * Deprecated: 1.1
+ * Use peek_repository() instead.
  */
+G_DEPRECATED_FOR (modulemd_component_rpm_peek_repository)
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self)
+{
+  return modulemd_component_rpm_peek_repository (self);
+}
+
+
+/**
+ * modulemd_component_rpm_peek_repository:
+ *
+ * Retrieves the repository location.
+ *
+ * Returns: A string containing the repository location.
+ *
+ * Since: 1.1
+ */
+const gchar *
+modulemd_component_rpm_peek_repository (ModulemdComponentRpm *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   return self->repo;
 }
+
+
+/**
+ * modulemd_component_rpm_dup_repository:
+ *
+ * Retrieves a copy of the repository location.
+ *
+ * Returns: A copy of the string containing the repository location.
+ *
+ * Since: 1.1
+ */
+gchar *
+modulemd_component_rpm_dup_repository (ModulemdComponentRpm *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  return g_strdup (self->repo);
+}
+
+
+static ModulemdComponent *
+modulemd_component_rpm_copy (ModulemdComponent *self)
+{
+  ModulemdComponentRpm *old_component = NULL;
+  ModulemdComponentRpm *new_component = NULL;
+
+  g_return_val_if_fail (self, NULL);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+
+  old_component = MODULEMD_COMPONENT_RPM (self);
+
+  new_component = modulemd_component_rpm_new ();
+
+  modulemd_component_set_buildorder (
+    MODULEMD_COMPONENT (new_component),
+    modulemd_component_peek_buildorder (self));
+
+  modulemd_component_set_name (MODULEMD_COMPONENT (new_component),
+                               modulemd_component_peek_name (self));
+
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (new_component),
+                                    modulemd_component_peek_rationale (self));
+
+  modulemd_component_rpm_set_arches (
+    new_component, modulemd_component_rpm_peek_arches (old_component));
+
+  modulemd_component_rpm_set_cache (
+    new_component, modulemd_component_rpm_peek_cache (old_component));
+
+  modulemd_component_rpm_set_multilib (
+    new_component, modulemd_component_rpm_peek_multilib (old_component));
+
+  modulemd_component_rpm_set_ref (
+    new_component, modulemd_component_rpm_peek_ref (old_component));
+
+  modulemd_component_rpm_set_repository (
+    new_component, modulemd_component_rpm_peek_repository (old_component));
+
+  return MODULEMD_COMPONENT (new_component);
+}
+
 
 static void
 modulemd_component_rpm_set_property (GObject *object,
@@ -292,23 +541,24 @@ modulemd_component_rpm_get_property (GObject *object,
   switch (prop_id)
     {
     case PROP_ARCHES:
-      g_value_set_object (value, modulemd_component_rpm_get_arches (self));
+      g_value_set_object (value, modulemd_component_rpm_peek_arches (self));
       break;
 
     case PROP_CACHE:
-      g_value_set_string (value, modulemd_component_rpm_get_cache (self));
+      g_value_set_string (value, modulemd_component_rpm_peek_cache (self));
       break;
 
     case PROP_MULTILIB:
-      g_value_set_object (value, modulemd_component_rpm_get_multilib (self));
+      g_value_set_object (value, modulemd_component_rpm_peek_multilib (self));
       break;
 
     case PROP_REF:
-      g_value_set_string (value, modulemd_component_rpm_get_ref (self));
+      g_value_set_string (value, modulemd_component_rpm_peek_ref (self));
       break;
 
     case PROP_REPO:
-      g_value_set_string (value, modulemd_component_rpm_get_repository (self));
+      g_value_set_string (value,
+                          modulemd_component_rpm_peek_repository (self));
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); break;
@@ -319,10 +569,13 @@ static void
 modulemd_component_rpm_class_init (ModulemdComponentRpmClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ModulemdComponentClass *parent_class = MODULEMD_COMPONENT_CLASS (klass);
 
   object_class->finalize = modulemd_component_rpm_finalize;
   object_class->get_property = modulemd_component_rpm_get_property;
   object_class->set_property = modulemd_component_rpm_set_property;
+
+  parent_class->copy = modulemd_component_rpm_copy;
 
   properties[PROP_ARCHES] =
     g_param_spec_object ("arches",

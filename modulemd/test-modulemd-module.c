@@ -529,7 +529,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   /* Make sure no errors occur when copying it */
   copy = modulemd_module_copy (fixture->md);
   g_assert_nonnull (copy);
-  g_assert_cmpuint (modulemd_module_peek_mdversion(copy), ==, 1);
+  g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 1);
 
   g_message ("v1 YAML:\n%s", yaml);
 
@@ -598,7 +598,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   /* Make sure no errors occur when copying it */
   copy = modulemd_module_copy (fixture->md);
   g_assert_nonnull (copy);
-  g_assert_cmpuint (modulemd_module_peek_mdversion(copy), ==, 2);
+  g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 2);
 
   g_message ("v2 YAML:\n%s", yaml);
 

@@ -63,13 +63,15 @@ enum ModulemdReqType
   MODULEMD_REQ_BUILDREQUIRES
 };
 
-static ModulemdModule **
-_parse_yaml (yaml_parser_t *parser, GError **error);
+static gboolean
+_parse_yaml (yaml_parser_t *parser,
+             ModulemdModule ***_modules,
+             GPtrArray **extra_data,
+             GError **error);
 
 static gboolean
-_parse_modulemd_root (ModulemdModule *module,
-                      yaml_parser_t *parser,
-                      GError **error);
+_parse_root (yaml_parser_t *parser, GObject **object, GError **error);
+
 static gboolean
 _parse_modulemd_data (ModulemdModule *module,
                       yaml_parser_t *parser,
@@ -157,17 +159,31 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GHashTable **_htable,
                          GError **error);
 
-ModulemdModule **
-parse_yaml_file (const gchar *path, GError **error)
+gboolean
+parse_yaml_file (const gchar *path,
+                 ModulemdModule ***modules,
+                 GPtrArray **extra_data,
+                 GError **error)
 {
+  gboolean result = FALSE;
   FILE *yaml_file = NULL;
-  ModulemdModule **modules = NULL;
   yaml_parser_t parser;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (path, NULL);
-
   g_debug ("TRACE: entering parse_yaml_file");
+
+  if (error == NULL || *error != NULL)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
+      goto error;
+    }
+
+  if (!path)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "Path not supplied.");
+      goto error;
+    }
 
   yaml_parser_initialize (&parser);
 
@@ -185,7 +201,12 @@ parse_yaml_file (const gchar *path, GError **error)
 
   yaml_parser_set_input_file (&parser, yaml_file);
 
-  modules = _parse_yaml (&parser, error);
+  if (!_parse_yaml (&parser, modules, extra_data, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
+    }
+
+  result = TRUE;
 
 error:
   yaml_parser_delete (&parser);
@@ -194,41 +215,75 @@ error:
       fclose (yaml_file);
     }
   g_debug ("TRACE: exiting parse_yaml_file");
-  return modules;
+  return result;
 }
 
-ModulemdModule **
-parse_yaml_string (const gchar *yaml, GError **error)
+gboolean
+parse_yaml_string (const gchar *yaml,
+                   ModulemdModule ***modules,
+                   GPtrArray **extra_data,
+                   GError **error)
 {
-  ModulemdModule **modules = NULL;
+  gboolean result = FALSE;
   yaml_parser_t parser;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (yaml, NULL);
-
   g_debug ("TRACE: entering parse_yaml_string");
+
+  if (error == NULL || *error != NULL)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
+      goto error;
+    }
+
+  if (!yaml)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "String not supplied.");
+      goto error;
+    }
 
   yaml_parser_initialize (&parser);
 
   yaml_parser_set_input_string (
     &parser, (const unsigned char *)yaml, strlen (yaml));
 
-  modules = _parse_yaml (&parser, error);
+  if (!_parse_yaml (&parser, modules, extra_data, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
+    }
+
+  result = TRUE;
+
+error:
   yaml_parser_delete (&parser);
 
   g_debug ("TRACE: exiting parse_yaml_string");
-  return modules;
+  return result;
 }
 
-static ModulemdModule **
-_parse_yaml (yaml_parser_t *parser, GError **error)
+static gboolean
+_parse_yaml (yaml_parser_t *parser,
+             ModulemdModule ***_modules,
+             GPtrArray **_extra_data,
+             GError **error)
 {
+  gboolean result;
   gsize count = 0;
+  gsize i = 0;
   ModulemdModule **modules = NULL;
   yaml_event_t event;
   gboolean done = FALSE;
+  GObject *object = NULL;
+  GPtrArray *objects = NULL;
 
   g_debug ("TRACE: entering _parse_yaml");
+
+  /* Create a pointer array to store all of the returned objects
+   * We'll optimize for the single-module case
+   */
+  objects = g_ptr_array_new_full (1, g_object_unref);
+
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_ERROR_RETURN (
@@ -246,18 +301,10 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_DOCUMENT_START_EVENT:
-          count++;
-          modules =
-            g_realloc_n (modules, count + 1, sizeof (ModulemdModule *));
-          modules[count] = NULL;
-
-          /* New document; create a new ModulemdModule object */
-          modules[count - 1] = modulemd_module_new ();
-
-          if (!_parse_modulemd_root (modules[count - 1], parser, error))
+          if (!_parse_root (parser, &object, error))
             {
               /* We must have an error value here */
-              g_return_val_if_fail (error, NULL);
+              g_return_val_if_fail (error, FALSE);
 
               if ((*error)->code == MODULEMD_YAML_ERROR_UNPARSEABLE)
                 {
@@ -279,11 +326,12 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
                */
               g_message ("Invalid document [%s]. Skipping it.",
                          (*error)->message);
-              g_clear_pointer (&modules[count - 1], g_object_unref);
               g_clear_error (error);
-              count--;
-              continue;
+              break;
             }
+
+          g_ptr_array_add (objects, object);
+          object = NULL;
 
           break;
 
@@ -300,6 +348,8 @@ _parse_yaml (yaml_parser_t *parser, GError **error)
       yaml_event_delete (&event);
     }
 
+  result = TRUE;
+
 error:
   /* error handling */
   if (*error)
@@ -313,25 +363,69 @@ error:
             }
           g_clear_pointer (&modules, g_free);
         }
+      result = FALSE;
+    }
+
+  /* For simplicity/performance, assume that every object is a Module
+   * Allocate enough space for every object, plus a NULL-terminator
+   */
+  (*_modules) = g_malloc0_n (objects->len + 1, sizeof (ModulemdModule *));
+
+  count = 0;
+  i = 0;
+  while (i < objects->len)
+    {
+      if (MODULEMD_IS_MODULE (g_ptr_array_index (objects, i)))
+        {
+          /* Add this module to the module list, adding a ref */
+          (*_modules)[count] = g_object_ref (g_ptr_array_index (objects, i));
+          count++;
+
+          /* Remove the object from the GPtrArray (which unrefs it) */
+          g_ptr_array_remove_index (objects, i);
+
+          /* Do not increment the iterator because GPtrArray will slide the
+           * remaining entries down when we remove this one.
+           */
+        }
+      else
+        {
+          /* Increment the iterator and continue */
+          i++;
+        }
+    }
+
+  if (_extra_data)
+    {
+      /* Return any remaining extra data */
+      *_extra_data = objects;
+    }
+  else
+    {
+      g_ptr_array_free (objects, TRUE);
     }
 
   g_debug ("TRACE: exiting _parse_yaml");
-  return modules;
+  return result;
 }
 
 static gboolean
-_parse_modulemd_root (ModulemdModule *module,
-                      yaml_parser_t *parser,
-                      GError **error)
+_parse_root (yaml_parser_t *parser, GObject **object, GError **error)
 {
   yaml_event_t event;
   gboolean done = FALSE;
   gboolean result = FALSE;
   guint64 version;
+  ModulemdModule *module = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd_root");
+  g_debug ("TRACE: entering _parse_root");
+
+  /* Assume this is a module metadata. We'll free this later if
+   * it turns out to be extra_data.
+   */
+  module = modulemd_module_new ();
 
   /* Parse until the end of this document */
   while (!done)
@@ -418,22 +512,29 @@ _parse_modulemd_root (ModulemdModule *module,
     }
 
   result = TRUE;
+  *object = (GObject *)module;
+
 error:
   if (*error)
     {
+      result = FALSE;
+
       /* Move the parser to the end of the mapping */
       g_debug ("TRACE: Error encountered; skipping to end of document.");
       do
         {
-          YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-            parser, &event, error, "Parser error");
+          if (!yaml_parser_parse (parser, &event))
+            {
+              /* Nothing we can do here. The stream is unparseable */
+              break;
+            }
+          g_debug ("Parser event: %s", mmd_yaml_get_event_name (event.type));
         }
       while (event.type != YAML_DOCUMENT_END_EVENT &&
              event.type != YAML_NO_EVENT);
-      result = FALSE;
     }
 
-  g_debug ("TRACE: exiting _parse_modulemd_root");
+  g_debug ("TRACE: exiting _parse_root");
   return result;
 }
 

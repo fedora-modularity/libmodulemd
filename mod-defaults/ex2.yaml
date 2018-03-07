@@ -1,0 +1,16 @@
+---
+document: modulemd-defaults
+version: 1
+data:
+    module: postgresql
+    stream: '8.0'
+    profiles:
+        '8.0': [server]
+---
+document: modulemd-defaults
+version: 1
+data:
+    module: nodejs
+    stream: '6.0'
+    profiles:
+        '6.0': [default]

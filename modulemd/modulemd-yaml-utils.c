@@ -25,6 +25,22 @@
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 
+int
+_write_yaml_string (void *data, unsigned char *buffer, size_t size)
+{
+  struct modulemd_yaml_string *yaml_string =
+    (struct modulemd_yaml_string *)data;
+
+  yaml_string->str =
+    g_realloc_n (yaml_string->str, yaml_string->len + size + 1, sizeof (char));
+
+  memcpy (yaml_string->str + yaml_string->len, buffer, size);
+  yaml_string->len += size;
+  yaml_string->str[yaml_string->len] = '\0';
+
+  return 1;
+}
+
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,
                         GVariant **variant,
@@ -281,6 +297,32 @@ error:
     }
 
   return ret;
+}
+
+ModulemdModule **
+mmd_yaml_dup_modules (GPtrArray *objects)
+{
+  GObject *object = NULL;
+  gsize module_count = 0;
+  ModulemdModule **modules = NULL;
+
+  g_return_val_if_fail (objects, NULL);
+
+  /* Assume that all objects are modules */
+  modules = g_new0 (ModulemdModule *, objects->len + 1);
+
+  for (gsize i = 0; i < objects->len; i++)
+    {
+      object = g_ptr_array_index (objects, i);
+      if (MODULEMD_IS_MODULE (object))
+        {
+          modules[module_count] =
+            modulemd_module_copy (MODULEMD_MODULE (object));
+          module_count++;
+        }
+    }
+
+  return modules;
 }
 
 const gchar *

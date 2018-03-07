@@ -1,0 +1,29 @@
+# Intents optional:
+document: modulemd-defaults
+version: 1
+data:
+    module: httpd
+    stream: '2.6'
+    profiles:
+        '2.6': [client, server]
+    intents:
+        workstation:
+            stream: '2.2'
+            profiles:
+                '2.2': [client]
+                '2.6': [client, server, bindings]
+---
+# Intents optional:
+document: modulemd-defaults
+version: 1
+data:
+    module: httpd
+    stream: '2.6'
+    profiles:
+        '2.6': [client, server]
+    intents:
+        workstation:
+            stream: '2.2'
+            profiles:
+                '2.2': [client]
+                '2.6': [client, server, bindings]

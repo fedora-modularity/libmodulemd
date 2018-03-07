@@ -15,7 +15,7 @@ data:
     profiles:
         'x.y': []
         bar: [baz, snafu]
-    # System intents dictionary. Indexed by the intent name.
+    # System intents dictionary, optional. Indexed by the intent name.
     # Overrides stream/profiles for intent.
     intents:
         desktop:

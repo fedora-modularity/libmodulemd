@@ -1,0 +1,40 @@
+# Document type identifier
+document: modulemd-defaults
+# Module metadata format version
+version: 1
+data:
+    # Module name that the defaults are for, required.
+    module: foo
+    # Module stream that is the default for the module, required.
+    stream: x.y
+    # Module profiles indexed by the stream name, required
+    # This is a dictionary of stream names to a list of default profiles to be
+    # installed.
+    # You need to specify an entry for at least the default stream, the empty
+    # list is valid.
+    profiles:
+        'x.y': []
+        bar: [baz, snafu]
+    # System intents dictionary. Indexed by the intent name.
+    # Overrides stream/profiles for intent.
+    intents:
+        desktop:
+            # Module stream that is the default for the module, required.
+            # Overrides the above values for systems with this intent.
+            stream: y.z
+            # Module profiles indexed by the stream name, required
+            # Overrides the above values for systems with this intent.
+            # From the above, foo:x.y has "other" as the value and foo:bar has
+            # no default profile.
+            profiles:
+                'y.z': [blah]
+                'x.y': [other]
+        server:
+            # Module stream that is the default for the module, required.
+            # Overrides the above values for systems with this intent.
+            stream: x.y
+            # Module profiles indexed by the stream name, required
+            # Overrides the above values for systems with this intent.
+            # From the above foo:x.y and foo:bar have no default profile.
+            profiles:
+                'x.y': []

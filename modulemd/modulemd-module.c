@@ -3440,24 +3440,27 @@ modulemd_module_new (void)
  *
  * Allocates a new #ModulemdModule from a file.
  *
- * Return value: a new #ModulemdModule.
+ * Return value: a new #ModulemdModule. When no longer needed, free it with
+ * g_object_unref().
  */
 ModulemdModule *
 modulemd_module_new_from_file (const gchar *yaml_file)
 {
   GError *error = NULL;
   ModulemdModule **modules = NULL;
-  GPtrArray *extra_data = NULL;
+  GPtrArray *data = NULL;
 
-  if (!parse_yaml_file (yaml_file, &modules, &extra_data, &error))
+  if (!parse_yaml_file (yaml_file, &data, &error))
     {
       g_message ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return NULL;
     }
 
+  modules = mmd_yaml_dup_modules (data);
+
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&extra_data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_free);
 
   for (gsize i = 1; modules[i]; i++)
     {
@@ -3480,20 +3483,19 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
                                    ModulemdModule ***_modules)
 {
   GError *error = NULL;
-  ModulemdModule **modules = NULL;
-  GPtrArray *extra_data = NULL;
+  GPtrArray *data = NULL;
 
-  if (!parse_yaml_file (yaml_file, &modules, &extra_data, &error))
+  if (!parse_yaml_file (yaml_file, &data, &error))
     {
       g_message ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
 
-  /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&extra_data, g_ptr_array_free);
+  *_modules = mmd_yaml_dup_modules (data);
 
-  *_modules = modules;
+  /* This old implementation needs to ignore extra_data, so just free it. */
+  g_clear_pointer (&data, g_ptr_array_free);
 }
 
 /**
@@ -3510,17 +3512,19 @@ modulemd_module_new_from_string (const gchar *yaml_string)
 {
   GError *error = NULL;
   ModulemdModule **modules = NULL;
-  GPtrArray *extra_data = NULL;
+  GPtrArray *data = NULL;
 
-  if (!parse_yaml_string (yaml_string, &modules, &extra_data, &error))
+  if (!parse_yaml_string (yaml_string, &data, &error))
     {
       g_message ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return NULL;
     }
 
+  modules = mmd_yaml_dup_modules (data);
+
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&extra_data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_free);
 
   for (gsize i = 1; modules[i]; i++)
     {
@@ -3543,20 +3547,19 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
                                      ModulemdModule ***_modules)
 {
   GError *error = NULL;
-  ModulemdModule **modules = NULL;
-  GPtrArray *extra_data = NULL;
+  GPtrArray *data = NULL;
 
-  if (!parse_yaml_string (yaml_string, &modules, &extra_data, &error))
+  if (!parse_yaml_string (yaml_string, &data, &error))
     {
       g_message ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
 
-  /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&extra_data, g_ptr_array_free);
+  *_modules = mmd_yaml_dup_modules (data);
 
-  *_modules = modules;
+  /* This old implementation needs to ignore extra_data, so just free it. */
+  g_clear_pointer (&data, g_ptr_array_free);
 }
 
 /**

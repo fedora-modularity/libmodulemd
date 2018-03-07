@@ -174,28 +174,6 @@ error:
   return ret;
 }
 
-struct modulemd_yaml_string
-{
-  char *str;
-  size_t len;
-};
-
-static int
-_write_string (void *data, unsigned char *buffer, size_t size)
-{
-  struct modulemd_yaml_string *yaml_string =
-    (struct modulemd_yaml_string *)data;
-
-  yaml_string->str =
-    g_realloc_n (yaml_string->str, yaml_string->len + size + 1, sizeof (char));
-
-  memcpy (yaml_string->str + yaml_string->len, buffer, size);
-  yaml_string->len += size;
-  yaml_string->str[yaml_string->len] = '\0';
-
-  return 1;
-}
-
 gboolean
 emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
 {
@@ -213,7 +191,7 @@ emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
 
   yaml_emitter_initialize (&emitter);
 
-  yaml_emitter_set_output (&emitter, _write_string, (void *)yaml_string);
+  yaml_emitter_set_output (&emitter, _write_yaml_string, (void *)yaml_string);
 
   yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (

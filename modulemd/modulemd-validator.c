@@ -117,8 +117,6 @@ main (int argc, char *argv[])
   const char *filename;
   GOptionContext *context;
   GError *error = NULL;
-  ModulemdModule **modules = NULL;
-  GPtrArray *extra_data = NULL;
   gboolean all_valid = TRUE;
   setlocale (LC_ALL, "");
 
@@ -145,7 +143,7 @@ main (int argc, char *argv[])
           fprintf (stdout, "Validating %s\n", filename);
         }
 
-      if (!parse_yaml_file (filename, &modules, &extra_data, &error))
+      if (!parse_yaml_file (filename, NULL, &error))
         {
           fprintf (stderr, "%s failed to validate\n", filename);
           if (options.verbosity >= MMD_VERBOSE)
@@ -153,15 +151,6 @@ main (int argc, char *argv[])
               fprintf (stdout, "ERROR: %s\n", error->message);
             }
           all_valid = FALSE;
-        }
-
-      if (modules)
-        {
-          for (gsize i = 0; modules[i]; i++)
-            {
-              g_object_unref (modules[i]);
-            }
-          g_clear_pointer (&modules, g_free);
         }
 
       g_clear_pointer (&error, g_error_free);

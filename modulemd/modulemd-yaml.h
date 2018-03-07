@@ -44,6 +44,10 @@ enum ModulemdYamlError
 const gchar *
 mmd_yaml_get_event_name (yaml_event_type_t type);
 
+typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
+                                         GObject **object,
+                                         GError **error);
+
 #define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \
   do                                                                          \
     {                                                                         \
@@ -159,17 +163,14 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
-gboolean
-parse_yaml_file (const gchar *path,
-                 ModulemdModule ***_modules,
-                 GPtrArray **extra_data,
-                 GError **error);
+ModulemdModule **
+mmd_yaml_dup_modules (GPtrArray *objects);
 
 gboolean
-parse_yaml_string (const gchar *yaml,
-                   ModulemdModule ***modules,
-                   GPtrArray **extra_data,
-                   GError **error);
+parse_yaml_file (const gchar *path, GPtrArray **data, GError **error);
+
+gboolean
+parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error);
 
 
 gboolean
@@ -177,6 +178,15 @@ emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error);
 
 gboolean
 emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error);
+
+struct modulemd_yaml_string
+{
+  char *str;
+  size_t len;
+};
+
+int
+_write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,

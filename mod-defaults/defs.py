@@ -8,6 +8,21 @@ sys.path.append("/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib
 import yaml
 
 all = {}
+def _add(d):
+    name = d['module']
+
+    if name in all:
+        if all[name] is None:
+            return
+        if d['pri'] == all[name]['pri']:
+            print >>sys.stderr, "Warn:", name, "listed twice"
+            all[name] = None
+            return
+        if d['pri'] <= all[name]['pri']:
+            return
+
+    all[name] = d
+
 pri = 0
 for arg in sys.argv[1:]:
     pri += 1
@@ -23,17 +38,13 @@ for arg in sys.argv[1:]:
 
         d['pri'] = pri
 
-        if d['module'] in all:
-            if all[d['module']] is None:
-                continue
-            if d['pri'] == all[d['module']]['pri']:
-                print >>sys.stderr, "Warn:", d['module'], "listed twice"
-                all[d['module']] = None
-                continue
-            if d['pri'] <= all[d['module']]['pri']:
-                continue
-
-        all[d['module']] = d
+        _add(d)
+        for intn in d.get('intents', []):
+            intd = {'module' : intn + '/' + d['module']}
+            intd['stream'] = d['intents'][intn]['stream']
+            intd['profiles'] = d['intents'][intn]['profiles']
+            intd['pri'] = pri
+            _add(intd)
 
 for n in sorted(all):
     d = all[n]

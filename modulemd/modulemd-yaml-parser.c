@@ -27,7 +27,6 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
-#include "modulemd-private.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 
@@ -67,7 +66,10 @@ static gboolean
 _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error);
 
 static gboolean
-_parse_modulemd_root (yaml_parser_t *parser, GObject **object, GError **error);
+_parse_modulemd_root (yaml_parser_t *parser,
+                      GObject **object,
+                      guint64 version,
+                      GError **error);
 
 static gboolean
 _parse_modulemd_data (ModulemdModule *module,
@@ -281,6 +283,7 @@ static gboolean
 _parse_subdocument (struct yaml_subdocument *subdocument,
                     ModulemdParsingFunc parse_func,
                     GObject **data,
+                    guint64 version,
                     GError **error);
 static gboolean
 _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
@@ -357,7 +360,7 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
       if (document->type == MODULEMD_TYPE_MODULE)
         {
           result = _parse_subdocument (
-            document, _parse_modulemd_root, &object, error);
+            document, _parse_modulemd_root, &object, document->version, error);
 
           if (result)
             {
@@ -487,6 +490,8 @@ _read_yaml_and_type (yaml_parser_t *parser,
                       *type = MODULEMD_TYPE_MODULE;
                     }
                   /* Handle additional types here */
+
+                  g_debug ("Document type: %d", *type);
                 }
 
               else if (g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -511,7 +516,9 @@ _read_yaml_and_type (yaml_parser_t *parser,
                     }
 
                   *version = g_ascii_strtoull (
-                    (const gchar *)event.data.scalar.value, NULL, 10);
+                    (const gchar *)value_event.data.scalar.value, NULL, 10);
+
+                  g_debug ("Document version: %d", *version);
                 }
             }
           break;
@@ -553,6 +560,7 @@ static gboolean
 _parse_subdocument (struct yaml_subdocument *subdocument,
                     ModulemdParsingFunc parse_func,
                     GObject **data,
+                    guint64 version,
                     GError **error)
 {
   gboolean result = FALSE;
@@ -578,7 +586,7 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
           break;
 
         case YAML_DOCUMENT_START_EVENT:
-          if (!parse_func (&parser, &object, error))
+          if (!parse_func (&parser, &object, version, error))
             {
               g_message ("Invalid [%s] document [%s].",
                          g_type_name (subdocument->type),
@@ -611,12 +619,15 @@ error:
 }
 
 static gboolean
-_parse_modulemd_root (yaml_parser_t *parser, GObject **object, GError **error)
+_parse_modulemd_root (yaml_parser_t *parser,
+                      GObject **object,
+                      guint64 version,
+                      GError **error)
 {
   yaml_event_t event;
   gboolean done = FALSE;
   gboolean result = FALSE;
-  guint64 version;
+  guint64 mdversion;
   ModulemdModule *module = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -627,6 +638,17 @@ _parse_modulemd_root (yaml_parser_t *parser, GObject **object, GError **error)
    * it turns out to be extra_data.
    */
   module = modulemd_module_new ();
+
+  /* Use the pre-processed mdversion */
+  if (version && version <= MD_VERSION_LATEST)
+    {
+      modulemd_module_set_mdversion (module, version);
+    }
+  else
+    {
+      /* No mdversion was discovered during pre-processing */
+      MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
+    }
 
   /* Parse until the end of this document */
   while (!done)
@@ -673,21 +695,22 @@ _parse_modulemd_root (yaml_parser_t *parser, GObject **object, GError **error)
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
-              version = g_ascii_strtoull (
+              mdversion = g_ascii_strtoull (
                 (const gchar *)event.data.scalar.value, NULL, 10);
-              if (!version)
+              if (!mdversion)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
-
-              if (!modulemd_module_check_mdversion_range (module, version))
+              if (mdversion != version)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Module is using features from "
-                                         "mismatched modulemd formats");
+                  /* Preprocessing and real parser don't match!
+                   * This should be impossible
+                   */
+                  MMD_YAML_ERROR_RETURN (
+                    error, "ModuleMD version doesn't match preprocessing");
                 }
-              modulemd_module_set_mdversion (module, version);
+              modulemd_module_set_mdversion (module, mdversion);
             }
 
           /* Process the data section */
@@ -888,8 +911,7 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
-              if (!modulemd_module_check_mdversion_range (module,
-                                                          MD_VERSION_1))
+              if (modulemd_module_peek_mdversion (module) > MD_VERSION_1)
                 {
                   /* EOL is not supported in v2 or later; use servicelevel */
                   MMD_YAML_ERROR_RETURN (
@@ -1450,51 +1472,17 @@ _parse_modulemd_deps (ModulemdModule *module,
                       GError **error)
 {
   gboolean result = FALSE;
-  yaml_event_t event;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   g_debug ("TRACE: entering _parse_modulemd_deps");
 
-  if (!modulemd_module_check_mdversion_range_is_set (module))
-    {
-      /* We will have to guess and set the assumed mdversion based on the next
-       * parser event. Whee!
-       */
-      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-        parser, &event, error, "Parser error");
-      switch (event.type)
-        {
-        case YAML_MAPPING_START_EVENT:
-          /* This must be a v1 dependency */
-          modulemd_module_set_mdversion_range (
-            module, MD_VERSION_1, MD_VERSION_1);
-          result = _parse_modulemd_deps_v1 (module, parser, error);
-          break;
-
-        case YAML_SEQUENCE_START_EVENT:
-          /* This must be a v2 dependency */
-          modulemd_module_set_mdversion_range (
-            module, MD_VERSION_2, MD_VERSION_MAX);
-          result = _parse_modulemd_deps_v2 (module, parser, error);
-          break;
-
-        default:
-          /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
-          break;
-        }
-      /* Processing is done, go to the end */
-      goto error;
-    }
-
-  if (modulemd_module_check_mdversion_range (module, MD_VERSION_1))
+  if (modulemd_module_peek_mdversion (module) == MD_VERSION_1)
     {
       result = _parse_modulemd_deps_v1 (module, parser, error);
       goto error;
     }
-  else if (modulemd_module_check_mdversion_range_full (
-             module, MD_VERSION_2, MD_VERSION_MAX))
+  else if (modulemd_module_peek_mdversion (module) >= MD_VERSION_2)
     {
       result = _parse_modulemd_deps_v2 (module, parser, error);
       goto error;

@@ -96,6 +96,9 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
   GHashTable *htable2 = NULL;
   GHashTable *buildrequires = NULL;
 
+  /* This functionality is only available on v1 */
+  modulemd_module_set_mdversion (md, MD_VERSION_1);
+
   /* Should be initialized to an empty hash table */
 
   htable = modulemd_module_get_buildrequires (md);
@@ -259,6 +262,9 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
   GHashTable *htable = NULL;
   GHashTable *htable2 = NULL;
   GHashTable *requires = NULL;
+
+  /* This functionality is only available on v1 */
+  modulemd_module_set_mdversion (md, MD_VERSION_1);
 
   /* Should be initialized to an empty hash table */
 

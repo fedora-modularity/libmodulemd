@@ -256,6 +256,7 @@ error:
 struct yaml_subdocument
 {
   GType type;
+  guint64 version;
   GObject *subdocument;
   char *yaml;
 };
@@ -271,8 +272,9 @@ modulemd_subdocument_free (gpointer mem)
 
 static gboolean
 _read_yaml_and_type (yaml_parser_t *parser,
-                     gchar **yaml_string,
+                     gchar **yaml,
                      GType *type,
+                     guint64 *version,
                      GError **error);
 
 static gboolean
@@ -318,15 +320,25 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
           /* New document to process */
           document = g_new0 (struct yaml_subdocument, 1);
 
-          if (!_read_yaml_and_type (
-                parser, &document->yaml, &document->type, error))
+          if (!_read_yaml_and_type (parser,
+                                    &document->yaml,
+                                    &document->type,
+                                    &document->version,
+                                    error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Parse error during preprocessing");
             }
 
-          /* Add the document to the list */
-          g_ptr_array_add (subdocuments, document);
+          /* Add all valid documents to the list */
+          if (document->type != G_TYPE_INVALID)
+            {
+              g_ptr_array_add (subdocuments, document);
+            }
+          else
+            {
+              modulemd_subdocument_free (document);
+            }
           document = NULL;
           break;
 
@@ -353,7 +365,16 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
             }
         }
       /* Parsers for other types go here */
-      /* else (document->type == <...>) */
+      /* else if (document->type == <...>) */
+      else
+        {
+          /* Unknown document type */
+          g_set_error_literal (error,
+                               MODULEMD_YAML_ERROR,
+                               MODULEMD_YAML_ERROR_PARSE,
+                               "Unknown document type");
+          result = FALSE;
+        }
 
       if (!result)
         {
@@ -387,15 +408,21 @@ static gboolean
 _read_yaml_and_type (yaml_parser_t *parser,
                      gchar **yaml,
                      GType *type,
+                     guint64 *version,
                      GError **error)
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
+  gsize depth = 0;
   struct modulemd_yaml_string *yaml_string = NULL;
   yaml_event_t event;
+  yaml_event_t value_event;
   yaml_emitter_t emitter;
 
   g_debug ("TRACE: entering _read_yaml_and_type");
+
+  /* In case we don't encounter a "document" type, default to INVALID */
+  *type = G_TYPE_INVALID;
 
   yaml_string = g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
   yaml_emitter_initialize (&emitter);
@@ -413,6 +440,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
   while (!done)
     {
+      value_event.type = YAML_NO_EVENT;
       YAML_PARSER_PARSE_WITH_ERROR_RETURN (
         parser, &event, error, "Parser error");
 
@@ -420,9 +448,72 @@ _read_yaml_and_type (yaml_parser_t *parser,
         {
         case YAML_DOCUMENT_END_EVENT: done = TRUE; break;
 
+        case YAML_SEQUENCE_START_EVENT:
+        case YAML_MAPPING_START_EVENT: depth++; break;
+
+        case YAML_SEQUENCE_END_EVENT:
+        case YAML_MAPPING_END_EVENT: depth--; break;
+
         case YAML_SCALAR_EVENT:
-          /* TODO: check for type properly here */
-          *type = MODULEMD_TYPE_MODULE;
+          if (depth == 1)
+            {
+              /* If we're in the root of the document, check for the
+               * document type and version
+               */
+
+              if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                              "document"))
+                {
+                  if ((*type) != G_TYPE_INVALID)
+                    {
+                      /* We encountered document-type twice in the same
+                       * document root mapping. This shouldn't ever happen
+                       */
+                      MMD_YAML_ERROR_RETURN (error, "Document type set twice");
+                    }
+
+                  YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                    parser, &value_event, error, "Parser error");
+
+                  if (value_event.type != YAML_SCALAR_EVENT)
+                    {
+                      MMD_YAML_ERROR_RETURN (error,
+                                             "Error parsing document type");
+                    }
+
+                  if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
+                                 "modulemd") == 0)
+                    {
+                      *type = MODULEMD_TYPE_MODULE;
+                    }
+                  /* Handle additional types here */
+                }
+
+              else if (g_strcmp0 ((const gchar *)event.data.scalar.value,
+                                  "version") == 0)
+                {
+                  if ((*version) != 0)
+                    {
+                      /* We encountered document-version twice in the same
+                       * document root mapping. This shouldn't ever happen
+                       */
+                      MMD_YAML_ERROR_RETURN (error,
+                                             "Document version set twice");
+                    }
+
+                  YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                    parser, &value_event, error, "Parser error");
+
+                  if (value_event.type != YAML_SCALAR_EVENT)
+                    {
+                      MMD_YAML_ERROR_RETURN (error,
+                                             "Error parsing document version");
+                    }
+
+                  *version = g_ascii_strtoull (
+                    (const gchar *)event.data.scalar.value, NULL, 10);
+                }
+            }
           break;
 
         default:
@@ -430,8 +521,16 @@ _read_yaml_and_type (yaml_parser_t *parser,
           break;
         }
 
+      /* Copy this event to the string */
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
         &emitter, &event, error, "Error storing YAML event");
+
+      if (value_event.type != YAML_NO_EVENT)
+        {
+          /* Copy this event to the string */
+          YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+            &emitter, &value_event, error, "Error storing YAML event");
+        }
     }
 
   yaml_stream_end_event_initialize (&event);

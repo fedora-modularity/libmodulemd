@@ -111,6 +111,8 @@ modulemd_module_upgrade_full (ModulemdModule *self, guint64 version);
  * @arch: (nullable): the module artifact architecture.
  *
  * Sets the "arch" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
@@ -134,6 +136,8 @@ modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
  *
  * Deprecated: 1.1
  * Use peek_arch() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_arch)
 const gchar *
@@ -185,6 +189,8 @@ modulemd_module_dup_arch (ModulemdModule *self)
  *
  * Sets the 'buildrequires' property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_buildrequires (ModulemdModule *self,
@@ -232,6 +238,8 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_buildrequires() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_buildrequires)
 GHashTable *
@@ -285,6 +293,8 @@ modulemd_module_dup_buildrequires (ModulemdModule *self)
  * @community: (nullable): the module community.
  *
  * Sets the "community" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_community (ModulemdModule *self, const gchar *community)
@@ -309,6 +319,8 @@ modulemd_module_set_community (ModulemdModule *self, const gchar *community)
  *
  * Deprecated: 1.1
  * Use peek_community() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_community)
 const gchar *
@@ -360,6 +372,8 @@ modulemd_module_dup_community (ModulemdModule *self)
  * this module are released.
  *
  * Sets the content_licenses property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_content_licenses (ModulemdModule *self,
@@ -385,6 +399,7 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
  * Deprecated: 1.1
  * Use peek_content_licenses() instead.
  *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_content_licenses)
 ModulemdSimpleSet *
@@ -442,6 +457,8 @@ modulemd_module_dup_content_licenses (ModulemdModule *self)
  * @context: (nullable): the module artifact architecture.
  *
  * Sets the "context" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_context (ModulemdModule *self, const gchar *context)
@@ -466,6 +483,8 @@ modulemd_module_set_context (ModulemdModule *self, const gchar *context)
  *
  * Deprecated: 1.1
  * Use peek_context() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_context)
 const gchar *
@@ -517,6 +536,8 @@ modulemd_module_dup_context (ModulemdModule *self)
  * The NULL-terminated list of dependencies.
  *
  * Sets the list of dependency objects for this module.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
@@ -556,6 +577,8 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
  * @dep: A dependency object to add to this module
  *
  * Helper function to populate the dependencies list
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_add_dependencies (ModulemdModule *self,
@@ -591,6 +614,8 @@ modulemd_module_add_dependencies (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_dependencies() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_dependencies)
 GPtrArray *
@@ -654,6 +679,8 @@ modulemd_module_dup_dependencies (ModulemdModule *self)
  * @description: (nullable): the module description.
  *
  * Sets the "description" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_description (ModulemdModule *self,
@@ -678,6 +705,8 @@ modulemd_module_set_description (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_description() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_description)
 const gchar *
@@ -728,6 +757,8 @@ modulemd_module_dup_description (ModulemdModule *self)
  * @documentation: (nullable): the module documentation.
  *
  * Sets the "documentation" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_documentation (ModulemdModule *self,
@@ -752,6 +783,8 @@ modulemd_module_set_documentation (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_documentation() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_documentation)
 const gchar *
@@ -805,6 +838,8 @@ modulemd_module_dup_documentation (ModulemdModule *self)
  *
  * Note: This property is obsolete. Use "servicelevels" instead.  This will fail
  * on modulemd files using the version 2 or later formats.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
@@ -853,6 +888,8 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
  *
  * Deprecated: 1.1
  * Use peek_eol() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_eol)
 const GDate *
@@ -923,6 +960,8 @@ modulemd_module_dup_eol (ModulemdModule *self)
  * @mdversion: the metadata version
  *
  * Sets the "mdversion" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
@@ -947,6 +986,8 @@ modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
  *
  * Deprecated: 1.1
  * Use peek_mdversion() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_mdversion)
 const guint64
@@ -977,6 +1018,8 @@ modulemd_module_peek_mdversion (ModulemdModule *self)
  * @component: A #ModulemdComponentModule
  *
  * Adds a #ModulemdComponentModule to the "module_components" hash table.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_add_module_component (ModulemdModule *self,
@@ -999,6 +1042,8 @@ modulemd_module_add_module_component (ModulemdModule *self,
  * modulemd_module_clear_module_components:
  *
  * Remove all entries from the "module_components" hash table.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_clear_module_components (ModulemdModule *self)
@@ -1020,6 +1065,8 @@ modulemd_module_clear_module_components (ModulemdModule *self)
  * module.
  *
  * Sets the module_components property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_module_components (ModulemdModule *self,
@@ -1068,6 +1115,8 @@ modulemd_module_set_module_components (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_module_components() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_module_components)
 GHashTable *
@@ -1135,6 +1184,8 @@ modulemd_module_dup_module_components (ModulemdModule *self)
  * this module are released.
  *
  * Sets the module_licenses property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_module_licenses (ModulemdModule *self,
@@ -1159,6 +1210,8 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_module_licenses() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_module_licenses)
 ModulemdSimpleSet *
@@ -1214,6 +1267,8 @@ modulemd_module_dup_module_licenses (ModulemdModule *self)
  * @name: (nullable): the module name.
  *
  * Sets the "name" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_name (ModulemdModule *self, const gchar *name)
@@ -1237,6 +1292,8 @@ modulemd_module_set_name (ModulemdModule *self, const gchar *name)
  *
  * Deprecated: 1.1
  * Use peek_name() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_name)
 const gchar *
@@ -1289,6 +1346,8 @@ modulemd_module_dup_name (ModulemdModule *self)
  * @profile: A #ModulemdProfile
  *
  * Adds a #ModulemdProfile definition to this module.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
@@ -1309,6 +1368,8 @@ modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
  * modulemd_module_clear_profiles:
  *
  * Remove all entries from the "profiles" hash table.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_clear_profiles (ModulemdModule *self)
@@ -1327,6 +1388,8 @@ modulemd_module_clear_profiles (ModulemdModule *self)
  * this module.
  *
  * Sets the 'profiles' property.
+ *
+ * Since: 1.0
  */
 
 void
@@ -1373,6 +1436,8 @@ modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
  *
  * Deprecated: 1.1
  * Use peek_profiles() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_profiles)
 GHashTable *
@@ -1439,6 +1504,8 @@ modulemd_module_dup_profiles (ModulemdModule *self)
  *
  * Sets the 'requires' property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
@@ -1485,6 +1552,8 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
  *
  * Deprecated: 1.1
  * Use peek_requires() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_requires)
 GHashTable *
@@ -1541,6 +1610,8 @@ modulemd_module_dup_requires (ModulemdModule *self)
  * public API for this module.
  *
  * Sets the rpm_api property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
@@ -1564,6 +1635,8 @@ modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
  *
  * Deprecated: 1.1
  * Use peek_rpm_api() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_rpm_api)
 ModulemdSimpleSet *
@@ -1619,6 +1692,8 @@ modulemd_module_dup_rpm_api (ModulemdModule *self)
  * contained in this module. Generally populated by the module build service.
  *
  * Sets the rpm_artifacts property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_rpm_artifacts (ModulemdModule *self,
@@ -1644,6 +1719,8 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_rpm_artifacts() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_rpm_artifacts)
 ModulemdSimpleSet *
@@ -1703,6 +1780,8 @@ modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
  * "macros".
  *
  * Sets the 'rpm-buildopts' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
@@ -1738,6 +1817,8 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
  *
  * Deprecated: 1.1
  * Use peek_rpm_buildopts() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_rpm_buildopts)
 GHashTable *
@@ -1791,6 +1872,8 @@ modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
  * @component: A #ModulemdComponentRpm
  *
  * Adds a #ModulemdComponentRpm to the "rpm_components" hash table.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_add_rpm_component (ModulemdModule *self,
@@ -1813,6 +1896,8 @@ modulemd_module_add_rpm_component (ModulemdModule *self,
  * modulemd_module_clear_rpm_components:
  *
  * Remove all entries from the "rpm_components" hash table.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_clear_rpm_components (ModulemdModule *self)
@@ -1834,6 +1919,8 @@ modulemd_module_clear_rpm_components (ModulemdModule *self)
  * module.
  *
  * Sets the rpm_components property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_rpm_components (ModulemdModule *self,
@@ -1882,6 +1969,8 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_rpm_components() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_rpm_components)
 GHashTable *
@@ -1951,6 +2040,8 @@ modulemd_module_dup_rpm_components (ModulemdModule *self)
  * explicitly filtered out of this module.
  *
  * Sets the rpm_artifacts property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_rpm_filter (ModulemdModule *self,
@@ -1976,6 +2067,8 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_rpm_filter() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_rpm_filter)
 ModulemdSimpleSet *
@@ -2030,6 +2123,8 @@ modulemd_module_dup_rpm_filter (ModulemdModule *self)
  * modulemd_module_clear_servicelevels:
  *
  * Remove all entries from the "servicelevels" hash table
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_clear_servicelevels (ModulemdModule *self)
@@ -2047,6 +2142,8 @@ modulemd_module_clear_servicelevels (ModulemdModule *self)
  * @servicelevels: (nullable) (element-type utf8 ModulemdServiceLevel): A hash table of #ServiceLevel objects
  *
  * Sets the service levels for the module.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_servicelevels (ModulemdModule *self,
@@ -2106,6 +2203,8 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
  *
  * Adds a service levels to the module. If the name already exists, it will be
  * replaced by this entry and will release a reference on the previous entry.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_add_servicelevel (ModulemdModule *self,
@@ -2146,6 +2245,8 @@ modulemd_module_add_servicelevel (ModulemdModule *self,
  *
  * Deprecated: 1.1
  * Use peek_servicelevels() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_servicelevels)
 GHashTable *
@@ -2212,6 +2313,8 @@ modulemd_module_dup_servicelevels (ModulemdModule *self)
  * @stream: (nullable): the module stream.
  *
  * Sets the "stream" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
@@ -2237,6 +2340,8 @@ modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
  *
  * Deprecated: 1.1
  * Use peek_stream() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_stream)
 const gchar *
@@ -2287,6 +2392,8 @@ modulemd_module_dup_stream (ModulemdModule *self)
  * @summary: (nullable): the module summary.
  *
  * Sets the "summary" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
@@ -2312,6 +2419,8 @@ modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
  *
  * Deprecated: 1.1
  * Use peek_summary() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_summary)
 const gchar *
@@ -2362,6 +2471,8 @@ modulemd_module_dup_summary (ModulemdModule *self)
  * @tracker: (nullable): the module tracker.
  *
  * Sets the "tracker" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
@@ -2387,6 +2498,8 @@ modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
  *
  * Deprecated: 1.1
  * Use peek_tracker() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_tracker)
 const gchar *
@@ -2437,6 +2550,8 @@ modulemd_module_dup_tracker (ModulemdModule *self)
  * @version: the module version
  *
  * Sets the "version" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_version (ModulemdModule *self, const guint64 version)
@@ -2460,6 +2575,8 @@ modulemd_module_set_version (ModulemdModule *self, const guint64 version)
  *
  * Deprecated: 1.1
  * Use peek_version() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_version)
 const guint64
@@ -2494,6 +2611,8 @@ modulemd_module_peek_version (ModulemdModule *self)
  * @xmd: (nullable) (element-type utf8 GVariant): Extensible metadata block
  *
  * Sets the 'xmd' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
@@ -2530,6 +2649,8 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
  *
  * Deprecated: 1.1
  * Use peek_xmd() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_module_peek_xmd)
 GHashTable *
@@ -3250,6 +3371,8 @@ modulemd_module_init (ModulemdModule *self)
  * Allocates a new #ModulemdModule.
  *
  * Return value: a new #ModulemdModule.
+ *
+ * Since: 1.0
  */
 ModulemdModule *
 modulemd_module_new (void)
@@ -3267,6 +3390,8 @@ modulemd_module_new (void)
  *
  * Return value: a new #ModulemdModule. When no longer needed, free it with
  * g_object_unref().
+ *
+ * Since: 1.0
  */
 ModulemdModule *
 modulemd_module_new_from_file (const gchar *yaml_file)
@@ -3302,6 +3427,8 @@ modulemd_module_new_from_file (const gchar *yaml_file)
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a file.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_new_all_from_file (const gchar *yaml_file,
@@ -3331,6 +3458,8 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
  * Allocates a new #ModulemdModule from a string.
  *
  * Return value: a new #ModulemdModule.
+ *
+ * Since: 1.0
  */
 ModulemdModule *
 modulemd_module_new_from_string (const gchar *yaml_string)
@@ -3366,6 +3495,8 @@ modulemd_module_new_from_string (const gchar *yaml_string)
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a string.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_new_all_from_string (const gchar *yaml_string,
@@ -3392,6 +3523,8 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
  * @yaml_file: A string containing the path to the output file
  *
  * Writes this module out to a YAML document on disk.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file)
@@ -3417,6 +3550,8 @@ modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file)
  * Writes this module out to a YAML document string.
  *
  * Return value: A string containing a YAML representation of this module.
+ *
+ * Since: 1.0
  */
 gchar *
 modulemd_module_dumps (ModulemdModule *self)
@@ -3446,6 +3581,8 @@ modulemd_module_dumps (ModulemdModule *self)
  *
  * This function writes out a file containing one or more YAML documents
  * generated from the supplied modules.
+ *
+ * Since: 1.0
  */
 void
 modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
@@ -3478,6 +3615,8 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
  * documents generated from the supplied modules.
  *
  * Return value: A string containing a YAML representation of all provided modules.
+ *
+ * Since: 1.0
  */
 gchar *
 modulemd_module_dumps_all (GPtrArray *module_array)
@@ -3570,6 +3709,8 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
  * Return value: TRUE if the upgrade was performed successfully. If this
  * function returns FALSE, the internal state of the data is undefined and
  * should not be used further.
+ *
+ * Since: 1.0
  */
 
 gboolean

@@ -54,6 +54,8 @@ G_DEFINE_TYPE (ModulemdServiceLevel, modulemd_servicelevel, G_TYPE_OBJECT)
  * @date: (nullable): The date this service level ends
  *
  * Sets the end date of the service level.
+ *
+ * Since: 1.0
  */
 void
 modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
@@ -88,6 +90,8 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
  *
  * Deprecated: 1.1
  * Use peek_eol() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_servicelevel_peek_eol)
 const GDate *
@@ -150,6 +154,8 @@ modulemd_servicelevel_dup_eol (ModulemdServiceLevel *self)
  * @name: (nullable): The name of this servicelevel
  *
  * Set the name of this service level.
+ *
+ * Since: 1.0
  */
 void
 modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name)
@@ -177,6 +183,8 @@ modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name)
  *
  * Deprecated: 1.1
  * Use peek_name() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_servicelevel_peek_name)
 const gchar *

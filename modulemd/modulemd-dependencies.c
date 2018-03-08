@@ -97,6 +97,8 @@ _modulemd_dependencies_add_stream (GHashTable *reqs,
  * dependent module. The matrix of streams and module names will be calculated
  * by the build-system. If the listed provided module name is already present,
  * the streams will be added (with deduplication).
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_add_buildrequires (ModulemdDependencies *self,
@@ -123,6 +125,8 @@ modulemd_dependencies_add_buildrequires (ModulemdDependencies *self,
  * module. The matrix of streams and module names will be calculated by the
  * build-system. If the listed provided module name is already present, the
  * streams will be added (with deduplication).
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
@@ -146,6 +150,8 @@ modulemd_dependencies_add_buildrequires_single (ModulemdDependencies *self,
  * requirements to build this module.
  *
  * Sets the 'buildrequires' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
@@ -188,6 +194,8 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
  *
  * Deprecated: 1.1
  * Use peek_buildrequires() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_dependencies_peek_buildrequires)
 GHashTable *
@@ -271,6 +279,8 @@ modulemd_dependencies_dup_buildrequires (ModulemdDependencies *self)
  * module. The matrix of streams and module names will be calculated by the
  * build-system. If the listed provided module name is already present, the
  * streams will be added (with deduplication).
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_add_requires (ModulemdDependencies *self,
@@ -297,6 +307,8 @@ modulemd_dependencies_add_requires (ModulemdDependencies *self,
  * dependent module. The matrix of streams and module names will be calculated
  * by the build-system. If the listed provided module name is already present,
  * the streams will be added (with deduplication).
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
@@ -320,6 +332,8 @@ modulemd_dependencies_add_requires_single (ModulemdDependencies *self,
  * The runtime requirements for this module.
  *
  * Sets the 'requires' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_set_requires (ModulemdDependencies *self,
@@ -360,6 +374,9 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
  * table containing the "requires" property.
  *
  * Deprecated: 1.1
+ * Use peek_requires() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_dependencies_peek_requires)
 GHashTable *
@@ -420,6 +437,8 @@ modulemd_dependencies_dup_requires (ModulemdDependencies *self)
  *
  * In either case, the caller is responsible for calling g_object_unref() later
  * to free it.
+ *
+ * Since: 1.0
  */
 void
 modulemd_dependencies_copy (ModulemdDependencies *self,

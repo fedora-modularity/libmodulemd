@@ -46,6 +46,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
                                          GObject **object,
+                                         guint64 version,
                                          GError **error);
 
 #define YAML_PARSER_PARSE_WITH_ERROR_RETURN(parser, event, error, msg)        \

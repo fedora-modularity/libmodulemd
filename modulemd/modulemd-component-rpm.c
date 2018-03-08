@@ -80,6 +80,8 @@ modulemd_component_rpm_finalize (GObject *object)
  * @arches: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
  * package should be available. An empty set means  the package is available
  * on all supported architectures.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
@@ -104,6 +106,8 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
  *
  * Deprecated: 1.1
  * Use peek_arches() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_rpm_peek_arches)
 ModulemdSimpleSet *
@@ -157,6 +161,8 @@ modulemd_component_rpm_dup_arches (ModulemdComponentRpm *self)
  * modulemd_component_rpm_set_cache
  * @cache: (nullable): A string: The URL of the lookaside cache where this package's
  * sources are stored.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_rpm_set_cache (ModulemdComponentRpm *self,
@@ -232,6 +238,8 @@ modulemd_component_rpm_dup_cache (ModulemdComponentRpm *self)
  * @multilib: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
  * package should be available as multilib. An empty set means the package is
  * not available as multilib on any architecture.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
@@ -256,6 +264,8 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
  *
  * Deprecated: 1.1
  * Use peek_multilib() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_rpm_peek_multilib)
 ModulemdSimpleSet *
@@ -310,6 +320,8 @@ modulemd_component_rpm_dup_multilib (ModulemdComponentRpm *self)
  * modulemd_component_rpm_set_ref
  * @ref: (nullable): A string: The particular repository commit hash, branch or tag name
  * used in this module.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref)
@@ -383,6 +395,8 @@ modulemd_component_rpm_dup_ref (ModulemdComponentRpm *self)
  * modulemd_component_rpm_set_repository
  * @repository: (nullable): A string: The VCS repository with the RPM SPEC file, patches and other
  * package data.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
@@ -409,6 +423,8 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
  *
  * Deprecated: 1.1
  * Use peek_repository() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_rpm_peek_repository)
 const gchar *

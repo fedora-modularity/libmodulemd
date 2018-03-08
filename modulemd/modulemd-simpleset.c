@@ -49,6 +49,14 @@ struct _ModulemdSimpleSet
 
 G_DEFINE_TYPE (ModulemdSimpleSet, modulemd_simpleset, G_TYPE_OBJECT)
 
+/**
+ * modulemd_simpleset_contains:
+ * @value: A string to compare against the set
+ *
+ * Returns: TRUE if the value existed in the set.
+ *
+ * Since: 1.0
+ */
 gboolean
 modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value)
 {
@@ -57,6 +65,14 @@ modulemd_simpleset_contains (ModulemdSimpleSet *self, const gchar *value)
   return g_hash_table_contains (self->set, value);
 }
 
+
+/**
+ * modulemd_simpleset_size:
+ *
+ * Returns: The number of elements in the set
+ *
+ * Since: 1.0
+ */
 guint
 modulemd_simpleset_size (ModulemdSimpleSet *self)
 {
@@ -97,6 +113,8 @@ modulemd_simpleset_remove_from_array (gpointer key,
  * Make the contents of the set equal to an array of strings. This function
  * will trigger a signal only if the resulting set is different. It does not
  * guarantee any order to the resulting set, only that it will be unique.
+ *
+ * Since: 1.0
  */
 void
 modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
@@ -144,6 +162,8 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
  * Use dup() instead.
  * This function was inconsistent with the other get() methods in libmodulemd
  * and should have been called dup() all along.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_simpleset_dup)
 gchar **
@@ -189,6 +209,8 @@ modulemd_simpleset_dup (ModulemdSimpleSet *self)
  * @value: A new string to add to the set
  *
  * This routine will add a new value to the set if it is not already present.
+ *
+ * Since: 1.0
  */
 void
 modulemd_simpleset_add (ModulemdSimpleSet *self, const gchar *value)
@@ -230,8 +252,9 @@ modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value)
  *
  * In either case, the caller is responsible for calling g_object_unref()
  * later to free it.
+ *
+ * Since: 1.0
  */
-
 void
 modulemd_simpleset_copy (ModulemdSimpleSet *self, ModulemdSimpleSet **dest)
 {

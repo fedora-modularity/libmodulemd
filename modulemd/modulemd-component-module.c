@@ -70,6 +70,8 @@ modulemd_component_module_finalize (GObject *object)
  * modulemd_component_module_set_ref
  * @ref: (nullable): A string: The particular repository commit hash, branch or tag name
  * used in this module.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_module_set_ref (ModulemdComponentModule *self,
@@ -96,6 +98,8 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
  *
  * Deprecated: 1.1
  * Use peek_ref() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_module_peek_ref)
 const gchar *
@@ -143,6 +147,8 @@ modulemd_component_module_dup_ref (ModulemdComponentModule *self)
  * modulemd_component_module_set_repository
  * @repository: (nullable): A string: The VCS repository with the modulemd file, and other
  * module data.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
@@ -169,6 +175,8 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
  *
  * Deprecated: 1.1
  * Use peek_repository() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_module_peek_repository)
 const gchar *

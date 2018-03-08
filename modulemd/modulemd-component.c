@@ -140,6 +140,8 @@ modulemd_component_default_dup_rationale (ModulemdComponent *self)
  * @buildorder: The order to build this component
  *
  * Sets the 'buildorder' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
@@ -161,6 +163,8 @@ modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
  *
  * Deprecated: 1.1
  * Use peek_buildorder() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_peek_buildorder)
 guint64
@@ -196,6 +200,8 @@ modulemd_component_peek_buildorder (ModulemdComponent *self)
  * @name: The name of the component
  *
  * Sets the 'name' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
@@ -218,6 +224,8 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
  *
  * Deprecated: 1.1
  * Use peek_name() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_peek_name)
 const gchar *
@@ -275,6 +283,8 @@ modulemd_component_dup_name (ModulemdComponent *self)
  * @rationale: The rationale for including this component
  *
  * Sets the 'rationale' property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
@@ -298,6 +308,8 @@ modulemd_component_set_rationale (ModulemdComponent *self,
  *
  * Deprecated: 1.1
  * Use peek_rationale() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_component_peek_rationale)
 const gchar *
@@ -504,6 +516,8 @@ modulemd_component_init (ModulemdComponent *self)
  * Allocates a new #ModulemdComponent
  *
  * Return value: a new #ModulemdComponent
+ *
+ * Since: 1.0
  */
 ModulemdComponent *
 modulemd_component_new (void)

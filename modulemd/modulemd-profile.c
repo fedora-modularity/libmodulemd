@@ -57,6 +57,8 @@ G_DEFINE_TYPE (ModulemdProfile, modulemd_profile, G_TYPE_OBJECT)
  * @description: (nullable): the profile description.
  *
  * Sets the "description" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_profile_set_description (ModulemdProfile *self,
@@ -83,6 +85,8 @@ modulemd_profile_set_description (ModulemdProfile *self,
  *
  * Deprecated: 1.1
  * Use peek_description() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_profile_peek_description)
 const gchar *
@@ -133,6 +137,8 @@ modulemd_profile_dup_description (ModulemdProfile *self)
  * @name: (nullable): the profile name.
  *
  * Sets the "name" property.
+ *
+ * Since: 1.0
  */
 void
 modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
@@ -158,6 +164,8 @@ modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
  *
  * Deprecated: 1.1
  * Use peek_name() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_profile_peek_name)
 const gchar *
@@ -209,6 +217,8 @@ modulemd_profile_dup_name (ModulemdProfile *self)
  *
  * Assigns the set of RPMs that will be installed when this profile is
  * activated.
+ *
+ * Since: 1.0
  */
 void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
@@ -233,6 +243,8 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
  *
  * Deprecated: 1.1
  * Use peek_rpms() instead.
+ *
+ * Since: 1.0
  */
 G_DEPRECATED_FOR (modulemd_profile_peek_rpms)
 ModulemdSimpleSet *

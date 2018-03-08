@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
 #include "modulemd-module.h"
 #include "modulemd-profile.h"

@@ -132,6 +132,13 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
             }
         }
+      else if (MODULEMD_IS_DEFAULTS (object))
+        {
+          if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+            }
+        }
       /* Emitters for other types go here */
       /* else if (document->type == <...>) */
       else

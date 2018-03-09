@@ -277,4 +277,9 @@ _emit_modulemd (yaml_emitter_t *emitter,
                 ModulemdModule *module,
                 GError **error);
 
+gboolean
+_emit_defaults (yaml_emitter_t *emitter,
+                ModulemdDefaults *defaults,
+                GError **error);
+
 #endif

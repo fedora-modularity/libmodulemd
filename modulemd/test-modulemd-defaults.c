@@ -45,6 +45,7 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
+  gchar *yaml_string = NULL;
   const gchar *module_name = "httpd";
   const gchar *default_stream = "2.6";
 
@@ -79,6 +80,14 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   set = g_hash_table_lookup (profile_defaults, default_stream);
   g_assert_true (modulemd_simpleset_contains (set, "client"));
   g_assert_true (modulemd_simpleset_contains (set, "server"));
+
+
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
 }
 
 
@@ -94,6 +103,7 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
+  gchar *yaml_string = NULL;
   const gchar *module_name = "postgresql";
   const gchar *default_stream = "8.0";
 
@@ -130,6 +140,13 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   set = g_hash_table_lookup (profile_defaults, default_stream);
   g_assert_true (modulemd_simpleset_contains (set, "server"));
 
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
+
 
   /* Second of the two subdocuments */
   module_name = "nodejs";
@@ -156,6 +173,13 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
 
   set = g_hash_table_lookup (profile_defaults, default_stream);
   g_assert_true (modulemd_simpleset_contains (set, "default"));
+
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
 }
 
 
@@ -171,6 +195,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
+  gchar *yaml_string = NULL;
   const gchar *module_name = "httpd";
   const gchar *default_stream = "2.2";
 
@@ -207,6 +232,13 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_assert_true (modulemd_simpleset_contains (set, "client"));
   g_assert_true (modulemd_simpleset_contains (set, "server"));
 
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
+
 
   /* Second of the three subdocuments */
   module_name = "postgresql";
@@ -236,6 +268,12 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_assert_true (modulemd_simpleset_contains (set, "server"));
   g_assert_true (modulemd_simpleset_contains (set, "foo"));
 
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
 
   /* Third of the three subdocuments */
   module_name = "nodejs";
@@ -265,6 +303,13 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
 
   set = g_hash_table_lookup (profile_defaults, "6.0");
   g_assert_true (modulemd_simpleset_contains (set, "default"));
+
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
 }
 
 int

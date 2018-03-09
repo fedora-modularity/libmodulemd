@@ -11,6 +11,7 @@ modulemd_srcs = [
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-parser.c',
+    'modulemd-yaml-parser-modulemd.c',
     'modulemd-yaml-utils.c'
 ]
 

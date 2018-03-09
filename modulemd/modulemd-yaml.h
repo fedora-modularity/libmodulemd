@@ -245,4 +245,11 @@ _parse_modulemd (yaml_parser_t *parser,
                  guint64 version,
                  GError **error);
 
+/* == ModulemdDefaults Parser == */
+gboolean
+_parse_defaults (yaml_parser_t *parser,
+                 GObject **object,
+                 guint64 version,
+                 GError **error);
+
 #endif

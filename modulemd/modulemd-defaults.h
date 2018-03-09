@@ -28,6 +28,8 @@
 
 #include <glib-object.h>
 
+#include "modulemd.h"
+
 enum
 {
   MD_DEFAULTS_VERSION_UNSET = 0,
@@ -76,6 +78,10 @@ void
 modulemd_defaults_set_profiles_for_stream (ModulemdDefaults *self,
                                            const gchar *stream,
                                            gchar **profiles);
+void
+modulemd_defaults_assign_profiles_for_stream (ModulemdDefaults *self,
+                                              const gchar *stream,
+                                              ModulemdSimpleSet *profiles);
 void
 modulemd_defaults_set_profile_defaults (ModulemdDefaults *self,
                                         GHashTable *profile_defaults);

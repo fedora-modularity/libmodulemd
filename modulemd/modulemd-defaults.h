@@ -94,6 +94,12 @@ GHashTable *
 modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self);
 
 
+void
+modulemd_defaults_dump (ModulemdDefaults *self, const gchar *file_path);
+
+void
+modulemd_defaults_dumps (ModulemdDefaults *self, gchar **yaml_string);
+
 G_END_DECLS
 
 #endif /* MODULEMD_DEFAULTS_H */

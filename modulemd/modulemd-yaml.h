@@ -227,6 +227,8 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GHashTable **_htable,
                          GError **error);
 
+gboolean
+_parse_skip (yaml_parser_t *parser, GError **error);
 
 /* == ModulemdModule Parser == */
 

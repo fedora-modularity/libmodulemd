@@ -672,3 +672,48 @@ error:
   g_debug ("TRACE: exiting _hashtable_from_mapping");
   return TRUE;
 }
+
+/* Helper function to skip over sections that aren't yet implemented */
+gboolean
+_parse_skip (yaml_parser_t *parser, GError **error)
+{
+  yaml_event_t event;
+  gboolean result = FALSE;
+  gboolean done = FALSE;
+  gsize depth = 0;
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_DOCUMENT_END_EVENT: done = TRUE; break;
+
+        case YAML_SEQUENCE_START_EVENT:
+        case YAML_MAPPING_START_EVENT: depth++; break;
+
+        case YAML_SEQUENCE_END_EVENT:
+        case YAML_MAPPING_END_EVENT:
+          depth--;
+
+          if (depth <= 0)
+            {
+              /* We've come back up to the original level from which we
+               * started
+               */
+              done = TRUE;
+            }
+          break;
+
+        default:
+          /* Just fall through here. */
+          break;
+        }
+    }
+
+  result = TRUE;
+error:
+  return result;
+}

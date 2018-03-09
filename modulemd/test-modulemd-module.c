@@ -503,7 +503,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
   ModulemdModule *copy = NULL;
-  ModulemdModule **modules = NULL;
+  GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
@@ -524,9 +524,9 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   modulemd_module_set_module_licenses (fixture->md, licenses);
 
   /* Dump it to YAML to validate it */
-  modules = g_new0 (ModulemdModule *, 1);
+  modules = g_ptr_array_new ();
   g_assert_nonnull (modules);
-  modules[0] = fixture->md;
+  g_ptr_array_add (modules, fixture->md);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
@@ -539,7 +539,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
 
   g_message ("v1 YAML:\n%s", yaml);
 
-  g_free (modules);
+  g_ptr_array_unref (modules);
 }
 
 
@@ -548,15 +548,14 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
   ModulemdModule *copy = NULL;
-  ModulemdModule **modules = NULL;
+  GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
   gboolean result;
 
-  modules = g_new0 (ModulemdModule *, 1);
-  g_assert_nonnull (modules);
-  modules[0] = fixture->md;
+  modules = g_ptr_array_new ();
+  g_ptr_array_add (modules, fixture->md);
 
   /* Verify that it fails when mdversion is unset */
   result = emit_yaml_string (modules, &yaml, &error);
@@ -608,7 +607,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
 
   g_message ("v2 YAML:\n%s", yaml);
 
-  g_free (modules);
+  g_ptr_array_unref (modules);
   g_clear_pointer (&yaml, g_free);
 }
 
@@ -616,7 +615,7 @@ static void
 modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
                                  gconstpointer user_data)
 {
-  ModulemdModule **modules = NULL;
+  GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
   gchar *yaml = NULL;
@@ -677,9 +676,8 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   g_assert_cmpuint (v2_deps->len, ==, 1);
 
   /* Dump it to YAML to validate it */
-  modules = g_new0 (ModulemdModule *, 1);
-  g_assert_nonnull (modules);
-  modules[0] = fixture->md;
+  modules = g_ptr_array_new ();
+  g_ptr_array_add (modules, fixture->md);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
@@ -687,7 +685,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
 
   g_message ("Upgraded YAML:\n%s", yaml);
 
-  g_free (modules);
+  g_ptr_array_unref (modules);
 }
 
 

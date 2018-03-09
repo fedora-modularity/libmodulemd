@@ -11,7 +11,7 @@ project. Following is example code how to do that:
 
 ```
 import gi
-gi.require_version('Modulemd', '1.0')
+gi.require_version('Modulemd', '1.1')
 from gi.repository import Modulemd
 help(Modulemd.Module)
 ```

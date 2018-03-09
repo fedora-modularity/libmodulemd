@@ -248,13 +248,13 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
         {
           result = _parse_subdocument (
             document, _parse_modulemd, &object, document->version, error);
-
-          if (result)
-            {
-              g_ptr_array_add (objects, object);
-            }
         }
       /* Parsers for other types go here */
+      else if (document->type == MODULEMD_TYPE_DEFAULTS)
+        {
+          result = _parse_subdocument (
+            document, _parse_defaults, &object, document->version, error);
+        }
       /* else if (document->type == <...>) */
       else
         {
@@ -266,7 +266,11 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
           result = FALSE;
         }
 
-      if (!result)
+      if (result)
+        {
+          g_ptr_array_add (objects, object);
+        }
+      else
         {
           if ((*error)->code == MODULEMD_YAML_ERROR_UNPARSEABLE)
             {
@@ -375,6 +379,12 @@ _read_yaml_and_type (yaml_parser_t *parser,
                                  "modulemd") == 0)
                     {
                       *type = MODULEMD_TYPE_MODULE;
+                    }
+
+                  if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
+                                 "modulemd-defaults") == 0)
+                    {
+                      *type = MODULEMD_TYPE_DEFAULTS;
                     }
                   /* Handle additional types here */
 

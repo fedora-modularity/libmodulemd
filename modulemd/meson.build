@@ -11,6 +11,7 @@ modulemd_srcs = [
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-parser.c',
+    'modulemd-yaml-parser-defaults.c',
     'modulemd-yaml-parser-modulemd.c',
     'modulemd-yaml-utils.c'
 ]
@@ -80,6 +81,19 @@ test_modulemd_component = executable(
     install : false,
 )
 test('test_modulemd_component', test_modulemd_component,
+     env : test_env)
+
+test_modulemd_defaults = executable(
+    'test_modulemd_defaults',
+    'test-modulemd-defaults.c',
+    link_with : modulemd_lib,
+        dependencies : [
+        gobject,
+        yaml
+    ],
+    install : false,
+)
+test('test_modulemd_defaults', test_modulemd_defaults,
      env : test_env)
 
 test_modulemd_dependencies = executable(

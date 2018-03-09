@@ -28,6 +28,7 @@
 #include <glib-object.h>
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
 #include "modulemd-profile.h"
 #include "modulemd-servicelevel.h"

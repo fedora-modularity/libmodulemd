@@ -509,7 +509,7 @@ error:
 gboolean
 _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gchar **strv = NULL;
   yaml_event_t event;
 
@@ -530,10 +530,10 @@ _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
                            g_ascii_strtoull (strv[1], NULL, 10), /* Month */
                            g_ascii_strtoull (strv[0], NULL, 10)); /* Year */
 
-  ret = TRUE;
+  result = TRUE;
 
 error:
-  return ret;
+  return result;
 }
 
 gboolean
@@ -541,6 +541,7 @@ _simpleset_from_sequence (yaml_parser_t *parser,
                           ModulemdSimpleSet **_set,
                           GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean started = FALSE;
   gboolean done = FALSE;
@@ -586,15 +587,16 @@ _simpleset_from_sequence (yaml_parser_t *parser,
         }
     }
 
+  *_set = set;
+  result = TRUE;
+
 error:
-  if (*error)
+  if (!result)
     {
       g_object_unref (set);
-      return FALSE;
     }
-  *_set = set;
   g_debug ("TRACE: exiting _simpleset_from_sequence");
-  return TRUE;
+  return result;
 }
 
 gboolean
@@ -602,6 +604,7 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GHashTable **_htable,
                          GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean started = FALSE;
   gboolean done = FALSE;
@@ -662,15 +665,13 @@ _hashtable_from_mapping (yaml_parser_t *parser,
     }
   *_htable = g_hash_table_ref (htable);
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (htable);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _hashtable_from_mapping");
-  return TRUE;
+  return result;
 }
 
 /* Helper function to skip over sections that aren't yet implemented */

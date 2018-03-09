@@ -59,6 +59,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
                                MODULEMD_YAML_ERROR,                           \
                                MODULEMD_YAML_ERROR_UNPARSEABLE,               \
                                msg);                                          \
+          result = FALSE;                                                     \
           goto error;                                                         \
         }                                                                     \
       g_debug ("Parser event: %s", mmd_yaml_get_event_name ((event)->type));  \
@@ -69,6 +70,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
   do                                                                          \
     {                                                                         \
       g_message (msg);                                                        \
+      result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -79,6 +81,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       g_message (msg);                                                        \
       g_set_error_literal (error, MODULEMD_YAML_ERROR, type, msg);            \
       goto error;                                                             \
+      result = FALSE;                                                         \
     }                                                                         \
   while (0)
 
@@ -90,6 +93,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
       g_debug ("Error occurred while parsing event %s",                       \
                mmd_yaml_get_event_name (event.type));                         \
+      result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -102,6 +106,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
           g_debug ("Error: %s", msg);                                         \
           g_set_error_literal (                                               \
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);       \
+          result = FALSE;                                                     \
           goto error;                                                         \
         }                                                                     \
       g_debug ("Emitter event: %s", mmd_yaml_get_event_name ((event)->type)); \
@@ -114,6 +119,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       g_message (msg);                                                        \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);           \
+      result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \
   while (0)
@@ -170,6 +176,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       g_message (msg);                                                        \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \
   while (0)

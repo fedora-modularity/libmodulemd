@@ -164,6 +164,16 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     }                                                                         \
   while (0)
 
+#define MMD_YAML_NOEVENT_ERROR_RETURN(error, msg)                             \
+  do                                                                          \
+    {                                                                         \
+      g_message (msg);                                                        \
+      g_set_error_literal (                                                   \
+        error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
+      goto error;                                                             \
+    }                                                                         \
+  while (0)
+
 ModulemdModule **
 mmd_yaml_dup_modules (GPtrArray *objects);
 
@@ -201,5 +211,29 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 
 gboolean
 emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error);
+
+/* == Common Parsing Functions == */
+
+gboolean
+_parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error);
+
+gboolean
+_simpleset_from_sequence (yaml_parser_t *parser,
+                          ModulemdSimpleSet **_set,
+                          GError **error);
+
+gboolean
+_hashtable_from_mapping (yaml_parser_t *parser,
+                         GHashTable **_htable,
+                         GError **error);
+
+
+/* == ModulemdModule Parser == */
+
+gboolean
+_parse_modulemd (yaml_parser_t *parser,
+                 GObject **object,
+                 guint64 version,
+                 GError **error);
 
 #endif

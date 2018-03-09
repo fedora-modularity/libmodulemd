@@ -62,12 +62,20 @@ void
 modulemd_module_new_all_from_file (const gchar *yaml_file,
                                    ModulemdModule ***_modules);
 
+void
+modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
+                                       GPtrArray **data);
+
 ModulemdModule *
 modulemd_module_new_from_string (const gchar *yaml_string);
 
 void
 modulemd_module_new_all_from_string (const gchar *yaml_string,
                                      ModulemdModule ***_modules);
+
+void
+modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
+                                         GPtrArray **data);
 
 void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file);

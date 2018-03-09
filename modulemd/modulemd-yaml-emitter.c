@@ -118,7 +118,7 @@ _emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
 gboolean
 emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   FILE *yaml_file = NULL;
   yaml_emitter_t emitter;
   yaml_event_t event;
@@ -161,7 +161,7 @@ emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     &emitter, &event, error, "Error ending stream");
 
-  ret = TRUE;
+  result = TRUE;
 
 error:
   yaml_emitter_delete (&emitter);
@@ -171,13 +171,13 @@ error:
     }
 
   g_debug ("TRACE: exiting emit_yaml_file");
-  return ret;
+  return result;
 }
 
 gboolean
 emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_emitter_t emitter;
   yaml_event_t event;
   struct modulemd_yaml_string *yaml_string = NULL;
@@ -211,18 +211,19 @@ emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
     &emitter, &event, error, "Error ending stream");
 
   *_yaml = yaml_string->str;
-  ret = TRUE;
+
+  result = TRUE;
 
 error:
   yaml_emitter_delete (&emitter);
-  if (ret != TRUE)
+  if (!result)
     {
       g_clear_pointer (&yaml_string->str, g_free);
     }
   g_free (yaml_string);
 
   g_debug ("TRACE: exiting emit_yaml_string");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -230,7 +231,7 @@ _emit_modulemd_document (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
 
   g_debug ("TRACE: entering _emit_modulemd_document");
@@ -248,11 +249,12 @@ _emit_modulemd_document (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending document");
 
-  ret = TRUE;
+  result = TRUE;
+
 error:
 
   g_debug ("TRACE: exiting _emit_modulemd_document");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -260,7 +262,7 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   guint64 mdversion = modulemd_module_get_mdversion (module);
   gchar *name = NULL;
@@ -319,13 +321,14 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending root mapping");
 
-  ret = TRUE;
+  result = TRUE;
+
 error:
   g_free (name);
   g_free (value);
 
   g_debug ("TRACE: exiting _emit_modulemd_root");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -333,7 +336,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *value = NULL;
@@ -529,13 +532,13 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending data mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_free (value);
 
   g_debug ("TRACE: exiting _emit_modulemd_data");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -543,7 +546,7 @@ _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
                               ModulemdModule *module,
                               GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *key;
@@ -558,7 +561,7 @@ _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
   if (!servicelevels || g_hash_table_size (servicelevels) < 1)
     {
       /* No profiles for this module. */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -588,7 +591,7 @@ _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending reference mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   if (keys)
@@ -597,7 +600,7 @@ error:
     }
 
   g_debug ("TRACE: exiting _emit_modulemd_servicelevels");
-  return ret;
+  return result;
 }
 
 
@@ -608,7 +611,7 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
                                    ModulemdServiceLevel *sl,
                                    GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
 
   gchar *name = NULL;
@@ -641,12 +644,12 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending servicelevel inner mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_free (value);
 
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -654,7 +657,7 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   ModulemdSimpleSet *set = NULL;
@@ -710,12 +713,12 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending license mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_licenses");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -723,7 +726,7 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
                     ModulemdModule *module,
                     GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   GHashTable *htable = NULL;
@@ -743,12 +746,12 @@ _emit_modulemd_xmd (yaml_emitter_t *emitter,
                                          "Error emitting variant hashtable");
         }
     }
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_xmd");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -756,7 +759,7 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
                         ModulemdModule *module,
                         GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   GHashTable *requires = NULL;
@@ -772,7 +775,7 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
       /* No dependencies for this module.
        * Unlikely, but not impossible
        */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -815,12 +818,12 @@ _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending dependency mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_deps_v1");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -832,7 +835,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
                         ModulemdModule *module,
                         GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   const GPtrArray *dependencies = NULL;
@@ -845,7 +848,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   if (!(dependencies && dependencies->len > 0))
     {
       /* Unlikely, but not impossible */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -903,12 +906,12 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending dependency sequence");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_deps_v2");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -916,7 +919,7 @@ _modulemd_emit_dep_stream_mapping (yaml_emitter_t *emitter,
                                    GHashTable *reqs,
                                    GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   GPtrArray *keys;
   gchar *name;
@@ -952,11 +955,11 @@ _modulemd_emit_dep_stream_mapping (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending dep stream mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
 
   g_debug ("TRACE: exiting _modulemd_emit_dep_stream_mapping");
-  return ret;
+  return result;
 }
 
 
@@ -965,7 +968,7 @@ _emit_modulemd_refs (yaml_emitter_t *emitter,
                      ModulemdModule *module,
                      GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *community = NULL;
@@ -981,7 +984,7 @@ _emit_modulemd_refs (yaml_emitter_t *emitter,
   if (!(community || documentation || tracker))
     {
       /* No references for this module. */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1019,7 +1022,7 @@ _emit_modulemd_refs (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending reference mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_free (community);
@@ -1027,7 +1030,7 @@ error:
   g_free (tracker);
 
   g_debug ("TRACE: exiting _emit_modulemd_refs");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1037,7 +1040,7 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
                               ModulemdProfile *profile,
                               GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
 
   gchar *name = NULL;
@@ -1079,11 +1082,11 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending profile inner mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_free (description);
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1091,7 +1094,7 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
                          ModulemdModule *module,
                          GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *key;
@@ -1106,7 +1109,7 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
   if (!(profiles && g_hash_table_size (profiles) > 0))
     {
       /* No profiles for this module. */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1134,12 +1137,12 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending reference mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_profiles");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1147,7 +1150,7 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
                     ModulemdModule *module,
                     GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   ModulemdSimpleSet *api = NULL;
@@ -1158,7 +1161,7 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
   if (!(api && modulemd_simpleset_size (api) > 0))
     {
       /* No API for this module */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1184,12 +1187,12 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending API mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_api");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1197,7 +1200,7 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
                         ModulemdModule *module,
                         GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   ModulemdSimpleSet *filters = NULL;
@@ -1208,7 +1211,7 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
   if (!(filters && modulemd_simpleset_size (filters) > 0))
     {
       /* No filters for this module */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1234,12 +1237,12 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending filter mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_filters");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1247,7 +1250,7 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   GHashTable *buildopts = NULL;
@@ -1256,7 +1259,7 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   buildopts = modulemd_module_get_rpm_buildopts (module);
   if (!(buildopts && g_hash_table_size (buildopts) > 0))
     {
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1282,12 +1285,12 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending buildopt mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1297,7 +1300,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
                                ModulemdComponentRpm *rpm_component,
                                GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *value = NULL;
   guint64 buildorder;
@@ -1397,11 +1400,11 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending RPM component inner mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_free (value);
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1411,7 +1414,7 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
                                   ModulemdComponentModule *module_component,
                                   GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *value = NULL;
   guint64 buildorder;
@@ -1472,11 +1475,11 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending module component inner mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (value);
 
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1484,7 +1487,7 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
                            ModulemdModule *module,
                            GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *key;
@@ -1513,7 +1516,7 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   if (!(rpm_components || module_components))
     {
       /* Omit this section */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1590,14 +1593,14 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending component mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
   g_clear_pointer (&rpm_keys, g_ptr_array_unref);
   g_clear_pointer (&module_keys, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_modulemd_components");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1605,7 +1608,7 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   ModulemdSimpleSet *artifacts = NULL;
@@ -1616,7 +1619,7 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
   if (!(artifacts && modulemd_simpleset_size (artifacts) > 0))
     {
       /* No artifacts for this module */
-      ret = TRUE;
+      result = TRUE;
       goto error;
     }
 
@@ -1642,12 +1645,12 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending artifact mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_artifacts");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1656,7 +1659,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
                           yaml_sequence_style_t style,
                           GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gsize i;
   yaml_event_t event;
   gchar **array = modulemd_simpleset_get (set);
@@ -1678,12 +1681,12 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending simpleset sequence");
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (array);
 
   g_debug ("TRACE: exiting _emit_modulemd_simpleset");
-  return ret;
+  return result;
 }
 
 
@@ -1693,7 +1696,7 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
                           yaml_scalar_style_t style,
                           GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   GPtrArray *keys;
   GHashTableIter iter;
@@ -1730,11 +1733,11 @@ _emit_modulemd_hashtable (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending hashtable mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
 
   g_debug ("TRACE: exiting _emit_modulemd_hashtable");
-  return ret;
+  return result;
 }
 
 static gboolean
@@ -1742,7 +1745,7 @@ _emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
                                   GHashTable *htable,
                                   GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   GPtrArray *keys;
   GHashTableIter iter;
@@ -1787,9 +1790,9 @@ _emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error ending variant hashtable mapping");
 
-  ret = TRUE;
+  result = TRUE;
 error:
 
   g_debug ("TRACE: exiting _emit_modulemd_variant_hashtable");
-  return ret;
+  return result;
 }

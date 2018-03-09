@@ -46,7 +46,7 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
                         GVariant **variant,
                         GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gboolean done = FALSE;
   yaml_event_t event;
   GVariantDict *dict = NULL;
@@ -122,13 +122,13 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
 
 
   *variant = g_variant_dict_end (dict);
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (key);
   g_variant_dict_unref (dict);
 
   g_debug ("TRACE: exiting parse_raw_yaml_mapping");
-  return ret;
+  return result;
 }
 
 gboolean
@@ -136,7 +136,7 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
                          GVariant **variant,
                          GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gboolean done = FALSE;
   yaml_event_t event;
   GVariant *value = NULL;
@@ -197,19 +197,19 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 
   *variant = g_variant_new_array (G_VARIANT_TYPE_VARIANT, array, count);
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_free (array);
   g_free (key);
 
   g_debug ("TRACE: exiting parse_raw_yaml_sequence");
-  return ret;
+  return result;
 }
 
 gboolean
 emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   yaml_event_t event;
   gchar *scalar = NULL;
   GVariantIter iter;
@@ -287,7 +287,7 @@ emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
       MMD_YAML_ERROR_RETURN (error, "Unhandled variant type");
     }
 
-  ret = TRUE;
+  result = TRUE;
 
 error:
   g_free (scalar);
@@ -296,7 +296,7 @@ error:
       g_variant_unref (value);
     }
 
-  return ret;
+  return result;
 }
 
 ModulemdModule **

@@ -270,6 +270,7 @@ _parse_modulemd_data (ModulemdModule *module,
                       yaml_parser_t *parser,
                       GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   guint64 version;
@@ -534,13 +535,12 @@ _parse_modulemd_data (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_data");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -549,6 +549,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
                           GError **error)
 {
   yaml_event_t event;
+  gboolean result = FALSE;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
 
@@ -603,14 +604,12 @@ _parse_modulemd_licenses (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
 error:
   g_clear_pointer (&set, g_object_unref);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_licenses");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -618,6 +617,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
                      yaml_parser_t *parser,
                      GError **error)
 {
+  gboolean result = FALSE;
   GHashTable *xmd = NULL;
   yaml_event_t event;
   GVariant *variant;
@@ -658,15 +658,12 @@ _parse_modulemd_xmd (ModulemdModule *module,
   /* Save this hash table as the xmd property */
   modulemd_module_set_xmd (module, xmd);
 
+  result = TRUE;
 error:
   g_hash_table_unref (xmd);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd_xmd");
-  return TRUE;
+  return result;
 }
 
 
@@ -675,6 +672,7 @@ _parse_modulemd_deps_v1 (ModulemdModule *module,
                          yaml_parser_t *parser,
                          GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *reqs = NULL;
@@ -730,14 +728,12 @@ _parse_modulemd_deps_v1 (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
 error:
   g_clear_pointer (&reqs, g_hash_table_unref);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_deps_v1");
-  return TRUE;
+  return result;
 }
 
 
@@ -751,6 +747,7 @@ _parse_modulemd_deps_v2 (ModulemdModule *module,
                          yaml_parser_t *parser,
                          GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *reqs = NULL;
@@ -791,14 +788,13 @@ _parse_modulemd_deps_v2 (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
   g_clear_pointer (&reqs, g_hash_table_unref);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_deps_v2");
-  return TRUE;
+  return result;
 }
 
 
@@ -814,7 +810,7 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
                         yaml_parser_t *parser,
                         GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gboolean done = FALSE;
   yaml_event_t event;
   enum ModulemdReqType reqtype;
@@ -882,10 +878,10 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
   g_object_unref (dep);
 
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_debug ("TRACE: exiting _parse_modulemd_v2_dep");
-  return ret;
+  return result;
 }
 
 
@@ -896,7 +892,7 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
                             ModulemdDependencies *dep,
                             GError **error)
 {
-  gboolean ret = FALSE;
+  gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
   yaml_event_t event;
@@ -963,10 +959,10 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
         }
     }
 
-  ret = TRUE;
+  result = TRUE;
 error:
   g_debug ("TRACE: exiting _parse_modulemd_v2_dep_map");
-  return ret;
+  return result;
 }
 
 
@@ -1007,6 +1003,7 @@ _parse_modulemd_refs (ModulemdModule *module,
                       yaml_parser_t *parser,
                       GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   GHashTable *refs = NULL;
   gpointer value;
@@ -1047,14 +1044,12 @@ _parse_modulemd_refs (ModulemdModule *module,
       MMD_YAML_ERROR_RETURN (error, "Unexpected key found in references.");
     }
 
+  result = TRUE;
+
 error:
   g_clear_pointer (&refs, g_hash_table_unref);
-  if (*error)
-    {
-      return FALSE;
-    }
   g_debug ("TRACE: exiting _parse_modulemd_refs");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1062,6 +1057,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
                           yaml_parser_t *parser,
                           GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *profiles = NULL;
@@ -1112,14 +1108,13 @@ _parse_modulemd_profiles (ModulemdModule *module,
     }
   modulemd_module_set_profiles (module, profiles);
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (profiles);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_profiles");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1128,6 +1123,7 @@ _parse_modulemd_profile (yaml_parser_t *parser,
                          ModulemdProfile **_profile,
                          GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
@@ -1199,14 +1195,13 @@ _parse_modulemd_profile (yaml_parser_t *parser,
 
   *_profile = g_object_ref (profile);
 
+  result = TRUE;
+
 error:
   g_object_unref (profile);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_profile");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1214,6 +1209,7 @@ _parse_modulemd_api (ModulemdModule *module,
                      yaml_parser_t *parser,
                      GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
@@ -1261,14 +1257,13 @@ _parse_modulemd_api (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
   g_object_unref (set);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_api");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1276,6 +1271,7 @@ _parse_modulemd_filters (ModulemdModule *module,
                          yaml_parser_t *parser,
                          GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
@@ -1324,14 +1320,13 @@ _parse_modulemd_filters (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
   g_object_unref (set);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_filters");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1339,6 +1334,7 @@ _parse_modulemd_buildopts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *opts = NULL;
@@ -1387,14 +1383,13 @@ _parse_modulemd_buildopts (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (opts);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_buildopts");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1402,6 +1397,7 @@ _parse_modulemd_components (ModulemdModule *module,
                             yaml_parser_t *parser,
                             GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *components = NULL;
@@ -1465,13 +1461,12 @@ _parse_modulemd_components (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_components");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1479,6 +1474,7 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
                                 GHashTable **_components,
                                 GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *components = NULL;
@@ -1528,15 +1524,13 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
     }
   *_components = g_hash_table_ref (components);
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (components);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd_rpm_components");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1545,6 +1539,7 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                                ModulemdComponentRpm **_component,
                                GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdComponentRpm *component = NULL;
@@ -1686,15 +1681,13 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
     }
   *_component = g_object_ref (component);
 
+  result = TRUE;
+
 error:
   g_object_unref (component);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd_module_components");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1702,6 +1695,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
                                    GHashTable **_components,
                                    GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *components = NULL;
@@ -1752,15 +1746,13 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
     }
   *_components = g_hash_table_ref (components);
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (components);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd_module_components");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1769,6 +1761,7 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
                                   ModulemdComponentModule **_component,
                                   GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdComponentModule *component = NULL;
@@ -1873,15 +1866,13 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
     }
   *_component = g_object_ref (component);
 
+  result = TRUE;
+
 error:
   g_object_unref (component);
-  if (*error)
-    {
-      return FALSE;
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd_module_component");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1889,6 +1880,7 @@ _parse_modulemd_artifacts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
@@ -1937,14 +1929,13 @@ _parse_modulemd_artifacts (ModulemdModule *module,
         }
     }
 
+  result = TRUE;
+
 error:
   g_object_unref (set);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_artifacts");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -1952,6 +1943,7 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
                                yaml_parser_t *parser,
                                GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   GHashTable *servicelevels = NULL;
@@ -2003,14 +1995,13 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
     }
   modulemd_module_set_servicelevels (module, servicelevels);
 
+  result = TRUE;
+
 error:
   g_hash_table_unref (servicelevels);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_servicelevels");
-  return TRUE;
+  return result;
 }
 
 static gboolean
@@ -2019,6 +2010,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
                               ModulemdServiceLevel **_servicelevel,
                               GError **error)
 {
+  gboolean result = FALSE;
   yaml_event_t event;
   gboolean done = FALSE;
   ModulemdServiceLevel *sl = NULL;
@@ -2080,12 +2072,11 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
 
   *_servicelevel = g_object_ref (sl);
 
+  result = TRUE;
+
 error:
   g_object_unref (sl);
-  if (*error)
-    {
-      return FALSE;
-    }
+
   g_debug ("TRACE: exiting _parse_modulemd_servicelevel");
-  return TRUE;
+  return result;
 }

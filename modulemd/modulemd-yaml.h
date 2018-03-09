@@ -238,6 +238,24 @@ _hashtable_from_mapping (yaml_parser_t *parser,
 gboolean
 _parse_skip (yaml_parser_t *parser, GError **error);
 
+
+gboolean
+_emit_modulemd_simpleset (yaml_emitter_t *emitter,
+                          ModulemdSimpleSet *set,
+                          yaml_sequence_style_t style,
+                          GError **error);
+
+gboolean
+_emit_modulemd_hashtable (yaml_emitter_t *emitter,
+                          GHashTable *htable,
+                          yaml_scalar_style_t style,
+                          GError **error);
+gboolean
+_emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
+                                  GHashTable *htable,
+                                  GError **error);
+
+
 /* == ModulemdModule Parser == */
 
 gboolean
@@ -252,5 +270,11 @@ _parse_defaults (yaml_parser_t *parser,
                  GObject **object,
                  guint64 version,
                  GError **error);
+
+/* == ModulemdModule Emitter == */
+gboolean
+_emit_modulemd (yaml_emitter_t *emitter,
+                ModulemdModule *module,
+                GError **error);
 
 #endif

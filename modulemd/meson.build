@@ -10,6 +10,7 @@ modulemd_srcs = [
     'modulemd-servicelevel.c',
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
+    'modulemd-yaml-emitter-modulemd.c',
     'modulemd-yaml-parser.c',
     'modulemd-yaml-parser-defaults.c',
     'modulemd-yaml-parser-modulemd.c',

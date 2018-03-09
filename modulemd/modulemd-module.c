@@ -3450,6 +3450,32 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
   g_clear_pointer (&data, g_ptr_array_free);
 }
 
+
+/**
+ * modulemd_module_new_all_from_file_ext:
+ * @yaml_file: A YAML file containing the module metadata.
+ * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer full):
+ * A #GPtrArray of objects read from the YAML stream.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Since: 1.1
+ */
+void
+modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
+                                       GPtrArray **data)
+{
+  GError *error = NULL;
+
+  if (!parse_yaml_file (yaml_file, data, &error))
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+}
+
+
 /**
  * modulemd_module_new_from_string:
  * @yaml_string: A YAML string containing the module metadata. If this string
@@ -3517,6 +3543,32 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
   /* This old implementation needs to ignore extra_data, so just free it. */
   g_clear_pointer (&data, g_ptr_array_free);
 }
+
+
+/**
+ * modulemd_module_new_all_from_string_ext:
+ * @yaml_string: A YAML string containing the module metadata.
+ * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer full):
+ * A #GPtrArray of objects read from the YAML stream.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Since: 1.1
+ */
+void
+modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
+                                         GPtrArray **data)
+{
+  GError *error = NULL;
+
+  if (!parse_yaml_string (yaml_string, data, &error))
+    {
+      g_message ("Error parsing YAML: %s", error->message);
+      g_error_free (error);
+      return;
+    }
+}
+
 
 /**
  * modulemd_module_dump:

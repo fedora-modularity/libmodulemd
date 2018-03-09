@@ -24,6 +24,7 @@
 
 #include "modulemd-defaults.h"
 #include "modulemd-simpleset.h"
+#include "modulemd-yaml.h"
 
 struct _ModulemdDefaults
 {
@@ -406,6 +407,67 @@ modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self)
     }
 
   return new;
+}
+
+
+/**
+ * modulemd_defaults_dump:
+ * @file_path: File path for exporting the YAML representation of this defaults
+ * object
+ *
+ * Exports the YAML representation of this defaults object to a file.
+ *
+ * Since: 1.1
+ */
+void
+modulemd_defaults_dump (ModulemdDefaults *self, const gchar *file_path)
+{
+  GPtrArray *objects = NULL;
+  GError *error = NULL;
+
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+
+  objects = g_ptr_array_new ();
+
+  g_ptr_array_add (objects, self);
+
+  if (!emit_yaml_file (objects, file_path, &error))
+    {
+      g_message ("Failed to export YAML: [%s]", error->message);
+    }
+
+  g_ptr_array_unref (objects);
+}
+
+/**
+ * modulemd_defaults_dumps:
+ * @yaml_string: (out): File path for exporting the YAML representation of this defaults
+ * object
+ *
+ * Exports the YAML representation of this defaults object to a string. The
+ * caller is responsible for calling g_free() on this string when they are
+ * finished with it.
+ *
+ * Since: 1.1
+ */
+void
+modulemd_defaults_dumps (ModulemdDefaults *self, gchar **yaml_string)
+{
+  GPtrArray *objects = NULL;
+  GError *error = NULL;
+
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+
+  objects = g_ptr_array_new ();
+
+  g_ptr_array_add (objects, self);
+
+  if (!emit_yaml_string (objects, yaml_string, &error))
+    {
+      g_message ("Failed to export YAML: [%s]", error->message);
+    }
+
+  g_ptr_array_unref (objects);
 }
 
 

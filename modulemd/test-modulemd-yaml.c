@@ -244,13 +244,13 @@ modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
   gchar *yaml2 = NULL;
   gboolean result;
   GError *error = NULL;
-  ModulemdModule **modules = NULL;
-  ModulemdModule **reloaded_modules = NULL;
+  GPtrArray *modules = NULL;
+  GPtrArray *reloaded_modules = NULL;
   gchar *yaml_path = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
-  modulemd_module_new_all_from_file (yaml_path, &modules);
+  modulemd_module_new_all_from_file_ext (yaml_path, &modules);
   g_clear_pointer (&yaml_path, g_free);
 
   result = emit_yaml_string (modules, &yaml, &error);
@@ -259,18 +259,15 @@ modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
   g_message ("YAML:\n%s", yaml);
 
   /* Load this string and emit it again. It must produce the same output. */
-  modulemd_module_new_all_from_string (yaml, &reloaded_modules);
+  modulemd_module_new_all_from_string_ext (yaml, &reloaded_modules);
   result = emit_yaml_string (modules, &yaml2, &error);
   g_assert_true (result);
   g_assert_true (yaml2);
   g_assert_cmpstr (yaml, ==, yaml2);
 
 
-  for (gsize i = 0; modules[i]; i++)
-    {
-      g_object_unref (modules[i]);
-    }
-  g_free (modules);
+  g_ptr_array_unref (modules);
+  g_ptr_array_unref (reloaded_modules);
 }
 
 static void
@@ -281,13 +278,13 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
   gchar *yaml2 = NULL;
   gboolean result;
   GError *error = NULL;
-  ModulemdModule **modules = NULL;
-  ModulemdModule **reloaded_modules = NULL;
+  GPtrArray *modules = NULL;
+  GPtrArray *reloaded_modules = NULL;
   gchar *yaml_path = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/good-v2.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
-  modulemd_module_new_all_from_file (yaml_path, &modules);
+  modulemd_module_new_all_from_file_ext (yaml_path, &modules);
   g_clear_pointer (&yaml_path, g_free);
 
   result = emit_yaml_string (modules, &yaml, &error);
@@ -305,17 +302,14 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
   g_clear_pointer (&yaml2, g_free);
 
   /* Load this string and emit it again. It must produce the same output. */
-  modulemd_module_new_all_from_string (yaml, &reloaded_modules);
+  modulemd_module_new_all_from_string_ext (yaml, &reloaded_modules);
   result = emit_yaml_string (reloaded_modules, &yaml2, &error);
   g_assert_true (result);
   g_assert_nonnull (yaml2);
   g_assert_cmpstr (yaml, ==, yaml2);
 
-  for (gsize i = 0; modules[i]; i++)
-    {
-      g_object_unref (modules[i]);
-    }
-  g_free (modules);
+  g_ptr_array_unref (modules);
+  g_ptr_array_unref (reloaded_modules);
 }
 
 int

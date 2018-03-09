@@ -25,6 +25,7 @@
 #ifndef MODULEMD_YAML_H
 #define MODULEMD_YAML_H
 
+#include <glib.h>
 #include <yaml.h>
 #include "modulemd.h"
 
@@ -192,10 +193,10 @@ parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error);
 
 
 gboolean
-emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error);
+emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error);
 
 gboolean
-emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error);
+emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error);
 
 struct modulemd_yaml_string
 {

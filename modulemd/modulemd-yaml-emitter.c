@@ -116,15 +116,16 @@ _emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
                                   GError **error);
 
 gboolean
-emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
+emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
 {
   gboolean result = FALSE;
   FILE *yaml_file = NULL;
   yaml_emitter_t emitter;
   yaml_event_t event;
+  GObject *object;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (modules, FALSE);
+  g_return_val_if_fail (objects, FALSE);
 
   g_debug ("TRACE: entering emit_yaml_file");
 
@@ -148,12 +149,18 @@ emit_yaml_file (ModulemdModule **modules, const gchar *path, GError **error)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     &emitter, &event, error, "Error starting stream");
 
-  for (gsize i = 0; modules[i]; i++)
+  for (gsize i = 0; i < objects->len; i++)
     {
+      object = g_ptr_array_index (objects, i);
+
       /* Write out the YAML */
-      if (!_emit_modulemd_document (&emitter, modules[i], error))
+      if (G_OBJECT_TYPE (object) == MODULEMD_TYPE_MODULE)
         {
-          MMD_YAML_EMITTER_ERROR_RETURN (error, "Could not emit YAML");
+          if (!_emit_modulemd_document (
+                &emitter, MODULEMD_MODULE (object), error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+            }
         }
     }
 
@@ -175,15 +182,16 @@ error:
 }
 
 gboolean
-emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
+emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
 {
   gboolean result = FALSE;
   yaml_emitter_t emitter;
   yaml_event_t event;
   struct modulemd_yaml_string *yaml_string = NULL;
+  GObject *object;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (modules, FALSE);
+  g_return_val_if_fail (objects, FALSE);
 
   g_debug ("TRACE: entering emit_yaml_string");
 
@@ -197,12 +205,30 @@ emit_yaml_string (ModulemdModule **modules, gchar **_yaml, GError **error)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     &emitter, &event, error, "Error starting stream");
 
-  for (gsize i = 0; modules[i]; i++)
+  for (gsize i = 0; i < objects->len; i++)
     {
+      object = g_ptr_array_index (objects, i);
+
       /* Write out the YAML */
-      if (!_emit_modulemd_document (&emitter, modules[i], error))
+      if (MODULEMD_IS_MODULE (object))
         {
-          MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+          if (!_emit_modulemd_document (
+                &emitter, MODULEMD_MODULE (object), error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+            }
+        }
+      /* Emitters for other types go here */
+      /* else if (document->type == <...>) */
+      else
+        {
+          /* Unknown document type */
+          g_set_error_literal (error,
+                               MODULEMD_YAML_ERROR,
+                               MODULEMD_YAML_ERROR_PARSE,
+                               "Unknown document type");
+          result = FALSE;
+          goto error;
         }
     }
 

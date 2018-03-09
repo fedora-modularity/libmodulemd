@@ -3582,18 +3582,17 @@ void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file)
 {
   GError *error = NULL;
-  ModulemdModule **modules = g_malloc0_n (2, sizeof (ModulemdModule *));
+  GPtrArray *objects = g_ptr_array_new ();
 
-  modules[0] = self;
-  modules[1] = NULL;
+  g_ptr_array_add (objects, self);
 
-  if (!emit_yaml_file (modules, yaml_file, &error))
+  if (!emit_yaml_file (objects, yaml_file, &error))
     {
       g_message ("Error emitting YAML file: %s", error->message);
       g_error_free (error);
     }
 
-  g_free (modules);
+  g_ptr_array_unref (objects);
 }
 
 /**
@@ -3610,19 +3609,18 @@ modulemd_module_dumps (ModulemdModule *self)
 {
   GError *error = NULL;
   gchar *yaml = NULL;
-  ModulemdModule **modules = g_malloc0_n (2, sizeof (ModulemdModule *));
+  GPtrArray *objects = g_ptr_array_new ();
 
-  modules[0] = self;
-  modules[1] = NULL;
+  g_ptr_array_add (objects, self);
 
-  if (!emit_yaml_string (modules, &yaml, &error))
+  if (!emit_yaml_string (objects, &yaml, &error))
     {
       g_message ("Error emitting YAML string: %s", error->message);
       g_error_free (error);
       yaml = NULL;
     }
 
-  g_free (modules);
+  g_ptr_array_unref (objects);
   return yaml;
 }
 
@@ -3640,22 +3638,12 @@ void
 modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
 {
   GError *error = NULL;
-  ModulemdModule **modules =
-    g_malloc0_n (module_array->len + 1, sizeof (ModulemdModule *));
 
-  for (gsize i = 0; i < module_array->len; i++)
-    {
-      modules[i] = g_ptr_array_index (module_array, i);
-    }
-  modules[module_array->len] = NULL;
-
-  if (!emit_yaml_file (modules, yaml_file, &error))
+  if (!emit_yaml_file (module_array, yaml_file, &error))
     {
       g_message ("Error emitting YAML file: %s", error->message);
       g_error_free (error);
     }
-
-  g_free (modules);
 }
 
 /**
@@ -3675,23 +3663,14 @@ modulemd_module_dumps_all (GPtrArray *module_array)
 {
   GError *error = NULL;
   gchar *yaml = NULL;
-  ModulemdModule **modules =
-    g_malloc0_n (module_array->len + 1, sizeof (ModulemdModule *));
 
-  for (gsize i = 0; i < module_array->len; i++)
-    {
-      modules[i] = g_ptr_array_index (module_array, i);
-    }
-  modules[module_array->len] = NULL;
-
-  if (!emit_yaml_string (modules, &yaml, &error))
+  if (!emit_yaml_string (module_array, &yaml, &error))
     {
       g_message ("Error emitting YAML string: %s", error->message);
       g_error_free (error);
       yaml = NULL;
     }
 
-  g_free (modules);
   return yaml;
 }
 

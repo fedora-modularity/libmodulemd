@@ -258,6 +258,31 @@ modulemd_defaults_set_profiles_for_stream (ModulemdDefaults *self,
                             properties[PROP_PROFILE_DEFAULTS]);
 }
 
+
+/**
+ * modulemd_defaults_assign_profiles_for_stream:
+ * @stream: The name of the stream getting default profiles
+ * @profiles: A #ModulemdSimpleSet of profile names to install by default when
+ * installing this stream of the module.
+ *
+ * Since: 1.1
+ */
+void
+modulemd_defaults_assign_profiles_for_stream (ModulemdDefaults *self,
+                                              const gchar *stream,
+                                              ModulemdSimpleSet *profiles)
+{
+  ModulemdSimpleSet *set = NULL;
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+
+  modulemd_simpleset_copy (profiles, &set);
+
+  g_hash_table_replace (self->profile_defaults, g_strdup (stream), set);
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            properties[PROP_PROFILE_DEFAULTS]);
+}
+
+
 /**
  * modulemd_defaults_set_profile_defaults:
  * @profile_defaults: (nullable) (element-type utf8 ModulemdSimpleSet) (transfer none):

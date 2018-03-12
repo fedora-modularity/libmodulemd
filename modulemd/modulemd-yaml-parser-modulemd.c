@@ -1004,16 +1004,12 @@ _parse_modulemd_refs (ModulemdModule *module,
                       GError **error)
 {
   gboolean result = FALSE;
-  yaml_event_t event;
   GHashTable *refs = NULL;
   gpointer value;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   g_debug ("TRACE: entering _parse_modulemd_refs");
-
-  /* This is a hack so we can use the MMD_YAML_ERROR_RETURN macro below */
-  event.type = YAML_SCALAR_EVENT;
 
   if (!_hashtable_from_mapping (parser, &refs, error))
     {

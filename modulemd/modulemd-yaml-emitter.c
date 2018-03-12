@@ -204,6 +204,10 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
+  for (i = 0; array[i]; i++)
+    {
+      g_free (array[i]);
+    }
   g_free (array);
 
   g_debug ("TRACE: exiting _emit_modulemd_simpleset");

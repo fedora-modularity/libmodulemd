@@ -54,6 +54,7 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   result = parse_yaml_file (yaml_path, &objects, &error);
+  g_free (yaml_path);
   g_assert_true (result);
 
   g_assert_cmpint (objects->len, ==, 1);
@@ -88,6 +89,7 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
   g_clear_pointer (&yaml_string, g_free);
+  g_clear_pointer (&objects, g_ptr_array_unref);
 }
 
 
@@ -112,6 +114,7 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   result = parse_yaml_file (yaml_path, &objects, &error);
+  g_free (yaml_path);
   g_assert_true (result);
 
   g_assert_cmpint (objects->len, ==, 2);
@@ -180,6 +183,7 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
   g_clear_pointer (&yaml_string, g_free);
+  g_clear_pointer (&objects, g_ptr_array_unref);
 }
 
 
@@ -204,6 +208,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   result = parse_yaml_file (yaml_path, &objects, &error);
+  g_free (yaml_path);
   g_assert_true (result);
 
   g_assert_cmpint (objects->len, ==, 3);
@@ -275,6 +280,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
 
   g_clear_pointer (&yaml_string, g_free);
 
+
   /* Third of the three subdocuments */
   module_name = "nodejs";
   default_stream = "8.0";
@@ -310,6 +316,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
   g_clear_pointer (&yaml_string, g_free);
+  g_clear_pointer (&objects, g_ptr_array_unref);
 }
 
 int

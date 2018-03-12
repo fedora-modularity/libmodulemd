@@ -323,6 +323,7 @@ modulemd_servicelevel_finalize (GObject *gobject)
   ModulemdServiceLevel *self = (ModulemdServiceLevel *)gobject;
 
   g_clear_pointer (&self->eol, g_date_free);
+  g_clear_pointer (&self->name, g_free);
 
   G_OBJECT_CLASS (modulemd_servicelevel_parent_class)->finalize (gobject);
 }

@@ -92,8 +92,6 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       g_message (msg);                                                        \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
-      g_debug ("Error occurred while parsing event %s",                       \
-               mmd_yaml_get_event_name (event.type));                         \
       result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \

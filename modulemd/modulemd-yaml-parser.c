@@ -238,6 +238,8 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
             error, "Unexpected YAML event during preprocessing");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   /* Iterate through the subdocuments and process them by type */
@@ -293,7 +295,7 @@ error:
     {
       g_clear_pointer (&objects, g_ptr_array_free);
     }
-  g_clear_pointer (&document, modulemd_subdocument_free);
+  g_clear_pointer (&subdocuments, g_ptr_array_unref);
 
   return result;
 }
@@ -441,11 +443,14 @@ _read_yaml_and_type (yaml_parser_t *parser,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     &emitter, &event, error, "Error ending stream");
 
+  yaml_event_delete (&event);
+
   *yaml = yaml_string->str;
   yaml_string->str = NULL;
 
   result = TRUE;
 error:
+  yaml_emitter_delete (&emitter);
   g_clear_pointer (&yaml_string->str, g_free);
   g_clear_pointer (&yaml_string, g_free);
 
@@ -511,6 +516,7 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
   result = TRUE;
 
 error:
+  yaml_parser_delete (&parser);
   g_debug ("TRACE: exiting _parse_yaml");
   return result;
 }
@@ -595,12 +601,14 @@ _simpleset_from_sequence (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
           break;
         }
+      yaml_event_delete (&event);
     }
 
   *_set = set;
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   if (!result)
     {
       g_object_unref (set);
@@ -616,6 +624,7 @@ _hashtable_from_mapping (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean started = FALSE;
   gboolean done = FALSE;
   GHashTable *htable = NULL;
@@ -652,14 +661,15 @@ _hashtable_from_mapping (yaml_parser_t *parser,
             }
           name = g_strdup ((const gchar *)event.data.scalar.value);
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-            parser, &event, error, "Parser error");
-          if (event.type != YAML_SCALAR_EVENT)
+            parser, &value_event, error, "Parser error");
+          if (value_event.type != YAML_SCALAR_EVENT)
             {
               g_free (name);
               MMD_YAML_ERROR_RETURN (error,
                                      "Non-scalar value for dictionary.");
             }
-          value = g_strdup ((const gchar *)event.data.scalar.value);
+          value = g_strdup ((const gchar *)value_event.data.scalar.value);
+          yaml_event_delete (&value_event);
 
           /* Set this key and value to the hash table */
           g_hash_table_insert (htable, name, value);
@@ -672,12 +682,16 @@ _hashtable_from_mapping (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   *_htable = g_hash_table_ref (htable);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&value_event);
+  yaml_event_delete (&event);
   g_hash_table_unref (htable);
 
   g_debug ("TRACE: exiting _hashtable_from_mapping");
@@ -722,9 +736,11 @@ _parse_skip (yaml_parser_t *parser, GError **error)
           /* Just fall through here. */
           break;
         }
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   return result;
 }

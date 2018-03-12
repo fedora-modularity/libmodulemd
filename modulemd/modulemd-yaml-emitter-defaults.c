@@ -256,8 +256,7 @@ _emit_defaults_profiles (yaml_emitter_t *emitter,
       set = g_hash_table_lookup (profile_defaults, name);
 
       MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
-      _emit_modulemd_simpleset (
-        emitter, set, YAML_FLOW_SEQUENCE_STYLE, error);
+      _emit_modulemd_simpleset (emitter, set, YAML_FLOW_SEQUENCE_STYLE, error);
     }
 
   yaml_mapping_end_event_initialize (&event);
@@ -269,7 +268,7 @@ _emit_defaults_profiles (yaml_emitter_t *emitter,
 
 error:
   g_clear_pointer (&name, g_free);
-  g_clear_pointer (&set, g_object_unref);
+  g_clear_pointer (&keys, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_defaults_profiles");
   return result;

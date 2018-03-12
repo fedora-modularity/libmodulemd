@@ -62,6 +62,7 @@ _parse_defaults (yaml_parser_t *parser,
                  GError **error)
 {
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   gboolean result = FALSE;
   const gchar *module_name = NULL;
@@ -110,13 +111,14 @@ _parse_defaults (yaml_parser_t *parser,
             {
               g_debug ("TRACE: root entry [document]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT ||
-                  g_strcmp0 ((const gchar *)event.data.scalar.value,
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT ||
+                  g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                              "modulemd-defaults"))
                 {
                   MMD_YAML_ERROR_RETURN (error, "Document type mismatch");
                 }
+              yaml_event_delete (&value_event);
             }
           /* Record the modulemd version for the parser */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -124,14 +126,15 @@ _parse_defaults (yaml_parser_t *parser,
             {
               g_debug ("TRACE: root entry [version]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
               mdversion = g_ascii_strtoull (
-                (const gchar *)event.data.scalar.value, NULL, 10);
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
+              yaml_event_delete (&value_event);
               if (!mdversion)
                 {
                   MMD_YAML_ERROR_RETURN (error,
@@ -170,6 +173,8 @@ _parse_defaults (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in root");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
 
@@ -202,6 +207,8 @@ _parse_defaults (yaml_parser_t *parser,
   result = TRUE;
 
 error:
+  yaml_event_delete (&value_event);
+  yaml_event_delete (&event);
   g_clear_pointer (&defaults, g_object_unref);
 
   g_debug ("TRACE: exiting _parse_defaults");
@@ -214,6 +221,7 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                       GError **error)
 {
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   gboolean result = FALSE;
 
@@ -241,14 +249,15 @@ _parse_defaults_data (ModulemdDefaults *defaults,
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "module"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse module name");
                 }
 
               modulemd_defaults_set_module_name (
-                defaults, (const gchar *)event.data.scalar.value);
+                defaults, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
             }
 
           /* Module default stream */
@@ -256,15 +265,16 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                                "stream"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module stream");
                 }
 
               modulemd_defaults_set_default_stream (
-                defaults, (const gchar *)event.data.scalar.value);
+                defaults, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
             }
 
           /* Profile defaults */
@@ -288,11 +298,15 @@ _parse_defaults_data (ModulemdDefaults *defaults,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in data");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&value_event);
+  yaml_event_delete (&event);
   if (!result)
     {
       g_clear_pointer (&defaults, g_object_unref);
@@ -344,6 +358,7 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
           modulemd_defaults_assign_profiles_for_stream (
             defaults, stream_name, set);
           g_clear_pointer (&set, g_object_unref);
+          g_clear_pointer (&stream_name, g_free);
           break;
 
         default:
@@ -351,12 +366,15 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in licenses");
           break;
         }
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_clear_pointer (&set, g_object_unref);
+  g_clear_pointer (&stream_name, g_free);
   if (*error)
     {
       return FALSE;

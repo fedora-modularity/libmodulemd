@@ -3697,6 +3697,7 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
       modulemd_servicelevel_set_name (sl, "rawhide");
 
       modulemd_module_add_servicelevel (self, sl);
+      g_clear_pointer (&sl, g_object_unref);
     }
 
   /* Upgrade the build and runtime requirements */
@@ -3726,6 +3727,9 @@ _modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
 
   modulemd_module_set_mdversion (self, MD_VERSION_2);
   modulemd_module_set_dependencies (self, deps);
+
+  g_clear_pointer (&deps, g_ptr_array_unref);
+  g_clear_pointer (&v2_dep, g_object_unref);
 
   return TRUE;
 }

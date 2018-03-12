@@ -61,29 +61,42 @@ _modulemd_dependencies_test_get_set (DependenciesFixture *fixture,
                                      DepSetMultiFn dep_set_multi_fn,
                                      DepGetFn dep_get_fn)
 {
+  gboolean copied = *(gboolean *)user_data;
   const gchar **streams = g_new0 (const gchar *, 3);
   ModulemdSimpleSet *platform = NULL;
   ModulemdSimpleSet *empty = NULL;
+  GList *keys = NULL;
+  GHashTable *deptable = NULL;
 
   /* Set an empty stream for requires */
   dep_set_multi_fn (fixture->dep, "empty", streams);
 
   /* Verify that we have one key in the dictionary */
-  g_assert_cmpuint (
-    g_list_length (g_hash_table_get_keys (dep_get_fn (fixture->dep))), ==, 1);
+  deptable = dep_get_fn (fixture->dep);
+  keys = g_hash_table_get_keys (deptable);
+  g_assert_cmpuint (g_list_length (keys), ==, 1);
+  g_list_free (keys);
+  if (copied)
+    g_hash_table_unref (deptable);
 
   /* Verify that this key contains no streams */
-  empty = g_hash_table_lookup (dep_get_fn (fixture->dep), "empty");
+  deptable = dep_get_fn (fixture->dep);
+  empty = g_hash_table_lookup (deptable, "empty");
   g_assert_nonnull (empty);
-
   g_assert_cmpuint (modulemd_simpleset_size (empty), ==, 0);
+  if (copied)
+    g_hash_table_unref (deptable);
 
   /* Set a single stream as a requires */
   dep_set_single_fn (fixture->dep, "platform", "f28");
 
   /* Verify that we have two keys in the dictionary */
-  g_assert_cmpuint (
-    g_list_length (g_hash_table_get_keys (dep_get_fn (fixture->dep))), ==, 2);
+  deptable = dep_get_fn (fixture->dep);
+  keys = g_hash_table_get_keys (deptable);
+  g_assert_cmpuint (g_list_length (keys), ==, 2);
+  g_list_free (keys);
+  if (copied)
+    g_hash_table_unref (deptable);
 
   /* Set multiple streams as requires */
   streams[0] = g_strdup ("f29");
@@ -91,8 +104,8 @@ _modulemd_dependencies_test_get_set (DependenciesFixture *fixture,
   dep_set_multi_fn (fixture->dep, "platform", streams);
 
   /* Check that each of the expected values are present in the list */
-
-  platform = g_hash_table_lookup (dep_get_fn (fixture->dep), "platform");
+  deptable = dep_get_fn (fixture->dep);
+  platform = g_hash_table_lookup (deptable, "platform");
   g_assert_nonnull (platform);
 
   g_assert_true (modulemd_simpleset_contains (platform, "f28"));
@@ -102,14 +115,18 @@ _modulemd_dependencies_test_get_set (DependenciesFixture *fixture,
   g_assert_cmpuint (modulemd_simpleset_size (platform), ==, 3);
 
   /* Verify that we still have two keys in the dictionary */
-  g_assert_cmpuint (
-    g_list_length (g_hash_table_get_keys (dep_get_fn (fixture->dep))), ==, 2);
+  keys = g_hash_table_get_keys (deptable);
+  g_assert_cmpuint (g_list_length (keys), ==, 2);
+  g_list_free (keys);
+  if (copied)
+    g_hash_table_unref (deptable);
 
   /* Add duplicates */
   dep_set_multi_fn (fixture->dep, "platform", streams);
 
   /* Verify that the list hasn't changed */
-  platform = g_hash_table_lookup (dep_get_fn (fixture->dep), "platform");
+  deptable = dep_get_fn (fixture->dep);
+  platform = g_hash_table_lookup (deptable, "platform");
   g_assert_nonnull (platform);
 
   g_assert_true (modulemd_simpleset_contains (platform, "f28"));
@@ -117,10 +134,20 @@ _modulemd_dependencies_test_get_set (DependenciesFixture *fixture,
   g_assert_true (modulemd_simpleset_contains (platform, "-f30"));
 
   g_assert_cmpuint (modulemd_simpleset_size (platform), ==, 3);
+  if (copied)
+    g_hash_table_unref (deptable);
 
   /* Verify that we still have two keys in the dictionary */
-  g_assert_cmpuint (
-    g_list_length (g_hash_table_get_keys (dep_get_fn (fixture->dep))), ==, 2);
+  deptable = dep_get_fn (fixture->dep);
+  keys = g_hash_table_get_keys (deptable);
+  g_assert_cmpuint (g_list_length (keys), ==, 2);
+  g_list_free (keys);
+  if (copied)
+    g_hash_table_unref (deptable);
+
+  g_clear_pointer (&streams[0], g_free);
+  g_clear_pointer (&streams[1], g_free);
+  g_clear_pointer (&streams, g_free);
 }
 
 static void
@@ -176,6 +203,8 @@ modulemd_dependencies_test_dup_set_requires (DependenciesFixture *fixture,
 int
 main (int argc, char *argv[])
 {
+  gboolean copied = TRUE;
+  gboolean uncopied = FALSE;
   setlocale (LC_ALL, "");
 
   g_test_init (&argc, &argv, NULL);
@@ -184,25 +213,26 @@ main (int argc, char *argv[])
   // Define the tests.
   g_test_add ("/modulemd/dependencies/test_dependencies_buildrequires",
               DependenciesFixture,
-              NULL,
+              &uncopied,
               modulemd_dependencies_set_up,
               modulemd_dependencies_test_get_set_buildrequires,
               modulemd_dependencies_tear_down);
   g_test_add ("/modulemd/dependencies/test_dependencies_requires",
               DependenciesFixture,
-              NULL,
+              &uncopied,
               modulemd_dependencies_set_up,
               modulemd_dependencies_test_get_set_requires,
               modulemd_dependencies_tear_down);
+
   g_test_add ("/modulemd/dependencies/test_dependencies_buildrequires_dup",
               DependenciesFixture,
-              NULL,
+              &copied,
               modulemd_dependencies_set_up,
               modulemd_dependencies_test_dup_set_buildrequires,
               modulemd_dependencies_tear_down);
   g_test_add ("/modulemd/dependencies/test_dependencies_requires_dup",
               DependenciesFixture,
-              NULL,
+              &copied,
               modulemd_dependencies_set_up,
               modulemd_dependencies_test_dup_set_requires,
               modulemd_dependencies_tear_down);

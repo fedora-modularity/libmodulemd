@@ -41,6 +41,30 @@ _write_yaml_string (void *data, unsigned char *buffer, size_t size)
   return 1;
 }
 
+static GVariant *
+mmd_variant_from_scalar (const gchar *scalar)
+{
+  GVariant *value = NULL;
+
+  /* Treat "TRUE" and "FALSE" as boolean values */
+  if (g_strcmp0 (scalar, "TRUE") == 0)
+    {
+      value = g_variant_new_boolean (TRUE);
+    }
+  else if (g_strcmp0 (scalar, "FALSE") == 0)
+    {
+      value = g_variant_new_boolean (FALSE);
+    }
+
+  else
+    {
+      /* Any value we don't handle specifically becomes a string */
+      value = g_variant_new_string (scalar);
+    }
+
+  return value;
+}
+
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,
                         GVariant **variant,
@@ -81,8 +105,8 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
           switch (event.type)
             {
             case YAML_SCALAR_EVENT:
-              value =
-                g_variant_new_string ((const gchar *)event.data.scalar.value);
+              value = mmd_variant_from_scalar (
+                (const gchar *)event.data.scalar.value);
               break;
 
             case YAML_MAPPING_START_EVENT:
@@ -162,7 +186,7 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           value = g_variant_new_variant (
-            g_variant_new_string ((const gchar *)event.data.scalar.value));
+            mmd_variant_from_scalar ((const gchar *)event.data.scalar.value));
           break;
 
         case YAML_MAPPING_START_EVENT:
@@ -220,6 +244,21 @@ emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
       /* Print the string as a scalar */
       scalar = g_strdup (g_variant_get_string (variant, NULL));
       g_debug ("Printing scalar: %s", scalar);
+      MMD_YAML_EMIT_SCALAR (&event, scalar, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
+    {
+      /* Print the boolean as a scalar */
+      if (g_variant_get_boolean (variant))
+        {
+          scalar = g_strdup ("TRUE");
+        }
+      else
+        {
+          scalar = g_strdup ("FALSE");
+        }
+      g_debug ("Printing boolean: %s", scalar);
       MMD_YAML_EMIT_SCALAR (&event, scalar, YAML_PLAIN_SCALAR_STYLE);
     }
 

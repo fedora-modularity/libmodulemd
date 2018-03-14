@@ -1,12 +1,18 @@
 #!/usr/bin/python3
 
 import os
-import unittest
+import sys
 
-import gi
-gi.require_version('Modulemd', os.getenv('MODULEMD_NSVERSION'))
-from gi.repository import Modulemd
-from gi.repository import GLib
+try:
+    import unittest
+    import gi
+    gi.require_version('Modulemd', os.getenv('MODULEMD_NSVERSION'))
+    from gi.repository import Modulemd
+    from gi.repository import GLib
+except ImportError:
+    # Return error 77 to skip this test on platforms without the necessary
+    # python modules
+    sys.exit (77)
 
 class TestIssues(unittest.TestCase):
 

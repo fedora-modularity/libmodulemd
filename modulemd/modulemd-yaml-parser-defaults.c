@@ -203,7 +203,7 @@ _parse_defaults (yaml_parser_t *parser,
                              "Default stream missing from profile defaults");
     }
 
-  *object = g_object_ref (defaults);
+  *object = g_object_ref (G_OBJECT (defaults));
   result = TRUE;
 
 error:

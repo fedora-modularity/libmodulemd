@@ -24,6 +24,7 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <inttypes.h>
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
@@ -388,7 +389,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
                     }
                   /* Handle additional types here */
 
-                  g_debug ("Document type: %d", *type);
+                  g_debug ("Document type: %s", g_type_name (*type));
                 }
 
               else if (g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -415,7 +416,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
                   *version = g_ascii_strtoull (
                     (const gchar *)value_event.data.scalar.value, NULL, 10);
 
-                  g_debug ("Document version: %d", *version);
+                  g_debug ("Document version: %" PRIx64, *version);
                 }
             }
           break;

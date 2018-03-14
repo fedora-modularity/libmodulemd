@@ -131,6 +131,7 @@ _parse_modulemd (yaml_parser_t *parser,
                  GError **error)
 {
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   gboolean result = FALSE;
   guint64 mdversion;
@@ -177,13 +178,14 @@ _parse_modulemd (yaml_parser_t *parser,
             {
               g_debug ("TRACE: root entry [document]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT ||
-                  g_strcmp0 ((const gchar *)event.data.scalar.value,
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT ||
+                  g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                              "modulemd"))
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown document type");
                 }
+              yaml_event_delete (&value_event);
             }
 
           /* Record the modulemd version for the parser */
@@ -192,18 +194,19 @@ _parse_modulemd (yaml_parser_t *parser,
             {
               g_debug ("TRACE: root entry [mdversion]");
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
 
               mdversion = g_ascii_strtoull (
-                (const gchar *)event.data.scalar.value, NULL, 10);
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
               if (!mdversion)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
                 }
+              yaml_event_delete (&value_event);
 
               if (mdversion != version)
                 {
@@ -236,12 +239,15 @@ _parse_modulemd (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in root");
           break;
         }
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
   *object = (GObject *)module;
 
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
 
   g_debug ("TRACE: exiting _parse_modulemd");
   return result;
@@ -254,6 +260,7 @@ _parse_modulemd_data (ModulemdModule *module,
 {
   gboolean result = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   guint64 version;
   GDate *eol = NULL;
@@ -282,14 +289,15 @@ _parse_modulemd_data (ModulemdModule *module,
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "name"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse module name");
                 }
 
               modulemd_module_set_name (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
             }
 
           /* Module stream */
@@ -297,15 +305,16 @@ _parse_modulemd_data (ModulemdModule *module,
                                "stream"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module stream");
                 }
 
               modulemd_module_set_stream (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
             }
 
           /* Module version */
@@ -313,21 +322,22 @@ _parse_modulemd_data (ModulemdModule *module,
                                "version"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module version");
                 }
 
               version = g_ascii_strtoull (
-                (const gchar *)event.data.scalar.value, NULL, 10);
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
               if (!version)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Unknown module version");
                 }
 
               modulemd_module_set_version (module, version);
+              yaml_event_delete (&value_event);
             }
 
           /* Module Context */
@@ -336,30 +346,33 @@ _parse_modulemd_data (ModulemdModule *module,
                                "context"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module context");
                 }
 
               modulemd_module_set_context (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
             }
 
           /* Module Artifact Architecture */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "arch"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (
                     error, "Failed to parse module artifact architecture");
                 }
 
               modulemd_module_set_arch (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           /* Module summary */
@@ -367,15 +380,17 @@ _parse_modulemd_data (ModulemdModule *module,
                                "summary"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module summary");
                 }
 
               modulemd_module_set_summary (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           /* Module description */
@@ -383,15 +398,17 @@ _parse_modulemd_data (ModulemdModule *module,
                                "description"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse module description");
                 }
 
               modulemd_module_set_description (
-                module, (const gchar *)event.data.scalar.value);
+                module, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           /* Module EOL (obsolete) */
@@ -515,11 +532,15 @@ _parse_modulemd_data (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in data");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
 
   g_debug ("TRACE: exiting _parse_modulemd_data");
   return result;
@@ -584,10 +605,13 @@ _parse_modulemd_licenses (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in licenses");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   g_clear_pointer (&set, g_object_unref);
 
   g_debug ("TRACE: exiting _parse_modulemd_licenses");
@@ -615,6 +639,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
     {
       MMD_YAML_ERROR_RETURN (error, "Invalid mapping");
     }
+  yaml_event_delete (&event);
 
   if (!parse_raw_yaml_mapping (parser, &variant, error))
     {
@@ -642,6 +667,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (xmd);
 
   g_debug ("TRACE: exiting _parse_modulemd_xmd");
@@ -708,10 +734,13 @@ _parse_modulemd_deps_v1 (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   g_clear_pointer (&reqs, g_hash_table_unref);
 
   g_debug ("TRACE: exiting _parse_modulemd_deps_v1");
@@ -768,11 +797,14 @@ _parse_modulemd_deps_v2 (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_clear_pointer (&reqs, g_hash_table_unref);
 
   g_debug ("TRACE: exiting _parse_modulemd_deps_v2");
@@ -854,14 +886,17 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   modulemd_module_add_dependencies (module, dep);
-  g_object_unref (dep);
 
 
   result = TRUE;
 error:
+  g_clear_pointer (&dep, g_object_unref);
+  yaml_event_delete (&event);
   g_debug ("TRACE: exiting _parse_modulemd_v2_dep");
   return result;
 }
@@ -880,6 +915,7 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
   yaml_event_t event;
   gchar *module_name = NULL;
   ModulemdSimpleSet *set = NULL;
+  const gchar **dep_set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -916,22 +952,27 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
               MMD_YAML_ERROR_RETURN_RETHROW (error,
                                              "Could not parse set of streams");
             }
+          dep_set = (const gchar **)modulemd_simpleset_dup (set);
 
           switch (reqtype)
             {
             case MODULEMD_REQ_BUILDREQUIRES:
               modulemd_dependencies_add_buildrequires (
-                dep,
-                module_name,
-                (const gchar **)modulemd_simpleset_get (set));
+                dep, module_name, dep_set);
               break;
             case MODULEMD_REQ_REQUIRES:
-              modulemd_dependencies_add_requires (
-                dep,
-                module_name,
-                (const gchar **)modulemd_simpleset_get (set));
+              modulemd_dependencies_add_requires (dep, module_name, dep_set);
               break;
             }
+
+          g_clear_pointer (&module_name, g_free);
+
+          for (gsize i = 0; i < modulemd_simpleset_size (set); i++)
+            {
+              g_clear_pointer (&dep_set[i], g_free);
+            }
+          g_clear_pointer (&dep_set, g_free);
+          g_clear_pointer (&set, g_object_unref);
           break;
 
         default:
@@ -939,10 +980,13 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep_map");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   g_debug ("TRACE: exiting _parse_modulemd_v2_dep_map");
   return result;
 }
@@ -1083,12 +1127,15 @@ _parse_modulemd_profiles (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   modulemd_module_set_profiles (module, profiles);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (profiles);
 
   g_debug ("TRACE: exiting _parse_modulemd_profiles");
@@ -1103,6 +1150,7 @@ _parse_modulemd_profile (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
   ModulemdProfile *profile = NULL;
@@ -1148,14 +1196,16 @@ _parse_modulemd_profile (yaml_parser_t *parser,
                                "description"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "No value for description");
                 }
 
               modulemd_profile_set_description (
-                profile, (const gchar *)event.data.scalar.value);
+                profile, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
           else
             {
@@ -1169,6 +1219,8 @@ _parse_modulemd_profile (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   *_profile = g_object_ref (profile);
@@ -1176,6 +1228,8 @@ _parse_modulemd_profile (yaml_parser_t *parser,
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
   g_object_unref (profile);
 
   g_debug ("TRACE: exiting _parse_modulemd_profile");
@@ -1233,11 +1287,14 @@ _parse_modulemd_api (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in api");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_object_unref (set);
 
   g_debug ("TRACE: exiting _parse_modulemd_api");
@@ -1296,11 +1353,14 @@ _parse_modulemd_filters (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in filters");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_object_unref (set);
 
   g_debug ("TRACE: exiting _parse_modulemd_filters");
@@ -1359,11 +1419,14 @@ _parse_modulemd_buildopts (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in buildopts");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (opts);
 
   g_debug ("TRACE: exiting _parse_modulemd_buildopts");
@@ -1437,11 +1500,14 @@ _parse_modulemd_components (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in components");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
 
   g_debug ("TRACE: exiting _parse_modulemd_components");
   return result;
@@ -1499,12 +1565,15 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   *_components = g_hash_table_ref (components);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (components);
 
   g_debug ("TRACE: exiting _parse_modulemd_rpm_components");
@@ -1519,6 +1588,7 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   ModulemdComponentRpm *component = NULL;
   ModulemdSimpleSet *set = NULL;
@@ -1551,25 +1621,27 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                           "buildorder"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse buildorder value");
                 }
 
               buildorder = g_ascii_strtoull (
-                (const gchar *)event.data.scalar.value, NULL, 10);
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
               modulemd_component_set_buildorder (
                 MODULEMD_COMPONENT (component), buildorder);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "rationale"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse rationale value");
@@ -1577,7 +1649,9 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
 
               modulemd_component_set_rationale (
                 MODULEMD_COMPONENT (component),
-                (const gchar *)event.data.scalar.value);
+                (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -1595,14 +1669,16 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                                "cache"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse cache value");
                 }
 
               modulemd_component_rpm_set_cache (
-                component, (const gchar *)event.data.scalar.value);
+                component, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -1619,29 +1695,33 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "ref"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
                 }
 
               modulemd_component_rpm_set_ref (
-                component, (const gchar *)event.data.scalar.value);
+                component, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "repository"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse repository value");
                 }
 
               modulemd_component_rpm_set_repository (
-                component, (const gchar *)event.data.scalar.value);
+                component, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else
@@ -1656,12 +1736,16 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   *_component = g_object_ref (component);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
   g_object_unref (component);
 
   g_debug ("TRACE: exiting _parse_modulemd_module_components");
@@ -1721,12 +1805,15 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   *_components = g_hash_table_ref (components);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (components);
 
   g_debug ("TRACE: exiting _parse_modulemd_module_components");
@@ -1741,6 +1828,7 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   gboolean done = FALSE;
   ModulemdComponentModule *component = NULL;
   guint64 buildorder = 0;
@@ -1772,25 +1860,27 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
                           "buildorder"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse buildorder value");
                 }
 
               buildorder = g_ascii_strtoull (
-                (const gchar *)event.data.scalar.value, NULL, 10);
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
               modulemd_component_set_buildorder (
                 MODULEMD_COMPONENT (component), buildorder);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "rationale"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse rationale value");
@@ -1798,35 +1888,41 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
 
               modulemd_component_set_rationale (
                 MODULEMD_COMPONENT (component),
-                (const gchar *)event.data.scalar.value);
+                (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "ref"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
                 }
 
               modulemd_component_module_set_ref (
-                component, (const gchar *)event.data.scalar.value);
+                component, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "repository"))
             {
               YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                parser, &event, error, "Parser error");
-              if (event.type != YAML_SCALAR_EVENT)
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
                 {
                   MMD_YAML_ERROR_RETURN (error,
                                          "Failed to parse repository value");
                 }
 
               modulemd_component_module_set_repository (
-                component, (const gchar *)event.data.scalar.value);
+                component, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
 
           else
@@ -1841,12 +1937,16 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   *_component = g_object_ref (component);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
   g_object_unref (component);
 
   g_debug ("TRACE: exiting _parse_modulemd_module_component");
@@ -1905,11 +2005,14 @@ _parse_modulemd_artifacts (ModulemdModule *module,
           MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in artifacts");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_object_unref (set);
 
   g_debug ("TRACE: exiting _parse_modulemd_artifacts");
@@ -1970,12 +2073,15 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
                                  "Unexpected YAML event in service levels");
           break;
         }
+
+      yaml_event_delete (&event);
     }
   modulemd_module_set_servicelevels (module, servicelevels);
 
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_hash_table_unref (servicelevels);
 
   g_debug ("TRACE: exiting _parse_modulemd_servicelevels");
@@ -2046,6 +2152,8 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
                                  "Unexpected YAML event in service level");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
   *_servicelevel = g_object_ref (sl);
@@ -2053,6 +2161,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
   result = TRUE;
 
 error:
+  yaml_event_delete (&event);
   g_object_unref (sl);
 
   g_debug ("TRACE: exiting _parse_modulemd_servicelevel");

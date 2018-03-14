@@ -3397,6 +3397,7 @@ ModulemdModule *
 modulemd_module_new_from_file (const gchar *yaml_file)
 {
   GError *error = NULL;
+  ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
   GPtrArray *data = NULL;
 
@@ -3408,16 +3409,22 @@ modulemd_module_new_from_file (const gchar *yaml_file)
     }
 
   modules = mmd_yaml_dup_modules (data);
+  module = modules[0];
 
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 
-  for (gsize i = 1; modules[i]; i++)
+  if (module)
     {
-      g_object_unref (modules[i]);
+      for (gsize i = 1; modules[i]; i++)
+        {
+          g_object_unref (modules[i]);
+        }
     }
 
-  return modules[0];
+  g_clear_pointer (&data, g_object_unref);
+  g_clear_pointer (&modules, g_free);
+  return module;
 }
 
 /**
@@ -3491,6 +3498,7 @@ ModulemdModule *
 modulemd_module_new_from_string (const gchar *yaml_string)
 {
   GError *error = NULL;
+  ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
   GPtrArray *data = NULL;
 
@@ -3503,15 +3511,21 @@ modulemd_module_new_from_string (const gchar *yaml_string)
 
   modules = mmd_yaml_dup_modules (data);
 
+  module = modules[0];
+
   /* This old implementation needs to ignore extra_data, so just free it. */
   g_clear_pointer (&data, g_ptr_array_free);
 
-  for (gsize i = 1; modules[i]; i++)
+  if (module)
     {
-      g_object_unref (modules[i]);
+      for (gsize i = 1; modules[i]; i++)
+        {
+          g_object_unref (modules[i]);
+        }
     }
+  g_free (modules);
 
-  return modules[0];
+  return module;
 }
 
 /**

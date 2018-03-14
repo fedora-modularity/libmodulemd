@@ -32,7 +32,6 @@
 
 typedef struct _ModuleFixture
 {
-  ModulemdModule *md;
 } ModuleFixture;
 
 typedef struct _ModulePropString
@@ -41,17 +40,6 @@ typedef struct _ModulePropString
   const gchar *test_str;
 } ModulePropString;
 
-static void
-modulemd_module_set_up (ModuleFixture *fixture, gconstpointer user_data)
-{
-  fixture->md = modulemd_module_new ();
-}
-
-static void
-modulemd_module_tear_down (ModuleFixture *fixture, gconstpointer user_data)
-{
-  g_object_unref (fixture->md);
-}
 
 static void
 modulemd_module_test_string_prop (ModuleFixture *fixture,
@@ -59,7 +47,7 @@ modulemd_module_test_string_prop (ModuleFixture *fixture,
 {
   GValue value = G_VALUE_INIT;
   GValue ref_value = G_VALUE_INIT;
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
   ModulePropString *prop_ctx = (ModulePropString *)user_data;
 
   g_value_init (&value, G_TYPE_STRING);
@@ -83,6 +71,7 @@ modulemd_module_test_string_prop (ModuleFixture *fixture,
 
   g_value_unset (&ref_value);
   g_value_unset (&value);
+  g_object_unref (md);
 }
 
 static void
@@ -91,7 +80,7 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 {
   GValue value = G_VALUE_INIT;
   GValue set_value = G_VALUE_INIT;
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
   GHashTable *htable = NULL;
   GHashTable *htable2 = NULL;
   GHashTable *buildrequires = NULL;
@@ -135,7 +124,7 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "buildrequires", &value);
-  htable2 = g_value_dup_boxed (&value);
+  htable2 = g_value_get_boxed (&value);
   g_value_reset (&value);
   htable = _modulemd_hash_table_deep_str_copy (htable2);
   htable2 = NULL;
@@ -143,7 +132,6 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
   g_assert_cmpstr (g_hash_table_lookup (htable, "MyKey2"), ==, "MyValue2");
-
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
@@ -161,13 +149,14 @@ modulemd_module_test_get_set_buildrequires (ModuleFixture *fixture,
   g_assert_cmpstr (
     g_hash_table_lookup (buildrequires, "MyKey3"), ==, "MyValue3");
   g_clear_pointer (&buildrequires, g_hash_table_unref);
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_community (ModuleFixture *fixture,
                                         gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_community (md), ==, NULL);
@@ -179,13 +168,14 @@ modulemd_module_test_get_set_community (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_community (md, NULL);
   g_assert_cmpstr (modulemd_module_get_community (md), ==, NULL);
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_description (ModuleFixture *fixture,
                                           gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_description (md), ==, NULL);
@@ -197,13 +187,14 @@ modulemd_module_test_get_set_description (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_description (md, NULL);
   g_assert_cmpstr (modulemd_module_get_description (md), ==, NULL);
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_documentation (ModuleFixture *fixture,
                                             gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_documentation (md), ==, NULL);
@@ -215,13 +206,14 @@ modulemd_module_test_get_set_documentation (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_documentation (md, NULL);
   g_assert_cmpstr (modulemd_module_get_documentation (md), ==, NULL);
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_mdversion (ModuleFixture *fixture,
                                         gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to 0 */
   g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, MD_VERSION_UNSET);
@@ -229,13 +221,14 @@ modulemd_module_test_get_set_mdversion (ModuleFixture *fixture,
   /* Assign a valid version */
   modulemd_module_set_mdversion (md, MD_VERSION_1);
   g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, MD_VERSION_1);
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_name (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_name (md), ==, NULL);
@@ -247,6 +240,7 @@ modulemd_module_test_get_set_name (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_name (md, NULL);
   g_assert_cmpstr (modulemd_module_get_name (md), ==, NULL);
+  g_object_unref (md);
 }
 
 static void
@@ -255,7 +249,7 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 {
   GValue value = G_VALUE_INIT;
   GValue set_value = G_VALUE_INIT;
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
   GHashTable *htable = NULL;
   GHashTable *htable2 = NULL;
   GHashTable *requires = NULL;
@@ -296,7 +290,7 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
 
   /* Verify the second key and value with properties */
   g_object_get_property (G_OBJECT (md), "requires", &value);
-  htable2 = g_value_dup_boxed (&value);
+  htable2 = g_value_get_boxed (&value);
   g_value_reset (&value);
   htable = _modulemd_hash_table_deep_str_copy (htable2);
   htable2 = NULL;
@@ -304,7 +298,6 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
   g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "MyKey2"));
   g_assert_cmpstr (g_hash_table_lookup (htable, "MyKey2"), ==, "MyValue2");
-
 
   /* Add a third key using the properties interface */
   g_hash_table_insert (htable, g_strdup ("MyKey3"), g_strdup ("MyValue3"));
@@ -321,13 +314,15 @@ modulemd_module_test_get_set_requires (ModuleFixture *fixture,
   g_assert_true (g_hash_table_contains (requires, "MyKey3"));
   g_assert_cmpstr (g_hash_table_lookup (requires, "MyKey3"), ==, "MyValue3");
   g_clear_pointer (&requires, g_hash_table_unref);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_stream (ModuleFixture *fixture,
                                      gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_stream (md), ==, NULL);
@@ -339,13 +334,15 @@ modulemd_module_test_get_set_stream (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_stream (md, NULL);
   g_assert_cmpstr (modulemd_module_get_stream (md), ==, NULL);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_summary (ModuleFixture *fixture,
                                       gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_summary (md), ==, NULL);
@@ -357,13 +354,15 @@ modulemd_module_test_get_set_summary (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_summary (md, NULL);
   g_assert_cmpstr (modulemd_module_get_summary (md), ==, NULL);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_tracker (ModuleFixture *fixture,
                                       gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to NULL */
   g_assert_cmpstr (modulemd_module_get_tracker (md), ==, NULL);
@@ -375,13 +374,15 @@ modulemd_module_test_get_set_tracker (ModuleFixture *fixture,
   /* Reassign it to NULL */
   modulemd_module_set_tracker (md, NULL);
   g_assert_cmpstr (modulemd_module_get_tracker (md), ==, NULL);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_version (ModuleFixture *fixture,
                                       gconstpointer user_data)
 {
-  ModulemdModule *md = fixture->md;
+  ModulemdModule *md = modulemd_module_new ();
 
   /* Should be initialized to 0 */
   g_assert_cmpuint (modulemd_module_get_version (md), ==, 0);
@@ -393,41 +394,45 @@ modulemd_module_test_get_set_version (ModuleFixture *fixture,
   /* Reassign it to 0 */
   modulemd_module_set_version (md, 0);
   g_assert_cmpuint (modulemd_module_get_version (md), ==, 0);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_get_set_dependencies (ModuleFixture *fixture,
                                            gconstpointer user_data)
 {
+  ModulemdModule *md = modulemd_module_new ();
   ModulemdDependencies *dep = NULL;
   const GPtrArray *deps = NULL;
   const gchar **platforms = g_new0 (const gchar *, 3);
   platforms[0] = "f27";
   platforms[1] = "f28";
 
-  modulemd_module_set_mdversion (fixture->md, 2);
+  modulemd_module_set_mdversion (md, 2);
 
   dep = modulemd_dependencies_new ();
   modulemd_dependencies_add_buildrequires (dep, "platform", platforms);
   modulemd_dependencies_add_requires (dep, "platform", platforms);
 
-  modulemd_module_add_dependencies (fixture->md, dep);
-  modulemd_module_add_dependencies (fixture->md, dep);
+  modulemd_module_add_dependencies (md, dep);
+  modulemd_module_add_dependencies (md, dep);
 
   g_clear_pointer (&dep, g_object_unref);
 
-  deps = modulemd_module_get_dependencies (fixture->md);
+  deps = modulemd_module_get_dependencies (md);
   g_assert_nonnull (deps);
   g_assert_cmpint (deps->len, ==, 2);
 
   /* We've previously had a bug where repeated get() calls were unrefing
    * values, so make sure that doesn't reappear
    */
-  deps = modulemd_module_get_dependencies (fixture->md);
+  deps = modulemd_module_get_dependencies (md);
   g_assert_nonnull (deps);
   g_assert_cmpint (deps->len, ==, 2);
 
   g_free (platforms);
+  g_object_unref (md);
 }
 
 
@@ -435,6 +440,7 @@ static void
 modulemd_module_test_construct_v1 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
+  ModulemdModule *md = modulemd_module_new ();
   ModulemdModule *copy = NULL;
   GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
@@ -443,31 +449,31 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   gboolean result;
 
   /* Add mdversion (required) */
-  modulemd_module_set_mdversion (fixture->md, 1);
+  modulemd_module_set_mdversion (md, 1);
 
   /* Add summary (required) */
-  modulemd_module_set_summary (fixture->md, "The summary");
+  modulemd_module_set_summary (md, "The summary");
 
   /* Add description (required) */
-  modulemd_module_set_description (fixture->md, "The description");
+  modulemd_module_set_description (md, "The description");
 
   /* Add module license (required) */
   licenses = modulemd_simpleset_new ();
   modulemd_simpleset_add (licenses, "MIT");
-  modulemd_module_set_module_licenses (fixture->md, licenses);
+  modulemd_module_set_module_licenses (md, licenses);
   g_object_unref (licenses);
 
   /* Dump it to YAML to validate it */
   modules = g_ptr_array_new ();
   g_assert_nonnull (modules);
-  g_ptr_array_add (modules, fixture->md);
+  g_ptr_array_add (modules, md);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
   /* Make sure no errors occur when copying it */
-  copy = modulemd_module_copy (fixture->md);
+  copy = modulemd_module_copy (md);
   g_assert_nonnull (copy);
   g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 1);
 
@@ -476,6 +482,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   g_ptr_array_unref (modules);
   g_object_unref (copy);
   g_free (yaml);
+  g_object_unref (md);
 }
 
 
@@ -483,6 +490,7 @@ static void
 modulemd_module_test_construct_v2 (ModuleFixture *fixture,
                                    gconstpointer user_data)
 {
+  ModulemdModule *md = modulemd_module_new ();
   ModulemdModule *copy = NULL;
   GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
@@ -491,7 +499,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   gboolean result;
 
   modules = g_ptr_array_new ();
-  g_ptr_array_add (modules, fixture->md);
+  g_ptr_array_add (modules, md);
 
   /* Verify that it fails when mdversion is unset */
   result = emit_yaml_string (modules, &yaml, &error);
@@ -500,7 +508,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_clear_error (&error);
 
   /* Add mdversion (required) */
-  modulemd_module_set_mdversion (fixture->md, 2);
+  modulemd_module_set_mdversion (md, 2);
 
   /* Verify that it fails when summary is unset */
   result = emit_yaml_string (modules, &yaml, &error);
@@ -509,7 +517,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_clear_error (&error);
 
   /* Add summary (required) */
-  modulemd_module_set_summary (fixture->md, "The summary");
+  modulemd_module_set_summary (md, "The summary");
 
   /* Verify that it fails when description is unset */
   result = emit_yaml_string (modules, &yaml, &error);
@@ -518,7 +526,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_clear_error (&error);
 
   /* Add description (required) */
-  modulemd_module_set_description (fixture->md, "The description");
+  modulemd_module_set_description (md, "The description");
 
   /* Verify that it fails when module license is unset */
   result = emit_yaml_string (modules, &yaml, &error);
@@ -529,7 +537,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   /* Add module license (required) */
   licenses = modulemd_simpleset_new ();
   modulemd_simpleset_add (licenses, "MIT");
-  modulemd_module_set_module_licenses (fixture->md, licenses);
+  modulemd_module_set_module_licenses (md, licenses);
   g_object_unref (licenses);
 
   /* Dump it to YAML to validate it */
@@ -538,7 +546,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_assert_nonnull (yaml);
 
   /* Make sure no errors occur when copying it */
-  copy = modulemd_module_copy (fixture->md);
+  copy = modulemd_module_copy (md);
   g_assert_nonnull (copy);
   g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 2);
 
@@ -547,12 +555,15 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_ptr_array_unref (modules);
   g_object_unref (copy);
   g_clear_pointer (&yaml, g_free);
+
+  g_object_unref (md);
 }
 
 static void
 modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
                                  gconstpointer user_data)
 {
+  ModulemdModule *md = modulemd_module_new ();
   GPtrArray *modules = NULL;
   ModulemdSimpleSet *licenses = NULL;
   GError *error = NULL;
@@ -565,27 +576,27 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
 
 
   /* Add mdversion (required) */
-  modulemd_module_set_mdversion (fixture->md, 1);
+  modulemd_module_set_mdversion (md, 1);
 
   /* Add summary (required) */
-  modulemd_module_set_summary (fixture->md, "The summary");
+  modulemd_module_set_summary (md, "The summary");
 
   /* Add description (required) */
-  modulemd_module_set_description (fixture->md, "The description");
+  modulemd_module_set_description (md, "The description");
 
   /* Add module license (required) */
   licenses = modulemd_simpleset_new ();
   modulemd_simpleset_add (licenses, "MIT");
-  modulemd_module_set_module_licenses (fixture->md, licenses);
+  modulemd_module_set_module_licenses (md, licenses);
   g_object_unref (licenses);
 
   /* Add EOL value */
   eol = g_date_new_dmy (3, 10, 2077);
-  modulemd_module_set_eol (fixture->md, eol);
+  modulemd_module_set_eol (md, eol);
   g_date_free (eol);
 
   /* There should be no "rawhide" service level yet */
-  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  servicelevels = modulemd_module_get_servicelevels (md);
   g_assert_false (g_hash_table_contains (servicelevels, "rawhide"));
   servicelevels = NULL;
 
@@ -593,33 +604,33 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   g_hash_table_insert (v1_deps, g_strdup ("platform"), g_strdup ("f28"));
 
   /* Add a BuildRequires */
-  modulemd_module_set_buildrequires (fixture->md, v1_deps);
+  modulemd_module_set_buildrequires (md, v1_deps);
 
   /* Add a runtime Requires */
-  modulemd_module_set_requires (fixture->md, v1_deps);
+  modulemd_module_set_requires (md, v1_deps);
 
   g_hash_table_unref (v1_deps);
 
   /* Upgrade to v2 */
-  result = modulemd_module_upgrade (fixture->md);
+  result = modulemd_module_upgrade (md);
   g_assert_true (result);
 
-  g_assert_cmpuint (modulemd_module_get_mdversion (fixture->md), ==, 2);
+  g_assert_cmpuint (modulemd_module_get_mdversion (md), ==, 2);
 
   /* The module should now contain an entry for rawhide */
-  servicelevels = modulemd_module_get_servicelevels (fixture->md);
+  servicelevels = modulemd_module_get_servicelevels (md);
   g_assert_true (g_hash_table_contains (servicelevels, "rawhide"));
   servicelevels = NULL;
 
 
   /* The module should now contain a single entry in the dependencies array */
-  v2_deps = modulemd_module_get_dependencies (fixture->md);
+  v2_deps = modulemd_module_get_dependencies (md);
   g_assert_nonnull (v2_deps);
   g_assert_cmpuint (v2_deps->len, ==, 1);
 
   /* Dump it to YAML to validate it */
   modules = g_ptr_array_new ();
-  g_ptr_array_add (modules, fixture->md);
+  g_ptr_array_add (modules, md);
 
   result = emit_yaml_string (modules, &yaml, &error);
   g_assert_true (result);
@@ -629,6 +640,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
 
   g_ptr_array_unref (modules);
   g_free (yaml);
+  g_object_unref (md);
 }
 
 
@@ -645,16 +657,16 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_get_set_buildrequires",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_buildrequires,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_community",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_community,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString community;
   community.property_name = "community";
@@ -662,17 +674,17 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_community",
               ModuleFixture,
               &community,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
 
   g_test_add ("/modulemd/module/test_get_set_description",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_description,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString desc;
   desc.property_name = "description";
@@ -680,16 +692,16 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_description",
               ModuleFixture,
               &desc,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_documentation",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_documentation,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString doc;
   doc.property_name = "documentation";
@@ -697,23 +709,23 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_documentation",
               ModuleFixture,
               &doc,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_mdversion",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_mdversion,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_name",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_name,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString name;
   name.property_name = "name";
@@ -721,23 +733,23 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_name",
               ModuleFixture,
               &name,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_requires",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_requires,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_stream",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_stream,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString stream;
   stream.property_name = "stream";
@@ -745,16 +757,16 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_stream",
               ModuleFixture,
               &stream,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_summary",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_summary,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString summary;
   summary.property_name = "summary";
@@ -762,16 +774,16 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_summary",
               ModuleFixture,
               &summary,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_tracker",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_tracker,
-              modulemd_module_tear_down);
+              NULL);
 
   ModulePropString tracker;
   tracker.property_name = "tracker";
@@ -779,9 +791,9 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_prop_tracker",
               ModuleFixture,
               &tracker,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_string_prop,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_get_set_version",
               ModuleFixture,
@@ -793,30 +805,30 @@ main (int argc, char *argv[])
   g_test_add ("/modulemd/module/test_get_set_dependencies",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_get_set_dependencies,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_construct_v1",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_construct_v1,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/test_construct_v2",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_construct_v2,
-              modulemd_module_tear_down);
+              NULL);
 
   g_test_add ("/modulemd/module/modulemd_module_test_upgrade_v2",
               ModuleFixture,
               NULL,
-              modulemd_module_set_up,
+              NULL,
               modulemd_module_test_upgrade_v2,
-              modulemd_module_tear_down);
+              NULL);
 
 
   return g_test_run ();

@@ -234,6 +234,12 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
 
   modules = mmd_yaml_dup_modules (data);
   g_assert_nonnull (modules);
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_free (modules);
 }
 
 static void

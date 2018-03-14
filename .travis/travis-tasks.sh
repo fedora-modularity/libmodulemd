@@ -8,6 +8,7 @@ pushd /builddir/
 meson --buildtype=debug travis
 
 ninja -C travis test
+cat /builddir/travis/meson-logs/testlog.txt
 
 meson --buildtype=debug coverity
 pushd coverity

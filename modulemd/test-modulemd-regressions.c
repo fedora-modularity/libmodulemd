@@ -58,6 +58,7 @@ modulemd_regressions_issue16 (RegressionFixture *fixture,
   g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
 
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
 }
 
 static void
@@ -72,6 +73,7 @@ modulemd_regressions_issue14_v1 (RegressionFixture *fixture,
   module = modulemd_module_new_from_file (yaml_path);
   g_assert_nonnull (module);
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
 }
 
 static void
@@ -86,6 +88,7 @@ modulemd_regressions_issue14_v2 (RegressionFixture *fixture,
   module = modulemd_module_new_from_file (yaml_path);
   g_assert_nonnull (module);
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
 }
 
 static void
@@ -100,6 +103,7 @@ modulemd_regressions_issue14_mismatch (RegressionFixture *fixture,
   module = modulemd_module_new_from_file (yaml_path);
   g_assert_null (module);
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
 }
 
 static void
@@ -113,6 +117,7 @@ modulemd_regressions_issue18 (RegressionFixture *fixture,
   module = modulemd_module_new_from_string (yaml_content);
   g_assert_null (module);
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_content, g_free);
 }
 
 int

@@ -1009,7 +1009,8 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
+  g_clear_pointer (&keys, g_ptr_array_unref);
+  g_clear_pointer (&name, g_free);
 
   g_debug ("TRACE: exiting _emit_modulemd_profiles");
   return result;

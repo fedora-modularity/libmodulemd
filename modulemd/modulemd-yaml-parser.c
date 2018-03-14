@@ -216,6 +216,7 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
                                     &document->version,
                                     error))
             {
+              modulemd_subdocument_free (document);
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Parse error during preprocessing");
             }
@@ -286,15 +287,12 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
 
   if (data)
     {
-      *data = objects;
+      *data = g_ptr_array_ref (objects);
     }
   result = TRUE;
 
 error:
-  if (!result)
-    {
-      g_clear_pointer (&objects, g_ptr_array_free);
-    }
+  g_clear_pointer (&objects, g_ptr_array_unref);
   g_clear_pointer (&subdocuments, g_ptr_array_unref);
 
   return result;

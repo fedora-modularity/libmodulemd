@@ -153,7 +153,7 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
 /**
  * modulemd_simpleset_get:
  *
- * Retrieves the set as a #GPtrArray of strings
+ * Retrieves the set as an array of strings
  *
  * Returns: (array zero-terminated=1) (transfer full):
  * A list representing a set of string values.
@@ -176,7 +176,7 @@ modulemd_simpleset_get (ModulemdSimpleSet *self)
 /**
  * modulemd_simpleset_dup:
  *
- * Retrieves the set as a #GPtrArray of strings
+ * Retrieves the set as an array of strings
  *
  * Returns: (array zero-terminated=1) (transfer full):
  * A list representing a set of string values.

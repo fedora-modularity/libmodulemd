@@ -3833,7 +3833,7 @@ modulemd_module_upgrade_full (ModulemdModule *self, guint64 version)
           /* Future upgrades go here */
 
         default:
-          g_error ("Programming error: no such version %d", version);
+          g_error ("Programming error: no such version %" PRIx64, version);
           result = FALSE;
           goto done;
         }

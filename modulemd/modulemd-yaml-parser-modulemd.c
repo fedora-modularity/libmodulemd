@@ -242,24 +242,6 @@ _parse_modulemd (yaml_parser_t *parser,
   *object = (GObject *)module;
 
 error:
-  if (*error)
-    {
-      result = FALSE;
-
-      /* Move the parser to the end of the mapping */
-      g_debug ("TRACE: Error encountered; skipping to end of document.");
-      do
-        {
-          if (!yaml_parser_parse (parser, &event))
-            {
-              /* Nothing we can do here. The stream is unparseable */
-              break;
-            }
-          g_debug ("Parser event: %s", mmd_yaml_get_event_name (event.type));
-        }
-      while (event.type != YAML_DOCUMENT_END_EVENT &&
-             event.type != YAML_NO_EVENT);
-    }
 
   g_debug ("TRACE: exiting _parse_modulemd");
   return result;

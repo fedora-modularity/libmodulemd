@@ -4,6 +4,8 @@
 # libmodulemd
 C Library for manipulating module metadata files
 
+[API Documentation](https://sgallagh.fedorapeople.org/docs/libmodulemd/1.1/)
+
 ## Using libmodulemd from Python
 
 Using libmodulemd from Python is possible thanks to gobject-introspection

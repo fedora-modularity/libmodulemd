@@ -26,7 +26,9 @@
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <yaml.h>
+#include <inttypes.h>
 
 enum
 {
@@ -2779,6 +2781,44 @@ modulemd_module_copy (ModulemdModule *self)
 
 
   return copy;
+}
+
+
+/**
+ * modulemd_module_dup_nsvc:
+ *
+ * Return the unique module identifier.
+ *
+ * Returns: a string describing the unique module identifier in the form:
+ * "NAME:STREAM:VERSION[:CONTEXT]". This string is owned by the caller and
+ * must be freed with g_free().
+ */
+gchar *
+modulemd_module_dup_nsvc (ModulemdModule *self)
+{
+  gchar *nsvc = NULL;
+  const gchar *name = modulemd_module_peek_name (self);
+  const gchar *stream = modulemd_module_peek_stream (self);
+  guint64 version = modulemd_module_peek_version (self);
+  const gchar *context = modulemd_module_peek_context (self);
+
+  if (!name || !stream || !version)
+    {
+      /* Mandatory field is missing */
+      return NULL;
+    }
+
+  if (context)
+    {
+      nsvc = g_strdup_printf (
+        "%s:%s:%" PRIx64 ":%s", name, stream, version, context);
+    }
+  else
+    {
+      nsvc = g_strdup_printf ("%s:%s:%" PRIx64, name, stream, version);
+    }
+
+  return nsvc;
 }
 
 

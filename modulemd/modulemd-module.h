@@ -442,6 +442,9 @@ modulemd_module_dup_xmd (ModulemdModule *self);
 ModulemdModule *
 modulemd_module_copy (ModulemdModule *self);
 
+gchar *
+modulemd_module_dup_nsvc (ModulemdModule *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_MODULE_H */

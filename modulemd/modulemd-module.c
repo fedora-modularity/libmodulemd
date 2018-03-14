@@ -264,7 +264,6 @@ GHashTable *
 modulemd_module_peek_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion == MD_VERSION_1, NULL);
 
   return self->buildrequires;
 }
@@ -284,7 +283,6 @@ GHashTable *
 modulemd_module_dup_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion == MD_VERSION_1, NULL);
 
   return _modulemd_hash_table_deep_str_copy (self->buildrequires);
 }
@@ -639,7 +637,6 @@ GPtrArray *
 modulemd_module_peek_dependencies (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion >= MD_VERSION_2, NULL);
 
   return self->dependencies;
 }
@@ -660,7 +657,6 @@ modulemd_module_dup_dependencies (ModulemdModule *self)
   ModulemdDependencies *copy = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion >= MD_VERSION_2, NULL);
 
   dependencies = g_ptr_array_new_with_free_func (g_object_unref);
 
@@ -917,7 +913,6 @@ const GDate *
 modulemd_module_peek_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_peek_mdversion (self) < 2, NULL);
 
   if (!g_date_valid (self->eol))
     {
@@ -944,7 +939,6 @@ GDate *
 modulemd_module_dup_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_peek_mdversion (self) < 2, NULL);
 
   if (!g_date_valid (self->eol))
     {
@@ -1580,7 +1574,6 @@ GHashTable *
 modulemd_module_peek_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion == MD_VERSION_1, NULL);
 
   return self->requires;
 }
@@ -1600,7 +1593,6 @@ GHashTable *
 modulemd_module_dup_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (self->mdversion == MD_VERSION_1, NULL);
 
   return _modulemd_hash_table_deep_str_copy (self->requires);
 }

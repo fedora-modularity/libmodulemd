@@ -141,6 +141,27 @@ modulemd_regressions_issue25 (RegressionFixture *fixture,
                    "%my_macro 1");
 }
 
+
+static void
+modulemd_regressions_issue26 (RegressionFixture *fixture,
+                              gconstpointer user_data)
+{
+  gchar *yaml_path;
+  ModulemdModule *module = NULL;
+
+  /* This would segfault because we weren't checking for NULL
+   * prior to attempting to free the simpleset in
+   * _parse_modulemd_filters
+   */
+  yaml_path = g_strdup_printf ("%s/test_data/issue26.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_nonnull (module);
+
+  g_object_unref (module);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -190,6 +211,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_regressions_issue25,
+              NULL);
+
+  g_test_add ("/modulemd/regressions/issue26",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue26,
               NULL);
 
   return g_test_run ();

@@ -1361,7 +1361,7 @@ _parse_modulemd_filters (ModulemdModule *module,
 
 error:
   yaml_event_delete (&event);
-  g_object_unref (set);
+  g_clear_pointer (&set, g_object_unref);
 
   g_debug ("TRACE: exiting _parse_modulemd_filters");
   return result;

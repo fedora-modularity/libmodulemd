@@ -190,17 +190,17 @@ _parse_defaults (yaml_parser_t *parser,
     }
 
   default_stream = modulemd_defaults_peek_default_stream (defaults);
-  if (!default_stream || !(default_stream[0]))
+  if (default_stream && default_stream[0])
     {
-      MMD_YAML_ERROR_RETURN (error, "No default stream specified");
-    }
-
-  /* Ensure that the default profile is references in the profiles section */
-  profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
-  if (!g_hash_table_contains (profile_defaults, default_stream))
-    {
-      MMD_YAML_ERROR_RETURN (error,
-                             "Default stream missing from profile defaults");
+      /* Ensure that the default profile is references in the profiles
+       * section
+       */
+      profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
+      if (!g_hash_table_contains (profile_defaults, default_stream))
+        {
+          MMD_YAML_ERROR_RETURN (
+            error, "Default stream missing from profile defaults");
+        }
     }
 
   *object = g_object_ref (G_OBJECT (defaults));

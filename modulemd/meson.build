@@ -73,7 +73,7 @@ test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 test_env.set('G_MESSAGES_DEBUG', 'all')
 test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
-test_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], libmodulemd_version_array[1]]))
+test_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
 test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
 
 test_modulemd_component = executable(
@@ -179,7 +179,7 @@ test ('test_modulemd_python', test_modulemd_python, env : test_env)
 gnome.generate_gir(
     modulemd_lib,
     sources : modulemd_srcs + modulemd_hdrs,
-    nsversion : '.'.join([libmodulemd_version_array[0], libmodulemd_version_array[1]]),
+    nsversion : '.'.join([libmodulemd_version_array[0], '0']),
     namespace : 'Modulemd',
     symbol_prefix : 'modulemd_',
     identifier_prefix : 'Modulemd',

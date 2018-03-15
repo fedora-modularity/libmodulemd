@@ -1410,7 +1410,7 @@ _parse_modulemd_buildopts (ModulemdModule *module,
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown filter type");
+              MMD_YAML_ERROR_RETURN (error, "Unknown buildopt type");
             }
           break;
 

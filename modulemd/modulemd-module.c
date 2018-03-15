@@ -2741,6 +2741,8 @@ modulemd_module_copy (ModulemdModule *self)
 
   modulemd_module_set_rpm_artifacts (copy, self->rpm_artifacts);
 
+  modulemd_module_set_rpm_buildopts (copy, self->rpm_buildopts);
+
   modulemd_module_set_rpm_components (copy, self->rpm_components);
 
   modulemd_module_set_rpm_filter (copy, self->rpm_filter);

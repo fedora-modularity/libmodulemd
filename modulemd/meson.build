@@ -204,7 +204,7 @@ gnome.gtkdoc(
 pkg.generate(
     libraries : modulemd_lib,
     subdirs : header_path,
-    version : '.'.join([libmodulemd_version_array[0], libmodulemd_version_array[1]]),
+    version : libmodulemd_version,
     name : 'modulemd',
     filebase : 'modulemd',
     description : 'Module metadata manipulation library',

@@ -109,18 +109,17 @@ _emit_defaults_root (yaml_emitter_t *emitter,
       MMD_YAML_EMITTER_ERROR_RETURN (error, "Module name is missing");
     }
 
-  if (!default_stream || !(module_name)[0])
+  if (default_stream && !(default_stream[0]))
     {
-      /* The default stream is required and is missing */
-      MMD_YAML_EMITTER_ERROR_RETURN (error,
-                                     "Module default stream is missing");
-    }
-
-  if (!profile_defaults || g_hash_table_size (profile_defaults) == 0)
-    {
-      /* No profile defaults */
-      MMD_YAML_EMITTER_ERROR_RETURN (error,
-                                     "Module profile defaults are missing");
+      /* Ensure that the default profile is references in the profiles
+       * section
+       */
+      profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
+      if (!g_hash_table_contains (profile_defaults, default_stream))
+        {
+          MMD_YAML_EMITTER_ERROR_RETURN (
+            error, "Default stream missing from profile defaults");
+        }
     }
 
   if (!(g_hash_table_contains (profile_defaults, default_stream)))

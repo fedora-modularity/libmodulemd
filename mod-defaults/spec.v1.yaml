@@ -5,9 +5,9 @@ version: 1
 data:
     # Module name that the defaults are for, required.
     module: foo
-    # Module stream that is the default for the module, required.
+    # Module stream that is the default for the module, optional.
     stream: x.y
-    # Module profiles indexed by the stream name, required
+    # Module profiles indexed by the stream name, optional
     # This is a dictionary of stream names to a list of default profiles to be
     # installed.
     # You need to specify an entry for at least the default stream, the empty

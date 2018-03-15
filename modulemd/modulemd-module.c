@@ -2704,9 +2704,10 @@ modulemd_module_dup_xmd (ModulemdModule *self)
 ModulemdModule *
 modulemd_module_copy (ModulemdModule *self)
 {
+  guint64 mdversion = modulemd_module_peek_mdversion (self);
   ModulemdModule *copy = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (modulemd_module_peek_mdversion (self), NULL);
+  g_return_val_if_fail (mdversion, NULL);
 
   copy = modulemd_module_new ();
 
@@ -2714,8 +2715,6 @@ modulemd_module_copy (ModulemdModule *self)
   modulemd_module_set_mdversion (copy, self->mdversion);
 
   modulemd_module_set_arch (copy, self->arch);
-
-  modulemd_module_set_buildrequires (copy, self->buildrequires);
 
   modulemd_module_set_community (copy, self->community);
 
@@ -2734,8 +2733,6 @@ modulemd_module_copy (ModulemdModule *self)
   modulemd_module_set_name (copy, self->name);
 
   modulemd_module_set_profiles (copy, self->profiles);
-
-  modulemd_module_set_requires (copy, self->requires);
 
   modulemd_module_set_rpm_api (copy, self->rpm_api);
 
@@ -2761,14 +2758,16 @@ modulemd_module_copy (ModulemdModule *self)
 
 
   /* Version-specific content */
-  if (modulemd_module_peek_mdversion (copy) == 1)
+  if (mdversion == MD_VERSION_1)
     {
+      modulemd_module_set_buildrequires (copy, self->buildrequires);
+      modulemd_module_set_requires (copy, self->requires);
       if (modulemd_module_peek_eol (self))
         {
           modulemd_module_set_eol (copy, self->eol);
         }
     }
-  else if (modulemd_module_peek_mdversion (copy) >= 2)
+  else if (mdversion >= MD_VERSION_2)
     {
       modulemd_module_set_dependencies (copy, self->dependencies);
     }

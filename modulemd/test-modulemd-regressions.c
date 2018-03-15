@@ -185,7 +185,7 @@ main (int argc, char *argv[])
               modulemd_regressions_issue18,
               NULL);
 
-    g_test_add ("/modulemd/regressions/issue25",
+  g_test_add ("/modulemd/regressions/issue25",
               RegressionFixture,
               NULL,
               NULL,

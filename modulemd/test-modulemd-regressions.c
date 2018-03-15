@@ -120,6 +120,27 @@ modulemd_regressions_issue18 (RegressionFixture *fixture,
   g_clear_pointer (&yaml_content, g_free);
 }
 
+static void
+modulemd_regressions_issue25 (RegressionFixture *fixture,
+                              gconstpointer user_data)
+{
+  gchar *yaml_path;
+  ModulemdModule *module = NULL;
+  GHashTable *buildopts = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue25.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_nonnull (module);
+
+  buildopts = modulemd_module_peek_rpm_buildopts (module);
+  g_assert_nonnull (buildopts);
+  g_assert_true (g_hash_table_contains (buildopts, "macros"));
+  g_assert_cmpstr ((const gchar *)g_hash_table_lookup (buildopts, "macros"),
+                   ==,
+                   "%my_macro 1");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -162,6 +183,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_regressions_issue18,
+              NULL);
+
+    g_test_add ("/modulemd/regressions/issue25",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue25,
               NULL);
 
   return g_test_run ();

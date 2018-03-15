@@ -37,5 +37,22 @@ class TestIssues(unittest.TestCase):
         mmd.set_xmd(d)
         mmd.dumps()
 
+    def test_issue25(self):
+        mmd = Modulemd.Module.new_from_file("%s/test_data/issue25.yaml" %
+                                            os.getenv('MESON_SOURCE_ROOT'))
+        assert mmd.peek_rpm_buildopts() != {}
+        assert mmd.peek_rpm_buildopts()['macros'] == '%my_macro 1'
+        mmd.upgrade()
+        assert mmd.peek_rpm_buildopts() != {}
+        assert mmd.peek_rpm_buildopts()['macros'] == '%my_macro 1'
+        mmd.set_rpm_buildopts({'macros': '%my_macro 1'})
+        assert mmd.peek_rpm_buildopts() != {}
+        assert mmd.peek_rpm_buildopts()['macros'] == '%my_macro 1'
+        dumped = mmd.dumps()
+        print ("YAML:\n%s" % dumped, file=sys.stderr)
+        mmd2 = Modulemd.Module.new_from_string(dumped)
+        assert mmd2.peek_rpm_buildopts() != {}
+        assert mmd2.peek_rpm_buildopts()['macros'] == '%my_macro 1'
+
 if __name__ == '__main__':
     unittest.main()

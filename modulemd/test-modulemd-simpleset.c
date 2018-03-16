@@ -63,15 +63,14 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
                                  gconstpointer user_data)
 {
   gsize i = 0;
-  gchar **array = g_malloc0_n (4, sizeof (gchar *));
+  gchar **array = g_malloc0_n (5, sizeof (gchar *));
   gchar **array2;
 
   array[0] = g_strdup ("alpha");
   array[1] = g_strdup ("bravo");
-  array[2] = NULL;
-
   /* Add duplicate value to ensure uniqueness of resulting set */
-  array[3] = g_strdup ("alpha");
+  array[2] = g_strdup ("alpha");
+  array[3] = NULL;
 
   /* Create the set from a strv */
   modulemd_simpleset_set (fixture->set, array);
@@ -81,7 +80,7 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
       g_assert_true (modulemd_simpleset_contains (fixture->set, array[i]));
     }
 
-  array2 = modulemd_simpleset_get (fixture->set);
+  array2 = modulemd_simpleset_dup (fixture->set);
 
   for (i = 0; array[i]; i++)
     {
@@ -96,13 +95,27 @@ modulemd_simpleset_test_get_set (SimpleSetFixture *fixture,
      * since one of them was a duplicate.
      */
   g_assert_cmpint (g_strv_length (array2), ==, 2);
+
+  for (i = 0; array[i]; i++)
+    {
+      g_free (array[i]);
+    }
+  g_free (array);
+
+  for (i = 0; array2[i]; i++)
+    {
+      g_free (array2[i]);
+    }
+  g_free (array2);
 }
 
 static void
 modulemd_simpleset_test_copy (SimpleSetFixture *fixture,
                               gconstpointer user_data)
 {
+  gsize i = 0;
   ModulemdSimpleSet *copy = NULL;
+  gchar **set = NULL;
 
   modulemd_simpleset_add (fixture->set, "alpha");
   modulemd_simpleset_add (fixture->set, "bravo");
@@ -115,7 +128,15 @@ modulemd_simpleset_test_copy (SimpleSetFixture *fixture,
   modulemd_simpleset_copy (fixture->set, &copy);
 
   g_assert_nonnull (copy);
-  g_assert_nonnull (modulemd_simpleset_get (copy));
+  set = modulemd_simpleset_dup (copy);
+  g_assert_nonnull (set);
+
+  for (i = 0; set[i]; i++)
+    {
+      g_free (set[i]);
+    }
+  g_clear_pointer (&set, g_free);
+
   g_assert_cmpint (modulemd_simpleset_size (copy), ==, 2);
   g_assert_true (modulemd_simpleset_contains (copy, "alpha"));
   g_assert_true (modulemd_simpleset_contains (copy, "bravo"));

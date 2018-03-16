@@ -42,8 +42,9 @@ modulemd_servicelevel_test_get_set_name (ServiceLevelFixture *fixture,
 
   modulemd_servicelevel_set_name (sl, refname);
 
-  name = modulemd_servicelevel_get_name (sl);
+  name = modulemd_servicelevel_peek_name (sl);
   g_assert_cmpstr (name, ==, refname);
+  g_clear_pointer (&sl, g_object_unref);
 }
 
 static void
@@ -60,9 +61,12 @@ modulemd_servicelevel_test_get_set_eol (ServiceLevelFixture *fixture,
 
   modulemd_servicelevel_set_eol (sl, refeol);
 
-  eol = modulemd_servicelevel_get_eol (sl);
+  eol = modulemd_servicelevel_peek_eol (sl);
 
   g_assert_cmpint (g_date_compare (eol, refeol), ==, 0);
+
+  g_clear_pointer (&refeol, g_date_free);
+  g_clear_pointer (&sl, g_object_unref);
 }
 
 int

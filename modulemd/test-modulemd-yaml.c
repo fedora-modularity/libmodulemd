@@ -167,6 +167,7 @@ modulemd_yaml_test_v1_load (YamlFixture *fixture, gconstpointer user_data)
       g_object_unref (modules[i]);
     }
   g_free (modules);
+  g_clear_pointer (&copy, g_object_unref);
 }
 
 static void
@@ -241,6 +242,8 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
     }
 
   g_free (modules);
+  g_clear_pointer (&data, g_ptr_array_unref);
+  g_clear_pointer (&copy, g_object_unref);
 }
 
 static void
@@ -273,6 +276,8 @@ modulemd_yaml_test_emit_v1_string (YamlFixture *fixture,
   g_assert_cmpstr (yaml, ==, yaml2);
 
 
+  g_clear_pointer (&yaml, g_free);
+  g_clear_pointer (&yaml2, g_free);
   g_ptr_array_unref (modules);
   g_ptr_array_unref (reloaded_modules);
 }
@@ -315,6 +320,8 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
   g_assert_nonnull (yaml2);
   g_assert_cmpstr (yaml, ==, yaml2);
 
+  g_clear_pointer (&yaml, g_free);
+  g_clear_pointer (&yaml2, g_free);
   g_ptr_array_unref (modules);
   g_ptr_array_unref (reloaded_modules);
 }

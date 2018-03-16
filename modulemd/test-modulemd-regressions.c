@@ -105,6 +105,7 @@ modulemd_regressions_issue16 (RegressionFixture *fixture,
   g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
 
   g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&module2, g_object_unref);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&yaml, g_free);
 }

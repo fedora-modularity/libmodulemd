@@ -630,7 +630,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
   gboolean result = FALSE;
   GHashTable *xmd = NULL;
   yaml_event_t event;
-  GVariant *variant;
+  GVariant *variant = NULL;
   GVariantIter iter;
   gchar *key;
   GVariant *value;
@@ -671,6 +671,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
 
   result = TRUE;
 error:
+  g_clear_pointer (&variant, g_variant_unref);
   yaml_event_delete (&event);
   g_hash_table_unref (xmd);
 

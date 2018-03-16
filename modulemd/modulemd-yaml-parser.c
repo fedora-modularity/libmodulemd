@@ -548,6 +548,8 @@ _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
   result = TRUE;
 
 error:
+  g_clear_pointer (&strv, g_strfreev);
+  yaml_event_delete (&event);
   return result;
 }
 

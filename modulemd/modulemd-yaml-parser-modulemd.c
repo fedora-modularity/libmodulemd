@@ -1743,6 +1743,7 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
           break;
         }
 
+      g_clear_pointer (&set, g_object_unref);
       yaml_event_delete (&event);
     }
   *_component = g_object_ref (component);

@@ -339,6 +339,7 @@ modulemd_defaults_test_missing_default_from_profile (DefaultsFixture *fixture,
   g_assert_true (result);
 
   g_assert_cmpint (objects->len, ==, 0);
+  g_clear_pointer (&objects, g_ptr_array_unref);
 }
 
 

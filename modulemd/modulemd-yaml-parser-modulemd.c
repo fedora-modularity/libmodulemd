@@ -986,6 +986,7 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
 
   result = TRUE;
 error:
+  g_clear_pointer (&module_name, g_free);
   yaml_event_delete (&event);
   g_debug ("TRACE: exiting _parse_modulemd_v2_dep_map");
   return result;

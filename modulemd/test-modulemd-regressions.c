@@ -59,6 +59,7 @@ modulemd_regressions_issue16 (RegressionFixture *fixture,
 
   g_clear_pointer (&module, g_object_unref);
   g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&yaml, g_free);
 }
 
 static void
@@ -131,6 +132,7 @@ modulemd_regressions_issue25 (RegressionFixture *fixture,
   yaml_path = g_strdup_printf ("%s/test_data/issue25.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   module = modulemd_module_new_from_file (yaml_path);
+  g_clear_pointer (&yaml_path, g_free);
   g_assert_nonnull (module);
 
   buildopts = modulemd_module_peek_rpm_buildopts (module);
@@ -139,6 +141,8 @@ modulemd_regressions_issue25 (RegressionFixture *fixture,
   g_assert_cmpstr ((const gchar *)g_hash_table_lookup (buildopts, "macros"),
                    ==,
                    "%my_macro 1");
+
+  g_object_unref (module);
 }
 
 
@@ -158,7 +162,8 @@ modulemd_regressions_issue26 (RegressionFixture *fixture,
   module = modulemd_module_new_from_file (yaml_path);
   g_assert_nonnull (module);
 
-  g_object_unref (module);
+  g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
 }
 
 

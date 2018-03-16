@@ -32,35 +32,6 @@ typedef struct _RegressionFixture
 {
 } RegressionFixture;
 
-static void
-modulemd_regressions_issue16 (RegressionFixture *fixture,
-                              gconstpointer user_data)
-{
-  gchar *yaml_path = NULL;
-  ModulemdModule *module = NULL;
-  ModulemdModule *module2 = NULL;
-  GHashTable *rpm_components = NULL;
-  gchar *yaml = NULL;
-
-  yaml_path = g_strdup_printf ("%s/test_data/issue16.yaml",
-                               g_getenv ("MESON_SOURCE_ROOT"));
-  module = modulemd_module_new_from_file (yaml_path);
-  g_assert_nonnull (module);
-  rpm_components = modulemd_module_get_rpm_components (module);
-  g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
-
-  yaml = modulemd_module_dumps (module);
-  g_message ("YAML dumps() content:\n%s\n", yaml);
-
-  module2 = modulemd_module_new_from_string (yaml);
-  g_assert_nonnull (module2);
-  rpm_components = modulemd_module_get_rpm_components (module2);
-  g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
-
-  g_clear_pointer (&module, g_object_unref);
-  g_clear_pointer (&yaml_path, g_free);
-  g_clear_pointer (&yaml, g_free);
-}
 
 static void
 modulemd_regressions_issue14_v1 (RegressionFixture *fixture,
@@ -106,6 +77,38 @@ modulemd_regressions_issue14_mismatch (RegressionFixture *fixture,
   g_clear_pointer (&module, g_object_unref);
   g_clear_pointer (&yaml_path, g_free);
 }
+
+
+static void
+modulemd_regressions_issue16 (RegressionFixture *fixture,
+                              gconstpointer user_data)
+{
+  gchar *yaml_path = NULL;
+  ModulemdModule *module = NULL;
+  ModulemdModule *module2 = NULL;
+  GHashTable *rpm_components = NULL;
+  gchar *yaml = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue16.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  module = modulemd_module_new_from_file (yaml_path);
+  g_assert_nonnull (module);
+  rpm_components = modulemd_module_get_rpm_components (module);
+  g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
+
+  yaml = modulemd_module_dumps (module);
+  g_message ("YAML dumps() content:\n%s\n", yaml);
+
+  module2 = modulemd_module_new_from_string (yaml);
+  g_assert_nonnull (module2);
+  rpm_components = modulemd_module_get_rpm_components (module2);
+  g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
+
+  g_clear_pointer (&module, g_object_unref);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&yaml, g_free);
+}
+
 
 static void
 modulemd_regressions_issue18 (RegressionFixture *fixture,
@@ -176,12 +179,6 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/regressions/issue16",
-              RegressionFixture,
-              NULL,
-              NULL,
-              modulemd_regressions_issue16,
-              NULL);
 
   g_test_add ("/modulemd/regressions/issue14_v1",
               RegressionFixture,
@@ -202,6 +199,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_regressions_issue14_mismatch,
+              NULL);
+
+  g_test_add ("/modulemd/regressions/issue16",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue16,
               NULL);
 
   g_test_add ("/modulemd/regressions/issue18",

@@ -3487,7 +3487,7 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
   *_modules = mmd_yaml_dup_modules (data);
 
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 }
 
 
@@ -3547,7 +3547,7 @@ modulemd_module_new_from_string (const gchar *yaml_string)
   module = modules[0];
 
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 
   if (module)
     {
@@ -3588,7 +3588,7 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
   *_modules = mmd_yaml_dup_modules (data);
 
   /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 }
 
 

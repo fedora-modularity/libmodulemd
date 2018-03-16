@@ -83,7 +83,7 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
       g_object_unref (modules[i]);
     }
   g_clear_pointer (&modules, g_free);
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 
 
   yaml_path = g_strdup_printf ("%s/test_data/bad-document.yaml",
@@ -92,9 +92,10 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
   g_clear_pointer (&yaml_path, g_free);
   g_assert_true (result);
   g_assert_null (error);
+  g_assert_nonnull (data);
   g_assert_cmpuint (data->len, ==, 0);
 
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 
   /* Validate the official reference YAML */
   g_info ("Reference YAML v1");
@@ -112,7 +113,7 @@ modulemd_yaml_test_parse_v1_file (YamlFixture *fixture,
       g_object_unref (modules[i]);
     }
   g_clear_pointer (&modules, g_free);
-  g_clear_pointer (&data, g_ptr_array_free);
+  g_clear_pointer (&data, g_ptr_array_unref);
 }
 
 static void

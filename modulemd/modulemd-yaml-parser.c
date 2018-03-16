@@ -605,15 +605,13 @@ _simpleset_from_sequence (yaml_parser_t *parser,
       yaml_event_delete (&event);
     }
 
-  *_set = set;
+  *_set = g_object_ref (set);
   result = TRUE;
 
 error:
   yaml_event_delete (&event);
-  if (!result)
-    {
-      g_object_unref (set);
-    }
+  g_object_unref (set);
+
   g_debug ("TRACE: exiting _simpleset_from_sequence");
   return result;
 }

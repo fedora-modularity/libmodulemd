@@ -73,6 +73,7 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
   gboolean result = FALSE;
   gboolean done = FALSE;
   yaml_event_t event;
+  yaml_event_t value_event;
   GVariantDict *dict = NULL;
   GVariant *value = NULL;
   gchar *key = NULL;
@@ -100,13 +101,13 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
           key = g_strdup ((const gchar *)event.data.scalar.value);
 
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-            parser, &event, error, "Parser error");
+            parser, &value_event, error, "Parser error");
 
-          switch (event.type)
+          switch (value_event.type)
             {
             case YAML_SCALAR_EVENT:
               value = mmd_variant_from_scalar (
-                (const gchar *)event.data.scalar.value);
+                (const gchar *)value_event.data.scalar.value);
               break;
 
             case YAML_MAPPING_START_EVENT:
@@ -131,6 +132,8 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
                                      "Unexpected YAML event in raw mapping");
               break;
             }
+
+          yaml_event_delete (&value_event);
           g_variant_dict_insert_value (dict, key, value);
           g_clear_pointer (&key, g_free);
 
@@ -142,12 +145,16 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
                                  "Unexpected YAML event in raw mapping");
           break;
         }
+
+      yaml_event_delete (&event);
     }
 
 
   *variant = g_variant_dict_end (dict);
   result = TRUE;
 error:
+  yaml_event_delete (&event);
+  yaml_event_delete (&value_event);
   g_free (key);
   g_variant_dict_unref (dict);
 
@@ -210,6 +217,8 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
           break;
         }
 
+      yaml_event_delete (&event);
+
       if (!done)
         {
           count++;
@@ -223,6 +232,7 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 
   result = TRUE;
 error:
+  yaml_event_delete (&event);
   g_free (array);
   g_free (key);
 

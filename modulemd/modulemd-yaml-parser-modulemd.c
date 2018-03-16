@@ -246,6 +246,10 @@ _parse_modulemd (yaml_parser_t *parser,
   *object = (GObject *)module;
 
 error:
+  if (!result)
+    {
+      g_clear_pointer (&module, g_object_unref);
+    }
   yaml_event_delete (&event);
   yaml_event_delete (&value_event);
 

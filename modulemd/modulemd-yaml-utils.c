@@ -226,6 +226,8 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
           array[count - 1] = value;
           value = NULL;
         }
+
+      yaml_event_delete (&event);
     }
 
   *variant = g_variant_new_array (G_VARIANT_TYPE_VARIANT, array, count);

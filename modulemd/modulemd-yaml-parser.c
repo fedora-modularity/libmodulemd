@@ -78,14 +78,12 @@ parse_yaml_file (const gchar *path, GPtrArray **data, GError **error)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
-      goto error;
     }
 
   if (!path)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "Path not supplied.");
-      goto error;
     }
 
   yaml_parser_initialize (&parser);
@@ -133,14 +131,12 @@ parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
-      goto error;
     }
 
   if (!yaml)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "String not supplied.");
-      goto error;
     }
 
   yaml_parser_initialize (&parser);

@@ -193,7 +193,8 @@ modulemd_yaml_test_v2_load (YamlFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (modules);
   g_assert_nonnull (modules[0]);
   g_assert_nonnull (modules[1]);
-  g_assert_null (modules[2]);
+  g_assert_nonnull (modules[2]);
+  g_assert_null (modules[3]);
 
   /* Copy this module */
   copy = modulemd_module_copy (modules[0]);

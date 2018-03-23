@@ -91,4 +91,6 @@ modulemd_component_rpm_peek_repository (ModulemdComponentRpm *self);
 gchar *
 modulemd_component_rpm_dup_repository (ModulemdComponentRpm *self);
 
+G_END_DECLS
+
 #endif /* MODULEMD_COMPONENT_RPM_H */

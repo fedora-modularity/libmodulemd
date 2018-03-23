@@ -29,6 +29,8 @@
 #include <yaml.h>
 #include "modulemd.h"
 
+G_BEGIN_DECLS
+
 #define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
 GQuark
 modulemd_yaml_error_quark (void);
@@ -280,4 +282,6 @@ _emit_defaults (yaml_emitter_t *emitter,
                 ModulemdDefaults *defaults,
                 GError **error);
 
-#endif
+G_END_DECLS
+
+#endif /* MODULEMD_YAML_H */

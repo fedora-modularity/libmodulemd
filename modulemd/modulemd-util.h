@@ -22,7 +22,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef MODULEMD_UTIL_H
+#define MODULEMD_UTIL_H
+
 #include "modulemd.h"
+
+G_BEGIN_DECLS
 
 GHashTable *
 _modulemd_hash_table_deep_str_copy (GHashTable *orig);
@@ -41,3 +46,7 @@ _modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
 
 void
 modulemd_variant_unref (void *ptr);
+
+G_END_DECLS
+
+#endif /* MODULEMD_UTIL_H */

@@ -63,4 +63,6 @@ modulemd_component_module_peek_repository (ModulemdComponentModule *self);
 gchar *
 modulemd_component_module_dup_repository (ModulemdComponentModule *self);
 
+G_END_DECLS
+
 #endif /* MODULEMD_COMPONENT_MODULE_H */

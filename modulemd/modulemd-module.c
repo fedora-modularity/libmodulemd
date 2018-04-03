@@ -3673,7 +3673,7 @@ modulemd_module_dumps (ModulemdModule *self)
 
 /**
  * modulemd_module_dump_all:
- * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer none):
+ * @module_array: (array zero-terminated=1) (element-type GObject) (transfer none):
  * A zero-terminated array of modules to be output
  *
  * This function writes out a file containing one or more YAML documents
@@ -3695,7 +3695,7 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
 
 /**
  * modulemd_module_dumps_all:
- * @module_array: (array zero-terminated=1) (element-type ModulemdModule) (transfer none):
+ * @module_array: (array zero-terminated=1) (element-type GObject) (transfer none):
  * A zero-terminated array of modules to be output
  *
  * This function returns an allocated string containing one or more YAML

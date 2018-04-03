@@ -77,6 +77,13 @@ emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
             }
         }
+      else if (G_OBJECT_TYPE (object) == MODULEMD_TYPE_DEFAULTS)
+        {
+          if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit defaults YAML");
+            }
+        }
     }
 
   yaml_stream_end_event_initialize (&event);

@@ -3463,7 +3463,7 @@ modulemd_module_new_from_file (const gchar *yaml_file)
 /**
  * modulemd_module_new_all_from_file:
  * @yaml_file: A YAML file containing the module metadata.
- * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer full):
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a file.
@@ -3494,7 +3494,7 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
 /**
  * modulemd_module_new_all_from_file_ext:
  * @yaml_file: A YAML file containing the module metadata.
- * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer full):
+ * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer container):
  * A #GPtrArray of objects read from the YAML stream.
  *
  * Allocates a #GPtrArray of various supported subdocuments from a file.
@@ -3564,7 +3564,7 @@ modulemd_module_new_from_string (const gchar *yaml_string)
 /**
  * modulemd_module_new_all_from_string:
  * @yaml_string: A YAML string containing the module metadata.
- * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer full):
+ * @_modules: (out) (array zero-terminated=1) (element-type ModulemdModule) (transfer container):
  * A zero-terminated array of modules contained in this document.
  *
  * Allocates a list of new #ModulemdModule from a string.
@@ -3595,7 +3595,7 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
 /**
  * modulemd_module_new_all_from_string_ext:
  * @yaml_string: A YAML string containing the module metadata.
- * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer full):
+ * @data: (out) (array zero-terminated=1) (element-type GObject) (transfer container):
  * A #GPtrArray of objects read from the YAML stream.
  *
  * Allocates a #GPtrArray of various supported subdocuments from a file.

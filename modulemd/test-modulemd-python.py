@@ -54,5 +54,13 @@ class TestIssues(unittest.TestCase):
         assert mmd2.peek_rpm_buildopts() != {}
         assert mmd2.peek_rpm_buildopts()['macros'] == '%my_macro 1'
 
+    def test_issue33(self):
+        # We had a bug where this was returning an array as (transfer full)
+        # instead of (transfer container) which resulted in the GI python
+        # double-freeing memory.
+        defs = Modulemd.Module.new_all_from_file_ext(
+            "%s/mod-defaults/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+        print (defs)
+
 if __name__ == '__main__':
     unittest.main()

@@ -122,7 +122,8 @@ _emit_defaults_root (yaml_emitter_t *emitter,
         }
     }
 
-  if (!(g_hash_table_contains (profile_defaults, default_stream)))
+  if (default_stream &&
+      !(g_hash_table_contains (profile_defaults, default_stream)))
     {
       /* Profile defaults are missing the default stream */
       MMD_YAML_EMITTER_ERROR_RETURN (
@@ -197,10 +198,14 @@ _emit_defaults_data (yaml_emitter_t *emitter,
 
 
   /* Module default stream */
-  name = g_strdup ("stream");
   value = modulemd_defaults_dup_default_stream (defaults);
+  if (value)
+    {
+      name = g_strdup ("stream");
 
-  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
 
 
   /* Profile Defaults */

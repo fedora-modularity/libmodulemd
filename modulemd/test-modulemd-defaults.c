@@ -321,6 +321,66 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
 
 
 static void
+modulemd_defaults_test_good_ex4 (DefaultsFixture *fixture,
+                                 gconstpointer user_data)
+{
+  gboolean result = FALSE;
+  gchar *yaml_path = NULL;
+  GPtrArray *objects = NULL;
+  GObject *object = NULL;
+  ModulemdDefaults *defaults = NULL;
+  GHashTable *profile_defaults = NULL;
+  ModulemdSimpleSet *set = NULL;
+  GError *error = NULL;
+  gchar *yaml_string = NULL;
+  const gchar *module_name = "httpd";
+  const gchar *default_stream = NULL;
+
+  yaml_path = g_strdup_printf ("%s/mod-defaults/ex4.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  result = parse_yaml_file (yaml_path, &objects, &error);
+  g_free (yaml_path);
+  g_assert_true (result);
+
+  g_assert_cmpint (objects->len, ==, 1);
+
+  object = g_ptr_array_index (objects, 0);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_DEFAULTS (object));
+
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (objects, 0));
+
+  g_assert_cmpint (
+    modulemd_defaults_peek_version (defaults), ==, MD_DEFAULTS_VERSION_1);
+
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, module_name);
+
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, default_stream);
+
+  profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_nonnull (profile_defaults);
+
+  set = g_hash_table_lookup (profile_defaults, "2.6");
+  g_assert_nonnull (set);
+  g_assert_true (modulemd_simpleset_contains (set, "client"));
+  g_assert_true (modulemd_simpleset_contains (set, "server"));
+
+
+  /* Test emitting the YAML back out */
+  modulemd_defaults_dumps (defaults, &yaml_string);
+  g_assert_nonnull (yaml_string);
+  g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  g_clear_pointer (&yaml_string, g_free);
+  g_clear_pointer (&objects, g_ptr_array_unref);
+}
+
+
+static void
 modulemd_defaults_test_missing_default_from_profile (DefaultsFixture *fixture,
                                                      gconstpointer user_data)
 {
@@ -371,6 +431,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_defaults_test_good_ex3,
+              NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_defaults_test_good_examples/ex4",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_defaults_test_good_ex4,
               NULL);
 
   g_test_add (

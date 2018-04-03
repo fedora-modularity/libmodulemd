@@ -81,7 +81,8 @@ emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
         {
           if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit defaults YAML");
+              MMD_YAML_ERROR_RETURN_RETHROW (error,
+                                             "Could not emit defaults YAML");
             }
         }
     }

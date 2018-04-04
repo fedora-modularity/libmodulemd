@@ -26,6 +26,12 @@
 #include "modulemd-simpleset.h"
 #include "modulemd-yaml.h"
 
+GQuark
+modulemd_defaults_error_quark (void)
+{
+  return g_quark_from_static_string ("modulemd-defaults-error-quark");
+}
+
 struct _ModulemdDefaults
 {
   GObject parent_instance;
@@ -407,6 +413,114 @@ modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self)
     }
 
   return new;
+}
+
+
+/**
+ * modulemd_defaults_new_from_file:
+ * @yaml_file: A YAML file containing the module metadata and other related
+ * information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.2
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error)
+{
+  GObject *object = NULL;
+  GPtrArray *data = NULL;
+  ModulemdDefaults *defaults = NULL;
+
+  if (!parse_yaml_file (yaml_file, &data, error))
+    {
+      return NULL;
+    }
+
+  for (gsize i = 0; i < data->len; i++)
+    {
+      object = g_ptr_array_index (data, i);
+      if (MODULEMD_IS_DEFAULTS (object))
+        {
+          defaults = MODULEMD_DEFAULTS (g_object_ref (object));
+          break;
+        }
+    }
+
+  if (!defaults)
+    {
+      g_set_error (error,
+                   MODULEMD_DEFAULTS_ERROR,
+                   MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT,
+                   "Provided YAML file contained no valid defaults objects");
+    }
+
+  g_clear_pointer (&data, g_ptr_array_unref);
+
+  return defaults;
+}
+
+
+/**
+ * modulemd_defaults_new_from_string:
+ * @yaml_string: A YAML string containing the module metadata and other related
+ * information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.2
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error)
+{
+  GObject *object = NULL;
+  GPtrArray *data = NULL;
+  ModulemdDefaults *defaults = NULL;
+
+  if (!parse_yaml_string (yaml_string, &data, error))
+    {
+      return NULL;
+    }
+
+  for (gsize i = 0; i < data->len; i++)
+    {
+      object = g_ptr_array_index (data, i);
+      if (MODULEMD_IS_DEFAULTS (object))
+        {
+          defaults = MODULEMD_DEFAULTS (g_object_ref (object));
+          break;
+        }
+    }
+
+  if (!defaults)
+    {
+      g_set_error (error,
+                   MODULEMD_DEFAULTS_ERROR,
+                   MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT,
+                   "Provided YAML file contained no valid defaults objects");
+    }
+
+  g_clear_pointer (&data, g_ptr_array_unref);
+
+  return defaults;
 }
 
 

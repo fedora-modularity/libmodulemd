@@ -43,6 +43,15 @@ enum
 
 G_BEGIN_DECLS
 
+#define MODULEMD_DEFAULTS_ERROR modulemd_defaults_error_quark ()
+GQuark
+modulemd_defaults_error_quark (void);
+
+enum ModulemdDefaultsError
+{
+  MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT
+};
+
 #define MODULEMD_TYPE_DEFAULTS (modulemd_defaults_get_type ())
 
 G_DECLARE_FINAL_TYPE (
@@ -92,6 +101,13 @@ GHashTable *
 modulemd_defaults_peek_profile_defaults (ModulemdDefaults *self);
 GHashTable *
 modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self);
+
+
+ModulemdDefaults *
+modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error);
+
+ModulemdDefaults *
+modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error);
 
 
 void

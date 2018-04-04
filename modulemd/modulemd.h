@@ -39,6 +39,12 @@ G_BEGIN_DECLS
 #include "modulemd-simpleset.h"
 #include "modulemd-servicelevel.h"
 
+GPtrArray *
+modulemd_objects_from_file (const gchar *yaml_file, GError **error);
+
+GPtrArray *
+modulemd_objects_from_string (const gchar *yaml_string, GError **error);
+
 G_END_DECLS
 
 #endif /* MODULEMD_H */

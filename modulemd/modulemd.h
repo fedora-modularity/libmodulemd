@@ -45,6 +45,12 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error);
 GPtrArray *
 modulemd_objects_from_string (const gchar *yaml_string, GError **error);
 
+void
+modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);
+
+gchar *
+modulemd_dumps (GPtrArray *objects, GError **error);
+
 G_END_DECLS
 
 #endif /* MODULEMD_H */

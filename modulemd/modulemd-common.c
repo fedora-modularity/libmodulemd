@@ -87,3 +87,53 @@ modulemd_objects_from_string (const gchar *yaml_string, GError **error)
 
   return data;
 }
+
+
+/**
+ * modulemd_dump:
+ * @objects: (array zero-terminated=1) (element-type GObject): A #GPtrArray of
+ * modulemd or related objects to dump to YAML.
+ * @yaml_file: The path to the file that should contain the resulting YAML
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Creates a file containing a series of YAML subdocuments, one per object
+ * passed in.
+ *
+ * Since: 1.2
+ */
+void
+modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error)
+{
+  g_return_if_fail (error == NULL || *error == NULL);
+
+  emit_yaml_file (objects, yaml_file, error);
+}
+
+
+/**
+ * modulemd_dumps:
+ * @objects: (array zero-terminated=1) (element-type GObject): A #GPtrArray of
+ * modulemd or related objects to dump to YAML.
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Creates a string containing a series of YAML subdocuments, one per object
+ * passed in. This string must be freed with g_free() when no longer needed.
+ *
+ * Since: 1.2
+ */
+gchar *
+modulemd_dumps (GPtrArray *objects, GError **error)
+{
+  gchar *yaml_string = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  if (!emit_yaml_string (objects, &yaml_string, error))
+    {
+      return NULL;
+    }
+
+  return yaml_string;
+}

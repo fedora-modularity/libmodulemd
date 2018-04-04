@@ -3688,6 +3688,9 @@ modulemd_module_dumps (ModulemdModule *self)
  * generated from the supplied modules.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.2
+ * Use Modulemd.dump() instead.
  */
 void
 modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
@@ -3712,6 +3715,9 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
  * Return value: A string containing a YAML representation of all provided modules.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.2
+ * Use Modulemd.dump() instead.
  */
 gchar *
 modulemd_module_dumps_all (GPtrArray *module_array)

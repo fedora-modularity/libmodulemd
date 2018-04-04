@@ -21,7 +21,7 @@
       </author>
     </authorgroup>
     <copyright>
-      <year>2017</year>
+      <year>2017-2018</year>
       <holder>Stephen Gallagher</holder>
     </copyright>
   </bookinfo>
@@ -33,6 +33,7 @@
         This part documents the Modulemd library.
       </para>
     </partintro>
+    <xi:include href="xml/modulemd.xml"/>
     <xi:include href="xml/modulemd-component.xml"/>
     <xi:include href="xml/modulemd-component-module.xml"/>
     <xi:include href="xml/modulemd-component-rpm.xml"/>

@@ -1,4 +1,5 @@
 modulemd_srcs = [
+    'modulemd-common.c',
     'modulemd-component.c',
     'modulemd-component-module.c',
     'modulemd-component-rpm.c',

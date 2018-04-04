@@ -3469,6 +3469,8 @@ modulemd_module_new_from_file (const gchar *yaml_file)
  * Allocates a list of new #ModulemdModule from a file.
  *
  * Since: 1.0
+ * Deprecated: 1.2
+ * Use Modulemd.objects_from_file() instead
  */
 void
 modulemd_module_new_all_from_file (const gchar *yaml_file,
@@ -3500,6 +3502,8 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
  * Allocates a #GPtrArray of various supported subdocuments from a file.
  *
  * Since: 1.1
+ * Deprecated: 1.2
+ * Use Modulemd.objects_from_file() instead
  */
 void
 modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
@@ -3570,6 +3574,8 @@ modulemd_module_new_from_string (const gchar *yaml_string)
  * Allocates a list of new #ModulemdModule from a string.
  *
  * Since: 1.0
+ * Deprecated: 1.2
+ * Use Modulemd.objects_from_string() instead
  */
 void
 modulemd_module_new_all_from_string (const gchar *yaml_string,
@@ -3601,6 +3607,8 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
  * Allocates a #GPtrArray of various supported subdocuments from a file.
  *
  * Since: 1.1
+ * Deprecated: 1.2
+ * Use Modulemd.objects_from_string() instead
  */
 void
 modulemd_module_new_all_from_string_ext (const gchar *yaml_string,

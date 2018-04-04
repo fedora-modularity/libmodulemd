@@ -37,10 +37,8 @@ static void
 modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
                                  gconstpointer user_data)
 {
-  gboolean result = FALSE;
   gchar *yaml_path = NULL;
   GPtrArray *objects = NULL;
-  GObject *object = NULL;
   ModulemdDefaults *defaults = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
@@ -53,17 +51,9 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  result = parse_yaml_file (yaml_path, &objects, &error);
-  g_free (yaml_path);
-  g_assert_true (result);
-
-  g_assert_cmpint (objects->len, ==, 1);
-
-  object = g_ptr_array_index (objects, 0);
-  g_assert_nonnull (object);
-  g_assert_true (MODULEMD_IS_DEFAULTS (object));
-
-  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (objects, 0));
+  defaults = modulemd_defaults_new_from_file (yaml_path, &error);
+  g_assert_nonnull (defaults);
+  g_assert_null (error);
 
   g_assert_cmpint (
     modulemd_defaults_peek_version (defaults), ==, MD_DEFAULTS_VERSION_1);

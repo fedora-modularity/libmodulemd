@@ -27,8 +27,6 @@
 
 #include <glib.h>
 
-G_BEGIN_DECLS
-
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
@@ -38,6 +36,8 @@ G_BEGIN_DECLS
 #include "modulemd-profile.h"
 #include "modulemd-simpleset.h"
 #include "modulemd-servicelevel.h"
+
+G_BEGIN_DECLS
 
 GPtrArray *
 modulemd_objects_from_file (const gchar *yaml_file, GError **error);

@@ -223,15 +223,15 @@ data:
             xxx:
                 rationale: xxx demonstrates arches and multilib.
                 # xxx is only available on the listed architectures.
-                # TODO: This needs a better definition of what the
-                #       architectures here actually mean.
+                # Includes specific hardware architectures, not families.
+                # See the data.arch field for details.
                 # Optional, defaults to all available arches.
                 arches: [ i686, x86_64 ]
                 # A list of architectures with multilib
                 # installs, i.e. both i686 and x86_64
                 # versions will be installed on x86_64.
-                # TODO: This needs to be reworked or dropped as it's
-                #       not at all useful in the current state.
+                # Includes specific hardware architectures, not families.
+                # See the data.arch field for details.
                 # Optional, defaults to no multilib.
                 multilib: [ x86_64 ]
             xyz:

@@ -374,3 +374,46 @@ modulemd_simpleset_new (void)
 {
   return g_object_new (MODULEMD_TYPE_SIMPLESET, NULL);
 }
+
+/**
+ * modulemd_simpleset_is_equal:
+ * @other: A #ModulemdSimpleSet to compare against
+ *
+ * Returns: True if the sets contain the same strings.
+ *
+ * Since: 1.3
+ */
+gboolean
+modulemd_simpleset_is_equal (ModulemdSimpleSet *self, ModulemdSimpleSet *other)
+{
+  g_auto (GStrv) set_a = NULL;
+  g_auto (GStrv) set_b = NULL;
+  gsize i = 0;
+
+  if (modulemd_simpleset_size (self) != modulemd_simpleset_size (other))
+    {
+      /* If they have a different number of strings in the set, they can't
+       * be identical.
+       */
+      return FALSE;
+    }
+
+  set_a = modulemd_simpleset_dup (self);
+  set_b = modulemd_simpleset_dup (other);
+
+  for (i = 0; set_a[i] && set_b[i]; i++)
+    {
+      /* These are guaranteed to be returned ordered, so we can
+       * assume that any difference at any index means that the
+       * lists are not identical.
+       */
+      if (g_strcmp0 (set_a[i], set_b[i]))
+        {
+          /* No match, so this simpleset is not equal */
+          return FALSE;
+        }
+    }
+
+  /* If we made it here, everything must have matched */
+  return TRUE;
+}

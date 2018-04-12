@@ -56,6 +56,11 @@ modulemd_simpleset_remove (ModulemdSimpleSet *self, const gchar *value);
 
 void
 modulemd_simpleset_copy (ModulemdSimpleSet *self, ModulemdSimpleSet **dest);
+
+gboolean
+modulemd_simpleset_is_equal (ModulemdSimpleSet *self,
+                             ModulemdSimpleSet *other);
+
 G_END_DECLS
 
 #endif /* MODULEMD_SIMPLESET_H */

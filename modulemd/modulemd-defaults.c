@@ -728,3 +728,88 @@ modulemd_defaults_copy (ModulemdDefaults *self)
 
   return new_defaults;
 }
+
+/**
+ * modulemd_defaults_merge:
+ * @first: A #ModulemdDefaults object providing the base for the merge.
+ * @second: A #ModulemdDefaults object being merged onto @first.
+ * @override: In the case of a conflict, should @second completely replace the
+ * contents of @first.
+ *
+ * Returns: (transfer full): A merged or replaced #ModulemdDefaults object. In
+ * case of unresolvable merge, NULL will be returned and an error will be set.
+ * This object must be freed with g_object_unref().
+ *
+ * Since: 1.3
+ */
+ModulemdDefaults *
+modulemd_defaults_merge (ModulemdDefaults *first,
+                         ModulemdDefaults *second,
+                         gboolean override,
+                         GError **error)
+{
+  g_autoptr (ModulemdDefaults) defaults = NULL;
+  GHashTable *profile_defaults = NULL;
+  GHashTableIter iter;
+  gpointer key, value, orig_value;
+
+  if (override)
+    {
+      /* If override is set, then returning a copy of second is the
+       * shortest path
+       */
+      return modulemd_defaults_copy (second);
+    }
+
+  /* First check for incompatibilities with the streams */
+  if (g_strcmp0 (modulemd_defaults_peek_default_stream (first),
+                 modulemd_defaults_peek_default_stream (second)))
+    {
+      /* Default streams don't match and override is not set.
+       * Return an error
+       */
+      g_set_error (
+        error,
+        MODULEMD_DEFAULTS_ERROR,
+        MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS,
+        "Conflicting default streams when merging defaults for module %s",
+        modulemd_defaults_peek_module_name (first));
+      return NULL;
+    }
+
+  defaults = modulemd_defaults_copy (first);
+
+  profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
+
+  g_hash_table_iter_init (&iter,
+                          modulemd_defaults_peek_profile_defaults (second));
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      orig_value = g_hash_table_lookup (profile_defaults, key);
+      if (orig_value)
+        {
+          /* This key already exists in the first defaults object.
+           * Check whether they have identical values
+           */
+          if (!modulemd_simpleset_is_equal (orig_value, value))
+            {
+              g_set_error (error,
+                           MODULEMD_DEFAULTS_ERROR,
+                           MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES,
+                           "Conflicting profile defaults when merging "
+                           "defaults for module %s",
+                           modulemd_defaults_peek_module_name (first));
+              return NULL;
+            }
+        }
+      else
+        {
+          /* This key is new. Add it */
+          g_hash_table_replace (profile_defaults,
+                                g_strdup (key),
+                                g_object_ref (MODULEMD_SIMPLESET (value)));
+        }
+    }
+
+  return g_object_ref (defaults);
+}

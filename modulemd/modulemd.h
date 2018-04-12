@@ -51,6 +51,12 @@ modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);
 gchar *
 modulemd_dumps (GPtrArray *objects, GError **error);
 
+GPtrArray *
+modulemd_merge_defaults (const GPtrArray *first,
+                         const GPtrArray *second,
+                         gboolean override,
+                         GError **error);
+
 G_END_DECLS
 
 #endif /* MODULEMD_H */

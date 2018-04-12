@@ -49,7 +49,9 @@ modulemd_defaults_error_quark (void);
 
 enum ModulemdDefaultsError
 {
-  MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT
+  MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT,
+  MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS,
+  MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES
 };
 
 #define MODULEMD_TYPE_DEFAULTS (modulemd_defaults_get_type ())
@@ -118,6 +120,12 @@ modulemd_defaults_dumps (ModulemdDefaults *self, gchar **yaml_string);
 
 ModulemdDefaults *
 modulemd_defaults_copy (ModulemdDefaults *self);
+
+ModulemdDefaults *
+modulemd_defaults_merge (ModulemdDefaults *first,
+                         ModulemdDefaults *second,
+                         gboolean override,
+                         GError **error);
 
 G_END_DECLS
 

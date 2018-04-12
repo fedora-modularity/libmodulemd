@@ -424,6 +424,151 @@ modulemd_defaults_test_copy (DefaultsFixture *fixture, gconstpointer user_data)
 }
 
 
+static void
+modulemd_defaults_test_merging (DefaultsFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) override_objects = NULL;
+  g_autoptr (GPtrArray) merged_base = NULL;
+  g_autoptr (GPtrArray) overridden = NULL;
+  ModulemdDefaults *defaults = NULL;
+  GError *error = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/defaults/merging-base.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  objects = modulemd_objects_from_file (yaml_path, &error);
+  g_clear_pointer (&yaml_path, g_free);
+  g_assert_nonnull (objects);
+  g_assert_cmpint (objects->len, ==, 6);
+
+  merged_base = modulemd_merge_defaults (objects, NULL, FALSE, &error);
+  if (!merged_base)
+    {
+      fprintf (stderr, "Error merging defaults: %s\n", error->message);
+    }
+  g_assert_nonnull (merged_base);
+  g_assert_cmpint (merged_base->len, ==, 3);
+
+  /* They should be in alphabetical order now */
+
+  /* HTTPD */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_base, 0));
+  g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "2.2");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    1);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "2.2"));
+
+  /* NODEJS */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_base, 1));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "8.0");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    3);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "6.0"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "8.0"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "9.0"));
+
+  /* POSTGRESQL */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_base, 2));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    2);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "8.1"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "8.2"));
+
+
+  /* Now test overriding with a higher-priority repo */
+
+  yaml_path = g_strdup_printf ("%s/test_data/defaults/overriding.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  override_objects = modulemd_objects_from_file (yaml_path, &error);
+  g_clear_pointer (&yaml_path, g_free);
+  g_assert_nonnull (override_objects);
+  g_assert_cmpint (override_objects->len, ==, 3);
+
+  overridden =
+    modulemd_merge_defaults (merged_base, override_objects, TRUE, &error);
+  if (!overridden)
+    {
+      fprintf (stderr, "Error merging defaults: %s\n", error->message);
+    }
+  g_assert_nonnull (overridden);
+  g_assert_cmpint (overridden->len, ==, 3);
+
+
+  /* They should be in alphabetical order now */
+
+  /* HTTPD */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (overridden, 0));
+  g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    2);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "2.2"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "2.4"));
+
+  /* NODEJS */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (overridden, 1));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "9.0");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    3);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "6.0"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "8.0"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "9.0"));
+
+  /* POSTGRESQL */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (overridden, 2));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    1);
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "8.1"));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -468,6 +613,13 @@ main (int argc, char *argv[])
               modulemd_defaults_test_copy,
               NULL);
 
+
+  g_test_add ("/modulemd/defaults/modulemd_defaults_test_merging",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_defaults_test_merging,
+              NULL);
 
   g_test_add (
     "/modulemd/defaults/modulemd_defaults_test_bad_examples/"

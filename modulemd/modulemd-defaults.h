@@ -116,6 +116,9 @@ modulemd_defaults_dump (ModulemdDefaults *self, const gchar *file_path);
 void
 modulemd_defaults_dumps (ModulemdDefaults *self, gchar **yaml_string);
 
+ModulemdDefaults *
+modulemd_defaults_copy (ModulemdDefaults *self);
+
 G_END_DECLS
 
 #endif /* MODULEMD_DEFAULTS_H */

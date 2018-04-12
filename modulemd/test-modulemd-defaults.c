@@ -393,6 +393,37 @@ modulemd_defaults_test_missing_default_from_profile (DefaultsFixture *fixture,
 }
 
 
+static void
+modulemd_defaults_test_copy (DefaultsFixture *fixture, gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  GError *error = NULL;
+  g_autoptr (ModulemdDefaults) orig = NULL;
+  g_autoptr (ModulemdDefaults) copy = NULL;
+
+  yaml_path = g_strdup_printf ("%s/mod-defaults/spec.v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+  orig = modulemd_defaults_new_from_file (yaml_path, &error);
+
+  copy = modulemd_defaults_copy (orig);
+  g_assert_nonnull (copy);
+
+  g_assert_cmpstr (modulemd_defaults_peek_module_name (orig),
+                   ==,
+                   modulemd_defaults_peek_module_name (copy));
+
+  g_assert_cmpstr (modulemd_defaults_peek_default_stream (orig),
+                   ==,
+                   modulemd_defaults_peek_default_stream (copy));
+
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (orig)),
+    ==,
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (copy)));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -429,6 +460,14 @@ main (int argc, char *argv[])
               NULL,
               modulemd_defaults_test_good_ex4,
               NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_defaults_test_copy",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_defaults_test_copy,
+              NULL);
+
 
   g_test_add (
     "/modulemd/defaults/modulemd_defaults_test_bad_examples/"

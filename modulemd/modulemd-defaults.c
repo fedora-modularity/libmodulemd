@@ -701,3 +701,30 @@ modulemd_defaults_init (ModulemdDefaults *self)
   self->profile_defaults =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 }
+
+
+/**
+ * modulemd_defaults_copy:
+ * Returns a deep-copy of the defaults object.
+ *
+ * Returns: (transfer full): A deep-copied #ModulemdDefaults object. This
+ * object must be freed with g_object_unref().
+ *
+ * Since: 1.3
+ */
+ModulemdDefaults *
+modulemd_defaults_copy (ModulemdDefaults *self)
+{
+  ModulemdDefaults *new_defaults = modulemd_defaults_new ();
+
+  modulemd_defaults_set_version (new_defaults,
+                                 modulemd_defaults_peek_version (self));
+  modulemd_defaults_set_module_name (
+    new_defaults, modulemd_defaults_peek_module_name (self));
+  modulemd_defaults_set_default_stream (
+    new_defaults, modulemd_defaults_peek_default_stream (self));
+  modulemd_defaults_set_profile_defaults (
+    new_defaults, modulemd_defaults_peek_profile_defaults (self));
+
+  return new_defaults;
+}

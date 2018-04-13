@@ -39,9 +39,9 @@ static void
 modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
                                  gconstpointer user_data)
 {
-  gchar *yaml_path = NULL;
+  g_autofree gchar *yaml_path = NULL;
   GPtrArray *objects = NULL;
-  ModulemdDefaults *defaults = NULL;
+  g_autoptr (ModulemdDefaults) defaults = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;

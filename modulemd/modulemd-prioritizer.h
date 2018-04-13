@@ -1,6 +1,6 @@
-/* modulemd.h
+/* modulemd-prioritizer.h
  *
- * Copyright (C) 2017 Stephen Gallagher
+ * Copyright (C) 2018 Stephen Gallagher
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,42 +22,30 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef MODULEMD_H
-#define MODULEMD_H
+#ifndef MODULEMD_PRIORITIZER_H
+#define MODULEMD_PRIORITIZER_H
 
-#include <glib.h>
-
-#include "modulemd-component.h"
-#include "modulemd-component-module.h"
-#include "modulemd-component-rpm.h"
-#include "modulemd-defaults.h"
-#include "modulemd-dependencies.h"
-#include "modulemd-module.h"
-#include "modulemd-prioritizer.h"
-#include "modulemd-profile.h"
-#include "modulemd-simpleset.h"
-#include "modulemd-servicelevel.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-GPtrArray *
-modulemd_objects_from_file (const gchar *yaml_file, GError **error);
+#define MODULEMD_TYPE_PRIORITIZER (modulemd_prioritizer_get_type ())
+
+G_DECLARE_FINAL_TYPE (
+  ModulemdPrioritizer, modulemd_prioritizer, MODULEMD, PRIORITIZER, GObject)
+
+ModulemdPrioritizer *
+modulemd_prioritizer_new (void);
+
+gboolean
+modulemd_prioritizer_add (ModulemdPrioritizer *self,
+                          GPtrArray *objects,
+                          gint64 priority,
+                          GError **error);
 
 GPtrArray *
-modulemd_objects_from_string (const gchar *yaml_string, GError **error);
-
-void
-modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);
-
-gchar *
-modulemd_dumps (GPtrArray *objects, GError **error);
-
-GPtrArray *
-modulemd_merge_defaults (const GPtrArray *first,
-                         const GPtrArray *second,
-                         gboolean override,
-                         GError **error);
+modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error);
 
 G_END_DECLS
 
-#endif /* MODULEMD_H */
+#endif /* MODULEMD_PRIORITIZER_H */

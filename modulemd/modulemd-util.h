@@ -44,6 +44,9 @@ _modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
 GPtrArray *
 _modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
 
+GList *
+_modulemd_ordered_int64_keys (GHashTable *htable);
+
 void
 modulemd_variant_unref (void *ptr);
 

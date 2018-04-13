@@ -114,6 +114,32 @@ _modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func)
   return keys;
 }
 
+static gint
+_modulemd_int64_sort (gconstpointer a, gconstpointer b)
+{
+  gint retval = *(const gint64 *)a - *(const gint64 *)b;
+  return retval;
+}
+
+GList *
+_modulemd_ordered_int64_keys (GHashTable *htable)
+{
+  g_autoptr (GList) hash_keys = NULL;
+  GList *unsorted_keys = NULL;
+  GList *sorted_keys = NULL;
+
+  /* Get the keys from the hash table */
+  hash_keys = g_hash_table_get_keys (htable);
+
+  /* Make a copy of the keys that we can modify */
+  unsorted_keys = g_list_copy (hash_keys);
+
+  /* Sort the keys numerically */
+  sorted_keys = g_list_sort (unsorted_keys, _modulemd_int64_sort);
+
+  return sorted_keys;
+}
+
 void
 modulemd_variant_unref (void *ptr)
 {

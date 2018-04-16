@@ -192,7 +192,7 @@ _emit_defaults_data (yaml_emitter_t *emitter,
 
 
   /* Module name */
-  name = g_strdup ("name");
+  name = g_strdup ("module");
   value = modulemd_defaults_dup_module_name (defaults);
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 

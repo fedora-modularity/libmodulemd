@@ -42,6 +42,7 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   g_autofree gchar *yaml_path = NULL;
   GPtrArray *objects = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
+  g_autoptr (ModulemdDefaults) defaults_reread = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
@@ -80,6 +81,11 @@ modulemd_defaults_test_good_ex1 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
+
   g_clear_pointer (&yaml_string, g_free);
   g_clear_pointer (&objects, g_ptr_array_unref);
 }
@@ -94,6 +100,7 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   GPtrArray *objects = NULL;
   GObject *object = NULL;
   ModulemdDefaults *defaults = NULL;
+  g_autoptr (ModulemdDefaults) defaults_reread = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
@@ -140,6 +147,11 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
+
   g_clear_pointer (&yaml_string, g_free);
 
 
@@ -174,6 +186,11 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
+
   g_clear_pointer (&yaml_string, g_free);
   g_clear_pointer (&objects, g_ptr_array_unref);
 }
@@ -188,6 +205,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   GPtrArray *objects = NULL;
   GObject *object = NULL;
   ModulemdDefaults *defaults = NULL;
+  g_autoptr (ModulemdDefaults) defaults_reread = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
@@ -234,6 +252,11 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
+
   g_clear_pointer (&yaml_string, g_free);
 
 
@@ -269,6 +292,11 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   modulemd_defaults_dumps (defaults, &yaml_string);
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
 
   g_clear_pointer (&yaml_string, g_free);
 
@@ -307,6 +335,11 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
 
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
+
   g_clear_pointer (&yaml_string, g_free);
   g_clear_pointer (&objects, g_ptr_array_unref);
 }
@@ -321,6 +354,7 @@ modulemd_defaults_test_good_ex4 (DefaultsFixture *fixture,
   GPtrArray *objects = NULL;
   GObject *object = NULL;
   ModulemdDefaults *defaults = NULL;
+  g_autoptr (ModulemdDefaults) defaults_reread = NULL;
   GHashTable *profile_defaults = NULL;
   ModulemdSimpleSet *set = NULL;
   GError *error = NULL;
@@ -366,6 +400,11 @@ modulemd_defaults_test_good_ex4 (DefaultsFixture *fixture,
   modulemd_defaults_dumps (defaults, &yaml_string);
   g_assert_nonnull (yaml_string);
   g_debug ("EX1 YAML:\n%s", yaml_string);
+
+  /* Read the YAML back in from the string to ensure the output was valid */
+  defaults_reread = modulemd_defaults_new_from_string (yaml_string, &error);
+  g_assert_nonnull (defaults_reread);
+  g_clear_pointer (&defaults_reread, g_object_unref);
 
   g_clear_pointer (&yaml_string, g_free);
   g_clear_pointer (&objects, g_ptr_array_unref);

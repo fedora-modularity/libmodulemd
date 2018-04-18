@@ -412,29 +412,6 @@ modulemd_defaults_test_good_ex4 (DefaultsFixture *fixture,
 
 
 static void
-modulemd_defaults_test_missing_default_from_profile (DefaultsFixture *fixture,
-                                                     gconstpointer user_data)
-{
-  gboolean result = FALSE;
-  gchar *yaml_path = NULL;
-  GPtrArray *objects = NULL;
-  GError *error = NULL;
-
-  yaml_path =
-    g_strdup_printf ("%s/mod-defaults/bad-missing-default-stream.yaml",
-                     g_getenv ("MESON_SOURCE_ROOT"));
-  g_assert_nonnull (yaml_path);
-
-  result = parse_yaml_file (yaml_path, &objects, &error);
-  g_free (yaml_path);
-  g_assert_true (result);
-
-  g_assert_cmpint (objects->len, ==, 0);
-  g_clear_pointer (&objects, g_ptr_array_unref);
-}
-
-
-static void
 modulemd_defaults_test_copy (DefaultsFixture *fixture, gconstpointer user_data)
 {
   g_autofree gchar *yaml_path = NULL;
@@ -947,15 +924,6 @@ main (int argc, char *argv[])
               NULL,
               modulemd_regressions_issue45,
               NULL);
-
-  g_test_add (
-    "/modulemd/defaults/modulemd_defaults_test_bad_examples/"
-    "default_stream_profile",
-    DefaultsFixture,
-    NULL,
-    NULL,
-    modulemd_defaults_test_missing_default_from_profile,
-    NULL);
 
   return g_test_run ();
 };

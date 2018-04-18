@@ -10,8 +10,6 @@ data:
     # Module profiles indexed by the stream name, optional
     # This is a dictionary of stream names to a list of default profiles to be
     # installed.
-    # You need to specify an entry for at least the default stream, the empty
-    # list is valid.
     profiles:
         'x.y': []
         bar: [baz, snafu]

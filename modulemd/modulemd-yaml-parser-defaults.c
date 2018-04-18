@@ -66,9 +66,7 @@ _parse_defaults (yaml_parser_t *parser,
   gboolean done = FALSE;
   gboolean result = FALSE;
   const gchar *module_name = NULL;
-  const gchar *default_stream = NULL;
   guint64 mdversion;
-  GHashTable *profile_defaults = NULL;
   ModulemdDefaults *defaults = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -182,25 +180,11 @@ _parse_defaults (yaml_parser_t *parser,
    * imported
    */
 
-  /* Ensure that the module name and default stream are set */
+  /* Ensure that the module name is set */
   module_name = modulemd_defaults_peek_module_name (defaults);
   if (!module_name || !(module_name[0]))
     {
       MMD_YAML_ERROR_RETURN (error, "Module name not specified");
-    }
-
-  default_stream = modulemd_defaults_peek_default_stream (defaults);
-  if (default_stream && default_stream[0])
-    {
-      /* Ensure that the default profile is references in the profiles
-       * section
-       */
-      profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
-      if (!g_hash_table_contains (profile_defaults, default_stream))
-        {
-          MMD_YAML_ERROR_RETURN (
-            error, "Default stream missing from profile defaults");
-        }
     }
 
   *object = g_object_ref (G_OBJECT (defaults));

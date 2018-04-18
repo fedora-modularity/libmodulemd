@@ -86,10 +86,6 @@ _emit_defaults_root (yaml_emitter_t *emitter,
   yaml_event_t event;
   guint64 mdversion = modulemd_defaults_peek_version (defaults);
   const gchar *module_name = modulemd_defaults_peek_module_name (defaults);
-  const gchar *default_stream =
-    modulemd_defaults_peek_default_stream (defaults);
-  GHashTable *profile_defaults =
-    modulemd_defaults_peek_profile_defaults (defaults);
   gchar *name = NULL;
   gchar *value = NULL;
 
@@ -107,27 +103,6 @@ _emit_defaults_root (yaml_emitter_t *emitter,
     {
       /* The module name is required and is missing */
       MMD_YAML_EMITTER_ERROR_RETURN (error, "Module name is missing");
-    }
-
-  if (default_stream && !(default_stream[0]))
-    {
-      /* Ensure that the default profile is references in the profiles
-       * section
-       */
-      profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
-      if (!g_hash_table_contains (profile_defaults, default_stream))
-        {
-          MMD_YAML_EMITTER_ERROR_RETURN (
-            error, "Default stream missing from profile defaults");
-        }
-    }
-
-  if (default_stream &&
-      !(g_hash_table_contains (profile_defaults, default_stream)))
-    {
-      /* Profile defaults are missing the default stream */
-      MMD_YAML_EMITTER_ERROR_RETURN (
-        error, "Module default stream is missing from profile defaults");
     }
 
   yaml_mapping_start_event_initialize (

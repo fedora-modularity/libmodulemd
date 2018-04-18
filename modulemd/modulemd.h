@@ -26,6 +26,7 @@
 #define MODULEMD_H
 
 #include <glib.h>
+#include <stdio.h>
 
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
@@ -45,6 +46,9 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error);
 
 GPtrArray *
 modulemd_objects_from_string (const gchar *yaml_string, GError **error);
+
+GPtrArray *
+modulemd_objects_from_stream (FILE *stream, GError **error);
 
 void
 modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);

@@ -48,6 +48,15 @@ enum
 
 G_BEGIN_DECLS
 
+#define MODULEMD_MODULE_ERROR modulemd_module_error_quark ()
+GQuark
+modulemd_module_error_quark (void);
+
+enum ModulemdModuleError
+{
+  MODULEMD_MODULE_ERROR_MISSING_CONTENT,
+};
+
 #define MODULEMD_TYPE_MODULE modulemd_module_get_type ()
 G_DECLARE_FINAL_TYPE (
   ModulemdModule, modulemd_module, MODULEMD, MODULE, GObject)
@@ -76,6 +85,10 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
 void
 modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
                                          GPtrArray **data);
+
+
+ModulemdModule *
+modulemd_module_new_from_stream (FILE *stream, GError **error);
 
 void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file);

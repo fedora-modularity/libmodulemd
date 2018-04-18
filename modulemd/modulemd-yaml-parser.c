@@ -159,6 +159,44 @@ error:
 }
 
 
+gboolean
+parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error)
+{
+  gboolean result = FALSE;
+  yaml_parser_t parser;
+
+  g_debug ("TRACE: entering parse_yaml_file");
+
+  if (error == NULL || *error != NULL)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
+    }
+
+  if (!stream)
+    {
+      MMD_ERROR_RETURN_FULL (
+        error, MODULEMD_YAML_ERROR_PROGRAMMING, "Stream not supplied.");
+    }
+
+  yaml_parser_initialize (&parser);
+
+  yaml_parser_set_input_file (&parser, stream);
+
+  if (!_parse_yaml (&parser, data, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
+    }
+
+  result = TRUE;
+
+error:
+  yaml_parser_delete (&parser);
+  g_debug ("TRACE: exiting parse_yaml_file");
+  return result;
+}
+
+
 static void
 modulemd_subdocument_free (gpointer mem)
 {

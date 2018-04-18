@@ -525,6 +525,58 @@ modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error)
 
 
 /**
+ * modulemd_defaults_new_from_stream:
+ * @stream: A YAML stream containing the module metadata and other related
+ * information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.4
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_stream (FILE *stream, GError **error)
+{
+  GObject *object = NULL;
+  g_autoptr (GPtrArray) data = NULL;
+  ModulemdDefaults *defaults = NULL;
+
+  if (!parse_yaml_stream (stream, &data, error))
+    {
+      return NULL;
+    }
+
+  for (gsize i = 0; i < data->len; i++)
+    {
+      object = g_ptr_array_index (data, i);
+      if (MODULEMD_IS_DEFAULTS (object))
+        {
+          defaults = MODULEMD_DEFAULTS (g_object_ref (object));
+          break;
+        }
+    }
+
+  if (!defaults)
+    {
+      g_set_error (error,
+                   MODULEMD_DEFAULTS_ERROR,
+                   MODULEMD_DEFAULTS_ERROR_MISSING_CONTENT,
+                   "Provided YAML stream contained no valid defaults objects");
+    }
+
+  return defaults;
+}
+
+
+/**
  * modulemd_defaults_dump:
  * @file_path: File path for exporting the YAML representation of this defaults
  * object

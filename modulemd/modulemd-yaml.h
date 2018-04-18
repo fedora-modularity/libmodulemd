@@ -191,6 +191,9 @@ parse_yaml_file (const gchar *path, GPtrArray **data, GError **error);
 gboolean
 parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error);
 
+gboolean
+parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error);
+
 
 gboolean
 emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error);

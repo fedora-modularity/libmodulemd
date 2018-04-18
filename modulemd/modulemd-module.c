@@ -30,6 +30,12 @@
 #include <yaml.h>
 #include <inttypes.h>
 
+GQuark
+modulemd_module_error_quark (void)
+{
+  return g_quark_from_static_string ("modulemd-module-error-quark");
+}
+
 enum
 {
   MD_PROP_0,
@@ -3622,6 +3628,52 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
       g_error_free (error);
       return;
     }
+}
+
+
+/**
+ * modulemd_module_new_from_stream:
+ * @stream: A YAML stream containing the module metadata. If this file
+ * contains more than one module, only the first will be loaded.
+ *
+ * Allocates a new #ModulemdModule from a file.
+ *
+ * Return value: a new #ModulemdModule. When no longer needed, free it with
+ * g_object_unref().
+ *
+ * Since: 1.4
+ */
+ModulemdModule *
+modulemd_module_new_from_stream (FILE *stream, GError **error)
+{
+  GObject *object = NULL;
+  ModulemdModule *module = NULL;
+  g_autoptr (GPtrArray) data = NULL;
+
+  if (!parse_yaml_stream (stream, &data, error))
+    {
+      return NULL;
+    }
+
+  for (gsize i = 0; i < data->len; i++)
+    {
+      object = g_ptr_array_index (data, i);
+      if (MODULEMD_IS_MODULE (object))
+        {
+          module = MODULEMD_MODULE (g_object_ref (object));
+          break;
+        }
+    }
+
+  if (!module)
+    {
+      g_set_error (error,
+                   MODULEMD_MODULE_ERROR,
+                   MODULEMD_MODULE_ERROR_MISSING_CONTENT,
+                   "Provided YAML file contained no valid module objects");
+    }
+
+  return module;
 }
 
 

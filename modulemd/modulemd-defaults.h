@@ -111,6 +111,9 @@ modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error);
 ModulemdDefaults *
 modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error);
 
+ModulemdDefaults *
+modulemd_defaults_new_from_stream (FILE *stream, GError **error);
+
 
 void
 modulemd_defaults_dump (ModulemdDefaults *self, const gchar *file_path);

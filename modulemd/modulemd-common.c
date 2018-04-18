@@ -58,6 +58,38 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error)
   return data;
 }
 
+
+/**
+ * modulemd_objects_from_stream:
+ * @stream: A YAML stream containing the module metadata and other related
+ * information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (array zero-terminated=1) (element-type GObject) (transfer container):
+ * A #GPtrArray of various supported subdocuments from a YAML file. These
+ * subdocuments will all be GObjects and their type can be identified with
+ * G_OBJECT_TYPE(object)
+ *
+ * Since: 1.4
+ */
+GPtrArray *
+modulemd_objects_from_stream (FILE *stream, GError **error)
+{
+  GPtrArray *data = NULL;
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  if (!parse_yaml_stream (stream, &data, error))
+    {
+      return NULL;
+    }
+
+  return data;
+}
+
+
 /**
  * modulemd_objects_from_string:
  * @yaml_string: A YAML string containing the module metadata and other related

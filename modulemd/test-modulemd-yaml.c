@@ -25,6 +25,7 @@
 #include "modulemd-yaml.h"
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <locale.h>
 
 typedef struct _YamlFixture
@@ -327,6 +328,92 @@ modulemd_yaml_test_emit_v2_string (YamlFixture *fixture,
   g_ptr_array_unref (reloaded_modules);
 }
 
+
+static void
+modulemd_yaml_test_v2_stream (YamlFixture *fixture, gconstpointer user_data)
+{
+  gboolean result;
+  ModulemdModule *module = NULL;
+  ModulemdModule *copy = NULL;
+  ModulemdModule **modules = NULL;
+  GPtrArray *data = NULL;
+  gchar *yaml_path = NULL;
+  GError *error = NULL;
+  FILE *stream = NULL;
+
+
+  yaml_path = g_strdup_printf ("%s/test_data/good-v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (stream);
+
+  module = modulemd_module_new_from_stream (stream, &error);
+  g_assert_true (module);
+  g_assert_null (error);
+  g_object_unref (module);
+
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+
+  g_assert_nonnull (modules);
+  g_assert_nonnull (modules[0]);
+  g_assert_nonnull (modules[1]);
+  g_assert_nonnull (modules[2]);
+  g_assert_null (modules[3]);
+
+  /* Copy this module */
+  copy = modulemd_module_copy (modules[0]);
+  g_assert_nonnull (copy);
+  g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 2);
+
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_clear_pointer (&modules, g_free);
+  g_free (yaml_path);
+
+  yaml_path = g_strdup_printf ("%s/test_data/mixed-v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  modulemd_module_new_all_from_file (yaml_path, &modules);
+
+  g_assert_nonnull (modules);
+  g_assert_nonnull (modules[0]);
+  g_assert_nonnull (modules[1]);
+  g_assert_null (modules[2]);
+
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_free (modules);
+  g_free (yaml_path);
+
+
+  /* Validate the official reference YAML */
+  g_info ("Reference YAML v2");
+  yaml_path =
+    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  result = parse_yaml_file (yaml_path, &data, &error);
+  g_free (yaml_path);
+  g_assert_true (result);
+
+  modules = mmd_yaml_dup_modules (data);
+  g_assert_nonnull (modules);
+  for (gsize i = 0; modules[i]; i++)
+    {
+      g_object_unref (modules[i]);
+    }
+
+  g_free (modules);
+  g_clear_pointer (&data, g_ptr_array_unref);
+  g_clear_pointer (&copy, g_object_unref);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -370,6 +457,13 @@ main (int argc, char *argv[])
               NULL,
               modulemd_yaml_set_up,
               modulemd_yaml_test_emit_v2_string,
+              modulemd_yaml_tear_down);
+
+  g_test_add ("/modulemd/yaml/test_v2_stream",
+              YamlFixture,
+              NULL,
+              modulemd_yaml_set_up,
+              modulemd_yaml_test_v2_stream,
               modulemd_yaml_tear_down);
 
   return g_test_run ();

@@ -789,7 +789,41 @@ modulemd_regressions_issue42 (DefaultsFixture *fixture,
   objects = modulemd_prioritizer_resolve (prioritizer, &error);
   g_assert_null (objects);
   g_assert_nonnull (error);
-  g_assert_cmpint (error->code, ==, MODULEMD_PRIORITIZER_NOTHING_TO_PRIORITIZE);
+  g_assert_cmpint (
+    error->code, ==, MODULEMD_PRIORITIZER_NOTHING_TO_PRIORITIZE);
+}
+
+
+static void
+modulemd_regressions_issue45 (DefaultsFixture *fixture,
+                              gconstpointer user_data)
+{
+  gboolean ret;
+  g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_base_path = NULL;
+  prioritizer = modulemd_prioritizer_new ();
+
+  yaml_base_path = g_strdup_printf ("%s/test_data/defaults/merging-base.yaml",
+                                    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_base_path);
+  objects = modulemd_objects_from_file (yaml_base_path, &error);
+
+  ret = modulemd_prioritizer_add (
+    prioritizer, objects, MODULEMD_PRIORITIZER_PRIORITY_MAX + 1, &error);
+  g_assert_false (ret);
+  g_assert_nonnull (error);
+  g_assert_cmpint (
+    error->code, ==, MODULEMD_PRIORITIZER_PRIORITY_OUT_OF_RANGE);
+  g_clear_pointer (&error, g_error_free);
+
+  /* Test that the prioritizer throws an error on a negative priority */
+  ret = modulemd_prioritizer_add (prioritizer, objects, -1, &error);
+  g_assert_false (ret);
+  g_assert_nonnull (error);
+  g_assert_cmpint (
+    error->code, ==, MODULEMD_PRIORITIZER_PRIORITY_OUT_OF_RANGE);
 }
 
 
@@ -857,6 +891,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_regressions_issue42,
+              NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_regressions_issue45",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue45,
               NULL);
 
   g_test_add (

@@ -22,6 +22,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <inttypes.h>
 #include "modulemd.h"
 #include "modulemd-util.h"
 
@@ -88,7 +89,7 @@ modulemd_prioritizer_init (ModulemdPrioritizer *self)
  * module-related objects loaded from a modulemd YAML stream.
  * @priority: The priority of the YAML stream these were loaded from. Items at
  * the same priority level will attempt to merge on conflict. Items at higher
- * priority levels will replace on conflict.
+ * priority levels will replace on conflict. Valid values are 0 - 1000.
  *
  * Returns: TRUE if the objects could be added without generating a conflict at
  * this priority level. If a conflict was detected, this function returns FALSE
@@ -110,6 +111,27 @@ modulemd_prioritizer_add (ModulemdPrioritizer *self,
 
   g_return_val_if_fail (MODULEMD_IS_PRIORITIZER (self), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  if (priority < MODULEMD_PRIORITIZER_PRIORITY_MIN)
+    {
+      g_set_error (error,
+                   MODULEMD_PRIORITIZER_ERROR,
+                   MODULEMD_PRIORITIZER_PRIORITY_OUT_OF_RANGE,
+                   "Priority %" PRIi64 " below the minimum value %d",
+                   priority,
+                   MODULEMD_PRIORITIZER_PRIORITY_MIN);
+      return FALSE;
+    }
+  else if (priority > MODULEMD_PRIORITIZER_PRIORITY_MAX)
+    {
+      g_set_error (error,
+                   MODULEMD_PRIORITIZER_ERROR,
+                   MODULEMD_PRIORITIZER_PRIORITY_OUT_OF_RANGE,
+                   "Priority %" PRIi64 " above the maximum value %d",
+                   priority,
+                   MODULEMD_PRIORITIZER_PRIORITY_MAX);
+      return FALSE;
+    }
 
   prio = g_new0 (gint64, 1);
   *prio = priority;

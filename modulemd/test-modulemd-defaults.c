@@ -776,6 +776,22 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
     modulemd_defaults_peek_profile_defaults (defaults), "8.1"));
 }
 
+static void
+modulemd_regressions_issue42 (DefaultsFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GError) error = NULL;
+  prioritizer = modulemd_prioritizer_new ();
+
+  /* Test that the prioritizer doesn't crash if it resolves zero documents */
+  objects = modulemd_prioritizer_resolve (prioritizer, &error);
+  g_assert_null (objects);
+  g_assert_nonnull (error);
+  g_assert_cmpint (error->code, ==, MODULEMD_PRIORITIZER_NOTHING_TO_PRIORITIZE);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -834,6 +850,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_defaults_test_prioritizer,
+              NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_regressions_issue42",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue42,
               NULL);
 
   g_test_add (

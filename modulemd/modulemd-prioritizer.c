@@ -25,6 +25,12 @@
 #include "modulemd.h"
 #include "modulemd-util.h"
 
+GQuark
+modulemd_prioritizer_error_quark (void)
+{
+  return g_quark_from_static_string ("modulemd-prioritizer-error-quark");
+}
+
 struct _ModulemdPrioritizer
 {
   GObject parent_instance;
@@ -183,6 +189,17 @@ modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
 
   current_level = priority_levels =
     _modulemd_ordered_int64_keys (self->priorities);
+
+  if (!current_level)
+    {
+      /* Nothing has been added to the resolver. */
+      g_set_error (error,
+                   MODULEMD_PRIORITIZER_ERROR,
+                   MODULEMD_PRIORITIZER_NOTHING_TO_PRIORITIZE,
+                   "No module objects have been added to the prioritizer. Use "
+                   "modulemd_prioritizer_add() first.");
+      return NULL;
+    }
 
   current = g_ptr_array_ref (
     g_hash_table_lookup (self->priorities, priority_levels->data));

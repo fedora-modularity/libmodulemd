@@ -29,6 +29,15 @@
 
 G_BEGIN_DECLS
 
+#define MODULEMD_PRIORITIZER_ERROR modulemd_prioritizer_error_quark ()
+GQuark
+modulemd_prioritizer_error_quark (void);
+
+enum ModulemdPrioritizerError
+{
+  MODULEMD_PRIORITIZER_NOTHING_TO_PRIORITIZE
+};
+
 #define MODULEMD_TYPE_PRIORITIZER (modulemd_prioritizer_get_type ())
 
 G_DECLARE_FINAL_TYPE (

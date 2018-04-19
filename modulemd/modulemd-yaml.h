@@ -212,6 +212,9 @@ struct modulemd_yaml_string
 int
 _write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
+void
+modulemd_yaml_string_free (gpointer mem);
+
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,
                         GVariant **variant,

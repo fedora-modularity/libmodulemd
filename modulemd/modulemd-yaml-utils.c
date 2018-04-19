@@ -25,6 +25,16 @@
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 
+void
+modulemd_yaml_string_free (gpointer mem)
+{
+  struct modulemd_yaml_string *yaml_string =
+    (struct modulemd_yaml_string *)mem;
+
+  g_clear_pointer (&yaml_string->str, g_free);
+  g_clear_pointer (&yaml_string, g_free);
+}
+
 int
 _write_yaml_string (void *data, unsigned char *buffer, size_t size)
 {

@@ -188,13 +188,22 @@ ModulemdModule **
 mmd_yaml_dup_modules (GPtrArray *objects);
 
 gboolean
-parse_yaml_file (const gchar *path, GPtrArray **data, GError **error);
+parse_yaml_file (const gchar *path,
+                 GPtrArray **data,
+                 GPtrArray **failures,
+                 GError **error);
 
 gboolean
-parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error);
+parse_yaml_string (const gchar *yaml,
+                   GPtrArray **data,
+                   GPtrArray **failures,
+                   GError **error);
 
 gboolean
-parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error);
+parse_yaml_stream (FILE *stream,
+                   GPtrArray **data,
+                   GPtrArray **failures,
+                   GError **error);
 
 
 gboolean

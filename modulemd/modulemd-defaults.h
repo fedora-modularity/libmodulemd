@@ -109,10 +109,25 @@ ModulemdDefaults *
 modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error);
 
 ModulemdDefaults *
+modulemd_defaults_new_from_file_ext (const gchar *yaml_file,
+                                     GPtrArray **failures,
+                                     GError **error);
+
+ModulemdDefaults *
 modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error);
 
 ModulemdDefaults *
+modulemd_defaults_new_from_string_ext (const gchar *yaml_string,
+                                       GPtrArray **failures,
+                                       GError **error);
+
+ModulemdDefaults *
 modulemd_defaults_new_from_stream (FILE *stream, GError **error);
+
+ModulemdDefaults *
+modulemd_defaults_new_from_stream_ext (FILE *stream,
+                                       GPtrArray **failures,
+                                       GError **error);
 
 
 void

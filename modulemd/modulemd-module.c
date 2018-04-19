@@ -3435,15 +3435,36 @@ modulemd_module_new (void)
 ModulemdModule *
 modulemd_module_new_from_file (const gchar *yaml_file)
 {
-  GError *error = NULL;
+  return modulemd_module_new_from_file_ext (yaml_file, NULL, NULL);
+}
+
+
+/**
+ * modulemd_module_new_from_file_ext:
+ * @yaml_file: A YAML file containing the module metadata. If this file
+ * contains more than one module, only the first will be loaded.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ *
+ * Allocates a new #ModulemdModule from a file.
+ *
+ * Return value: a new #ModulemdModule. When no longer needed, free it with
+ * g_object_unref().
+ *
+ * Since: 1.4
+ */
+ModulemdModule *
+modulemd_module_new_from_file_ext (const gchar *yaml_file,
+                                   GPtrArray **failures,
+                                   GError **error)
+{
   ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
   GPtrArray *data = NULL;
 
-  if (!parse_yaml_file (yaml_file, &data, &error))
+  if (!parse_yaml_file (yaml_file, &data, failures, error))
     {
-      g_debug ("Error parsing YAML: %s", error->message);
-      g_error_free (error);
       return NULL;
     }
 
@@ -3485,7 +3506,7 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
   GError *error = NULL;
   GPtrArray *data = NULL;
 
-  if (!parse_yaml_file (yaml_file, &data, &error))
+  if (!parse_yaml_file (yaml_file, &data, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
@@ -3517,7 +3538,7 @@ modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
 {
   GError *error = NULL;
 
-  if (!parse_yaml_file (yaml_file, data, &error))
+  if (!parse_yaml_file (yaml_file, data, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
@@ -3540,15 +3561,35 @@ modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
 ModulemdModule *
 modulemd_module_new_from_string (const gchar *yaml_string)
 {
-  GError *error = NULL;
+  return modulemd_module_new_from_string_ext (yaml_string, NULL, NULL);
+}
+
+
+/**
+ * modulemd_module_new_from_string_ext:
+ * @yaml_string: A YAML string containing the module metadata. If this string
+ * contains more than one module, only the first will be loaded.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ *
+ * Allocates a new #ModulemdModule from a string.
+ *
+ * Return value: a new #ModulemdModule.
+ *
+ * Since: 1.4
+ */
+ModulemdModule *
+modulemd_module_new_from_string_ext (const gchar *yaml_string,
+                                     GPtrArray **failures,
+                                     GError **error)
+{
   ModulemdModule *module = NULL;
   ModulemdModule **modules = NULL;
   GPtrArray *data = NULL;
 
-  if (!parse_yaml_string (yaml_string, &data, &error))
+  if (!parse_yaml_string (yaml_string, &data, failures, error))
     {
-      g_debug ("Error parsing YAML: %s", error->message);
-      g_error_free (error);
       return NULL;
     }
 
@@ -3571,6 +3612,7 @@ modulemd_module_new_from_string (const gchar *yaml_string)
   return module;
 }
 
+
 /**
  * modulemd_module_new_all_from_string:
  * @yaml_string: A YAML string containing the module metadata.
@@ -3590,7 +3632,7 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
   GError *error = NULL;
   GPtrArray *data = NULL;
 
-  if (!parse_yaml_string (yaml_string, &data, &error))
+  if (!parse_yaml_string (yaml_string, &data, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
@@ -3622,7 +3664,7 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
 {
   GError *error = NULL;
 
-  if (!parse_yaml_string (yaml_string, data, &error))
+  if (!parse_yaml_string (yaml_string, data, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
@@ -3646,11 +3688,35 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
 ModulemdModule *
 modulemd_module_new_from_stream (FILE *stream, GError **error)
 {
+  return modulemd_module_new_from_stream_ext (stream, NULL, error);
+}
+
+
+/**
+ * modulemd_module_new_from_stream_ext:
+ * @stream: A YAML stream containing the module metadata. If this file
+ * contains more than one module, only the first will be loaded.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ *
+ * Allocates a new #ModulemdModule from a file.
+ *
+ * Return value: a new #ModulemdModule. When no longer needed, free it with
+ * g_object_unref().
+ *
+ * Since: 1.4
+ */
+ModulemdModule *
+modulemd_module_new_from_stream_ext (FILE *stream,
+                                     GPtrArray **failures,
+                                     GError **error)
+{
   GObject *object = NULL;
   ModulemdModule *module = NULL;
   g_autoptr (GPtrArray) data = NULL;
 
-  if (!parse_yaml_stream (stream, &data, error))
+  if (!parse_yaml_stream (stream, &data, failures, error))
     {
       return NULL;
     }

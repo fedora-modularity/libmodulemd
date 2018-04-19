@@ -47,10 +47,38 @@
 GPtrArray *
 modulemd_objects_from_file (const gchar *yaml_file, GError **error)
 {
+  return modulemd_objects_from_file_ext (yaml_file, NULL, error);
+}
+
+
+/**
+ * modulemd_objects_from_file_ext:
+ * @yaml_file: A YAML file containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (array zero-terminated=1) (element-type GObject) (transfer container):
+ * A #GPtrArray of various supported subdocuments from a YAML file. These
+ * subdocuments will all be GObjects and their type can be identified with
+ * G_OBJECT_TYPE(object). This array must be freed with g_ptr_array_unref().
+ *
+ * Since: 1.4
+ */
+GPtrArray *
+modulemd_objects_from_file_ext (const gchar *yaml_file,
+                                GPtrArray **failures,
+                                GError **error)
+{
   GPtrArray *data = NULL;
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!parse_yaml_file (yaml_file, &data, error))
+  if (!parse_yaml_file (yaml_file, &data, failures, error))
     {
       return NULL;
     }
@@ -78,10 +106,38 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error)
 GPtrArray *
 modulemd_objects_from_stream (FILE *stream, GError **error)
 {
+  return modulemd_objects_from_stream_ext (stream, NULL, error);
+}
+
+
+/**
+ * modulemd_objects_from_stream_ext:
+ * @stream: A YAML stream containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (array zero-terminated=1) (element-type GObject) (transfer container):
+ * A #GPtrArray of various supported subdocuments from a YAML file. These
+ * subdocuments will all be GObjects and their type can be identified with
+ * G_OBJECT_TYPE(object)
+ *
+ * Since: 1.4
+ */
+GPtrArray *
+modulemd_objects_from_stream_ext (FILE *stream,
+                                  GPtrArray **failures,
+                                  GError **error)
+{
   GPtrArray *data = NULL;
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!parse_yaml_stream (stream, &data, error))
+  if (!parse_yaml_stream (stream, &data, failures, error))
     {
       return NULL;
     }
@@ -109,10 +165,38 @@ modulemd_objects_from_stream (FILE *stream, GError **error)
 GPtrArray *
 modulemd_objects_from_string (const gchar *yaml_string, GError **error)
 {
+  return modulemd_objects_from_string_ext (yaml_string, NULL, error);
+}
+
+
+/**
+ * modulemd_objects_from_string_ext:
+ * @yaml_string: A YAML string containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (array zero-terminated=1) (element-type GObject) (transfer container):
+ * A #GPtrArray of various supported subdocuments from a YAML file. These
+ * subdocuments will all be GObjects and their type can be identified with
+ * G_OBJECT_TYPE(object)
+ *
+ * Since: 1.4
+ */
+GPtrArray *
+modulemd_objects_from_string_ext (const gchar *yaml_string,
+                                  GPtrArray **failures,
+                                  GError **error)
+{
   GPtrArray *data = NULL;
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!parse_yaml_string (yaml_string, &data, error))
+  if (!parse_yaml_string (yaml_string, &data, failures, error))
     {
       return NULL;
     }

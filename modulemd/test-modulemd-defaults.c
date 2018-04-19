@@ -112,7 +112,7 @@ modulemd_defaults_test_good_ex2 (DefaultsFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  result = parse_yaml_file (yaml_path, &objects, &error);
+  result = parse_yaml_file (yaml_path, &objects, NULL, &error);
   g_free (yaml_path);
   g_assert_true (result);
 
@@ -217,7 +217,7 @@ modulemd_defaults_test_good_ex3 (DefaultsFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  result = parse_yaml_file (yaml_path, &objects, &error);
+  result = parse_yaml_file (yaml_path, &objects, NULL, &error);
   g_free (yaml_path);
   g_assert_true (result);
 
@@ -366,7 +366,7 @@ modulemd_defaults_test_good_ex4 (DefaultsFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  result = parse_yaml_file (yaml_path, &objects, &error);
+  result = parse_yaml_file (yaml_path, &objects, NULL, &error);
   g_free (yaml_path);
   g_assert_true (result);
 

@@ -30,6 +30,7 @@
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
+#include "modulemd-subdocument-private.h"
 
 GQuark
 modulemd_yaml_error_quark (void)
@@ -38,26 +39,17 @@ modulemd_yaml_error_quark (void)
 }
 
 
-struct yaml_subdocument
-{
-  GType type;
-  guint64 version;
-  char *yaml;
-};
-
+static gboolean
+_parse_yaml (yaml_parser_t *parser,
+             GPtrArray **data,
+             GPtrArray **failures,
+             GError **error);
 
 static gboolean
-_parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error);
+_read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument);
 
 static gboolean
-_read_yaml_and_type (yaml_parser_t *parser,
-                     gchar **yaml,
-                     GType *type,
-                     guint64 *version,
-                     GError **error);
-
-static gboolean
-_parse_subdocument (struct yaml_subdocument *subdocument,
+_parse_subdocument (ModulemdSubdocument *subdocument,
                     ModulemdParsingFunc parse_func,
                     GObject **data,
                     guint64 version,
@@ -65,7 +57,10 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
 
 
 gboolean
-parse_yaml_file (const gchar *path, GPtrArray **data, GError **error)
+parse_yaml_file (const gchar *path,
+                 GPtrArray **data,
+                 GPtrArray **failures,
+                 GError **error)
 {
   gboolean result = FALSE;
   FILE *yaml_file = NULL;
@@ -101,7 +96,7 @@ parse_yaml_file (const gchar *path, GPtrArray **data, GError **error)
 
   yaml_parser_set_input_file (&parser, yaml_file);
 
-  if (!_parse_yaml (&parser, data, error))
+  if (!_parse_yaml (&parser, data, failures, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
     }
@@ -119,7 +114,10 @@ error:
 }
 
 gboolean
-parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error)
+parse_yaml_string (const gchar *yaml,
+                   GPtrArray **data,
+                   GPtrArray **failures,
+                   GError **error)
 {
   gboolean result = FALSE;
   yaml_parser_t parser;
@@ -143,7 +141,7 @@ parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error)
   yaml_parser_set_input_string (
     &parser, (const unsigned char *)yaml, strlen (yaml));
 
-  if (!_parse_yaml (&parser, data, error))
+  if (!_parse_yaml (&parser, data, failures, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
     }
@@ -159,7 +157,10 @@ error:
 
 
 gboolean
-parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error)
+parse_yaml_stream (FILE *stream,
+                   GPtrArray **data,
+                   GPtrArray **failures,
+                   GError **error)
 {
   gboolean result = FALSE;
   yaml_parser_t parser;
@@ -182,7 +183,7 @@ parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error)
 
   yaml_parser_set_input_file (&parser, stream);
 
-  if (!_parse_yaml (&parser, data, error))
+  if (!_parse_yaml (&parser, data, failures, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse YAML");
     }
@@ -196,31 +197,31 @@ error:
 }
 
 
-static void
-modulemd_subdocument_free (gpointer mem)
-{
-  struct yaml_subdocument *document = (struct yaml_subdocument *)mem;
-  g_clear_pointer (&document->yaml, g_free);
-  g_free (document);
-}
-
-
 static gboolean
-_parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
+_parse_yaml (yaml_parser_t *parser,
+             GPtrArray **data,
+             GPtrArray **failures,
+             GError **error)
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
   yaml_event_t event;
-  struct yaml_subdocument *document = NULL;
-  GPtrArray *subdocuments = NULL;
-  GPtrArray *objects = NULL;
+  g_autoptr (GPtrArray) subdocuments = NULL;
+  g_autoptr (GPtrArray) failed_subdocuments = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (ModulemdSubdocument) document = NULL;
+  ModulemdSubdocument *subdocument = NULL;
+  g_autoptr (GError) subdocument_error = NULL;
+
   GObject *object = NULL;
+
   g_debug ("TRACE: entering _parse_yaml");
 
   /* Read through the complete stream once, separating subdocuments and
    * identifying their types
    */
-  subdocuments = g_ptr_array_new_full (1, modulemd_subdocument_free);
+  subdocuments = g_ptr_array_new_full (1, g_object_unref);
+  failed_subdocuments = g_ptr_array_new_with_free_func (g_object_unref);
   objects = g_ptr_array_new_full (1, g_object_unref);
 
   while (!done)
@@ -240,30 +241,31 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
           break;
 
         case YAML_DOCUMENT_START_EVENT:
-          /* New document to process */
-          document = g_new0 (struct yaml_subdocument, 1);
-
-          if (!_read_yaml_and_type (parser,
-                                    &document->yaml,
-                                    &document->type,
-                                    &document->version,
-                                    error))
+          if (!_read_yaml_and_type (parser, &document))
             {
-              modulemd_subdocument_free (document);
+              g_ptr_array_add (failed_subdocuments, g_object_ref (document));
+
+              if (error)
+                {
+                  *error =
+                    g_error_copy (modulemd_subdocument_get_gerror (document));
+                }
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Parse error during preprocessing");
             }
 
           /* Add all valid documents to the list */
-          if (document->type != G_TYPE_INVALID)
+          if (modulemd_subdocument_get_doctype (document) != G_TYPE_INVALID)
             {
-              g_ptr_array_add (subdocuments, document);
+              g_ptr_array_add (subdocuments, g_object_ref (document));
             }
           else
             {
-              modulemd_subdocument_free (document);
+              /* Any documents we're skipping should also go into this list */
+              g_ptr_array_add (failed_subdocuments, g_object_ref (document));
             }
-          document = NULL;
+
+          g_clear_pointer (&document, g_object_unref);
           break;
 
         default:
@@ -279,17 +281,27 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
   /* Iterate through the subdocuments and process them by type */
   for (gsize i = 0; i < subdocuments->len; i++)
     {
-      document = g_ptr_array_index (subdocuments, i);
-      if (document->type == MODULEMD_TYPE_MODULE)
+      subdocument = g_ptr_array_index (subdocuments, i);
+      if (modulemd_subdocument_get_doctype (subdocument) ==
+          MODULEMD_TYPE_MODULE)
         {
-          result = _parse_subdocument (
-            document, _parse_modulemd, &object, document->version, error);
+          result =
+            _parse_subdocument (subdocument,
+                                _parse_modulemd,
+                                &object,
+                                modulemd_subdocument_get_version (subdocument),
+                                &subdocument_error);
         }
       /* Parsers for other types go here */
-      else if (document->type == MODULEMD_TYPE_DEFAULTS)
+      else if (modulemd_subdocument_get_doctype (subdocument) ==
+               MODULEMD_TYPE_DEFAULTS)
         {
-          result = _parse_subdocument (
-            document, _parse_defaults, &object, document->version, error);
+          result =
+            _parse_subdocument (subdocument,
+                                _parse_defaults,
+                                &object,
+                                modulemd_subdocument_get_version (subdocument),
+                                &subdocument_error);
         }
       /* else if (document->type == <...>) */
       else
@@ -308,12 +320,12 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
         }
       else
         {
-          if ((*error)->code == MODULEMD_YAML_ERROR_UNPARSEABLE)
-            {
-              MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                             "Error processing subdocuments");
-            }
-          g_debug ("Invalid document [%s]. Skipping it.", (*error)->message);
+          modulemd_subdocument_set_gerror (subdocument, subdocument_error);
+          g_clear_error (&subdocument_error);
+
+          g_ptr_array_add (failed_subdocuments, g_object_ref (subdocument));
+
+          g_debug ("Skipping invalid document");
           g_clear_error (error);
         }
     }
@@ -322,36 +334,36 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
     {
       *data = g_ptr_array_ref (objects);
     }
+
   result = TRUE;
 
 error:
-  g_clear_pointer (&objects, g_ptr_array_unref);
-  g_clear_pointer (&subdocuments, g_ptr_array_unref);
+  if (failures)
+    {
+      *failures = g_ptr_array_ref (failed_subdocuments);
+    }
 
   return result;
 }
 
 
 static gboolean
-_read_yaml_and_type (yaml_parser_t *parser,
-                     gchar **yaml,
-                     GType *type,
-                     guint64 *version,
-                     GError **error)
+_read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
 {
+  g_autoptr (ModulemdSubdocument) document = NULL;
+  g_autoptr (GError) error = NULL;
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean finish_invalid_document = FALSE;
   gsize depth = 0;
-  struct modulemd_yaml_string *yaml_string = NULL;
+  g_autofree struct modulemd_yaml_string *yaml_string = NULL;
   yaml_event_t event;
   yaml_event_t value_event;
   yaml_emitter_t emitter;
 
   g_debug ("TRACE: entering _read_yaml_and_type");
 
-  /* In case we don't encounter a "document" type, default to INVALID */
-  *type = G_TYPE_INVALID;
+  document = modulemd_subdocument_new ();
 
   yaml_string = g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
   yaml_emitter_initialize (&emitter);
@@ -360,18 +372,18 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
   yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error starting stream");
+    &emitter, &event, &error, "Error starting stream");
 
   yaml_document_start_event_initialize (&event, NULL, NULL, NULL, 0);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error starting document");
+    &emitter, &event, &error, "Error starting document");
 
 
   while (!done)
     {
       value_event.type = YAML_NO_EVENT;
       YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-        parser, &event, error, "Parser error");
+        parser, &event, &error, "Parser error");
 
       switch (event.type)
         {
@@ -393,13 +405,15 @@ _read_yaml_and_type (yaml_parser_t *parser,
               if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                               "document"))
                 {
-                  if ((*type) != G_TYPE_INVALID)
+                  if (modulemd_subdocument_get_doctype (document) !=
+                      G_TYPE_INVALID)
                     {
                       /* We encountered document-type twice in the same
                        * document root mapping. This shouldn't ever happen
                        */
                       g_debug ("Document type specified more than once");
-                      *type = G_TYPE_INVALID;
+                      modulemd_subdocument_set_doctype (document,
+                                                        G_TYPE_INVALID);
 
                       /*
                        * This is a recoverable parsing error, so we don't want
@@ -407,16 +421,23 @@ _read_yaml_and_type (yaml_parser_t *parser,
                        */
                       finish_invalid_document = TRUE;
 
+                      g_set_error (
+                        &error,
+                        MODULEMD_YAML_ERROR,
+                        MODULEMD_YAML_ERROR_PARSE,
+                        "Document type was specified more than once");
+
                       break;
                     }
 
                   YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                    parser, &value_event, error, "Parser error");
+                    parser, &value_event, &error, "Parser error");
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
                       g_debug ("Document type not a scalar");
-                      *type = G_TYPE_INVALID;
+                      modulemd_subdocument_set_doctype (document,
+                                                        G_TYPE_INVALID);
 
                       switch (value_event.type)
                         {
@@ -434,6 +455,11 @@ _read_yaml_and_type (yaml_parser_t *parser,
                        * to exit with FALSE.
                        */
                       finish_invalid_document = TRUE;
+
+                      g_set_error (&error,
+                                   MODULEMD_YAML_ERROR,
+                                   MODULEMD_YAML_ERROR_PARSE,
+                                   "Document type was not a scalar value");
 
                       break;
                     }
@@ -441,58 +467,81 @@ _read_yaml_and_type (yaml_parser_t *parser,
                   if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                                  "modulemd") == 0)
                     {
-                      *type = MODULEMD_TYPE_MODULE;
+                      modulemd_subdocument_set_doctype (document,
+                                                        MODULEMD_TYPE_MODULE);
                     }
 
                   else if (g_strcmp0 (
                              (const gchar *)value_event.data.scalar.value,
                              "modulemd-defaults") == 0)
                     {
-                      *type = MODULEMD_TYPE_DEFAULTS;
+                      modulemd_subdocument_set_doctype (
+                        document, MODULEMD_TYPE_DEFAULTS);
                     }
                   /* Handle additional types here */
 
                   else
                     {
                       /* Unknown document type */
-                      *type = G_TYPE_INVALID;
+                      modulemd_subdocument_set_doctype (document,
+                                                        G_TYPE_INVALID);
 
                       finish_invalid_document = TRUE;
+
+                      g_set_error (&error,
+                                   MODULEMD_YAML_ERROR,
+                                   MODULEMD_YAML_ERROR_PARSE,
+                                   "Document type is not recognized");
                     }
 
-                  g_debug ("Document type: %s", g_type_name (*type));
+                  g_debug (
+                    "Document type: %s",
+                    g_type_name (modulemd_subdocument_get_doctype (document)));
                 }
 
               else if (g_strcmp0 ((const gchar *)event.data.scalar.value,
                                   "version") == 0)
                 {
-                  if ((*version) != 0)
+                  if (modulemd_subdocument_get_version (document) != 0)
                     {
-                      g_debug ("Document type specified more than once");
-                      *type = G_TYPE_INVALID;
+                      g_debug ("Document version specified more than once");
+                      modulemd_subdocument_set_doctype (document,
+                                                        G_TYPE_INVALID);
 
                       /*
                        * This is a recoverable parsing error, so we don't want
                        * to exit with FALSE.
                        */
                       finish_invalid_document = TRUE;
+
+                      g_set_error (
+                        &error,
+                        MODULEMD_YAML_ERROR,
+                        MODULEMD_YAML_ERROR_PARSE,
+                        "Document version was specified more than once");
 
                       break;
                     }
 
                   YAML_PARSER_PARSE_WITH_ERROR_RETURN (
-                    parser, &value_event, error, "Parser error");
+                    parser, &value_event, &error, "Parser error");
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
                       g_debug ("Document version not a scalar");
-                      *type = G_TYPE_INVALID;
+                      modulemd_subdocument_set_doctype (document,
+                                                        G_TYPE_INVALID);
 
                       /*
                        * This is a recoverable parsing error, so we don't want
                        * to exit with FALSE.
                        */
                       finish_invalid_document = TRUE;
+
+                      g_set_error (&error,
+                                   MODULEMD_YAML_ERROR,
+                                   MODULEMD_YAML_ERROR_PARSE,
+                                   "Document version was not a scalar");
 
                       switch (value_event.type)
                         {
@@ -507,11 +556,13 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
                       break;
                     }
+                  modulemd_subdocument_set_version (
+                    document,
+                    g_ascii_strtoull (
+                      (const gchar *)value_event.data.scalar.value, NULL, 10));
 
-                  *version = g_ascii_strtoull (
-                    (const gchar *)value_event.data.scalar.value, NULL, 10);
-
-                  g_debug ("Document version: %" PRIx64, *version);
+                  g_debug ("Document version: %" PRIx64,
+                           modulemd_subdocument_get_version (document));
                 }
             }
           break;
@@ -523,37 +574,51 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
       /* Copy this event to the string */
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-        &emitter, &event, error, "Error storing YAML event");
+        &emitter, &event, &error, "Error storing YAML event");
 
       if (value_event.type != YAML_NO_EVENT)
         {
           /* Copy this event to the string */
           YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-            &emitter, &value_event, error, "Error storing YAML event");
+            &emitter, &value_event, &error, "Error storing YAML event");
         }
     }
 
   yaml_stream_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error ending stream");
+    &emitter, &event, &error, "Error ending stream");
 
   yaml_event_delete (&event);
 
-  *yaml = yaml_string->str;
-  yaml_string->str = NULL;
+  /* If we get here with an invalid document type and no error */
+  if (modulemd_subdocument_get_doctype (document) == G_TYPE_INVALID &&
+      error == NULL)
+    {
+      g_set_error (&error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_PARSE,
+                   "Document type was unspecified or unknown");
+    }
 
   result = TRUE;
 error:
   yaml_emitter_delete (&emitter);
-  g_clear_pointer (&yaml_string->str, g_free);
-  g_clear_pointer (&yaml_string, g_free);
+
+  modulemd_subdocument_set_gerror (document, error);
+
+  /* Copy the string, even if it was only partial because it's still useful
+   * to know where parsing broke
+   */
+  modulemd_subdocument_set_yaml (document, yaml_string->str);
+  if (subdocument)
+    *subdocument = g_object_ref (document);
 
   g_debug ("TRACE: exiting _read_yaml_and_type");
   return result;
 }
 
 static gboolean
-_parse_subdocument (struct yaml_subdocument *subdocument,
+_parse_subdocument (ModulemdSubdocument *subdocument,
                     ModulemdParsingFunc parse_func,
                     GObject **data,
                     guint64 version,
@@ -566,9 +631,10 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
   yaml_parser_t parser;
 
   yaml_parser_initialize (&parser);
-  yaml_parser_set_input_string (&parser,
-                                (const unsigned char *)subdocument->yaml,
-                                strlen (subdocument->yaml));
+  yaml_parser_set_input_string (
+    &parser,
+    (const unsigned char *)modulemd_subdocument_get_yaml (subdocument),
+    strlen (modulemd_subdocument_get_yaml (subdocument)));
 
   while (!done)
     {
@@ -584,9 +650,6 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
         case YAML_DOCUMENT_START_EVENT:
           if (!parse_func (&parser, &object, version, error))
             {
-              g_debug ("Invalid [%s] document [%s].",
-                       g_type_name (subdocument->type),
-                       (*error)->message);
               goto error;
             }
           break;

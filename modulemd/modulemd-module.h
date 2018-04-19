@@ -67,6 +67,11 @@ modulemd_module_new (void);
 ModulemdModule *
 modulemd_module_new_from_file (const gchar *yaml_file);
 
+ModulemdModule *
+modulemd_module_new_from_file_ext (const gchar *yaml_file,
+                                   GPtrArray **failures,
+                                   GError **error);
+
 void
 modulemd_module_new_all_from_file (const gchar *yaml_file,
                                    ModulemdModule ***_modules);
@@ -77,6 +82,11 @@ modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
 
 ModulemdModule *
 modulemd_module_new_from_string (const gchar *yaml_string);
+
+ModulemdModule *
+modulemd_module_new_from_string_ext (const gchar *yaml_string,
+                                     GPtrArray **failures,
+                                     GError **error);
 
 void
 modulemd_module_new_all_from_string (const gchar *yaml_string,
@@ -89,6 +99,11 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
 
 ModulemdModule *
 modulemd_module_new_from_stream (FILE *stream, GError **error);
+
+ModulemdModule *
+modulemd_module_new_from_stream_ext (FILE *stream,
+                                     GPtrArray **failures,
+                                     GError **error);
 
 void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file);

@@ -14,6 +14,51 @@ except ImportError:
     # python modules
     sys.exit (77)
 
+class TestStandard(unittest.TestCase):
+    def test_failures (self):
+        (objects, failures) = Modulemd.objects_from_file_ext (
+            "%s/test_data/mixed-v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+
+        # There should be two valid documents
+        assert len(objects) == 2
+
+        # And seven failed documents
+        assert len(failures) == 7
+
+        # Validate that all failures are due to failed document type detection
+        for failure in failures:
+            assert failure.props.gerror.code == 3
+
+        assert failures[0].props.gerror.message == 'Document type is not recognized'
+        assert failures[1].props.gerror.message == 'Document type was specified more than once'
+        assert failures[2].props.gerror.message == 'Document version was specified more than once'
+        assert failures[3].props.gerror.message == 'Document type was not a scalar value'
+        assert failures[4].props.gerror.message == 'Document type is not recognized'
+        assert failures[5].props.gerror.message == 'Document type is not recognized'
+        assert failures[6].props.gerror.message == 'Unknown modulemd defaults version'
+
+        # Read in a file that's definitely not YAML
+        try:
+            (objects, failures) = Modulemd.objects_from_file_ext (
+                "%s/COPYING" % os.getenv('MESON_SOURCE_ROOT'))
+        except GLib.GError as e:
+            # Verify that it's a parser error
+            assert e.message == "Parser error"
+
+
+        # Read in a file that fails modulemd validation
+        (objects, failures) = Modulemd.objects_from_file_ext (
+                "%s/test_data/issue14-mismatch.yaml"
+                % os.getenv('MESON_SOURCE_ROOT'))
+
+        assert len(objects) == 0
+        assert len(failures) == 1
+
+        assert failures[0].props.gerror.message == 'Received scalar where sequence expected'
+
+
+
+
 class TestIssues(unittest.TestCase):
 
     def test_issue24(self):

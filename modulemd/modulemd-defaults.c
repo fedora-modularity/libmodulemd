@@ -437,11 +437,41 @@ modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self)
 ModulemdDefaults *
 modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error)
 {
+  return modulemd_defaults_new_from_file_ext (yaml_file, NULL, error);
+}
+
+
+/**
+ * modulemd_defaults_new_from_file_ext:
+ * @yaml_file: A YAML file containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.4
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_file_ext (const gchar *yaml_file,
+                                     GPtrArray **failures,
+                                     GError **error)
+{
   GObject *object = NULL;
   GPtrArray *data = NULL;
   ModulemdDefaults *defaults = NULL;
 
-  if (!parse_yaml_file (yaml_file, &data, error))
+  if (!parse_yaml_file (yaml_file, &data, failures, error))
     {
       return NULL;
     }
@@ -491,11 +521,41 @@ modulemd_defaults_new_from_file (const gchar *yaml_file, GError **error)
 ModulemdDefaults *
 modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error)
 {
+  return modulemd_defaults_new_from_string_ext (yaml_string, NULL, error);
+}
+
+
+/**
+ * modulemd_defaults_new_from_string_ext:
+ * @yaml_string: A YAML string containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.4
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_string_ext (const gchar *yaml_string,
+                                       GPtrArray **failures,
+                                       GError **error)
+{
   GObject *object = NULL;
   GPtrArray *data = NULL;
   ModulemdDefaults *defaults = NULL;
 
-  if (!parse_yaml_string (yaml_string, &data, error))
+  if (!parse_yaml_string (yaml_string, &data, failures, error))
     {
       return NULL;
     }
@@ -545,11 +605,41 @@ modulemd_defaults_new_from_string (const gchar *yaml_string, GError **error)
 ModulemdDefaults *
 modulemd_defaults_new_from_stream (FILE *stream, GError **error)
 {
+  return modulemd_defaults_new_from_stream_ext (stream, NULL, error);
+}
+
+
+/**
+ * modulemd_defaults_new_from_stream_ext:
+ * @stream: A YAML stream containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Constructs a new #ModulemdDefaults object from the first valid
+ * modulemd-defaults document in the given module stream. This will ignore any
+ * documents of other types, malformed documents and defaults that appear later
+ * in the stream.
+ *
+ * Returns: A #ModulemdDefaults object constructed the first valid
+ * modulemd-defaults document in the given module stream. This must be freed
+ * with g_object_unref() when no longer needed.
+ *
+ * Since: 1.4
+ */
+ModulemdDefaults *
+modulemd_defaults_new_from_stream_ext (FILE *stream,
+                                       GPtrArray **failures,
+                                       GError **error)
+{
   GObject *object = NULL;
   g_autoptr (GPtrArray) data = NULL;
   ModulemdDefaults *defaults = NULL;
 
-  if (!parse_yaml_stream (stream, &data, error))
+  if (!parse_yaml_stream (stream, &data, failures, error))
     {
       return NULL;
     }

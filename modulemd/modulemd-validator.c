@@ -143,7 +143,7 @@ main (int argc, char *argv[])
           fprintf (stdout, "Validating %s\n", filename);
         }
 
-      if (!parse_yaml_file (filename, NULL, &error))
+      if (!parse_yaml_file (filename, NULL, NULL, &error))
         {
           fprintf (stderr, "%s failed to validate\n", filename);
           if (options.verbosity >= MMD_VERBOSE)

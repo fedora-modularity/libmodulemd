@@ -127,7 +127,7 @@ parse_yaml_string (const gchar *yaml, GPtrArray **data, GError **error)
 
   g_debug ("TRACE: entering parse_yaml_string");
 
-  if (error == NULL || *error != NULL)
+  if (error != NULL && *error != NULL)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
@@ -165,9 +165,9 @@ parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error)
   gboolean result = FALSE;
   yaml_parser_t parser;
 
-  g_debug ("TRACE: entering parse_yaml_file");
+  g_debug ("TRACE: entering parse_yaml_stream");
 
-  if (error == NULL || *error != NULL)
+  if (error != NULL && *error != NULL)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
@@ -192,7 +192,7 @@ parse_yaml_stream (FILE *stream, GPtrArray **data, GError **error)
 
 error:
   yaml_parser_delete (&parser);
-  g_debug ("TRACE: exiting parse_yaml_file");
+  g_debug ("TRACE: exiting parse_yaml_stream");
   return result;
 }
 

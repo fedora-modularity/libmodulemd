@@ -171,6 +171,20 @@ modulemd_regressions_issue26 (RegressionFixture *fixture,
 }
 
 
+static void
+modulemd_regressions_issue53 (RegressionFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/issue53.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  objects = modulemd_objects_from_file (yaml_path, NULL);
+  g_assert_nonnull (objects);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -228,6 +242,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_regressions_issue26,
+              NULL);
+
+  g_test_add ("/modulemd/regressions/issue53",
+              RegressionFixture,
+              NULL,
+              NULL,
+              modulemd_regressions_issue53,
               NULL);
 
   return g_test_run ();

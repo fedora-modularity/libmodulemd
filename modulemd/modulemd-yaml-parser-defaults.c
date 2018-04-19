@@ -359,10 +359,6 @@ error:
   yaml_event_delete (&event);
   g_clear_pointer (&set, g_object_unref);
   g_clear_pointer (&stream_name, g_free);
-  if (*error)
-    {
-      return FALSE;
-    }
   g_debug ("TRACE: exiting _parse_defaults_profiles");
   return result;
 }

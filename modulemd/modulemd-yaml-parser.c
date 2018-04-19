@@ -74,7 +74,7 @@ parse_yaml_file (const gchar *path, GPtrArray **data, GError **error)
 
   g_debug ("TRACE: entering parse_yaml_file");
 
-  if (error == NULL || *error != NULL)
+  if (error != NULL && *error != NULL)
     {
       MMD_ERROR_RETURN_FULL (
         error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");

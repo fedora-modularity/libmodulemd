@@ -1,0 +1,462 @@
+---
+document: modulemd
+version: 2
+data:
+  name: django
+  stream: 1.6
+  version: 20180307130104
+  context: c2c572ec
+  summary: A high-level Python Web framework
+  description: >-
+    Django is a high-level Python Web framework that encourages rapid development
+    and a clean, pragmatic design. It focuses on automating as much as possible and
+    adhering to the DRY (Don't Repeat Yourself) principle.
+  license:
+    module:
+    - MIT
+  xmd:
+    mbs:
+      scmurl: https://src.fedoraproject.org/modules/django.git?#90c50f8ad1cb5ca41d62632699c375dce6353adf
+      commit: 90c50f8ad1cb5ca41d62632699c375dce6353adf
+      buildrequires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+      rpms:
+        python-django:
+          ref: 1c3a01558a435b56f8ef4f8fc0e5c1cd35f006a5
+      requires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+  dependencies:
+  - buildrequires:
+      platform: [f28]
+    requires:
+      platform: [f28]
+  references:
+    community: https://www.djangoproject.com
+    documentation: https://docs.djangoproject.com
+    tracker: https://code.djangoproject.com/query
+  profiles:
+    default:
+      rpms:
+      - python2-django
+    python2_development:
+      rpms:
+      - python2-django
+  api:
+    rpms:
+    - python2-django
+  components:
+    rpms:
+      python-django:
+        rationale: The Django python web framework
+        repository: git://pkgs.fedoraproject.org/rpms/python-django
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-django
+        ref: 1.6
+  artifacts:
+    rpms:
+    - python-django-bash-completion-0:1.6.11.7-1.module_1560+089ce146.noarch
+    - python2-django-0:1.6.11.7-1.module_1560+089ce146.noarch
+...
+---
+document: modulemd
+version: 2
+data:
+  name: nodejs
+  stream: 6
+  version: 20180308155546
+  context: c2c572ec
+  summary: Javascript runtime
+  description: >-
+    Node.js is a platform built on Chrome''s JavaScript runtime for easily building
+    fast, scalable network applications. Node.js uses an event-driven, non-blocking
+    I/O model that makes it lightweight and efficient, perfect for data-intensive
+    real-time applications that run across distributed devices.
+  license:
+    module:
+    - MIT
+  xmd:
+    mbs:
+      scmurl: https://src.fedoraproject.org/modules/nodejs.git?#2d349c5055939081aefa37d71cd77051d235cb79
+      commit: 2d349c5055939081aefa37d71cd77051d235cb79
+      buildrequires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+      rpms:
+        nodejs:
+          ref: 374ae23edf3676653fec706a5c81c5cdf019ce11
+      requires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+  dependencies:
+  - buildrequires:
+      platform: [f28]
+    requires:
+      platform: [f28]
+  references:
+    community: http://nodejs.org
+    documentation: http://nodejs.org/en/docs
+    tracker: https://github.com/nodejs/node/issues
+  profiles:
+    default:
+      rpms:
+      - nodejs
+      - npm
+    development:
+      rpms:
+      - nodejs
+      - nodejs-devel
+      - npm
+    minimal:
+      rpms:
+      - nodejs
+  api:
+    rpms:
+    - nodejs
+    - nodejs-devel
+    - npm
+  components:
+    rpms:
+      nodejs:
+        rationale: Javascript runtime and npm package manager.
+        repository: git://pkgs.fedoraproject.org/rpms/nodejs
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/nodejs
+        ref: 6
+        buildorder: 10
+  artifacts:
+    rpms:
+    - nodejs-1:6.13.1-1.module_1575+55808bea.x86_64
+    - nodejs-devel-1:6.13.1-1.module_1575+55808bea.x86_64
+    - nodejs-docs-1:6.13.1-1.module_1575+55808bea.noarch
+    - npm-1:3.10.10-1.6.13.1.1.module_1575+55808bea.x86_64
+...
+---
+document: modulemd
+version: 2
+data:
+  name: nodejs
+  stream: 8
+  version: 20180308143646
+  context: c2c572ec
+  summary: Javascript runtime
+  description: >-
+    Node.js is a platform built on Chrome''s JavaScript runtime for easily building
+    fast, scalable network applications. Node.js uses an event-driven, non-blocking
+    I/O model that makes it lightweight and efficient, perfect for data-intensive
+    real-time applications that run across distributed devices.
+  license:
+    module:
+    - MIT
+  xmd:
+    mbs:
+      scmurl: https://src.fedoraproject.org/modules/nodejs.git?#4dc5da13fa51c5a5cc9f02a81d71416bc6ce787e
+      commit: 4dc5da13fa51c5a5cc9f02a81d71416bc6ce787e
+      buildrequires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+      rpms:
+        nodejs:
+          ref: 64f8f82763943f764d25225c2d95ae065490b10a
+      requires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+  dependencies:
+  - buildrequires:
+      platform: [f28]
+    requires:
+      platform: [f28]
+  references:
+    community: http://nodejs.org
+    documentation: http://nodejs.org/en/docs
+    tracker: https://github.com/nodejs/node/issues
+  profiles:
+    default:
+      rpms:
+      - nodejs
+      - npm
+    development:
+      rpms:
+      - nodejs
+      - nodejs-devel
+      - npm
+    minimal:
+      rpms:
+      - nodejs
+  api:
+    rpms:
+    - nodejs
+    - nodejs-devel
+    - npm
+  components:
+    rpms:
+      nodejs:
+        rationale: Javascript runtime and npm package manager.
+        repository: git://pkgs.fedoraproject.org/rpms/nodejs
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/nodejs
+        ref: 8
+        buildorder: 10
+  artifacts:
+    rpms:
+    - nodejs-1:8.10.0-3.module_1572+d7ec111e.x86_64
+    - nodejs-devel-1:8.10.0-3.module_1572+d7ec111e.x86_64
+    - nodejs-docs-1:8.10.0-3.module_1572+d7ec111e.noarch
+    - npm-1:5.6.0-1.8.10.0.3.module_1572+d7ec111e.x86_64
+...
+---
+document: modulemd
+version: 2
+data:
+  name: nodejs
+  stream: 9
+  version: 20180308142225
+  context: c2c572ec
+  summary: Javascript runtime
+  description: >-
+    Node.js is a platform built on Chrome''s JavaScript runtime for easily building
+    fast, scalable network applications. Node.js uses an event-driven, non-blocking
+    I/O model that makes it lightweight and efficient, perfect for data-intensive
+    real-time applications that run across distributed devices.
+  license:
+    module:
+    - MIT
+  xmd:
+    mbs:
+      scmurl: https://src.fedoraproject.org/modules/nodejs.git?#3f3665745cb84576f1faa66646cb8c37913ec461
+      commit: 3f3665745cb84576f1faa66646cb8c37913ec461
+      buildrequires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+      rpms:
+        nodejs:
+          ref: 65648a2672dc03641b9eaa4d25a8f19d94fd90c3
+      requires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 4
+  dependencies:
+  - buildrequires:
+      platform: [f28]
+    requires:
+      platform: [f28]
+  references:
+    community: http://nodejs.org
+    documentation: http://nodejs.org/en/docs
+    tracker: https://github.com/nodejs/node/issues
+  profiles:
+    default:
+      rpms:
+      - nodejs
+      - npm
+    development:
+      rpms:
+      - nodejs
+      - nodejs-devel
+      - npm
+    minimal:
+      rpms:
+      - nodejs
+  api:
+    rpms:
+    - nodejs
+    - nodejs-devel
+    - npm
+  components:
+    rpms:
+      nodejs:
+        rationale: Javascript runtime and npm package manager.
+        repository: git://pkgs.fedoraproject.org/rpms/nodejs
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/nodejs
+        ref: 9
+        buildorder: 10
+  artifacts:
+    rpms:
+    - nodejs-1:9.8.0-1.module_1571+4f4bc63d.x86_64
+    - nodejs-devel-1:9.8.0-1.module_1571+4f4bc63d.x86_64
+    - nodejs-docs-1:9.8.0-1.module_1571+4f4bc63d.noarch
+    - npm-1:5.6.0-1.9.8.0.1.module_1571+4f4bc63d.x86_64
+...
+---
+document: modulemd
+version: 2
+data:
+  name: reviewboard
+  stream: 2.5
+  version: 20180206144254
+  context: e0c83381
+  summary: A web-based code review tool
+  description: >-
+    Review Board is a powerful web-based code review tool that offers developers an
+    easy way to handle code reviews. It scales well from small projects to large companies
+    and offers a variety of tools to take much of the stress and time out of the code
+    review process.
+  license:
+    module:
+    - MIT
+  xmd:
+    mbs:
+      scmurl: https://src.fedoraproject.org/modules/reviewboard.git?#1738e1ce6352c0d4da31ba137cab0b5dc5f30166
+      commit: 1738e1ce6352c0d4da31ba137cab0b5dc5f30166
+      buildrequires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 3
+        django:
+          ref: 14fb96b250feec2e2c883e06255de2c36faa7313
+          stream: 1.6
+          filtered_rpms: []
+          version: 20180117164842
+      rpms:
+        python-django-multiselectfield:
+          ref: 149bf58875fb7b55efe29e1735baf96d44eb99a9
+        ReviewBoard:
+          ref: 5d28213f6a797e5ce28ad05ab23f80fe67353da8
+        python-django-evolution:
+          ref: 512424e1fc4b99f6f74c01a4130a4d9402b56b4e
+        python-django-pipeline:
+          ref: f019137be96cf86f49a81001fef47a0c7ab6aa35
+        python-markdown:
+          ref: 0af9dd03b4822c04be2742b39b5a4d48ef2d2222
+        python-django-haystack:
+          ref: 20fe71a6fc50a83b24578fbaf86e94a4ca584d31
+        python-djblets:
+          ref: d5634779089456ff3d0ac7b78eec81e13ff4c733
+      requires:
+        platform:
+          ref: virtual
+          stream: f28
+          filtered_rpms: []
+          version: 3
+        django:
+          ref: 14fb96b250feec2e2c883e06255de2c36faa7313
+          stream: 1.6
+          filtered_rpms: []
+          version: 20180117164842
+  dependencies:
+  - buildrequires:
+      django: [1.6]
+      platform: [f28]
+    requires:
+      django: [1.6]
+      platform: [f28]
+  references:
+    community: https://www.reviewboard.org
+    documentation: https://www.reviewboard.org/docs
+    tracker: https://hellosplat.com/s/beanbag/tickets/
+  profiles:
+    default:
+      rpms:
+      - ReviewBoard
+    server:
+      rpms:
+      - ReviewBoard
+  api:
+    rpms:
+    - ReviewBoard
+    - python2-djblets
+  components:
+    rpms:
+      ReviewBoard:
+        rationale: The Review Board code review tool
+        repository: git://pkgs.fedoraproject.org/rpms/ReviewBoard
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/ReviewBoard
+        ref: 2.5
+        buildorder: 20
+      python-django-evolution:
+        rationale: A database modification library used and maintained by the Review
+          Board upstream
+        repository: git://pkgs.fedoraproject.org/rpms/python-django-evolution
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-django-evolution
+        ref: 0.7
+      python-django-haystack:
+        rationale: An older version of the Haystack search library for Django, needed
+          for compatibility.
+        repository: git://pkgs.fedoraproject.org/rpms/python-django-haystack
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-django-haystack
+        ref: 2.4
+      python-django-multiselectfield:
+        rationale: An older version of a mult-select form field needed by Review Board.
+        repository: git://pkgs.fedoraproject.org/rpms/python-django-multiselectfield
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-django-multiselectfield
+        ref: 0.1
+      python-django-pipeline:
+        rationale: An older version of this asset-packaging library for Django that
+          is compatible with Review Board.
+        repository: git://pkgs.fedoraproject.org/rpms/python-django-pipeline
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-django-pipeline
+        ref: 1.3
+      python-djblets:
+        rationale: Review Board tool library
+        repository: git://pkgs.fedoraproject.org/rpms/python-djblets
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-djblets
+        ref: 0.9
+        buildorder: 10
+      python-markdown:
+        rationale: An older version of this Markdown implementation that is compatible
+          with Review Board.
+        repository: git://pkgs.fedoraproject.org/rpms/python-markdown
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/python-markdown
+        ref: 2.4
+  artifacts:
+    rpms:
+    - ReviewBoard-0:2.5.17-17.module_d032b812.noarch
+    - python-django-haystack-docs-0:2.4.1-12.module_d032b812.noarch
+    - python2-django-evolution-1:0.7.7-12.module_d032b812.noarch
+    - python2-django-haystack-0:2.4.1-12.module_d032b812.noarch
+    - python2-django-multiselectfield-0:0.1.3-10.module_d032b812.noarch
+    - python2-django-pipeline-0:1.3.27-11.module_d032b812.noarch
+    - python2-djblets-0:0.9.9-13.module_d032b812.noarch
+    - python2-markdown-0:2.4.1-11.module_d032b812.noarch
+    - python3-markdown-0:2.4.1-11.module_d032b812.noarch
+...
+---
+document: modulemd-defaults
+version: 1
+data:
+  module: reviewboard
+  stream: 2.5
+  profiles:
+    2.5: [default]
+...
+---
+document: modulemd-defaults
+version: 1
+data:
+  module: nodejs
+  profiles:
+    6: [default]
+    8: [default]
+    9: [default]
+...
+---
+document: modulemd-defaults
+version: 1
+data:
+  module: django
+  profiles:
+    1.6: [default]
+...

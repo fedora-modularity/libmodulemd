@@ -800,14 +800,16 @@ modulemd_regressions_issue44 (DefaultsFixture *fixture,
   /* Add another almost-identical document, except with a conflicting default
    * stream set.
    */
-  yaml_conflicting_path = g_strdup_printf ("%s/test_data/defaults/issue44-2.yaml",
-                                    g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_conflicting_path = g_strdup_printf (
+    "%s/test_data/defaults/issue44-2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_conflicting_path);
 
-  conflicting_objects = modulemd_objects_from_file (yaml_conflicting_path, &error);
+  conflicting_objects =
+    modulemd_objects_from_file (yaml_conflicting_path, &error);
   g_assert_nonnull (conflicting_objects);
 
-  result = modulemd_prioritizer_add (prioritizer, conflicting_objects, 0, &error);
+  result =
+    modulemd_prioritizer_add (prioritizer, conflicting_objects, 0, &error);
   g_assert_false (result);
 }
 

@@ -42,7 +42,6 @@ struct yaml_subdocument
 {
   GType type;
   guint64 version;
-  GObject *subdocument;
   char *yaml;
 };
 
@@ -201,7 +200,6 @@ static void
 modulemd_subdocument_free (gpointer mem)
 {
   struct yaml_subdocument *document = (struct yaml_subdocument *)mem;
-  g_clear_pointer (&document->subdocument, g_object_unref);
   g_clear_pointer (&document->yaml, g_free);
   g_free (document);
 }

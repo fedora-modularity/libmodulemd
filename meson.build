@@ -1,5 +1,5 @@
 project('modulemd', 'c',
-        version : '1.3.0',
+        version : '1.4.0',
         default_options : [
           'buildtype=debugoptimized',
           'c_std=c11',

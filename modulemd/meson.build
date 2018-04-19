@@ -10,6 +10,7 @@ modulemd_srcs = [
     'modulemd-profile.c',
     'modulemd-simpleset.c',
     'modulemd-servicelevel.c',
+    'modulemd-subdocument.c',
     'modulemd-util.c',
     'modulemd-yaml-emitter.c',
     'modulemd-yaml-emitter-defaults.c',
@@ -32,11 +33,13 @@ modulemd_hdrs = [
     'modulemd-profile.h',
     'modulemd-simpleset.h',
     'modulemd-servicelevel.h',
+    'modulemd-subdocument.h',
 ]
 
 modulemd_priv_hdrs = [
     'modulemd-util.h',
     'modulemd-yaml.h',
+    'modulemd-subdocument-private.h',
 ]
 
 libmodulemd_version = meson.project_version()
@@ -161,6 +164,17 @@ test_modulemd_simpleset = executable(
     install : false,
 )
 test('test_modulemd_simpleset', test_modulemd_simpleset,
+     env : test_env)
+
+test_modulemd_subdocument = executable(
+    'test_modulemd_subdocument',
+    'test-modulemd-subdocument.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_subdocument', test_modulemd_subdocument,
      env : test_env)
 
 test_modulemd_yaml = executable(

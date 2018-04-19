@@ -54,12 +54,19 @@ modulemd_lib = library(
     version: libmodulemd_version,
 )
 
+modulemd_dep = declare_dependency(
+    include_directories : include_directories('.'),
+    link_with : modulemd_lib,
+    dependencies : [
+        gobject,
+    ]
+)
+
 modulemd_validator = executable(
     'modulemd-validator',
     'modulemd-validator.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : true,
 )
@@ -82,9 +89,8 @@ test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
 test_modulemd_component = executable(
     'test_modulemd_component',
     'test-modulemd-component.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -94,9 +100,8 @@ test('test_modulemd_component', test_modulemd_component,
 test_modulemd_defaults = executable(
     'test_modulemd_defaults',
     'test-modulemd-defaults.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
         yaml
     ],
     install : false,
@@ -107,9 +112,8 @@ test('test_modulemd_defaults', test_modulemd_defaults,
 test_modulemd_dependencies = executable(
     'test_modulemd_dependencies',
     'test-modulemd-dependencies.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -119,9 +123,8 @@ test('test_modulemd_dependencies', test_modulemd_dependencies,
 test_modulemd_module = executable(
     'test_modulemd_module',
     'test-modulemd-module.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -131,9 +134,8 @@ test('test_modulemd_module', test_modulemd_module,
 test_modulemd_regressions = executable(
     'test_modulemd_regressions',
     'test-modulemd-regressions.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -143,9 +145,8 @@ test('test_modulemd_regressions', test_modulemd_regressions,
 test_modulemd_servicelevel = executable(
     'test_modulemd_servicelevel',
     'test-modulemd-servicelevel.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -154,9 +155,8 @@ test('test_modulemd_servicelevel', test_modulemd_servicelevel)
 test_modulemd_simpleset = executable(
     'test_modulemd_simpleset',
     'test-modulemd-simpleset.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
     ],
     install : false,
 )
@@ -166,9 +166,8 @@ test('test_modulemd_simpleset', test_modulemd_simpleset,
 test_modulemd_yaml = executable(
     'test_modulemd_yaml',
     'test-modulemd-yaml.c',
-    link_with : modulemd_lib,
-        dependencies : [
-        gobject,
+    dependencies : [
+        modulemd_dep,
         yaml
     ],
     install : false,

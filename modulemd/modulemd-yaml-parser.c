@@ -333,6 +333,7 @@ error:
   return result;
 }
 
+
 static gboolean
 _read_yaml_and_type (yaml_parser_t *parser,
                      gchar **yaml,
@@ -342,6 +343,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
+  gboolean finish_invalid_document = FALSE;
   gsize depth = 0;
   struct modulemd_yaml_string *yaml_string = NULL;
   yaml_event_t event;
@@ -384,7 +386,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: depth--; break;
 
         case YAML_SCALAR_EVENT:
-          if (depth == 1)
+          if (depth == 1 && !finish_invalid_document)
             {
               /* If we're in the root of the document, check for the
                * document type and version
@@ -398,7 +400,16 @@ _read_yaml_and_type (yaml_parser_t *parser,
                       /* We encountered document-type twice in the same
                        * document root mapping. This shouldn't ever happen
                        */
-                      MMD_YAML_ERROR_RETURN (error, "Document type set twice");
+                      g_message ("Document type specified more than once");
+                      *type = G_TYPE_INVALID;
+
+                      /*
+                       * This is a recoverable parsing error, so we don't want
+                       * to exit with FALSE.
+                       */
+                      finish_invalid_document = TRUE;
+
+                      break;
                     }
 
                   YAML_PARSER_PARSE_WITH_ERROR_RETURN (
@@ -406,8 +417,27 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
-                      MMD_YAML_ERROR_RETURN (error,
-                                             "Error parsing document type");
+                      g_message ("Document type not a scalar");
+                      *type = G_TYPE_INVALID;
+
+                      switch (value_event.type)
+                        {
+                        case YAML_SEQUENCE_START_EVENT:
+                        case YAML_MAPPING_START_EVENT: depth++; break;
+
+                        case YAML_SEQUENCE_END_EVENT:
+                        case YAML_MAPPING_END_EVENT: depth--; break;
+
+                        default: break;
+                        }
+
+                      /*
+                       * This is a recoverable parsing error, so we don't want
+                       * to exit with FALSE.
+                       */
+                      finish_invalid_document = TRUE;
+
+                      break;
                     }
 
                   if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
@@ -416,12 +446,21 @@ _read_yaml_and_type (yaml_parser_t *parser,
                       *type = MODULEMD_TYPE_MODULE;
                     }
 
-                  if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
-                                 "modulemd-defaults") == 0)
+                  else if (g_strcmp0 (
+                             (const gchar *)value_event.data.scalar.value,
+                             "modulemd-defaults") == 0)
                     {
                       *type = MODULEMD_TYPE_DEFAULTS;
                     }
                   /* Handle additional types here */
+
+                  else
+                    {
+                      /* Unknown document type */
+                      *type = G_TYPE_INVALID;
+
+                      finish_invalid_document = TRUE;
+                    }
 
                   g_debug ("Document type: %s", g_type_name (*type));
                 }
@@ -431,11 +470,16 @@ _read_yaml_and_type (yaml_parser_t *parser,
                 {
                   if ((*version) != 0)
                     {
-                      /* We encountered document-version twice in the same
-                       * document root mapping. This shouldn't ever happen
+                      g_message ("Document type specified more than once");
+                      *type = G_TYPE_INVALID;
+
+                      /*
+                       * This is a recoverable parsing error, so we don't want
+                       * to exit with FALSE.
                        */
-                      MMD_YAML_ERROR_RETURN (error,
-                                             "Document version set twice");
+                      finish_invalid_document = TRUE;
+
+                      break;
                     }
 
                   YAML_PARSER_PARSE_WITH_ERROR_RETURN (
@@ -443,8 +487,27 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
-                      MMD_YAML_ERROR_RETURN (error,
-                                             "Error parsing document version");
+                      g_message ("Document version not a scalar");
+                      *type = G_TYPE_INVALID;
+
+                      /*
+                       * This is a recoverable parsing error, so we don't want
+                       * to exit with FALSE.
+                       */
+                      finish_invalid_document = TRUE;
+
+                      switch (value_event.type)
+                        {
+                        case YAML_SEQUENCE_START_EVENT:
+                        case YAML_MAPPING_START_EVENT: depth++; break;
+
+                        case YAML_SEQUENCE_END_EVENT:
+                        case YAML_MAPPING_END_EVENT: depth--; break;
+
+                        default: break;
+                        }
+
+                      break;
                     }
 
                   *version = g_ascii_strtoull (

@@ -1,4 +1,24 @@
 ---
+document: notreal
+version: 3
+---
+document: modulemd-defaults
+document: someotherdoc
+version: threeve
+---
+document: modulemd-defaults
+version: threeve
+---
+document: modulemd-defaults
+version: 1
+version: threeve
+---
+document: [notreal]
+version: 3
+---
+document: notreal
+version: [3]
+---
 # Document type identifier
 document: modulemd
 # Module metadata format version

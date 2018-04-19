@@ -104,7 +104,9 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     {                                                                         \
       if (!yaml_emitter_emit (emitter, event))                                \
         {                                                                     \
-          g_debug ("Error: %s", msg);                                         \
+          g_debug ("Error: %s - event type: %s",                              \
+                   msg,                                                       \
+                   mmd_yaml_get_event_name ((event)->type));                  \
           g_set_error_literal (                                               \
             error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);       \
           result = FALSE;                                                     \

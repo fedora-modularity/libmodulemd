@@ -215,7 +215,7 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
 
   if (version > MD_VERSION_1)
     {
-      g_message ("Incompatible modulemd version");
+      g_debug ("Incompatible modulemd version");
       return;
     }
 
@@ -558,7 +558,7 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 
   if (mdversion && mdversion < MD_VERSION_2)
     {
-      g_message ("Incompatible modulemd version");
+      g_debug ("Incompatible modulemd version");
       return;
     }
 
@@ -600,7 +600,7 @@ modulemd_module_add_dependencies (ModulemdModule *self,
 
   if (mdversion && mdversion < MD_VERSION_2)
     {
-      g_message ("Incompatible modulemd version");
+      g_debug ("Incompatible modulemd version");
       return;
     }
 
@@ -1523,7 +1523,7 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 
   if (version > MD_VERSION_1)
     {
-      g_message ("Incompatible modulemd version");
+      g_debug ("Incompatible modulemd version");
       return;
     }
 
@@ -3442,7 +3442,7 @@ modulemd_module_new_from_file (const gchar *yaml_file)
 
   if (!parse_yaml_file (yaml_file, &data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return NULL;
     }
@@ -3487,7 +3487,7 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
 
   if (!parse_yaml_file (yaml_file, &data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
@@ -3519,7 +3519,7 @@ modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
 
   if (!parse_yaml_file (yaml_file, data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
@@ -3547,7 +3547,7 @@ modulemd_module_new_from_string (const gchar *yaml_string)
 
   if (!parse_yaml_string (yaml_string, &data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return NULL;
     }
@@ -3592,7 +3592,7 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
 
   if (!parse_yaml_string (yaml_string, &data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
@@ -3624,7 +3624,7 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
 
   if (!parse_yaml_string (yaml_string, data, &error))
     {
-      g_message ("Error parsing YAML: %s", error->message);
+      g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
@@ -3695,7 +3695,7 @@ modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file)
 
   if (!emit_yaml_file (objects, yaml_file, &error))
     {
-      g_message ("Error emitting YAML file: %s", error->message);
+      g_debug ("Error emitting YAML file: %s", error->message);
       g_error_free (error);
     }
 
@@ -3722,7 +3722,7 @@ modulemd_module_dumps (ModulemdModule *self)
 
   if (!emit_yaml_string (objects, &yaml, &error))
     {
-      g_message ("Error emitting YAML string: %s", error->message);
+      g_debug ("Error emitting YAML string: %s", error->message);
       g_error_free (error);
       yaml = NULL;
     }
@@ -3751,7 +3751,7 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
 
   if (!emit_yaml_file (module_array, yaml_file, &error))
     {
-      g_message ("Error emitting YAML file: %s", error->message);
+      g_debug ("Error emitting YAML file: %s", error->message);
       g_error_free (error);
     }
 }
@@ -3779,7 +3779,7 @@ modulemd_module_dumps_all (GPtrArray *module_array)
 
   if (!emit_yaml_string (module_array, &yaml, &error))
     {
-      g_message ("Error emitting YAML string: %s", error->message);
+      g_debug ("Error emitting YAML string: %s", error->message);
       g_error_free (error);
       yaml = NULL;
     }

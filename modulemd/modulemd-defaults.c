@@ -599,7 +599,7 @@ modulemd_defaults_dump (ModulemdDefaults *self, const gchar *file_path)
 
   if (!emit_yaml_file (objects, file_path, &error))
     {
-      g_message ("Failed to export YAML: [%s]", error->message);
+      g_debug ("Failed to export YAML: [%s]", error->message);
     }
 
   g_ptr_array_unref (objects);
@@ -630,7 +630,7 @@ modulemd_defaults_dumps (ModulemdDefaults *self, gchar **yaml_string)
 
   if (!emit_yaml_string (objects, yaml_string, &error))
     {
-      g_message ("Failed to export YAML: [%s]", error->message);
+      g_debug ("Failed to export YAML: [%s]", error->message);
     }
 
   g_ptr_array_unref (objects);

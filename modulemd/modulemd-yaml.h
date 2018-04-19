@@ -72,7 +72,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_YAML_ERROR_RETURN_RETHROW(error, msg)                             \
   do                                                                          \
     {                                                                         \
-      g_message (msg);                                                        \
+      g_debug (msg);                                                          \
       result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \
@@ -81,7 +81,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_ERROR_RETURN_FULL(error, type, msg)                               \
   do                                                                          \
     {                                                                         \
-      g_message (msg);                                                        \
+      g_debug (msg);                                                          \
       g_set_error_literal (error, MODULEMD_YAML_ERROR, type, msg);            \
       goto error;                                                             \
       result = FALSE;                                                         \
@@ -91,7 +91,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_YAML_ERROR_RETURN(error, msg)                                     \
   do                                                                          \
     {                                                                         \
-      g_message (msg);                                                        \
+      g_debug (msg);                                                          \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
       result = FALSE;                                                         \
@@ -119,7 +119,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_YAML_EMITTER_ERROR_RETURN(error, msg)                             \
   do                                                                          \
     {                                                                         \
-      g_message (msg);                                                        \
+      g_debug (msg);                                                          \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, msg);           \
       result = FALSE;                                                         \
@@ -176,7 +176,7 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_YAML_NOEVENT_ERROR_RETURN(error, msg)                             \
   do                                                                          \
     {                                                                         \
-      g_message (msg);                                                        \
+      g_debug (msg);                                                          \
       g_set_error_literal (                                                   \
         error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);          \
       result = FALSE;                                                         \

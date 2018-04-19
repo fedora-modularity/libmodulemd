@@ -160,8 +160,8 @@ _parse_defaults (yaml_parser_t *parser,
 
           else
             {
-              g_message ("Unexpected key in root: %s",
-                         (const gchar *)event.data.scalar.value);
+              g_debug ("Unexpected key in root: %s",
+                       (const gchar *)event.data.scalar.value);
               MMD_YAML_ERROR_RETURN (error, "Unexpected key in root");
             }
           break;

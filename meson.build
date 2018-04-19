@@ -24,6 +24,7 @@ test_cflags = [
   '-Werror=array-bounds',
   '-Werror=write-strings',
   '-DG_LOG_USE_STRUCTURED',
+  '-DG_LOG_DOMAIN="libmodulemd"',
 ]
 foreach cflag: test_cflags
   if cc.has_argument(cflag)

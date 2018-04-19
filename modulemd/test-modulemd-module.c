@@ -477,7 +477,7 @@ modulemd_module_test_construct_v1 (ModuleFixture *fixture,
   g_assert_nonnull (copy);
   g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 1);
 
-  g_message ("v1 YAML:\n%s", yaml);
+  g_debug ("v1 YAML:\n%s", yaml);
 
   g_ptr_array_unref (modules);
   g_object_unref (copy);
@@ -550,7 +550,7 @@ modulemd_module_test_construct_v2 (ModuleFixture *fixture,
   g_assert_nonnull (copy);
   g_assert_cmpuint (modulemd_module_peek_mdversion (copy), ==, 2);
 
-  g_message ("v2 YAML:\n%s", yaml);
+  g_debug ("v2 YAML:\n%s", yaml);
 
   g_ptr_array_unref (modules);
   g_object_unref (copy);
@@ -636,7 +636,7 @@ modulemd_module_test_upgrade_v2 (ModuleFixture *fixture,
   g_assert_true (result);
   g_assert_nonnull (yaml);
 
-  g_message ("Upgraded YAML:\n%s", yaml);
+  g_debug ("Upgraded YAML:\n%s", yaml);
 
   g_ptr_array_unref (modules);
   g_free (yaml);

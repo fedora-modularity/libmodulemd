@@ -97,7 +97,7 @@ modulemd_regressions_issue16 (RegressionFixture *fixture,
   g_assert_cmpint (g_hash_table_size (rpm_components), >, 0);
 
   yaml = modulemd_module_dumps (module);
-  g_message ("YAML dumps() content:\n%s\n", yaml);
+  g_debug ("YAML dumps() content:\n%s\n", yaml);
 
   module2 = modulemd_module_new_from_string (yaml);
   g_assert_nonnull (module2);

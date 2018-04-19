@@ -315,7 +315,7 @@ _parse_yaml (yaml_parser_t *parser, GPtrArray **data, GError **error)
               MMD_YAML_ERROR_RETURN_RETHROW (error,
                                              "Error processing subdocuments");
             }
-          g_message ("Invalid document [%s]. Skipping it.", (*error)->message);
+          g_debug ("Invalid document [%s]. Skipping it.", (*error)->message);
           g_clear_error (error);
         }
     }
@@ -400,7 +400,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
                       /* We encountered document-type twice in the same
                        * document root mapping. This shouldn't ever happen
                        */
-                      g_message ("Document type specified more than once");
+                      g_debug ("Document type specified more than once");
                       *type = G_TYPE_INVALID;
 
                       /*
@@ -417,7 +417,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
-                      g_message ("Document type not a scalar");
+                      g_debug ("Document type not a scalar");
                       *type = G_TYPE_INVALID;
 
                       switch (value_event.type)
@@ -470,7 +470,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
                 {
                   if ((*version) != 0)
                     {
-                      g_message ("Document type specified more than once");
+                      g_debug ("Document type specified more than once");
                       *type = G_TYPE_INVALID;
 
                       /*
@@ -487,7 +487,7 @@ _read_yaml_and_type (yaml_parser_t *parser,
 
                   if (value_event.type != YAML_SCALAR_EVENT)
                     {
-                      g_message ("Document version not a scalar");
+                      g_debug ("Document version not a scalar");
                       *type = G_TYPE_INVALID;
 
                       /*
@@ -586,9 +586,9 @@ _parse_subdocument (struct yaml_subdocument *subdocument,
         case YAML_DOCUMENT_START_EVENT:
           if (!parse_func (&parser, &object, version, error))
             {
-              g_message ("Invalid [%s] document [%s].",
-                         g_type_name (subdocument->type),
-                         (*error)->message);
+              g_debug ("Invalid [%s] document [%s].",
+                       g_type_name (subdocument->type),
+                       (*error)->message);
               goto error;
             }
           break;

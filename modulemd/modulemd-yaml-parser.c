@@ -356,7 +356,7 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
   gboolean done = FALSE;
   gboolean finish_invalid_document = FALSE;
   gsize depth = 0;
-  g_autofree struct modulemd_yaml_string *yaml_string = NULL;
+  g_autoptr (modulemd_yaml_string) yaml_string = NULL;
   yaml_event_t event;
   yaml_event_t value_event;
   yaml_emitter_t emitter;
@@ -365,7 +365,7 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
 
   document = modulemd_subdocument_new ();
 
-  yaml_string = g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
   yaml_emitter_initialize (&emitter);
 
   yaml_emitter_set_output (&emitter, _write_yaml_string, (void *)yaml_string);

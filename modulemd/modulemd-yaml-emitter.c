@@ -110,7 +110,7 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
   gboolean result = FALSE;
   yaml_emitter_t emitter;
   yaml_event_t event;
-  struct modulemd_yaml_string *yaml_string = NULL;
+  g_autoptr (modulemd_yaml_string) yaml_string = NULL;
   GObject *object;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -118,7 +118,7 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
 
   g_debug ("TRACE: entering emit_yaml_string");
 
-  yaml_string = g_malloc0_n (1, sizeof (struct modulemd_yaml_string));
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
 
   yaml_emitter_initialize (&emitter);
 
@@ -166,16 +166,12 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
     &emitter, &event, error, "Error ending stream");
 
   *_yaml = yaml_string->str;
+  yaml_string->str = NULL;
 
   result = TRUE;
 
 error:
   yaml_emitter_delete (&emitter);
-  if (!result)
-    {
-      g_clear_pointer (&yaml_string->str, g_free);
-    }
-  g_free (yaml_string);
 
   g_debug ("TRACE: exiting emit_yaml_string");
   return result;

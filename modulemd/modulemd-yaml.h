@@ -212,17 +212,19 @@ emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error);
 gboolean
 emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error);
 
-struct modulemd_yaml_string
+typedef struct _modulemd_yaml_string
 {
   char *str;
   size_t len;
-};
+} modulemd_yaml_string;
 
 int
 _write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
 void
-modulemd_yaml_string_free (gpointer mem);
+modulemd_yaml_string_free (modulemd_yaml_string *yaml_string);
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_yaml_string,
+                               modulemd_yaml_string_free);
 
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,

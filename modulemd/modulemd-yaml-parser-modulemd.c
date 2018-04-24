@@ -1999,6 +1999,14 @@ _parse_modulemd_artifacts (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN_RETHROW (error,
                                                  "Parse error in artifacts");
                 }
+
+              if (!modulemd_simpleset_validate_contents (
+                    set, modulemd_validate_nevra, NULL))
+                {
+                  MMD_YAML_ERROR_RETURN (error,
+                                         "RPM artifacts not in NEVRA format");
+                }
+
               modulemd_module_set_rpm_artifacts (module, set);
             }
           else

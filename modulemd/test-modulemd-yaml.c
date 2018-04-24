@@ -437,6 +437,33 @@ modulemd_yaml_test_validate_nevra (YamlFixture *fixture,
 }
 
 
+static void
+modulemd_yaml_test_artifact_validation (YamlFixture *fixture,
+                                        gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Attempt to read in a modulemd with a data.artifacts.rpm section
+   * containing values without the Epoch included.
+   */
+  yaml_path = g_strdup_printf ("%s/test_data/issue46.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  objects = modulemd_objects_from_file_ext (yaml_path, &failures, &error);
+  g_assert_nonnull (objects);
+  g_assert_cmpint (objects->len, ==, 0);
+  g_assert_null (error);
+  g_assert_nonnull (failures);
+  g_assert_cmpint (failures->len, ==, 1);
+  g_assert_cmpstr (
+    modulemd_subdocument_get_gerror (g_ptr_array_index (failures, 0))->message,
+    ==,
+    "RPM artifacts not in NEVRA format");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -494,6 +521,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_yaml_test_validate_nevra,
+              NULL);
+
+  g_test_add ("/modulemd/yaml/test_artifact_validation",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_test_artifact_validation,
               NULL);
 
   return g_test_run ();

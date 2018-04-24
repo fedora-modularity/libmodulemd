@@ -23,6 +23,7 @@
  */
 
 #include "modulemd-yaml.h"
+#include "modulemd-util.h"
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -414,6 +415,28 @@ modulemd_yaml_test_v2_stream (YamlFixture *fixture, gconstpointer user_data)
 }
 
 
+static void
+modulemd_yaml_test_validate_nevra (YamlFixture *fixture,
+                                   gconstpointer user_data)
+{
+  const gchar *good = "nodejs-devel-1:8.10.0-3.module_1572+d7ec111e.x86_64";
+  const gchar *garbage = "DEADBEEF";
+  const gchar *garbage2 = "DEAD.BEEF";
+  const gchar *garbage3 = "MORE-DEAD.BEEF";
+  const gchar *missing_epoch =
+    "nodejs-devel-8.10.0-3.module_1572+d7ec111e.x86_64";
+  const gchar *nonint_epoch =
+    "nodejs-devel-FOO:8.10.0-3.module_1572+d7ec111e.x86_64";
+
+  g_assert_true (modulemd_validate_nevra (good));
+  g_assert_false (modulemd_validate_nevra (garbage));
+  g_assert_false (modulemd_validate_nevra (garbage2));
+  g_assert_false (modulemd_validate_nevra (garbage3));
+  g_assert_false (modulemd_validate_nevra (missing_epoch));
+  g_assert_false (modulemd_validate_nevra (nonint_epoch));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -465,6 +488,13 @@ main (int argc, char *argv[])
               modulemd_yaml_set_up,
               modulemd_yaml_test_v2_stream,
               modulemd_yaml_tear_down);
+
+  g_test_add ("/modulemd/yaml/test_validate_nevra",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_test_validate_nevra,
+              NULL);
 
   return g_test_run ();
 }

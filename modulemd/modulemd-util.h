@@ -50,6 +50,9 @@ _modulemd_ordered_int64_keys (GHashTable *htable);
 void
 modulemd_variant_unref (void *ptr);
 
+gboolean
+modulemd_validate_nevra (const gchar *nevra);
+
 G_END_DECLS
 
 #endif /* MODULEMD_UTIL_H */

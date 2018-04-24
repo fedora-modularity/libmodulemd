@@ -61,6 +61,23 @@ gboolean
 modulemd_simpleset_is_equal (ModulemdSimpleSet *self,
                              ModulemdSimpleSet *other);
 
+/**
+ * SimpleSetValidationFn:
+ * @str: The current string being validated from the set
+ *
+ * This function is called once for each string in a #ModulemdSimpleSet
+ * when the validate_contents() routine is invoked. It must return TRUE
+ * if the string passes validation or FALSE if it does not.
+ *
+ * Since: 1.4
+ */
+typedef gboolean (*ModulemdSimpleSetValidationFn) (const gchar *str);
+
+gboolean
+modulemd_simpleset_validate_contents (ModulemdSimpleSet *self,
+                                      ModulemdSimpleSetValidationFn func,
+                                      GPtrArray **failures);
+
 G_END_DECLS
 
 #endif /* MODULEMD_SIMPLESET_H */

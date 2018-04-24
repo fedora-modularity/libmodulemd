@@ -417,3 +417,47 @@ modulemd_simpleset_is_equal (ModulemdSimpleSet *self, ModulemdSimpleSet *other)
   /* If we made it here, everything must have matched */
   return TRUE;
 }
+
+
+/**
+ * modulemd_simpleset_validate_contents:
+ * @func: (scope call): a #SimpleSetValidationFn that will be run against each
+ * entry in the set.
+ * @failures: (array zero-terminated=1) (element-type utf8) (out) (nullable):
+ * An array of strings in the set that failed the validation function. If this
+ * returns non-NULL, it must be freed with g_ptr_array_unref().
+ *
+ * Returns: TRUE if all members of the set passed the validation. If any of the
+ * set fails validation, they will be returned via failures.
+ *
+ * Since: 1.4
+ */
+gboolean
+modulemd_simpleset_validate_contents (ModulemdSimpleSet *self,
+                                      ModulemdSimpleSetValidationFn func,
+                                      GPtrArray **failures)
+{
+  gboolean passing = TRUE;
+  GHashTableIter iter;
+  g_autoptr (GPtrArray) _failed = NULL;
+  gpointer key, value;
+
+  _failed = g_ptr_array_new_with_free_func (g_free);
+
+  g_hash_table_iter_init (&iter, self->set);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (!func ((const gchar *)key))
+        {
+          passing = FALSE;
+          g_ptr_array_add (_failed, g_strdup (key));
+        }
+    }
+
+  if (!passing && failures)
+    {
+      *failures = g_ptr_array_ref (_failed);
+    }
+
+  return passing;
+}

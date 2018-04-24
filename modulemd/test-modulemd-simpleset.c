@@ -176,6 +176,61 @@ modulemd_simpleset_test_copy (SimpleSetFixture *fixture,
   g_clear_pointer (&copy, g_object_unref);
 }
 
+static gboolean
+test_validate_true (const gchar *str)
+{
+  return TRUE;
+}
+
+static gboolean
+test_validate_false (const gchar *str)
+{
+  return FALSE;
+}
+
+static gboolean
+test_validate_nofoo (const gchar *str)
+{
+  if (g_strcmp0 (str, "foo") == 0)
+    {
+      return FALSE;
+    }
+  return TRUE;
+}
+
+static void
+modulemd_simpleset_test_validate (SimpleSetFixture *fixture,
+                                  gconstpointer user_data)
+{
+  gboolean result = FALSE;
+  g_autoptr (ModulemdSimpleSet) set = modulemd_simpleset_new ();
+  g_autoptr (GPtrArray) failures = NULL;
+
+  /* Add three strings to the set */
+  modulemd_simpleset_add (set, "foo");
+  modulemd_simpleset_add (set, "bar");
+  modulemd_simpleset_add (set, "baz");
+
+  result =
+    modulemd_simpleset_validate_contents (set, test_validate_true, &failures);
+  g_assert_true (result);
+  g_assert_null (failures);
+
+  result =
+    modulemd_simpleset_validate_contents (set, test_validate_false, &failures);
+  g_assert_false (result);
+  g_assert_nonnull (failures);
+  g_assert_cmpint (failures->len, ==, 3);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  result =
+    modulemd_simpleset_validate_contents (set, test_validate_nofoo, &failures);
+  g_assert_false (result);
+  g_assert_nonnull (failures);
+  g_assert_cmpint (failures->len, ==, 1);
+  g_assert_cmpstr ((const gchar *)g_ptr_array_index (failures, 0), ==, "foo");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -198,6 +253,13 @@ main (int argc, char *argv[])
               modulemd_simpleset_set_up,
               modulemd_simpleset_test_copy,
               modulemd_simpleset_tear_down);
+
+  g_test_add ("/modulemd/simpleset/test_validate",
+              SimpleSetFixture,
+              NULL,
+              NULL,
+              modulemd_simpleset_test_validate,
+              NULL);
 
   return g_test_run ();
 }

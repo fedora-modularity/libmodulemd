@@ -182,7 +182,7 @@ modulemd_validate_nevra (const gchar *nevra)
    */
 
   /* Process the "release" tag */
-  while (i > 0)
+  while (i >= tmp)
     {
       if (*i == '-')
         {
@@ -191,7 +191,7 @@ modulemd_validate_nevra (const gchar *nevra)
       i--;
     }
 
-  if (i <= 0)
+  if (i < tmp)
     {
       /* We hit the start of the string without hitting '-' */
       return FALSE;
@@ -208,7 +208,7 @@ modulemd_validate_nevra (const gchar *nevra)
         }
       i--;
     }
-  if (i <= 0)
+  if (i < tmp)
     {
       /* We hit the start of the string without hitting ':' */
       return FALSE;

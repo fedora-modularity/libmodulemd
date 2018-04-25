@@ -116,8 +116,11 @@ main (int argc, char *argv[])
 {
   const char *filename;
   GOptionContext *context;
-  GError *error = NULL;
+  g_autoptr (GError) error = NULL;
   gboolean all_valid = TRUE;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  ModulemdSubdocument *doc = NULL;
   setlocale (LC_ALL, "");
 
   context = g_option_context_new ("FILES - Simple modulemd YAML validator");
@@ -135,7 +138,7 @@ main (int argc, char *argv[])
       return EXIT_FAILURE;
     }
 
-  for (gsize i = 1; options.filenames[i]; i++)
+  for (gsize i = 0; options.filenames[i]; i++)
     {
       filename = options.filenames[i];
       if (options.verbosity >= MMD_VERBOSE)
@@ -143,9 +146,10 @@ main (int argc, char *argv[])
           fprintf (stdout, "Validating %s\n", filename);
         }
 
-      if (!parse_yaml_file (filename, NULL, NULL, &error))
+      objects = modulemd_objects_from_file_ext (filename, &failures, &error);
+      if (!objects)
         {
-          fprintf (stderr, "%s failed to validate\n", filename);
+          fprintf (stderr, "%s was not valid YAML\n", filename);
           if (options.verbosity >= MMD_VERBOSE)
             {
               fprintf (stdout, "ERROR: %s\n", error->message);
@@ -153,6 +157,23 @@ main (int argc, char *argv[])
           all_valid = FALSE;
         }
 
+      else if (failures->len > 0)
+        {
+          fprintf (stderr, "%s failed to validate\n", filename);
+          if (options.verbosity >= MMD_VERBOSE)
+            {
+              for (gsize i = 0; i < failures->len; i++)
+                {
+                  doc = (ModulemdSubdocument *)g_ptr_array_index (failures, i);
+                  fprintf (stdout, "\nFailed subdocument (%s): \n%s\n",
+                           modulemd_subdocument_get_gerror (doc)->message,
+                           modulemd_subdocument_get_yaml(doc));
+                }
+            }
+          all_valid = FALSE;
+        }
+
+      g_clear_pointer (&objects, g_ptr_array_unref);
       g_clear_pointer (&error, g_error_free);
     }
 

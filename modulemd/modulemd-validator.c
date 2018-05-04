@@ -60,6 +60,7 @@ set_verbosity (const gchar *option_name,
                gpointer data,
                GError **error)
 {
+  g_autofree gchar *debugging_env = NULL;
   if (g_strcmp0 ("-v", option_name) == 0 ||
       g_strcmp0 ("--verbose", option_name) == 0)
     {
@@ -73,7 +74,23 @@ set_verbosity (const gchar *option_name,
       if (options.verbosity < MMD_DEBUG)
         {
           options.verbosity = MMD_DEBUG;
+          const gchar *old_debug = g_getenv ("G_MESSAGES_DEBUG");
+          if (old_debug != NULL)
+            {
+              debugging_env =
+                g_strdup_printf ("%s,%s", old_debug, G_LOG_DOMAIN);
+            }
+          else
+            {
+              debugging_env = g_strdup (G_LOG_DOMAIN);
+            }
+          g_setenv ("G_MESSAGES_DEBUG", debugging_env, TRUE);
         }
+    }
+  else if (g_strcmp0 ("-q", option_name) == 0 ||
+           g_strcmp0 ("--quiet", option_name) == 0)
+    {
+      options.verbosity = MMD_QUIET;
     }
   else
     {
@@ -88,7 +105,14 @@ set_verbosity (const gchar *option_name,
   return TRUE;
 }
 
-static GOptionEntry entries[] = { { "verbose",
+static GOptionEntry entries[] = { { "quiet",
+                                    'q',
+                                    G_OPTION_FLAG_NO_ARG,
+                                    G_OPTION_ARG_CALLBACK,
+                                    set_verbosity,
+                                    "Print no output",
+                                    NULL },
+                                  { "verbose",
                                     'v',
                                     G_OPTION_FLAG_NO_ARG,
                                     G_OPTION_ARG_CALLBACK,
@@ -149,9 +173,9 @@ main (int argc, char *argv[])
       objects = modulemd_objects_from_file_ext (filename, &failures, &error);
       if (!objects)
         {
-          fprintf (stderr, "%s was not valid YAML\n", filename);
-          if (options.verbosity >= MMD_VERBOSE)
+          if (options.verbosity >= MMD_DEFAULT)
             {
+              fprintf (stderr, "%s was not valid YAML\n", filename);
               fprintf (stdout, "ERROR: %s\n", error->message);
             }
           all_valid = FALSE;
@@ -159,15 +183,16 @@ main (int argc, char *argv[])
 
       else if (failures->len > 0)
         {
-          fprintf (stderr, "%s failed to validate\n", filename);
-          if (options.verbosity >= MMD_VERBOSE)
+          if (options.verbosity >= MMD_DEFAULT)
             {
+              fprintf (stderr, "%s failed to validate\n", filename);
               for (gsize i = 0; i < failures->len; i++)
                 {
                   doc = (ModulemdSubdocument *)g_ptr_array_index (failures, i);
-                  fprintf (stdout, "\nFailed subdocument (%s): \n%s\n",
+                  fprintf (stdout,
+                           "\nFailed subdocument (%s): \n%s\n",
                            modulemd_subdocument_get_gerror (doc)->message,
-                           modulemd_subdocument_get_yaml(doc));
+                           modulemd_subdocument_get_yaml (doc));
                 }
             }
           all_valid = FALSE;

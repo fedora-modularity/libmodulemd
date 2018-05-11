@@ -33,6 +33,7 @@
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
+#include "modulemd-intent.h"
 #include "modulemd-module.h"
 #include "modulemd-prioritizer.h"
 #include "modulemd-profile.h"

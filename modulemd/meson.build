@@ -5,6 +5,7 @@ modulemd_srcs = [
     'modulemd-component-rpm.c',
     'modulemd-defaults.c',
     'modulemd-dependencies.c',
+    'modulemd-intent.c',
     'modulemd-module.c',
     'modulemd-prioritizer.c',
     'modulemd-profile.c',
@@ -28,6 +29,7 @@ modulemd_hdrs = [
     'modulemd-component-rpm.h',
     'modulemd-defaults.h',
     'modulemd-dependencies.h',
+    'modulemd-intent.h',
     'modulemd-module.h',
     'modulemd-prioritizer.h',
     'modulemd-profile.h',
@@ -136,6 +138,19 @@ test_modulemd_dependencies = executable(
 test('test_modulemd_dependencies', test_modulemd_dependencies,
      env : test_env)
 test('test_release_modulemd_dependencies', test_modulemd_dependencies,
+     env : test_release_env)
+
+test_modulemd_intent = executable(
+    'test_modulemd_intent',
+    'test-modulemd-intent.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_intent', test_modulemd_intent,
+     env : test_env)
+test('test_release_modulemd_intent', test_modulemd_intent,
      env : test_release_env)
 
 test_modulemd_module = executable(

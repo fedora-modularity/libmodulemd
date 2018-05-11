@@ -115,5 +115,28 @@ class TestIssues(unittest.TestCase):
             "%s/mod-defaults/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
         print (defs)
 
+class TestIntent(unittest.TestCase):
+    def test_basic(self):
+        intent = Modulemd.Intent.new("intent_name")
+        intent.set_default_stream("default stream")
+
+        assert intent.props.intent_name == 'intent_name'
+        assert intent.props.default_stream == 'default stream'
+
+        intent.set_profiles_for_stream("default stream", ['default', 'server'])
+
+        contents = intent.props.profile_defaults['default stream']
+        assert contents.contains('default')
+        assert contents.contains('server')
+
+        assert intent.props.profile_defaults['default stream'].contains('default')
+        assert intent.props.profile_defaults['default stream'].contains('server')
+
+        intent_copy = intent.copy()
+        assert intent_copy.props.intent_name == 'intent_name'
+        assert intent_copy.props.default_stream == 'default stream'
+        assert intent_copy.props.profile_defaults['default stream'].contains('default')
+        assert intent_copy.props.profile_defaults['default stream'].contains('server')
+
 if __name__ == '__main__':
     unittest.main()

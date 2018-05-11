@@ -57,6 +57,14 @@ class TestStandard(unittest.TestCase):
         assert failures[0].props.gerror.message == 'Received scalar where sequence expected'
 
 
+class TestDefaults(unittest.TestCase):
+    def test_defaults(self):
+        defaults = Modulemd.Defaults.new_from_file(
+            '%s/mod-defaults/spec.v1.yaml' % os.getenv('MESON_SOURCE_ROOT'))
+        assert defaults
+
+        assert defaults.props.profile_defaults['bar'].contains('baz')
+        assert defaults.props.profile_defaults['bar'].contains('snafu')
 
 
 class TestIssues(unittest.TestCase):

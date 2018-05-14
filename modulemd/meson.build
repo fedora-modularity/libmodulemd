@@ -81,6 +81,7 @@ install_headers(
   subdir : header_path,
 )
 
+# Test env with fatal warnings and criticals
 test_env = environment()
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 test_env.set('G_MESSAGES_DEBUG', 'all')
@@ -88,6 +89,14 @@ test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
 test_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
 test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
+
+# Test env with release values
+test_release_env = environment()
+test_release_env.set('G_MESSAGES_DEBUG', 'all')
+test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+test_release_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
+test_release_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
+test_release_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
 
 test_modulemd_component = executable(
     'test_modulemd_component',
@@ -99,6 +108,8 @@ test_modulemd_component = executable(
 )
 test('test_modulemd_component', test_modulemd_component,
      env : test_env)
+test('test_release_modulemd_component', test_modulemd_component,
+     env : test_release_env)
 
 test_modulemd_defaults = executable(
     'test_modulemd_defaults',
@@ -111,6 +122,8 @@ test_modulemd_defaults = executable(
 )
 test('test_modulemd_defaults', test_modulemd_defaults,
      env : test_env)
+test('test_release_modulemd_defaults', test_modulemd_defaults,
+     env : test_release_env)
 
 test_modulemd_dependencies = executable(
     'test_modulemd_dependencies',
@@ -122,6 +135,8 @@ test_modulemd_dependencies = executable(
 )
 test('test_modulemd_dependencies', test_modulemd_dependencies,
      env : test_env)
+test('test_release_modulemd_dependencies', test_modulemd_dependencies,
+     env : test_release_env)
 
 test_modulemd_module = executable(
     'test_modulemd_module',
@@ -133,6 +148,8 @@ test_modulemd_module = executable(
 )
 test('test_modulemd_module', test_modulemd_module,
      env : test_env)
+test('test_release_modulemd_module', test_modulemd_module,
+     env : test_release_env)
 
 test_modulemd_regressions = executable(
     'test_modulemd_regressions',
@@ -144,6 +161,8 @@ test_modulemd_regressions = executable(
 )
 test('test_modulemd_regressions', test_modulemd_regressions,
     env : test_env)
+test('test_release_modulemd_regressions', test_modulemd_regressions,
+    env : test_release_env)
 
 test_modulemd_servicelevel = executable(
     'test_modulemd_servicelevel',
@@ -153,7 +172,10 @@ test_modulemd_servicelevel = executable(
     ],
     install : false,
 )
-test('test_modulemd_servicelevel', test_modulemd_servicelevel)
+test('test_modulemd_servicelevel', test_modulemd_servicelevel,
+     env : test_env)
+test('test_release_modulemd_servicelevel', test_modulemd_servicelevel,
+     env : test_release_env)
 
 test_modulemd_simpleset = executable(
     'test_modulemd_simpleset',
@@ -165,6 +187,8 @@ test_modulemd_simpleset = executable(
 )
 test('test_modulemd_simpleset', test_modulemd_simpleset,
      env : test_env)
+test('test_release_modulemd_simpleset', test_modulemd_simpleset,
+     env : test_release_env)
 
 test_modulemd_subdocument = executable(
     'test_modulemd_subdocument',
@@ -176,6 +200,8 @@ test_modulemd_subdocument = executable(
 )
 test('test_modulemd_subdocument', test_modulemd_subdocument,
      env : test_env)
+test('test_release_modulemd_subdocument', test_modulemd_subdocument,
+     env : test_release_env)
 
 test_modulemd_yaml = executable(
     'test_modulemd_yaml',
@@ -188,9 +214,13 @@ test_modulemd_yaml = executable(
 )
 test('test_modulemd_yaml', test_modulemd_yaml,
      env : test_env)
+test('test_release_modulemd_yaml', test_modulemd_yaml,
+     env : test_release_env)
 
 test_modulemd_python = find_program('test-modulemd-python.py')
 test ('test_modulemd_python', test_modulemd_python, env : test_env)
+test ('test_release_modulemd_python', test_modulemd_python,
+      env : test_release_env)
 
 gnome.generate_gir(
     modulemd_lib,

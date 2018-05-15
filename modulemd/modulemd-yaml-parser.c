@@ -205,7 +205,7 @@ _parse_yaml (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   g_autoptr (GPtrArray) subdocuments = NULL;
   g_autoptr (GPtrArray) failed_subdocuments = NULL;
   g_autoptr (GPtrArray) objects = NULL;
@@ -357,8 +357,8 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
   gboolean finish_invalid_document = FALSE;
   gsize depth = 0;
   g_autoptr (modulemd_yaml_string) yaml_string = NULL;
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT(value_event);
   yaml_emitter_t emitter;
 
   g_debug ("TRACE: entering _read_yaml_and_type");
@@ -588,8 +588,6 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     &emitter, &event, &error, "Error ending stream");
 
-  yaml_event_delete (&event);
-
   /* If we get here with an invalid document type and no error */
   if (modulemd_subdocument_get_doctype (document) == G_TYPE_INVALID &&
       error == NULL)
@@ -625,7 +623,7 @@ _parse_subdocument (ModulemdSubdocument *subdocument,
                     GError **error)
 {
   gboolean result = FALSE;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean done = FALSE;
   GObject *object = NULL;
   yaml_parser_t parser;
@@ -683,8 +681,8 @@ gboolean
 _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
 {
   gboolean result = FALSE;
-  gchar **strv = NULL;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
+  g_auto(GStrv) strv = NULL;
 
   YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
   if (event.type != YAML_SCALAR_EVENT)
@@ -706,8 +704,6 @@ _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
   result = TRUE;
 
 error:
-  g_clear_pointer (&strv, g_strfreev);
-  yaml_event_delete (&event);
   return result;
 }
 
@@ -717,10 +713,10 @@ _simpleset_from_sequence (yaml_parser_t *parser,
                           GError **error)
 {
   gboolean result = FALSE;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean started = FALSE;
   gboolean done = FALSE;
-  ModulemdSimpleSet *set = NULL;
+  g_autoptr(ModulemdSimpleSet) set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -767,9 +763,6 @@ _simpleset_from_sequence (yaml_parser_t *parser,
   result = TRUE;
 
 error:
-  yaml_event_delete (&event);
-  g_object_unref (set);
-
   g_debug ("TRACE: exiting _simpleset_from_sequence");
   return result;
 }
@@ -780,11 +773,11 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GError **error)
 {
   gboolean result = FALSE;
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT(value_event);
   gboolean started = FALSE;
   gboolean done = FALSE;
-  GHashTable *htable = NULL;
+  g_autoptr(GHashTable) htable = NULL;
   gchar *name = NULL;
   gchar *value = NULL;
 
@@ -847,9 +840,6 @@ _hashtable_from_mapping (yaml_parser_t *parser,
   result = TRUE;
 
 error:
-  yaml_event_delete (&value_event);
-  yaml_event_delete (&event);
-  g_hash_table_unref (htable);
 
   g_debug ("TRACE: exiting _hashtable_from_mapping");
   return result;
@@ -859,7 +849,7 @@ error:
 gboolean
 _parse_skip (yaml_parser_t *parser, GError **error)
 {
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gsize depth = 0;
@@ -898,6 +888,5 @@ _parse_skip (yaml_parser_t *parser, GError **error)
 
   result = TRUE;
 error:
-  yaml_event_delete (&event);
   return result;
 }

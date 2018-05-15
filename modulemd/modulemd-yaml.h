@@ -226,6 +226,12 @@ modulemd_yaml_string_free (modulemd_yaml_string *yaml_string);
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_yaml_string,
                                modulemd_yaml_string_free);
 
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_event_t, yaml_event_delete);
+
+#define MMD_INIT_YAML_EVENT(_event)                                           \
+  g_auto (yaml_event_t) _event;                                               \
+  memset (&(_event), 0, sizeof (yaml_event_t));
+
 gboolean
 parse_raw_yaml_mapping (yaml_parser_t *parser,
                         GVariant **variant,

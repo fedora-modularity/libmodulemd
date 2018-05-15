@@ -72,8 +72,8 @@ _parse_defaults (yaml_parser_t *parser,
                  guint64 version,
                  GError **error)
 {
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
   const gchar *module_name = NULL;
@@ -125,6 +125,7 @@ _parse_defaults (yaml_parser_t *parser,
                   g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                              "modulemd-defaults"))
                 {
+                  yaml_event_delete (&value_event);
                   MMD_YAML_ERROR_RETURN (error, "Document type mismatch");
                 }
               yaml_event_delete (&value_event);
@@ -202,8 +203,6 @@ _parse_defaults (yaml_parser_t *parser,
   result = TRUE;
 
 error:
-  yaml_event_delete (&value_event);
-  yaml_event_delete (&event);
   g_clear_pointer (&defaults, g_object_unref);
 
   g_debug ("TRACE: exiting _parse_defaults");
@@ -215,8 +214,8 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                       yaml_parser_t *parser,
                       GError **error)
 {
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT(value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
 
@@ -300,8 +299,6 @@ _parse_defaults_data (ModulemdDefaults *defaults,
   result = TRUE;
 
 error:
-  yaml_event_delete (&value_event);
-  yaml_event_delete (&event);
   if (!result)
     {
       g_clear_pointer (&defaults, g_object_unref);
@@ -316,7 +313,7 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
                           yaml_parser_t *parser,
                           GError **error)
 {
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
@@ -378,7 +375,6 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
   result = TRUE;
 
 error:
-  yaml_event_delete (&event);
   g_clear_pointer (&set, g_object_unref);
   g_clear_pointer (&stream_name, g_free);
   g_debug ("TRACE: exiting _parse_defaults_profiles");
@@ -391,7 +387,7 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
                          yaml_parser_t *parser,
                          GError **error)
 {
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean in_map = FALSE;
   gboolean result = FALSE;
   gboolean done = FALSE;
@@ -452,7 +448,6 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
   result = TRUE;
 
 error:
-  yaml_event_delete (&event);
   g_debug ("TRACE: exiting _parse_defaults_intents");
   return result;
 }
@@ -466,8 +461,8 @@ _parse_intent (yaml_parser_t *parser,
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT(value_event);
   g_autoptr (ModulemdIntent) _intent = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -515,6 +510,8 @@ _parse_intent (yaml_parser_t *parser,
 
               modulemd_intent_set_default_stream (
                 _intent, (const gchar *)value_event.data.scalar.value);
+
+              yaml_event_delete (&value_event);
             }
           else if (g_strcmp0 ("profiles",
                               (const gchar *)event.data.scalar.value) == 0)
@@ -549,7 +546,6 @@ _parse_intent (yaml_parser_t *parser,
     }
 
 error:
-  yaml_event_delete (&event);
   g_debug ("TRACE: exiting _parse_intent");
   return result;
 }
@@ -560,7 +556,7 @@ _parse_intent_profiles (ModulemdIntent *intent,
                         yaml_parser_t *parser,
                         GError **error)
 {
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT(event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
@@ -622,7 +618,6 @@ _parse_intent_profiles (ModulemdIntent *intent,
   result = TRUE;
 
 error:
-  yaml_event_delete (&event);
   g_clear_pointer (&set, g_object_unref);
   g_clear_pointer (&stream_name, g_free);
   g_debug ("TRACE: exiting _parse_intent_profiles");

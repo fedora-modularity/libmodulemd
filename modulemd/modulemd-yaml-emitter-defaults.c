@@ -46,6 +46,19 @@ _emit_defaults_profiles (yaml_emitter_t *emitter,
                          ModulemdDefaults *defaults,
                          GError **error);
 
+static gboolean
+_emit_defaults_intents (yaml_emitter_t *emitter,
+                        ModulemdDefaults *defaults,
+                        GError **error);
+
+static gboolean
+_emit_intent (yaml_emitter_t *emitter, ModulemdIntent *intent, GError **error);
+
+static gboolean
+_emit_intent_profiles (yaml_emitter_t *emitter,
+                       ModulemdIntent *intent,
+                       GError **error);
+
 gboolean
 _emit_defaults (yaml_emitter_t *emitter,
                 ModulemdDefaults *defaults,
@@ -190,6 +203,13 @@ _emit_defaults_data (yaml_emitter_t *emitter,
                                      "Could not write out profile defaults");
     }
 
+  /* Intents */
+
+  if (!_emit_defaults_intents (emitter, defaults, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not write out intents");
+    }
+
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
@@ -250,5 +270,154 @@ error:
   g_clear_pointer (&keys, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_defaults_profiles");
+  return result;
+}
+
+
+static gboolean
+_emit_defaults_intents (yaml_emitter_t *emitter,
+                        ModulemdDefaults *defaults,
+                        GError **error)
+{
+  gboolean result = FALSE;
+  g_autofree gchar *name = NULL;
+  yaml_event_t event;
+  GHashTable *intents = NULL;
+  g_autoptr (GPtrArray) keys = NULL;
+  ModulemdIntent *intent = NULL;
+
+  g_debug ("TRACE: entering _emit_defaults_intents");
+
+  name = g_strdup ("intents");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  /* Start the map */
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting intents mapping");
+
+  intents = modulemd_defaults_peek_intents (defaults);
+  keys = _modulemd_ordered_str_keys (intents, _modulemd_strcmp_sort);
+
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      name = g_strdup (g_ptr_array_index (keys, i));
+      intent = g_hash_table_lookup (intents, name);
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+      if (!_emit_intent (emitter, intent, error))
+        {
+          MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not write out intents");
+        }
+    }
+
+
+  /* End the map */
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending intents mapping");
+
+  result = TRUE;
+error:
+  yaml_event_delete (&event);
+
+  g_debug ("TRACE: exiting _emit_defaults_intents");
+  return result;
+}
+
+
+static gboolean
+_emit_intent (yaml_emitter_t *emitter, ModulemdIntent *intent, GError **error)
+{
+  gboolean result = FALSE;
+  g_autofree gchar *name = NULL;
+  g_autofree gchar *value = NULL;
+  yaml_event_t event;
+
+  g_debug ("TRACE: entering _emit_intent");
+
+  /* Start the map */
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting intent mapping");
+
+  /* Emit the default stream, if any */
+  value = modulemd_intent_dup_default_stream (intent);
+  if (value)
+    {
+      name = g_strdup ("stream");
+
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
+
+  if (!_emit_intent_profiles (emitter, intent, error))
+    {
+      MMD_YAML_ERROR_RETURN_RETHROW (
+        error, "Could not write out intent profile defaults");
+    }
+
+
+  /* End the map */
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending intents mapping");
+
+  result = TRUE;
+error:
+  yaml_event_delete (&event);
+
+  g_debug ("TRACE: exiting _emit_intent");
+  return result;
+}
+
+static gboolean
+_emit_intent_profiles (yaml_emitter_t *emitter,
+                       ModulemdIntent *intent,
+                       GError **error)
+{
+  gboolean result = FALSE;
+  yaml_event_t event;
+  gchar *name = NULL;
+  GHashTable *profile_defaults = NULL;
+  GPtrArray *keys = NULL;
+  ModulemdSimpleSet *set = NULL;
+
+  g_debug ("TRACE: entering _emit_intent_profiles");
+
+  name = g_strdup ("profiles");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  /* Start the map */
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting profile default mapping");
+
+  profile_defaults = modulemd_intent_peek_profile_defaults (intent);
+  keys = _modulemd_ordered_str_keys (profile_defaults, _modulemd_strcmp_sort);
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      name = g_strdup (g_ptr_array_index (keys, i));
+      set = g_hash_table_lookup (profile_defaults, name);
+
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+      _emit_modulemd_simpleset (emitter, set, YAML_FLOW_SEQUENCE_STYLE, error);
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending intent profile default mapping");
+
+
+  result = TRUE;
+
+error:
+  g_clear_pointer (&name, g_free);
+  g_clear_pointer (&keys, g_ptr_array_unref);
+
+  g_debug ("TRACE: exiting _emit_intent_profiles");
   return result;
 }

@@ -751,7 +751,7 @@ modulemd_defaults_get_property (GObject *object,
 
     case PROP_PROFILE_DEFAULTS:
       g_value_take_boxed (value,
-                         modulemd_defaults_dup_profile_defaults (self));
+                          modulemd_defaults_dup_profile_defaults (self));
       break;
 
 

@@ -66,6 +66,25 @@ class TestDefaults(unittest.TestCase):
         assert defaults.props.profile_defaults['bar'].contains('baz')
         assert defaults.props.profile_defaults['bar'].contains('snafu')
 
+        assert defaults.props.intents
+        assert 'desktop' in defaults.props.intents
+        assert defaults.props.intents['desktop'].props.default_stream == 'y.z'
+        assert 'y.z' in defaults.props.intents['desktop'].props.profile_defaults
+        assert 'blah' in defaults.props.intents['desktop'].props.profile_defaults['y.z'].get()
+        assert 'x.y' in defaults.props.intents['desktop'].props.profile_defaults
+        assert 'other' in defaults.props.intents['desktop'].props.profile_defaults['x.y'].get()
+
+        assert 'server' in defaults.props.intents
+        assert defaults.props.intents['server'].props.default_stream == 'x.y'
+        assert 'x.y' in defaults.props.intents['server'].props.profile_defaults
+        assert not defaults.props.intents['server'].props.profile_defaults['x.y'].get()
+
+        nointents = Modulemd.Defaults.new_from_file(
+            '%s/mod-defaults/ex2.yaml' % os.getenv('MESON_SOURCE_ROOT'))
+        assert nointents
+
+        assert not nointents.props.intents
+
     def test_construction(self):
         defaults = Modulemd.Defaults()
         defaults.set_version(1)

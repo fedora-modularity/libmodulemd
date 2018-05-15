@@ -54,6 +54,17 @@ static gboolean
 _parse_defaults_intents (ModulemdDefaults *defaults,
                          yaml_parser_t *parser,
                          GError **error);
+static gboolean
+_parse_intent (yaml_parser_t *parser,
+               const gchar *name,
+               ModulemdIntent **intent,
+               GError **error);
+
+static gboolean
+_parse_intent_profiles (ModulemdIntent *intent,
+                        yaml_parser_t *parser,
+                        GError **error);
+
 
 gboolean
 _parse_defaults (yaml_parser_t *parser,
@@ -308,6 +319,7 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
   yaml_event_t event;
   gboolean result = FALSE;
   gboolean done = FALSE;
+  gboolean in_map = FALSE;
   gchar *stream_name = NULL;
   ModulemdSimpleSet *set = NULL;
 
@@ -324,6 +336,7 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
         {
         case YAML_MAPPING_START_EVENT:
           /* This is the start of the profile content. */
+          in_map = TRUE;
           break;
 
         case YAML_MAPPING_END_EVENT:
@@ -332,6 +345,14 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
           break;
 
         case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              /* We got a scalar where we expected a map */
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Malformed YAML in intent profiles");
+              break;
+            }
+
           /* Each scalar event represents a profile */
           stream_name = g_strdup ((const gchar *)event.data.scalar.value);
 
@@ -347,7 +368,8 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in licenses");
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event in default profiles");
           break;
         }
       yaml_event_delete (&event);
@@ -369,15 +391,240 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
                          yaml_parser_t *parser,
                          GError **error)
 {
+  yaml_event_t event;
+  gboolean in_map = FALSE;
   gboolean result = FALSE;
+  gboolean done = FALSE;
+  g_autoptr (ModulemdIntent) intent = NULL;
 
-  /* Not yet implemented, so skip it */
-  result = _parse_skip (parser, error);
-  if (!result)
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_defaults_intents");
+
+  while (!done)
     {
-      MMD_YAML_NOEVENT_ERROR_RETURN (error, "Could not skip intents");
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the intent content. */
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the intent content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              /* We got a scalar where we expected a map */
+              MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+              break;
+            }
+
+          /* Each scalar event represents an intent */
+          if (!_parse_intent (parser,
+                              (const gchar *)event.data.scalar.value,
+                              &intent,
+                              error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse intent");
+              break;
+            }
+
+          modulemd_defaults_add_intent (defaults, intent);
+          g_clear_pointer (&intent, g_object_unref);
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  result = TRUE;
+
+error:
+  yaml_event_delete (&event);
+  g_debug ("TRACE: exiting _parse_defaults_intents");
+  return result;
+}
+
+static gboolean
+_parse_intent (yaml_parser_t *parser,
+               const gchar *name,
+               ModulemdIntent **intent,
+               GError **error)
+{
+  gboolean result = FALSE;
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  yaml_event_t event;
+  yaml_event_t value_event;
+  g_autoptr (ModulemdIntent) _intent = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_debug ("TRACE: entering _parse_intent");
+
+  _intent = modulemd_intent_new (name);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the intent content. */
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the intent content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              /* We got a scalar where we expected a map */
+              MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+              break;
+            }
+
+          /* Default Stream */
+
+          if (g_strcmp0 ("stream", (const gchar *)event.data.scalar.value) ==
+              0)
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (
+                    error, "Failed to parse default module stream");
+                }
+
+              modulemd_intent_set_default_stream (
+                _intent, (const gchar *)value_event.data.scalar.value);
+            }
+          else if (g_strcmp0 ("profiles",
+                              (const gchar *)event.data.scalar.value) == 0)
+            {
+              if (!_parse_intent_profiles (_intent, parser, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Could not parse intent profiles");
+                }
+            }
+          else
+            {
+              /* Unexpected key in the map */
+              MMD_YAML_ERROR_RETURN (error, "Unexpected key in intent");
+              break;
+            }
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  result = TRUE;
+  if (intent)
+    {
+      *intent = g_object_ref (_intent);
     }
 
 error:
+  yaml_event_delete (&event);
+  g_debug ("TRACE: exiting _parse_intent");
+  return result;
+}
+
+
+static gboolean
+_parse_intent_profiles (ModulemdIntent *intent,
+                        yaml_parser_t *parser,
+                        GError **error)
+{
+  yaml_event_t event;
+  gboolean result = FALSE;
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  gchar *stream_name = NULL;
+  ModulemdSimpleSet *set = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_intent_profiles");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the profile content. */
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the profile content */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              /* We got a scalar where we expected a map */
+              MMD_YAML_ERROR_RETURN (error,
+                                     "Malformed YAML in intent profiles");
+              break;
+            }
+
+          /* Each scalar event represents a profile */
+          stream_name = g_strdup ((const gchar *)event.data.scalar.value);
+
+          if (!_simpleset_from_sequence (parser, &set, error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid sequence");
+            }
+          modulemd_intent_assign_profiles_for_stream (
+            intent, stream_name, set);
+          g_clear_pointer (&set, g_object_unref);
+          g_clear_pointer (&stream_name, g_free);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event in intent profiles");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  result = TRUE;
+
+error:
+  yaml_event_delete (&event);
+  g_clear_pointer (&set, g_object_unref);
+  g_clear_pointer (&stream_name, g_free);
+  g_debug ("TRACE: exiting _parse_intent_profiles");
   return result;
 }

@@ -29,6 +29,7 @@
 #include <glib-object.h>
 
 #include "modulemd.h"
+#include "modulemd-intent.h"
 
 enum
 {
@@ -103,6 +104,15 @@ GHashTable *
 modulemd_defaults_peek_profile_defaults (ModulemdDefaults *self);
 GHashTable *
 modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self);
+
+void
+modulemd_defaults_add_intent (ModulemdDefaults *self, ModulemdIntent *intent);
+void
+modulemd_defaults_set_intents (ModulemdDefaults *self, GHashTable *intents);
+GHashTable *
+modulemd_defaults_peek_intents (ModulemdDefaults *self);
+GHashTable *
+modulemd_defaults_dup_intents (ModulemdDefaults *self);
 
 
 ModulemdDefaults *

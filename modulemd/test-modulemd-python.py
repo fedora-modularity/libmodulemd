@@ -58,13 +58,33 @@ class TestStandard(unittest.TestCase):
 
 
 class TestDefaults(unittest.TestCase):
-    def test_defaults(self):
+    def test_spec(self):
         defaults = Modulemd.Defaults.new_from_file(
             '%s/mod-defaults/spec.v1.yaml' % os.getenv('MESON_SOURCE_ROOT'))
         assert defaults
 
         assert defaults.props.profile_defaults['bar'].contains('baz')
         assert defaults.props.profile_defaults['bar'].contains('snafu')
+
+    def test_construction(self):
+        defaults = Modulemd.Defaults()
+        defaults.set_version(1)
+        defaults.set_module_name("foo")
+        defaults.set_default_stream("stable")
+        defaults.set_profiles_for_stream("stable", ['default'])
+
+        intent = Modulemd.Intent.new('server')
+        intent.set_default_stream('stable')
+        intent.set_profiles_for_stream('stable', ['server', 'microservice'])
+        intent.set_profiles_for_stream('PoC', ['cloud', 'microservice'])
+        defaults.add_intent(intent)
+
+        assert 'server' in defaults.props.intents
+        assert 'server' in defaults.props.intents['server'].props.profile_defaults['stable'].get()
+        assert 'microservice' in defaults.props.intents['server'].props.profile_defaults['stable'].get()
+        assert 'cloud' in defaults.props.intents['server'].props.profile_defaults['PoC'].get()
+        assert 'microservice' in defaults.props.intents['server'].props.profile_defaults['PoC'].get()
+
 
 
 class TestIssues(unittest.TestCase):

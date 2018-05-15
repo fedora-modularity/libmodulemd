@@ -40,6 +40,7 @@ struct _ModulemdDefaults
   guint64 version;
   gchar *module_name;
   gchar *default_stream;
+  GHashTable *intents;
   GHashTable *profile_defaults;
 };
 
@@ -52,6 +53,7 @@ enum
   PROP_VERSION,
   PROP_MODULE_NAME,
   PROP_DEFAULT_STREAM,
+  PROP_INTENTS,
   PROP_PROFILE_DEFAULTS,
 
   N_PROPS
@@ -72,6 +74,7 @@ modulemd_defaults_finalize (GObject *object)
 
   g_clear_pointer (&self->module_name, g_free);
   g_clear_pointer (&self->default_stream, g_free);
+  g_clear_pointer (&self->intents, g_hash_table_unref);
   g_clear_pointer (&self->profile_defaults, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_defaults_parent_class)->finalize (object);
@@ -417,6 +420,119 @@ modulemd_defaults_dup_profile_defaults (ModulemdDefaults *self)
 
 
 /**
+ * modulemd_defaults_add_intent:
+ * @intent: (transfer none) (not nullable): The #ModulemdIntent to add to the
+ * intents table.
+ *
+ * Adds an intent object to the hash table.
+ *
+ * Since: 1.5
+ */
+void
+modulemd_defaults_add_intent (ModulemdDefaults *self, ModulemdIntent *intent)
+{
+  g_autoptr (ModulemdIntent) copy = NULL;
+
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+  g_return_if_fail (MODULEMD_IS_INTENT (intent));
+
+  copy = modulemd_intent_copy (intent);
+  g_hash_table_replace (self->intents,
+                        g_strdup (modulemd_intent_peek_intent_name (intent)),
+                        g_object_ref (copy));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INTENTS]);
+}
+
+
+/**
+ * modulemd_defaults_set_intents:
+ * @intents: (element-type utf8 ModulemdIntent) (nullable) (transfer none):
+ * A #GHashTable containing defaults for individual system intents.
+ *
+ * Since: 1.5
+ */
+void
+modulemd_defaults_set_intents (ModulemdDefaults *self, GHashTable *intents)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+
+  g_hash_table_remove_all (self->intents);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INTENTS]);
+
+  if (intents)
+    {
+      g_hash_table_iter_init (&iter, intents);
+
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          modulemd_defaults_add_intent (self, MODULEMD_INTENT (value));
+        }
+    }
+}
+
+
+/**
+ * modulemd_defaults_peek_intents:
+ *
+ * Get a pointer to the intents hash table. The returned table is managed by the
+ * #ModulemdDefaults object and must not be modified or freed.
+ *
+ * Returns: (element-type utf8 ModulemdIntent) (transfer none): A pointer to the
+ * intents hash table.
+ *
+ * Since: 1.5
+ */
+GHashTable *
+modulemd_defaults_peek_intents (ModulemdDefaults *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self), NULL);
+
+  return self->intents;
+}
+
+
+/**
+ * modulemd_defaults_dup_intents:
+ *
+ * Get a copy of the intents hash table. The returned table is managed by the
+ * caller and must be freed with g_hash_table_unref()
+ *
+ * Returns: (element-type utf8 ModulemdIntent) (transfer none): A copy of the
+ * intents hash table.
+ *
+ * Since: 1.5
+ */
+GHashTable *
+modulemd_defaults_dup_intents (ModulemdDefaults *self)
+{
+  g_autoptr (GHashTable) intents = NULL;
+  ModulemdIntent *intent = NULL;
+  gpointer key, value;
+  GHashTableIter iter;
+
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self), NULL);
+
+  intents =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  g_hash_table_iter_init (&iter, self->intents);
+
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      intent = MODULEMD_INTENT (value);
+      g_hash_table_replace (
+        intents,
+        g_strdup (modulemd_intent_peek_intent_name (intent)),
+        modulemd_intent_copy (intent));
+    }
+
+  return g_hash_table_ref (intents);
+}
+
+
+/**
  * modulemd_defaults_new_from_file:
  * @yaml_file: A YAML file containing the module metadata and other related
  * information such as default streams.
@@ -749,6 +865,10 @@ modulemd_defaults_get_property (GObject *object,
       g_value_set_string (value, modulemd_defaults_peek_default_stream (self));
       break;
 
+    case PROP_INTENTS:
+      g_value_take_boxed (value, modulemd_defaults_dup_intents (self));
+      break;
+
     case PROP_PROFILE_DEFAULTS:
       g_value_take_boxed (value,
                           modulemd_defaults_dup_profile_defaults (self));
@@ -779,6 +899,10 @@ modulemd_defaults_set_property (GObject *object,
 
     case PROP_DEFAULT_STREAM:
       modulemd_defaults_set_default_stream (self, g_value_get_string (value));
+      break;
+
+    case PROP_INTENTS:
+      modulemd_defaults_set_intents (self, g_value_get_boxed (value));
       break;
 
     case PROP_PROFILE_DEFAULTS:
@@ -833,6 +957,17 @@ modulemd_defaults_class_init (ModulemdDefaultsClass *klass)
     G_TYPE_HASH_TABLE,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
+  /**
+   * ModulemdDefaults:intents: (type GLib.HashTable(utf8,ModulemdIntent))
+   */
+  properties[PROP_INTENTS] = g_param_spec_boxed (
+    "intents",
+    "Intents",
+    "A hash table describing divergent defaults based on the intent of the "
+    "system.",
+    G_TYPE_HASH_TABLE,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -840,6 +975,8 @@ modulemd_defaults_class_init (ModulemdDefaultsClass *klass)
 static void
 modulemd_defaults_init (ModulemdDefaults *self)
 {
+  self->intents =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
   self->profile_defaults =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 }

@@ -58,6 +58,8 @@ modulemd_intent_finalize (GObject *object)
 {
   ModulemdIntent *self = (ModulemdIntent *)object;
 
+  g_clear_pointer (&self->intent_name, g_free);
+  g_clear_pointer (&self->default_stream, g_free);
   g_clear_pointer (&self->profile_defaults, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_intent_parent_class)->finalize (object);

@@ -209,7 +209,7 @@ _parse_yaml (yaml_parser_t *parser,
   g_autoptr (GPtrArray) subdocuments = NULL;
   g_autoptr (GPtrArray) failed_subdocuments = NULL;
   g_autoptr (GPtrArray) objects = NULL;
-  g_autoptr (ModulemdSubdocument) document = NULL;
+  ModulemdSubdocument *document = NULL;
   ModulemdSubdocument *subdocument = NULL;
   g_autoptr (GError) subdocument_error = NULL;
 
@@ -243,7 +243,7 @@ _parse_yaml (yaml_parser_t *parser,
         case YAML_DOCUMENT_START_EVENT:
           if (!_read_yaml_and_type (parser, &document))
             {
-              g_ptr_array_add (failed_subdocuments, g_object_ref (document));
+              g_ptr_array_add (failed_subdocuments, document);
 
               if (error)
                 {

@@ -12,11 +12,13 @@ try:
 except ImportError:
     # Return error 77 to skip this test on platforms without the necessary
     # python modules
-    sys.exit (77)
+    sys.exit(77)
+
 
 class TestStandard(unittest.TestCase):
-    def test_failures (self):
-        (objects, failures) = Modulemd.objects_from_file_ext (
+
+    def test_failures(self):
+        (objects, failures) = Modulemd.objects_from_file_ext(
             "%s/test_data/mixed-v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
 
         # There should be two valid documents
@@ -29,35 +31,43 @@ class TestStandard(unittest.TestCase):
         for failure in failures:
             assert failure.props.gerror.code == 3
 
-        assert failures[0].props.gerror.message == 'Document type is not recognized'
-        assert failures[1].props.gerror.message == 'Document type was specified more than once'
-        assert failures[2].props.gerror.message == 'Document version was specified more than once'
-        assert failures[3].props.gerror.message == 'Document type was not a scalar value'
-        assert failures[4].props.gerror.message == 'Document type is not recognized'
-        assert failures[5].props.gerror.message == 'Document type is not recognized'
-        assert failures[6].props.gerror.message == 'Unknown modulemd defaults version'
+        assert failures[
+            0].props.gerror.message == 'Document type is not recognized'
+        assert failures[
+            1].props.gerror.message == 'Document type was specified more than once'
+        assert failures[
+            2].props.gerror.message == 'Document version was specified more than once'
+        assert failures[
+            3].props.gerror.message == 'Document type was not a scalar value'
+        assert failures[
+            4].props.gerror.message == 'Document type is not recognized'
+        assert failures[
+            5].props.gerror.message == 'Document type is not recognized'
+        assert failures[
+            6].props.gerror.message == 'Unknown modulemd defaults version'
 
         # Read in a file that's definitely not YAML
         try:
-            (objects, failures) = Modulemd.objects_from_file_ext (
+            (objects, failures) = Modulemd.objects_from_file_ext(
                 "%s/COPYING" % os.getenv('MESON_SOURCE_ROOT'))
         except GLib.GError as e:
             # Verify that it's a parser error
             assert e.message == "Parser error"
 
-
         # Read in a file that fails modulemd validation
-        (objects, failures) = Modulemd.objects_from_file_ext (
-                "%s/test_data/issue14-mismatch.yaml"
-                % os.getenv('MESON_SOURCE_ROOT'))
+        (objects, failures) = Modulemd.objects_from_file_ext(
+            "%s/test_data/issue14-mismatch.yaml"
+            % os.getenv('MESON_SOURCE_ROOT'))
 
         assert len(objects) == 0
         assert len(failures) == 1
 
-        assert failures[0].props.gerror.message == 'Received scalar where sequence expected'
+        assert failures[
+            0].props.gerror.message == 'Received scalar where sequence expected'
 
 
 class TestDefaults(unittest.TestCase):
+
     def test_spec(self):
         defaults = Modulemd.Defaults.new_from_file(
             '%s/mod-defaults/spec.v1.yaml' % os.getenv('MESON_SOURCE_ROOT'))
@@ -69,15 +79,20 @@ class TestDefaults(unittest.TestCase):
         assert defaults.props.intents
         assert 'desktop' in defaults.props.intents
         assert defaults.props.intents['desktop'].props.default_stream == 'y.z'
-        assert 'y.z' in defaults.props.intents['desktop'].props.profile_defaults
-        assert 'blah' in defaults.props.intents['desktop'].props.profile_defaults['y.z'].get()
-        assert 'x.y' in defaults.props.intents['desktop'].props.profile_defaults
-        assert 'other' in defaults.props.intents['desktop'].props.profile_defaults['x.y'].get()
+        assert 'y.z' in defaults.props.intents[
+            'desktop'].props.profile_defaults
+        assert 'blah' in defaults.props.intents[
+            'desktop'].props.profile_defaults['y.z'].get()
+        assert 'x.y' in defaults.props.intents[
+            'desktop'].props.profile_defaults
+        assert 'other' in defaults.props.intents[
+            'desktop'].props.profile_defaults['x.y'].get()
 
         assert 'server' in defaults.props.intents
         assert defaults.props.intents['server'].props.default_stream == 'x.y'
         assert 'x.y' in defaults.props.intents['server'].props.profile_defaults
-        assert not defaults.props.intents['server'].props.profile_defaults['x.y'].get()
+        assert not defaults.props.intents[
+            'server'].props.profile_defaults['x.y'].get()
 
         nointents = Modulemd.Defaults.new_from_file(
             '%s/mod-defaults/ex2.yaml' % os.getenv('MESON_SOURCE_ROOT'))
@@ -99,11 +114,14 @@ class TestDefaults(unittest.TestCase):
         defaults.add_intent(intent)
 
         assert 'server' in defaults.props.intents
-        assert 'server' in defaults.props.intents['server'].props.profile_defaults['stable'].get()
-        assert 'microservice' in defaults.props.intents['server'].props.profile_defaults['stable'].get()
-        assert 'cloud' in defaults.props.intents['server'].props.profile_defaults['PoC'].get()
-        assert 'microservice' in defaults.props.intents['server'].props.profile_defaults['PoC'].get()
-
+        assert 'server' in defaults.props.intents[
+            'server'].props.profile_defaults['stable'].get()
+        assert 'microservice' in defaults.props.intents[
+            'server'].props.profile_defaults['stable'].get()
+        assert 'cloud' in defaults.props.intents[
+            'server'].props.profile_defaults['PoC'].get()
+        assert 'microservice' in defaults.props.intents[
+            'server'].props.profile_defaults['PoC'].get()
 
 
 class TestIssues(unittest.TestCase):
@@ -141,7 +159,7 @@ class TestIssues(unittest.TestCase):
         assert mmd.peek_rpm_buildopts() != {}
         assert mmd.peek_rpm_buildopts()['macros'] == '%my_macro 1'
         dumped = mmd.dumps()
-        print ("YAML:\n%s" % dumped, file=sys.stderr)
+        print("YAML:\n%s" % dumped, file=sys.stderr)
         mmd2 = Modulemd.Module.new_from_string(dumped)
         assert mmd2.peek_rpm_buildopts() != {}
         assert mmd2.peek_rpm_buildopts()['macros'] == '%my_macro 1'
@@ -152,9 +170,11 @@ class TestIssues(unittest.TestCase):
         # double-freeing memory.
         defs = Modulemd.Module.new_all_from_file_ext(
             "%s/mod-defaults/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
-        print (defs)
+        print(defs)
+
 
 class TestIntent(unittest.TestCase):
+
     def test_basic(self):
         intent = Modulemd.Intent.new("intent_name")
         intent.set_default_stream("default stream")
@@ -168,14 +188,18 @@ class TestIntent(unittest.TestCase):
         assert contents.contains('default')
         assert contents.contains('server')
 
-        assert intent.props.profile_defaults['default stream'].contains('default')
-        assert intent.props.profile_defaults['default stream'].contains('server')
+        assert intent.props.profile_defaults[
+            'default stream'].contains('default')
+        assert intent.props.profile_defaults[
+            'default stream'].contains('server')
 
         intent_copy = intent.copy()
         assert intent_copy.props.intent_name == 'intent_name'
         assert intent_copy.props.default_stream == 'default stream'
-        assert intent_copy.props.profile_defaults['default stream'].contains('default')
-        assert intent_copy.props.profile_defaults['default stream'].contains('server')
+        assert intent_copy.props.profile_defaults[
+            'default stream'].contains('default')
+        assert intent_copy.props.profile_defaults[
+            'default stream'].contains('server')
 
 if __name__ == '__main__':
     unittest.main()

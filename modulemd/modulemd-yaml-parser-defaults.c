@@ -214,8 +214,8 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                       yaml_parser_t *parser,
                       GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
 
@@ -313,7 +313,7 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
                           yaml_parser_t *parser,
                           GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
@@ -387,7 +387,7 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
                          yaml_parser_t *parser,
                          GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean in_map = FALSE;
   gboolean result = FALSE;
   gboolean done = FALSE;
@@ -461,8 +461,8 @@ _parse_intent (yaml_parser_t *parser,
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   g_autoptr (ModulemdIntent) _intent = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -556,7 +556,7 @@ _parse_intent_profiles (ModulemdIntent *intent,
                         yaml_parser_t *parser,
                         GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;

@@ -205,7 +205,7 @@ _parse_yaml (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   g_autoptr (GPtrArray) subdocuments = NULL;
   g_autoptr (GPtrArray) failed_subdocuments = NULL;
   g_autoptr (GPtrArray) objects = NULL;
@@ -357,8 +357,8 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
   gboolean finish_invalid_document = FALSE;
   gsize depth = 0;
   g_autoptr (modulemd_yaml_string) yaml_string = NULL;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   yaml_emitter_t emitter;
 
   g_debug ("TRACE: entering _read_yaml_and_type");
@@ -623,7 +623,7 @@ _parse_subdocument (ModulemdSubdocument *subdocument,
                     GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GObject *object = NULL;
   yaml_parser_t parser;
@@ -681,8 +681,8 @@ gboolean
 _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  g_auto(GStrv) strv = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  g_auto (GStrv) strv = NULL;
 
   YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
   if (event.type != YAML_SCALAR_EVENT)
@@ -713,10 +713,10 @@ _simpleset_from_sequence (yaml_parser_t *parser,
                           GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean started = FALSE;
   gboolean done = FALSE;
-  g_autoptr(ModulemdSimpleSet) set = NULL;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -773,11 +773,11 @@ _hashtable_from_mapping (yaml_parser_t *parser,
                          GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean started = FALSE;
   gboolean done = FALSE;
-  g_autoptr(GHashTable) htable = NULL;
+  g_autoptr (GHashTable) htable = NULL;
   gchar *name = NULL;
   gchar *value = NULL;
 
@@ -849,7 +849,7 @@ error:
 gboolean
 _parse_skip (yaml_parser_t *parser, GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   gsize depth = 0;

@@ -130,8 +130,8 @@ _parse_modulemd (yaml_parser_t *parser,
                  guint64 version,
                  GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
   guint64 mdversion;
@@ -243,7 +243,7 @@ _parse_modulemd (yaml_parser_t *parser,
     }
 
   result = TRUE;
-  *object = g_object_ref((GObject *)module);
+  *object = g_object_ref ((GObject *)module);
 
 error:
   g_debug ("TRACE: exiting _parse_modulemd");
@@ -256,8 +256,8 @@ _parse_modulemd_data (ModulemdModule *module,
                       GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   guint64 version;
   GDate *eol = NULL;
@@ -546,7 +546,7 @@ _parse_modulemd_licenses (ModulemdModule *module,
                           yaml_parser_t *parser,
                           GError **error)
 {
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean result = FALSE;
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
@@ -619,7 +619,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
 {
   gboolean result = FALSE;
   g_autoptr (GHashTable) xmd = NULL;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   g_autoptr (GVariant) variant = NULL;
   GVariantIter iter;
   gchar *key;
@@ -671,7 +671,7 @@ _parse_modulemd_deps_v1 (ModulemdModule *module,
                          GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *reqs = NULL;
 
@@ -748,7 +748,7 @@ _parse_modulemd_deps_v2 (ModulemdModule *module,
                          GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -812,7 +812,7 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   enum ModulemdReqType reqtype;
   g_autoptr (ModulemdDependencies) dep = NULL;
 
@@ -896,7 +896,7 @@ _parse_modulemd_v2_dep_map (ModulemdModule *module,
   gboolean result = FALSE;
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gchar *module_name = NULL;
   ModulemdSimpleSet *set = NULL;
   const gchar **dep_set = NULL;
@@ -1064,7 +1064,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
                           GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *profiles = NULL;
   gchar *name = NULL;
@@ -1132,8 +1132,8 @@ _parse_modulemd_profile (yaml_parser_t *parser,
                          GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
   ModulemdProfile *profile = NULL;
@@ -1223,7 +1223,7 @@ _parse_modulemd_api (ModulemdModule *module,
                      GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
 
@@ -1287,7 +1287,7 @@ _parse_modulemd_filters (ModulemdModule *module,
                          GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
 
@@ -1352,7 +1352,7 @@ _parse_modulemd_buildopts (ModulemdModule *module,
                            GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *opts = NULL;
 
@@ -1417,7 +1417,7 @@ _parse_modulemd_components (ModulemdModule *module,
                             GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *components = NULL;
 
@@ -1496,7 +1496,7 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
                                 GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *components = NULL;
   gchar *name = NULL;
@@ -1563,8 +1563,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                                GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   ModulemdComponentRpm *component = NULL;
   ModulemdSimpleSet *set = NULL;
@@ -1733,7 +1733,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
                                    GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *components = NULL;
   gchar *name = NULL;
@@ -1801,8 +1801,8 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
                                   GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
-  MMD_INIT_YAML_EVENT(value_event);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   ModulemdComponentModule *component = NULL;
   guint64 buildorder = 0;
@@ -1931,7 +1931,7 @@ _parse_modulemd_artifacts (ModulemdModule *module,
                            GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   ModulemdSimpleSet *set = NULL;
 
@@ -2004,7 +2004,7 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
                                GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   GHashTable *servicelevels = NULL;
   gchar *name = NULL;
@@ -2073,7 +2073,7 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
                               GError **error)
 {
   gboolean result = FALSE;
-  MMD_INIT_YAML_EVENT(event);
+  MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   ModulemdServiceLevel *sl = NULL;
   GDate *eol = NULL;

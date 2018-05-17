@@ -83,6 +83,19 @@ install_headers(
   subdir : header_path,
 )
 
+# Fake test to ensure that all sources and headers are formatted properly
+test_clang_format = find_program('clang-format')
+clang_args = [ '-i' ]
+test('test_clang_format', test_clang_format,
+     args : clang_args + files(modulemd_srcs + modulemd_hdrs + modulemd_priv_hdrs))
+
+# Fake test to ensure that the python tests are formatted according to PEP8
+test_autopep8 = find_program('python3-autopep8', 'autopep8')
+autopep8_args = [ '--in-place', '-a', '-a' ]
+autopep8_scripts = [ files('test-modulemd-python.py') ]
+test('test_autopep8', test_autopep8,
+     args: autopep8_args + autopep8_scripts)
+
 # Test env with fatal warnings and criticals
 test_env = environment()
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')

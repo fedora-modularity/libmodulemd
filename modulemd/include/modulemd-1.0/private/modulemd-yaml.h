@@ -90,8 +90,8 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       gchar *formatted = g_strdup_printf (__VA_ARGS__);                       \
       g_debug ("%s [line %zu col %zu]",                                       \
                formatted,                                                     \
-               event.start_mark.line,                                         \
-               event.start_mark.column);                                      \
+               event.start_mark.line + 1,                                     \
+               event.start_mark.column + 1);                                  \
       g_free (formatted);                                                     \
       goto error;                                                             \
     }                                                                         \
@@ -124,8 +124,8 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       gchar *formatted = g_strdup_printf (__VA_ARGS__);                       \
       gchar *formatted2 = g_strdup_printf ("%s [line %zu col %zu]",           \
                                            formatted,                         \
-                                           event.start_mark.line,             \
-                                           event.start_mark.column);          \
+                                           event.start_mark.line + 1,         \
+                                           event.start_mark.column + 1);      \
       g_free (formatted);                                                     \
       g_debug (formatted2);                                                   \
       g_set_error (                                                           \
@@ -145,8 +145,8 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
           g_debug ("Error: %s - event type: %s [line %zu col %zu]",           \
                    formatted,                                                 \
                    mmd_yaml_get_event_name ((event)->type),                   \
-                   (event)->start_mark.line,                                  \
-                   (event)->start_mark.column);                               \
+                   (event)->start_mark.line + 1,                              \
+                   (event)->start_mark.column + 1);                           \
           g_set_error_literal (_error,                                        \
                                MODULEMD_YAML_ERROR,                           \
                                MODULEMD_YAML_ERROR_EMIT,                      \
@@ -194,8 +194,8 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     {                                                                         \
       gchar *formatted = g_strdup_printf ("%s [line %zu col %zu]",            \
                                           __VA_ARGS__,                        \
-                                          event.start_mark.line,              \
-                                          event.start_mark.column);           \
+                                          event.start_mark.line + 1,          \
+                                          event.start_mark.column + 1);       \
       g_debug (formatted);                                                    \
       g_set_error (                                                           \
         _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, formatted);    \

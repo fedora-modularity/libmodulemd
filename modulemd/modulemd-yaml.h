@@ -83,8 +83,8 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     {                                                                         \
       g_debug (msg);                                                          \
       g_set_error_literal (_error, MODULEMD_YAML_ERROR, type, msg);           \
-      goto error;                                                             \
       result = FALSE;                                                         \
+      goto error;                                                             \
     }                                                                         \
   while (0)
 

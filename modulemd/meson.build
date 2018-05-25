@@ -109,9 +109,14 @@ test('test_clang_format', test_clang_format,
 # Fake test to ensure that the python tests are formatted according to PEP8
 test_autopep8 = find_program('python3-autopep8', 'autopep8')
 autopep8_args = [ '--in-place', '-a', '-a' ]
-autopep8_scripts = [ files('test-modulemd-python.py') ]
+autopep8_scripts = [ files('test-modulemd-python.py', 'test-dirty.py') ]
 test('test_autopep8', test_autopep8,
      args: autopep8_args + autopep8_scripts)
+
+test_dirty_repo = find_program('python3')
+dirty_repo_scripts = [ files('test-dirty.py') ]
+test('test_dirty_repo', test_dirty_repo,
+     args: dirty_repo_scripts)
 
 # Test env with fatal warnings and criticals
 test_env = environment()

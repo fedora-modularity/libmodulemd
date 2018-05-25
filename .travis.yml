@@ -23,5 +23,5 @@ before_install:
   - ./.travis/travis-docker-build.sh
 
 script:
-  - docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN --rm fedora-modularity/libmodulemd
+  - docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS --rm fedora-modularity/libmodulemd
 

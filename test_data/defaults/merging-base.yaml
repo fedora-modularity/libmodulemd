@@ -7,6 +7,7 @@ data:
     stream: '2.2'
     profiles:
         '2.2': [client, server]
+        '2.8': [notreal]
     intents:
         workstation:
             stream: '2.4'

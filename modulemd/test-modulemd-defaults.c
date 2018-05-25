@@ -481,9 +481,11 @@ modulemd_defaults_test_merging (DefaultsFixture *fixture,
   g_assert_cmpint (
     g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
     ==,
-    1);
+    2);
   g_assert_true (g_hash_table_contains (
     modulemd_defaults_peek_profile_defaults (defaults), "2.2"));
+  g_assert_true (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "2.8"));
 
   /* NODEJS */
   defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_base, 1));
@@ -554,6 +556,8 @@ modulemd_defaults_test_merging (DefaultsFixture *fixture,
     modulemd_defaults_peek_profile_defaults (defaults), "2.2"));
   g_assert_true (g_hash_table_contains (
     modulemd_defaults_peek_profile_defaults (defaults), "2.4"));
+  g_assert_false (g_hash_table_contains (
+    modulemd_defaults_peek_profile_defaults (defaults), "2.8"));
 
   /* NODEJS */
   defaults = MODULEMD_DEFAULTS (g_ptr_array_index (overridden, 1));
@@ -598,6 +602,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
   g_autoptr (GPtrArray) merged_objects = NULL;
   g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
   g_autoptr (GError) error = NULL;
+  GHashTable *htable = NULL;
   gint64 prio;
   ModulemdDefaults *defaults = NULL;
   gboolean result;
@@ -713,14 +718,19 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
   g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
-  g_assert_cmpint (
-    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
-    ==,
-    2);
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "2.2"));
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "2.4"));
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 2);
+  g_assert_true (g_hash_table_contains (htable, "2.2"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "server"));
+  g_assert_true (g_hash_table_contains (htable, "2.4"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.4"), "server"));
+  g_assert_false (g_hash_table_contains (htable, "2.8"));
 
   /* NODEJS */
   defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 1));
@@ -732,12 +742,18 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
     g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
     ==,
     3);
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "6.0"));
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "8.0"));
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "9.0"));
+
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
+  g_assert_true (g_hash_table_contains (htable, "6.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "6.0"), "default"));
+  g_assert_true (g_hash_table_contains (htable, "8.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.0"), "minimal"));
+  g_assert_true (g_hash_table_contains (htable, "9.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "9.0"), "supermegaultra"));
 
   /* POSTGRESQL */
   defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
@@ -745,13 +761,17 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
     modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
-  g_assert_cmpint (
-    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
-    ==,
-    1);
-  g_assert_true (g_hash_table_contains (
-    modulemd_defaults_peek_profile_defaults (defaults), "8.1"));
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 1);
+  g_assert_true (g_hash_table_contains (htable, "8.1"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "server"));
+  g_assert_true (
+    modulemd_simpleset_contains (g_hash_table_lookup (htable, "8.1"), "foo"));
 }
+
 
 static void
 modulemd_regressions_issue42 (DefaultsFixture *fixture,

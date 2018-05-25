@@ -44,6 +44,19 @@ modulemd_priv_hdrs = [
     'modulemd-subdocument-private.h',
 ]
 
+test_srcs = [
+    'test-modulemd-component.c',
+    'test-modulemd-defaults.c',
+    'test-modulemd-dependencies.c',
+    'test-modulemd-intent.c',
+    'test-modulemd-module.c',
+    'test-modulemd-regressions.c',
+    'test-modulemd-servicelevel.c',
+    'test-modulemd-simpleset.c',
+    'test-modulemd-subdocument.c',
+    'test-modulemd-yaml.c',
+]
+
 libmodulemd_version = meson.project_version()
 libmodulemd_version_array = libmodulemd_version.split('.')
 
@@ -87,7 +100,11 @@ install_headers(
 test_clang_format = find_program('clang-format')
 clang_args = [ '-i' ]
 test('test_clang_format', test_clang_format,
-     args : clang_args + files(modulemd_srcs + modulemd_hdrs + modulemd_priv_hdrs))
+     args : clang_args + files(
+         modulemd_srcs +
+         modulemd_hdrs +
+         modulemd_priv_hdrs +
+         test_srcs))
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 test_autopep8 = find_program('python3-autopep8', 'autopep8')

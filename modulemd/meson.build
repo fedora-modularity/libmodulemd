@@ -285,11 +285,20 @@ gnome.generate_gir(
     install : true,
 )
 
-cdata = configuration_data()
-cdata.set('VERSION', libmodulemd_version)
-configure_file(input : 'version.xml.in',
+xcdata = configuration_data()
+xcdata.set('VERSION', libmodulemd_version)
+configure_file(
+  input : 'version.xml.in',
   output : 'version.xml',
-  configuration : cdata)
+  configuration : xcdata
+)
+
+cdata = configuration_data()
+cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
+configure_file(
+  output : 'config.h',
+  configuration : cdata
+)
 
 gnome.gtkdoc(
     'modulemd',

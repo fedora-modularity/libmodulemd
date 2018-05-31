@@ -22,6 +22,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "config.h"
 #include "modulemd.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
@@ -410,4 +411,17 @@ modulemd_merge_defaults (const GPtrArray *first,
     }
 
   return g_ptr_array_ref (merged);
+}
+
+/**
+ * modulemd_get_version:
+ *
+ * Returns: The version of libmodulemd.
+ *
+ * Since: 1.5
+ */
+const gchar *
+modulemd_get_version (void)
+{
+  return LIBMODULEMD_VERSION;
 }

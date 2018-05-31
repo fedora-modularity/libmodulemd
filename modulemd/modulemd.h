@@ -43,6 +43,9 @@
 
 G_BEGIN_DECLS
 
+const gchar *
+modulemd_get_version (void);
+
 GPtrArray *
 modulemd_objects_from_file (const gchar *yaml_file, GError **error);
 

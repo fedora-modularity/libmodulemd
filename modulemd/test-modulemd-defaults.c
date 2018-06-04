@@ -439,6 +439,21 @@ modulemd_defaults_test_copy (DefaultsFixture *fixture, gconstpointer user_data)
     g_hash_table_size (modulemd_defaults_peek_profile_defaults (orig)),
     ==,
     g_hash_table_size (modulemd_defaults_peek_profile_defaults (copy)));
+
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_intents (orig)), ==, 2);
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_intents (copy)), ==, 2);
+
+  g_assert_true (
+    g_hash_table_contains (modulemd_defaults_peek_intents (orig), "desktop"));
+  g_assert_true (
+    g_hash_table_contains (modulemd_defaults_peek_intents (copy), "desktop"));
+
+  g_assert_true (
+    g_hash_table_contains (modulemd_defaults_peek_intents (orig), "server"));
+  g_assert_true (
+    g_hash_table_contains (modulemd_defaults_peek_intents (copy), "server"));
 }
 
 

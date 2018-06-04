@@ -1005,6 +1005,9 @@ modulemd_defaults_copy (ModulemdDefaults *self)
   modulemd_defaults_set_profile_defaults (
     new_defaults, modulemd_defaults_peek_profile_defaults (self));
 
+  modulemd_defaults_set_intents (new_defaults,
+                                 modulemd_defaults_peek_intents (self));
+
   return new_defaults;
 }
 

@@ -716,7 +716,8 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in deps");
           break;
         }
 
@@ -777,7 +778,8 @@ _parse_modulemd_deps_v2 (ModulemdModuleStream *modulestream,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in deps");
           break;
         }
 

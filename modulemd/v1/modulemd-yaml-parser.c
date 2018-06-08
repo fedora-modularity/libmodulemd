@@ -673,7 +673,10 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                       g_set_error (&error,
                                    MODULEMD_YAML_ERROR,
                                    MODULEMD_YAML_ERROR_PARSE,
-                                   "Document type is not recognized");
+                                   "Document type is not recognized "
+                                   "[line %zu col %zu]",
+                                   event.start_mark.line,
+                                   event.start_mark.column);
                     }
 
                   g_debug (
@@ -927,8 +930,8 @@ _simpleset_from_sequence (yaml_parser_t *parser,
         case YAML_SCALAR_EVENT:
           if (!started)
             {
-              MMD_YAML_ERROR_RETURN (
-                error, "Received scalar where sequence expected");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Received scalar where sequence expected");
             }
           modulemd_simpleset_add (set, (const gchar *)event.data.scalar.value);
           break;

@@ -55,7 +55,10 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
           result = FALSE;                                                     \
           goto error;                                                         \
         }                                                                     \
-      g_debug ("Parser event: %s", mmd_yaml_get_event_name ((event)->type));  \
+      g_debug ("Parser event: %s (%zu/%zu)",                                  \
+               mmd_yaml_get_event_name ((event)->type),                       \
+               (event)->start_mark.line,                                      \
+               (event)->start_mark.column);                                   \
     }                                                                         \
   while (0)
 

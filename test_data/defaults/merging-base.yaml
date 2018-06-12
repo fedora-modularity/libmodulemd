@@ -66,3 +66,19 @@ data:
     profiles:
         '8.0': [super]
         '9.0': [supermegaultra]
+---
+# Supplements the first item above. Should be merged cleanly
+document: modulemd-defaults
+version: 1
+data:
+    module: httpd
+    stream: '2.2'
+    profiles:
+        '2.2': [client, server]
+    intents:
+        workstation:
+            stream: '2.4'
+            profiles:
+                '2.4': [client]
+                '2.6': [client, server, bindings]
+                '2.8': [client, server, bindings]

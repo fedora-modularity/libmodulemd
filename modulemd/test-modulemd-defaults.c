@@ -476,7 +476,7 @@ modulemd_defaults_test_merging (DefaultsFixture *fixture,
   objects = modulemd_objects_from_file (yaml_path, &error);
   g_clear_pointer (&yaml_path, g_free);
   g_assert_nonnull (objects);
-  g_assert_cmpint (objects->len, ==, 6);
+  g_assert_cmpint (objects->len, ==, 7);
 
   merged_base = modulemd_merge_defaults (objects, NULL, FALSE, &error);
   if (!merged_base)
@@ -628,7 +628,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
 
   base_objects = modulemd_objects_from_file (yaml_base_path, &error);
   g_assert_nonnull (base_objects);
-  g_assert_cmpint (base_objects->len, ==, 6);
+  g_assert_cmpint (base_objects->len, ==, 7);
 
   yaml_override_path = g_strdup_printf (
     "%s/test_data/defaults/overriding.yaml", g_getenv ("MESON_SOURCE_ROOT"));

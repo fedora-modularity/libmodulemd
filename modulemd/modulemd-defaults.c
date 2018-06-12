@@ -1032,8 +1032,19 @@ modulemd_defaults_merge (ModulemdDefaults *first,
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
   GHashTable *profile_defaults = NULL;
-  GHashTableIter iter;
-  gpointer key, value, orig_value;
+  g_autoptr (GHashTable) intents = NULL;
+  ModulemdIntent *base_intent = NULL;
+  ModulemdIntent *merge_intent = NULL;
+  g_autoptr (ModulemdIntent) new_intent = NULL;
+  g_autoptr (GHashTable) base_profiles = NULL;
+  GHashTable *merge_profiles = NULL;
+  const gchar *intent_name = NULL;
+  ModulemdSimpleSet *profile = NULL;
+  GHashTableIter iter, profile_iter;
+  gpointer key, value, orig_value, prof_key, prof_value;
+
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (first), NULL);
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (second), NULL);
 
   if (override)
     {
@@ -1061,6 +1072,7 @@ modulemd_defaults_merge (ModulemdDefaults *first,
 
   defaults = modulemd_defaults_copy (first);
 
+  /* Merge the profile defaults */
   profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
 
   g_hash_table_iter_init (&iter,
@@ -1092,6 +1104,89 @@ modulemd_defaults_merge (ModulemdDefaults *first,
                                 g_object_ref (MODULEMD_SIMPLESET (value)));
         }
     }
+
+
+  /* Merge intents */
+  intents = modulemd_defaults_dup_intents (defaults);
+  g_hash_table_iter_init (&iter, modulemd_defaults_peek_intents (second));
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      merge_intent = MODULEMD_INTENT (value);
+      /* Check if this module name exists in the current table */
+      intent_name = modulemd_intent_peek_intent_name (merge_intent);
+      base_intent = g_hash_table_lookup (
+        intents, modulemd_intent_peek_intent_name (merge_intent));
+
+      if (!base_intent)
+        {
+          /* This intent doesn't exist yet, so just add it completely. */
+          g_hash_table_insert (intents,
+                               g_strdup (intent_name),
+                               modulemd_intent_copy (merge_intent));
+          continue;
+        }
+
+      /* Compare the default stream for this intent */
+      if (g_strcmp0 (modulemd_intent_peek_default_stream (base_intent),
+                     modulemd_intent_peek_default_stream (merge_intent)))
+        {
+          /* The streams didn't match, so bail out */
+          g_set_error (error,
+                       MODULEMD_DEFAULTS_ERROR,
+                       MODULEMD_DEFAULTS_ERROR_CONFLICTING_INTENT_STREAM,
+                       "Conflicting default stream for intent profile [%s]"
+                       "when merging defaults for module %s",
+                       (const gchar *)intent_name,
+                       modulemd_defaults_peek_module_name (first));
+          return NULL;
+        }
+
+      /* Construct a new Intent with the merged values which will replace
+       * the existing one at the end */
+      new_intent = modulemd_intent_copy (base_intent);
+
+      /* Merge the profile definitions for this intent */
+      base_profiles = modulemd_intent_dup_profile_defaults (new_intent);
+
+      merge_profiles = modulemd_intent_peek_profile_defaults (merge_intent);
+      g_hash_table_iter_init (&profile_iter, merge_profiles);
+      while (g_hash_table_iter_next (&profile_iter, &prof_key, &prof_value))
+        {
+          /* Check if this profile exists in this intent */
+          profile = g_hash_table_lookup (base_profiles, prof_key);
+
+          if (!profile)
+            {
+              /* Add this profile to the intent */
+              modulemd_simpleset_copy (prof_value, &profile);
+              g_hash_table_insert (
+                base_profiles, g_strdup ((const gchar *)prof_key), profile);
+              continue;
+            }
+
+          if (!modulemd_simpleset_is_equal (profile, prof_value))
+            {
+              /* If we get here, the sets were unequal, so we need to fail */
+              g_set_error (error,
+                           MODULEMD_DEFAULTS_ERROR,
+                           MODULEMD_DEFAULTS_ERROR_CONFLICTING_INTENT_PROFILE,
+                           "Conflicting intent profile [%s:%s] when merging "
+                           "defaults for module %s",
+                           (const gchar *)intent_name,
+                           (const gchar *)prof_key,
+                           modulemd_defaults_peek_module_name (first));
+              return NULL;
+            }
+        }
+
+      modulemd_intent_set_profile_defaults (new_intent, base_profiles);
+      g_clear_pointer (&base_profiles, g_hash_table_unref);
+      g_hash_table_replace (
+        intents, g_strdup (intent_name), g_object_ref (new_intent));
+      g_clear_pointer (&new_intent, g_object_unref);
+    }
+
+  modulemd_defaults_set_intents (defaults, intents);
 
   return g_object_ref (defaults);
 }

@@ -229,6 +229,18 @@ data:
             macros: |
                 %demomacro 1
                 %demomacro2 %{demomacro}23
+            # Explicit list of package build names this module will produce.
+            # By default the build system only allows components listed under
+            # data.components.rpms to be built as part of this module.
+            # In case the expected RPM build names do not match the component
+            # names, the list can be defined here.
+            # This list overrides rather then just extends the default.
+            # Optional, list of package build names without versions.
+            whitelist:
+                - fooscl-1-bar
+                - fooscl-1-baz
+                - xxx
+                - xyz
     # Functional components of the module, optional
     components:
         # RPM content of the module, optional

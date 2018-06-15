@@ -28,6 +28,7 @@
 #include <glib.h>
 #include <stdio.h>
 
+#include "modulemd-buildopts.h"
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"

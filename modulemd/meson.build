@@ -1,4 +1,5 @@
 modulemd_srcs = [
+    'modulemd-buildopts.c',
     'modulemd-common.c',
     'modulemd-component.c',
     'modulemd-component-module.c',
@@ -24,6 +25,7 @@ modulemd_srcs = [
 
 modulemd_hdrs = [
     'modulemd.h',
+    'modulemd-buildopts.h',
     'modulemd-component.h',
     'modulemd-component-module.h',
     'modulemd-component-rpm.h',
@@ -45,6 +47,7 @@ modulemd_priv_hdrs = [
 ]
 
 test_srcs = [
+    'test-modulemd-buildopts.c',
     'test-modulemd-component.c',
     'test-modulemd-defaults.c',
     'test-modulemd-dependencies.c',
@@ -134,6 +137,19 @@ test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test_release_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
 test_release_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
 test_release_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
+
+test_modulemd_buildopts = executable(
+    'test_modulemd_buildopts',
+    'test-modulemd-buildopts.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_buildopts', test_modulemd_buildopts,
+     env : test_env)
+test('test_release_modulemd_buildopts', test_modulemd_buildopts,
+     env : test_release_env)
 
 test_modulemd_component = executable(
     'test_modulemd_component',

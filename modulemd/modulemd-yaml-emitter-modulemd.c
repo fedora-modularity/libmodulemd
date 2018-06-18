@@ -86,6 +86,12 @@ static gboolean
 _emit_modulemd_buildopts (yaml_emitter_t *emitter,
                           ModulemdModule *module,
                           GError **error);
+
+static gboolean
+_emit_modulemd_rpm_buildopts (yaml_emitter_t *emitter,
+                              ModulemdBuildopts *buildopts,
+                              GError **error);
+
 static gboolean
 _emit_modulemd_components (yaml_emitter_t *emitter,
                            ModulemdModule *module,
@@ -1124,11 +1130,11 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  GHashTable *buildopts = NULL;
+  g_autoptr (ModulemdBuildopts) buildopts = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_buildopts");
-  buildopts = modulemd_module_get_rpm_buildopts (module);
-  if (!(buildopts && g_hash_table_size (buildopts) > 0))
+  buildopts = modulemd_module_get_buildopts (module);
+  if (!buildopts)
     {
       result = TRUE;
       goto error;
@@ -1143,11 +1149,7 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting buildopt mapping");
 
-  name = g_strdup ("rpms");
-  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
-
-  if (!_emit_modulemd_hashtable (
-        emitter, buildopts, YAML_LITERAL_SCALAR_STYLE, error))
+  if (!_emit_modulemd_rpm_buildopts (emitter, buildopts, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing buildopts");
     }
@@ -1159,6 +1161,62 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
   result = TRUE;
 error:
   g_free (name);
+
+  g_debug ("TRACE: exiting _emit_modulemd_buildopts");
+  return result;
+}
+
+static gboolean
+_emit_modulemd_rpm_buildopts (yaml_emitter_t *emitter,
+                              ModulemdBuildopts *buildopts,
+                              GError **error)
+{
+  gboolean result = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+  g_autofree gchar *name = NULL;
+  g_autofree gchar *value = NULL;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
+
+  g_debug ("TRACE: entering _emit_modulemd_buildopts");
+
+  name = g_strdup ("rpms");
+  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+
+  yaml_mapping_start_event_initialize (
+    &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
+
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error starting RPM buildopt mapping");
+
+  value = modulemd_buildopts_get_rpm_macros (buildopts);
+  if (value)
+    {
+      name = g_strdup ("macros");
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_LITERAL_SCALAR_STYLE);
+    }
+
+  set = modulemd_buildopts_get_rpm_whitelist_simpleset (buildopts);
+
+  if (set)
+    {
+      name = g_strdup ("whitelist");
+      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+      if (!_emit_modulemd_simpleset (
+            emitter, set, YAML_BLOCK_SEQUENCE_STYLE, error))
+        {
+          MMD_YAML_EMITTER_ERROR_RETURN (
+            error, "Could not emit RPM buildopt whitelist");
+        }
+    }
+
+  yaml_mapping_end_event_initialize (&event);
+  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+    emitter, &event, error, "Error ending RPM buildopt mapping");
+
+
+  result = TRUE;
+error:
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
   return result;

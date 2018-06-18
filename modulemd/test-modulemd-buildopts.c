@@ -47,7 +47,7 @@ modulemd_buildopts_test_basic (BuildoptsFixture *fixture,
   g_auto (GStrv) retrieved_whitelist;
   g_auto (GStrv) boxed_whitelist;
   g_autofree gchar *retrieved_macros = NULL;
-  g_auto (GValue) value = G_VALUE_INIT;
+  g_autofree gchar *rpm_macros = NULL;
 
   /* Test standard object construction succeeds */
   buildopts = g_object_new (MODULEMD_TYPE_BUILDOPTS, NULL);
@@ -66,16 +66,14 @@ modulemd_buildopts_test_basic (BuildoptsFixture *fixture,
   g_clear_pointer (&retrieved_macros, g_free);
 
   /* Test GObject properties for RPM macros*/
-  g_value_init (&value, G_TYPE_STRING);
-  g_object_get_property (G_OBJECT (buildopts), "rpm-macros", &value);
-  g_assert_cmpstr (g_value_get_string (&value), ==, demo_macros);
+  g_object_get (G_OBJECT (buildopts), "rpm-macros", &rpm_macros, NULL);
+  g_assert_cmpstr (rpm_macros, ==, demo_macros);
 
   /* Assign another value */
-  g_value_reset (&value);
-  g_value_set_static_string (&value, demo_macros2);
-  g_object_set_property (G_OBJECT (buildopts), "rpm-macros", &value);
+  g_object_set (G_OBJECT (buildopts), "rpm-macros", demo_macros2, NULL);
   retrieved_macros = modulemd_buildopts_get_rpm_macros (buildopts);
   g_assert_cmpstr (retrieved_macros, ==, demo_macros2);
+  g_clear_pointer (&retrieved_macros, g_free);
 
 
   /* Test set/get methods for RPM whitelist */
@@ -92,27 +90,23 @@ modulemd_buildopts_test_basic (BuildoptsFixture *fixture,
   g_clear_pointer (&retrieved_whitelist, g_strfreev);
 
   /* Test GObject properties for RPM whitelist */
-  g_value_unset (&value);
-  g_value_init (&value, G_TYPE_STRV);
   boxed_whitelist = g_malloc0_n (2, sizeof (gchar *));
   boxed_whitelist[0] = g_strdup ("jonsnow");
 
-  g_object_get_property (G_OBJECT (buildopts), "rpm-whitelist", &value);
-  retrieved_whitelist = g_value_get_boxed (&value);
+  g_object_get (
+    G_OBJECT (buildopts), "rpm-whitelist", &retrieved_whitelist, NULL);
 
   g_assert_cmpstr (retrieved_whitelist[0], ==, demo_whitelist[0]);
   g_assert_cmpstr (retrieved_whitelist[1], ==, demo_whitelist[1]);
   g_assert_null (retrieved_whitelist[2]);
-  g_value_reset (&value);
+  g_clear_pointer (&retrieved_whitelist, g_strfreev);
 
-  g_value_set_boxed (&value, boxed_whitelist);
-  g_object_set_property (G_OBJECT (buildopts), "rpm-whitelist", &value);
+  g_object_set (G_OBJECT (buildopts), "rpm-whitelist", boxed_whitelist, NULL);
   retrieved_whitelist = modulemd_buildopts_get_rpm_whitelist (buildopts);
 
   g_assert_cmpstr (retrieved_whitelist[0], ==, boxed_whitelist[0]);
   g_assert_null (retrieved_whitelist[1]);
   g_clear_pointer (&retrieved_whitelist, g_strfreev);
-  g_value_reset (&value);
 
 
   /* Test copying */

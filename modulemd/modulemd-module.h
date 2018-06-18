@@ -133,6 +133,13 @@ gchar *
 modulemd_module_dup_arch (ModulemdModule *self);
 
 void
+modulemd_module_set_buildopts (ModulemdModule *self,
+                               ModulemdBuildopts *buildopts);
+
+ModulemdBuildopts *
+modulemd_module_get_buildopts (ModulemdModule *self);
+
+void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires);
 

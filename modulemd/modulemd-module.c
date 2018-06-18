@@ -41,6 +41,7 @@ enum
   MD_PROP_0,
 
   MD_PROP_ARCH,
+  MD_PROP_BUILDOPTS,
   MD_PROP_BUILDREQUIRES,
   MD_PROP_COMMUNITY,
   MD_PROP_CONTENT_LIC,
@@ -80,6 +81,7 @@ struct _ModulemdModule
 
   /* == Members == */
   gchar *arch;
+  ModulemdBuildopts *buildopts;
   GHashTable *buildrequires;
   gchar *community;
   ModulemdSimpleSet *content_licenses;
@@ -95,8 +97,8 @@ struct _ModulemdModule
   GHashTable *profiles;
   GHashTable *requires;
   ModulemdSimpleSet *rpm_api;
-  ModulemdSimpleSet *rpm_artifacts;
   GHashTable *rpm_buildopts;
+  ModulemdSimpleSet *rpm_artifacts;
   GHashTable *rpm_components;
   ModulemdSimpleSet *rpm_filter;
   GHashTable *servicelevels;
@@ -187,6 +189,52 @@ modulemd_module_dup_arch (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return g_strdup (self->arch);
+}
+
+
+/**
+ * modulemd_module_set_buildopts:
+ * @buildopts: (nullable) (transfer none): A #ModulemdBuildopts object
+ *
+ * Copies a #ModulemdBuildopts object into the module. This object contains
+ * additional instructions to the build system required to build this module.
+ *
+ * Since: 1.5
+ */
+void
+modulemd_module_set_buildopts (ModulemdModule *self,
+                               ModulemdBuildopts *buildopts)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (!buildopts || MODULEMD_IS_BUILDOPTS (buildopts));
+
+  g_clear_pointer (&self->buildopts, g_object_unref);
+  if (buildopts)
+    {
+      self->buildopts = modulemd_buildopts_copy (buildopts);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_BUILDOPTS]);
+}
+
+
+/**
+ * modulemd_module_get_buildopts:
+ *
+ * Get a copy of the #ModulemdBuildopts object
+ *
+ * Returns: (transfer none): a copy of the #ModulemdBuildopts object. This
+ * object must be freed with g_object_unref() when the caller is finished with
+ * it. This function will return NULL if no buildopts have been set.
+ *
+ * Since: 1.5
+ */
+ModulemdBuildopts *
+modulemd_module_get_buildopts (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return modulemd_buildopts_copy (self->buildopts);
 }
 
 
@@ -1782,29 +1830,25 @@ modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
  * Sets the 'rpm-buildopts' property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.5
+ * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
  */
+G_DEPRECATED_FOR (modulemd_module_set_buildopts)
 void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
 {
-  GHashTableIter iter;
-  gpointer key, value;
+  const gchar *rpm_macros = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (self->rpm_buildopts != buildopts);
 
-  g_hash_table_remove_all (self->rpm_buildopts);
-  if (buildopts)
+  /* First, make sure the Buildopts object exists */
+  if (!self->buildopts)
     {
-      g_hash_table_iter_init (&iter, buildopts);
-      while (g_hash_table_iter_next (&iter, &key, &value))
-        {
-          g_hash_table_replace (self->rpm_buildopts,
-                                g_strdup ((const gchar *)key),
-                                g_strdup ((const gchar *)value));
-        }
+      self->buildopts = modulemd_buildopts_new ();
     }
 
-  g_object_notify_by_pspec (G_OBJECT (self),
-                            md_properties[MD_PROP_RPM_BUILDOPTS]);
+  rpm_macros = g_hash_table_lookup (buildopts, "macros");
+  modulemd_buildopts_set_rpm_macros (self->buildopts, rpm_macros);
 }
 
 /**
@@ -1837,11 +1881,32 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
  * containing the "rpm-buildopts" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.5
+ * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
  */
+G_DEPRECATED_FOR (modulemd_module_get_buildopts)
 GHashTable *
 modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
 {
+  g_autofree gchar *rpm_macros = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  if (self->buildopts)
+    {
+      rpm_macros = modulemd_buildopts_get_rpm_macros (self->buildopts);
+    }
+
+  if (rpm_macros)
+    {
+      /* Update the hash table for backwards compatibility */
+      g_hash_table_replace (
+        self->rpm_buildopts, g_strdup ("macros"), g_strdup (rpm_macros));
+    }
+  else
+    {
+      g_hash_table_remove_all (self->rpm_buildopts);
+    }
 
   return self->rpm_buildopts;
 }
@@ -1856,14 +1921,20 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
  * containing the "rpm-buildopts" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.5
+ * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
  */
+G_DEPRECATED_FOR (modulemd_module_get_buildopts)
 GHashTable *
 modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return _modulemd_hash_table_deep_str_copy (self->rpm_buildopts);
-  ;
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+  return _modulemd_hash_table_deep_str_copy (
+    modulemd_module_peek_rpm_buildopts (self));
+  G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 
@@ -2722,6 +2793,8 @@ modulemd_module_copy (ModulemdModule *self)
 
   modulemd_module_set_arch (copy, self->arch);
 
+  modulemd_module_set_buildopts (copy, self->buildopts);
+
   modulemd_module_set_community (copy, self->community);
 
   modulemd_module_set_content_licenses (copy, self->content_licenses);
@@ -2743,8 +2816,6 @@ modulemd_module_copy (ModulemdModule *self)
   modulemd_module_set_rpm_api (copy, self->rpm_api);
 
   modulemd_module_set_rpm_artifacts (copy, self->rpm_artifacts);
-
-  modulemd_module_set_rpm_buildopts (copy, self->rpm_buildopts);
 
   modulemd_module_set_rpm_components (copy, self->rpm_components);
 
@@ -2835,6 +2906,10 @@ modulemd_module_set_property (GObject *gobject,
       modulemd_module_set_arch (self, g_value_get_string (value));
       break;
 
+    case MD_PROP_BUILDOPTS:
+      modulemd_module_set_buildopts (self, g_value_get_object (value));
+      break;
+
     case MD_PROP_BUILDREQUIRES:
       modulemd_module_set_buildrequires (self, g_value_get_boxed (value));
       break;
@@ -2900,7 +2975,9 @@ modulemd_module_set_property (GObject *gobject,
       break;
 
     case MD_PROP_RPM_BUILDOPTS:
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       modulemd_module_set_rpm_buildopts (self, g_value_get_boxed (value));
+      G_GNUC_END_IGNORE_DEPRECATIONS
       break;
 
     case MD_PROP_RPM_COMPONENTS:
@@ -2953,6 +3030,10 @@ modulemd_module_get_property (GObject *gobject,
     {
     case MD_PROP_ARCH:
       g_value_set_string (value, modulemd_module_peek_arch (self));
+      break;
+
+    case MD_PROP_BUILDOPTS:
+      g_value_take_object (value, modulemd_module_get_buildopts (self));
       break;
 
     case MD_PROP_BUILDREQUIRES:
@@ -3020,7 +3101,9 @@ modulemd_module_get_property (GObject *gobject,
       break;
 
     case MD_PROP_RPM_BUILDOPTS:
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       g_value_set_boxed (value, modulemd_module_peek_rpm_buildopts (self));
+      G_GNUC_END_IGNORE_DEPRECATIONS
       break;
 
     case MD_PROP_RPM_COMPONENTS:
@@ -3067,6 +3150,7 @@ modulemd_module_finalize (GObject *gobject)
   ModulemdModule *self = (ModulemdModule *)gobject;
 
   g_clear_pointer (&self->arch, g_free);
+  g_clear_pointer (&self->buildopts, g_object_unref);
   g_clear_pointer (&self->buildrequires, g_hash_table_unref);
   g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->content_licenses, g_object_unref);
@@ -3116,6 +3200,14 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
                          "i486, armv7hl, x86_64. Filled in by the buildsystem "
                          "during the compose stage.",
                          NULL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  md_properties[MD_PROP_BUILDOPTS] =
+    g_param_spec_object ("buildopts",
+                         "Build options for the module",
+                         "Assorted instructions for the build system on how "
+                         "to build this module.",
+                         MODULEMD_TYPE_BUILDOPTS,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**

@@ -89,6 +89,10 @@ _parse_modulemd_buildopts (ModulemdModule *module,
                            yaml_parser_t *parser,
                            GError **error);
 static gboolean
+_parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
+                               yaml_parser_t *parser,
+                               GError **error);
+static gboolean
 _parse_modulemd_components (ModulemdModule *module,
                             yaml_parser_t *parser,
                             GError **error);
@@ -1354,11 +1358,13 @@ _parse_modulemd_buildopts (ModulemdModule *module,
   gboolean result = FALSE;
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  GHashTable *opts = NULL;
+  g_autoptr (ModulemdBuildopts) buildopts = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   g_debug ("TRACE: entering _parse_modulemd_buildopts");
+
+  buildopts = modulemd_buildopts_new ();
 
   while (!done)
     {
@@ -1380,12 +1386,11 @@ _parse_modulemd_buildopts (ModulemdModule *module,
           /* Currently, we only support "rpms" here */
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "rpms"))
             {
-              if (!_hashtable_from_mapping (parser, &opts, error))
+              if (!_parse_modulemd_rpm_buildopts (buildopts, parser, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                                 "Parse error in buildopts");
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Parse error in RPM buildopts");
                 }
-              modulemd_module_set_rpm_buildopts (module, opts);
             }
           else
             {
@@ -1402,12 +1407,100 @@ _parse_modulemd_buildopts (ModulemdModule *module,
       yaml_event_delete (&event);
     }
 
+  modulemd_module_set_buildopts (module, buildopts);
+
   result = TRUE;
 
 error:
-  g_hash_table_unref (opts);
 
   g_debug ("TRACE: exiting _parse_modulemd_buildopts");
+  return result;
+}
+
+static gboolean
+_parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
+                               yaml_parser_t *parser,
+                               GError **error)
+{
+  gboolean result = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
+  gboolean done = FALSE;
+  gboolean in_mapping = FALSE;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
+
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("TRACE: entering _parse_modulemd_rpm_buildopts");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+        parser, &event, error, "Parser error");
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the RPM buildopts. */
+          in_mapping = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the RPM buildopts */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_mapping)
+            {
+              MMD_YAML_ERROR_RETURN (
+                error, "Received a scalar when a map was expected.");
+              break;
+            }
+
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "macros"))
+            {
+              YAML_PARSER_PARSE_WITH_ERROR_RETURN (
+                parser, &value_event, error, "Parser error");
+              if (value_event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_ERROR_RETURN (error, "Failed to parse RPM macros");
+                }
+              modulemd_buildopts_set_rpm_macros (
+                buildopts, (const gchar *)value_event.data.scalar.value);
+              yaml_event_delete (&value_event);
+            }
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "whitelist"))
+            {
+              if (!_simpleset_from_sequence (parser, &set, error))
+                {
+                  MMD_YAML_ERROR_RETURN_RETHROW (
+                    error, "Parse error in RPM whitelist");
+                }
+              modulemd_buildopts_set_rpm_whitelist_simpleset (buildopts, set);
+            }
+          else
+            {
+              MMD_YAML_ERROR_RETURN (error, "Unknown RPM buildopt key");
+            }
+
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event in RPM buildopts");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  result = TRUE;
+error:
+
+  g_debug ("TRACE: exiting _parse_modulemd_rpm_buildopts");
   return result;
 }
 

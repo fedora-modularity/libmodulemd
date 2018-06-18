@@ -50,4 +50,7 @@ modulemd_buildopts_set_rpm_whitelist (ModulemdBuildopts *self,
 GStrv
 modulemd_buildopts_get_rpm_whitelist (ModulemdBuildopts *self);
 
+ModulemdBuildopts *
+modulemd_buildopts_copy (ModulemdBuildopts *self);
+
 G_END_DECLS

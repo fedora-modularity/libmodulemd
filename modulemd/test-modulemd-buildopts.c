@@ -40,6 +40,7 @@ modulemd_buildopts_test_basic (BuildoptsFixture *fixture,
                                gconstpointer user_data)
 {
   g_autoptr (ModulemdBuildopts) buildopts = NULL;
+  g_autoptr (ModulemdBuildopts) copy = NULL;
   const gchar *demo_macros = "%demomacro 1\n%demomacro2 %{demomacro}23";
   const gchar *demo_macros2 = "foo";
   g_auto (GStrv) demo_whitelist;
@@ -112,6 +113,17 @@ modulemd_buildopts_test_basic (BuildoptsFixture *fixture,
   g_assert_null (retrieved_whitelist[1]);
   g_clear_pointer (&retrieved_whitelist, g_strfreev);
   g_value_reset (&value);
+
+
+  /* Test copying */
+  copy = modulemd_buildopts_copy (buildopts);
+
+  retrieved_macros = modulemd_buildopts_get_rpm_macros (copy);
+  g_assert_cmpstr (retrieved_macros, ==, demo_macros2);
+
+  retrieved_whitelist = modulemd_buildopts_get_rpm_whitelist (copy);
+  g_assert_cmpstr (retrieved_whitelist[0], ==, boxed_whitelist[0]);
+  g_assert_null (retrieved_whitelist[1]);
 }
 
 int

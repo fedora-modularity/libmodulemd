@@ -243,3 +243,32 @@ static void
 modulemd_buildopts_init (ModulemdBuildopts *self)
 {
 }
+
+
+/**
+ * modulemd_buildopts_copy:
+ *
+ * Make a deep copy of this #ModulemdBuildopts object.
+ *
+ * Returns: (transfer full): A deep copy of this #ModulemdBuildopts object.
+ * This value must be freed with g_object_unref().
+ *
+ * Since: 1.5
+ */
+ModulemdBuildopts *
+modulemd_buildopts_copy (ModulemdBuildopts *self)
+{
+  g_autoptr (ModulemdBuildopts) new = NULL;
+  g_auto (GStrv) whitelist = NULL;
+
+  if (!self)
+    return NULL;
+
+  new = modulemd_buildopts_new ();
+
+  modulemd_buildopts_set_rpm_macros (new, self->rpm_macros);
+  whitelist = modulemd_buildopts_get_rpm_whitelist (self);
+  modulemd_buildopts_set_rpm_whitelist (new, whitelist);
+
+  return g_object_ref (new);
+}

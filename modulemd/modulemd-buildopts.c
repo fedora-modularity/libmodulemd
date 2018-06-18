@@ -144,6 +144,32 @@ modulemd_buildopts_set_rpm_whitelist (ModulemdBuildopts *self, GStrv whitelist)
 
 
 /**
+ * modulemd_buildopts_set_rpm_whitelist_simpleset:
+ * @whitelist: (transfer none): The #ModulemdSimpleSet set of RPM names
+ * for the whitelist.
+ *
+ * This will make a copy of all of the unique items in @whitelist.
+ *
+ * Since: 1.5
+ */
+void
+modulemd_buildopts_set_rpm_whitelist_simpleset (ModulemdBuildopts *self,
+                                                ModulemdSimpleSet *whitelist)
+{
+  g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
+
+  g_clear_pointer (&self->rpm_whitelist, g_object_unref);
+
+  if (!whitelist)
+    return;
+
+  modulemd_simpleset_copy (whitelist, &self->rpm_whitelist);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RPM_WHITELIST]);
+}
+
+
+/**
  * modulemd_buildopts_get_rpm_whitelist:
  *
  * Returns a copy of the whitelist.
@@ -164,6 +190,33 @@ modulemd_buildopts_get_rpm_whitelist (ModulemdBuildopts *self)
     }
 
   return modulemd_simpleset_dup (self->rpm_whitelist);
+}
+
+
+/**
+ * modulemd_buildopts_get_rpm_whitelist_simpleset:
+ *
+ * Returns a copy of the whitelist as a #ModulemdSimpleset
+ *
+ * Returns: (transfer full): The #ModulemdSimpleSet of RPM names
+ * for the whitelist. May return NULL if no whitelist is stored.
+ *
+ * Since: 1.5
+ */
+ModulemdSimpleSet *
+modulemd_buildopts_get_rpm_whitelist_simpleset (ModulemdBuildopts *self)
+{
+  g_autoptr (ModulemdSimpleSet) set = NULL;
+  g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);
+
+  if (!self->rpm_whitelist)
+    {
+      return NULL;
+    }
+
+  modulemd_simpleset_copy (self->rpm_whitelist, &set);
+
+  return g_object_ref (set);
 }
 
 

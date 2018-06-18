@@ -25,6 +25,7 @@
 #pragma once
 
 #include <glib-object.h>
+#include "modulemd-simpleset.h"
 
 G_BEGIN_DECLS
 
@@ -47,8 +48,15 @@ void
 modulemd_buildopts_set_rpm_whitelist (ModulemdBuildopts *self,
                                       GStrv whitelist);
 
+void
+modulemd_buildopts_set_rpm_whitelist_simpleset (ModulemdBuildopts *self,
+                                                ModulemdSimpleSet *whitelist);
+
 GStrv
 modulemd_buildopts_get_rpm_whitelist (ModulemdBuildopts *self);
+
+ModulemdSimpleSet *
+modulemd_buildopts_get_rpm_whitelist_simpleset (ModulemdBuildopts *self);
 
 ModulemdBuildopts *
 modulemd_buildopts_copy (ModulemdBuildopts *self);

@@ -3029,7 +3029,7 @@ modulemd_module_get_property (GObject *gobject,
   switch (property_id)
     {
     case MD_PROP_ARCH:
-      g_value_set_string (value, modulemd_module_peek_arch (self));
+      g_value_take_string (value, modulemd_module_dup_arch (self));
       break;
 
     case MD_PROP_BUILDOPTS:
@@ -3037,19 +3037,19 @@ modulemd_module_get_property (GObject *gobject,
       break;
 
     case MD_PROP_BUILDREQUIRES:
-      g_value_set_boxed (value, modulemd_module_peek_buildrequires (self));
+      g_value_take_boxed (value, modulemd_module_dup_buildrequires (self));
       break;
 
     case MD_PROP_COMMUNITY:
-      g_value_set_string (value, modulemd_module_peek_community (self));
+      g_value_take_string (value, modulemd_module_dup_community (self));
       break;
 
     case MD_PROP_CONTENT_LIC:
-      g_value_set_object (value, modulemd_module_peek_content_licenses (self));
+      g_value_take_object (value, modulemd_module_dup_content_licenses (self));
       break;
 
     case MD_PROP_CONTEXT:
-      g_value_set_string (value, modulemd_module_peek_context (self));
+      g_value_take_string (value, modulemd_module_dup_context (self));
       break;
 
     case MD_PROP_DEPS:
@@ -3057,15 +3057,15 @@ modulemd_module_get_property (GObject *gobject,
       break;
 
     case MD_PROP_DESC:
-      g_value_set_string (value, modulemd_module_peek_description (self));
+      g_value_take_string (value, modulemd_module_dup_description (self));
       break;
 
     case MD_PROP_DOCS:
-      g_value_set_string (value, modulemd_module_peek_documentation (self));
+      g_value_take_string (value, modulemd_module_dup_documentation (self));
       break;
 
     case MD_PROP_EOL:
-      g_value_set_boxed (value, modulemd_module_peek_eol (self));
+      g_value_take_boxed (value, modulemd_module_dup_eol (self));
       break;
 
     case MD_PROP_MDVERSION:
@@ -3073,61 +3073,61 @@ modulemd_module_get_property (GObject *gobject,
       break;
 
     case MD_PROP_MODULE_COMPONENTS:
-      g_value_set_boxed (value, modulemd_module_peek_module_components (self));
+      g_value_take_boxed (value, modulemd_module_dup_module_components (self));
       break;
 
     case MD_PROP_MODULE_LIC:
-      g_value_set_object (value, modulemd_module_peek_module_licenses (self));
+      g_value_take_object (value, modulemd_module_dup_module_licenses (self));
       break;
 
     case MD_PROP_NAME:
-      g_value_set_string (value, modulemd_module_peek_name (self));
+      g_value_take_string (value, modulemd_module_dup_name (self));
       break;
 
     case MD_PROP_PROFILES:
-      g_value_set_boxed (value, modulemd_module_peek_profiles (self));
+      g_value_take_boxed (value, modulemd_module_dup_profiles (self));
       break;
 
     case MD_PROP_REQUIRES:
-      g_value_set_boxed (value, modulemd_module_peek_requires (self));
+      g_value_take_boxed (value, modulemd_module_dup_requires (self));
       break;
 
     case MD_PROP_RPM_API:
-      g_value_set_object (value, modulemd_module_peek_rpm_api (self));
+      g_value_take_object (value, modulemd_module_dup_rpm_api (self));
       break;
 
     case MD_PROP_RPM_ARTIFACTS:
-      g_value_set_object (value, modulemd_module_peek_rpm_artifacts (self));
+      g_value_take_object (value, modulemd_module_dup_rpm_artifacts (self));
       break;
 
     case MD_PROP_RPM_BUILDOPTS:
       G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-      g_value_set_boxed (value, modulemd_module_peek_rpm_buildopts (self));
+      g_value_take_boxed (value, modulemd_module_dup_rpm_buildopts (self));
       G_GNUC_END_IGNORE_DEPRECATIONS
       break;
 
     case MD_PROP_RPM_COMPONENTS:
-      g_value_set_boxed (value, modulemd_module_peek_rpm_components (self));
+      g_value_take_boxed (value, modulemd_module_dup_rpm_components (self));
       break;
 
     case MD_PROP_RPM_FILTER:
-      g_value_set_object (value, modulemd_module_peek_rpm_filter (self));
+      g_value_take_object (value, modulemd_module_dup_rpm_filter (self));
       break;
 
     case MD_PROP_SL:
-      g_value_set_boxed (value, modulemd_module_peek_servicelevels (self));
+      g_value_take_boxed (value, modulemd_module_dup_servicelevels (self));
       break;
 
     case MD_PROP_STREAM:
-      g_value_set_string (value, modulemd_module_peek_stream (self));
+      g_value_take_string (value, modulemd_module_dup_stream (self));
       break;
 
     case MD_PROP_SUMMARY:
-      g_value_set_string (value, modulemd_module_peek_summary (self));
+      g_value_take_string (value, modulemd_module_dup_summary (self));
       break;
 
     case MD_PROP_TRACKER:
-      g_value_set_string (value, modulemd_module_peek_tracker (self));
+      g_value_take_string (value, modulemd_module_dup_tracker (self));
       break;
 
     case MD_PROP_VERSION:
@@ -3135,7 +3135,7 @@ modulemd_module_get_property (GObject *gobject,
       break;
 
     case MD_PROP_XMD:
-      g_value_set_boxed (value, modulemd_module_peek_xmd (self));
+      g_value_take_boxed (value, modulemd_module_dup_xmd (self));
       break;
 
     default:

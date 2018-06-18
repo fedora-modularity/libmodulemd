@@ -105,17 +105,17 @@ class TestDefaults(unittest.TestCase):
         assert 'y.z' in defaults.props.intents[
             'desktop'].props.profile_defaults
         assert 'blah' in defaults.props.intents[
-            'desktop'].props.profile_defaults['y.z'].get()
+            'desktop'].props.profile_defaults['y.z'].dup()
         assert 'x.y' in defaults.props.intents[
             'desktop'].props.profile_defaults
         assert 'other' in defaults.props.intents[
-            'desktop'].props.profile_defaults['x.y'].get()
+            'desktop'].props.profile_defaults['x.y'].dup()
 
         assert 'server' in defaults.props.intents
         assert defaults.props.intents['server'].props.default_stream == 'x.y'
         assert 'x.y' in defaults.props.intents['server'].props.profile_defaults
         assert not defaults.props.intents[
-            'server'].props.profile_defaults['x.y'].get()
+            'server'].props.profile_defaults['x.y'].dup()
 
         nointents = Modulemd.Defaults.new_from_file(
             '%s/mod-defaults/ex2.yaml' % os.getenv('MESON_SOURCE_ROOT'))
@@ -138,13 +138,13 @@ class TestDefaults(unittest.TestCase):
 
         assert 'server' in defaults.props.intents
         assert 'server' in defaults.props.intents[
-            'server'].props.profile_defaults['stable'].get()
+            'server'].props.profile_defaults['stable'].dup()
         assert 'microservice' in defaults.props.intents[
-            'server'].props.profile_defaults['stable'].get()
+            'server'].props.profile_defaults['stable'].dup()
         assert 'cloud' in defaults.props.intents[
-            'server'].props.profile_defaults['PoC'].get()
+            'server'].props.profile_defaults['PoC'].dup()
         assert 'microservice' in defaults.props.intents[
-            'server'].props.profile_defaults['PoC'].get()
+            'server'].props.profile_defaults['PoC'].dup()
 
 
 class TestIssues(unittest.TestCase):

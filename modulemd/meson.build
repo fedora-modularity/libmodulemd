@@ -1,3 +1,18 @@
+developer_build = get_option('developer_build')
+python3 = pymod.find_python()
+
+clang_format = find_program('clang-format', required: developer_build)
+if not clang_format.found()
+    clang_format = disabler()
+endif
+
+autopep8 = find_program('python3-autopep8', 'autopep8',
+                        required : developer_build)
+if not autopep8.found()
+    autopep8 = disabler()
+endif
+
+
 modulemd_srcs = [
     'modulemd-buildopts.c',
     'modulemd-common.c',
@@ -100,9 +115,8 @@ install_headers(
 )
 
 # Fake test to ensure that all sources and headers are formatted properly
-test_clang_format = find_program('clang-format')
 clang_args = [ '-i' ]
-test('test_clang_format', test_clang_format,
+test('clang_format', clang_format,
      args : clang_args + files(
          modulemd_srcs +
          modulemd_hdrs +
@@ -110,15 +124,16 @@ test('test_clang_format', test_clang_format,
          test_srcs))
 
 # Fake test to ensure that the python tests are formatted according to PEP8
-test_autopep8 = find_program('python3-autopep8', 'autopep8')
 autopep8_args = [ '--in-place', '-a', '-a' ]
 autopep8_scripts = [ files('test-modulemd-python.py', 'test-dirty.py') ]
-test('test_autopep8', test_autopep8,
+test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
 
-test_dirty_repo = find_program('python3')
+# Fake test to ensure that the autoformatters didn't end up making changes
+# when run in CI (such as during a pull-request). This test is skipped
+# automatically if not running in CI.
 dirty_repo_scripts = [ files('test-dirty.py') ]
-test('test_dirty_repo', test_dirty_repo,
+test('test_dirty_repo', python3,
      args: dirty_repo_scripts)
 
 # Test env with fatal warnings and criticals
@@ -283,10 +298,13 @@ test('test_modulemd_yaml', test_modulemd_yaml,
 test('test_release_modulemd_yaml', test_modulemd_yaml,
      env : test_release_env)
 
-test_modulemd_python = find_program('test-modulemd-python.py')
-test ('test_modulemd_python', test_modulemd_python, env : test_env)
-test ('test_release_modulemd_python', test_modulemd_python,
-      env : test_release_env)
+modulemd_python_scripts = files('test-modulemd-python.py')
+test ('test_modulemd_python', python3,
+      env : test_env,
+      args : modulemd_python_scripts)
+test ('test_release_modulemd_python', python3,
+      env : test_release_env,
+      args : modulemd_python_scripts)
 
 gnome.generate_gir(
     modulemd_lib,

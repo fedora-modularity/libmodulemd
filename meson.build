@@ -7,7 +7,7 @@ project('modulemd', 'c',
           'b_asneeded=true',
         ],
         license : 'MIT',
-        meson_version : '>=0.36.0')
+        meson_version : '>=0.44.0')
 
 cc = meson.get_compiler('c')
 test_cflags = [
@@ -32,6 +32,7 @@ foreach cflag: test_cflags
   endif
 endforeach
 
+pymod = import('python3')
 gnome = import('gnome')
 pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')

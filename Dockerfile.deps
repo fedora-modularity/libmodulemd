@@ -4,5 +4,29 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 ARG TARBALL
 
-RUN dnf -y --setopt=install_weak_deps=False install git-core meson gcc ninja-build wget curl openssl popt-devel sudo pkgconf glib2-devel gobject-introspection-devel python3-gobject-base libyaml-devel gtk-doc redhat-rpm-config ruby rubygems "rubygem(json)" python3-autopep8 clang python3-GitPython && dnf -y clean all
+RUN dnf -y --setopt=install_weak_deps=False install \
+	clang \
+	curl \
+	gcc \
+	git-core \
+	glib2-devel \
+	gobject-introspection-devel \
+	gtk-doc \
+	libyaml-devel \
+	meson \
+	ninja-build \
+	openssl \
+	pkgconf \
+	popt-devel \
+	python3-autopep8 \
+	python3-GitPython \
+	python3-gobject-base \
+	redhat-rpm-config \
+	ruby \
+	"rubygem(json)" \
+	rubygems \
+	sudo \
+	valgrind \
+	wget \
+    && dnf -y clean all
 

@@ -12,6 +12,11 @@ if not autopep8.found()
     autopep8 = disabler()
 endif
 
+valgrind = find_program('valgrind', required: developer_build)
+
+if not valgrind.found()
+    valgrind = disabler()
+endif
 
 modulemd_srcs = [
     'modulemd-buildopts.c',
@@ -125,7 +130,9 @@ test('clang_format', clang_format,
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 autopep8_args = [ '--in-place', '-a', '-a' ]
-autopep8_scripts = [ files('test-modulemd-python.py', 'test-dirty.py') ]
+autopep8_scripts = [ files('test-modulemd-python.py',
+                           'test-dirty.py',
+                           'test-valgrind.py') ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
 
@@ -305,6 +312,14 @@ test ('test_modulemd_python', python3,
 test ('test_release_modulemd_python', python3,
       env : test_release_env,
       args : modulemd_python_scripts)
+
+if valgrind.found()
+    modulemd_valgrind_scripts = files('test-valgrind.py')
+    test ('test_valgrind', python3,
+          env : test_env,
+          args : modulemd_valgrind_scripts,
+          timeout : 60)
+endif
 
 gnome.generate_gir(
     modulemd_lib,

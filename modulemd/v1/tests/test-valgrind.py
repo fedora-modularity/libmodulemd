@@ -6,6 +6,9 @@ import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 
+if os.getenv('MMD_SKIP_VALGRIND'):
+    sys.exit(77)
+
 tests = [
     'test_v1_modulemd_buildopts',
     'test_v1_modulemd_component',

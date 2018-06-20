@@ -40,6 +40,7 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
             print("Valgrind exited with an error on %s" % test,
                   file=sys.stderr)
             failed = True
+            continue
 
         # Process the XML for leaks
         tree = ET.parse('%s/%s.xml' % (tmpdirname, test))

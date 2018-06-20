@@ -40,6 +40,10 @@ except ImportError:
 
 class TestStandard(unittest.TestCase):
 
+    def test_version(self):
+        # Make sure that we are linking against the correct version
+        assert os.getenv('MODULEMD_VERSION') == Modulemd.get_version()
+
     def test_failures(self):
         (objects, failures) = Modulemd.objects_from_file_ext(
             "%s/test_data/mixed-v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))

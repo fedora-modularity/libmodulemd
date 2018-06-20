@@ -7,17 +7,17 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 tests = [
-    'test_modulemd_buildopts',
-    'test_modulemd_component',
-    'test_modulemd_defaults',
-    'test_modulemd_dependencies',
-    'test_modulemd_intent',
-    'test_modulemd_module',
-    'test_modulemd_regressions',
-    'test_modulemd_servicelevel',
-    'test_modulemd_simpleset',
-    'test_modulemd_subdocument',
-    'test_modulemd_yaml',
+    'test_v1_modulemd_buildopts',
+    'test_v1_modulemd_component',
+    'test_v1_modulemd_defaults',
+    'test_v1_modulemd_dependencies',
+    'test_v1_modulemd_intent',
+    'test_v1_modulemd_module',
+    'test_v1_modulemd_regressions',
+    'test_v1_modulemd_servicelevel',
+    'test_v1_modulemd_simpleset',
+    'test_v1_modulemd_subdocument',
+    'test_v1_modulemd_yaml',
 ]
 
 failed = False

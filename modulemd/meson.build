@@ -1,4 +1,6 @@
 developer_build = get_option('developer_build')
+test_dirty_git = get_option('test_dirty_git')
+
 python3 = pymod.find_python()
 
 clang_format = find_program('clang-format', required: developer_build)
@@ -107,12 +109,16 @@ autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
 
+
 # Fake test to ensure that the autoformatters didn't end up making changes
-# when run in CI (such as during a pull-request). This test is skipped
-# automatically if not running in CI.
-dirty_repo_scripts = [ files('common/tests/test-dirty.py') ]
-test('test_dirty_repo', python3,
-     args: dirty_repo_scripts)
+# when run in CI (such as during a pull-request). This test is only run if
+# meson was configured with `-Dtest_dirty_git=true`
+
+if test_dirty_git
+    dirty_repo_scripts = [ files('common/tests/test-dirty.py') ]
+    test('test_dirty_repo', python3,
+         args: dirty_repo_scripts)
+endif
 
 if build_api_v1
     subdir('v1')

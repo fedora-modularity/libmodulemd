@@ -5,7 +5,7 @@ set -e
 
 pushd /builddir/
 
-meson --buildtype=debug travis
+meson --buildtype=debug -Dtest_dirty_git=true travis
 
 ninja -C travis test
 if [ $? != 0 ]; then

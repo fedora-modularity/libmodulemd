@@ -2,13 +2,6 @@
 
 import os
 import sys
-
-travis = os.getenv('TRAVIS')
-
-if not travis:
-    # Skip this test when not running in CI
-    sys.exit(77)
-
 import git
 
 script_dir = os.path.dirname(os.path.realpath(__file__))

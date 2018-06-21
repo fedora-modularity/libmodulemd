@@ -489,12 +489,12 @@ modulemd_dependencies_get_property (GObject *object,
   switch (prop_id)
     {
     case DEPS_PROP_BUILDREQUIRES:
-      g_value_set_boxed (value,
-                         modulemd_dependencies_peek_buildrequires (self));
+      g_value_take_boxed (value,
+                          modulemd_dependencies_dup_buildrequires (self));
       break;
 
     case DEPS_PROP_REQUIRES:
-      g_value_set_boxed (value, modulemd_dependencies_peek_requires (self));
+      g_value_take_boxed (value, modulemd_dependencies_dup_requires (self));
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); break;

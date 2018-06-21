@@ -70,4 +70,4 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
 
 
 if failed:
-    os.exit(1)
+    sys.exit(1)

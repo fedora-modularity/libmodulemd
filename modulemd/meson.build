@@ -23,6 +23,7 @@ endif
 build_api_v1 = get_option('build_api_v1')
 
 modulemd_v1_srcs = files(
+    'common/modulemd-modulestream.c',
     'v1/modulemd-buildopts.c',
     'v1/modulemd-common.c',
     'v1/modulemd-component.c',
@@ -48,6 +49,7 @@ modulemd_v1_srcs = files(
 )
 
 modulemd_v1_hdrs = files(
+    'include/common/modulemd-modulestream.h',
     'include/modulemd-1.0/modulemd.h',
     'include/modulemd-1.0/modulemd-buildopts.h',
     'include/modulemd-1.0/modulemd-component.h',
@@ -65,6 +67,7 @@ modulemd_v1_hdrs = files(
 )
 
 modulemd_priv_hdrs = files(
+    'include/common/private/modulemd-private.h',
     'include/common/private/modulemd-util.h',
     'include/common/private/modulemd-yaml.h',
     'include/common/private/modulemd-subdocument-private.h',
@@ -72,6 +75,7 @@ modulemd_priv_hdrs = files(
 
 v1_include_dirs = include_directories (
     '.',
+    'include/common',
     'include/common/private',
     'include/modulemd-1.0')
 

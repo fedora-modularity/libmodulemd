@@ -36,6 +36,7 @@
 #include "modulemd-dependencies.h"
 #include "modulemd-intent.h"
 #include "modulemd-module.h"
+#include "modulemd-modulestream.h"
 #include "modulemd-prioritizer.h"
 #include "modulemd-profile.h"
 #include "modulemd-simpleset.h"

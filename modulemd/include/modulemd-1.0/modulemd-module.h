@@ -34,17 +34,6 @@
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
 
-enum
-{
-  MD_VERSION_UNSET = 0,
-
-  MD_VERSION_1 = 1,
-  MD_VERSION_2 = 2,
-
-  MD_VERSION_MAX = G_MAXUINT64
-};
-
-#define MD_VERSION_LATEST MD_VERSION_2
 
 G_BEGIN_DECLS
 

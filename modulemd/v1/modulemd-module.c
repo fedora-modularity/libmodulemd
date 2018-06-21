@@ -23,6 +23,7 @@
  */
 
 #include "modulemd.h"
+#include "modulemd-private.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 #include <glib.h>

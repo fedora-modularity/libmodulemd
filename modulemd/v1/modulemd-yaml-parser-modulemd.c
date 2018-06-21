@@ -27,6 +27,7 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
+#include "modulemd-private.h"
 #include "modulemd-yaml.h"
 #include "modulemd-util.h"
 

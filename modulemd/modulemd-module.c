@@ -223,7 +223,7 @@ modulemd_module_set_buildopts (ModulemdModule *self,
  *
  * Get a copy of the #ModulemdBuildopts object
  *
- * Returns: (transfer none): a copy of the #ModulemdBuildopts object. This
+ * Returns: (transfer full): a copy of the #ModulemdBuildopts object. This
  * object must be freed with g_object_unref() when the caller is finished with
  * it. This function will return NULL if no buildopts have been set.
  *
@@ -235,6 +235,26 @@ modulemd_module_get_buildopts (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   return modulemd_buildopts_copy (self->buildopts);
+}
+
+
+/**
+ * modulemd_module_peek_buildopts: (skip)
+ *
+ * Get a copy of the #ModulemdBuildopts object
+ *
+ * Returns: (transfer none): The #ModulemdBuildopts object. This
+ * object must not be modified or freed.
+ * This function will return NULL if no buildopts have been set.
+ *
+ * Since: 1.6
+ */
+ModulemdBuildopts *
+modulemd_module_peek_buildopts (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return self->buildopts;
 }
 
 

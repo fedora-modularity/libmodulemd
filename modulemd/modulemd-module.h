@@ -139,6 +139,9 @@ modulemd_module_set_buildopts (ModulemdModule *self,
 ModulemdBuildopts *
 modulemd_module_get_buildopts (ModulemdModule *self);
 
+ModulemdBuildopts *
+modulemd_module_peek_buildopts (ModulemdModule *self);
+
 void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires);

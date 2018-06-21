@@ -23,7 +23,7 @@
  */
 
 #include "modulemd.h"
-#include "modulemd-yaml.h"
+#include "private/modulemd-yaml.h"
 
 void
 modulemd_yaml_string_free (modulemd_yaml_string *yaml_string)

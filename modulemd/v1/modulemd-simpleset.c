@@ -25,7 +25,7 @@
 #include <glib.h>
 #include <string.h>
 #include "modulemd-simpleset.h"
-#include "modulemd-util.h"
+#include "private/modulemd-util.h"
 
 enum
 {

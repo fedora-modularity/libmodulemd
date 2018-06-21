@@ -26,7 +26,7 @@
 #include <locale.h>
 
 #include "modulemd.h"
-#include "modulemd-subdocument-private.h"
+#include "private/modulemd-subdocument-private.h"
 
 typedef struct _SubdocumentFixture
 {

@@ -26,7 +26,7 @@
 #include <locale.h>
 
 #include "modulemd.h"
-#include "modulemd-yaml.h"
+#include "private/modulemd-yaml.h"
 
 typedef struct _RegressionFixture
 {

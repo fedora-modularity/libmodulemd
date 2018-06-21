@@ -22,8 +22,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 #include <glib.h>
 #include <glib/gstdio.h>

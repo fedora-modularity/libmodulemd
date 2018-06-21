@@ -23,7 +23,7 @@
  */
 
 #include <string.h>
-#include "modulemd-util.h"
+#include "private/modulemd-util.h"
 
 GHashTable *
 _modulemd_hash_table_deep_str_copy (GHashTable *orig)

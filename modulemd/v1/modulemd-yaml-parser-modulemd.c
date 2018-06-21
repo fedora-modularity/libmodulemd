@@ -27,9 +27,9 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
-#include "modulemd-private.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-private.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 
 enum ModulemdReqType

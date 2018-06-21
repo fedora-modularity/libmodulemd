@@ -28,9 +28,9 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
-#include "modulemd-subdocument-private.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-subdocument-private.h"
 
 GQuark
 modulemd_yaml_error_quark (void)

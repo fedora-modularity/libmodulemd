@@ -24,7 +24,7 @@
 
 #include "modulemd-defaults.h"
 #include "modulemd-simpleset.h"
-#include "modulemd-yaml.h"
+#include "private/modulemd-yaml.h"
 
 GQuark
 modulemd_defaults_error_quark (void)

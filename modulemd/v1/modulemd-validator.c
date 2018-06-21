@@ -23,7 +23,7 @@
  */
 
 #include "modulemd.h"
-#include "modulemd-yaml.h"
+#include "private/modulemd-yaml.h"
 
 #include <glib.h>
 #include <locale.h>

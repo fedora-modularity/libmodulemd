@@ -28,8 +28,8 @@
 #include <errno.h>
 #include <inttypes.h>
 #include "modulemd.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 static gboolean
 _emit_modulemd_root (yaml_emitter_t *emitter,

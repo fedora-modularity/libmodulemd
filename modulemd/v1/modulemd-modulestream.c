@@ -23,10 +23,11 @@
  */
 
 #include "modulemd.h"
-#include "modulemd-private.h"
 #include "modulemd-modulestream.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-private.h"
+
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <yaml.h>

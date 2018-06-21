@@ -23,7 +23,7 @@
  */
 
 #include "modulemd-subdocument.h"
-#include "modulemd-subdocument-private.h"
+#include "private/modulemd-subdocument-private.h"
 
 struct _ModulemdSubdocument
 {

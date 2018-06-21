@@ -24,7 +24,7 @@
 
 #include <glib.h>
 #include "modulemd.h"
-#include "modulemd-util.h"
+#include "private/modulemd-util.h"
 
 struct _ModulemdDependencies
 {

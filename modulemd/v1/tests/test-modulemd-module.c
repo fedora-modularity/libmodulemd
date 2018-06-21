@@ -22,11 +22,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "modulemd-private.h"
+#include "private/modulemd-private.h"
 #include "modulemd-module.h"
 #include "modulemd-simpleset.h"
-#include "modulemd-util.h"
-#include "modulemd-yaml.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
 
 #include <glib.h>
 #include <locale.h>

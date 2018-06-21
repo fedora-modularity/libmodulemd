@@ -27,8 +27,8 @@
 #include <yaml.h>
 #include <errno.h>
 #include "modulemd.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 #define _yaml_parser_defaults_recurse_down(fn)                                \
   do                                                                          \

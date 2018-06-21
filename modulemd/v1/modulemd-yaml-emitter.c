@@ -28,8 +28,8 @@
 #include <errno.h>
 #include <inttypes.h>
 #include "modulemd.h"
-#include "modulemd-yaml.h"
-#include "modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 gboolean
 emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)

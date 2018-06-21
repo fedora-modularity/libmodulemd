@@ -24,7 +24,7 @@
 
 #include <inttypes.h>
 #include "modulemd.h"
-#include "modulemd-util.h"
+#include "private/modulemd-util.h"
 
 GQuark
 modulemd_prioritizer_error_quark (void)

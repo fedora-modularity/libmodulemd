@@ -23,7 +23,6 @@ endif
 build_api_v1 = get_option('build_api_v1')
 
 modulemd_v1_srcs = files(
-    'common/modulemd-modulestream.c',
     'v1/modulemd-buildopts.c',
     'v1/modulemd-common.c',
     'v1/modulemd-component.c',
@@ -33,6 +32,7 @@ modulemd_v1_srcs = files(
     'v1/modulemd-dependencies.c',
     'v1/modulemd-intent.c',
     'v1/modulemd-module.c',
+    'v1/modulemd-modulestream.c',
     'v1/modulemd-prioritizer.c',
     'v1/modulemd-profile.c',
     'v1/modulemd-simpleset.c',
@@ -49,7 +49,6 @@ modulemd_v1_srcs = files(
 )
 
 modulemd_v1_hdrs = files(
-    'include/common/modulemd-modulestream.h',
     'include/modulemd-1.0/modulemd.h',
     'include/modulemd-1.0/modulemd-buildopts.h',
     'include/modulemd-1.0/modulemd-component.h',
@@ -59,6 +58,7 @@ modulemd_v1_hdrs = files(
     'include/modulemd-1.0/modulemd-dependencies.h',
     'include/modulemd-1.0/modulemd-intent.h',
     'include/modulemd-1.0/modulemd-module.h',
+    'include/modulemd-1.0/modulemd-modulestream.h',
     'include/modulemd-1.0/modulemd-prioritizer.h',
     'include/modulemd-1.0/modulemd-profile.h',
     'include/modulemd-1.0/modulemd-simpleset.h',
@@ -67,17 +67,13 @@ modulemd_v1_hdrs = files(
 )
 
 modulemd_priv_hdrs = files(
-    'include/common/private/modulemd-private.h',
-    'include/common/private/modulemd-util.h',
-    'include/common/private/modulemd-yaml.h',
-    'include/common/private/modulemd-subdocument-private.h',
+    'include/modulemd-1.0/private/modulemd-private.h',
+    'include/modulemd-1.0/private/modulemd-util.h',
+    'include/modulemd-1.0/private/modulemd-yaml.h',
+    'include/modulemd-1.0/private/modulemd-subdocument-private.h',
 )
 
-v1_include_dirs = include_directories (
-    '.',
-    'include/common',
-    'include/common/private',
-    'include/modulemd-1.0')
+v1_include_dirs = include_directories ('include/modulemd-1.0')
 
 test_v1_srcs = files(
     'v1/tests/test-modulemd-buildopts.c',

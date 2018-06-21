@@ -147,7 +147,7 @@ modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
 
   if (g_strcmp0 (self->name, name) != 0)
     {
-      g_free (self->description);
+      g_free (self->name);
       self->name = g_strdup (name);
       g_object_notify_by_pspec (G_OBJECT (self),
                                 profile_properties[PROFILE_PROP_NAME]);

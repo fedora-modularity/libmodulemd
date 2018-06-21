@@ -16,6 +16,7 @@ tests = [
     'test_v1_modulemd_dependencies',
     'test_v1_modulemd_intent',
     'test_v1_modulemd_module',
+    'test_v1_modulemd_modulestream',
     'test_v1_modulemd_regressions',
     'test_v1_modulemd_servicelevel',
     'test_v1_modulemd_simpleset',

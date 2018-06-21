@@ -86,6 +86,7 @@ test_v1_srcs = files(
     'v1/tests/test-modulemd-dependencies.c',
     'v1/tests/test-modulemd-intent.c',
     'v1/tests/test-modulemd-module.c',
+    'v1/tests/test-modulemd-modulestream.c',
     'v1/tests/test-modulemd-regressions.c',
     'v1/tests/test-modulemd-servicelevel.c',
     'v1/tests/test-modulemd-simpleset.c',

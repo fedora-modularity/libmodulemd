@@ -134,6 +134,19 @@ test('test_v1_modulemd_module', test_v1_modulemd_module,
 test('test_v1_release_modulemd_module', test_v1_modulemd_module,
      env : test_release_env)
 
+test_v1_modulemd_modulestream = executable(
+    'test_v1_modulemd_modulestream',
+    'tests/test-modulemd-modulestream.c',
+    dependencies : [
+        modulemd_v1_dep,
+    ],
+    install : false,
+)
+test('test_v1_modulemd_modulestream', test_v1_modulemd_modulestream,
+     env : test_env)
+test('test_v1_release_modulemd_modulestream', test_v1_modulemd_modulestream,
+     env : test_release_env)
+
 test_v1_modulemd_regressions = executable(
     'test_v1_modulemd_regressions',
     'tests/test-modulemd-regressions.c',

@@ -22,6 +22,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* ============================================================================
+ * This object is deprecated as of v1.6.0 and should be replaced with
+ * ModulemdModuleStream.
+ */
+
 #include "modulemd.h"
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-util.h"
@@ -80,41 +85,28 @@ struct _ModulemdModule
 {
   GObject parent_instance;
 
-  /* == Members == */
-  gchar *arch;
-  ModulemdBuildopts *buildopts;
+  ModulemdModuleStream *stream;
+
+  /* == Members for backwards-compatibility == */
+  GHashTable *rpm_buildopts;
+
+  /* Members to emulate peek() */
   GHashTable *buildrequires;
-  gchar *community;
   ModulemdSimpleSet *content_licenses;
-  gchar *context;
-  gchar *description;
   GPtrArray *dependencies;
-  gchar *documentation;
-  GDate *eol;
-  guint64 mdversion;
   GHashTable *module_components;
   ModulemdSimpleSet *module_licenses;
-  gchar *name;
   GHashTable *profiles;
   GHashTable *requires;
   ModulemdSimpleSet *rpm_api;
-  GHashTable *rpm_buildopts;
   ModulemdSimpleSet *rpm_artifacts;
   GHashTable *rpm_components;
   ModulemdSimpleSet *rpm_filter;
   GHashTable *servicelevels;
-  gchar *stream;
-  gchar *summary;
-  gchar *tracker;
-  guint64 version;
   GHashTable *xmd;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
-
-
-static gboolean
-modulemd_module_upgrade_full (ModulemdModule *self, guint64 version);
 
 
 /**
@@ -124,18 +116,19 @@ modulemd_module_upgrade_full (ModulemdModule *self, guint64 version);
  * Sets the "arch" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_arch)
 void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->arch, arch) != 0)
-    {
-      g_free (self->arch);
-      self->arch = g_strdup (arch);
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_ARCH]);
-    }
+  modulemd_modulestream_set_arch (self->stream, arch);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_ARCH]);
 }
 
 /**
@@ -165,13 +158,17 @@ modulemd_module_get_arch (ModulemdModule *self)
  * Returns: A string containing the "arch" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_arch)
 const gchar *
 modulemd_module_peek_arch (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->arch;
+  return modulemd_modulestream_peek_arch (self->stream);
 }
 
 
@@ -183,13 +180,17 @@ modulemd_module_peek_arch (ModulemdModule *self)
  * Returns: A copy of the string containing the "arch" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_arch)
 gchar *
 modulemd_module_dup_arch (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->arch);
+  return modulemd_modulestream_get_arch (self->stream);
 }
 
 
@@ -201,7 +202,11 @@ modulemd_module_dup_arch (ModulemdModule *self)
  * additional instructions to the build system required to build this module.
  *
  * Since: 1.5
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_buildopts)
 void
 modulemd_module_set_buildopts (ModulemdModule *self,
                                ModulemdBuildopts *buildopts)
@@ -209,11 +214,7 @@ modulemd_module_set_buildopts (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!buildopts || MODULEMD_IS_BUILDOPTS (buildopts));
 
-  g_clear_pointer (&self->buildopts, g_object_unref);
-  if (buildopts)
-    {
-      self->buildopts = modulemd_buildopts_copy (buildopts);
-    }
+  modulemd_modulestream_set_buildopts (self->stream, buildopts);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_BUILDOPTS]);
 }
@@ -229,13 +230,17 @@ modulemd_module_set_buildopts (ModulemdModule *self,
  * it. This function will return NULL if no buildopts have been set.
  *
  * Since: 1.5
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 ModulemdBuildopts *
 modulemd_module_get_buildopts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return modulemd_buildopts_copy (self->buildopts);
+  return modulemd_modulestream_get_buildopts (self->stream);
 }
 
 
@@ -249,57 +254,41 @@ modulemd_module_get_buildopts (ModulemdModule *self)
  * This function will return NULL if no buildopts have been set.
  *
  * Since: 1.6
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 ModulemdBuildopts *
 modulemd_module_peek_buildopts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->buildopts;
+  return modulemd_modulestream_peek_buildopts (self->stream);
 }
 
 
 /**
  * modulemd_module_set_buildrequires:
- * @buildrequires: (nullable) (element-type utf8 utf8): The requirements to build this
- * module.
+ * @buildrequires: (nullable) (element-type utf8 utf8): The requirements to
+ * build this module.
  *
  * Sets the 'buildrequires' property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_buildrequires)
 void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires)
 {
-  GHashTableIter iter;
-  gpointer module_name, stream_name;
-  guint64 version;
-
-  version = modulemd_module_peek_mdversion (self);
-
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (self->buildrequires != buildrequires);
 
-  if (version > MD_VERSION_1)
-    {
-      g_debug ("Incompatible modulemd version");
-      return;
-    }
-
-  g_hash_table_remove_all (self->buildrequires);
-
-  if (buildrequires)
-    {
-      g_hash_table_iter_init (&iter, buildrequires);
-      while (g_hash_table_iter_next (&iter, &module_name, &stream_name))
-        {
-          g_hash_table_replace (self->buildrequires,
-                                g_strdup ((const gchar *)module_name),
-                                g_strdup ((const gchar *)stream_name));
-        }
-    }
+  modulemd_modulestream_set_buildrequires (self->stream, buildrequires);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_BUILDREQUIRES]);
@@ -313,12 +302,12 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
  * Returns: (element-type utf8 utf8) (transfer none): A hash table
  * containing the "buildrequires" property.
  *
- * Deprecated: 1.1
- * Use peek_buildrequires() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_buildrequires)
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
 {
@@ -334,11 +323,18 @@ modulemd_module_get_buildrequires (ModulemdModule *self)
  * containing the "buildrequires" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_peek_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->buildrequires, g_hash_table_unref);
+  self->buildrequires = modulemd_modulestream_get_buildrequires (self->stream);
 
   return self->buildrequires;
 }
@@ -353,13 +349,17 @@ modulemd_module_peek_buildrequires (ModulemdModule *self)
  * containing the "buildrequires" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_dup_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return _modulemd_hash_table_deep_str_copy (self->buildrequires);
+  return modulemd_modulestream_get_buildrequires (self->stream);
 }
 
 
@@ -370,19 +370,19 @@ modulemd_module_dup_buildrequires (ModulemdModule *self)
  * Sets the "community" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_community)
 void
 modulemd_module_set_community (ModulemdModule *self, const gchar *community)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->community, community) != 0)
-    {
-      g_free (self->community);
-      self->community = g_strdup (community);
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_COMMUNITY]);
-    }
+  modulemd_modulestream_set_community (self->stream, community);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_COMMUNITY]);
 }
 
 /**
@@ -392,12 +392,12 @@ modulemd_module_set_community (ModulemdModule *self, const gchar *community)
  *
  * Returns: A string containing the "community" property.
  *
- * Deprecated: 1.1
- * Use peek_community() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_community)
+G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 const gchar *
 modulemd_module_get_community (ModulemdModule *self)
 {
@@ -413,13 +413,17 @@ modulemd_module_get_community (ModulemdModule *self)
  * Returns: A string containing the "community" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 const gchar *
 modulemd_module_peek_community (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->community;
+  return modulemd_modulestream_peek_community (self->stream);
 }
 
 
@@ -431,13 +435,17 @@ modulemd_module_peek_community (ModulemdModule *self)
  * Returns: A copy of string containing the "community" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 gchar *
 modulemd_module_dup_community (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->community);
+  return modulemd_modulestream_get_community (self->stream);
 }
 
 
@@ -449,7 +457,11 @@ modulemd_module_dup_community (ModulemdModule *self)
  * Sets the content_licenses property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_content_licenses)
 void
 modulemd_module_set_content_licenses (ModulemdModule *self,
                                       ModulemdSimpleSet *licenses)
@@ -457,7 +469,7 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
-  modulemd_simpleset_copy (licenses, &self->content_licenses);
+  modulemd_modulestream_set_content_licenses (self->stream, licenses);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_CONTENT_LIC]);
@@ -471,18 +483,18 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
  * Returns: (transfer none): a #SimpleSet containing the set of licenses in the
  * "content_licenses" property.
  *
- * Deprecated: 1.1
- * Use peek_content_licenses() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_content_licenses)
+G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_get_content_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->content_licenses;
+  return modulemd_module_peek_content_licenses (self);
 }
 
 
@@ -495,11 +507,19 @@ modulemd_module_get_content_licenses (ModulemdModule *self)
  * "content_licenses" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_peek_content_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->content_licenses, g_object_unref);
+  self->content_licenses =
+    modulemd_modulestream_get_content_licenses (self->stream);
 
   return self->content_licenses;
 }
@@ -514,16 +534,17 @@ modulemd_module_peek_content_licenses (ModulemdModule *self)
  * "content_licenses" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_dup_content_licenses (ModulemdModule *self)
 {
-  ModulemdSimpleSet *set = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  modulemd_simpleset_copy (self->content_licenses, &set);
-
-  return set;
+  return modulemd_modulestream_get_content_licenses (self->stream);
 }
 
 
@@ -534,19 +555,20 @@ modulemd_module_dup_content_licenses (ModulemdModule *self)
  * Sets the "context" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_context)
 void
 modulemd_module_set_context (ModulemdModule *self, const gchar *context)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->context, context) != 0)
-    {
-      g_free (self->context);
-      self->context = g_strdup (context);
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_CONTEXT]);
-    }
+
+  modulemd_modulestream_set_context (self->stream, context);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_CONTEXT]);
 }
 
 /**
@@ -556,12 +578,12 @@ modulemd_module_set_context (ModulemdModule *self, const gchar *context)
  *
  * Returns: A string containing the "context" property.
  *
- * Deprecated: 1.1
- * Use peek_context() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_context)
+G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 const gchar *
 modulemd_module_get_context (ModulemdModule *self)
 {
@@ -577,13 +599,17 @@ modulemd_module_get_context (ModulemdModule *self)
  * Returns: A string containing the "context" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 const gchar *
 modulemd_module_peek_context (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->context;
+  return modulemd_modulestream_peek_context (self->stream);
 }
 
 
@@ -595,13 +621,17 @@ modulemd_module_peek_context (ModulemdModule *self)
  * Returns: A copy of the string containing the "context" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 gchar *
 modulemd_module_dup_context (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->context);
+  return modulemd_modulestream_get_context (self->stream);
 }
 
 
@@ -613,35 +643,15 @@ modulemd_module_dup_context (ModulemdModule *self)
  * Sets the list of dependency objects for this module.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_dependencies)
 void
 modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 {
-  gsize i = 0;
-  ModulemdDependencies *copy = NULL;
-  guint64 mdversion;
-
-  mdversion = modulemd_module_peek_mdversion (self);
-
-  g_return_if_fail (MODULEMD_IS_MODULE (self));
-
-  if (mdversion && mdversion < MD_VERSION_2)
-    {
-      g_debug ("Incompatible modulemd version");
-      return;
-    }
-
-  g_ptr_array_set_size (self->dependencies, 0);
-
-  if (deps)
-    {
-      for (i = 0; i < deps->len; i++)
-        {
-          modulemd_dependencies_copy (g_ptr_array_index (deps, i), &copy);
-          g_ptr_array_add (self->dependencies, g_object_ref (copy));
-          g_clear_pointer (&copy, g_object_unref);
-        }
-    }
+  modulemd_modulestream_set_dependencies (self->stream, deps);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
 }
@@ -654,28 +664,16 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
  * Helper function to populate the dependencies list
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_add_dependencies)
 void
 modulemd_module_add_dependencies (ModulemdModule *self,
                                   ModulemdDependencies *dep)
 {
-  ModulemdDependencies *copy = NULL;
-
-  guint64 mdversion;
-
-  mdversion = modulemd_module_peek_mdversion (self);
-
-  g_return_if_fail (MODULEMD_IS_MODULE (self));
-
-  if (mdversion && mdversion < MD_VERSION_2)
-    {
-      g_debug ("Incompatible modulemd version");
-      return;
-    }
-
-  modulemd_dependencies_copy (dep, &copy);
-  g_ptr_array_add (self->dependencies, g_object_ref (copy));
-  g_clear_pointer (&copy, g_object_unref);
+  modulemd_modulestream_add_dependencies (self->stream, dep);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DEPS]);
 }
@@ -687,12 +685,12 @@ modulemd_module_add_dependencies (ModulemdModule *self,
  * Returns: (element-type ModulemdDependencies) (transfer none): The list
  * of dependency objects for this module.
  *
- * Deprecated: 1.1
- * Use peek_dependencies() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_dependencies)
+G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_get_dependencies (ModulemdModule *self)
 {
@@ -707,11 +705,18 @@ modulemd_module_get_dependencies (ModulemdModule *self)
  * of dependency objects for this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_peek_dependencies (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->dependencies, g_ptr_array_unref);
+  self->dependencies = modulemd_modulestream_get_dependencies (self->stream);
 
   return self->dependencies;
 }
@@ -724,26 +729,15 @@ modulemd_module_peek_dependencies (ModulemdModule *self)
  * of dependency objects for this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_dup_dependencies (ModulemdModule *self)
 {
-  GPtrArray *dependencies = NULL;
-  ModulemdDependencies *copy = NULL;
-
-  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-
-  dependencies = g_ptr_array_new_with_free_func (g_object_unref);
-
-  for (gsize i = 0; i < self->dependencies->len; i++)
-    {
-      copy = NULL;
-      modulemd_dependencies_copy (g_ptr_array_index (self->dependencies, i),
-                                  &copy);
-      g_ptr_array_add (dependencies, copy);
-    }
-
-  return dependencies;
+  return modulemd_modulestream_get_dependencies (self->stream);
 }
 
 
@@ -754,19 +748,20 @@ modulemd_module_dup_dependencies (ModulemdModule *self)
  * Sets the "description" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_description)
 void
 modulemd_module_set_description (ModulemdModule *self,
                                  const gchar *description)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->description, description) != 0)
-    {
-      g_free (self->description);
-      self->description = g_strdup (description);
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DESC]);
-    }
+  modulemd_modulestream_set_description (self->stream, description);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DESC]);
 }
 
 /**
@@ -776,12 +771,12 @@ modulemd_module_set_description (ModulemdModule *self,
  *
  * Returns: A string containing the "description" property.
  *
- * Deprecated: 1.1
- * Use peek_description() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_description)
+G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 const gchar *
 modulemd_module_get_description (ModulemdModule *self)
 {
@@ -797,13 +792,17 @@ modulemd_module_get_description (ModulemdModule *self)
  * Returns: A string containing the "description" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 const gchar *
 modulemd_module_peek_description (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->description;
+  return modulemd_modulestream_peek_description (self->stream);
 }
 
 
@@ -815,13 +814,17 @@ modulemd_module_peek_description (ModulemdModule *self)
  * Returns: A copy of the string containing the "description" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 gchar *
 modulemd_module_dup_description (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->description);
+  return modulemd_modulestream_get_description (self->stream);
 }
 
 
@@ -832,19 +835,20 @@ modulemd_module_dup_description (ModulemdModule *self)
  * Sets the "documentation" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_documentation)
 void
 modulemd_module_set_documentation (ModulemdModule *self,
                                    const gchar *documentation)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->documentation, documentation) != 0)
-    {
-      g_free (self->documentation);
-      self->documentation = g_strdup (documentation);
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DOCS]);
-    }
+  modulemd_modulestream_set_documentation (self->stream, documentation);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_DOCS]);
 }
 
 /**
@@ -854,12 +858,12 @@ modulemd_module_set_documentation (ModulemdModule *self,
  *
  * Returns: A string containing the "documentation" property.
  *
- * Deprecated: 1.1
- * Use peek_documentation() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_documentation)
+G_DEPRECATED_FOR (modulemd_modulestream_get_documentation)
 const gchar *
 modulemd_module_get_documentation (ModulemdModule *self)
 {
@@ -875,13 +879,17 @@ modulemd_module_get_documentation (ModulemdModule *self)
  * Returns: A string containing the "documentation" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_documentation)
 const gchar *
 modulemd_module_peek_documentation (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->documentation;
+  return modulemd_modulestream_peek_documentation (self->stream);
 }
 
 
@@ -893,13 +901,17 @@ modulemd_module_peek_documentation (ModulemdModule *self)
  * Returns: A copy of the string containing the "documentation" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_module_get_documentation)
 gchar *
 modulemd_module_dup_documentation (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->documentation);
+  return modulemd_modulestream_get_documentation (self->stream);
 }
 
 
@@ -913,39 +925,20 @@ modulemd_module_dup_documentation (ModulemdModule *self)
  * on modulemd files using the version 2 or later formats.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_eol)
 void
 modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (modulemd_module_peek_mdversion (self) < 2);
 
-  if (!date)
-    {
-      gboolean previously_valid = g_date_valid (self->eol);
+  modulemd_modulestream_set_eol (self->stream, date);
 
-      g_date_clear (self->eol, 1);
-
-      if (previously_valid)
-        {
-          g_object_notify_by_pspec (G_OBJECT (self),
-                                    md_properties[MD_PROP_EOL]);
-        }
-
-      return;
-    }
-
-  g_return_if_fail (g_date_valid (date));
-
-  if (!g_date_valid (self->eol) || g_date_compare (date, self->eol) != 0)
-    {
-      /* Date is changing. Update it */
-      g_date_set_year (self->eol, g_date_get_year (date));
-      g_date_set_month (self->eol, g_date_get_month (date));
-      g_date_set_day (self->eol, g_date_get_day (date));
-
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_EOL]);
-    }
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_EOL]);
 }
 
 
@@ -959,12 +952,12 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
  *
  * Returns: A #GDate containing the "EOL" date
  *
- * Deprecated: 1.1
- * Use peek_eol() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_eol)
+G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 const GDate *
 modulemd_module_get_eol (ModulemdModule *self)
 {
@@ -983,18 +976,17 @@ modulemd_module_get_eol (ModulemdModule *self)
  * Returns: A #GDate containing the "EOL" date
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 const GDate *
 modulemd_module_peek_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  if (!g_date_valid (self->eol))
-    {
-      return NULL;
-    }
-
-  return self->eol;
+  return modulemd_modulestream_peek_eol (self->stream);
 }
 
 
@@ -1009,20 +1001,17 @@ modulemd_module_peek_eol (ModulemdModule *self)
  * Returns: A #GDate containing a copy of the "EOL" date
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 GDate *
 modulemd_module_dup_eol (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  if (!g_date_valid (self->eol))
-    {
-      return NULL;
-    }
-
-  return g_date_new_dmy (g_date_get_day (self->eol),
-                         g_date_get_month (self->eol),
-                         g_date_get_year (self->eol));
+  return modulemd_modulestream_get_eol (self->stream);
 }
 
 
@@ -1033,18 +1022,20 @@ modulemd_module_dup_eol (ModulemdModule *self)
  * Sets the "mdversion" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_mdversion)
 void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (self->mdversion != mdversion)
-    {
-      self->mdversion = mdversion;
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_MDVERSION]);
-    }
+
+  modulemd_modulestream_set_mdversion (self->stream, mdversion);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_MDVERSION]);
 }
 
 
@@ -1055,12 +1046,12 @@ modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
  *
  * Returns: A 64-bit unsigned integer containing the "mdversion" property.
  *
- * Deprecated: 1.1
- * Use peek_mdversion() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_mdversion)
+G_DEPRECATED_FOR (modulemd_modulestream_get_mdversion)
 const guint64
 modulemd_module_get_mdversion (ModulemdModule *self)
 {
@@ -1074,13 +1065,17 @@ modulemd_module_get_mdversion (ModulemdModule *self)
  * Retrieves the "mdversion" for modulemd.
  *
  * Returns: A 64-bit unsigned integer containing the "mdversion" property.
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_mdversion)
 guint64
 modulemd_module_peek_mdversion (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
 
-  return self->mdversion;
+  return modulemd_modulestream_get_mdversion (self->stream);
 }
 
 
@@ -1091,7 +1086,11 @@ modulemd_module_peek_mdversion (ModulemdModule *self)
  * Adds a #ModulemdComponentModule to the "module_components" hash table.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_add_module_component)
 void
 modulemd_module_add_module_component (ModulemdModule *self,
                                       ModulemdComponentModule *component)
@@ -1099,10 +1098,7 @@ modulemd_module_add_module_component (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (MODULEMD_IS_COMPONENT_MODULE (component));
 
-  g_hash_table_replace (
-    self->module_components,
-    g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
-    g_object_ref (component));
+  modulemd_modulestream_add_module_component (self->stream, component);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_COMPONENTS]);
@@ -1115,13 +1111,17 @@ modulemd_module_add_module_component (ModulemdModule *self,
  * Remove all entries from the "module_components" hash table.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_clear_module_components)
 void
 modulemd_module_clear_module_components (ModulemdModule *self)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  g_hash_table_remove_all (self->module_components);
+  modulemd_modulestream_clear_module_components (self->stream);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_COMPONENTS]);
@@ -1138,40 +1138,19 @@ modulemd_module_clear_module_components (ModulemdModule *self)
  * Sets the module_components property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_module_components)
 void
 modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components)
 {
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if ((!components || g_hash_table_size (components) == 0) &&
-      g_hash_table_size (self->module_components) == 0)
-    {
-      /* Nothing to do; don't send notification */
-      return;
-    }
+  modulemd_modulestream_set_module_components (self->stream, components);
 
-  /* For any other case, we'll assume a full replacement */
-  modulemd_module_clear_module_components (self);
-
-  if (components)
-    {
-      g_hash_table_iter_init (&iter, components);
-      while (g_hash_table_iter_next (&iter, &key, &value))
-        {
-          /* Throw an error if the name of the key and the name the component
-           * has internally are different.
-           */
-          g_hash_table_replace (
-            self->module_components,
-            g_strdup (
-              modulemd_component_get_name ((ModulemdComponent *)value)),
-            g_object_ref ((ModulemdComponentModule *)value));
-        }
-    }
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_COMPONENTS]);
 }
@@ -1184,12 +1163,12 @@ modulemd_module_set_module_components (ModulemdModule *self,
  * Returns: (element-type utf8 ModulemdComponentModule) (transfer none): A hash table
  * containing the "module-components" property.
  *
- * Deprecated: 1.1
- * Use peek_module_components() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_module_components)
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_get_module_components (ModulemdModule *self)
 {
@@ -1206,11 +1185,19 @@ modulemd_module_get_module_components (ModulemdModule *self)
  * containing the "module-components" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_peek_module_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->module_components, g_hash_table_unref);
+  self->module_components =
+    modulemd_modulestream_get_module_components (self->stream);
 
   return self->module_components;
 }
@@ -1225,27 +1212,19 @@ modulemd_module_peek_module_components (ModulemdModule *self)
  * A copy of the hash table containing the "module-components" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_dup_module_components (ModulemdModule *self)
 {
-  GHashTable *components = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  components =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  g_hash_table_iter_init (&iter, self->module_components);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      g_hash_table_replace (
-        components,
-        g_strdup ((gchar *)key),
-        modulemd_component_copy (MODULEMD_COMPONENT (value)));
-    }
 
-  return components;
+  return modulemd_modulestream_get_module_components (self->stream);
+  ;
 }
 
 
@@ -1257,7 +1236,11 @@ modulemd_module_dup_module_components (ModulemdModule *self)
  * Sets the module_licenses property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_module_licenses)
 void
 modulemd_module_set_module_licenses (ModulemdModule *self,
                                      ModulemdSimpleSet *licenses)
@@ -1265,7 +1248,7 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!licenses || MODULEMD_IS_SIMPLESET (licenses));
 
-  modulemd_simpleset_copy (licenses, &self->module_licenses);
+  modulemd_modulestream_set_module_licenses (self->stream, licenses);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_MODULE_LIC]);
@@ -1279,12 +1262,12 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
  * Returns: (transfer none): a #ModulemdSimpleSet containing the set of
  * licenses in the "module_licenses" property.
  *
- * Deprecated: 1.1
- * Use peek_module_licenses() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_module_licenses)
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_get_module_licenses (ModulemdModule *self)
 {
@@ -1301,11 +1284,19 @@ modulemd_module_get_module_licenses (ModulemdModule *self)
  * licenses in the "module_licenses" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_peek_module_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->module_licenses, g_object_unref);
+  self->module_licenses =
+    modulemd_modulestream_get_module_licenses (self->stream);
 
   return self->module_licenses;
 }
@@ -1320,16 +1311,17 @@ modulemd_module_peek_module_licenses (ModulemdModule *self)
  * licenses in the "module_licenses" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_dup_module_licenses (ModulemdModule *self)
 {
-  ModulemdSimpleSet *licenses = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  modulemd_simpleset_copy (self->module_licenses, &licenses);
-
-  return licenses;
+  return modulemd_modulestream_get_module_licenses (self->stream);
 }
 
 
@@ -1340,18 +1332,19 @@ modulemd_module_dup_module_licenses (ModulemdModule *self)
  * Sets the "name" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_name)
 void
 modulemd_module_set_name (ModulemdModule *self, const gchar *name)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->name, name) != 0)
-    {
-      g_free (self->name);
-      self->name = g_strdup (name);
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_NAME]);
-    }
+  modulemd_modulestream_set_name (self->stream, name);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_NAME]);
 }
 
 /**
@@ -1361,12 +1354,12 @@ modulemd_module_set_name (ModulemdModule *self, const gchar *name)
  *
  * Returns: A string containing the "name" property.
  *
- * Deprecated: 1.1
- * Use peek_name() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_name)
+G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 const gchar *
 modulemd_module_get_name (ModulemdModule *self)
 {
@@ -1384,13 +1377,17 @@ modulemd_module_get_name (ModulemdModule *self)
  * Returns: A string containing the "name" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 const gchar *
 modulemd_module_peek_name (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->name;
+  return modulemd_modulestream_peek_name (self->stream);
 }
 
 
@@ -1402,13 +1399,17 @@ modulemd_module_peek_name (ModulemdModule *self)
  * Returns: A copy of the string containing the "name" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 gchar *
 modulemd_module_dup_name (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->name);
+  return modulemd_modulestream_get_name (self->stream);
 }
 
 
@@ -1419,17 +1420,18 @@ modulemd_module_dup_name (ModulemdModule *self)
  * Adds a #ModulemdProfile definition to this module.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_add_profile)
 void
 modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (MODULEMD_IS_PROFILE (profile));
 
-  g_hash_table_replace (
-    self->profiles,
-    g_strdup (modulemd_profile_get_name ((ModulemdProfile *)profile)),
-    g_object_ref (profile));
+  modulemd_modulestream_add_profile (self->stream, profile);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
 }
@@ -1441,13 +1443,17 @@ modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
  * Remove all entries from the "profiles" hash table.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_clear_profiles)
 void
 modulemd_module_clear_profiles (ModulemdModule *self)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  g_hash_table_remove_all (self->profiles);
+  modulemd_modulestream_clear_profiles (self->stream);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
 }
@@ -1461,37 +1467,17 @@ modulemd_module_clear_profiles (ModulemdModule *self)
  * Sets the 'profiles' property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-
+G_DEPRECATED_FOR (modulemd_modulestream_set_profiles)
 void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
 {
-  GHashTableIter iter;
-  gpointer key, value;
-
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if ((!profiles || g_hash_table_size (profiles) == 0) &&
-      g_hash_table_size (self->profiles) == 0)
-    {
-      /* Nothing to do; don't send notification */
-      return;
-    }
-
-  /* For any other case, we'll assume a full replacement */
-  modulemd_module_clear_profiles (self);
-
-  if (profiles)
-    {
-      g_hash_table_iter_init (&iter, profiles);
-      while (g_hash_table_iter_next (&iter, &key, &value))
-        {
-          g_hash_table_replace (
-            self->profiles,
-            g_strdup (modulemd_profile_get_name ((ModulemdProfile *)value)),
-            g_object_ref ((ModulemdProfile *)value));
-        }
-    }
+  modulemd_modulestream_set_profiles (self->stream, profiles);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_PROFILES]);
 }
@@ -1505,12 +1491,12 @@ modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
  * Returns: (element-type utf8 ModulemdProfile) (transfer none): A hash
  * table containing the "profiles" property.
  *
- * Deprecated: 1.1
- * Use peek_profiles() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_profiles)
+G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_get_profiles (ModulemdModule *self)
 {
@@ -1527,11 +1513,18 @@ modulemd_module_get_profiles (ModulemdModule *self)
  * table containing the "profiles" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_peek_profiles (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->profiles, g_hash_table_unref);
+  self->profiles = modulemd_modulestream_get_profiles (self->stream);
 
   return self->profiles;
 }
@@ -1546,26 +1539,17 @@ modulemd_module_peek_profiles (ModulemdModule *self)
  * table containing a copy of the "profiles" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_dup_profiles (ModulemdModule *self)
 {
-  GHashTable *profiles = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  profiles =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  g_hash_table_iter_init (&iter, self->profiles);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      g_hash_table_replace (profiles,
-                            g_strdup ((gchar *)key),
-                            modulemd_profile_copy (MODULEMD_PROFILE (value)));
-    }
-
-  return profiles;
+  return modulemd_modulestream_get_profiles (self->stream);
 }
 
 
@@ -1577,37 +1561,18 @@ modulemd_module_dup_profiles (ModulemdModule *self)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_requires)
 void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
-  GHashTableIter iter;
-  gpointer module_name, stream_name;
-  guint64 version;
-
-  version = modulemd_module_peek_mdversion (self);
-
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (self->requires != requires);
 
-  if (version > MD_VERSION_1)
-    {
-      g_debug ("Incompatible modulemd version");
-      return;
-    }
+  modulemd_modulestream_set_requires (self->stream, requires);
 
-  g_hash_table_remove_all (self->requires);
-
-  if (requires)
-    {
-      g_hash_table_iter_init (&iter, requires);
-      while (g_hash_table_iter_next (&iter, &module_name, &stream_name))
-        {
-          g_hash_table_replace (self->requires,
-                                g_strdup ((const gchar *)module_name),
-                                g_strdup ((const gchar *)stream_name));
-        }
-    }
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_REQUIRES]);
 }
 
@@ -1621,12 +1586,12 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
  * containing the "requires" property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later.
  *
- * Deprecated: 1.1
- * Use peek_requires() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_requires)
+G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)
 {
@@ -1644,11 +1609,18 @@ modulemd_module_get_requires (ModulemdModule *self)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_peek_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->requires, g_hash_table_unref);
+  self->requires = modulemd_modulestream_get_requires (self->stream);
 
   return self->requires;
 }
@@ -1663,13 +1635,17 @@ modulemd_module_peek_requires (ModulemdModule *self)
  * containing a copy of the "buildrequires" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_dup_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return _modulemd_hash_table_deep_str_copy (self->requires);
+  return modulemd_modulestream_get_requires (self->stream);
 }
 
 
@@ -1681,14 +1657,18 @@ modulemd_module_dup_requires (ModulemdModule *self)
  * Sets the rpm_api property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_api)
 void
 modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!apis || MODULEMD_IS_SIMPLESET (apis));
 
-  modulemd_simpleset_copy (apis, &self->rpm_api);
+  modulemd_modulestream_set_rpm_api (self->stream, apis);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_RPM_API]);
 }
@@ -1702,12 +1682,12 @@ modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
  * Returns: (transfer none): a #SimpleSet containing the set of binary RPM
  * packages in the "rpm_api" property.
  *
- * Deprecated: 1.1
- * Use peek_rpm_api() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_rpm_api)
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_api (ModulemdModule *self)
 {
@@ -1724,11 +1704,18 @@ modulemd_module_get_rpm_api (ModulemdModule *self)
  * packages in the "rpm_api" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_api (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->rpm_api, g_object_unref);
+  self->rpm_api = modulemd_modulestream_get_rpm_api (self->stream);
 
   return self->rpm_api;
 }
@@ -1743,15 +1730,17 @@ modulemd_module_peek_rpm_api (ModulemdModule *self)
  * packages in the "rpm_api" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_api (ModulemdModule *self)
 {
-  ModulemdSimpleSet *api = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  modulemd_simpleset_copy (self->rpm_api, &api);
-  return api;
+  return modulemd_modulestream_get_rpm_api (self->stream);
 }
 
 
@@ -1763,7 +1752,11 @@ modulemd_module_dup_rpm_api (ModulemdModule *self)
  * Sets the rpm_artifacts property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_artifacts)
 void
 modulemd_module_set_rpm_artifacts (ModulemdModule *self,
                                    ModulemdSimpleSet *artifacts)
@@ -1771,7 +1764,7 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!artifacts || MODULEMD_IS_SIMPLESET (artifacts));
 
-  modulemd_simpleset_copy (artifacts, &self->rpm_artifacts);
+  modulemd_modulestream_set_rpm_artifacts (self->stream, artifacts);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_ARTIFACTS]);
@@ -1786,12 +1779,12 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
  * Returns: (transfer none): a #SimpleSet containing the set of binary RPMs
  * contained in this module.
  *
- * Deprecated: 1.1
- * Use peek_rpm_artifacts() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_rpm_artifacts)
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_artifacts)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_artifacts (ModulemdModule *self)
 {
@@ -1810,11 +1803,17 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
  * contained in this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->rpm_artifacts, g_object_unref);
+  self->rpm_artifacts = modulemd_modulestream_get_rpm_artifacts (self->stream);
 
   return self->rpm_artifacts;
 }
@@ -1829,16 +1828,17 @@ modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
  * contained in this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_artifacts)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
 {
-  ModulemdSimpleSet *artifacts = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  modulemd_simpleset_copy (self->rpm_artifacts, &artifacts);
-
-  return artifacts;
+  return modulemd_modulestream_get_rpm_artifacts (self->stream);
 }
 
 
@@ -1852,24 +1852,28 @@ modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
  *
  * Since: 1.0
  *
- * Deprecated: 1.5
- * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_set_buildopts)
+G_DEPRECATED_FOR (modulemd_modulestream_set_buildopts)
 void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
 {
+  g_autoptr (ModulemdBuildopts) opts = NULL;
   const gchar *rpm_macros = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
   /* First, make sure the Buildopts object exists */
-  if (!self->buildopts)
+  opts = modulemd_modulestream_get_buildopts (self->stream);
+  if (!opts)
     {
-      self->buildopts = modulemd_buildopts_new ();
+      opts = modulemd_buildopts_new ();
     }
 
   rpm_macros = g_hash_table_lookup (buildopts, "macros");
-  modulemd_buildopts_set_rpm_macros (self->buildopts, rpm_macros);
+  modulemd_buildopts_set_rpm_macros (opts, rpm_macros);
+
+  modulemd_modulestream_set_buildopts (self->stream, opts);
 }
 
 /**
@@ -1880,12 +1884,12 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
  * Returns: (element-type utf8 utf8) (transfer none): A hash table
  * containing the "rpm-buildopts" property.
  *
- * Deprecated: 1.1
- * Use peek_rpm_buildopts() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_rpm_buildopts)
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_buildopts)
 GHashTable *
 modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 {
@@ -1903,19 +1907,25 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
  *
  * Since: 1.1
  *
- * Deprecated: 1.5
- * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_get_buildopts)
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 GHashTable *
 modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
 {
+  ModulemdBuildopts *opts = NULL;
   g_autofree gchar *rpm_macros = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  if (self->buildopts)
+  g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
+  self->rpm_buildopts =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  opts = modulemd_modulestream_peek_buildopts (self->stream);
+  if (opts)
     {
-      rpm_macros = modulemd_buildopts_get_rpm_macros (self->buildopts);
+      rpm_macros = modulemd_buildopts_get_rpm_macros (opts);
     }
 
   if (rpm_macros)
@@ -1923,10 +1933,6 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
       /* Update the hash table for backwards compatibility */
       g_hash_table_replace (
         self->rpm_buildopts, g_strdup ("macros"), g_strdup (rpm_macros));
-    }
-  else
-    {
-      g_hash_table_remove_all (self->rpm_buildopts);
     }
 
   return self->rpm_buildopts;
@@ -1943,19 +1949,40 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
  *
  * Since: 1.1
  *
- * Deprecated: 1.5
- * Use #ModulemdBuildopts via Modulemd.get_buildopts() instead.
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_get_buildopts)
+G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 GHashTable *
 modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
 {
+  ModulemdBuildopts *opts = NULL;
+  g_autoptr (GHashTable) rpm_buildopts = NULL;
+  g_autofree gchar *rpm_macros = NULL;
+
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  return _modulemd_hash_table_deep_str_copy (
-    modulemd_module_peek_rpm_buildopts (self));
-  G_GNUC_END_IGNORE_DEPRECATIONS
+  opts = modulemd_modulestream_peek_buildopts (self->stream);
+  if (opts)
+    {
+      rpm_macros = modulemd_buildopts_get_rpm_macros (opts);
+    }
+
+  rpm_buildopts =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  if (rpm_macros)
+    {
+      /* Update the hash table for backwards compatibility */
+      g_hash_table_replace (
+        rpm_buildopts, g_strdup ("macros"), g_strdup (rpm_macros));
+    }
+  else
+    {
+      g_hash_table_remove_all (rpm_buildopts);
+    }
+
+  return g_hash_table_ref (rpm_buildopts);
 }
 
 
@@ -1966,7 +1993,11 @@ modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
  * Adds a #ModulemdComponentRpm to the "rpm_components" hash table.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_add_rpm_component)
 void
 modulemd_module_add_rpm_component (ModulemdModule *self,
                                    ModulemdComponentRpm *component)
@@ -1974,10 +2005,7 @@ modulemd_module_add_rpm_component (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (component));
 
-  g_hash_table_replace (
-    self->rpm_components,
-    g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
-    g_object_ref (component));
+  modulemd_modulestream_add_rpm_component (self->stream, component);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_COMPONENTS]);
@@ -1990,13 +2018,17 @@ modulemd_module_add_rpm_component (ModulemdModule *self,
  * Remove all entries from the "rpm_components" hash table.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_clear_rpm_components)
 void
 modulemd_module_clear_rpm_components (ModulemdModule *self)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  g_hash_table_remove_all (self->rpm_components);
+  modulemd_modulestream_clear_rpm_components (self->stream);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_COMPONENTS]);
@@ -2013,39 +2045,18 @@ modulemd_module_clear_rpm_components (ModulemdModule *self)
  * Sets the rpm_components property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 void
 modulemd_module_set_rpm_components (ModulemdModule *self,
                                     GHashTable *components)
 {
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if ((!components || g_hash_table_size (components) == 0) &&
-      g_hash_table_size (self->rpm_components) == 0)
-    {
-      /* Nothing to do; don't send notification */
-      return;
-    }
+  modulemd_modulestream_set_rpm_components (self->stream, components);
 
-  /* For any other case, we'll assume a full replacement */
-  modulemd_module_clear_rpm_components (self);
-
-  if (components)
-    {
-      g_hash_table_iter_init (&iter, components);
-      while (g_hash_table_iter_next (&iter, &key, &value))
-        {
-          /* Throw an error if the name of the key and the name the component
-           * has internally are different.
-           */
-          g_hash_table_replace (self->rpm_components,
-                                g_strdup (modulemd_component_get_name (
-                                  (ModulemdComponent *)value)),
-                                g_object_ref ((ModulemdComponentRpm *)value));
-        }
-    }
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_COMPONENTS]);
 }
@@ -2059,12 +2070,12 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
  * Returns: (element-type utf8 ModulemdComponentRpm) (transfer none): A hash table
  * containing the "rpm-components" property.
  *
- * Deprecated: 1.1
- * Use peek_rpm_components() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_rpm_components)
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_get_rpm_components (ModulemdModule *self)
 {
@@ -2083,11 +2094,19 @@ modulemd_module_get_rpm_components (ModulemdModule *self)
  * containing the "rpm-components" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_peek_rpm_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->rpm_components, g_hash_table_unref);
+  self->rpm_components =
+    modulemd_modulestream_get_rpm_components (self->stream);
 
   return self->rpm_components;
 }
@@ -2102,27 +2121,17 @@ modulemd_module_peek_rpm_components (ModulemdModule *self)
  * A hash table containing the "rpm-components" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_dup_rpm_components (ModulemdModule *self)
 {
-  GHashTable *components = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  components =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  g_hash_table_iter_init (&iter, self->rpm_components);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      g_hash_table_replace (
-        components,
-        g_strdup ((gchar *)key),
-        modulemd_component_copy (MODULEMD_COMPONENT (value)));
-    }
-
-  return components;
+  return modulemd_modulestream_get_rpm_components (self->stream);
 }
 
 
@@ -2134,7 +2143,11 @@ modulemd_module_dup_rpm_components (ModulemdModule *self)
  * Sets the rpm_artifacts property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_filter)
 void
 modulemd_module_set_rpm_filter (ModulemdModule *self,
                                 ModulemdSimpleSet *filter)
@@ -2142,7 +2155,7 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (!filter || MODULEMD_IS_SIMPLESET (filter));
 
-  modulemd_simpleset_copy (filter, &self->rpm_filter);
+  modulemd_modulestream_set_rpm_filter (self->stream, filter);
 
   g_object_notify_by_pspec (G_OBJECT (self),
                             md_properties[MD_PROP_RPM_FILTER]);
@@ -2157,12 +2170,12 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
  * Returns: (transfer none): a #SimpleSet containing the set of binary RPMs
  * filtered out of this module.
  *
- * Deprecated: 1.1
- * Use peek_rpm_filter() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_rpm_filter)
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_filter (ModulemdModule *self)
 {
@@ -2179,11 +2192,18 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
  * filtered out of this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_filter (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->rpm_filter, g_object_unref);
+  self->rpm_filter = modulemd_modulestream_get_rpm_filter (self->stream);
 
   return self->rpm_filter;
 }
@@ -2198,16 +2218,17 @@ modulemd_module_peek_rpm_filter (ModulemdModule *self)
  * filtered out of this module.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_filter (ModulemdModule *self)
 {
-  ModulemdSimpleSet *filters = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-
-  modulemd_simpleset_copy (self->rpm_filter, &filters);
-
-  return filters;
+  return modulemd_modulestream_get_rpm_filter (self->stream);
+  ;
 }
 
 
@@ -2217,13 +2238,17 @@ modulemd_module_dup_rpm_filter (ModulemdModule *self)
  * Remove all entries from the "servicelevels" hash table
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_clear_servicelevels)
 void
 modulemd_module_clear_servicelevels (ModulemdModule *self)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  g_hash_table_remove_all (self->servicelevels);
+  modulemd_modulestream_clear_servicelevels (self->stream);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
 }
@@ -2236,55 +2261,19 @@ modulemd_module_clear_servicelevels (ModulemdModule *self)
  * Sets the service levels for the module.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_servicelevels)
 void
 modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels)
 {
-  GHashTableIter iter;
-  gpointer key, value;
-  const gchar *name = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if ((!servicelevels || g_hash_table_size (servicelevels) == 0) &&
-      g_hash_table_size (self->servicelevels))
-    {
-      /* Nothing to do; don't send notification */
-      return;
-    }
+  modulemd_modulestream_set_servicelevels (self->stream, servicelevels);
 
-  /* For any other case, we'll assume a full replacement */
-  modulemd_module_clear_servicelevels (self);
-
-  if (servicelevels)
-    {
-      g_hash_table_iter_init (&iter, servicelevels);
-
-      while (g_hash_table_iter_next (&iter, &key, &value))
-        {
-          /* Always use the servicelevel object's name property for the key.
-           * This will protect against coding mistakes where the hash table and
-           * its entries have different views of the name.
-           */
-          name =
-            modulemd_servicelevel_get_name ((ModulemdServiceLevel *)value);
-          if (!name)
-            {
-              /* Uh oh; this servicelevel is missing its name.
-               * We will have to skip it
-               */
-              g_warning (
-                "Attempted to add a servicelevel with a NULL name. "
-                "The hashtable had key '%s'\n",
-                (const gchar *)key);
-              continue;
-            }
-
-          g_hash_table_replace (self->servicelevels,
-                                g_strdup (name),
-                                g_object_ref ((ModulemdServiceLevel *)value));
-        }
-    }
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
 }
 
@@ -2297,31 +2286,18 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
  * replaced by this entry and will release a reference on the previous entry.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_add_servicelevel)
 void
 modulemd_module_add_servicelevel (ModulemdModule *self,
                                   ModulemdServiceLevel *servicelevel)
 {
-  const gchar *name = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (!servicelevel)
-    {
-      return;
-    }
-
-  name = modulemd_servicelevel_get_name (servicelevel);
-  if (!name)
-    {
-      /* Uh oh; this servicelevel is missing its name.
-       * We will log a warning when those are enabled and then skip it.
-       */
-      g_warning ("Attempted to add a servicelevel with a NULL name");
-      return;
-    }
-
-  g_hash_table_replace (
-    self->servicelevels, g_strdup (name), g_object_ref (servicelevel));
+  modulemd_modulestream_add_servicelevel (self->stream, servicelevel);
 
   g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SL]);
 }
@@ -2335,12 +2311,12 @@ modulemd_module_add_servicelevel (ModulemdModule *self,
  * Returns: (element-type utf8 ModulemdServiceLevel) (transfer none): A
  * hash table containing the service levels.
  *
- * Deprecated: 1.1
- * Use peek_servicelevels() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_servicelevels)
+G_DEPRECATED_FOR (modulemd_modulestream_get_servicelevels)
 GHashTable *
 modulemd_module_get_servicelevels (ModulemdModule *self)
 {
@@ -2357,11 +2333,17 @@ modulemd_module_get_servicelevels (ModulemdModule *self)
  * hash table containing the service levels.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 GHashTable *
 modulemd_module_peek_servicelevels (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->servicelevels, g_hash_table_unref);
+  self->servicelevels = modulemd_modulestream_get_servicelevels (self->stream);
 
   return self->servicelevels;
 }
@@ -2376,27 +2358,16 @@ modulemd_module_peek_servicelevels (ModulemdModule *self)
  * hash table containing the service levels.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 GHashTable *
 modulemd_module_dup_servicelevels (ModulemdModule *self)
 {
-  GHashTable *servicelevels = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  servicelevels =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  g_hash_table_iter_init (&iter, self->servicelevels);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      g_hash_table_replace (
-        servicelevels,
-        g_strdup ((gchar *)key),
-        modulemd_servicelevel_copy (MODULEMD_SERVICELEVEL (value)));
-    }
-
-  return servicelevels;
+  return modulemd_modulestream_get_servicelevels (self->stream);
 }
 
 
@@ -2407,19 +2378,18 @@ modulemd_module_dup_servicelevels (ModulemdModule *self)
  * Sets the "stream" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 void
 modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->stream, stream) != 0)
-    {
-      g_free (self->stream);
-      self->stream = g_strdup (stream);
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_STREAM]);
-    }
+  modulemd_modulestream_set_stream (self->stream, stream);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_STREAM]);
 }
 
 
@@ -2430,12 +2400,12 @@ modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
  *
  * Returns: A string containing the "stream" property.
  *
- * Deprecated: 1.1
- * Use peek_stream() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_stream)
+G_DEPRECATED_FOR (modulemd_modulestream_get_stream)
 const gchar *
 modulemd_module_get_stream (ModulemdModule *self)
 {
@@ -2451,13 +2421,17 @@ modulemd_module_get_stream (ModulemdModule *self)
  * Returns: A string containing the "stream" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_stream)
 const gchar *
 modulemd_module_peek_stream (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->stream;
+  return modulemd_modulestream_peek_stream (self->stream);
 }
 
 
@@ -2469,13 +2443,16 @@ modulemd_module_peek_stream (ModulemdModule *self)
  * Returns: A copy of the string containing the "stream" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 gchar *
 modulemd_module_dup_stream (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->stream);
+  return modulemd_modulestream_get_stream (self->stream);
 }
 
 
@@ -2486,19 +2463,19 @@ modulemd_module_dup_stream (ModulemdModule *self)
  * Sets the "summary" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_summary)
 void
 modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->summary, summary) != 0)
-    {
-      g_free (self->summary);
-      self->summary = g_strdup (summary);
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_SUMMARY]);
-    }
+  modulemd_modulestream_set_summary (self->stream, summary);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_SUMMARY]);
 }
 
 
@@ -2509,12 +2486,12 @@ modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
  *
  * Returns: A string containing the "summary" property.
  *
- * Deprecated: 1.1
- * Use peek_summary() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_summary)
+G_DEPRECATED_FOR (modulemd_modulestream_get_summary)
 const gchar *
 modulemd_module_get_summary (ModulemdModule *self)
 {
@@ -2530,13 +2507,17 @@ modulemd_module_get_summary (ModulemdModule *self)
  * Returns: A string containing the "summary" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_summary)
 const gchar *
 modulemd_module_peek_summary (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->summary;
+  return modulemd_modulestream_peek_summary (self->stream);
 }
 
 
@@ -2548,13 +2529,16 @@ modulemd_module_peek_summary (ModulemdModule *self)
  * Returns: A copy of the string containing the "summary" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
 gchar *
 modulemd_module_dup_summary (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->summary);
+  return modulemd_modulestream_get_summary (self->stream);
 }
 
 
@@ -2565,19 +2549,19 @@ modulemd_module_dup_summary (ModulemdModule *self)
  * Sets the "tracker" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_tracker)
 void
 modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (g_strcmp0 (self->tracker, tracker) != 0)
-    {
-      g_free (self->tracker);
-      self->tracker = g_strdup (tracker);
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_TRACKER]);
-    }
+  modulemd_modulestream_set_tracker (self->stream, tracker);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_TRACKER]);
 }
 
 
@@ -2588,12 +2572,12 @@ modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
  *
  * Returns: A string containing the "tracker" property.
  *
- * Deprecated: 1.1
- * Use peek_tracker() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_tracker)
+G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 const gchar *
 modulemd_module_get_tracker (ModulemdModule *self)
 {
@@ -2609,13 +2593,17 @@ modulemd_module_get_tracker (ModulemdModule *self)
  * Returns: A string containing the "tracker" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 const gchar *
 modulemd_module_peek_tracker (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return self->tracker;
+  return modulemd_modulestream_peek_tracker (self->stream);
 }
 
 
@@ -2627,13 +2615,17 @@ modulemd_module_peek_tracker (ModulemdModule *self)
  * Returns: A copy of the string containing the "tracker" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 gchar *
 modulemd_module_dup_tracker (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return g_strdup (self->tracker);
+  return modulemd_modulestream_get_tracker (self->stream);
 }
 
 
@@ -2644,17 +2636,19 @@ modulemd_module_dup_tracker (ModulemdModule *self)
  * Sets the "version" property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_version)
 void
 modulemd_module_set_version (ModulemdModule *self, const guint64 version)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
-  if (self->version != version)
-    {
-      self->version = version;
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                md_properties[MD_PROP_VERSION]);
-    }
+
+  modulemd_modulestream_set_version (self->stream, version);
+
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_VERSION]);
 }
 
 
@@ -2665,12 +2659,12 @@ modulemd_module_set_version (ModulemdModule *self, const guint64 version)
  *
  * Returns: A 64-bit unsigned integer containing the "version" property.
  *
- * Deprecated: 1.1
- * Use peek_version() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_version)
+G_DEPRECATED_FOR (modulemd_modulestream_get_version)
 const guint64
 modulemd_module_get_version (ModulemdModule *self)
 {
@@ -2694,7 +2688,7 @@ modulemd_module_peek_version (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), 0);
 
-  return self->version;
+  return modulemd_modulestream_get_version (self->stream);
 }
 
 
@@ -2705,29 +2699,19 @@ modulemd_module_peek_version (ModulemdModule *self)
  * Sets the 'xmd' property.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_set_xmd)
 void
 modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
 {
   g_return_if_fail (MODULEMD_IS_MODULE (self));
 
-  if (xmd != self->xmd)
-    {
-      if (self->xmd)
-        {
-          g_hash_table_unref (self->xmd);
-        }
+  modulemd_modulestream_set_xmd (self->stream, xmd);
 
-      if (xmd)
-        {
-          self->xmd = _modulemd_hash_table_deep_variant_copy (xmd);
-        }
-      else
-        {
-          self->xmd = NULL;
-        }
-      g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_XMD]);
-    }
+  g_object_notify_by_pspec (G_OBJECT (self), md_properties[MD_PROP_XMD]);
 }
 
 
@@ -2739,12 +2723,12 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
  * Returns: (element-type utf8 GVariant) (transfer none): A hash table
  * containing the "xmd" property.
  *
- * Deprecated: 1.1
- * Use peek_xmd() instead.
- *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_peek_xmd)
+G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_get_xmd (ModulemdModule *self)
 {
@@ -2761,11 +2745,18 @@ modulemd_module_get_xmd (ModulemdModule *self)
  * containing the "xmd" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_peek_xmd (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  g_clear_pointer (&self->xmd, g_hash_table_unref);
+  self->xmd = modulemd_modulestream_get_xmd (self->stream);
 
   return self->xmd;
 }
@@ -2780,13 +2771,17 @@ modulemd_module_peek_xmd (ModulemdModule *self)
  * containing the "xmd" property.
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_dup_xmd (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  return _modulemd_hash_table_deep_variant_copy (self->xmd);
+  return modulemd_modulestream_get_xmd (self->stream);
 }
 
 
@@ -2798,78 +2793,21 @@ modulemd_module_dup_xmd (ModulemdModule *self)
  * Returns: (transfer full): A deep copy of this #ModulemdModule
  *
  * Since: 1.1
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_copy)
 ModulemdModule *
 modulemd_module_copy (ModulemdModule *self)
 {
-  guint64 mdversion = modulemd_module_peek_mdversion (self);
   ModulemdModule *copy = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (mdversion, NULL);
 
   copy = modulemd_module_new ();
 
-  /* Set mdversion first */
-  modulemd_module_set_mdversion (copy, self->mdversion);
-
-  modulemd_module_set_arch (copy, self->arch);
-
-  modulemd_module_set_buildopts (copy, self->buildopts);
-
-  modulemd_module_set_community (copy, self->community);
-
-  modulemd_module_set_content_licenses (copy, self->content_licenses);
-
-  modulemd_module_set_context (copy, self->context);
-
-  modulemd_module_set_description (copy, self->description);
-
-  modulemd_module_set_documentation (copy, self->documentation);
-
-  modulemd_module_set_module_components (copy, self->module_components);
-
-  modulemd_module_set_module_licenses (copy, self->module_licenses);
-
-  modulemd_module_set_name (copy, self->name);
-
-  modulemd_module_set_profiles (copy, self->profiles);
-
-  modulemd_module_set_rpm_api (copy, self->rpm_api);
-
-  modulemd_module_set_rpm_artifacts (copy, self->rpm_artifacts);
-
-  modulemd_module_set_rpm_components (copy, self->rpm_components);
-
-  modulemd_module_set_rpm_filter (copy, self->rpm_filter);
-
-  modulemd_module_set_servicelevels (copy, self->servicelevels);
-
-  modulemd_module_set_stream (copy, self->stream);
-
-  modulemd_module_set_summary (copy, self->summary);
-
-  modulemd_module_set_tracker (copy, self->tracker);
-
-  modulemd_module_set_version (copy, self->version);
-
-  modulemd_module_set_xmd (copy, self->xmd);
-
-
-  /* Version-specific content */
-  if (mdversion == MD_VERSION_1)
-    {
-      modulemd_module_set_buildrequires (copy, self->buildrequires);
-      modulemd_module_set_requires (copy, self->requires);
-      if (modulemd_module_peek_eol (self))
-        {
-          modulemd_module_set_eol (copy, self->eol);
-        }
-    }
-  else if (mdversion >= MD_VERSION_2)
-    {
-      modulemd_module_set_dependencies (copy, self->dependencies);
-    }
-
+  g_clear_pointer (&copy->stream, g_object_unref);
+  copy->stream = modulemd_modulestream_copy (self->stream);
 
   return copy;
 }
@@ -2883,33 +2821,15 @@ modulemd_module_copy (ModulemdModule *self)
  * Returns: a string describing the unique module identifier in the form:
  * "NAME:STREAM:VERSION[:CONTEXT]". This string is owned by the caller and
  * must be freed with g_free().
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
  */
+G_DEPRECATED_FOR (modulemd_modulestream_get_nsvc)
 gchar *
 modulemd_module_dup_nsvc (ModulemdModule *self)
 {
-  gchar *nsvc = NULL;
-  const gchar *name = modulemd_module_peek_name (self);
-  const gchar *stream = modulemd_module_peek_stream (self);
-  guint64 version = modulemd_module_peek_version (self);
-  const gchar *context = modulemd_module_peek_context (self);
-
-  if (!name || !stream || !version)
-    {
-      /* Mandatory field is missing */
-      return NULL;
-    }
-
-  if (context)
-    {
-      nsvc = g_strdup_printf (
-        "%s:%s:%" PRIx64 ":%s", name, stream, version, context);
-    }
-  else
-    {
-      nsvc = g_strdup_printf ("%s:%s:%" PRIx64, name, stream, version);
-    }
-
-  return nsvc;
+  return modulemd_modulestream_get_nsvc (self->stream);
 }
 
 
@@ -2920,7 +2840,7 @@ modulemd_module_set_property (GObject *gobject,
                               GParamSpec *pspec)
 {
   ModulemdModule *self = MODULEMD_MODULE (gobject);
-
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   switch (property_id)
     {
     case MD_PROP_ARCH:
@@ -3037,6 +2957,7 @@ modulemd_module_set_property (GObject *gobject,
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
     }
+  G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
@@ -3046,7 +2967,7 @@ modulemd_module_get_property (GObject *gobject,
                               GParamSpec *pspec)
 {
   ModulemdModule *self = MODULEMD_MODULE (gobject);
-
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   switch (property_id)
     {
     case MD_PROP_ARCH:
@@ -3163,6 +3084,7 @@ modulemd_module_get_property (GObject *gobject,
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
     }
+  G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
@@ -3170,19 +3092,11 @@ modulemd_module_finalize (GObject *gobject)
 {
   ModulemdModule *self = (ModulemdModule *)gobject;
 
-  g_clear_pointer (&self->arch, g_free);
-  g_clear_pointer (&self->buildopts, g_object_unref);
   g_clear_pointer (&self->buildrequires, g_hash_table_unref);
-  g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->content_licenses, g_object_unref);
-  g_clear_pointer (&self->context, g_free);
   g_clear_pointer (&self->dependencies, g_ptr_array_unref);
-  g_clear_pointer (&self->description, g_free);
-  g_clear_pointer (&self->documentation, g_free);
-  g_clear_pointer (&self->eol, g_date_free);
   g_clear_pointer (&self->module_components, g_hash_table_unref);
   g_clear_pointer (&self->module_licenses, g_object_unref);
-  g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->profiles, g_hash_table_unref);
   g_clear_pointer (&self->requires, g_hash_table_unref);
   g_clear_pointer (&self->rpm_api, g_object_unref);
@@ -3191,10 +3105,9 @@ modulemd_module_finalize (GObject *gobject)
   g_clear_pointer (&self->rpm_components, g_hash_table_unref);
   g_clear_pointer (&self->rpm_filter, g_object_unref);
   g_clear_pointer (&self->servicelevels, g_hash_table_unref);
-  g_clear_pointer (&self->stream, g_free);
-  g_clear_pointer (&self->summary, g_free);
-  g_clear_pointer (&self->tracker, g_free);
   g_clear_pointer (&self->xmd, g_hash_table_unref);
+
+  g_clear_pointer (&self->stream, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
 }
@@ -3482,41 +3395,8 @@ modulemd_module_class_init (ModulemdModuleClass *klass)
 static void
 modulemd_module_init (ModulemdModule *self)
 {
-  /* Allocate the members */
-  self->buildopts = modulemd_buildopts_new ();
-
-  self->buildrequires =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
-  self->module_components =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  self->rpm_components =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-
-  self->dependencies = g_ptr_array_new_with_free_func (g_object_unref);
-
-  self->eol = g_date_new ();
-
-  self->content_licenses = modulemd_simpleset_new ();
-  self->module_licenses = modulemd_simpleset_new ();
-
-  self->profiles =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-
-  self->requires =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
-  self->rpm_api = modulemd_simpleset_new ();
-  self->rpm_artifacts = modulemd_simpleset_new ();
-  self->rpm_buildopts =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-  self->rpm_filter = modulemd_simpleset_new ();
-
-  self->servicelevels =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-
-  self->xmd = g_hash_table_new_full (
-    g_str_hash, g_str_equal, g_free, modulemd_variant_unref);
+  /* Allocate the ModulemdStream that lives under the hood */
+  self->stream = modulemd_modulestream_new ();
 }
 
 /**
@@ -3968,66 +3848,6 @@ modulemd_module_dumps_all (GPtrArray *module_array)
   return yaml;
 }
 
-static gboolean
-_modulemd_upgrade_v1_to_v2 (ModulemdModule *self)
-{
-  const GDate *eol = NULL;
-  ModulemdServiceLevel *sl = NULL;
-  GHashTable *buildrequires = NULL;
-  GHashTable *requires = NULL;
-  ModulemdDependencies *v2_dep = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
-  GPtrArray *deps = NULL;
-
-  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
-
-  /* Upgrade the EOL field to a "rawhide" servicelevel*/
-  eol = modulemd_module_peek_eol (self);
-  if (eol && g_date_valid (eol))
-    {
-      sl = modulemd_servicelevel_new ();
-      modulemd_servicelevel_set_eol (sl, eol);
-      modulemd_servicelevel_set_name (sl, "rawhide");
-
-      modulemd_module_add_servicelevel (self, sl);
-      g_clear_pointer (&sl, g_object_unref);
-    }
-
-  /* Upgrade the build and runtime requirements */
-  v2_dep = modulemd_dependencies_new ();
-
-
-  /* First do BuildRequires */
-  buildrequires = modulemd_module_peek_buildrequires (self);
-  g_hash_table_iter_init (&iter, buildrequires);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      modulemd_dependencies_add_buildrequires_single (
-        v2_dep, (const gchar *)key, (const gchar *)value);
-    }
-
-  /* Now add runtime Requires */
-  requires = modulemd_module_peek_requires (self);
-  g_hash_table_iter_init (&iter, requires);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      modulemd_dependencies_add_requires_single (
-        v2_dep, (const gchar *)key, (const gchar *)value);
-    }
-
-  deps = g_ptr_array_new ();
-  g_ptr_array_add (deps, v2_dep);
-
-  modulemd_module_set_mdversion (self, MD_VERSION_2);
-  modulemd_module_set_dependencies (self, deps);
-
-  g_clear_pointer (&deps, g_ptr_array_unref);
-  g_clear_pointer (&v2_dep, g_object_unref);
-
-  return TRUE;
-}
-
 /**
  * modulemd_module_upgrade:
  * Upgrade the module to the latest supported version
@@ -4049,46 +3869,7 @@ modulemd_module_upgrade (ModulemdModule *self)
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
 
-  result = modulemd_module_upgrade_full (self, MD_VERSION_LATEST);
+  result = modulemd_modulestream_upgrade (self->stream);
 
-  return result;
-}
-
-static gboolean
-modulemd_module_upgrade_full (ModulemdModule *self, guint64 version)
-{
-  gboolean result = FALSE;
-  guint64 mdversion;
-
-  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
-
-  mdversion = modulemd_module_peek_mdversion (self);
-
-  while (mdversion < version)
-    {
-      switch (mdversion + 1)
-        {
-        case MD_VERSION_1:
-          /* No upgrade needed for v1 */
-          break;
-
-        case MD_VERSION_2:
-          result = _modulemd_upgrade_v1_to_v2 (self);
-          if (!result)
-            goto done;
-          break;
-
-          /* Future upgrades go here */
-
-        default:
-          g_error ("Programming error: no such version %" PRIx64, version);
-          result = FALSE;
-          goto done;
-        }
-      mdversion++;
-    }
-
-  result = TRUE;
-done:
   return result;
 }

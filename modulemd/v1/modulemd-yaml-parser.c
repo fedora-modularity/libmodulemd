@@ -283,11 +283,11 @@ _parse_yaml (yaml_parser_t *parser,
     {
       subdocument = g_ptr_array_index (subdocuments, i);
       if (modulemd_subdocument_get_doctype (subdocument) ==
-          MODULEMD_TYPE_MODULE)
+          MODULEMD_TYPE_MODULESTREAM)
         {
           result =
             _parse_subdocument (subdocument,
-                                _parse_modulemd,
+                                _parse_module_stream,
                                 &object,
                                 modulemd_subdocument_get_version (subdocument),
                                 &subdocument_error);
@@ -467,8 +467,8 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                   if (g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                                  "modulemd") == 0)
                     {
-                      modulemd_subdocument_set_doctype (document,
-                                                        MODULEMD_TYPE_MODULE);
+                      modulemd_subdocument_set_doctype (
+                        document, MODULEMD_TYPE_MODULESTREAM);
                     }
 
                   else if (g_strcmp0 (

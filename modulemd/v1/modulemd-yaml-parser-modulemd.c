@@ -41,7 +41,7 @@ enum ModulemdReqType
 #define _yaml_parser_modulemd_recurse_down(fn)                                \
   do                                                                          \
     {                                                                         \
-      if (!fn (module, parser, error))                                        \
+      if (!fn (modulestream, parser, error))                                  \
         {                                                                     \
           goto error;                                                         \
         }                                                                     \
@@ -49,27 +49,27 @@ enum ModulemdReqType
   while (0)
 
 static gboolean
-_parse_modulemd_data (ModulemdModule *module,
+_parse_modulemd_data (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error);
 static gboolean
-_parse_modulemd_licenses (ModulemdModule *module,
+_parse_modulemd_licenses (ModulemdModuleStream *modulestream,
                           yaml_parser_t *parser,
                           GError **error);
 static gboolean
-_parse_modulemd_xmd (ModulemdModule *module,
+_parse_modulemd_xmd (ModulemdModuleStream *modulestream,
                      yaml_parser_t *parser,
                      GError **error);
 static gboolean
-_parse_modulemd_deps (ModulemdModule *module,
+_parse_modulemd_deps (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error);
 static gboolean
-_parse_modulemd_refs (ModulemdModule *module,
+_parse_modulemd_refs (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error);
 static gboolean
-_parse_modulemd_profiles (ModulemdModule *module,
+_parse_modulemd_profiles (ModulemdModuleStream *modulestream,
                           yaml_parser_t *parser,
                           GError **error);
 static gboolean
@@ -78,15 +78,15 @@ _parse_modulemd_profile (yaml_parser_t *parser,
                          ModulemdProfile **_profile,
                          GError **error);
 static gboolean
-_parse_modulemd_api (ModulemdModule *module,
+_parse_modulemd_api (ModulemdModuleStream *modulestream,
                      yaml_parser_t *parser,
                      GError **error);
 static gboolean
-_parse_modulemd_filters (ModulemdModule *module,
+_parse_modulemd_filters (ModulemdModuleStream *modulestream,
                          yaml_parser_t *parser,
                          GError **error);
 static gboolean
-_parse_modulemd_buildopts (ModulemdModule *module,
+_parse_modulemd_buildopts (ModulemdModuleStream *modulestream,
                            yaml_parser_t *parser,
                            GError **error);
 static gboolean
@@ -94,7 +94,7 @@ _parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
                                yaml_parser_t *parser,
                                GError **error);
 static gboolean
-_parse_modulemd_components (ModulemdModule *module,
+_parse_modulemd_components (ModulemdModuleStream *modulestream,
                             yaml_parser_t *parser,
                             GError **error);
 static gboolean
@@ -107,20 +107,20 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                                ModulemdComponentRpm **_components,
                                GError **error);
 static gboolean
-_parse_modulemd_module_components (yaml_parser_t *parser,
-                                   GHashTable **_components,
-                                   GError **error);
+_parse_modulemd_modulestream_components (yaml_parser_t *parser,
+                                         GHashTable **_components,
+                                         GError **error);
 static gboolean
-_parse_modulemd_module_component (yaml_parser_t *parser,
-                                  const gchar *name,
-                                  ModulemdComponentModule **_components,
-                                  GError **error);
+_parse_modulemd_modulestream_component (yaml_parser_t *parser,
+                                        const gchar *name,
+                                        ModulemdComponentModule **_components,
+                                        GError **error);
 static gboolean
-_parse_modulemd_artifacts (ModulemdModule *module,
+_parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
                            yaml_parser_t *parser,
                            GError **error);
 static gboolean
-_parse_modulemd_servicelevels (ModulemdModule *module,
+_parse_modulemd_servicelevels (ModulemdModuleStream *modulestream,
                                yaml_parser_t *parser,
                                GError **error);
 static gboolean
@@ -130,28 +130,28 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
                               GError **error);
 
 gboolean
-_parse_modulemd (yaml_parser_t *parser,
-                 GObject **object,
-                 guint64 version,
-                 GError **error)
+_parse_module_stream (yaml_parser_t *parser,
+                      GObject **object,
+                      guint64 version,
+                      GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
   MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
   guint64 mdversion;
-  g_autoptr (ModulemdModule) module = NULL;
+  g_autoptr (ModulemdModuleStream) modulestream = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("TRACE: entering _parse_modulemd");
+  g_debug ("TRACE: entering _parse_module_stream");
 
-  module = modulemd_module_new ();
+  modulestream = modulemd_modulestream_new ();
 
   /* Use the pre-processed mdversion */
   if (version && version <= MD_VERSION_LATEST)
     {
-      modulemd_module_set_mdversion (module, version);
+      modulemd_modulestream_set_mdversion (modulestream, version);
     }
   else
     {
@@ -221,7 +221,7 @@ _parse_modulemd (yaml_parser_t *parser,
                   MMD_YAML_ERROR_RETURN (
                     error, "ModuleMD version doesn't match preprocessing");
                 }
-              modulemd_module_set_mdversion (module, mdversion);
+              modulemd_modulestream_set_mdversion (modulestream, mdversion);
             }
 
           /* Process the data section */
@@ -248,15 +248,15 @@ _parse_modulemd (yaml_parser_t *parser,
     }
 
   result = TRUE;
-  *object = g_object_ref ((GObject *)module);
+  *object = g_object_ref ((GObject *)modulestream);
 
 error:
-  g_debug ("TRACE: exiting _parse_modulemd");
+  g_debug ("TRACE: exiting _parse_module_stream");
   return result;
 }
 
 static gboolean
-_parse_modulemd_data (ModulemdModule *module,
+_parse_modulemd_data (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error)
 {
@@ -297,8 +297,8 @@ _parse_modulemd_data (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN (error, "Failed to parse module name");
                 }
 
-              modulemd_module_set_name (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_name (
+                modulestream, (const gchar *)value_event.data.scalar.value);
               yaml_event_delete (&value_event);
             }
 
@@ -314,8 +314,8 @@ _parse_modulemd_data (ModulemdModule *module,
                                          "Failed to parse module stream");
                 }
 
-              modulemd_module_set_stream (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_stream (
+                modulestream, (const gchar *)value_event.data.scalar.value);
               yaml_event_delete (&value_event);
             }
 
@@ -338,7 +338,7 @@ _parse_modulemd_data (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN (error, "Unknown module version");
                 }
 
-              modulemd_module_set_version (module, version);
+              modulemd_modulestream_set_version (modulestream, version);
               yaml_event_delete (&value_event);
             }
 
@@ -355,8 +355,8 @@ _parse_modulemd_data (ModulemdModule *module,
                                          "Failed to parse module context");
                 }
 
-              modulemd_module_set_context (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_context (
+                modulestream, (const gchar *)value_event.data.scalar.value);
               yaml_event_delete (&value_event);
             }
 
@@ -371,8 +371,8 @@ _parse_modulemd_data (ModulemdModule *module,
                     error, "Failed to parse module artifact architecture");
                 }
 
-              modulemd_module_set_arch (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_arch (
+                modulestream, (const gchar *)value_event.data.scalar.value);
 
               yaml_event_delete (&value_event);
             }
@@ -389,8 +389,8 @@ _parse_modulemd_data (ModulemdModule *module,
                                          "Failed to parse module summary");
                 }
 
-              modulemd_module_set_summary (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_summary (
+                modulestream, (const gchar *)value_event.data.scalar.value);
 
               yaml_event_delete (&value_event);
             }
@@ -407,8 +407,8 @@ _parse_modulemd_data (ModulemdModule *module,
                                          "Failed to parse module description");
                 }
 
-              modulemd_module_set_description (
-                module, (const gchar *)value_event.data.scalar.value);
+              modulemd_modulestream_set_description (
+                modulestream, (const gchar *)value_event.data.scalar.value);
 
               yaml_event_delete (&value_event);
             }
@@ -416,7 +416,8 @@ _parse_modulemd_data (ModulemdModule *module,
           /* Module EOL (obsolete) */
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
             {
-              if (modulemd_module_peek_mdversion (module) > MD_VERSION_1)
+              if (modulemd_modulestream_get_mdversion (modulestream) >
+                  MD_VERSION_1)
                 {
                   /* EOL is not supported in v2 or later; use servicelevel */
                   MMD_YAML_ERROR_RETURN (
@@ -431,7 +432,7 @@ _parse_modulemd_data (ModulemdModule *module,
                     error, "Failed to parse module EOL date");
                 }
 
-              modulemd_module_set_eol (module, eol);
+              modulemd_modulestream_set_eol (modulestream, eol);
               g_date_free (eol);
             }
 
@@ -547,7 +548,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_licenses (ModulemdModule *module,
+_parse_modulemd_licenses (ModulemdModuleStream *modulestream,
                           yaml_parser_t *parser,
                           GError **error)
 {
@@ -585,12 +586,12 @@ _parse_modulemd_licenses (ModulemdModule *module,
 
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "module"))
             {
-              modulemd_module_set_module_licenses (module, set);
+              modulemd_modulestream_set_module_licenses (modulestream, set);
             }
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "content"))
             {
-              modulemd_module_set_content_licenses (module, set);
+              modulemd_modulestream_set_content_licenses (modulestream, set);
             }
           else
             {
@@ -618,7 +619,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_xmd (ModulemdModule *module,
+_parse_modulemd_xmd (ModulemdModuleStream *modulestream,
                      yaml_parser_t *parser,
                      GError **error)
 {
@@ -660,7 +661,7 @@ _parse_modulemd_xmd (ModulemdModule *module,
     }
 
   /* Save this hash table as the xmd property */
-  modulemd_module_set_xmd (module, xmd);
+  modulemd_modulestream_set_xmd (modulestream, xmd);
 
   result = TRUE;
 
@@ -671,7 +672,7 @@ error:
 
 
 static gboolean
-_parse_modulemd_deps_v1 (ModulemdModule *module,
+_parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
                          yaml_parser_t *parser,
                          GError **error)
 {
@@ -709,12 +710,12 @@ _parse_modulemd_deps_v1 (ModulemdModule *module,
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                           "buildrequires"))
             {
-              modulemd_module_set_buildrequires (module, reqs);
+              modulemd_modulestream_set_buildrequires (modulestream, reqs);
             }
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "requires"))
             {
-              modulemd_module_set_requires (module, reqs);
+              modulemd_modulestream_set_requires (modulestream, reqs);
             }
           else
             {
@@ -743,12 +744,12 @@ error:
 
 
 static gboolean
-_parse_modulemd_v2_dep (ModulemdModule *module,
+_parse_modulemd_v2_dep (ModulemdModuleStream *modulestream,
                         yaml_parser_t *parser,
                         GError **error);
 
 static gboolean
-_parse_modulemd_deps_v2 (ModulemdModule *module,
+_parse_modulemd_deps_v2 (ModulemdModuleStream *modulestream,
                          yaml_parser_t *parser,
                          GError **error)
 {
@@ -777,7 +778,7 @@ _parse_modulemd_deps_v2 (ModulemdModule *module,
           break;
 
         case YAML_MAPPING_START_EVENT:
-          if (!_parse_modulemd_v2_dep (module, parser, error))
+          if (!_parse_modulemd_v2_dep (modulestream, parser, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Failed to parse requires/buildrequires");
@@ -804,14 +805,14 @@ error:
 
 
 static gboolean
-_parse_modulemd_v2_dep_map (ModulemdModule *module,
+_parse_modulemd_v2_dep_map (ModulemdModuleStream *modulestream,
                             yaml_parser_t *parser,
                             enum ModulemdReqType reqtype,
                             ModulemdDependencies *dep,
                             GError **error);
 
 static gboolean
-_parse_modulemd_v2_dep (ModulemdModule *module,
+_parse_modulemd_v2_dep (ModulemdModuleStream *modulestream,
                         yaml_parser_t *parser,
                         GError **error)
 {
@@ -864,7 +865,7 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
             }
 
           if (!_parse_modulemd_v2_dep_map (
-                module, parser, reqtype, dep, error))
+                modulestream, parser, reqtype, dep, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Error processing dependency map.");
@@ -881,7 +882,7 @@ _parse_modulemd_v2_dep (ModulemdModule *module,
       yaml_event_delete (&event);
     }
 
-  modulemd_module_add_dependencies (module, dep);
+  modulemd_modulestream_add_dependencies (modulestream, dep);
 
 
   result = TRUE;
@@ -892,7 +893,7 @@ error:
 
 
 static gboolean
-_parse_modulemd_v2_dep_map (ModulemdModule *module,
+_parse_modulemd_v2_dep_map (ModulemdModuleStream *modulestream,
                             yaml_parser_t *parser,
                             enum ModulemdReqType reqtype,
                             ModulemdDependencies *dep,
@@ -982,7 +983,7 @@ error:
 
 
 static gboolean
-_parse_modulemd_deps (ModulemdModule *module,
+_parse_modulemd_deps (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error)
 {
@@ -992,14 +993,14 @@ _parse_modulemd_deps (ModulemdModule *module,
 
   g_debug ("TRACE: entering _parse_modulemd_deps");
 
-  if (modulemd_module_peek_mdversion (module) == MD_VERSION_1)
+  if (modulemd_modulestream_get_mdversion (modulestream) == MD_VERSION_1)
     {
-      result = _parse_modulemd_deps_v1 (module, parser, error);
+      result = _parse_modulemd_deps_v1 (modulestream, parser, error);
       goto error;
     }
-  else if (modulemd_module_peek_mdversion (module) >= MD_VERSION_2)
+  else if (modulemd_modulestream_get_mdversion (modulestream) >= MD_VERSION_2)
     {
-      result = _parse_modulemd_deps_v2 (module, parser, error);
+      result = _parse_modulemd_deps_v2 (modulestream, parser, error);
       goto error;
     }
   else
@@ -1014,7 +1015,7 @@ error:
 
 
 static gboolean
-_parse_modulemd_refs (ModulemdModule *module,
+_parse_modulemd_refs (ModulemdModuleStream *modulestream,
                       yaml_parser_t *parser,
                       GError **error)
 {
@@ -1033,19 +1034,20 @@ _parse_modulemd_refs (ModulemdModule *module,
 
   if ((value = g_hash_table_lookup (refs, "community")))
     {
-      modulemd_module_set_community (module, (const gchar *)value);
+      modulemd_modulestream_set_community (modulestream, (const gchar *)value);
       g_hash_table_remove (refs, "community");
     }
 
   if ((value = g_hash_table_lookup (refs, "documentation")))
     {
-      modulemd_module_set_documentation (module, (const gchar *)value);
+      modulemd_modulestream_set_documentation (modulestream,
+                                               (const gchar *)value);
       g_hash_table_remove (refs, "documentation");
     }
 
   if ((value = g_hash_table_lookup (refs, "tracker")))
     {
-      modulemd_module_set_tracker (module, (const gchar *)value);
+      modulemd_modulestream_set_tracker (modulestream, (const gchar *)value);
       g_hash_table_remove (refs, "tracker");
     }
 
@@ -1064,7 +1066,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_profiles (ModulemdModule *module,
+_parse_modulemd_profiles (ModulemdModuleStream *modulestream,
                           yaml_parser_t *parser,
                           GError **error)
 {
@@ -1119,7 +1121,7 @@ _parse_modulemd_profiles (ModulemdModule *module,
 
       yaml_event_delete (&event);
     }
-  modulemd_module_set_profiles (module, profiles);
+  modulemd_modulestream_set_profiles (modulestream, profiles);
 
   result = TRUE;
 
@@ -1223,7 +1225,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_api (ModulemdModule *module,
+_parse_modulemd_api (ModulemdModuleStream *modulestream,
                      yaml_parser_t *parser,
                      GError **error)
 {
@@ -1260,7 +1262,7 @@ _parse_modulemd_api (ModulemdModule *module,
                 {
                   MMD_YAML_ERROR_RETURN_RETHROW (error, "Parse error in API");
                 }
-              modulemd_module_set_rpm_api (module, set);
+              modulemd_modulestream_set_rpm_api (modulestream, set);
             }
           else
             {
@@ -1287,7 +1289,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_filters (ModulemdModule *module,
+_parse_modulemd_filters (ModulemdModuleStream *modulestream,
                          yaml_parser_t *parser,
                          GError **error)
 {
@@ -1325,7 +1327,7 @@ _parse_modulemd_filters (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN_RETHROW (error,
                                                  "Parse error in filters");
                 }
-              modulemd_module_set_rpm_filter (module, set);
+              modulemd_modulestream_set_rpm_filter (modulestream, set);
             }
           else
             {
@@ -1352,7 +1354,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_buildopts (ModulemdModule *module,
+_parse_modulemd_buildopts (ModulemdModuleStream *modulestream,
                            yaml_parser_t *parser,
                            GError **error)
 {
@@ -1408,7 +1410,7 @@ _parse_modulemd_buildopts (ModulemdModule *module,
       yaml_event_delete (&event);
     }
 
-  modulemd_module_set_buildopts (module, buildopts);
+  modulemd_modulestream_set_buildopts (modulestream, buildopts);
 
   result = TRUE;
 
@@ -1506,7 +1508,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_components (ModulemdModule *module,
+_parse_modulemd_components (ModulemdModuleStream *modulestream,
                             yaml_parser_t *parser,
                             GError **error)
 {
@@ -1546,19 +1548,21 @@ _parse_modulemd_components (ModulemdModule *module,
                   MMD_YAML_ERROR_RETURN_RETHROW (
                     error, "Could not parse RPM components");
                 }
-              modulemd_module_set_rpm_components (module, components);
+              modulemd_modulestream_set_rpm_components (modulestream,
+                                                        components);
               g_hash_table_unref (components);
             }
           else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
                                "modules"))
             {
-              if (!_parse_modulemd_module_components (
+              if (!_parse_modulemd_modulestream_components (
                     parser, &components, error))
                 {
                   MMD_YAML_ERROR_RETURN_RETHROW (
                     error, "Could not parse module components");
                 }
-              modulemd_module_set_module_components (module, components);
+              modulemd_modulestream_set_module_components (modulestream,
+                                                           components);
               g_hash_table_unref (components);
             }
           else
@@ -1817,14 +1821,14 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
 error:
   g_object_unref (component);
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_components");
+  g_debug ("TRACE: exiting _parse_modulemd_modulestream_components");
   return result;
 }
 
 static gboolean
-_parse_modulemd_module_components (yaml_parser_t *parser,
-                                   GHashTable **_components,
-                                   GError **error)
+_parse_modulemd_modulestream_components (yaml_parser_t *parser,
+                                         GHashTable **_components,
+                                         GError **error)
 {
   gboolean result = FALSE;
   MMD_INIT_YAML_EVENT (event);
@@ -1834,7 +1838,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
   ModulemdComponentModule *component = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_debug ("TRACE: entering _parse_modulemd_module_components");
+  g_debug ("TRACE: entering _parse_modulemd_modulestream_components");
 
   components =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
@@ -1857,7 +1861,7 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           name = g_strdup ((const gchar *)event.data.scalar.value);
-          if (!_parse_modulemd_module_component (
+          if (!_parse_modulemd_modulestream_component (
                 parser, name, &component, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
@@ -1884,15 +1888,15 @@ _parse_modulemd_module_components (yaml_parser_t *parser,
 error:
   g_hash_table_unref (components);
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_components");
+  g_debug ("TRACE: exiting _parse_modulemd_modulestream_components");
   return result;
 }
 
 static gboolean
-_parse_modulemd_module_component (yaml_parser_t *parser,
-                                  const gchar *name,
-                                  ModulemdComponentModule **_component,
-                                  GError **error)
+_parse_modulemd_modulestream_component (yaml_parser_t *parser,
+                                        const gchar *name,
+                                        ModulemdComponentModule **_component,
+                                        GError **error)
 {
   gboolean result = FALSE;
   MMD_INIT_YAML_EVENT (event);
@@ -2015,12 +2019,12 @@ _parse_modulemd_module_component (yaml_parser_t *parser,
 error:
   g_object_unref (component);
 
-  g_debug ("TRACE: exiting _parse_modulemd_module_component");
+  g_debug ("TRACE: exiting _parse_modulemd_modulestream_component");
   return result;
 }
 
 static gboolean
-_parse_modulemd_artifacts (ModulemdModule *module,
+_parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
                            yaml_parser_t *parser,
                            GError **error)
 {
@@ -2066,7 +2070,7 @@ _parse_modulemd_artifacts (ModulemdModule *module,
                                          "RPM artifacts not in NEVRA format");
                 }
 
-              modulemd_module_set_rpm_artifacts (module, set);
+              modulemd_modulestream_set_rpm_artifacts (modulestream, set);
             }
           else
             {
@@ -2093,7 +2097,7 @@ error:
 }
 
 static gboolean
-_parse_modulemd_servicelevels (ModulemdModule *module,
+_parse_modulemd_servicelevels (ModulemdModuleStream *modulestream,
                                yaml_parser_t *parser,
                                GError **error)
 {
@@ -2149,7 +2153,7 @@ _parse_modulemd_servicelevels (ModulemdModule *module,
 
       yaml_event_delete (&event);
     }
-  modulemd_module_set_servicelevels (module, servicelevels);
+  modulemd_modulestream_set_servicelevels (modulestream, servicelevels);
 
   result = TRUE;
 

@@ -284,10 +284,10 @@ _emit_modulemd_variant_hashtable (yaml_emitter_t *emitter,
 /* == ModulemdModule Parser == */
 
 gboolean
-_parse_modulemd (yaml_parser_t *parser,
-                 GObject **object,
-                 guint64 version,
-                 GError **error);
+_parse_module_stream (yaml_parser_t *parser,
+                      GObject **object,
+                      guint64 version,
+                      GError **error);
 
 /* == ModulemdDefaults Parser == */
 gboolean

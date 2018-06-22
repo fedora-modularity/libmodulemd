@@ -138,20 +138,15 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
   g_autofree gchar *arch = NULL;
   g_autofree gchar *summary = NULL;
   g_autofree gchar *description = NULL;
-  g_autoptr (GHashTable) servicelevels = NULL;
   g_autoptr (ModulemdSimpleSet) module_licenses = NULL;
   g_autoptr (ModulemdSimpleSet) content_licenses = NULL;
-  g_autoptr (GHashTable) xmd = NULL;
   g_autoptr (GPtrArray) dependencies = NULL;
   g_autofree gchar *community = NULL;
   g_autofree gchar *documentation = NULL;
   g_autofree gchar *tracker = NULL;
-  g_autoptr (GHashTable) profiles = NULL;
   g_autoptr (ModulemdSimpleSet) rpm_api = NULL;
   g_autoptr (ModulemdSimpleSet) rpm_filter = NULL;
   g_autoptr (ModulemdBuildopts) buildopts = NULL;
-  g_autoptr (GHashTable) rpm_components = NULL;
-  g_autoptr (GHashTable) module_components = NULL;
   g_autoptr (ModulemdSimpleSet) rpm_artifacts = NULL;
 
   g_autofree gchar *rpm_macros = NULL;
@@ -178,20 +173,15 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
                 "arch", &arch,
                 "summary", &summary,
                 "description", &description,
-                "servicelevels", &servicelevels,
                 "module-licenses", &module_licenses,
                 "content-licenses", &content_licenses,
-                "xmd", &xmd,
                 "dependencies", &dependencies,
                 "community", &community,
                 "documentation", &documentation,
                 "tracker", &tracker,
-                "profiles", &profiles,
                 "rpm-api", &rpm_api,
                 "rpm-filter", &rpm_filter,
                 "buildopts", &buildopts,
-                "components-rpm", &rpm_components,
-                "components-module", &module_components,
                 "rpm-artifacts", &rpm_artifacts,
                 NULL);
   // clang-format on
@@ -214,18 +204,11 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
     "A module for the demonstration of the metadata format. Also, the "
     "obligatory lorem ipsum dolor sit amet goes right here.");
 
-  g_assert_true (g_hash_table_contains (servicelevels, "rawhide"));
-  g_assert_true (g_hash_table_contains (servicelevels, "stable_api"));
-  g_assert_true (g_hash_table_contains (servicelevels, "bug_fixes"));
-  g_assert_true (g_hash_table_contains (servicelevels, "security_fixes"));
-
   g_assert_true (modulemd_simpleset_contains (module_licenses, "MIT"));
 
   g_assert_true (modulemd_simpleset_contains (content_licenses, "Beerware"));
   g_assert_true (modulemd_simpleset_contains (content_licenses, "GPLv2+"));
   g_assert_true (modulemd_simpleset_contains (content_licenses, "zlib"));
-
-  g_assert_true (g_hash_table_contains (xmd, "some_key"));
 
   for (gsize i = 0; i < dependencies->len; i++)
     {
@@ -238,12 +221,6 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
   g_assert_cmpstr (documentation, ==, "http://www.example.com/");
 
   g_assert_cmpstr (tracker, ==, "http://www.example.com/");
-
-  g_assert_true (g_hash_table_contains (profiles, "default"));
-  g_assert_true (g_hash_table_contains (profiles, "container"));
-  g_assert_true (g_hash_table_contains (profiles, "minimal"));
-  g_assert_true (g_hash_table_contains (profiles, "buildroot"));
-  g_assert_true (g_hash_table_contains (profiles, "srpm-buildroot"));
 
   g_assert_true (modulemd_simpleset_contains (rpm_api, "bar"));
   g_assert_true (modulemd_simpleset_contains (rpm_api, "bar-extras"));
@@ -262,13 +239,6 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
   g_assert_true (modulemd_simpleset_contains (rpm_whitelist, "fooscl-1-baz"));
   g_assert_true (modulemd_simpleset_contains (rpm_whitelist, "xxx"));
   g_assert_true (modulemd_simpleset_contains (rpm_whitelist, "xyz"));
-
-  g_assert_true (g_hash_table_contains (rpm_components, "bar"));
-  g_assert_true (g_hash_table_contains (rpm_components, "baz"));
-  g_assert_true (g_hash_table_contains (rpm_components, "xxx"));
-  g_assert_true (g_hash_table_contains (rpm_components, "xyz"));
-
-  g_assert_true (g_hash_table_contains (module_components, "includedmodule"));
 
   g_assert_true (MODULEMD_IS_SIMPLESET (rpm_artifacts));
   g_assert_true (modulemd_simpleset_contains (

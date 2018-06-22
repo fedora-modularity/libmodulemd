@@ -45,7 +45,6 @@ enum
 
   PROP_ARCH,
   PROP_BUILDOPTS,
-  PROP_BUILDREQUIRES,
   PROP_COMMUNITY,
   PROP_CONTENT_LIC,
   PROP_CONTEXT,
@@ -55,20 +54,14 @@ enum
   PROP_EOL,
   PROP_MDVERSION,
   PROP_MODULE_LIC,
-  PROP_MODULE_COMPONENTS,
   PROP_NAME,
-  PROP_PROFILES,
   PROP_RPM_API,
   PROP_RPM_ARTIFACTS,
-  PROP_RPM_COMPONENTS,
   PROP_RPM_FILTER,
-  PROP_REQUIRES,
-  PROP_SL,
   PROP_STREAM,
   PROP_SUMMARY,
   PROP_TRACKER,
   PROP_VERSION,
-  PROP_XMD,
 
   MD_N_PROPERTIES
 };
@@ -711,8 +704,6 @@ modulemd_modulestream_set_buildrequires (ModulemdModuleStream *self,
                                 g_strdup ((const gchar *)stream_name));
         }
     }
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILDREQUIRES]);
 }
 
 /**
@@ -1324,9 +1315,6 @@ modulemd_modulestream_add_module_component (ModulemdModuleStream *self,
     g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
     MODULEMD_COMPONENT_MODULE (
       modulemd_component_copy (MODULEMD_COMPONENT (component))));
-
-  g_object_notify_by_pspec (G_OBJECT (self),
-                            properties[PROP_MODULE_COMPONENTS]);
 }
 
 
@@ -1343,9 +1331,6 @@ modulemd_modulestream_clear_module_components (ModulemdModuleStream *self)
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
 
   g_hash_table_remove_all (self->module_components);
-
-  g_object_notify_by_pspec (G_OBJECT (self),
-                            properties[PROP_MODULE_COMPONENTS]);
 }
 
 
@@ -1394,8 +1379,6 @@ modulemd_modulestream_set_module_components (ModulemdModuleStream *self,
               modulemd_component_copy (MODULEMD_COMPONENT (value))));
         }
     }
-  g_object_notify_by_pspec (G_OBJECT (self),
-                            properties[PROP_MODULE_COMPONENTS]);
 }
 
 /**
@@ -1573,8 +1556,6 @@ modulemd_modulestream_add_profile (ModulemdModuleStream *self,
     self->profiles,
     g_strdup (modulemd_profile_get_name ((ModulemdProfile *)profile)),
     modulemd_profile_copy (profile));
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROFILES]);
 }
 
 
@@ -1591,8 +1572,6 @@ modulemd_modulestream_clear_profiles (ModulemdModuleStream *self)
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
 
   g_hash_table_remove_all (self->profiles);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROFILES]);
 }
 
 
@@ -1636,8 +1615,6 @@ modulemd_modulestream_set_profiles (ModulemdModuleStream *self,
             modulemd_profile_copy ((ModulemdProfile *)value));
         }
     }
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROFILES]);
 }
 
 
@@ -1715,7 +1692,6 @@ modulemd_modulestream_set_requires (ModulemdModuleStream *self,
                                 g_strdup ((const gchar *)stream_name));
         }
     }
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_REQUIRES]);
 }
 
 
@@ -1888,8 +1864,6 @@ modulemd_modulestream_add_rpm_component (ModulemdModuleStream *self,
     g_strdup (modulemd_component_get_name (MODULEMD_COMPONENT (component))),
     MODULEMD_COMPONENT_RPM (
       modulemd_component_copy (MODULEMD_COMPONENT (component))));
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RPM_COMPONENTS]);
 }
 
 
@@ -1906,8 +1880,6 @@ modulemd_modulestream_clear_rpm_components (ModulemdModuleStream *self)
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
 
   g_hash_table_remove_all (self->rpm_components);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RPM_COMPONENTS]);
 }
 
 
@@ -1957,7 +1929,6 @@ modulemd_modulestream_set_rpm_components (ModulemdModuleStream *self,
               modulemd_component_copy (MODULEMD_COMPONENT (value))));
         }
     }
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RPM_COMPONENTS]);
 }
 
 
@@ -2072,8 +2043,6 @@ modulemd_modulestream_clear_servicelevels (ModulemdModuleStream *self)
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
 
   g_hash_table_remove_all (self->servicelevels);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SL]);
 }
 
 
@@ -2135,7 +2104,6 @@ modulemd_modulestream_set_servicelevels (ModulemdModuleStream *self,
             modulemd_servicelevel_copy (MODULEMD_SERVICELEVEL (value)));
         }
     }
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SL]);
 }
 
 
@@ -2173,8 +2141,6 @@ modulemd_modulestream_add_servicelevel (ModulemdModuleStream *self,
   g_hash_table_replace (self->servicelevels,
                         g_strdup (name),
                         modulemd_servicelevel_copy (servicelevel));
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SL]);
 }
 
 
@@ -2469,7 +2435,6 @@ modulemd_modulestream_set_xmd (ModulemdModuleStream *self, GHashTable *xmd)
         {
           self->xmd = NULL;
         }
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_XMD]);
     }
 }
 
@@ -2549,11 +2514,6 @@ modulemd_modulestream_set_property (GObject *gobject,
       modulemd_modulestream_set_buildopts (self, g_value_get_object (value));
       break;
 
-    case PROP_BUILDREQUIRES:
-      modulemd_modulestream_set_buildrequires (self,
-                                               g_value_get_boxed (value));
-      break;
-
     case PROP_COMMUNITY:
       modulemd_modulestream_set_community (self, g_value_get_string (value));
       break;
@@ -2588,11 +2548,6 @@ modulemd_modulestream_set_property (GObject *gobject,
       modulemd_modulestream_set_mdversion (self, g_value_get_uint64 (value));
       break;
 
-    case PROP_MODULE_COMPONENTS:
-      modulemd_modulestream_set_module_components (self,
-                                                   g_value_get_boxed (value));
-      break;
-
     case PROP_MODULE_LIC:
       modulemd_modulestream_set_module_licenses (self,
                                                  g_value_get_object (value));
@@ -2600,14 +2555,6 @@ modulemd_modulestream_set_property (GObject *gobject,
 
     case PROP_NAME:
       modulemd_modulestream_set_name (self, g_value_get_string (value));
-      break;
-
-    case PROP_PROFILES:
-      modulemd_modulestream_set_profiles (self, g_value_get_boxed (value));
-      break;
-
-    case PROP_REQUIRES:
-      modulemd_modulestream_set_requires (self, g_value_get_boxed (value));
       break;
 
     case PROP_RPM_API:
@@ -2619,18 +2566,8 @@ modulemd_modulestream_set_property (GObject *gobject,
                                                g_value_get_object (value));
       break;
 
-    case PROP_RPM_COMPONENTS:
-      modulemd_modulestream_set_rpm_components (self,
-                                                g_value_get_boxed (value));
-      break;
-
     case PROP_RPM_FILTER:
       modulemd_modulestream_set_rpm_filter (self, g_value_get_object (value));
-      break;
-
-    case PROP_SL:
-      modulemd_modulestream_set_servicelevels (self,
-                                               g_value_get_boxed (value));
       break;
 
     case PROP_STREAM:
@@ -2647,10 +2584,6 @@ modulemd_modulestream_set_property (GObject *gobject,
 
     case PROP_VERSION:
       modulemd_modulestream_set_version (self, g_value_get_uint64 (value));
-      break;
-
-    case PROP_XMD:
-      modulemd_modulestream_set_xmd (self, g_value_get_boxed (value));
       break;
 
     default:
@@ -2675,11 +2608,6 @@ modulemd_modulestream_get_property (GObject *gobject,
 
     case PROP_BUILDOPTS:
       g_value_take_object (value, modulemd_modulestream_get_buildopts (self));
-      break;
-
-    case PROP_BUILDREQUIRES:
-      g_value_take_boxed (value,
-                          modulemd_modulestream_get_buildrequires (self));
       break;
 
     case PROP_COMMUNITY:
@@ -2718,11 +2646,6 @@ modulemd_modulestream_get_property (GObject *gobject,
       g_value_set_uint64 (value, modulemd_modulestream_get_mdversion (self));
       break;
 
-    case PROP_MODULE_COMPONENTS:
-      g_value_take_boxed (value,
-                          modulemd_modulestream_get_module_components (self));
-      break;
-
     case PROP_MODULE_LIC:
       g_value_take_object (value,
                            modulemd_modulestream_get_module_licenses (self));
@@ -2730,14 +2653,6 @@ modulemd_modulestream_get_property (GObject *gobject,
 
     case PROP_NAME:
       g_value_take_string (value, modulemd_modulestream_get_name (self));
-      break;
-
-    case PROP_PROFILES:
-      g_value_take_boxed (value, modulemd_modulestream_get_profiles (self));
-      break;
-
-    case PROP_REQUIRES:
-      g_value_take_boxed (value, modulemd_modulestream_get_requires (self));
       break;
 
     case PROP_RPM_API:
@@ -2749,18 +2664,8 @@ modulemd_modulestream_get_property (GObject *gobject,
                            modulemd_modulestream_get_rpm_artifacts (self));
       break;
 
-    case PROP_RPM_COMPONENTS:
-      g_value_take_boxed (value,
-                          modulemd_modulestream_get_rpm_components (self));
-      break;
-
     case PROP_RPM_FILTER:
       g_value_take_object (value, modulemd_modulestream_get_rpm_filter (self));
-      break;
-
-    case PROP_SL:
-      g_value_take_boxed (value,
-                          modulemd_modulestream_get_servicelevels (self));
       break;
 
     case PROP_STREAM:
@@ -2777,10 +2682,6 @@ modulemd_modulestream_get_property (GObject *gobject,
 
     case PROP_VERSION:
       g_value_set_uint64 (value, modulemd_modulestream_get_version (self));
-      break;
-
-    case PROP_XMD:
-      g_value_take_boxed (value, modulemd_modulestream_get_xmd (self));
       break;
 
     default:
@@ -2853,19 +2754,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          "to build this module.",
                          MODULEMD_TYPE_BUILDOPTS,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ModulemdModuleStream:buildrequires: (type GLib.HashTable(utf8,utf8))
-   */
-  properties[PROP_BUILDREQUIRES] =
-    g_param_spec_boxed ("buildrequires",
-                        "Module BuildRequires",
-                        "A dictionary property representing the required "
-                        "build dependencies of the module. Keys are the "
-                        "required module names (strings), values are their "
-                        "required stream names (also strings).",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   properties[PROP_COMMUNITY] =
     g_param_spec_string ("community",
@@ -2945,16 +2833,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          0,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
-  /**
-   * ModulemdModuleStream:components-module: (type GLib.HashTable(utf8,ModulemdComponentModule))
-   */
-  properties[PROP_MODULE_COMPONENTS] =
-    g_param_spec_boxed ("components-module",
-                        "Module Components",
-                        "The module components that define this module.",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
   properties[PROP_MODULE_LIC] =
     g_param_spec_object ("module-licenses",
                          "Module Licenses",
@@ -2970,30 +2848,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          "the module.",
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ModulemdModuleStream:profiles: (type GLib.HashTable(utf8,ModulemdProfile))
-   */
-  properties[PROP_PROFILES] =
-    g_param_spec_boxed ("profiles",
-                        "Module Profiles",
-                        "A dictionary property representing the module "
-                        "profiles.",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ModulemdModuleStream:requires: (type GLib.HashTable(utf8,utf8))
-   */
-  properties[PROP_REQUIRES] =
-    g_param_spec_boxed ("requires",
-                        "Module Requires",
-                        "A dictionary property representing the required "
-                        "dependencies of the module. Keys are the "
-                        "required module names (strings), values are their "
-                        "required stream names (also strings).",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   properties[PROP_RPM_API] =
     g_param_spec_object ("rpm-api",
@@ -3011,16 +2865,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          MODULEMD_TYPE_SIMPLESET,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
-  /**
-   * ModulemdModuleStream:components-rpm: (type GLib.HashTable(utf8,ModulemdComponentRpm))
-   */
-  properties[PROP_RPM_COMPONENTS] =
-    g_param_spec_boxed ("components-rpm",
-                        "RPM Components",
-                        "The RPM components that define this module.",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
   properties[PROP_RPM_FILTER] =
     g_param_spec_object ("rpm-filter",
                          "Module filter - RPMs",
@@ -3028,17 +2872,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          "this module.",
                          MODULEMD_TYPE_SIMPLESET,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ModulemdModuleStream:servicelevels: (type GLib.HashTable(utf8,ModulemdServiceLevel))
-   */
-  properties[PROP_SL] =
-    g_param_spec_boxed ("servicelevels",
-                        "Service Levels",
-                        "A dictionary of service levels that apply to this "
-                        "module.",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   properties[PROP_STREAM] =
     g_param_spec_string ("stream",
@@ -3073,17 +2906,6 @@ modulemd_modulestream_class_init (ModulemdModuleStreamClass *klass)
                          G_MAXUINT64,
                          0,
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ModulemdModuleStream:xmd: (type GLib.HashTable(utf8,GVariant))
-   */
-  properties[PROP_XMD] =
-    g_param_spec_boxed ("xmd",
-                        "Extensible Metadata Block",
-                        "A dictionary of user-defined keys and values. "
-                        "Optional.  Defaults to an empty dictionary. ",
-                        G_TYPE_HASH_TABLE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (
     object_class, MD_N_PROPERTIES, properties);

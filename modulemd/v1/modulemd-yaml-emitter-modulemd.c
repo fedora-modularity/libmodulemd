@@ -33,58 +33,58 @@
 
 static gboolean
 _emit_modulemd_root (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error);
 static gboolean
 _emit_modulemd_data (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error);
 static gboolean
 _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
-                              ModulemdModule *module,
+                              ModulemdModuleStream *modulestream,
                               GError **error);
 static gboolean
 _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
-                                   ModulemdModule *module,
+                                   ModulemdModuleStream *modulestream,
                                    gchar *key,
                                    ModulemdServiceLevel *sl,
                                    GError **error);
 static gboolean
 _emit_modulemd_licenses (yaml_emitter_t *emitter,
-                         ModulemdModule *module,
+                         ModulemdModuleStream *modulestream,
                          GError **error);
 static gboolean
 _emit_modulemd_xmd (yaml_emitter_t *emitter,
-                    ModulemdModule *module,
+                    ModulemdModuleStream *modulestream,
                     GError **error);
 static gboolean
 _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error);
 static gboolean
 _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error);
 
 static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error);
 static gboolean
 _emit_modulemd_profiles (yaml_emitter_t *emitter,
-                         ModulemdModule *module,
+                         ModulemdModuleStream *modulestream,
                          GError **error);
 static gboolean
 _emit_modulemd_api (yaml_emitter_t *emitter,
-                    ModulemdModule *module,
+                    ModulemdModuleStream *modulestream,
                     GError **error);
 static gboolean
 _emit_modulemd_filters (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error);
 static gboolean
 _emit_modulemd_buildopts (yaml_emitter_t *emitter,
-                          ModulemdModule *module,
+                          ModulemdModuleStream *modulestream,
                           GError **error);
 
 static gboolean
@@ -94,18 +94,18 @@ _emit_modulemd_rpm_buildopts (yaml_emitter_t *emitter,
 
 static gboolean
 _emit_modulemd_components (yaml_emitter_t *emitter,
-                           ModulemdModule *module,
+                           ModulemdModuleStream *modulestream,
                            GError **error);
 static gboolean
 _emit_modulemd_artifacts (yaml_emitter_t *emitter,
-                          ModulemdModule *module,
+                          ModulemdModuleStream *modulestream,
                           GError **error);
 
 
 gboolean
-_emit_modulemd (yaml_emitter_t *emitter,
-                ModulemdModule *module,
-                GError **error)
+_emit_modulestream (yaml_emitter_t *emitter,
+                    ModulemdModuleStream *modulestream,
+                    GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
@@ -116,7 +116,7 @@ _emit_modulemd (yaml_emitter_t *emitter,
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
     emitter, &event, error, "Error starting document");
 
-  if (!_emit_modulemd_root (emitter, module, error))
+  if (!_emit_modulemd_root (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to process root");
     }
@@ -135,12 +135,12 @@ error:
 
 static gboolean
 _emit_modulemd_root (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  guint64 mdversion = modulemd_module_get_mdversion (module);
+  guint64 mdversion = modulemd_modulestream_get_mdversion (modulestream);
   gchar *name = NULL;
   gchar *value = NULL;
 
@@ -188,7 +188,7 @@ _emit_modulemd_root (yaml_emitter_t *emitter,
     emitter, &event, error, "Error writing data");
   g_clear_pointer (&name, g_free);
 
-  if (!_emit_modulemd_data (emitter, module, error))
+  if (!_emit_modulemd_data (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit data");
     }
@@ -209,7 +209,7 @@ error:
 
 static gboolean
 _emit_modulemd_data (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error)
 {
   gboolean result = FALSE;
@@ -229,7 +229,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module name */
-  value = g_strdup (modulemd_module_get_name (module));
+  value = modulemd_modulestream_get_name (modulestream);
   if (value)
     {
       name = g_strdup ("name");
@@ -239,7 +239,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module stream */
-  value = g_strdup (modulemd_module_get_stream (module));
+  value = modulemd_modulestream_get_stream (modulestream);
   if (value)
     {
       name = g_strdup ("stream");
@@ -249,7 +249,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module version */
-  version = modulemd_module_get_version (module);
+  version = modulemd_modulestream_get_version (modulestream);
   if (version)
     {
       name = g_strdup ("version");
@@ -259,7 +259,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
     }
 
   /* Module Context */
-  value = g_strdup (modulemd_module_get_context (module));
+  value = modulemd_modulestream_get_context (modulestream);
   if (value)
     {
       name = g_strdup ("context");
@@ -269,7 +269,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module Artifact Architecture */
-  value = g_strdup (modulemd_module_get_arch (module));
+  value = modulemd_modulestream_get_arch (modulestream);
   if (value)
     {
       name = g_strdup ("arch");
@@ -279,7 +279,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module summary */
-  value = g_strdup (modulemd_module_get_summary (module));
+  value = modulemd_modulestream_get_summary (modulestream);
   if (!value)
     {
       /* Summary is mandatory */
@@ -291,7 +291,7 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
 
   /* Module description */
-  value = g_strdup (modulemd_module_get_description (module));
+  value = modulemd_modulestream_get_description (modulestream);
   if (!value)
     {
       /* Description is mandatory */
@@ -303,10 +303,10 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
 
   /* Module EOL (obsolete */
 
-  if (modulemd_module_get_mdversion (module) == 1)
+  if (modulemd_modulestream_get_mdversion (modulestream) == 1)
     {
       /* EOL is removed from mdversion 2+ */
-      eol = modulemd_module_get_eol (module);
+      eol = modulemd_modulestream_peek_eol (modulestream);
       if (eol)
         {
           name = g_strdup ("eol");
@@ -320,85 +320,85 @@ _emit_modulemd_data (yaml_emitter_t *emitter,
     }
 
   /* Module Service Levels */
-  if (!_emit_modulemd_servicelevels (emitter, module, error))
+  if (!_emit_modulemd_servicelevels (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit service levels");
     }
 
   /* Module Licenses */
-  if (!_emit_modulemd_licenses (emitter, module, error))
+  if (!_emit_modulemd_licenses (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit licenses");
     }
 
 
   /* Extensible Metadata Block */
-  if (!_emit_modulemd_xmd (emitter, module, error))
+  if (!_emit_modulemd_xmd (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit xmd");
     }
 
 
   /* Dependencies */
-  if (modulemd_module_get_mdversion (module) == 1)
+  if (modulemd_modulestream_get_mdversion (modulestream) == 1)
     {
-      if (!_emit_modulemd_deps_v1 (emitter, module, error))
+      if (!_emit_modulemd_deps_v1 (emitter, modulestream, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
         }
     }
   else
     {
-      if (!_emit_modulemd_deps_v2 (emitter, module, error))
+      if (!_emit_modulemd_deps_v2 (emitter, modulestream, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit dependencies");
         }
     }
 
   /* References */
-  if (!_emit_modulemd_refs (emitter, module, error))
+  if (!_emit_modulemd_refs (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
     }
 
 
   /* Profiles */
-  if (!_emit_modulemd_profiles (emitter, module, error))
+  if (!_emit_modulemd_profiles (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit references");
     }
 
 
   /* API */
-  if (!_emit_modulemd_api (emitter, module, error))
+  if (!_emit_modulemd_api (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit API");
     }
 
 
   /* Filters */
-  if (!_emit_modulemd_filters (emitter, module, error))
+  if (!_emit_modulemd_filters (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit filters");
     }
 
 
   /* Build options */
-  if (!_emit_modulemd_buildopts (emitter, module, error))
+  if (!_emit_modulemd_buildopts (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
     }
 
 
   /* Components */
-  if (!_emit_modulemd_components (emitter, module, error))
+  if (!_emit_modulemd_components (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
     }
 
 
   /* Artifacts */
-  if (!_emit_modulemd_artifacts (emitter, module, error))
+  if (!_emit_modulemd_artifacts (emitter, modulestream, error))
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Failed to emit buildopts");
     }
@@ -419,20 +419,20 @@ error:
 
 static gboolean
 _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
-                              ModulemdModule *module,
+                              ModulemdModuleStream *modulestream,
                               GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *key;
-  GHashTable *servicelevels = NULL;
+  g_autoptr (GHashTable) servicelevels = NULL;
   ModulemdServiceLevel *sl = NULL;
   GPtrArray *keys = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_servicelevels");
 
-  servicelevels = modulemd_module_get_servicelevels (module);
+  servicelevels = modulemd_modulestream_get_servicelevels (modulestream);
 
   if (!servicelevels || g_hash_table_size (servicelevels) < 1)
     {
@@ -455,7 +455,8 @@ _emit_modulemd_servicelevels (yaml_emitter_t *emitter,
     {
       key = g_ptr_array_index (keys, i);
       sl = g_hash_table_lookup (servicelevels, key);
-      if (!_emit_modulemd_servicelevel_entry (emitter, module, key, sl, error))
+      if (!_emit_modulemd_servicelevel_entry (
+            emitter, modulestream, key, sl, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error,
                                          "Could not process service levels");
@@ -482,7 +483,7 @@ error:
 
 static gboolean
 _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
-                                   ModulemdModule *module,
+                                   ModulemdModuleStream *modulestream,
                                    gchar *key,
                                    ModulemdServiceLevel *sl,
                                    GError **error)
@@ -492,7 +493,7 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
 
   gchar *name = NULL;
   gchar *value = NULL;
-  const GDate *eol = modulemd_servicelevel_get_eol (sl);
+  const GDate *eol = modulemd_servicelevel_peek_eol (sl);
 
   if (!eol || !g_date_valid (eol))
     {
@@ -530,13 +531,13 @@ error:
 
 static gboolean
 _emit_modulemd_licenses (yaml_emitter_t *emitter,
-                         ModulemdModule *module,
+                         ModulemdModuleStream *modulestream,
                          GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  ModulemdSimpleSet *set = NULL;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_licenses");
 
@@ -551,7 +552,7 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
 
 
   /* Module Licenses */
-  set = modulemd_module_get_module_licenses (module);
+  set = modulemd_modulestream_get_module_licenses (modulestream);
   if (!set || modulemd_simpleset_size (set) < 1)
     {
       /* Module license is mandatory */
@@ -566,10 +567,11 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
     {
       MMD_YAML_ERROR_RETURN_RETHROW (error, "Error writing module licenses");
     }
+  g_clear_pointer (&set, g_object_unref);
 
 
   /* Content licenses */
-  set = modulemd_module_get_content_licenses (module);
+  set = modulemd_modulestream_get_content_licenses (modulestream);
   if (set && modulemd_simpleset_size (set) > 0)
     {
       /* Content licenses are optional */
@@ -583,6 +585,7 @@ _emit_modulemd_licenses (yaml_emitter_t *emitter,
                                          "Error writing module licenses");
         }
     }
+  g_clear_pointer (&set, g_object_unref);
 
 
   yaml_mapping_end_event_initialize (&event);
@@ -599,17 +602,17 @@ error:
 
 static gboolean
 _emit_modulemd_xmd (yaml_emitter_t *emitter,
-                    ModulemdModule *module,
+                    ModulemdModuleStream *modulestream,
                     GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  GHashTable *htable = NULL;
+  g_autoptr (GHashTable) htable = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_xmd");
 
-  htable = modulemd_module_get_xmd (module);
+  htable = modulemd_modulestream_get_xmd (modulestream);
   if (htable && g_hash_table_size (htable) > 0)
     {
       name = g_strdup ("xmd");
@@ -632,19 +635,19 @@ error:
 
 static gboolean
 _emit_modulemd_deps_v1 (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  GHashTable *requires = NULL;
-  GHashTable *buildrequires = NULL;
+  g_autoptr (GHashTable) buildrequires = NULL;
+  g_autoptr (GHashTable) requires = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_deps_v1");
 
-  buildrequires = modulemd_module_get_buildrequires (module);
-  requires = modulemd_module_get_requires (module);
+  buildrequires = modulemd_modulestream_get_buildrequires (modulestream);
+  requires = modulemd_modulestream_get_requires (modulestream);
   if (!(buildrequires && g_hash_table_size (buildrequires) > 0) &&
       !(requires && g_hash_table_size (requires) > 0))
     {
@@ -708,19 +711,19 @@ _modulemd_emit_dep_stream_mapping (yaml_emitter_t *emitter,
                                    GError **error);
 static gboolean
 _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
-  const GPtrArray *dependencies = NULL;
+  g_autoptr (GPtrArray) dependencies = NULL;
   ModulemdDependencies *dep = NULL;
-  GHashTable *reqs = NULL;
+  g_autoptr (GHashTable) reqs = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_deps_v2");
 
-  dependencies = modulemd_module_get_dependencies (module);
+  dependencies = modulemd_modulestream_get_dependencies (modulestream);
   if (!(dependencies && dependencies->len > 0))
     {
       /* Unlikely, but not impossible */
@@ -748,7 +751,7 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
       dep = MODULEMD_DEPENDENCIES (g_ptr_array_index (dependencies, i));
 
       /* Write out the BuildRequires first */
-      reqs = modulemd_dependencies_get_buildrequires (dep);
+      reqs = modulemd_dependencies_dup_buildrequires (dep);
       if (reqs && g_hash_table_size (reqs) > 0)
         {
           name = g_strdup ("buildrequires");
@@ -759,9 +762,10 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
                                              "Could not parse stream mapping");
             }
         }
+      g_clear_pointer (&reqs, g_hash_table_unref);
 
       /* Then write out the Requires */
-      reqs = modulemd_dependencies_get_requires (dep);
+      reqs = modulemd_dependencies_dup_requires (dep);
       if (reqs && g_hash_table_size (reqs) > 0)
         {
           name = g_strdup ("requires");
@@ -773,6 +777,8 @@ _emit_modulemd_deps_v2 (yaml_emitter_t *emitter,
                                              "Could not parse stream mapping");
             }
         }
+      g_clear_pointer (&reqs, g_hash_table_unref);
+
       yaml_mapping_end_event_initialize (&event);
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
         emitter, &event, error, "Error ending internal dependency mapping");
@@ -841,21 +847,21 @@ error:
 
 static gboolean
 _emit_modulemd_refs (yaml_emitter_t *emitter,
-                     ModulemdModule *module,
+                     ModulemdModuleStream *modulestream,
                      GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
-  gchar *community = NULL;
-  gchar *documentation = NULL;
-  gchar *tracker = NULL;
+  g_autofree gchar *name = NULL;
+  g_autofree gchar *community = NULL;
+  g_autofree gchar *documentation = NULL;
+  g_autofree gchar *tracker = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_refs");
 
-  community = g_strdup (modulemd_module_get_community (module));
-  documentation = g_strdup (modulemd_module_get_documentation (module));
-  tracker = g_strdup (modulemd_module_get_tracker (module));
+  community = modulemd_modulestream_get_community (modulestream);
+  documentation = modulemd_modulestream_get_documentation (modulestream);
+  tracker = modulemd_modulestream_get_tracker (modulestream);
 
   if (!(community || documentation || tracker))
     {
@@ -900,10 +906,6 @@ _emit_modulemd_refs (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
-  g_free (community);
-  g_free (documentation);
-  g_free (tracker);
 
   g_debug ("TRACE: exiting _emit_modulemd_refs");
   return result;
@@ -911,7 +913,7 @@ error:
 
 static gboolean
 _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
-                              ModulemdModule *module,
+                              ModulemdModuleStream *modulestream,
                               gchar *key,
                               ModulemdProfile *profile,
                               GError **error)
@@ -919,9 +921,9 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
   gboolean result = FALSE;
   yaml_event_t event;
 
-  gchar *name = NULL;
-  gchar *description = NULL;
-  ModulemdSimpleSet *rpms = NULL;
+  g_autofree gchar *name = NULL;
+  g_autofree gchar *description = NULL;
+  g_autoptr (ModulemdSimpleSet) rpms = NULL;
 
   name = g_strdup (key);
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
@@ -932,7 +934,7 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
     emitter, &event, error, "Error starting profile inner mapping");
 
   /* Description */
-  description = g_strdup (modulemd_profile_get_description (profile));
+  description = modulemd_profile_dup_description (profile);
   if (description)
     {
       name = g_strdup ("description");
@@ -941,7 +943,7 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
     }
 
   /* RPMs */
-  rpms = modulemd_profile_get_rpms (profile);
+  rpms = modulemd_profile_dup_rpms (profile);
   if (rpms && modulemd_simpleset_size (rpms) > 0)
     {
       name = g_strdup ("rpms");
@@ -967,20 +969,20 @@ error:
 
 static gboolean
 _emit_modulemd_profiles (yaml_emitter_t *emitter,
-                         ModulemdModule *module,
+                         ModulemdModuleStream *modulestream,
                          GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
   gchar *name = NULL;
   gchar *key;
-  GHashTable *profiles = NULL;
+  g_autoptr (GHashTable) profiles = NULL;
   ModulemdProfile *profile = NULL;
   GPtrArray *keys = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_profiles");
 
-  profiles = modulemd_module_get_profiles (module);
+  profiles = modulemd_modulestream_get_profiles (modulestream);
 
   if (!(profiles && g_hash_table_size (profiles) > 0))
     {
@@ -1003,7 +1005,8 @@ _emit_modulemd_profiles (yaml_emitter_t *emitter,
     {
       key = g_ptr_array_index (keys, i);
       profile = g_hash_table_lookup (profiles, key);
-      if (!_emit_modulemd_profile_entry (emitter, module, key, profile, error))
+      if (!_emit_modulemd_profile_entry (
+            emitter, modulestream, key, profile, error))
         {
           MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not process profiles");
         }
@@ -1024,16 +1027,16 @@ error:
 
 static gboolean
 _emit_modulemd_api (yaml_emitter_t *emitter,
-                    ModulemdModule *module,
+                    ModulemdModuleStream *modulestream,
                     GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
-  ModulemdSimpleSet *api = NULL;
+  g_autofree gchar *name = NULL;
+  g_autoptr (ModulemdSimpleSet) api = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_api");
-  api = modulemd_module_get_rpm_api (module);
+  api = modulemd_modulestream_get_rpm_api (modulestream);
 
   if (!(api && modulemd_simpleset_size (api) > 0))
     {
@@ -1066,7 +1069,6 @@ _emit_modulemd_api (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_api");
   return result;
@@ -1074,16 +1076,16 @@ error:
 
 static gboolean
 _emit_modulemd_filters (yaml_emitter_t *emitter,
-                        ModulemdModule *module,
+                        ModulemdModuleStream *modulestream,
                         GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
-  ModulemdSimpleSet *filters = NULL;
+  g_autofree gchar *name = NULL;
+  g_autoptr (ModulemdSimpleSet) filters = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_filters");
-  filters = modulemd_module_get_rpm_filter (module);
+  filters = modulemd_modulestream_get_rpm_filter (modulestream);
 
   if (!(filters && modulemd_simpleset_size (filters) > 0))
     {
@@ -1116,7 +1118,6 @@ _emit_modulemd_filters (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_filters");
   return result;
@@ -1124,16 +1125,16 @@ error:
 
 static gboolean
 _emit_modulemd_buildopts (yaml_emitter_t *emitter,
-                          ModulemdModule *module,
+                          ModulemdModuleStream *modulestream,
                           GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
+  g_autofree gchar *name = NULL;
   g_autoptr (ModulemdBuildopts) buildopts = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_buildopts");
-  buildopts = modulemd_module_get_buildopts (module);
+  buildopts = modulemd_modulestream_get_buildopts (modulestream);
   if (!buildopts)
     {
       result = TRUE;
@@ -1160,7 +1161,6 @@ _emit_modulemd_buildopts (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_buildopts");
   return result;
@@ -1224,14 +1224,14 @@ error:
 
 static gboolean
 _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
-                               ModulemdModule *module,
+                               ModulemdModuleStream *modulestream,
                                gchar *key,
                                ModulemdComponentRpm *rpm_component,
                                GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *value = NULL;
+  g_autofree gchar *value = NULL;
   guint64 buildorder;
   ModulemdSimpleSet *set = NULL;
 
@@ -1246,8 +1246,8 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
     emitter, &event, error, "Error starting RPM component inner mapping");
 
   /* Rationale */
-  value = g_strdup (
-    modulemd_component_get_rationale ((MODULEMD_COMPONENT (rpm_component))));
+  value =
+    modulemd_component_dup_rationale ((MODULEMD_COMPONENT (rpm_component)));
   if (!value)
     {
       MMD_YAML_EMITTER_ERROR_RETURN (error,
@@ -1257,7 +1257,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
   /* Repository */
-  value = g_strdup (modulemd_component_rpm_get_repository (rpm_component));
+  value = modulemd_component_rpm_dup_repository (rpm_component);
   if (value)
     {
       name = g_strdup ("repository");
@@ -1266,7 +1266,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
     }
 
   /* Cache */
-  value = g_strdup (modulemd_component_rpm_get_cache (rpm_component));
+  value = modulemd_component_rpm_dup_cache (rpm_component);
   if (value)
     {
       name = g_strdup ("cache");
@@ -1275,7 +1275,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
     }
 
   /* Ref */
-  value = g_strdup (modulemd_component_rpm_get_ref (rpm_component));
+  value = modulemd_component_rpm_dup_ref (rpm_component);
   if (value)
     {
       name = g_strdup ("ref");
@@ -1331,24 +1331,23 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
-  g_free (value);
   return result;
 }
 
 static gboolean
 _emit_modulemd_module_components (yaml_emitter_t *emitter,
-                                  ModulemdModule *module,
+                                  ModulemdModuleStream *modulestream,
                                   gchar *key,
                                   ModulemdComponentModule *module_component,
                                   GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *value = NULL;
+  g_autofree gchar *name = NULL;
+  g_autofree gchar *value = NULL;
   guint64 buildorder;
 
-  gchar *name = g_strdup (key);
+  name = g_strdup (key);
 
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -1359,8 +1358,8 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
     emitter, &event, error, "Error starting module component inner mapping");
 
   /* Rationale */
-  value = g_strdup (modulemd_component_get_rationale (
-    (MODULEMD_COMPONENT (module_component))));
+  value =
+    modulemd_component_dup_rationale ((MODULEMD_COMPONENT (module_component)));
   if (!value)
     {
       MMD_YAML_EMITTER_ERROR_RETURN (error,
@@ -1370,8 +1369,7 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
   /* Repository */
-  value =
-    g_strdup (modulemd_component_module_get_repository (module_component));
+  value = modulemd_component_module_dup_repository (module_component);
   if (value)
     {
       name = g_strdup ("repository");
@@ -1380,8 +1378,7 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
     }
 
   /* Ref */
-  value =
-    g_strdup (modulemd_component_module_get_repository (module_component));
+  value = modulemd_component_module_dup_repository (module_component);
   if (value)
     {
       name = g_strdup ("ref");
@@ -1406,40 +1403,40 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (value);
 
   return result;
 }
 
 static gboolean
 _emit_modulemd_components (yaml_emitter_t *emitter,
-                           ModulemdModule *module,
+                           ModulemdModuleStream *modulestream,
                            GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
+  g_autofree gchar *name = NULL;
   gchar *key;
   ModulemdComponentRpm *rpm_component;
   ModulemdComponentModule *module_component;
-  GHashTable *rpm_components;
-  GHashTable *module_components;
-  GPtrArray *rpm_keys = NULL;
-  GPtrArray *module_keys = NULL;
+  g_autoptr (GHashTable) rpm_components;
+  g_autoptr (GHashTable) module_components;
+  g_autoptr (GPtrArray) rpm_keys = NULL;
+  g_autoptr (GPtrArray) module_keys = NULL;
   gsize i;
 
   g_debug ("TRACE: entering _emit_modulemd_components");
 
-  rpm_components = modulemd_module_get_rpm_components (module);
+  rpm_components = modulemd_modulestream_get_rpm_components (modulestream);
   if (rpm_components && g_hash_table_size (rpm_components) < 1)
     {
-      rpm_components = NULL;
+      g_clear_pointer (&rpm_components, g_hash_table_unref);
     }
 
-  module_components = modulemd_module_get_module_components (module);
+  module_components =
+    modulemd_modulestream_get_module_components (modulestream);
   if (module_components && g_hash_table_size (module_components) < 1)
     {
-      module_components = NULL;
+      g_clear_pointer (&module_components, g_hash_table_unref);
     }
 
   if (!(rpm_components || module_components))
@@ -1476,7 +1473,7 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
           key = g_ptr_array_index (rpm_keys, i);
           rpm_component = g_hash_table_lookup (rpm_components, key);
           if (!_emit_modulemd_rpm_components (
-                emitter, module, key, rpm_component, error))
+                emitter, modulestream, key, rpm_component, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Could not process RPM components");
@@ -1506,7 +1503,7 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
           key = g_ptr_array_index (module_keys, i);
           module_component = g_hash_table_lookup (module_components, key);
           if (!_emit_modulemd_module_components (
-                emitter, module, key, module_component, error))
+                emitter, modulestream, key, module_component, error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (
                 error, "Could not process module components");
@@ -1524,9 +1521,6 @@ _emit_modulemd_components (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
-  g_clear_pointer (&rpm_keys, g_ptr_array_unref);
-  g_clear_pointer (&module_keys, g_ptr_array_unref);
 
   g_debug ("TRACE: exiting _emit_modulemd_components");
   return result;
@@ -1534,17 +1528,17 @@ error:
 
 static gboolean
 _emit_modulemd_artifacts (yaml_emitter_t *emitter,
-                          ModulemdModule *module,
+                          ModulemdModuleStream *modulestream,
                           GError **error)
 {
   gboolean result = FALSE;
   yaml_event_t event;
-  gchar *name = NULL;
-  ModulemdSimpleSet *artifacts = NULL;
+  g_autofree gchar *name = NULL;
+  g_autoptr (ModulemdSimpleSet) artifacts = NULL;
 
   g_debug ("TRACE: entering _emit_modulemd_artifacts");
 
-  artifacts = modulemd_module_get_rpm_artifacts (module);
+  artifacts = modulemd_modulestream_get_rpm_artifacts (modulestream);
   if (!(artifacts && modulemd_simpleset_size (artifacts) > 0))
     {
       /* No artifacts for this module */
@@ -1576,7 +1570,6 @@ _emit_modulemd_artifacts (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
 
   g_debug ("TRACE: exiting _emit_modulemd_artifacts");
   return result;

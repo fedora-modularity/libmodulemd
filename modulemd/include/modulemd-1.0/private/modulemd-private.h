@@ -24,6 +24,8 @@
 
 #include <glib.h>
 
+#include "modulemd.h"
+
 #pragma once
 
 enum
@@ -37,3 +39,9 @@ enum
 };
 
 #define MD_VERSION_LATEST MD_VERSION_2
+
+ModulemdModule *
+modulemd_module_new_from_modulestream (ModulemdModuleStream *stream);
+
+ModulemdModuleStream *
+modulemd_module_peek_modulestream (ModulemdModule *self);

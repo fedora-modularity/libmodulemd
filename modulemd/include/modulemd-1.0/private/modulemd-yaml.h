@@ -298,9 +298,9 @@ _parse_defaults (yaml_parser_t *parser,
 
 /* == ModulemdModule Emitter == */
 gboolean
-_emit_modulemd (yaml_emitter_t *emitter,
-                ModulemdModule *module,
-                GError **error);
+_emit_modulestream (yaml_emitter_t *emitter,
+                    ModulemdModuleStream *module,
+                    GError **error);
 
 gboolean
 _emit_defaults (yaml_emitter_t *emitter,

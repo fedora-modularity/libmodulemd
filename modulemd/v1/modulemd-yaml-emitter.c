@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include "modulemd.h"
+#include "private/modulemd-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-util.h"
 
@@ -70,14 +71,27 @@ emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
       object = g_ptr_array_index (objects, i);
 
       /* Write out the YAML */
-      if (G_OBJECT_TYPE (object) == MODULEMD_TYPE_MODULE)
+      if (MODULEMD_IS_MODULE (object))
         {
-          if (!_emit_modulemd (&emitter, MODULEMD_MODULE (object), error))
+          if (!_emit_modulestream (
+                &emitter,
+                modulemd_module_peek_modulestream (MODULEMD_MODULE (object)),
+                error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Could not emit module stream YAML");
             }
         }
-      else if (G_OBJECT_TYPE (object) == MODULEMD_TYPE_DEFAULTS)
+      else if (MODULEMD_IS_MODULESTREAM (object))
+        {
+          if (!_emit_modulestream (
+                &emitter, MODULEMD_MODULESTREAM (object), error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Could not emit module stream YAML");
+            }
+        }
+      else if (MODULEMD_IS_DEFAULTS (object))
         {
           if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
             {
@@ -135,7 +149,19 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
       /* Write out the YAML */
       if (MODULEMD_IS_MODULE (object))
         {
-          if (!_emit_modulemd (&emitter, MODULEMD_MODULE (object), error))
+          if (!_emit_modulestream (
+                &emitter,
+                modulemd_module_peek_modulestream (MODULEMD_MODULE (object)),
+                error))
+            {
+              MMD_YAML_ERROR_RETURN_RETHROW (
+                error, "Could not emit module stream YAML");
+            }
+        }
+      else if (MODULEMD_IS_MODULESTREAM (object))
+        {
+          if (!_emit_modulestream (
+                &emitter, MODULEMD_MODULESTREAM (object), error))
             {
               MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
             }

@@ -23,6 +23,7 @@
  */
 
 #include "modulemd.h"
+#include "private/modulemd-private.h"
 #include "private/modulemd-yaml.h"
 
 void
@@ -372,6 +373,12 @@ mmd_yaml_dup_modules (GPtrArray *objects)
         {
           modules[module_count] =
             modulemd_module_copy (MODULEMD_MODULE (object));
+          module_count++;
+        }
+      else if (MODULEMD_IS_MODULESTREAM (object))
+        {
+          modules[module_count] = modulemd_module_new_from_modulestream (
+            MODULEMD_MODULESTREAM (object));
           module_count++;
         }
     }

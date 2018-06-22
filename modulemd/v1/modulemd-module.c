@@ -108,7 +108,6 @@ struct _ModulemdModule
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
 
-
 /**
  * modulemd_module_set_arch:
  * @arch: (nullable): the module artifact architecture.
@@ -3407,11 +3406,36 @@ modulemd_module_init (ModulemdModule *self)
  * Return value: a new #ModulemdModule.
  *
  * Since: 1.0
+ *
+ * Deprecated: 1.6
+ * This object is being replaced by #ModulemdModuleStream
+ *
  */
+G_DEPRECATED_FOR (modulemd_modulestream_new)
 ModulemdModule *
 modulemd_module_new (void)
 {
   return g_object_new (MODULEMD_TYPE_MODULE, NULL);
+}
+
+
+ModulemdModule *
+modulemd_module_new_from_modulestream (ModulemdModuleStream *stream)
+{
+  ModulemdModule *module = g_object_new (MODULEMD_TYPE_MODULE, NULL);
+
+  g_clear_pointer (&module->stream, g_object_unref);
+  module->stream = modulemd_modulestream_copy (stream);
+
+  return module;
+}
+
+
+ModulemdModuleStream *
+modulemd_module_peek_modulestream (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  return self->stream;
 }
 
 
@@ -3437,7 +3461,8 @@ modulemd_module_new_from_file (const gchar *yaml_file)
 /**
  * modulemd_module_new_from_file_ext:
  * @yaml_file: A YAML file containing the module metadata. If this file
- * contains more than one module, only the first will be loaded.
+ * contains more than one subdocument, only the first will be loaded (if it is
+ * a module stream document).
  * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
  * An array containing any subdocuments from the YAML file that failed to
  * parse. This must be freed with g_ptr_array_unref().
@@ -3455,30 +3480,18 @@ modulemd_module_new_from_file_ext (const gchar *yaml_file,
                                    GError **error)
 {
   ModulemdModule *module = NULL;
-  ModulemdModule **modules = NULL;
-  GPtrArray *data = NULL;
+  g_autoptr (GPtrArray) data = NULL;
 
   if (!parse_yaml_file (yaml_file, &data, failures, error))
     {
       return NULL;
     }
 
-  modules = mmd_yaml_dup_modules (data);
-  module = modules[0];
-
-  /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_unref);
-
-  if (module)
+  if (MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
     {
-      for (gsize i = 1; modules[i]; i++)
-        {
-          g_object_unref (modules[i]);
-        }
+      module =
+        modulemd_module_new_from_modulestream (g_ptr_array_index (data, 0));
     }
-
-  g_clear_pointer (&data, g_object_unref);
-  g_clear_pointer (&modules, g_free);
   return module;
 }
 
@@ -3707,7 +3720,6 @@ modulemd_module_new_from_stream_ext (FILE *stream,
                                      GPtrArray **failures,
                                      GError **error)
 {
-  GObject *object = NULL;
   ModulemdModule *module = NULL;
   g_autoptr (GPtrArray) data = NULL;
 
@@ -3716,14 +3728,10 @@ modulemd_module_new_from_stream_ext (FILE *stream,
       return NULL;
     }
 
-  for (gsize i = 0; i < data->len; i++)
+  if (MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
     {
-      object = g_ptr_array_index (data, i);
-      if (MODULEMD_IS_MODULE (object))
-        {
-          module = MODULEMD_MODULE (g_object_ref (object));
-          break;
-        }
+      module =
+        modulemd_module_new_from_modulestream (g_ptr_array_index (data, 0));
     }
 
   if (!module)

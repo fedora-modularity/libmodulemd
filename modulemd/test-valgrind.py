@@ -53,6 +53,13 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                             print("Memory leak detected in %s" % test,
                                   file=sys.stderr)
                             failed = True
+                        elif error_child.text == 'InvalidRead':
+                            print("Invalid read detected in %s" % test,
+                                  file=sys.stderr)
+                            failed = True
+                        elif error_child.text == 'UninitCondition':
+                            print("Invalid read detected in %s" % test,
+                                  file=sys.stderr)
 
 
 if failed:

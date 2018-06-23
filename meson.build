@@ -12,7 +12,7 @@ project('modulemd', 'c',
 cc = meson.get_compiler('c')
 test_cflags = [
   '-Wpointer-arith',
-  '-Wmissing-declarations',
+  '-Werror=missing-declarations',
   '-Wmissing-prototypes',
   '-Wstrict-prototypes',
   '-Wuninitialized',

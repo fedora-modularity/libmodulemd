@@ -78,8 +78,8 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
-  yaml_event_t event;
-  yaml_event_t value_event;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
   GVariantDict *dict = NULL;
   GVariant *value = NULL;
   gchar *key = NULL;
@@ -159,8 +159,6 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
   *variant = g_variant_dict_end (dict);
   result = TRUE;
 error:
-  yaml_event_delete (&event);
-  yaml_event_delete (&value_event);
   g_free (key);
   g_variant_dict_unref (dict);
 
@@ -175,7 +173,7 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 {
   gboolean result = FALSE;
   gboolean done = FALSE;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT (event);
   GVariant *value = NULL;
   GVariant **array = NULL;
   gchar *key = NULL;
@@ -240,7 +238,6 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
 
   result = TRUE;
 error:
-  yaml_event_delete (&event);
   g_free (array);
   g_free (key);
 

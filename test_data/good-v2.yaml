@@ -91,6 +91,8 @@ data:
                     - is
                     - getting
                     - silly
+        empty_dict: {}
+        empty_list: []
     # Module dependencies, if any.  Optional.
     # A list of dictionaries describing build and runtime dependencies
     # of this module.  Each list item describes a combination of dependencies

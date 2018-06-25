@@ -3487,11 +3487,20 @@ modulemd_module_new_from_file_ext (const gchar *yaml_file,
       return NULL;
     }
 
-  if (MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
+  if (data->len && MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
     {
-      module =
-        modulemd_module_new_from_modulestream (g_ptr_array_index (data, 0));
+      module = modulemd_module_new_from_modulestream (
+        MODULEMD_MODULESTREAM (g_ptr_array_index (data, 0)));
     }
+
+  if (!module)
+    {
+      g_set_error (error,
+                   MODULEMD_MODULE_ERROR,
+                   MODULEMD_MODULE_ERROR_MISSING_CONTENT,
+                   "Provided YAML file contained no valid module objects");
+    }
+
   return module;
 }
 
@@ -3593,29 +3602,26 @@ modulemd_module_new_from_string_ext (const gchar *yaml_string,
                                      GError **error)
 {
   ModulemdModule *module = NULL;
-  ModulemdModule **modules = NULL;
-  GPtrArray *data = NULL;
+  g_autoptr (GPtrArray) data = NULL;
 
   if (!parse_yaml_string (yaml_string, &data, failures, error))
     {
       return NULL;
     }
 
-  modules = mmd_yaml_dup_modules (data);
-
-  module = modules[0];
-
-  /* This old implementation needs to ignore extra_data, so just free it. */
-  g_clear_pointer (&data, g_ptr_array_unref);
-
-  if (module)
+  if (data->len && MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
     {
-      for (gsize i = 1; modules[i]; i++)
-        {
-          g_object_unref (modules[i]);
-        }
+      module = modulemd_module_new_from_modulestream (
+        MODULEMD_MODULESTREAM (g_ptr_array_index (data, 0)));
     }
-  g_free (modules);
+
+  if (!module)
+    {
+      g_set_error (error,
+                   MODULEMD_MODULE_ERROR,
+                   MODULEMD_MODULE_ERROR_MISSING_CONTENT,
+                   "Provided YAML string contained no valid module objects");
+    }
 
   return module;
 }
@@ -3728,10 +3734,10 @@ modulemd_module_new_from_stream_ext (FILE *stream,
       return NULL;
     }
 
-  if (MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
+  if (data->len && MODULEMD_IS_MODULESTREAM (g_ptr_array_index (data, 0)))
     {
-      module =
-        modulemd_module_new_from_modulestream (g_ptr_array_index (data, 0));
+      module = modulemd_module_new_from_modulestream (
+        MODULEMD_MODULESTREAM (g_ptr_array_index (data, 0)));
     }
 
   if (!module)
@@ -3739,7 +3745,7 @@ modulemd_module_new_from_stream_ext (FILE *stream,
       g_set_error (error,
                    MODULEMD_MODULE_ERROR,
                    MODULEMD_MODULE_ERROR_MISSING_CONTENT,
-                   "Provided YAML file contained no valid module objects");
+                   "Provided YAML stream contained no valid module objects");
     }
 
   return module;

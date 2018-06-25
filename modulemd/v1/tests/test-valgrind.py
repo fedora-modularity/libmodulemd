@@ -73,6 +73,9 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                             print("Uninitialized usage detected in %s" % test,
                                   file=sys.stderr)
                             failed = True
+        if failed:
+            with open('%s/%s.xml' % (tmpdirname, test), 'r') as xml:
+                print(xml.read())
 
 
 if failed:

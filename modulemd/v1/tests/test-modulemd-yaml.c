@@ -464,6 +464,98 @@ modulemd_yaml_test_artifact_validation (YamlFixture *fixture,
 }
 
 
+static void
+modulemd_yaml_test_index_from_file (YamlFixture *fixture,
+                                    gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GHashTable) module_index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  ModulemdImprovedModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/long-valid.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  module_index = parse_module_index_from_file (yaml_path, &failures, &error);
+  g_assert_nonnull (module_index);
+
+  g_assert_true (g_hash_table_contains (module_index, "nodejs"));
+
+  module = g_hash_table_lookup (module_index, "nodejs");
+  g_assert_nonnull (module);
+  g_assert_true (MODULEMD_IS_IMPROVEDMODULE (module));
+
+  g_assert_cmpstr (modulemd_improvedmodule_peek_name (module), ==, "nodejs");
+  g_assert_nonnull (modulemd_improvedmodule_peek_defaults (module));
+}
+
+
+static void
+modulemd_yaml_test_index_from_string (YamlFixture *fixture,
+                                      gconstpointer user_data)
+{
+  const gchar *yaml_string = NULL;
+  g_autoptr (GHashTable) module_index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  ModulemdImprovedModule *module = NULL;
+
+  yaml_string =
+    "document: modulemd\nversion: 2\ndata:\n    name: Foo\n    summary: Foo\n "
+    "   "
+    "description: >\n        Bar\n    license:\n        module:\n        - "
+    "MIT";
+
+  module_index =
+    parse_module_index_from_string (yaml_string, &failures, &error);
+  g_assert_nonnull (module_index);
+
+  g_assert_true (g_hash_table_contains (module_index, "Foo"));
+
+  module = g_hash_table_lookup (module_index, "Foo");
+  g_assert_nonnull (module);
+  g_assert_true (MODULEMD_IS_IMPROVEDMODULE (module));
+
+  g_assert_cmpstr (modulemd_improvedmodule_peek_name (module), ==, "Foo");
+  g_assert_null (modulemd_improvedmodule_peek_defaults (module));
+}
+
+
+static void
+modulemd_yaml_test_index_from_stream (YamlFixture *fixture,
+                                      gconstpointer user_data)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  g_autoptr (GHashTable) module_index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  ModulemdImprovedModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/long-valid.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (yaml_stream);
+
+  module_index =
+    parse_module_index_from_stream (yaml_stream, &failures, &error);
+  g_assert_nonnull (module_index);
+
+  g_assert_true (g_hash_table_contains (module_index, "nodejs"));
+
+  module = g_hash_table_lookup (module_index, "nodejs");
+  g_assert_nonnull (module);
+  g_assert_true (MODULEMD_IS_IMPROVEDMODULE (module));
+
+  g_assert_cmpstr (modulemd_improvedmodule_peek_name (module), ==, "nodejs");
+  g_assert_nonnull (modulemd_improvedmodule_peek_defaults (module));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -528,6 +620,27 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_yaml_test_artifact_validation,
+              NULL);
+
+  g_test_add ("/modulemd/yaml/test_index_from_file",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_test_index_from_file,
+              NULL);
+
+  g_test_add ("/modulemd/yaml/test_index_from_string",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_test_index_from_string,
+              NULL);
+
+  g_test_add ("/modulemd/yaml/test_index_from_stream",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_test_index_from_stream,
               NULL);
 
   return g_test_run ();

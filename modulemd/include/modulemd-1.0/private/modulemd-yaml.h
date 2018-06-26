@@ -193,17 +193,32 @@ parse_yaml_file (const gchar *path,
                  GPtrArray **failures,
                  GError **error);
 
+GHashTable *
+parse_module_index_from_file (const gchar *path,
+                              GPtrArray **failures,
+                              GError **error);
+
 gboolean
 parse_yaml_string (const gchar *yaml,
                    GPtrArray **data,
                    GPtrArray **failures,
                    GError **error);
 
+GHashTable *
+parse_module_index_from_string (const gchar *yaml,
+                                GPtrArray **failures,
+                                GError **error);
+
 gboolean
 parse_yaml_stream (FILE *stream,
                    GPtrArray **data,
                    GPtrArray **failures,
                    GError **error);
+
+GHashTable *
+parse_module_index_from_stream (FILE *iostream,
+                                GPtrArray **failures,
+                                GError **error);
 
 
 gboolean
@@ -223,10 +238,15 @@ _write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
 void
 modulemd_yaml_string_free (modulemd_yaml_string *yaml_string);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FILE, fclose);
+
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_yaml_string,
                                modulemd_yaml_string_free);
 
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_event_t, yaml_event_delete);
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_parser_t, yaml_parser_delete);
 
 #define MMD_INIT_YAML_EVENT(_event)                                           \
   g_auto (yaml_event_t) _event;                                               \

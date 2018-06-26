@@ -197,6 +197,260 @@ error:
 }
 
 
+static ModulemdImprovedModule *
+get_or_create_module_from_index (GHashTable *htable, const gchar *module_name)
+{
+  ModulemdImprovedModule *stored_module = NULL;
+  ModulemdImprovedModule *module = NULL;
+
+  stored_module = g_hash_table_lookup (htable, module_name);
+  if (stored_module)
+    {
+      module = modulemd_improvedmodule_copy (stored_module);
+    }
+  else
+    {
+      /* This is the first encounter of this module */
+      module = modulemd_improvedmodule_new (module_name);
+    }
+  return module;
+}
+
+
+static GHashTable *
+module_index_from_data (GPtrArray *data, GError **error)
+{
+  GObject *item = NULL;
+  g_autofree gchar *module_name = NULL;
+  g_autoptr (ModulemdImprovedModule) module = NULL;
+  ModulemdModuleStream *stream = NULL;
+  ModulemdDefaults *defaults = NULL;
+  g_autoptr (GHashTable) module_index = NULL;
+
+  module_index =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  /* Iterate through the data and add the entries to the module_index */
+  for (gsize i = 0; i < data->len; i++)
+    {
+      item = g_ptr_array_index (data, i);
+
+      if (G_OBJECT_TYPE (item) == MODULEMD_TYPE_MODULESTREAM)
+        {
+          stream = MODULEMD_MODULESTREAM (item);
+          module_name = modulemd_modulestream_get_name (stream);
+          module = get_or_create_module_from_index (module_index, module_name);
+
+          /* Add the stream to this module. Note: if the same stream name
+           * appears in the data more than once, the last one encountered wins.
+           */
+          modulemd_improvedmodule_add_stream (module, stream);
+
+          /* Save it back to the index */
+          g_hash_table_replace (module_index,
+                                g_strdup (module_name),
+                                modulemd_improvedmodule_copy (module));
+        }
+      else if (G_OBJECT_TYPE (item) == MODULEMD_TYPE_DEFAULTS)
+        {
+          defaults = MODULEMD_DEFAULTS (item);
+          module_name = modulemd_defaults_dup_module_name (defaults);
+          module = get_or_create_module_from_index (module_index, module_name);
+
+          /* Update the defaults. Note: if defaults for this module appear in
+           * the data more than once, the last one encountered wins.
+           */
+          modulemd_improvedmodule_set_defaults (module, defaults);
+
+          /* Save it back to the index */
+          g_hash_table_replace (module_index,
+                                g_strdup (module_name),
+                                modulemd_improvedmodule_copy (module));
+        }
+
+      g_clear_pointer (&module, g_object_unref);
+      g_clear_pointer (&module_name, g_free);
+    }
+
+  return g_hash_table_ref (module_index);
+}
+
+
+GHashTable *
+parse_module_index_from_file (const gchar *path,
+                              GPtrArray **failures,
+                              GError **error)
+{
+  g_autoptr (FILE) yaml_file = NULL;
+  g_autoptr (GPtrArray) data = NULL;
+  g_auto (yaml_parser_t) parser;
+  GHashTable *module_index = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_debug ("TRACE: entering parse_module_index_from_file");
+  yaml_parser_initialize (&parser);
+
+  if (error != NULL && *error != NULL)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "GError is initialized.");
+      return NULL;
+    }
+
+  if (!path)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "Path not supplied.");
+      return NULL;
+    }
+
+  errno = 0;
+  yaml_file = g_fopen (path, "rb");
+  if (!yaml_file)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_OPEN,
+                   "Failed to open file: %s",
+                   g_strerror (errno));
+      return NULL;
+    }
+
+  yaml_parser_set_input_file (&parser, yaml_file);
+
+  if (!_parse_yaml (&parser, &data, failures, &nested_error))
+    {
+      g_debug ("Could not parse YAML: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  module_index = module_index_from_data (data, &nested_error);
+  if (!module_index)
+    {
+      g_debug ("Could not get module_index: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  g_debug ("TRACE: exiting parse_module_index_from_file");
+  return module_index;
+}
+
+
+GHashTable *
+parse_module_index_from_string (const gchar *yaml,
+                                GPtrArray **failures,
+                                GError **error)
+{
+  g_autoptr (GPtrArray) data = NULL;
+  g_auto (yaml_parser_t) parser;
+  GHashTable *module_index = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_debug ("TRACE: entering parse_module_index_from_string");
+  yaml_parser_initialize (&parser);
+
+  if (error != NULL && *error != NULL)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "GError is initialized.");
+      return NULL;
+    }
+
+  if (!yaml)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "String not supplied.");
+      return NULL;
+    }
+
+
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml, strlen (yaml));
+
+  if (!_parse_yaml (&parser, &data, failures, &nested_error))
+    {
+      g_debug ("Could not parse YAML: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  module_index = module_index_from_data (data, &nested_error);
+  if (!module_index)
+    {
+      g_debug ("Could not get module_index: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  g_debug ("TRACE: exiting parse_module_index_from_string");
+  return module_index;
+}
+
+
+GHashTable *
+parse_module_index_from_stream (FILE *iostream,
+                                GPtrArray **failures,
+                                GError **error)
+{
+  g_autoptr (GPtrArray) data = NULL;
+  g_auto (yaml_parser_t) parser;
+  GHashTable *module_index = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_debug ("TRACE: entering parse_module_index_from_stream");
+  yaml_parser_initialize (&parser);
+
+  if (error != NULL && *error != NULL)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "GError is initialized.");
+      return NULL;
+    }
+
+  if (!iostream)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PROGRAMMING,
+                           "Stream not supplied.");
+      return NULL;
+    }
+
+  yaml_parser_set_input_file (&parser, iostream);
+
+  if (!_parse_yaml (&parser, &data, failures, &nested_error))
+    {
+      g_debug ("Could not parse YAML: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  module_index = module_index_from_data (data, &nested_error);
+  if (!module_index)
+    {
+      g_debug ("Could not get module_index: %s", nested_error->message);
+      g_propagate_error (error, nested_error);
+      return NULL;
+    }
+
+  g_debug ("TRACE: exiting parse_module_index_from_stream");
+
+  return module_index;
+}
+
+
 static gboolean
 _parse_yaml (yaml_parser_t *parser,
              GPtrArray **data,

@@ -34,6 +34,7 @@
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
+#include "modulemd-improvedmodule.h"
 #include "modulemd-intent.h"
 #include "modulemd-module.h"
 #include "modulemd-modulestream.h"

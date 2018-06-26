@@ -26,6 +26,8 @@
 
 #include <glib-object.h>
 
+#include "modulemd-simpleset.h"
+
 G_BEGIN_DECLS
 
 #define MODULEMD_TYPE_INTENT (modulemd_intent_get_type ())

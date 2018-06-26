@@ -27,9 +27,10 @@
 #define MODULEMD_DEFAULTS_H
 
 #include <glib-object.h>
+#include <stdio.h>
 
-#include "modulemd.h"
 #include "modulemd-intent.h"
+#include "modulemd-simpleset.h"
 
 enum
 {

@@ -228,7 +228,9 @@ modulemd_component_module_copy (ModulemdComponent *self)
   ModulemdComponentModule *old_component = NULL;
   ModulemdComponentModule *new_component = NULL;
 
-  g_return_val_if_fail (self, NULL);
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self), NULL);
 
   old_component = MODULEMD_COMPONENT_MODULE (self);

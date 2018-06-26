@@ -479,6 +479,9 @@ modulemd_intent_copy (ModulemdIntent *self)
 {
   g_autoptr (ModulemdIntent) new_intent = NULL;
 
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_INTENT (self), NULL);
 
   new_intent = modulemd_intent_new (self->intent_name);

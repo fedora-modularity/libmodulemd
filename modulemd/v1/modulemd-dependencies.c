@@ -439,13 +439,18 @@ modulemd_dependencies_dup_requires (ModulemdDependencies *self)
  * In either case, the caller is responsible for calling g_object_unref() later
  * to free it.
  *
+ * If @self is NULL, no changes will occur to @dest.
+ *
  * Since: 1.0
  */
 void
 modulemd_dependencies_copy (ModulemdDependencies *self,
                             ModulemdDependencies **dest)
 {
-  g_return_if_fail (self && MODULEMD_IS_DEPENDENCIES (self));
+  if (!self)
+    return;
+
+  g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
   g_return_if_fail (dest);
   g_return_if_fail (*dest == NULL ||
                     (*dest != NULL && MODULEMD_IS_DEPENDENCIES (*dest)));

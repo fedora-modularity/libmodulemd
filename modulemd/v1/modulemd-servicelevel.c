@@ -256,6 +256,10 @@ ModulemdServiceLevel *
 modulemd_servicelevel_copy (ModulemdServiceLevel *self)
 {
   ModulemdServiceLevel *new_sl = NULL;
+
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_SERVICELEVEL (self), NULL);
 
   new_sl = modulemd_servicelevel_new ();

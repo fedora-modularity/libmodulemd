@@ -994,6 +994,9 @@ modulemd_defaults_init (ModulemdDefaults *self)
 ModulemdDefaults *
 modulemd_defaults_copy (ModulemdDefaults *self)
 {
+  if (!self)
+    return NULL;
+
   ModulemdDefaults *new_defaults = modulemd_defaults_new ();
 
   modulemd_defaults_set_version (new_defaults,

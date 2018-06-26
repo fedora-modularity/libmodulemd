@@ -476,7 +476,9 @@ modulemd_component_rpm_copy (ModulemdComponent *self)
   ModulemdComponentRpm *old_component = NULL;
   ModulemdComponentRpm *new_component = NULL;
 
-  g_return_val_if_fail (self, NULL);
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
 
   old_component = MODULEMD_COMPONENT_RPM (self);

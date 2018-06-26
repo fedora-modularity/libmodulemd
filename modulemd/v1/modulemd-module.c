@@ -2801,6 +2801,10 @@ ModulemdModule *
 modulemd_module_copy (ModulemdModule *self)
 {
   ModulemdModule *copy = NULL;
+
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   copy = modulemd_module_new ();

@@ -376,6 +376,9 @@ modulemd_component_copy (ModulemdComponent *self)
 {
   ModulemdComponentClass *klass;
 
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
 
   klass = MODULEMD_COMPONENT_GET_CLASS (self);

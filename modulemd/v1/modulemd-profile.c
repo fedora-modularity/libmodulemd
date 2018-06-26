@@ -331,6 +331,10 @@ ModulemdProfile *
 modulemd_profile_copy (ModulemdProfile *self)
 {
   ModulemdProfile *new_profile = NULL;
+
+  if (!self)
+    return NULL;
+
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   new_profile = modulemd_profile_new ();

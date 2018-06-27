@@ -17,6 +17,7 @@
  * @short_description: An RPM component that goes into a module stream.
  */
 
+#include "modulemd.h"
 #include "modulemd-component-rpm.h"
 
 struct _ModulemdComponentRpm
@@ -104,7 +105,6 @@ modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_rpm_peek_arches)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_arches (ModulemdComponentRpm *self)
 {
@@ -262,7 +262,6 @@ modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_rpm_peek_multilib)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self)
 {
@@ -342,7 +341,6 @@ modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref)
  * Deprecated: 1.1
  * Use peek_ref() instead.
  */
-G_DEPRECATED_FOR (modulemd_component_rpm_peek_ref)
 const gchar *
 modulemd_component_rpm_get_ref (ModulemdComponentRpm *self)
 {
@@ -421,7 +419,6 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_rpm_peek_repository)
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self)
 {

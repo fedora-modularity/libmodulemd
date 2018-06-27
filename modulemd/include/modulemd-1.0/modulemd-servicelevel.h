@@ -14,8 +14,7 @@
 #ifndef _MODULEMD_SERVICELEVEL_H
 #define _MODULEMD_SERVICELEVEL_H
 
-#include <glib.h>
-#include <glib-object.h>
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 
@@ -29,6 +28,7 @@ modulemd_servicelevel_new (void);
 void
 modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date);
 
+MMD_DEPRECATED_FOR (modulemd_servicelevel_peek_eol)
 const GDate *
 modulemd_servicelevel_get_eol (ModulemdServiceLevel *self);
 
@@ -41,6 +41,7 @@ modulemd_servicelevel_dup_eol (ModulemdServiceLevel *self);
 void
 modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name);
 
+MMD_DEPRECATED_FOR (modulemd_servicelevel_peek_name)
 const gchar *
 modulemd_servicelevel_get_name (ModulemdServiceLevel *self);
 

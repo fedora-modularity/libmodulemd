@@ -11,8 +11,6 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
-
 #include "modulemd.h"
 
 #pragma once

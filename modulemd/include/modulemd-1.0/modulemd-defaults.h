@@ -14,7 +14,7 @@
 #ifndef MODULEMD_DEFAULTS_H
 #define MODULEMD_DEFAULTS_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 #include <stdio.h>
 
 #include "modulemd-intent.h"

@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 

@@ -14,7 +14,7 @@
 #ifndef MODULEMD_SIMPLESET_H
 #define MODULEMD_SIMPLESET_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 
@@ -32,8 +32,11 @@ modulemd_simpleset_size (ModulemdSimpleSet *self);
 
 void
 modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set);
+
+MMD_DEPRECATED_FOR (modulemd_simpleset_dup)
 gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self);
+
 gchar **
 modulemd_simpleset_dup (ModulemdSimpleSet *self);
 

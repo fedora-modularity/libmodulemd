@@ -17,6 +17,7 @@
  * @short_description: A module component that goes into a module stream.
  */
 
+#include "modulemd.h"
 #include "modulemd-component-module.h"
 
 struct _ModulemdComponentModule
@@ -96,7 +97,6 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_module_peek_ref)
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self)
 {
@@ -173,7 +173,6 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_module_peek_repository)
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self)
 {

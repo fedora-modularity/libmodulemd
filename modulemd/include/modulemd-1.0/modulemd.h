@@ -14,7 +14,21 @@
 #ifndef MODULEMD_H
 #define MODULEMD_H
 
+#ifdef MMD_DISABLE_DEPRECATION_WARNINGS
+#define MMD_DEPRECATED extern
+#define MMD_DEPRECATED_FOR(f) extern
+#define MMD_UNAVAILABLE(maj, min) extern
+#define MMD_DEPRECATED_TYPE_FOR(f)
+#else
+#define MMD_DEPRECATED G_DEPRECATED extern
+#define MMD_DEPRECATED_FOR(f) G_DEPRECATED_FOR (f) extern
+#define MMD_DEPRECATED_TYPE_FOR(f) G_DEPRECATED_FOR (f)
+#define MMD_UNAVAILABLE(maj, min) G_UNAVAILABLE (maj, min) extern
+#endif
+
+
 #include <glib.h>
+#include <glib-object.h>
 #include <stdio.h>
 
 #include "modulemd-buildopts.h"

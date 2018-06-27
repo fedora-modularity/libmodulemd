@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "modulemd.h"
 #include <glib.h>
 #include <string.h>
 #include "modulemd-simpleset.h"
@@ -160,7 +161,6 @@ modulemd_simpleset_set (ModulemdSimpleSet *self, gchar **set)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_simpleset_dup)
 gchar **
 modulemd_simpleset_get (ModulemdSimpleSet *self)
 {

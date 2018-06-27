@@ -14,7 +14,7 @@
 #ifndef MODULEMD_COMPONENT_H
 #define MODULEMD_COMPONENT_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 
@@ -53,6 +53,8 @@ modulemd_component_new (void);
 void
 modulemd_component_set_buildorder (ModulemdComponent *self,
                                    guint64 buildorder);
+
+MMD_DEPRECATED_FOR (modulemd_component_peek_buildorder)
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self);
 
@@ -61,8 +63,11 @@ modulemd_component_peek_buildorder (ModulemdComponent *self);
 
 void
 modulemd_component_set_name (ModulemdComponent *self, const gchar *name);
+
+MMD_DEPRECATED_FOR (modulemd_component_peek_name)
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self);
+
 const gchar *
 modulemd_component_peek_name (ModulemdComponent *self);
 gchar *
@@ -71,8 +76,11 @@ modulemd_component_dup_name (ModulemdComponent *self);
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
                                   const gchar *rationale);
+
+MMD_DEPRECATED_FOR (modulemd_component_peek_rationale)
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
+
 const gchar *
 modulemd_component_peek_rationale (ModulemdComponent *self);
 gchar *

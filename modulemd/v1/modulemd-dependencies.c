@@ -11,8 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
 #include "modulemd.h"
+#include <glib.h>
 #include "private/modulemd-util.h"
 
 /**
@@ -194,7 +194,6 @@ modulemd_dependencies_set_buildrequires (ModulemdDependencies *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_dependencies_peek_buildrequires)
 GHashTable *
 modulemd_dependencies_get_buildrequires (ModulemdDependencies *self)
 {
@@ -375,7 +374,6 @@ modulemd_dependencies_set_requires (ModulemdDependencies *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_dependencies_peek_requires)
 GHashTable *
 modulemd_dependencies_get_requires (ModulemdDependencies *self)
 {

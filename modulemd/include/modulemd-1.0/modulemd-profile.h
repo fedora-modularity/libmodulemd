@@ -14,7 +14,7 @@
 #ifndef MODULEMD_PROFILE_H
 #define MODULEMD_PROFILE_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 
 G_BEGIN_DECLS
 
@@ -29,6 +29,7 @@ void
 modulemd_profile_set_description (ModulemdProfile *self,
                                   const gchar *description);
 
+MMD_DEPRECATED_FOR (modulemd_profile_peek_description)
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self);
 
@@ -39,8 +40,11 @@ modulemd_profile_dup_description (ModulemdProfile *self);
 
 void
 modulemd_profile_set_name (ModulemdProfile *self, const gchar *name);
+
+MMD_DEPRECATED_FOR (modulemd_profile_peek_name)
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self);
+
 const gchar *
 modulemd_profile_peek_name (ModulemdProfile *self);
 gchar *
@@ -49,6 +53,7 @@ modulemd_profile_dup_name (ModulemdProfile *self);
 void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 
+MMD_DEPRECATED_FOR (modulemd_profile_peek_rpms)
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self);
 

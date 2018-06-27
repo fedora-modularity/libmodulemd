@@ -11,8 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
 #include "modulemd.h"
+#include <glib.h>
 
 /**
  * SECTION: modulemd-profile
@@ -83,7 +83,6 @@ modulemd_profile_set_description (ModulemdProfile *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_profile_peek_description)
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self)
 {
@@ -162,7 +161,6 @@ modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_profile_peek_name)
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self)
 {
@@ -241,7 +239,6 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_profile_peek_rpms)
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self)
 {

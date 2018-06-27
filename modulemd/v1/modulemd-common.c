@@ -65,11 +65,7 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error)
  * G_OBJECT_TYPE(object). This array must be freed with g_ptr_array_unref().
  *
  * Since: 1.4
- *
- * Deprecated: 1.6
- * Use Modulemd.index_from_file() instead
  */
-G_DEPRECATED_FOR (modulemd_index_from_file)
 GPtrArray *
 modulemd_objects_from_file_ext (const gchar *yaml_file,
                                 GPtrArray **failures,
@@ -157,11 +153,7 @@ modulemd_objects_from_stream (FILE *stream, GError **error)
  * G_OBJECT_TYPE(object)
  *
  * Since: 1.4
- *
- * Deprecated: 1.6
- * Use Modulemd.index_from_stream() instead.
  */
-G_DEPRECATED_FOR (modulemd_index_from_stream)
 GPtrArray *
 modulemd_objects_from_stream_ext (FILE *stream,
                                   GPtrArray **failures,

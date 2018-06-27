@@ -11,8 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
 #include "modulemd.h"
+#include <glib.h>
 
 /**
  * SECTION: modulemd-servicelevel
@@ -88,7 +88,6 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_servicelevel_peek_eol)
 const GDate *
 modulemd_servicelevel_get_eol (ModulemdServiceLevel *self)
 {
@@ -181,7 +180,6 @@ modulemd_servicelevel_set_name (ModulemdServiceLevel *self, const gchar *name)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_servicelevel_peek_name)
 const gchar *
 modulemd_servicelevel_get_name (ModulemdServiceLevel *self)
 {

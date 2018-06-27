@@ -16,6 +16,7 @@
  * ModulemdModuleStream.
  */
 
+#define MMD_DISABLE_DEPRECATION_WARNINGS 1
 #include "modulemd.h"
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-util.h"
@@ -29,6 +30,8 @@
  * SECTION: modulemd-module
  * @title: Modulemd.Module
  * @short_description: DEPRECATED: use #ModulemdModuleStream instead
+ *
+ * Deprecated: 1.6
  */
 
 GQuark
@@ -102,6 +105,8 @@ struct _ModulemdModule
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
+typedef struct _ModulemdModule
+  ModulemdModule MMD_DEPRECATED_TYPE_FOR (ModulemdModuleStream);
 
 /**
  * modulemd_module_set_arch:
@@ -110,11 +115,7 @@ G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
  * Sets the "arch" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_arch)
 void
 modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
 {
@@ -132,12 +133,8 @@ modulemd_module_set_arch (ModulemdModule *self, const gchar *arch)
  *
  * Returns: A string containing the "arch" property.
  *
- * Deprecated: 1.1
- * Use peek_arch() instead.
- *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_module_peek_arch)
 const gchar *
 modulemd_module_get_arch (ModulemdModule *self)
 {
@@ -152,11 +149,7 @@ modulemd_module_get_arch (ModulemdModule *self)
  * Returns: A string containing the "arch" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_arch)
 const gchar *
 modulemd_module_peek_arch (ModulemdModule *self)
 {
@@ -174,11 +167,7 @@ modulemd_module_peek_arch (ModulemdModule *self)
  * Returns: A copy of the string containing the "arch" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_arch)
 gchar *
 modulemd_module_dup_arch (ModulemdModule *self)
 {
@@ -196,11 +185,7 @@ modulemd_module_dup_arch (ModulemdModule *self)
  * additional instructions to the build system required to build this module.
  *
  * Since: 1.5
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_buildopts)
 void
 modulemd_module_set_buildopts (ModulemdModule *self,
                                ModulemdBuildopts *buildopts)
@@ -224,11 +209,7 @@ modulemd_module_set_buildopts (ModulemdModule *self,
  * it. This function will return NULL if no buildopts have been set.
  *
  * Since: 1.5
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 ModulemdBuildopts *
 modulemd_module_get_buildopts (ModulemdModule *self)
 {
@@ -248,11 +229,7 @@ modulemd_module_get_buildopts (ModulemdModule *self)
  * This function will return NULL if no buildopts have been set.
  *
  * Since: 1.6
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 ModulemdBuildopts *
 modulemd_module_peek_buildopts (ModulemdModule *self)
 {
@@ -271,11 +248,7 @@ modulemd_module_peek_buildopts (ModulemdModule *self)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_buildrequires)
 void
 modulemd_module_set_buildrequires (ModulemdModule *self,
                                    GHashTable *buildrequires)
@@ -297,11 +270,7 @@ modulemd_module_set_buildrequires (ModulemdModule *self,
  * containing the "buildrequires" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_get_buildrequires (ModulemdModule *self)
 {
@@ -317,11 +286,7 @@ modulemd_module_get_buildrequires (ModulemdModule *self)
  * containing the "buildrequires" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_peek_buildrequires (ModulemdModule *self)
 {
@@ -343,11 +308,7 @@ modulemd_module_peek_buildrequires (ModulemdModule *self)
  * containing the "buildrequires" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildrequires)
 GHashTable *
 modulemd_module_dup_buildrequires (ModulemdModule *self)
 {
@@ -364,11 +325,7 @@ modulemd_module_dup_buildrequires (ModulemdModule *self)
  * Sets the "community" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_community)
 void
 modulemd_module_set_community (ModulemdModule *self, const gchar *community)
 {
@@ -387,11 +344,7 @@ modulemd_module_set_community (ModulemdModule *self, const gchar *community)
  * Returns: A string containing the "community" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 const gchar *
 modulemd_module_get_community (ModulemdModule *self)
 {
@@ -407,11 +360,7 @@ modulemd_module_get_community (ModulemdModule *self)
  * Returns: A string containing the "community" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 const gchar *
 modulemd_module_peek_community (ModulemdModule *self)
 {
@@ -429,11 +378,7 @@ modulemd_module_peek_community (ModulemdModule *self)
  * Returns: A copy of string containing the "community" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_community)
 gchar *
 modulemd_module_dup_community (ModulemdModule *self)
 {
@@ -451,11 +396,7 @@ modulemd_module_dup_community (ModulemdModule *self)
  * Sets the content_licenses property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_content_licenses)
 void
 modulemd_module_set_content_licenses (ModulemdModule *self,
                                       ModulemdSimpleSet *licenses)
@@ -478,11 +419,7 @@ modulemd_module_set_content_licenses (ModulemdModule *self,
  * "content_licenses" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_get_content_licenses (ModulemdModule *self)
 {
@@ -501,11 +438,7 @@ modulemd_module_get_content_licenses (ModulemdModule *self)
  * "content_licenses" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_peek_content_licenses (ModulemdModule *self)
 {
@@ -528,11 +461,7 @@ modulemd_module_peek_content_licenses (ModulemdModule *self)
  * "content_licenses" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_content_licenses)
 ModulemdSimpleSet *
 modulemd_module_dup_content_licenses (ModulemdModule *self)
 {
@@ -549,11 +478,7 @@ modulemd_module_dup_content_licenses (ModulemdModule *self)
  * Sets the "context" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_context)
 void
 modulemd_module_set_context (ModulemdModule *self, const gchar *context)
 {
@@ -573,11 +498,7 @@ modulemd_module_set_context (ModulemdModule *self, const gchar *context)
  * Returns: A string containing the "context" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 const gchar *
 modulemd_module_get_context (ModulemdModule *self)
 {
@@ -593,11 +514,7 @@ modulemd_module_get_context (ModulemdModule *self)
  * Returns: A string containing the "context" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 const gchar *
 modulemd_module_peek_context (ModulemdModule *self)
 {
@@ -615,11 +532,7 @@ modulemd_module_peek_context (ModulemdModule *self)
  * Returns: A copy of the string containing the "context" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_context)
 gchar *
 modulemd_module_dup_context (ModulemdModule *self)
 {
@@ -637,11 +550,7 @@ modulemd_module_dup_context (ModulemdModule *self)
  * Sets the list of dependency objects for this module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_dependencies)
 void
 modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
 {
@@ -658,11 +567,7 @@ modulemd_module_set_dependencies (ModulemdModule *self, GPtrArray *deps)
  * Helper function to populate the dependencies list
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_add_dependencies)
 void
 modulemd_module_add_dependencies (ModulemdModule *self,
                                   ModulemdDependencies *dep)
@@ -680,11 +585,7 @@ modulemd_module_add_dependencies (ModulemdModule *self,
  * of dependency objects for this module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_get_dependencies (ModulemdModule *self)
 {
@@ -699,11 +600,7 @@ modulemd_module_get_dependencies (ModulemdModule *self)
  * of dependency objects for this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_peek_dependencies (ModulemdModule *self)
 {
@@ -723,11 +620,7 @@ modulemd_module_peek_dependencies (ModulemdModule *self)
  * of dependency objects for this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_dependencies)
 GPtrArray *
 modulemd_module_dup_dependencies (ModulemdModule *self)
 {
@@ -742,11 +635,7 @@ modulemd_module_dup_dependencies (ModulemdModule *self)
  * Sets the "description" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_description)
 void
 modulemd_module_set_description (ModulemdModule *self,
                                  const gchar *description)
@@ -766,11 +655,7 @@ modulemd_module_set_description (ModulemdModule *self,
  * Returns: A string containing the "description" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 const gchar *
 modulemd_module_get_description (ModulemdModule *self)
 {
@@ -786,11 +671,7 @@ modulemd_module_get_description (ModulemdModule *self)
  * Returns: A string containing the "description" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 const gchar *
 modulemd_module_peek_description (ModulemdModule *self)
 {
@@ -808,11 +689,7 @@ modulemd_module_peek_description (ModulemdModule *self)
  * Returns: A copy of the string containing the "description" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_description)
 gchar *
 modulemd_module_dup_description (ModulemdModule *self)
 {
@@ -829,11 +706,7 @@ modulemd_module_dup_description (ModulemdModule *self)
  * Sets the "documentation" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_documentation)
 void
 modulemd_module_set_documentation (ModulemdModule *self,
                                    const gchar *documentation)
@@ -853,11 +726,7 @@ modulemd_module_set_documentation (ModulemdModule *self,
  * Returns: A string containing the "documentation" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_documentation)
 const gchar *
 modulemd_module_get_documentation (ModulemdModule *self)
 {
@@ -873,11 +742,7 @@ modulemd_module_get_documentation (ModulemdModule *self)
  * Returns: A string containing the "documentation" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_documentation)
 const gchar *
 modulemd_module_peek_documentation (ModulemdModule *self)
 {
@@ -895,11 +760,7 @@ modulemd_module_peek_documentation (ModulemdModule *self)
  * Returns: A copy of the string containing the "documentation" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_module_get_documentation)
 gchar *
 modulemd_module_dup_documentation (ModulemdModule *self)
 {
@@ -919,11 +780,7 @@ modulemd_module_dup_documentation (ModulemdModule *self)
  * on modulemd files using the version 2 or later formats.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_eol)
 void
 modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
 {
@@ -947,11 +804,7 @@ modulemd_module_set_eol (ModulemdModule *self, const GDate *date)
  * Returns: A #GDate containing the "EOL" date
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 const GDate *
 modulemd_module_get_eol (ModulemdModule *self)
 {
@@ -970,11 +823,7 @@ modulemd_module_get_eol (ModulemdModule *self)
  * Returns: A #GDate containing the "EOL" date
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 const GDate *
 modulemd_module_peek_eol (ModulemdModule *self)
 {
@@ -995,11 +844,7 @@ modulemd_module_peek_eol (ModulemdModule *self)
  * Returns: A #GDate containing a copy of the "EOL" date
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_eol)
 GDate *
 modulemd_module_dup_eol (ModulemdModule *self)
 {
@@ -1016,11 +861,7 @@ modulemd_module_dup_eol (ModulemdModule *self)
  * Sets the "mdversion" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_mdversion)
 void
 modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
 {
@@ -1041,11 +882,7 @@ modulemd_module_set_mdversion (ModulemdModule *self, const guint64 mdversion)
  * Returns: A 64-bit unsigned integer containing the "mdversion" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_mdversion)
 const guint64
 modulemd_module_get_mdversion (ModulemdModule *self)
 {
@@ -1059,11 +896,7 @@ modulemd_module_get_mdversion (ModulemdModule *self)
  * Retrieves the "mdversion" for modulemd.
  *
  * Returns: A 64-bit unsigned integer containing the "mdversion" property.
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_mdversion)
 guint64
 modulemd_module_peek_mdversion (ModulemdModule *self)
 {
@@ -1080,11 +913,7 @@ modulemd_module_peek_mdversion (ModulemdModule *self)
  * Adds a #ModulemdComponentModule to the "module_components" hash table.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_add_module_component)
 void
 modulemd_module_add_module_component (ModulemdModule *self,
                                       ModulemdComponentModule *component)
@@ -1105,11 +934,7 @@ modulemd_module_add_module_component (ModulemdModule *self,
  * Remove all entries from the "module_components" hash table.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_clear_module_components)
 void
 modulemd_module_clear_module_components (ModulemdModule *self)
 {
@@ -1132,11 +957,7 @@ modulemd_module_clear_module_components (ModulemdModule *self)
  * Sets the module_components property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_module_components)
 void
 modulemd_module_set_module_components (ModulemdModule *self,
                                        GHashTable *components)
@@ -1158,11 +979,7 @@ modulemd_module_set_module_components (ModulemdModule *self,
  * containing the "module-components" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_get_module_components (ModulemdModule *self)
 {
@@ -1179,11 +996,7 @@ modulemd_module_get_module_components (ModulemdModule *self)
  * containing the "module-components" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_peek_module_components (ModulemdModule *self)
 {
@@ -1206,11 +1019,7 @@ modulemd_module_peek_module_components (ModulemdModule *self)
  * A copy of the hash table containing the "module-components" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_components)
 GHashTable *
 modulemd_module_dup_module_components (ModulemdModule *self)
 {
@@ -1230,11 +1039,7 @@ modulemd_module_dup_module_components (ModulemdModule *self)
  * Sets the module_licenses property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_module_licenses)
 void
 modulemd_module_set_module_licenses (ModulemdModule *self,
                                      ModulemdSimpleSet *licenses)
@@ -1257,11 +1062,7 @@ modulemd_module_set_module_licenses (ModulemdModule *self,
  * licenses in the "module_licenses" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_get_module_licenses (ModulemdModule *self)
 {
@@ -1278,11 +1079,7 @@ modulemd_module_get_module_licenses (ModulemdModule *self)
  * licenses in the "module_licenses" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_peek_module_licenses (ModulemdModule *self)
 {
@@ -1305,11 +1102,7 @@ modulemd_module_peek_module_licenses (ModulemdModule *self)
  * licenses in the "module_licenses" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_module_licenses)
 ModulemdSimpleSet *
 modulemd_module_dup_module_licenses (ModulemdModule *self)
 {
@@ -1326,11 +1119,7 @@ modulemd_module_dup_module_licenses (ModulemdModule *self)
  * Sets the "name" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_name)
 void
 modulemd_module_set_name (ModulemdModule *self, const gchar *name)
 {
@@ -1349,11 +1138,7 @@ modulemd_module_set_name (ModulemdModule *self, const gchar *name)
  * Returns: A string containing the "name" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 const gchar *
 modulemd_module_get_name (ModulemdModule *self)
 {
@@ -1371,11 +1156,7 @@ modulemd_module_get_name (ModulemdModule *self)
  * Returns: A string containing the "name" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 const gchar *
 modulemd_module_peek_name (ModulemdModule *self)
 {
@@ -1393,11 +1174,7 @@ modulemd_module_peek_name (ModulemdModule *self)
  * Returns: A copy of the string containing the "name" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_name)
 gchar *
 modulemd_module_dup_name (ModulemdModule *self)
 {
@@ -1414,11 +1191,7 @@ modulemd_module_dup_name (ModulemdModule *self)
  * Adds a #ModulemdProfile definition to this module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_add_profile)
 void
 modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
 {
@@ -1437,11 +1210,7 @@ modulemd_module_add_profile (ModulemdModule *self, ModulemdProfile *profile)
  * Remove all entries from the "profiles" hash table.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_clear_profiles)
 void
 modulemd_module_clear_profiles (ModulemdModule *self)
 {
@@ -1461,11 +1230,7 @@ modulemd_module_clear_profiles (ModulemdModule *self)
  * Sets the 'profiles' property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_profiles)
 void
 modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
 {
@@ -1486,11 +1251,7 @@ modulemd_module_set_profiles (ModulemdModule *self, GHashTable *profiles)
  * table containing the "profiles" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_get_profiles (ModulemdModule *self)
 {
@@ -1507,11 +1268,7 @@ modulemd_module_get_profiles (ModulemdModule *self)
  * table containing the "profiles" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_peek_profiles (ModulemdModule *self)
 {
@@ -1533,11 +1290,7 @@ modulemd_module_peek_profiles (ModulemdModule *self)
  * table containing a copy of the "profiles" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_profiles)
 GHashTable *
 modulemd_module_dup_profiles (ModulemdModule *self)
 {
@@ -1555,11 +1308,7 @@ modulemd_module_dup_profiles (ModulemdModule *self)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_requires)
 void
 modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
 {
@@ -1581,11 +1330,7 @@ modulemd_module_set_requires (ModulemdModule *self, GHashTable *requires)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_get_requires (ModulemdModule *self)
 {
@@ -1603,11 +1348,7 @@ modulemd_module_get_requires (ModulemdModule *self)
  * valid for modulemd files of version 2 or later.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_peek_requires (ModulemdModule *self)
 {
@@ -1629,11 +1370,7 @@ modulemd_module_peek_requires (ModulemdModule *self)
  * containing a copy of the "buildrequires" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_requires)
 GHashTable *
 modulemd_module_dup_requires (ModulemdModule *self)
 {
@@ -1651,11 +1388,7 @@ modulemd_module_dup_requires (ModulemdModule *self)
  * Sets the rpm_api property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_api)
 void
 modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
 {
@@ -1677,11 +1410,7 @@ modulemd_module_set_rpm_api (ModulemdModule *self, ModulemdSimpleSet *apis)
  * packages in the "rpm_api" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_api (ModulemdModule *self)
 {
@@ -1698,11 +1427,7 @@ modulemd_module_get_rpm_api (ModulemdModule *self)
  * packages in the "rpm_api" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_api (ModulemdModule *self)
 {
@@ -1724,11 +1449,7 @@ modulemd_module_peek_rpm_api (ModulemdModule *self)
  * packages in the "rpm_api" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_api)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_api (ModulemdModule *self)
 {
@@ -1746,11 +1467,7 @@ modulemd_module_dup_rpm_api (ModulemdModule *self)
  * Sets the rpm_artifacts property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_artifacts)
 void
 modulemd_module_set_rpm_artifacts (ModulemdModule *self,
                                    ModulemdSimpleSet *artifacts)
@@ -1774,11 +1491,7 @@ modulemd_module_set_rpm_artifacts (ModulemdModule *self,
  * contained in this module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_artifacts)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_artifacts (ModulemdModule *self)
 {
@@ -1797,9 +1510,6 @@ modulemd_module_get_rpm_artifacts (ModulemdModule *self)
  * contained in this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
@@ -1822,11 +1532,7 @@ modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
  * contained in this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_artifacts)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
 {
@@ -1845,11 +1551,7 @@ modulemd_module_dup_rpm_artifacts (ModulemdModule *self)
  * Sets the 'rpm-buildopts' property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_buildopts)
 void
 modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
 {
@@ -1879,11 +1581,7 @@ modulemd_module_set_rpm_buildopts (ModulemdModule *self, GHashTable *buildopts)
  * containing the "rpm-buildopts" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_buildopts)
 GHashTable *
 modulemd_module_get_rpm_buildopts (ModulemdModule *self)
 {
@@ -1900,11 +1598,7 @@ modulemd_module_get_rpm_buildopts (ModulemdModule *self)
  * containing the "rpm-buildopts" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 GHashTable *
 modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
 {
@@ -1942,11 +1636,7 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
  * containing the "rpm-buildopts" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_buildopts)
 GHashTable *
 modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
 {
@@ -1987,11 +1677,7 @@ modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
  * Adds a #ModulemdComponentRpm to the "rpm_components" hash table.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_add_rpm_component)
 void
 modulemd_module_add_rpm_component (ModulemdModule *self,
                                    ModulemdComponentRpm *component)
@@ -2012,11 +1698,7 @@ modulemd_module_add_rpm_component (ModulemdModule *self,
  * Remove all entries from the "rpm_components" hash table.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_clear_rpm_components)
 void
 modulemd_module_clear_rpm_components (ModulemdModule *self)
 {
@@ -2039,9 +1721,6 @@ modulemd_module_clear_rpm_components (ModulemdModule *self)
  * Sets the rpm_components property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 void
 modulemd_module_set_rpm_components (ModulemdModule *self,
@@ -2065,11 +1744,7 @@ modulemd_module_set_rpm_components (ModulemdModule *self,
  * containing the "rpm-components" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_get_rpm_components (ModulemdModule *self)
 {
@@ -2088,11 +1763,7 @@ modulemd_module_get_rpm_components (ModulemdModule *self)
  * containing the "rpm-components" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_peek_rpm_components (ModulemdModule *self)
 {
@@ -2115,11 +1786,7 @@ modulemd_module_peek_rpm_components (ModulemdModule *self)
  * A hash table containing the "rpm-components" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_components)
 GHashTable *
 modulemd_module_dup_rpm_components (ModulemdModule *self)
 {
@@ -2137,11 +1804,7 @@ modulemd_module_dup_rpm_components (ModulemdModule *self)
  * Sets the rpm_artifacts property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_rpm_filter)
 void
 modulemd_module_set_rpm_filter (ModulemdModule *self,
                                 ModulemdSimpleSet *filter)
@@ -2165,11 +1828,7 @@ modulemd_module_set_rpm_filter (ModulemdModule *self,
  * filtered out of this module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_get_rpm_filter (ModulemdModule *self)
 {
@@ -2186,11 +1845,7 @@ modulemd_module_get_rpm_filter (ModulemdModule *self)
  * filtered out of this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_peek_rpm_filter (ModulemdModule *self)
 {
@@ -2212,11 +1867,7 @@ modulemd_module_peek_rpm_filter (ModulemdModule *self)
  * filtered out of this module.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_rpm_filter)
 ModulemdSimpleSet *
 modulemd_module_dup_rpm_filter (ModulemdModule *self)
 {
@@ -2232,11 +1883,7 @@ modulemd_module_dup_rpm_filter (ModulemdModule *self)
  * Remove all entries from the "servicelevels" hash table
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_clear_servicelevels)
 void
 modulemd_module_clear_servicelevels (ModulemdModule *self)
 {
@@ -2255,11 +1902,7 @@ modulemd_module_clear_servicelevels (ModulemdModule *self)
  * Sets the service levels for the module.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_servicelevels)
 void
 modulemd_module_set_servicelevels (ModulemdModule *self,
                                    GHashTable *servicelevels)
@@ -2280,11 +1923,7 @@ modulemd_module_set_servicelevels (ModulemdModule *self,
  * replaced by this entry and will release a reference on the previous entry.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_add_servicelevel)
 void
 modulemd_module_add_servicelevel (ModulemdModule *self,
                                   ModulemdServiceLevel *servicelevel)
@@ -2306,11 +1945,7 @@ modulemd_module_add_servicelevel (ModulemdModule *self,
  * hash table containing the service levels.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_servicelevels)
 GHashTable *
 modulemd_module_get_servicelevels (ModulemdModule *self)
 {
@@ -2327,9 +1962,6 @@ modulemd_module_get_servicelevels (ModulemdModule *self)
  * hash table containing the service levels.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 GHashTable *
 modulemd_module_peek_servicelevels (ModulemdModule *self)
@@ -2352,9 +1984,6 @@ modulemd_module_peek_servicelevels (ModulemdModule *self)
  * hash table containing the service levels.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 GHashTable *
 modulemd_module_dup_servicelevels (ModulemdModule *self)
@@ -2372,9 +2001,6 @@ modulemd_module_dup_servicelevels (ModulemdModule *self)
  * Sets the "stream" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 void
 modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
@@ -2395,11 +2021,7 @@ modulemd_module_set_stream (ModulemdModule *self, const gchar *stream)
  * Returns: A string containing the "stream" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_stream)
 const gchar *
 modulemd_module_get_stream (ModulemdModule *self)
 {
@@ -2415,11 +2037,7 @@ modulemd_module_get_stream (ModulemdModule *self)
  * Returns: A string containing the "stream" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_stream)
 const gchar *
 modulemd_module_peek_stream (ModulemdModule *self)
 {
@@ -2437,9 +2055,6 @@ modulemd_module_peek_stream (ModulemdModule *self)
  * Returns: A copy of the string containing the "stream" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 gchar *
 modulemd_module_dup_stream (ModulemdModule *self)
@@ -2457,11 +2072,7 @@ modulemd_module_dup_stream (ModulemdModule *self)
  * Sets the "summary" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_summary)
 void
 modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
 {
@@ -2481,11 +2092,7 @@ modulemd_module_set_summary (ModulemdModule *self, const gchar *summary)
  * Returns: A string containing the "summary" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_summary)
 const gchar *
 modulemd_module_get_summary (ModulemdModule *self)
 {
@@ -2501,11 +2108,7 @@ modulemd_module_get_summary (ModulemdModule *self)
  * Returns: A string containing the "summary" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_summary)
 const gchar *
 modulemd_module_peek_summary (ModulemdModule *self)
 {
@@ -2523,9 +2126,6 @@ modulemd_module_peek_summary (ModulemdModule *self)
  * Returns: A copy of the string containing the "summary" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
 gchar *
 modulemd_module_dup_summary (ModulemdModule *self)
@@ -2543,11 +2143,7 @@ modulemd_module_dup_summary (ModulemdModule *self)
  * Sets the "tracker" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_tracker)
 void
 modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
 {
@@ -2567,11 +2163,7 @@ modulemd_module_set_tracker (ModulemdModule *self, const gchar *tracker)
  * Returns: A string containing the "tracker" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 const gchar *
 modulemd_module_get_tracker (ModulemdModule *self)
 {
@@ -2587,11 +2179,7 @@ modulemd_module_get_tracker (ModulemdModule *self)
  * Returns: A string containing the "tracker" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 const gchar *
 modulemd_module_peek_tracker (ModulemdModule *self)
 {
@@ -2609,11 +2197,7 @@ modulemd_module_peek_tracker (ModulemdModule *self)
  * Returns: A copy of the string containing the "tracker" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_tracker)
 gchar *
 modulemd_module_dup_tracker (ModulemdModule *self)
 {
@@ -2630,11 +2214,7 @@ modulemd_module_dup_tracker (ModulemdModule *self)
  * Sets the "version" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_version)
 void
 modulemd_module_set_version (ModulemdModule *self, const guint64 version)
 {
@@ -2654,11 +2234,7 @@ modulemd_module_set_version (ModulemdModule *self, const guint64 version)
  * Returns: A 64-bit unsigned integer containing the "version" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_version)
 const guint64
 modulemd_module_get_version (ModulemdModule *self)
 {
@@ -2693,11 +2269,7 @@ modulemd_module_peek_version (ModulemdModule *self)
  * Sets the 'xmd' property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_set_xmd)
 void
 modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
 {
@@ -2718,11 +2290,7 @@ modulemd_module_set_xmd (ModulemdModule *self, GHashTable *xmd)
  * containing the "xmd" property.
  *
  * Since: 1.0
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_get_xmd (ModulemdModule *self)
 {
@@ -2739,11 +2307,7 @@ modulemd_module_get_xmd (ModulemdModule *self)
  * containing the "xmd" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_peek_xmd (ModulemdModule *self)
 {
@@ -2765,11 +2329,7 @@ modulemd_module_peek_xmd (ModulemdModule *self)
  * containing the "xmd" property.
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_xmd)
 GHashTable *
 modulemd_module_dup_xmd (ModulemdModule *self)
 {
@@ -2787,11 +2347,7 @@ modulemd_module_dup_xmd (ModulemdModule *self)
  * Returns: (transfer full): A deep copy of this #ModulemdModule
  *
  * Since: 1.1
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_copy)
 ModulemdModule *
 modulemd_module_copy (ModulemdModule *self)
 {
@@ -2819,11 +2375,7 @@ modulemd_module_copy (ModulemdModule *self)
  * Returns: a string describing the unique module identifier in the form:
  * "NAME:STREAM:VERSION[:CONTEXT]". This string is owned by the caller and
  * must be freed with g_free().
- *
- * Deprecated: 1.6
- * This object is being replaced by #ModulemdModuleStream
  */
-G_DEPRECATED_FOR (modulemd_modulestream_get_nsvc)
 gchar *
 modulemd_module_dup_nsvc (ModulemdModule *self)
 {
@@ -3512,8 +3064,6 @@ modulemd_module_new_from_file_ext (const gchar *yaml_file,
  * Allocates a list of new #ModulemdModule from a file.
  *
  * Since: 1.0
- * Deprecated: 1.2
- * Use Modulemd.objects_from_file() instead
  */
 void
 modulemd_module_new_all_from_file (const gchar *yaml_file,
@@ -3545,8 +3095,6 @@ modulemd_module_new_all_from_file (const gchar *yaml_file,
  * Allocates a #GPtrArray of various supported subdocuments from a file.
  *
  * Since: 1.1
- * Deprecated: 1.2
- * Use Modulemd.objects_from_file() instead
  */
 void
 modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
@@ -3635,8 +3183,6 @@ modulemd_module_new_from_string_ext (const gchar *yaml_string,
  * Allocates a list of new #ModulemdModule from a string.
  *
  * Since: 1.0
- * Deprecated: 1.2
- * Use Modulemd.objects_from_string() instead
  */
 void
 modulemd_module_new_all_from_string (const gchar *yaml_string,
@@ -3668,8 +3214,6 @@ modulemd_module_new_all_from_string (const gchar *yaml_string,
  * Allocates a #GPtrArray of various supported subdocuments from a file.
  *
  * Since: 1.1
- * Deprecated: 1.2
- * Use Modulemd.objects_from_string() instead
  */
 void
 modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
@@ -3814,9 +3358,6 @@ modulemd_module_dumps (ModulemdModule *self)
  * generated from the supplied modules.
  *
  * Since: 1.0
- *
- * Deprecated: 1.2
- * Use Modulemd.dump() instead.
  */
 void
 modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
@@ -3841,9 +3382,6 @@ modulemd_module_dump_all (GPtrArray *module_array, const gchar *yaml_file)
  * Return value: A string containing a YAML representation of all provided modules.
  *
  * Since: 1.0
- *
- * Deprecated: 1.2
- * Use Modulemd.dump() instead.
  */
 gchar *
 modulemd_module_dumps_all (GPtrArray *module_array)

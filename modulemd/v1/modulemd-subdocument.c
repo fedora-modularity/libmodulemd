@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "modulemd.h"
 #include "modulemd-subdocument.h"
 #include "private/modulemd-subdocument-private.h"
 

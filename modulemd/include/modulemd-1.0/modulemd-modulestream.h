@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "modulemd.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"

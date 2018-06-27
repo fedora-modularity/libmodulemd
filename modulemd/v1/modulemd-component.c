@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "modulemd.h"
 #include "modulemd-component.h"
 
 /**
@@ -163,7 +164,6 @@ modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_peek_buildorder)
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self)
 {
@@ -224,7 +224,6 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_peek_name)
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self)
 {
@@ -308,7 +307,6 @@ modulemd_component_set_rationale (ModulemdComponent *self,
  *
  * Since: 1.0
  */
-G_DEPRECATED_FOR (modulemd_component_peek_rationale)
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self)
 {

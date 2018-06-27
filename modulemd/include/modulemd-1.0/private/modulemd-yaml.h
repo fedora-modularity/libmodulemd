@@ -14,9 +14,9 @@
 #ifndef MODULEMD_YAML_H
 #define MODULEMD_YAML_H
 
+#include "modulemd.h"
 #include <glib.h>
 #include <yaml.h>
-#include "modulemd.h"
 
 G_BEGIN_DECLS
 

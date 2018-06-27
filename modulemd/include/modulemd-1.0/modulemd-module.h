@@ -14,7 +14,7 @@
 #ifndef MODULEMD_MODULE_H
 #define MODULEMD_MODULE_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"

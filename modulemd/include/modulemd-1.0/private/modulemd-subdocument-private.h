@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <glib.h>
+#include "modulemd.h"
 #include <modulemd-subdocument.h>
 
 G_BEGIN_DECLS

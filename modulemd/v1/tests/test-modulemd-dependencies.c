@@ -10,7 +10,7 @@
  * For more information on the license, see COPYING.
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
-
+#define MMD_DISABLE_DEPRECATION_WARNINGS 1
 #include "modulemd.h"
 
 #include <glib.h>

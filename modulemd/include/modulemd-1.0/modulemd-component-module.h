@@ -14,7 +14,7 @@
 #ifndef MODULEMD_COMPONENT_MODULE_H
 #define MODULEMD_COMPONENT_MODULE_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 #include "modulemd-component.h"
 #include "modulemd-simpleset.h"
 
@@ -34,8 +34,11 @@ modulemd_component_module_new (void);
 void
 modulemd_component_module_set_ref (ModulemdComponentModule *self,
                                    const gchar *ref);
+
+MMD_DEPRECATED_FOR (modulemd_component_module_peek_ref)
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self);
+
 const gchar *
 modulemd_component_module_peek_ref (ModulemdComponentModule *self);
 gchar *
@@ -44,6 +47,8 @@ modulemd_component_module_dup_ref (ModulemdComponentModule *self);
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
                                           const gchar *repository);
+
+MMD_DEPRECATED_FOR (modulemd_component_module_peek_repository)
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self);
 

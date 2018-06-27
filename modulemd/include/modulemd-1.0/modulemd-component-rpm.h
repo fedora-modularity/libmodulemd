@@ -14,7 +14,7 @@
 #ifndef MODULEMD_COMPONENT_RPM_H
 #define MODULEMD_COMPONENT_RPM_H
 
-#include <glib-object.h>
+#include "modulemd.h"
 #include "modulemd-component.h"
 #include "modulemd-simpleset.h"
 
@@ -34,8 +34,11 @@ modulemd_component_rpm_new (void);
 void
 modulemd_component_rpm_set_arches (ModulemdComponentRpm *self,
                                    ModulemdSimpleSet *arches);
+
+MMD_DEPRECATED_FOR (modulemd_component_rpm_peek_arches)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_arches (ModulemdComponentRpm *self);
+
 ModulemdSimpleSet *
 modulemd_component_rpm_peek_arches (ModulemdComponentRpm *self);
 ModulemdSimpleSet *
@@ -44,8 +47,11 @@ modulemd_component_rpm_dup_arches (ModulemdComponentRpm *self);
 void
 modulemd_component_rpm_set_cache (ModulemdComponentRpm *self,
                                   const gchar *cache);
+
+MMD_DEPRECATED_FOR (modulemd_component_rpm_peek_cache)
 const gchar *
 modulemd_component_rpm_get_cache (ModulemdComponentRpm *self);
+
 const gchar *
 modulemd_component_rpm_peek_cache (ModulemdComponentRpm *self);
 gchar *
@@ -54,8 +60,11 @@ modulemd_component_rpm_dup_cache (ModulemdComponentRpm *self);
 void
 modulemd_component_rpm_set_multilib (ModulemdComponentRpm *self,
                                      ModulemdSimpleSet *multilib);
+
+MMD_DEPRECATED_FOR (modulemd_component_rpm_peek_multilib)
 ModulemdSimpleSet *
 modulemd_component_rpm_get_multilib (ModulemdComponentRpm *self);
+
 ModulemdSimpleSet *
 modulemd_component_rpm_peek_multilib (ModulemdComponentRpm *self);
 ModulemdSimpleSet *
@@ -63,8 +72,11 @@ modulemd_component_rpm_dup_multilib (ModulemdComponentRpm *self);
 
 void
 modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref);
+
+MMD_DEPRECATED_FOR (modulemd_component_rpm_peek_ref)
 const gchar *
 modulemd_component_rpm_get_ref (ModulemdComponentRpm *self);
+
 const gchar *
 modulemd_component_rpm_peek_ref (ModulemdComponentRpm *self);
 gchar *
@@ -73,8 +85,11 @@ modulemd_component_rpm_dup_ref (ModulemdComponentRpm *self);
 void
 modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
                                        const gchar *repository);
+
+MMD_DEPRECATED_FOR (modulemd_component_rpm_peek_repository)
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self);
+
 const gchar *
 modulemd_component_rpm_peek_repository (ModulemdComponentRpm *self);
 gchar *

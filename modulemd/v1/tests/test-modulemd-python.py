@@ -228,5 +228,23 @@ class TestIntent(unittest.TestCase):
         assert intent_copy.props.profile_defaults[
             'default stream'].contains('server')
 
+
+class TestIndexParser (unittest.TestCase):
+
+    def test_file_parser(self):
+        (module_index, failures) = Modulemd.index_from_file(
+            "%s/test_data/long-valid.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+
+        assert len(failures) == 0
+
+        assert 'django' in module_index
+
+        assert module_index['django'].props.name == 'django'
+
+        streams = module_index['django'].get_streams()
+
+        assert '1.6' in streams
+
+
 if __name__ == '__main__':
     unittest.main()

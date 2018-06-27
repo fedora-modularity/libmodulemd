@@ -70,7 +70,11 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error)
  * G_OBJECT_TYPE(object). This array must be freed with g_ptr_array_unref().
  *
  * Since: 1.4
+ *
+ * Deprecated: 1.6
+ * Use Modulemd.index_from_file() instead
  */
+G_DEPRECATED_FOR (modulemd_index_from_file)
 GPtrArray *
 modulemd_objects_from_file_ext (const gchar *yaml_file,
                                 GPtrArray **failures,
@@ -85,6 +89,35 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
     }
 
   return data;
+}
+
+
+/**
+ * modulemd_index_from_file:
+ * @yaml_file: A YAML file containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML file that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
+ * A #GHashTable containing all of the subdocuments from a YAML file, indexed
+ * by module name. This hash table must be freed with g_hash_table_unref().
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_index_from_file (const gchar *yaml_file,
+                          GPtrArray **failures,
+                          GError **error)
+{
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  return parse_module_index_from_file (yaml_file, failures, error);
 }
 
 
@@ -129,7 +162,11 @@ modulemd_objects_from_stream (FILE *stream, GError **error)
  * G_OBJECT_TYPE(object)
  *
  * Since: 1.4
+ *
+ * Deprecated: 1.6
+ * Use Modulemd.index_from_stream() instead.
  */
+G_DEPRECATED_FOR (modulemd_index_from_stream)
 GPtrArray *
 modulemd_objects_from_stream_ext (FILE *stream,
                                   GPtrArray **failures,
@@ -144,6 +181,35 @@ modulemd_objects_from_stream_ext (FILE *stream,
     }
 
   return data;
+}
+
+
+/**
+ * modulemd_index_from_stream:
+ * @yaml_stream: A YAML stream containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML stream that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
+ * A #GHashTable containing all of the subdocuments from a YAML file, indexed
+ * by module name. This hash table must be freed with g_hash_table_unref().
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_index_from_stream (FILE *yaml_stream,
+                            GPtrArray **failures,
+                            GError **error)
+{
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  return parse_module_index_from_stream (yaml_stream, failures, error);
 }
 
 
@@ -203,6 +269,35 @@ modulemd_objects_from_string_ext (const gchar *yaml_string,
     }
 
   return data;
+}
+
+
+/**
+ * modulemd_index_from_string:
+ * @yaml_string: A YAML string containing the module metadata and other related
+ * information such as default streams.
+ * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
+ * An array containing any subdocuments from the YAML string that failed to
+ * parse. This must be freed with g_ptr_array_unref().
+ * @error: (out): A #GError containing additional information if this function
+ * fails.
+ *
+ * Allocates a #GPtrArray of various supported subdocuments from a file.
+ *
+ * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
+ * A #GHashTable containing all of the subdocuments from a YAML file, indexed
+ * by module name. This hash table must be freed with g_hash_table_unref().
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_index_from_string (const gchar *yaml_string,
+                            GPtrArray **failures,
+                            GError **error)
+{
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  return parse_module_index_from_string (yaml_string, failures, error);
 }
 
 

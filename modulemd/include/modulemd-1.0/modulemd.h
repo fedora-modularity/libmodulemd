@@ -57,6 +57,11 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
                                 GPtrArray **failures,
                                 GError **error);
 
+GHashTable *
+modulemd_index_from_file (const gchar *yaml_file,
+                          GPtrArray **failures,
+                          GError **error);
+
 GPtrArray *
 modulemd_objects_from_string (const gchar *yaml_string, GError **error);
 
@@ -65,6 +70,11 @@ modulemd_objects_from_string_ext (const gchar *yaml_string,
                                   GPtrArray **failures,
                                   GError **error);
 
+GHashTable *
+modulemd_index_from_string (const gchar *yaml_string,
+                            GPtrArray **failures,
+                            GError **error);
+
 GPtrArray *
 modulemd_objects_from_stream (FILE *stream, GError **error);
 
@@ -72,6 +82,11 @@ GPtrArray *
 modulemd_objects_from_stream_ext (FILE *stream,
                                   GPtrArray **failures,
                                   GError **error);
+
+GHashTable *
+modulemd_index_from_stream (FILE *yaml_stream,
+                            GPtrArray **failures,
+                            GError **error);
 
 void
 modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);

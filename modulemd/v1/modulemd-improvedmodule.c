@@ -24,6 +24,9 @@
 
 #include "modulemd.h"
 #include "modulemd-improvedmodule.h"
+#include "private/modulemd-improvedmodule-private.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
 
 struct _ModulemdImprovedModule
 {
@@ -404,4 +407,88 @@ modulemd_improvedmodule_init (ModulemdImprovedModule *self)
 {
   self->streams =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+}
+
+
+GPtrArray *
+modulemd_improvedmodule_serialize (ModulemdImprovedModule *self)
+{
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) keys = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
+
+  /* First export all of the ModuleStream objects */
+  keys = _modulemd_ordered_str_keys (self->streams, _modulemd_strcmp_sort);
+
+  /* Preallocate the array to hold the full set of streams, plus the defaults */
+  objects = g_ptr_array_new_full (keys->len + 1, g_object_unref);
+
+  for (gsize i = 0; i < keys->len; i++)
+    {
+      g_ptr_array_add (objects,
+                       modulemd_improvedmodule_get_stream_by_name (
+                         self, g_ptr_array_index (keys, i)));
+    }
+
+  /* Then write out the default object if it exists */
+  if (modulemd_improvedmodule_peek_defaults (self))
+    {
+      g_ptr_array_add (objects, modulemd_improvedmodule_get_defaults (self));
+    }
+
+  return g_ptr_array_ref (objects);
+}
+
+
+/**
+ * modulemd_improvedmodule_dump:
+ * @yaml_file: A string containing the path to the output file
+ *
+ * Writes this module out to a YAML document on disk.
+ *
+ * Since: 1.6
+ */
+void
+modulemd_improvedmodule_dump (ModulemdImprovedModule *self,
+                              const gchar *yaml_file,
+                              GError **error)
+{
+  g_autoptr (GPtrArray) objects = NULL;
+
+  g_return_if_fail (MODULEMD_IS_IMPROVEDMODULE (self));
+
+  objects = modulemd_improvedmodule_serialize (self);
+
+  if (!emit_yaml_file (objects, yaml_file, error))
+    {
+      g_debug ("Error emitting YAML file: %s", (*error)->message);
+    }
+}
+
+/**
+ * modulemd_improvedmodule_dumps:
+ *
+ * Writes this module out to a YAML document string.
+ *
+ * Return value: (transfer full): A string containing a YAML representation of
+ * this module and all of its streams. This string must be freed with g_free().
+ *
+ * Since: 1.6
+ */
+gchar *
+modulemd_improvedmodule_dumps (ModulemdImprovedModule *self, GError **error)
+{
+  gchar *yaml = NULL;
+  g_autoptr (GPtrArray) objects = NULL;
+
+  objects = modulemd_improvedmodule_serialize (self);
+
+  if (!emit_yaml_string (objects, &yaml, error))
+    {
+      g_debug ("Error emitting YAML string: %s", (*error)->message);
+      g_clear_pointer (&yaml, g_free);
+    }
+
+  return yaml;
 }

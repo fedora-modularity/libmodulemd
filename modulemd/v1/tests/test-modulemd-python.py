@@ -246,5 +246,22 @@ class TestIndexParser (unittest.TestCase):
         assert '1.6' in streams
 
 
+class TestImprovedModule (unittest.TestCase):
+
+    def test_dump(self):
+        (module_index, failures) = Modulemd.index_from_file(
+            "%s/test_data/long-valid.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+        assert len(failures) == 0
+
+        assert 'nodejs' in module_index
+
+        yaml_out = module_index['nodejs'].dumps()
+
+        assert 'scalable network applications' in yaml_out
+        assert '20180308155546' in yaml_out
+        assert 'document: modulemd-defaults' in yaml_out
+        assert 'module: nodejs' in yaml_out
+
+
 if __name__ == '__main__':
     unittest.main()

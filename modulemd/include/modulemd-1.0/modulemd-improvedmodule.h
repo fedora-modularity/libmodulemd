@@ -75,4 +75,12 @@ modulemd_improvedmodule_peek_defaults (ModulemdImprovedModule *self);
 ModulemdImprovedModule *
 modulemd_improvedmodule_copy (ModulemdImprovedModule *self);
 
+void
+modulemd_improvedmodule_dump (ModulemdImprovedModule *self,
+                              const gchar *yaml_file,
+                              GError **error);
+
+gchar *
+modulemd_improvedmodule_dumps (ModulemdImprovedModule *self, GError **error);
+
 G_END_DECLS

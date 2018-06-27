@@ -69,10 +69,11 @@ modulemd_v1_hdrs = files(
 )
 
 modulemd_priv_hdrs = files(
+    'include/modulemd-1.0/private/modulemd-improvedmodule-private.h',
     'include/modulemd-1.0/private/modulemd-private.h',
+    'include/modulemd-1.0/private/modulemd-subdocument-private.h',
     'include/modulemd-1.0/private/modulemd-util.h',
     'include/modulemd-1.0/private/modulemd-yaml.h',
-    'include/modulemd-1.0/private/modulemd-subdocument-private.h',
 )
 
 v1_include_dirs = include_directories ('include/modulemd-1.0')

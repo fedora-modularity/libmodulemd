@@ -202,7 +202,7 @@ _emit_modulemd_simpleset (yaml_emitter_t *emitter,
   gboolean result = FALSE;
   gsize i;
   yaml_event_t event;
-  gchar **array = modulemd_simpleset_get (set);
+  gchar **array = modulemd_simpleset_dup (set);
   gchar *item;
 
   g_debug ("TRACE: entering _emit_modulemd_simpleset");

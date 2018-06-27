@@ -1274,7 +1274,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
 
   /* Buildorder */
   buildorder =
-    modulemd_component_get_buildorder (MODULEMD_COMPONENT (rpm_component));
+    modulemd_component_peek_buildorder (MODULEMD_COMPONENT (rpm_component));
   if (buildorder)
     {
       name = g_strdup ("buildorder");
@@ -1284,7 +1284,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
     }
 
   /* Arches */
-  set = modulemd_component_rpm_get_arches (rpm_component);
+  set = modulemd_component_rpm_peek_arches (rpm_component);
   if (set && modulemd_simpleset_size (set) > 0)
     {
       name = g_strdup ("arches");
@@ -1300,7 +1300,7 @@ _emit_modulemd_rpm_components (yaml_emitter_t *emitter,
 
 
   /* Multilib */
-  set = modulemd_component_rpm_get_multilib (rpm_component);
+  set = modulemd_component_rpm_peek_multilib (rpm_component);
   if (set && modulemd_simpleset_size (set) > 0)
     {
       name = g_strdup ("multilib");
@@ -1377,7 +1377,7 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
 
   /* Buildorder */
   buildorder =
-    modulemd_component_get_buildorder (MODULEMD_COMPONENT (module_component));
+    modulemd_component_peek_buildorder (MODULEMD_COMPONENT (module_component));
   if (buildorder)
     {
       name = g_strdup ("buildorder");

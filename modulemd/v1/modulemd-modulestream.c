@@ -1312,7 +1312,7 @@ modulemd_modulestream_add_module_component (ModulemdModuleStream *self,
 
   g_hash_table_replace (
     self->module_components,
-    g_strdup (modulemd_component_get_name ((ModulemdComponent *)component)),
+    modulemd_component_dup_name ((ModulemdComponent *)component),
     MODULEMD_COMPONENT_MODULE (
       modulemd_component_copy (MODULEMD_COMPONENT (component))));
 }
@@ -1373,8 +1373,7 @@ modulemd_modulestream_set_module_components (ModulemdModuleStream *self,
            */
           g_hash_table_replace (
             self->module_components,
-            g_strdup (
-              modulemd_component_get_name ((ModulemdComponent *)value)),
+            modulemd_component_dup_name ((ModulemdComponent *)value),
             MODULEMD_COMPONENT_MODULE (
               modulemd_component_copy (MODULEMD_COMPONENT (value))));
         }
@@ -1552,10 +1551,9 @@ modulemd_modulestream_add_profile (ModulemdModuleStream *self,
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
   g_return_if_fail (MODULEMD_IS_PROFILE (profile));
 
-  g_hash_table_replace (
-    self->profiles,
-    g_strdup (modulemd_profile_get_name ((ModulemdProfile *)profile)),
-    modulemd_profile_copy (profile));
+  g_hash_table_replace (self->profiles,
+                        modulemd_profile_dup_name ((ModulemdProfile *)profile),
+                        modulemd_profile_copy (profile));
 }
 
 
@@ -1611,7 +1609,7 @@ modulemd_modulestream_set_profiles (ModulemdModuleStream *self,
         {
           g_hash_table_replace (
             self->profiles,
-            g_strdup (modulemd_profile_get_name ((ModulemdProfile *)value)),
+            modulemd_profile_dup_name ((ModulemdProfile *)value),
             modulemd_profile_copy ((ModulemdProfile *)value));
         }
     }
@@ -1861,7 +1859,7 @@ modulemd_modulestream_add_rpm_component (ModulemdModuleStream *self,
 
   g_hash_table_replace (
     self->rpm_components,
-    g_strdup (modulemd_component_get_name (MODULEMD_COMPONENT (component))),
+    modulemd_component_dup_name (MODULEMD_COMPONENT (component)),
     MODULEMD_COMPONENT_RPM (
       modulemd_component_copy (MODULEMD_COMPONENT (component))));
 }
@@ -1922,8 +1920,7 @@ modulemd_modulestream_set_rpm_components (ModulemdModuleStream *self,
            */
           g_hash_table_replace (
             self->rpm_components,
-            g_strdup (
-              modulemd_component_get_name (MODULEMD_COMPONENT (value))),
+            modulemd_component_dup_name (MODULEMD_COMPONENT (value)),
 
             MODULEMD_COMPONENT_RPM (
               modulemd_component_copy (MODULEMD_COMPONENT (value))));
@@ -2085,7 +2082,7 @@ modulemd_modulestream_set_servicelevels (ModulemdModuleStream *self,
            * its entries have different views of the name.
            */
           name =
-            modulemd_servicelevel_get_name ((ModulemdServiceLevel *)value);
+            modulemd_servicelevel_peek_name ((ModulemdServiceLevel *)value);
           if (!name)
             {
               /* Uh oh; this servicelevel is missing its name.
@@ -2128,7 +2125,7 @@ modulemd_modulestream_add_servicelevel (ModulemdModuleStream *self,
       return;
     }
 
-  name = modulemd_servicelevel_get_name (servicelevel);
+  name = modulemd_servicelevel_peek_name (servicelevel);
   if (!name)
     {
       /* Uh oh; this servicelevel is missing its name.

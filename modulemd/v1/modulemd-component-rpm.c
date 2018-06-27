@@ -11,6 +11,12 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+/**
+ * SECTION: modulemd-component-rpm
+ * @title: Modulemd.ComponentModule
+ * @short_description: An RPM component that goes into a module stream.
+ */
+
 #include "modulemd-component-rpm.h"
 
 struct _ModulemdComponentRpm

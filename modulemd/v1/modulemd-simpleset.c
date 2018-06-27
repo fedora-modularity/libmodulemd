@@ -16,6 +16,12 @@
 #include "modulemd-simpleset.h"
 #include "private/modulemd-util.h"
 
+/**
+ * SECTION: modulemd-simpleset
+ * @title: Modulemd.SimpleSet
+ * @short_description: Stores a set of strings, guaranteeing uniqueness.
+ */
+
 enum
 {
   SET_PROP_0,

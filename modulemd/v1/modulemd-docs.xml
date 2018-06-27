@@ -39,6 +39,8 @@
     <xi:include href="xml/modulemd-component-rpm.xml"/>
     <xi:include href="xml/modulemd-defaults.xml"/>
     <xi:include href="xml/modulemd-dependencies.xml"/>
+    <xi:include href="xml/modulemd-improvedmodule.xml"/>
+    <xi:include href="xml/modulemd-intent.xml"/>
     <xi:include href="xml/modulemd-module.xml"/>
     <xi:include href="xml/modulemd-modulestream.xml"/>
     <xi:include href="xml/modulemd-prioritizer.xml"/>

@@ -25,6 +25,12 @@
 #include <yaml.h>
 #include <inttypes.h>
 
+/**
+ * SECTION: modulemd-module
+ * @title: Modulemd.Module
+ * @short_description: DEPRECATED: use #ModulemdModuleStream instead
+ */
+
 GQuark
 modulemd_module_error_quark (void)
 {

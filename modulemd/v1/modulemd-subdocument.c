@@ -14,6 +14,15 @@
 #include "modulemd-subdocument.h"
 #include "private/modulemd-subdocument-private.h"
 
+
+/**
+ * SECTION: modulemd-subdocument
+ * @title: Modulemd.Subdocument
+ * @short_description: Contains information about individual YAML subdocuments
+ * being parsed for modulemd information.
+ */
+
+
 struct _ModulemdSubdocument
 {
   GObject parent_instance;

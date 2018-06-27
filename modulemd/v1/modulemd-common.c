@@ -17,6 +17,12 @@
 #include "private/modulemd-util.h"
 #include <glib.h>
 
+/**
+ * SECTION: modulemd
+ * @title: Modulemd
+ * @short_description: Utility functions for managing Module Metadata
+ */
+
 
 /**
  * modulemd_objects_from_file:

@@ -14,6 +14,12 @@
 #include <glib.h>
 #include "modulemd.h"
 
+/**
+ * SECTION: modulemd-servicelevel
+ * @title: Modulemd.ServiceLevel
+ * @short_description: Provides lifecycle information for a module stream.
+ */
+
 enum
 {
   SL_PROP_0,

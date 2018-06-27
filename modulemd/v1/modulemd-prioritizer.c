@@ -15,6 +15,13 @@
 #include "modulemd.h"
 #include "private/modulemd-util.h"
 
+/**
+ * SECTION: modulemd-prioritizer
+ * @title: Modulemd.Prioritizer
+ * @short_description: Class to aid in merging module metadata from multiple
+ * repositories.
+ */
+
 GQuark
 modulemd_prioritizer_error_quark (void)
 {

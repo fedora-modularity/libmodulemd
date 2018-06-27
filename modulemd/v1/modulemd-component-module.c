@@ -11,6 +11,12 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+/**
+ * SECTION: modulemd-component-module
+ * @title: Modulemd.ComponentModule
+ * @short_description: A module component that goes into a module stream.
+ */
+
 #include "modulemd-component-module.h"
 
 struct _ModulemdComponentModule

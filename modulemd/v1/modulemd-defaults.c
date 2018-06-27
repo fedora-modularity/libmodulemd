@@ -15,6 +15,13 @@
 #include "modulemd-simpleset.h"
 #include "private/modulemd-yaml.h"
 
+/**
+ * SECTION: modulemd-defaults
+ * @title: Modulemd.Defaults
+ * @short_description: Represents the default stream, profiles and other global
+ * data for a module.
+ */
+
 GQuark
 modulemd_defaults_error_quark (void)
 {

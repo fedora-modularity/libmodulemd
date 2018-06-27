@@ -11,6 +11,13 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+/**
+ * SECTION: modulemd-modulestream
+ * @title: Modulemd.ModuleStream
+ * @short_description: The data to represent a stream of a module as described
+ * by a modulemd YAML document.
+ */
+
 #include "modulemd.h"
 #include "modulemd-modulestream.h"
 #include "private/modulemd-yaml.h"

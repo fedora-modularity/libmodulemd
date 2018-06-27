@@ -14,6 +14,13 @@
 #include "modulemd.h"
 #include "modulemd-intent.h"
 
+/**
+ * SECTION: modulemd-intent
+ * @title: Modulemd.Intent
+ * @short_description: Overrides #ModulemdDefaults when a specific system
+ * "purpose" has been set.
+ */
+
 struct _ModulemdIntent
 {
   GObject parent_instance;

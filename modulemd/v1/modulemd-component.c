@@ -13,6 +13,14 @@
 
 #include "modulemd-component.h"
 
+/**
+ * SECTION: modulemd-component
+ * @title: Modulemd.Component
+ * @short_description: Pure virtual parent class for components that go into a
+ * module stream. See #ModulemdComponentRPM and #ModulemdComponentModule for
+ * specific types.
+ */
+
 enum
 {
   COMPONENT_PROP_0,

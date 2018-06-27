@@ -14,6 +14,13 @@
 #include "modulemd.h"
 #include "modulemd-buildopts.h"
 
+/**
+ * SECTION: modulemd-buildopts
+ * @title: Modulemd.Buildopts
+ * @short_description: Provides hints to the build-system on how to build this
+ * module.
+ */
+
 struct _ModulemdBuildopts
 {
   GObject parent_instance;

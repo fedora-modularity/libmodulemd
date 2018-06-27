@@ -15,6 +15,13 @@
 #include "modulemd.h"
 #include "private/modulemd-util.h"
 
+/**
+ * SECTION: modulemd-dependencies
+ * @title: Modulemd.Dependencies
+ * @short_description: Object to represent build-time and runtime dependencies
+ * of a module stream.
+ */
+
 struct _ModulemdDependencies
 {
   GObject parent_instance;

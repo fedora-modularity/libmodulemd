@@ -17,6 +17,13 @@
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
+/**
+ * SECTION: modulemd-improvedmodule
+ * @title: Modulemd.ImprovedModule
+ * @short_description: Collects all information about a module: all of its
+ * streams, defaults, etc.
+ */
+
 struct _ModulemdImprovedModule
 {
   GObject parent_instance;

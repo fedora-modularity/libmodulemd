@@ -14,6 +14,12 @@
 #include <glib.h>
 #include "modulemd.h"
 
+/**
+ * SECTION: modulemd-profile
+ * @title: Modulemd.Profile
+ * @short_description: Stores profile information for a module stream.
+ */
+
 enum
 {
   PROFILE_PROP_0,

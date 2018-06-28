@@ -211,6 +211,22 @@ test('test_v1_release_modulemd_subdocument', test_v1_modulemd_subdocument,
      env : test_release_env)
 
 
+test_v1_modulemd_translation = executable(
+    'test_v1_modulemd_translation',
+    'tests/test-modulemd-translation.c',
+    dependencies : [
+        modulemd_v1_dep,
+    ],
+    install : false,
+)
+test('test_v1_modulemd_translation',
+     test_v1_modulemd_translation,
+     env : test_env)
+test('test_v1_release_modulemd_translation',
+     test_v1_modulemd_translation,
+     env : test_release_env)
+
+
 test_v1_modulemd_translation_entry = executable(
     'test_v1_modulemd_translation_entry',
     'tests/test-modulemd-translation-entry.c',
@@ -225,6 +241,7 @@ test('test_v1_modulemd_translation_entry',
 test('test_v1_release_modulemd_translation_entry',
      test_v1_modulemd_translation_entry,
      env : test_release_env)
+
 
 test_v1_modulemd_yaml = executable(
     'test_v1_modulemd_yaml',

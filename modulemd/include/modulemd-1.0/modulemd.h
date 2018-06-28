@@ -46,6 +46,7 @@
 #include "modulemd-simpleset.h"
 #include "modulemd-servicelevel.h"
 #include "modulemd-subdocument.h"
+#include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
 
 G_BEGIN_DECLS

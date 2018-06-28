@@ -50,6 +50,7 @@ modulemd_v1_srcs = files(
     'v1/modulemd-simpleset.c',
     'v1/modulemd-servicelevel.c',
     'v1/modulemd-subdocument.c',
+    'v1/modulemd-translation.c',
     'v1/modulemd-translation-entry.c',
     'v1/modulemd-util.c',
     'v1/modulemd-yaml-emitter.c',
@@ -78,6 +79,7 @@ modulemd_v1_hdrs = files(
     'include/modulemd-1.0/modulemd-simpleset.h',
     'include/modulemd-1.0/modulemd-servicelevel.h',
     'include/modulemd-1.0/modulemd-subdocument.h',
+    'include/modulemd-1.0/modulemd-translation.h',
     'include/modulemd-1.0/modulemd-translation-entry.h',
 )
 
@@ -103,6 +105,7 @@ test_v1_srcs = files(
     'v1/tests/test-modulemd-servicelevel.c',
     'v1/tests/test-modulemd-simpleset.c',
     'v1/tests/test-modulemd-subdocument.c',
+    'v1/tests/test-modulemd-translation.c',
     'v1/tests/test-modulemd-translation-entry.c',
     'v1/tests/test-modulemd-yaml.c',
 )

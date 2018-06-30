@@ -45,7 +45,7 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
 
   /* Test construction with values set */
   translation =
-    modulemd_translation_new ("foomodule", "barstream", 1, 20180628210000llu);
+    modulemd_translation_new ("foomodule", "barstream", 1, 201806282100llu);
 
   g_assert_nonnull (translation);
   g_assert_cmpstr (
@@ -54,7 +54,7 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
     modulemd_translation_peek_module_stream (translation), ==, "barstream");
   g_assert_cmpint (modulemd_translation_get_mdversion (translation), ==, 1);
   g_assert_cmpint (
-    modulemd_translation_get_modified (translation), ==, 20180628210000llu);
+    modulemd_translation_get_modified (translation), ==, 201806282100llu);
 
   // clang-format off
   g_object_get (translation,
@@ -68,7 +68,7 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
   g_assert_cmpstr (module_name, ==, "foomodule");
   g_assert_cmpstr (module_stream, ==, "barstream");
   g_assert_cmpint (mdversion, ==, 1);
-  g_assert_cmpint (modified, ==, 20180628210000llu);
+  g_assert_cmpint (modified, ==, 201806282100llu);
 
   entry = modulemd_translation_entry_new ("en-US");
   modulemd_translation_entry_set_summary (entry, "Summary Text");
@@ -105,7 +105,7 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
   g_assert_cmpstr (module_name, ==, "foomodule");
   g_assert_cmpstr (module_stream, ==, "barstream");
   g_assert_cmpint (mdversion, ==, 1);
-  g_assert_cmpint (modified, ==, 20180628210000llu);
+  g_assert_cmpint (modified, ==, 201806282100llu);
 
   retrieved_entry = modulemd_translation_get_entry_by_locale (copy, "en-US");
   g_assert_nonnull (retrieved_entry);
@@ -118,6 +118,59 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
     "Desc Text");
 }
 
+static void
+modulemd_translation_test_yaml (TranslationFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  ModulemdTranslation *translation = NULL;
+  ModulemdTranslationEntry *entry = NULL;
+  g_autofree gchar *module_name;
+  g_autofree gchar *module_stream;
+  guint64 mdversion, modified;
+
+  yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+
+  objects = modulemd_objects_from_file_ext (yaml_path, &failures, &error);
+  g_assert_nonnull (objects);
+  g_assert_cmpint (objects->len, ==, 1);
+
+  translation = g_ptr_array_index (objects, 0);
+  g_assert_true (MODULEMD_IS_TRANSLATION (translation));
+
+  // clang-format off
+  g_object_get (translation,
+                "module-name", &module_name,
+                "module-stream", &module_stream,
+                "mdversion", &mdversion,
+                "modified", &modified,
+                NULL);
+  // clang-format on
+
+  g_assert_cmpstr (module_name, ==, "foo");
+  g_assert_cmpstr (module_stream, ==, "latest");
+  g_assert_cmpint (mdversion, ==, 1);
+  g_assert_cmpint (modified, ==, 201805231425llu);
+
+  entry = modulemd_translation_get_entry_by_locale (translation, "ja");
+  g_assert_nonnull (entry);
+  g_assert_true (MODULEMD_IS_TRANSLATION_ENTRY (entry));
+  g_assert_cmpstr (modulemd_translation_entry_peek_locale (entry), ==, "ja");
+  g_assert_cmpstr (
+    modulemd_translation_entry_peek_summary (entry), ==, "モジュールの例");
+  g_assert_cmpstr (modulemd_translation_entry_peek_description (entry),
+                   ==,
+                   "モジュールの例です。");
+  g_assert_cmpstr (
+    modulemd_translation_entry_peek_profile_description (entry, "profile_a"),
+    ==,
+    "プロファイルの例");
+}
+
 
 int
 main (int argc, char *argv[])
@@ -128,11 +181,19 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests
+
   g_test_add ("/modulemd/translation/test_basic",
               TranslationFixture,
               NULL,
               NULL,
               modulemd_translation_test_basic,
+              NULL);
+
+  g_test_add ("/modulemd/translation/test_yaml",
+              TranslationFixture,
+              NULL,
+              NULL,
+              modulemd_translation_test_yaml,
               NULL);
 
   return g_test_run ();

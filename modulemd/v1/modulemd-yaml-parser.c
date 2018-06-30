@@ -546,6 +546,16 @@ _parse_yaml (yaml_parser_t *parser,
                                 modulemd_subdocument_get_version (subdocument),
                                 &subdocument_error);
         }
+      else if (modulemd_subdocument_get_doctype (subdocument) ==
+               MODULEMD_TYPE_TRANSLATION)
+        {
+          result =
+            _parse_subdocument (subdocument,
+                                _parse_translation,
+                                &object,
+                                modulemd_subdocument_get_version (subdocument),
+                                &subdocument_error);
+        }
       /* else if (document->type == <...>) */
       else
         {
@@ -720,6 +730,14 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                     {
                       modulemd_subdocument_set_doctype (
                         document, MODULEMD_TYPE_DEFAULTS);
+                    }
+
+                  else if (g_strcmp0 (
+                             (const gchar *)value_event.data.scalar.value,
+                             "modulemd-translations") == 0)
+                    {
+                      modulemd_subdocument_set_doctype (
+                        document, MODULEMD_TYPE_TRANSLATION);
                     }
                   /* Handle additional types here */
 

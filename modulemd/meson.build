@@ -59,6 +59,7 @@ modulemd_v1_srcs = files(
     'v1/modulemd-yaml-parser.c',
     'v1/modulemd-yaml-parser-defaults.c',
     'v1/modulemd-yaml-parser-modulemd.c',
+    'v1/modulemd-yaml-parser-translation.c',
     'v1/modulemd-yaml-utils.c'
 )
 

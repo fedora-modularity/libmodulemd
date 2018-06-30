@@ -58,6 +58,22 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     }                                                                         \
   while (0)
 
+#define YAML_PARSER_PARSE_WITH_EXIT(parser, event, _error)                    \
+  do                                                                          \
+    {                                                                         \
+      if (!yaml_parser_parse (parser, event))                                 \
+        {                                                                     \
+          g_debug ("Parser error");                                           \
+          g_set_error_literal (_error,                                        \
+                               MODULEMD_YAML_ERROR,                           \
+                               MODULEMD_YAML_ERROR_UNPARSEABLE,               \
+                               "Parser error");                               \
+          return FALSE;                                                       \
+        }                                                                     \
+      g_debug ("Parser event: %s", mmd_yaml_get_event_name ((event)->type));  \
+    }                                                                         \
+  while (0)
+
 #define MMD_YAML_ERROR_RETURN_RETHROW(_error, msg)                            \
   do                                                                          \
     {                                                                         \
@@ -170,6 +186,15 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
         _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, msg);         \
       result = FALSE;                                                         \
       goto error;                                                             \
+    }                                                                         \
+  while (0)
+
+#define MMD_YAML_SET_ERROR(_error, ...)                                       \
+  do                                                                          \
+    {                                                                         \
+      g_debug (__VA_ARGS__);                                                  \
+      g_set_error (                                                           \
+        _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, __VA_ARGS__); \
     }                                                                         \
   while (0)
 
@@ -304,6 +329,13 @@ _parse_defaults (yaml_parser_t *parser,
                  GObject **object,
                  guint64 version,
                  GError **error);
+
+/* == ModulemdTranslation Parser == */
+gboolean
+_parse_translation (yaml_parser_t *parser,
+                    GObject **object,
+                    guint64 version,
+                    GError **error);
 
 /* == ModulemdModule Emitter == */
 gboolean

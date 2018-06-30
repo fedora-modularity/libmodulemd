@@ -13,6 +13,13 @@
 
 #include "modulemd.h"
 #include "modulemd-translation.h"
+#include "private/modulemd-yaml.h"
+
+GQuark
+modulemd_translation_error_quark (void)
+{
+  return g_quark_from_static_string ("modulemd-translation-error-quark");
+}
 
 struct _ModulemdTranslation
 {
@@ -96,6 +103,105 @@ modulemd_translation_copy (ModulemdTranslation *self)
   _modulemd_translation_copy_internal (copy, self);
 
   return copy;
+}
+
+
+gboolean
+modulemd_translation_import_from_file (ModulemdTranslation *self,
+                                       const gchar *yaml_file,
+                                       GError **error)
+{
+  g_autoptr (GPtrArray) data = NULL;
+
+  if (!parse_yaml_file (yaml_file, &data, NULL, error))
+    return FALSE;
+
+  if (data->len < 1)
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML contained no valid subdocuments");
+      return FALSE;
+    }
+  else if (!MODULEMD_IS_TRANSLATION (g_ptr_array_index (data, 0)))
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML was not a valid translation document");
+      return FALSE;
+    }
+
+  _modulemd_translation_copy_internal (self, g_ptr_array_index (data, 0));
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_translation_import_from_string (ModulemdTranslation *self,
+                                         const gchar *yaml,
+                                         GError **error)
+{
+  g_autoptr (GPtrArray) data = NULL;
+
+  if (!parse_yaml_string (yaml, &data, NULL, error))
+    return FALSE;
+
+  if (data->len < 1)
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML contained no valid subdocuments");
+      return FALSE;
+    }
+  else if (!MODULEMD_IS_TRANSLATION (g_ptr_array_index (data, 0)))
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML was not a valid translation document");
+      return FALSE;
+    }
+
+  _modulemd_translation_copy_internal (self, g_ptr_array_index (data, 0));
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_translation_import_from_stream (ModulemdTranslation *self,
+                                         FILE *yaml_stream,
+                                         GError **error)
+{
+  g_autoptr (GPtrArray) data = NULL;
+
+  if (!parse_yaml_stream (yaml_stream, &data, NULL, error))
+    return FALSE;
+
+  if (data->len < 1)
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML contained no valid subdocuments");
+      return FALSE;
+    }
+  else if (!MODULEMD_IS_TRANSLATION (g_ptr_array_index (data, 0)))
+    {
+      g_set_error (error,
+                   MODULEMD_TRANSLATION_ERROR,
+                   MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+                   "Provided YAML was not a valid translation document");
+      return FALSE;
+    }
+
+  _modulemd_translation_copy_internal (self, g_ptr_array_index (data, 0));
+
+  return TRUE;
 }
 
 

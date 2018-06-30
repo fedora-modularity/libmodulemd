@@ -172,6 +172,57 @@ modulemd_translation_test_yaml (TranslationFixture *fixture,
 }
 
 
+static void
+modulemd_translation_test_import (TranslationFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  ModulemdTranslationEntry *entry = NULL;
+  g_autofree gchar *module_name;
+  g_autofree gchar *module_stream;
+  guint64 mdversion, modified;
+
+  yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+
+  translation = g_object_new (MODULEMD_TYPE_TRANSLATION, NULL);
+  modulemd_translation_import_from_file (translation, yaml_path, &error);
+
+  g_assert_nonnull (translation);
+  g_assert_true (MODULEMD_IS_TRANSLATION (translation));
+
+  // clang-format off
+  g_object_get (translation,
+                "module-name", &module_name,
+                "module-stream", &module_stream,
+                "mdversion", &mdversion,
+                "modified", &modified,
+                NULL);
+  // clang-format on
+
+  g_assert_cmpstr (module_name, ==, "foo");
+  g_assert_cmpstr (module_stream, ==, "latest");
+  g_assert_cmpint (mdversion, ==, 1);
+  g_assert_cmpint (modified, ==, 201805231425llu);
+
+  entry = modulemd_translation_get_entry_by_locale (translation, "ja");
+  g_assert_nonnull (entry);
+  g_assert_true (MODULEMD_IS_TRANSLATION_ENTRY (entry));
+  g_assert_cmpstr (modulemd_translation_entry_peek_locale (entry), ==, "ja");
+  g_assert_cmpstr (
+    modulemd_translation_entry_peek_summary (entry), ==, "モジュールの例");
+  g_assert_cmpstr (modulemd_translation_entry_peek_description (entry),
+                   ==,
+                   "モジュールの例です。");
+  g_assert_cmpstr (
+    modulemd_translation_entry_peek_profile_description (entry, "profile_a"),
+    ==,
+    "プロファイルの例");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -194,6 +245,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_translation_test_yaml,
+              NULL);
+
+  g_test_add ("/modulemd/translation/test_import",
+              TranslationFixture,
+              NULL,
+              NULL,
+              modulemd_translation_test_import,
               NULL);
 
   return g_test_run ();

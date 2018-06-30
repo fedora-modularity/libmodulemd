@@ -28,6 +28,15 @@ enum
   MD_TRANSLATION_VERSION_MAX = G_MAXUINT64
 };
 
+#define MODULEMD_TRANSLATION_ERROR modulemd_translation_error_quark ()
+GQuark
+modulemd_translation_error_quark (void);
+
+enum ModulemdTranslationError
+{
+  MODULEMD_TRANSLATION_ERROR_MISSING_CONTENT,
+};
+
 #define MD_TRANSLATION_VERSION_LATEST MD_TRANSLATION_VERSION_1
 
 /**
@@ -69,6 +78,57 @@ modulemd_translation_new (const gchar *module_name,
  */
 ModulemdTranslation *
 modulemd_translation_copy (ModulemdTranslation *self);
+
+
+/**
+ * modulemd_translation_import_from_file:
+ * @yaml_file: (transfer none) (not nullable): The path to a YAML file that
+ * contains one modulemd-translations subdocument.
+ *
+ * Returns: TRUE if the YAML document was a valid modulemd-translations document
+ * and populates @self with its contents. If any error occurs, @error is set
+ * appropriately and the function returns FALSE.
+ *
+ *  Since: 1.6
+ */
+gboolean
+modulemd_translation_import_from_file (ModulemdTranslation *self,
+                                       const gchar *yaml_file,
+                                       GError **error);
+
+
+/**
+ * modulemd_translation_import_from_file:
+ * @yaml: (transfer none) (not nullable): A string that contains one
+ * modulemd-translations YAML subdocument.
+ *
+ * Returns: TRUE if the YAML document was a valid modulemd-translations document
+ * and populates @self with its contents. If any error occurs, @error is set
+ * appropriately and the function returns FALSE.
+ *
+ *  Since: 1.6
+ */
+gboolean
+modulemd_translation_import_from_string (ModulemdTranslation *self,
+                                         const gchar *yaml,
+                                         GError **error);
+
+
+/**
+ * modulemd_translation_import_from_stream:
+ * @yaml_stream: (transfer none) (not nullable): A YAML stream that contains one
+ * modulemd-translations YAML subdocument.
+ *
+ * Returns: TRUE if the YAML document was a valid modulemd-translations document
+ * and populates @self with its contents. If any error occurs, @error is set
+ * appropriately and the function returns FALSE.
+ *
+ *  Since: 1.6
+ */
+gboolean
+modulemd_translation_import_from_stream (ModulemdTranslation *self,
+                                         FILE *yaml_stream,
+                                         GError **error);
 
 
 /**

@@ -233,3 +233,24 @@ modulemd_validate_nevra (const gchar *nevra)
 
   return TRUE;
 }
+
+
+modulemd_tracer *
+modulemd_trace_init (const gchar *function_name)
+{
+  modulemd_tracer *self = g_malloc0_n (1, sizeof (modulemd_tracer));
+  self->function_name = g_strdup (function_name);
+
+  g_debug ("TRACE: Entering %s", self->function_name);
+
+  return self;
+}
+
+
+void
+modulemd_trace_free (modulemd_tracer *tracer)
+{
+  g_debug ("TRACE: Exiting %s", tracer->function_name);
+  g_clear_pointer (&tracer->function_name, g_free);
+  g_free (tracer);
+}

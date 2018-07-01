@@ -116,7 +116,7 @@ modulemd_translation_import_from_file (ModulemdTranslation *self,
 
 
 /**
- * modulemd_translation_import_from_file:
+ * modulemd_translation_import_from_string:
  * @yaml: (transfer none) (not nullable): A string that contains one
  * modulemd-translations YAML subdocument.
  *
@@ -295,6 +295,18 @@ modulemd_translation_add_entry (ModulemdTranslation *self,
 ModulemdTranslationEntry *
 modulemd_translation_get_entry_by_locale (ModulemdTranslation *self,
                                           const gchar *locale);
+
+
+/**
+ * modulemd_translation_get_locales:
+ *
+ * Returns: (transfer container) (element-type utf8): A sorted list of locales
+ * known to this #ModulemdTranslation.
+ *
+ * Since: 1.6
+ */
+GPtrArray *
+modulemd_translation_get_locales (ModulemdTranslation *self);
 
 
 G_END_DECLS

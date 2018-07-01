@@ -13,6 +13,7 @@
 
 #include "modulemd.h"
 #include "modulemd-translation.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
 GQuark
@@ -354,6 +355,14 @@ modulemd_translation_get_entry_by_locale (ModulemdTranslation *self,
     return NULL;
 
   return modulemd_translation_entry_copy (entry);
+}
+
+
+GPtrArray *
+modulemd_translation_get_locales (ModulemdTranslation *self)
+{
+  return _modulemd_ordered_str_keys (self->translations,
+                                     _modulemd_strcmp_sort);
 }
 
 

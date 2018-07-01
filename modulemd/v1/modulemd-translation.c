@@ -52,11 +52,19 @@ enum
 
 static GParamSpec *properties[N_PROPS];
 
+
 ModulemdTranslation *
-modulemd_translation_new (const gchar *module_name,
-                          const gchar *module_stream,
-                          guint64 mdversion,
-                          guint64 modified)
+modulemd_translation_new (void)
+{
+  return g_object_new (MODULEMD_TYPE_TRANSLATION, NULL);
+}
+
+
+ModulemdTranslation *
+modulemd_translation_new_full (const gchar *module_name,
+                               const gchar *module_stream,
+                               guint64 mdversion,
+                               guint64 modified)
 {
   // clang-format off
   return g_object_new (MODULEMD_TYPE_TRANSLATION,

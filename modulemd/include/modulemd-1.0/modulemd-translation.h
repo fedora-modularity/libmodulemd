@@ -53,18 +53,36 @@ G_DECLARE_FINAL_TYPE (
 
 /**
  * modulemd_translation_new:
- * @module_name: (transfer none): The name of the module to which these
- * translations apply.
- * @module_stream: (transfer none): The name of the stream to which these
- * translations apply.
+ *
+ * Creates a new, uninitialized #ModulemdTranslation object. Use
+ * .import_from_*() to initialize from an existing source.
  *
  * Since: 1.6
  */
 ModulemdTranslation *
-modulemd_translation_new (const gchar *module_name,
-                          const gchar *module_stream,
-                          guint64 mdversion,
-                          guint64 modified);
+modulemd_translation_new (void);
+
+
+/**
+ * modulemd_translation_new_full:
+ * @module_name: (transfer none): The name of the module to which these
+ * translations apply.
+ * @module_stream: (transfer none): The name of the stream to which these
+ * translations apply.
+ * @mdversion: The metadata version of the document.
+ * @modified: The last modified time represented as a 64-bit integer (such as
+ * 201807011200)
+ *
+ * Creates a new #ModulemdTranslation object and initializes its basic
+ * information.
+ *
+ * Since: 1.6
+ */
+ModulemdTranslation *
+modulemd_translation_new_full (const gchar *module_name,
+                               const gchar *module_stream,
+                               guint64 mdversion,
+                               guint64 modified);
 
 /**
  * modulemd_translation_copy:

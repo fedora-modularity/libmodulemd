@@ -44,8 +44,8 @@ modulemd_translation_test_basic (TranslationFixture *fixture,
   g_clear_pointer (&translation, g_object_unref);
 
   /* Test construction with values set */
-  translation =
-    modulemd_translation_new ("foomodule", "barstream", 1, 201806282100llu);
+  translation = modulemd_translation_new_full (
+    "foomodule", "barstream", 1, 201806282100llu);
 
   g_assert_nonnull (translation);
   g_assert_cmpstr (
@@ -187,7 +187,7 @@ modulemd_translation_test_import (TranslationFixture *fixture,
   yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
 
-  translation = g_object_new (MODULEMD_TYPE_TRANSLATION, NULL);
+  translation = modulemd_translation_new ();
   modulemd_translation_import_from_file (translation, yaml_path, &error);
 
   g_assert_nonnull (translation);

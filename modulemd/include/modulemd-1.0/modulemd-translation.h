@@ -150,6 +150,37 @@ modulemd_translation_import_from_stream (ModulemdTranslation *self,
 
 
 /**
+ * modulemd_translation_dump:
+ * @yaml_file: A string containing the path to the output file
+ *
+ * Writes this module stream translation out to a YAML document on disk.
+ *
+ * Returns: False if the file could not be written and sets @error.
+ *
+ * Since: 1.6
+ */
+gboolean
+modulemd_translation_dump (ModulemdTranslation *self,
+                           const gchar *yaml_file,
+                           GError **error);
+
+
+/**
+ * modulemd_translation_dumps:
+ *
+ * Writes this module out to a YAML document string.
+ *
+ * Returns: (transfer full): The serialized YAML representation of this module
+ * stream translation or NULL and sets @error appropriately. The returned string
+ * must be freed with g_free().
+ *
+ * Since: 1.6
+ */
+gchar *
+modulemd_translation_dumps (ModulemdTranslation *self, GError **error);
+
+
+/**
  * modulemd_translation_set_mdversion:
  * @version: The version of the modulemd-translation format in use
  *

@@ -214,6 +214,43 @@ modulemd_translation_import_from_stream (ModulemdTranslation *self,
 }
 
 
+gboolean
+modulemd_translation_dump (ModulemdTranslation *self,
+                           const gchar *yaml_file,
+                           GError **error)
+{
+  g_autoptr (GPtrArray) objects = g_ptr_array_new ();
+
+  g_ptr_array_add (objects, self);
+
+  if (!emit_yaml_file (objects, yaml_file, error))
+    {
+      g_debug ("Error emitting YAML file: %s", (*error)->message);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+gchar *
+modulemd_translation_dumps (ModulemdTranslation *self, GError **error)
+{
+  gchar *yaml = NULL;
+  g_autoptr (GPtrArray) objects = g_ptr_array_new ();
+
+  g_ptr_array_add (objects, self);
+
+  if (!emit_yaml_string (objects, &yaml, error))
+    {
+      g_debug ("Error emitting YAML file: %s", (*error)->message);
+      g_clear_pointer (&yaml, g_free);
+    }
+
+  return yaml;
+}
+
+
 static void
 modulemd_translation_finalize (GObject *object)
 {

@@ -231,7 +231,6 @@ modulemd_translation_test_emitter (TranslationFixture *fixture,
   g_autoptr (GError) error = NULL;
   g_autofree gchar *yaml_path = NULL;
   g_autofree gchar *output_yaml = NULL;
-  g_autoptr (GPtrArray) objects = g_ptr_array_new_full (1, g_object_unref);
 
   yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
@@ -240,9 +239,7 @@ modulemd_translation_test_emitter (TranslationFixture *fixture,
   translation = modulemd_translation_new ();
   modulemd_translation_import_from_file (translation, yaml_path, &error);
 
-  g_ptr_array_add (objects, g_object_ref (translation));
-
-  output_yaml = modulemd_dumps (objects, &error);
+  output_yaml = modulemd_translation_dumps (translation, &error);
   if (output_yaml == NULL)
     {
       g_debug ("Error: %s", error->message);

@@ -223,6 +223,50 @@ modulemd_translation_test_import (TranslationFixture *fixture,
 }
 
 
+static void
+modulemd_translation_test_emitter (TranslationFixture *fixture,
+                                   gconstpointer user_data)
+{
+  g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autofree gchar *output_yaml = NULL;
+  g_autoptr (GPtrArray) objects = g_ptr_array_new_full (1, g_object_unref);
+
+  yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  translation = modulemd_translation_new ();
+  modulemd_translation_import_from_file (translation, yaml_path, &error);
+
+  g_ptr_array_add (objects, g_object_ref (translation));
+
+  output_yaml = modulemd_dumps (objects, &error);
+  if (output_yaml == NULL)
+    {
+      g_debug ("Error: %s", error->message);
+    }
+  g_assert_nonnull (output_yaml);
+  g_assert_true (output_yaml[0]);
+
+  g_debug ("\n%s\n", output_yaml);
+
+  g_assert_cmpstr (
+    output_yaml,
+    ==,
+    "---\ndocument: modulemd-translations\nversion: 1\ndata:\n  module: foo\n "
+    " stream: latest\n  modified: 201805231425\n  translations:\n    en_GB:\n "
+    "     summary: An example module\n      description: An example module.\n "
+    "     profiles:\n        profile_a: An example profile\n    es_ES:\n      "
+    "summary: Un módulo de ejemplo\n      description: Un módulo de "
+    "ejemplo.\n      profiles:\n        profile_a: Un perfil de ejemplo\n    "
+    "ja:\n      summary: モジュールの例\n      description: "
+    "モジュールの例です。\n      profiles:\n        profile_a: "
+    "プロファイルの例\n...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -252,6 +296,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_translation_test_import,
+              NULL);
+
+  g_test_add ("/modulemd/translation/test_emitter",
+              TranslationFixture,
+              NULL,
+              NULL,
+              modulemd_translation_test_emitter,
               NULL);
 
   return g_test_run ();

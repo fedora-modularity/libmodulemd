@@ -121,6 +121,22 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     }                                                                         \
   while (0)
 
+#define MMD_EMIT_WITH_EXIT(emitter, event, _error, ...)                       \
+  do                                                                          \
+    {                                                                         \
+      g_debug ("Emitter event: %s", mmd_yaml_get_event_name ((event)->type)); \
+      if (!yaml_emitter_emit (emitter, event))                                \
+        {                                                                     \
+          g_debug (__VA_ARGS__);                                              \
+          g_set_error (_error,                                                \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       __VA_ARGS__);                                          \
+          return FALSE;                                                       \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
 #define MMD_YAML_EMITTER_ERROR_RETURN(_error, msg)                            \
   do                                                                          \
     {                                                                         \
@@ -145,6 +161,23 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
                                     style);                                   \
       YAML_EMITTER_EMIT_WITH_ERROR_RETURN (                                   \
         emitter, event, error, "Error writing scalar");                       \
+      g_clear_pointer (&scalar, g_free);                                      \
+    }                                                                         \
+  while (0)
+
+#define MMD_EMIT_SCALAR(event, scalar, style)                                 \
+  do                                                                          \
+    {                                                                         \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)scalar,                    \
+                                    (int)strlen (scalar),                     \
+                                    1,                                        \
+                                    1,                                        \
+                                    style);                                   \
+      MMD_EMIT_WITH_EXIT (                                                    \
+        emitter, event, error, "Error writing scalar \"%s\"", scalar);        \
       g_clear_pointer (&scalar, g_free);                                      \
     }                                                                         \
   while (0)
@@ -178,6 +211,33 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
     }                                                                         \
   while (0)
 
+#define MMD_EMIT_STR_STR_DICT(event, _name, _value, style)                    \
+  do                                                                          \
+    {                                                                         \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)_name,                     \
+                                    (int)strlen (_name),                      \
+                                    1,                                        \
+                                    1,                                        \
+                                    YAML_PLAIN_SCALAR_STYLE);                 \
+      MMD_EMIT_WITH_EXIT (emitter, event, error, "Error writing name");       \
+      g_clear_pointer (&_name, g_free);                                       \
+                                                                              \
+      yaml_scalar_event_initialize (event,                                    \
+                                    NULL,                                     \
+                                    NULL,                                     \
+                                    (yaml_char_t *)_value,                    \
+                                    (int)strlen (_value),                     \
+                                    1,                                        \
+                                    1,                                        \
+                                    style);                                   \
+      MMD_EMIT_WITH_EXIT (emitter, event, error, "Error writing value");      \
+      g_clear_pointer (&_value, g_free);                                      \
+    }                                                                         \
+  while (0)
+
 #define MMD_YAML_NOEVENT_ERROR_RETURN(_error, msg)                            \
   do                                                                          \
     {                                                                         \
@@ -195,6 +255,15 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
       g_debug (__VA_ARGS__);                                                  \
       g_set_error (                                                           \
         _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, __VA_ARGS__); \
+    }                                                                         \
+  while (0)
+
+#define MMD_EMITTER_SET_ERROR(_error, ...)                                    \
+  do                                                                          \
+    {                                                                         \
+      g_debug (__VA_ARGS__);                                                  \
+      g_set_error (                                                           \
+        _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT, __VA_ARGS__);  \
     }                                                                         \
   while (0)
 
@@ -261,6 +330,8 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_yaml_string,
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_event_t, yaml_event_delete);
 
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_parser_t, yaml_parser_delete);
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_emitter_t, yaml_emitter_delete);
 
 #define MMD_INIT_YAML_EVENT(_event)                                           \
   g_auto (yaml_event_t) _event;                                               \
@@ -343,10 +414,18 @@ _emit_modulestream (yaml_emitter_t *emitter,
                     ModulemdModuleStream *module,
                     GError **error);
 
+
+/* == ModulemdDefaults Emitter == */
 gboolean
 _emit_defaults (yaml_emitter_t *emitter,
                 ModulemdDefaults *defaults,
                 GError **error);
+
+/* == ModulemdTranslation Emitter == */
+gboolean
+_emit_translation (yaml_emitter_t *emitter,
+                   ModulemdTranslation *translation,
+                   GError **error);
 
 G_END_DECLS
 

@@ -56,6 +56,7 @@ modulemd_v1_srcs = files(
     'v1/modulemd-yaml-emitter.c',
     'v1/modulemd-yaml-emitter-defaults.c',
     'v1/modulemd-yaml-emitter-modulemd.c',
+    'v1/modulemd-yaml-emitter-translation.c',
     'v1/modulemd-yaml-parser.c',
     'v1/modulemd-yaml-parser-defaults.c',
     'v1/modulemd-yaml-parser-modulemd.c',

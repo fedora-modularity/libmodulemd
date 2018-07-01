@@ -22,18 +22,17 @@
 #include "private/modulemd-util.h"
 
 gboolean
+emit_yaml (yaml_emitter_t *emitter, GPtrArray *objects, GError **error);
+
+gboolean
 emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
 {
-  gboolean result = FALSE;
-  FILE *yaml_file = NULL;
-  yaml_emitter_t emitter;
-  yaml_event_t event;
-  GObject *object;
+  MODULEMD_INIT_TRACE
+  g_autoptr (FILE) yaml_file = NULL;
+  g_auto (yaml_emitter_t) emitter;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (objects, FALSE);
-
-  g_debug ("TRACE: entering emit_yaml_file");
 
   yaml_emitter_initialize (&emitter);
 
@@ -46,80 +45,28 @@ emit_yaml_file (GPtrArray *objects, const gchar *path, GError **error)
                    MODULEMD_YAML_ERROR_OPEN,
                    "Failed to open file: %s",
                    g_strerror (errno));
-      goto error;
+      return FALSE;
     }
 
   yaml_emitter_set_output_file (&emitter, yaml_file);
 
-  yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error starting stream");
-
-  for (gsize i = 0; i < objects->len; i++)
+  if (!emit_yaml (&emitter, objects, error))
     {
-      object = g_ptr_array_index (objects, i);
-
-      /* Write out the YAML */
-      if (MODULEMD_IS_MODULE (object))
-        {
-          if (!_emit_modulestream (
-                &emitter,
-                modulemd_module_peek_modulestream (MODULEMD_MODULE (object)),
-                error))
-            {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Could not emit module stream YAML");
-            }
-        }
-      else if (MODULEMD_IS_MODULESTREAM (object))
-        {
-          if (!_emit_modulestream (
-                &emitter, MODULEMD_MODULESTREAM (object), error))
-            {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Could not emit module stream YAML");
-            }
-        }
-      else if (MODULEMD_IS_DEFAULTS (object))
-        {
-          if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
-            {
-              MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                             "Could not emit defaults YAML");
-            }
-        }
+      return FALSE;
     }
 
-  yaml_stream_end_event_initialize (&event);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error ending stream");
-
-  result = TRUE;
-
-error:
-  yaml_emitter_delete (&emitter);
-  if (yaml_file)
-    {
-      fclose (yaml_file);
-    }
-
-  g_debug ("TRACE: exiting emit_yaml_file");
-  return result;
+  return TRUE;
 }
 
 gboolean
 emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
 {
-  gboolean result = FALSE;
-  yaml_emitter_t emitter;
-  yaml_event_t event;
+  MODULEMD_INIT_TRACE
+  g_auto (yaml_emitter_t) emitter;
   g_autoptr (modulemd_yaml_string) yaml_string = NULL;
-  GObject *object;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (objects, FALSE);
-
-  g_debug ("TRACE: entering emit_yaml_string");
 
   yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
 
@@ -127,9 +74,29 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
 
   yaml_emitter_set_output (&emitter, _write_yaml_string, (void *)yaml_string);
 
+  if (!emit_yaml (&emitter, objects, error))
+    {
+      return FALSE;
+    }
+
+  /* Steal the final string to return */
+  *_yaml = yaml_string->str;
+  yaml_string->str = NULL;
+
+  return TRUE;
+}
+
+
+gboolean
+emit_yaml (yaml_emitter_t *emitter, GPtrArray *objects, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  GObject *object = NULL;
+
+  yaml_emitter_set_unicode (emitter, TRUE);
+
   yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error starting stream");
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Error starting stream");
 
   for (gsize i = 0; i < objects->len; i++)
     {
@@ -139,27 +106,40 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
       if (MODULEMD_IS_MODULE (object))
         {
           if (!_emit_modulestream (
-                &emitter,
+                emitter,
                 modulemd_module_peek_modulestream (MODULEMD_MODULE (object)),
                 error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Could not emit module stream YAML");
+              g_debug ("Could not emit module stream YAML: %s",
+                       (*error)->message);
+              return FALSE;
             }
         }
       else if (MODULEMD_IS_MODULESTREAM (object))
         {
           if (!_emit_modulestream (
-                &emitter, MODULEMD_MODULESTREAM (object), error))
+                emitter, MODULEMD_MODULESTREAM (object), error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+              g_debug ("Could not emit YAML: %s", (*error)->message);
+              return FALSE;
             }
         }
       else if (MODULEMD_IS_DEFAULTS (object))
         {
-          if (!_emit_defaults (&emitter, MODULEMD_DEFAULTS (object), error))
+          if (!_emit_defaults (emitter, MODULEMD_DEFAULTS (object), error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not emit YAML");
+              g_debug ("Could not emit YAML: %s", (*error)->message);
+              return FALSE;
+            }
+        }
+      else if (MODULEMD_IS_TRANSLATION (object))
+        {
+          if (!_emit_translation (
+                emitter, MODULEMD_TRANSLATION (object), error))
+            {
+              g_debug ("Could not emit translation YAML: %s",
+                       (*error)->message);
+              return FALSE;
             }
         }
       /* Emitters for other types go here */
@@ -167,29 +147,19 @@ emit_yaml_string (GPtrArray *objects, gchar **_yaml, GError **error)
       else
         {
           /* Unknown document type */
-          g_set_error_literal (error,
-                               MODULEMD_YAML_ERROR,
-                               MODULEMD_YAML_ERROR_PARSE,
-                               "Unknown document type");
-          result = FALSE;
-          goto error;
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MODULEMD_YAML_ERROR_PARSE,
+                       "Unknown document type: %s",
+                       G_OBJECT_TYPE_NAME (object));
+          return FALSE;
         }
     }
 
   yaml_stream_end_event_initialize (&event);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    &emitter, &event, error, "Error ending stream");
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Error ending stream");
 
-  *_yaml = yaml_string->str;
-  yaml_string->str = NULL;
-
-  result = TRUE;
-
-error:
-  yaml_emitter_delete (&emitter);
-
-  g_debug ("TRACE: exiting emit_yaml_string");
-  return result;
+  return TRUE;
 }
 
 

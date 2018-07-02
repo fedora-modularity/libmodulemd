@@ -778,6 +778,188 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
 
 
 static void
+modulemd_defaults_test_index_prioritizer (DefaultsFixture *fixture,
+                                          gconstpointer user_data)
+{
+  g_autofree gchar *yaml_base_path = NULL;
+  g_autofree gchar *yaml_override_path = NULL;
+  g_autoptr (GHashTable) index = NULL;
+  g_autoptr (GHashTable) override_index = NULL;
+  g_autoptr (GPtrArray) merged_objects = NULL;
+  g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
+  g_autoptr (GError) error = NULL;
+  GHashTable *htable = NULL;
+  gint64 prio;
+  ModulemdDefaults *defaults = NULL;
+  gboolean result;
+
+  yaml_base_path = g_strdup_printf ("%s/test_data/defaults/merging-base.yaml",
+                                    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_base_path);
+
+  index = modulemd_index_from_file (yaml_base_path, NULL, &error);
+  g_assert_nonnull (index);
+  g_assert_cmpint (g_hash_table_size (index), ==, 3);
+
+  yaml_override_path = g_strdup_printf (
+    "%s/test_data/defaults/overriding.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_override_path);
+
+  override_index = modulemd_index_from_file (yaml_override_path, NULL, &error);
+  g_assert_nonnull (override_index);
+  g_assert_cmpint (g_hash_table_size (index), ==, 3);
+
+
+  /* Test that importing the base objects work. These objects include several
+   * exact duplicates which will be cleaned up by this process.
+   */
+
+  /* Pick a random number from 0-99 for the higher priority.
+   * This will help exercise the sort function and make sure it doesn't
+   * occasionally fail.
+   */
+  prio = g_test_rand_int_range (0, 99);
+  g_info ("Random low priority level: %" PRIi64 "\n", prio);
+
+  prioritizer = modulemd_prioritizer_new ();
+  result = modulemd_prioritizer_add_index (prioritizer, index, prio, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /*
+   * Test that importing the base objects works again. This will be a worst-
+   * case scenario where all of the values being imported are duplicated.
+   */
+  result = modulemd_prioritizer_add_index (prioritizer, index, prio, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /*
+   * Test that importing the overrides at the same priority level fails.
+   *
+   * These objects have several conflicts with the base objects that cannot be
+   * merged.
+   */
+  result =
+    modulemd_prioritizer_add_index (prioritizer, override_index, prio, &error);
+  g_assert_false (result);
+  g_assert_cmpstr (
+    g_quark_to_string (error->domain), ==, "modulemd-defaults-error-quark");
+  g_assert_cmpint (
+    error->code, ==, MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS);
+  g_clear_pointer (&error, g_error_free);
+
+  /* The object's internal state is undefined after an error, so delete it */
+  g_clear_pointer (&prioritizer, g_object_unref);
+
+
+  /* Start over and add the base */
+  prioritizer = modulemd_prioritizer_new ();
+  result = modulemd_prioritizer_add_index (prioritizer, index, prio, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /* Test that importing the overrides at a higher priority level succeeds. */
+
+  /* Pick a random number from 100-999 for the higher priority.
+   * This will help exercise the sort function and make sure it doesn't
+   * occasionally fail.
+   */
+  prio = g_test_rand_int_range (100, 999);
+  g_info ("Random high priority level: %" PRIi64 "\n", prio);
+
+  result =
+    modulemd_prioritizer_add_index (prioritizer, override_index, prio, &error);
+  g_assert_true (result);
+
+  /*
+   * Test that re-importing the overrides at the same priority level
+   * succeeds.
+   */
+  result =
+    modulemd_prioritizer_add_index (prioritizer, override_index, prio, &error);
+  g_assert_true (result);
+
+
+  /* Merge all of the results together */
+  merged_objects = modulemd_prioritizer_resolve (prioritizer, &error);
+  g_assert_nonnull (merged_objects);
+  g_assert_cmpint (merged_objects->len, ==, 3);
+
+
+  /* HTTPD */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
+  g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 2);
+  g_assert_true (g_hash_table_contains (htable, "2.2"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "server"));
+  g_assert_true (g_hash_table_contains (htable, "2.4"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.4"), "server"));
+  g_assert_false (g_hash_table_contains (htable, "2.8"));
+
+  /* NODEJS */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 1));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "9.0");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    3);
+
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
+  g_assert_true (g_hash_table_contains (htable, "6.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "6.0"), "default"));
+  g_assert_true (g_hash_table_contains (htable, "8.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.0"), "minimal"));
+  g_assert_true (g_hash_table_contains (htable, "9.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "9.0"), "supermegaultra"));
+
+  /* POSTGRESQL */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 1);
+  g_assert_true (g_hash_table_contains (htable, "8.1"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "server"));
+  g_assert_true (
+    modulemd_simpleset_contains (g_hash_table_lookup (htable, "8.1"), "foo"));
+}
+
+
+static void
 modulemd_regressions_issue42 (DefaultsFixture *fixture,
                               gconstpointer user_data)
 {
@@ -928,6 +1110,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_defaults_test_prioritizer,
+              NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_defaults_test_index_prioritizer",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_defaults_test_index_prioritizer,
               NULL);
 
   g_test_add ("/modulemd/defaults/modulemd_regressions_issue42",

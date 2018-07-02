@@ -19,6 +19,15 @@
 
 G_BEGIN_DECLS
 
+#define MODULEMD_ERROR modulemd_error_quark ()
+GQuark
+modulemd_error_quark (void);
+
+enum ModulemdError
+{
+  MODULEMD_ERROR_PROGRAMMING
+};
+
 GHashTable *
 _modulemd_hash_table_deep_str_copy (GHashTable *orig);
 
@@ -66,8 +75,17 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_tracer, modulemd_trace_free);
   while (0);
 
 
+GPtrArray *
+_modulemd_index_serialize (GHashTable *index, GError **error);
+
+
 ModulemdTranslationEntry *
 _get_locale_entry (ModulemdTranslation *translation, const gchar *_locale);
+
+
+GHashTable *
+module_index_from_data (GPtrArray *data, GError **error);
+
 
 G_END_DECLS
 

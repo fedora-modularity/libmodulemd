@@ -15,6 +15,7 @@
 #define MODULEMD_PROFILE_H
 
 #include "modulemd.h"
+#include "modulemd-prioritizer.h"
 
 G_BEGIN_DECLS
 
@@ -87,6 +88,40 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
 
 ModulemdProfile *
 modulemd_profile_copy (ModulemdProfile *self);
+
+
+/**
+ * modulemd_prioritizer_add_index:
+ * @index: (transfer none) (not nullable): A #GHashTable of
+ * #ModulemdImprovedModule objects whose contents need to be merged depending on
+ * priority.
+ * @priority: The priority of the YAML stream these were loaded from. Items at
+ * the same priority level will attempt to merge on conflict. Items at higher
+ * priority levels will replace on conflict. Valid values are 0 - 1000.
+ *
+ * Returns: TRUE if the objects could be added without generating a conflict at
+ * this priority level. If a conflict was detected, this function returns FALSE
+ * and @error is set. The internal state is undefined in the case of an error.
+ *
+ * Since: 1.6
+ */
+gboolean
+modulemd_prioritizer_add_index (ModulemdPrioritizer *self,
+                                GHashTable *index,
+                                gint64 priority,
+                                GError **error);
+
+/**
+ * modulemd_prioritizer_resolve_index:
+ *
+ * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
+ * A #GHashTable of #ModulemdImprovedModule objects with all priorities
+ * resolved. This hash table must be freed with g_hash_table_unref().
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_prioritizer_resolve_index (ModulemdPrioritizer *self, GError **error);
 
 G_END_DECLS
 

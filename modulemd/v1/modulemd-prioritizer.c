@@ -13,6 +13,7 @@
 
 #include <inttypes.h>
 #include "modulemd.h"
+#include "modulemd-prioritizer.h"
 #include "private/modulemd-util.h"
 
 /**
@@ -183,6 +184,25 @@ modulemd_prioritizer_add (ModulemdPrioritizer *self,
   return TRUE;
 }
 
+gboolean
+modulemd_prioritizer_add_index (ModulemdPrioritizer *self,
+                                GHashTable *index,
+                                gint64 priority,
+                                GError **error)
+{
+  g_autoptr (GPtrArray) objects = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_PRIORITIZER (self), FALSE);
+  g_return_val_if_fail (index, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  objects = _modulemd_index_serialize (index, error);
+  if (!objects)
+    return FALSE;
+
+  return modulemd_prioritizer_add (self, objects, priority, error);
+}
+
 
 /**
  * modulemd_prioritizer_resolve:
@@ -243,4 +263,20 @@ modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
     }
 
   return g_ptr_array_ref (current);
+}
+
+
+GHashTable *
+modulemd_prioritizer_resolve_index (ModulemdPrioritizer *self, GError **error)
+{
+  g_autoptr (GPtrArray) objects = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_PRIORITIZER (self), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  objects = modulemd_prioritizer_resolve (self, error);
+  if (!objects)
+    return NULL;
+
+  return module_index_from_data (objects, error);
 }

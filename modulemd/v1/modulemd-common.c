@@ -13,6 +13,7 @@
 
 #include "config.h"
 #include "modulemd.h"
+#include "private/modulemd-improvedmodule-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-util.h"
 #include <glib.h>
@@ -285,6 +286,91 @@ modulemd_index_from_string (const gchar *yaml_string,
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   return parse_module_index_from_string (yaml_string, failures, error);
+}
+
+
+static GPtrArray *
+_modulemd_index_serialize (GHashTable *index, GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  gsize i;
+  g_autoptr (GPtrArray) objects = NULL;
+  g_autoptr (GPtrArray) sub_objects = NULL;
+
+
+  if (!index)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_PROGRAMMING,
+                   "Index was NULL.");
+      return NULL;
+    }
+
+  objects = g_ptr_array_new_with_free_func (g_object_unref);
+  g_hash_table_iter_init (&iter, index);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (!value || !MODULEMD_IS_IMPROVEDMODULE (value))
+        {
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MODULEMD_YAML_ERROR_PROGRAMMING,
+                       "Index value was not a ModulemdImprovedModule.");
+          return NULL;
+        }
+
+      sub_objects =
+        modulemd_improvedmodule_serialize (MODULEMD_IMPROVEDMODULE (value));
+
+      for (i = 0; i < sub_objects->len; i++)
+        {
+          g_ptr_array_add (objects,
+                           g_object_ref (g_ptr_array_index (sub_objects, i)));
+        }
+      g_clear_pointer (&sub_objects, g_ptr_array_unref);
+    }
+
+  return g_ptr_array_ref (objects);
+}
+
+
+gboolean
+modulemd_dump_index (GHashTable *index, const gchar *yaml_file, GError **error)
+{
+  g_autoptr (GPtrArray) objects = _modulemd_index_serialize (index, error);
+  if (!objects)
+    {
+      g_debug ("Serialization of index failed: %s", (*error)->message);
+      return FALSE;
+    }
+
+  return emit_yaml_file (objects, yaml_file, error);
+}
+
+
+gchar *
+modulemd_dumps_index (GHashTable *index, GError **error)
+{
+  gboolean result;
+  gchar *yaml = NULL;
+
+  g_autoptr (GPtrArray) objects = _modulemd_index_serialize (index, error);
+  if (!objects)
+    {
+      g_debug ("Serialization of index failed: %s", (*error)->message);
+      return FALSE;
+    }
+
+  result = emit_yaml_string (objects, &yaml, error);
+  if (!result)
+    {
+      g_debug ("Emitting YAML string failed: %s", (*error)->message);
+      return NULL;
+    }
+
+  return yaml;
 }
 
 

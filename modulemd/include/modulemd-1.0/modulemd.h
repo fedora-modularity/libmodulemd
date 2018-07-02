@@ -93,6 +93,40 @@ modulemd_index_from_stream (FILE *yaml_stream,
                             GPtrArray **failures,
                             GError **error);
 
+
+/**
+ * modulemd_dump_index:
+ * @index: (element-type utf8 ModulemdImprovedModule) (transfer none): The index
+ * of #ModulemdImprovedModule objects to dump to a YAML file.
+ * @yaml_file: (transfer none): The path to the file that should contain the
+ * resulting YAML.
+ *
+ * Returns: TRUE if the file was written successfully. In the event of an error,
+ * sets @error appropriately and returns FALSE.
+ *
+ * Since: 1.6
+ */
+gboolean
+modulemd_dump_index (GHashTable *index,
+                     const gchar *yaml_file,
+                     GError **error);
+
+
+/**
+ * modulemd_dumps_index:
+ * @index: (element-type utf8 ModulemdImprovedModule) (transfer none): The index
+ * of #ModulemdImprovedModule objects to dump to a string.
+ *
+ * Returns: A YAML representation of the index as a string, which must be freed
+ * with g_free(). In the event of an error, sets @error appropriately and
+ * returns NULL.
+ *
+ * Since: 1.6
+ */
+gchar *
+modulemd_dumps_index (GHashTable *index, GError **error);
+
+
 void
 modulemd_dump (GPtrArray *objects, const gchar *yaml_file, GError **error);
 

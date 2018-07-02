@@ -201,11 +201,13 @@ _modulemd_modulestream_copy_internal (ModulemdModuleStream *dest,
 ModulemdModuleStream *
 modulemd_modulestream_copy (ModulemdModuleStream *self)
 {
-  guint64 mdversion = modulemd_modulestream_get_mdversion (self);
+  guint64 mdversion;
   g_autoptr (ModulemdModuleStream) copy = NULL;
 
   if (!self)
     return NULL;
+
+  mdversion = modulemd_modulestream_get_mdversion (self);
 
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
   g_return_val_if_fail (mdversion, NULL);

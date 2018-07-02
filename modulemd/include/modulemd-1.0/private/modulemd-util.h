@@ -65,6 +65,10 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_tracer, modulemd_trace_free);
     }                                                                         \
   while (0);
 
+
+ModulemdTranslationEntry *
+_get_locale_entry (ModulemdTranslation *translation, const gchar *_locale);
+
 G_END_DECLS
 
 #endif /* MODULEMD_UTIL_H */

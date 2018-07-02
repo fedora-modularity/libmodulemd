@@ -62,6 +62,7 @@ data:
         tracker: http://www.example.com/
     profiles:
         default:
+            description: An example profile
             rpms:
                 - bar
                 - bar-extras
@@ -146,17 +147,17 @@ data:
             summary: An example module
             description: An example module.
             profiles:
-                profile_a: An example profile
+                default: An example profile
         es_ES:
             summary: Un módulo de ejemplo
             description: Un módulo de ejemplo.
             profiles:
-                profile_a: Un perfil de ejemplo
+                default: Un perfil de ejemplo
         ja:
             summary: モジュールの例
             description: モジュールの例です。
             profiles:
-                profile_a: プロファイルの例
+                default: プロファイルの例
 ...
 ---
 document: modulemd-translations
@@ -172,17 +173,17 @@ data:
             summary: An example module
             description: An example module.
             profiles:
-                profile_a: An example profile
+                default: An example profile
         es_ES:
             summary: Un módulo de ejemplo
             description: Un módulo de ejemplo.
             profiles:
-                profile_a: Un perfil de ejemplo
+                default: Un perfil de ejemplo
         ja:
             summary: モジュールの例
             description: モジュールの例です。
             profiles:
-                profile_a: プロファイルの例
+                default: プロファイルの例
 ...
 ---
 document: modulemd-translations
@@ -198,17 +199,17 @@ data:
             summary: An example module
             description: An example module.
             profiles:
-                profile_a: An example profile
+                default: An example profile
         es_ES:
             summary: Un módulo de ejemplo
             description: Un módulo de ejemplo.
             profiles:
-                profile_a: Un perfil de ejemplo
+                default: Un perfil de ejemplo
         ja:
             summary: モジュールの例
             description: モジュールの例です。
             profiles:
-                profile_a: プロファイルの例
+                default: プロファイルの例
 ...
 ---
 document: modulemd-translations
@@ -225,17 +226,17 @@ data:
             summary: An old example module
             description: An example module.
             profiles:
-                profile_a: An example profile
+                default: An example profile
         es_ES:
             summary: Un módulo de ejemplo
             description: Un módulo de ejemplo.
             profiles:
-                profile_a: Un perfil de ejemplo
+                default: Un perfil de ejemplo
         ja:
             summary: モジュールの例
             description: モジュールの例です。
             profiles:
-                profile_a: プロファイルの例
+                default: プロファイルの例
 ...
 ---
 document: modulemd-defaults

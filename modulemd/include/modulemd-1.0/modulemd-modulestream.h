@@ -150,6 +150,23 @@ modulemd_modulestream_set_description (ModulemdModuleStream *self,
 gchar *
 modulemd_modulestream_get_description (ModulemdModuleStream *self);
 
+/**
+ * modulemd_modulestream_get_localized_description:
+ * @locale: (transfer none) (nullable): Specify the locale for the description.
+ * If NULL is passed, it will attempt to use the LC_MESSAGES locale. If "C" is
+ * passed or if the locale has no translation available, it will treat it as
+ * untranslated.
+ *
+ * Returns: (transfer full): A string containing the "description" property,
+ * translated into the language specified by @locale if possible. This string
+ * must be freed with g_free().
+ *
+ * Since: 1.6
+ */
+gchar *
+modulemd_modulestream_get_localized_description (ModulemdModuleStream *self,
+                                                 const gchar *locale);
+
 const gchar *
 modulemd_modulestream_peek_description (ModulemdModuleStream *self);
 
@@ -307,6 +324,24 @@ modulemd_modulestream_set_summary (ModulemdModuleStream *self,
 
 gchar *
 modulemd_modulestream_get_summary (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_modulestream_get_localized_summary:
+ * @locale: (transfer none) (nullable): Specify the locale for the summary. If
+ * NULL is passed, it will attempt to use the LC_MESSAGES locale. If "C" is
+ * passed or if the locale has no translation available, it will treat it as
+ * untranslated.
+ *
+ * Returns: (transfer full): A string containing the "summary" property,
+ * translated into the language specified by @locale if possible. This string
+ * must be freed with g_free().
+ *
+ * Since: 1.6
+ */
+gchar *
+modulemd_modulestream_get_localized_summary (ModulemdModuleStream *self,
+                                             const gchar *locale);
 
 const gchar *
 modulemd_modulestream_peek_summary (ModulemdModuleStream *self);

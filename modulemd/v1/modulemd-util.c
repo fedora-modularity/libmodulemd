@@ -14,6 +14,7 @@
 #include "modulemd.h"
 #include <string.h>
 #include "private/modulemd-util.h"
+#include <locale.h>
 
 GHashTable *
 _modulemd_hash_table_deep_str_copy (GHashTable *orig)
@@ -253,4 +254,37 @@ modulemd_trace_free (modulemd_tracer *tracer)
   g_debug ("TRACE: Exiting %s", tracer->function_name);
   g_clear_pointer (&tracer->function_name, g_free);
   g_free (tracer);
+}
+
+
+ModulemdTranslationEntry *
+_get_locale_entry (ModulemdTranslation *translation, const gchar *_locale)
+{
+  ModulemdTranslationEntry *entry = NULL;
+  g_autofree gchar *locale = NULL;
+
+  if (!translation)
+    return NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_TRANSLATION (translation), NULL);
+
+  if (_locale)
+    {
+      if (g_strcmp0 (_locale, "C") == 0 || g_strcmp0 (_locale, "C.UTF-8") == 0)
+        {
+          /* If the locale is "C" or "C.UTF-8", always return the standard value */
+          return NULL;
+        }
+
+      locale = g_strdup (_locale);
+    }
+  else
+    {
+      /* If the locale was NULL, use the locale of this process */
+      locale = g_strdup (setlocale (LC_MESSAGES, NULL));
+    }
+
+  entry = modulemd_translation_get_entry_by_locale (translation, locale);
+
+  return entry;
 }

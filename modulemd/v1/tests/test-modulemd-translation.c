@@ -275,6 +275,8 @@ modulemd_translation_test_index (TranslationFixture *fixture,
   ModulemdImprovedModule *module = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (GHashTable) profiles = NULL;
+  ModulemdProfile *profile = NULL;
   g_autofree gchar *result_yaml = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/translations.yaml",
@@ -331,7 +333,8 @@ modulemd_translation_test_index (TranslationFixture *fixture,
     "http://www.example.com/\n    documentation: http://www.example.com/\n    "
     "tracker: http://www.example.com/\n  profiles:\n    buildroot:\n      "
     "rpms:\n      - bar-devel\n    container:\n      rpms:\n      - bar\n     "
-    " - bar-devel\n    default:\n      rpms:\n      - bar\n      - "
+    " - bar-devel\n    default:\n      description: An example profile\n      "
+    "rpms:\n      - bar\n      - "
     "bar-extras\n      - baz\n    minimal:\n      description: Minimal "
     "profile installing only the bar package.\n      rpms:\n      - bar\n    "
     "srpm-buildroot:\n      rpms:\n      - bar-extras\n  api:\n    rpms:\n    "
@@ -359,14 +362,35 @@ modulemd_translation_test_index (TranslationFixture *fixture,
     "modulemd-translations\nversion: 1\ndata:\n  module: foo\n  stream: "
     "stream-name\n  modified: 201805231425\n  translations:\n    en_GB:\n     "
     " summary: An example module\n      description: An example module.\n     "
-    " profiles:\n        profile_a: An example profile\n    es_ES:\n      "
+    " profiles:\n        default: An example profile\n    es_ES:\n      "
     "summary: Un módulo de ejemplo\n      description: Un módulo de "
-    "ejemplo.\n      profiles:\n        profile_a: Un perfil de ejemplo\n    "
+    "ejemplo.\n      profiles:\n        default: Un perfil de ejemplo\n    "
     "ja:\n      summary: モジュールの例\n      description: "
-    "モジュールの例です。\n      profiles:\n        profile_a: "
+    "モジュールの例です。\n      profiles:\n        default: "
     "プロファイルの例\n...\n---\ndocument: modulemd-defaults\nversion: "
     "1\ndata:\n  module: foo\n  stream: stream-name\n  profiles:\n    "
     "stream_name: [default]\n  intents: {}\n...\n");
+
+  /* Test specific translations */
+  g_assert_cmpstr (modulemd_modulestream_get_localized_summary (stream, "ja"),
+                   ==,
+                   "モジュールの例");
+  g_assert_cmpstr (
+    modulemd_modulestream_get_localized_description (stream, "ja"),
+    ==,
+    "モジュールの例です。");
+
+  profiles = modulemd_modulestream_get_profiles (stream);
+  g_assert_nonnull (profiles);
+
+  g_assert_true (g_hash_table_contains (profiles, "default"));
+
+  profile = g_hash_table_lookup (profiles, "default");
+  g_assert_nonnull (profile);
+
+  g_assert_cmpstr (modulemd_profile_get_localized_description (profile, "ja"),
+                   ==,
+                   "プロファイルの例");
 }
 
 

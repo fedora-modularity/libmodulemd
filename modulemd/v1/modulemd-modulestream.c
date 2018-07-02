@@ -23,6 +23,7 @@
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-private.h"
+#include "private/modulemd-profile-private.h"
 
 #include <glib.h>
 #include <glib/gprintf.h>
@@ -1080,6 +1081,27 @@ modulemd_modulestream_get_description (ModulemdModuleStream *self)
 }
 
 
+gchar *
+modulemd_modulestream_get_localized_description (ModulemdModuleStream *self,
+                                                 const gchar *locale)
+{
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  entry = _get_locale_entry (self->translation, locale);
+
+  /* Check whether a translation exists for this locale */
+  if (entry)
+    {
+      return modulemd_translation_entry_get_description (entry);
+    }
+
+  /* No matching translation existed. Return the standard description */
+  return modulemd_modulestream_get_description (self);
+}
+
+
 /**
  * modulemd_modulestream_peek_description: (skip)
  *
@@ -1554,6 +1576,11 @@ modulemd_modulestream_add_profile (ModulemdModuleStream *self,
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
   g_return_if_fail (MODULEMD_IS_PROFILE (profile));
 
+  /* Associate translations with this profile */
+  if (self->translation)
+    modulemd_profile_associate_translation (profile, self->translation);
+
+
   g_hash_table_replace (self->profiles,
                         modulemd_profile_dup_name ((ModulemdProfile *)profile),
                         modulemd_profile_copy (profile));
@@ -1610,10 +1637,7 @@ modulemd_modulestream_set_profiles (ModulemdModuleStream *self,
       g_hash_table_iter_init (&iter, profiles);
       while (g_hash_table_iter_next (&iter, &key, &value))
         {
-          g_hash_table_replace (
-            self->profiles,
-            modulemd_profile_dup_name ((ModulemdProfile *)value),
-            modulemd_profile_copy ((ModulemdProfile *)value));
+          modulemd_modulestream_add_profile (self, (MODULEMD_PROFILE (value)));
         }
     }
 }
@@ -2306,6 +2330,27 @@ modulemd_modulestream_peek_summary (ModulemdModuleStream *self)
 }
 
 
+gchar *
+modulemd_modulestream_get_localized_summary (ModulemdModuleStream *self,
+                                             const gchar *locale)
+{
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  entry = _get_locale_entry (self->translation, locale);
+
+  /* Check whether a translation exists for this locale */
+  if (entry)
+    {
+      return modulemd_translation_entry_get_summary (entry);
+    }
+
+  /* No matching translation existed. Return the standard summary */
+  return modulemd_modulestream_get_summary (self);
+}
+
+
 /**
  * modulemd_modulestream_set_tracker:
  * @tracker: (transfer none) (nullable): the module tracker.
@@ -2375,31 +2420,31 @@ modulemd_modulestream_set_translation (ModulemdModuleStream *self,
   g_return_if_fail (!translation || MODULEMD_IS_TRANSLATION (translation));
 
   const gchar *module_name = NULL;
-
   const gchar *module_stream = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
 
-  if (translation)
-    {
-      module_name = modulemd_translation_peek_module_name (translation);
-      module_stream = modulemd_translation_peek_module_stream (translation);
-
-      if (g_strcmp0 (self->name, module_name) ||
-          g_strcmp0 (self->stream, module_stream))
-        {
-          g_warning (
-            "Attempting to assign translations of %s:%s to module stream "
-            "%s:%s",
-            module_name,
-            module_stream,
-            self->name,
-            self->stream);
-          return;
-        }
-    }
-  else
+  if (!translation)
     {
       /* If we were passed NULL, just clear the value and return */
       g_clear_pointer (&self->translation, g_object_unref);
+      return;
+    }
+
+
+  module_name = modulemd_translation_peek_module_name (translation);
+  module_stream = modulemd_translation_peek_module_stream (translation);
+
+  if (g_strcmp0 (self->name, module_name) ||
+      g_strcmp0 (self->stream, module_stream))
+    {
+      g_warning (
+        "Attempting to assign translations of %s:%s to module stream "
+        "%s:%s",
+        module_name,
+        module_stream,
+        self->name,
+        self->stream);
       return;
     }
 
@@ -2410,6 +2455,14 @@ modulemd_modulestream_set_translation (ModulemdModuleStream *self,
     {
       g_clear_pointer (&self->translation, g_object_unref);
       self->translation = modulemd_translation_copy (translation);
+
+      /* Associate this translation with profiles */
+      g_hash_table_iter_init (&iter, self->profiles);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          modulemd_profile_associate_translation (MODULEMD_PROFILE (value),
+                                                  self->translation);
+        }
     }
 }
 

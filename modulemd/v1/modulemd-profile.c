@@ -12,6 +12,9 @@
  */
 
 #include "modulemd.h"
+#include "modulemd-profile.h"
+#include "private/modulemd-profile-private.h"
+#include "private/modulemd-util.h"
 #include <glib.h>
 
 /**
@@ -43,6 +46,8 @@ struct _ModulemdProfile
   gchar *name;
 
   ModulemdSimpleSet *rpms;
+
+  ModulemdTranslation *translation;
 };
 
 G_DEFINE_TYPE (ModulemdProfile, modulemd_profile, G_TYPE_OBJECT)
@@ -87,6 +92,28 @@ const gchar *
 modulemd_profile_get_description (ModulemdProfile *self)
 {
   return modulemd_profile_peek_description (self);
+}
+
+
+gchar *
+modulemd_profile_get_localized_description (ModulemdProfile *self,
+                                            const gchar *locale)
+{
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  entry = _get_locale_entry (self->translation, locale);
+
+  /* Check whether a translation exists for this locale */
+  if (entry)
+    {
+      return modulemd_translation_entry_get_profile_description (
+        entry, modulemd_profile_peek_name (self));
+    }
+
+  /* No matching translation existed. Return the standard description */
+  return modulemd_profile_dup_description (self);
 }
 
 
@@ -310,6 +337,27 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm)
 }
 
 
+void
+modulemd_profile_associate_translation (ModulemdProfile *self,
+                                        ModulemdTranslation *translation)
+{
+  if (translation != self->translation)
+    {
+      /* Don't associate an older translation. Shouldn't ever reach this, but
+       * let's be safe.
+       */
+      if (self->translation &&
+          modulemd_translation_get_modified (self->translation) >=
+            modulemd_translation_get_modified (translation))
+        return;
+
+      /* Add a reference to the translation. We don't want a full copy here */
+      g_clear_pointer (&self->translation, g_object_unref);
+      self->translation = g_object_ref (translation);
+    }
+}
+
+
 /**
  * modulemd_profile_copy:
  *
@@ -335,6 +383,9 @@ modulemd_profile_copy (ModulemdProfile *self)
                                     modulemd_profile_peek_description (self));
   modulemd_profile_set_name (new_profile, modulemd_profile_peek_name (self));
   modulemd_profile_set_rpms (new_profile, modulemd_profile_peek_rpms (self));
+
+  if (self->translation)
+    modulemd_profile_associate_translation (new_profile, self->translation);
 
   return new_profile;
 }
@@ -404,6 +455,7 @@ modulemd_profile_finalize (GObject *gobject)
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->rpms, g_object_unref);
+  g_clear_pointer (&self->translation, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_profile_parent_class)->finalize (gobject);
 }

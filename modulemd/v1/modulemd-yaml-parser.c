@@ -215,14 +215,25 @@ module_index_from_data (GPtrArray *data, GError **error)
   ModulemdModuleStream *stream = NULL;
   ModulemdDefaults *defaults = NULL;
   g_autoptr (GHashTable) module_index = NULL;
+  GError *merge_error = NULL;
+  g_autoptr (GPtrArray) clean_data = NULL;
+
+  /* Deduplicate and merge any ModulemdDefaults objects in the list */
+  clean_data = modulemd_merge_defaults (data, NULL, FALSE, &merge_error);
+  if (!clean_data)
+    {
+      g_debug ("Error merging defaults: %s", merge_error->message);
+      g_propagate_error (error, merge_error);
+      return NULL;
+    }
 
   module_index =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   /* Iterate through the data and add the entries to the module_index */
-  for (gsize i = 0; i < data->len; i++)
+  for (gsize i = 0; i < clean_data->len; i++)
     {
-      item = g_ptr_array_index (data, i);
+      item = g_ptr_array_index (clean_data, i);
 
       if (G_OBJECT_TYPE (item) == MODULEMD_TYPE_MODULESTREAM)
         {
@@ -246,9 +257,7 @@ module_index_from_data (GPtrArray *data, GError **error)
           module_name = modulemd_defaults_dup_module_name (defaults);
           module = get_or_create_module_from_index (module_index, module_name);
 
-          /* Update the defaults. Note: if defaults for this module appear in
-           * the data more than once, the last one encountered wins.
-           */
+          /* Update the defaults. */
           modulemd_improvedmodule_set_defaults (module, defaults);
 
           /* Save it back to the index */

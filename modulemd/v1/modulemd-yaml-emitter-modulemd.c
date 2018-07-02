@@ -484,12 +484,6 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
   gchar *value = NULL;
   const GDate *eol = modulemd_servicelevel_peek_eol (sl);
 
-  if (!eol || !g_date_valid (eol))
-    {
-      event.type = YAML_NO_EVENT;
-      MMD_YAML_ERROR_RETURN (error, "Invalid EOL date");
-    }
-
   name = g_strdup (key);
   MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
@@ -499,12 +493,16 @@ _emit_modulemd_servicelevel_entry (yaml_emitter_t *emitter,
     emitter, &event, error, "Error starting servicelevel inner mapping");
 
   /* EOL */
-  name = g_strdup ("eol");
-  value = g_strdup_printf ("%.2u-%.2u-%.2u",
-                           g_date_get_year (eol),
-                           g_date_get_month (eol),
-                           g_date_get_day (eol));
-  MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
+  if (eol && g_date_valid (eol))
+    {
+      name = g_strdup ("eol");
+      value = g_strdup_printf ("%.2u-%.2u-%.2u",
+                               g_date_get_year (eol),
+                               g_date_get_month (eol),
+                               g_date_get_day (eol));
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
 
   yaml_mapping_end_event_initialize (&event);
   YAML_EMITTER_EMIT_WITH_ERROR_RETURN (

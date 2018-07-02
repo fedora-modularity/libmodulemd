@@ -400,10 +400,9 @@ data:
     # Filled in by the buildsystem.  Service level names might have special
     # meaning to other systems.  Defined externally.
     servicelevels:
-        rawhide:
-            # EOL dates are the ISO 8601 format.
-            eol: 2077-10-23
+        rawhide: {} # Rawhide has no EOL date
         stable_api:
+            # EOL dates are the ISO 8601 format.
             eol: 2077-10-23
         bug_fixes:
             eol: 2077-10-23

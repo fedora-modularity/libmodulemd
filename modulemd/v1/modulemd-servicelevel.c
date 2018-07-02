@@ -46,9 +46,12 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
   g_return_if_fail (MODULEMD_IS_SERVICELEVEL (self));
   g_return_if_fail (!date || g_date_valid (date));
 
-  if (!date)
+  if (!date || !g_date_valid (date))
     {
       g_date_clear (self->eol, 1);
+      g_object_notify_by_pspec (G_OBJECT (self),
+                                servicelevel_properties[SL_PROP_EOL]);
+      return;
     }
 
   if (!g_date_valid (self->eol) || g_date_compare (date, self->eol) != 0)
@@ -57,10 +60,10 @@ modulemd_servicelevel_set_eol (ModulemdServiceLevel *self, const GDate *date)
       g_date_set_year (self->eol, g_date_get_year (date));
       g_date_set_month (self->eol, g_date_get_month (date));
       g_date_set_day (self->eol, g_date_get_day (date));
-
-      g_object_notify_by_pspec (G_OBJECT (self),
-                                servicelevel_properties[SL_PROP_EOL]);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self),
+                            servicelevel_properties[SL_PROP_EOL]);
 }
 
 

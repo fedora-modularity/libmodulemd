@@ -19,6 +19,12 @@
 
 G_BEGIN_DECLS
 
+/**
+ * SECTION: modulemd-translation
+ * @title: Modulemd.Translation
+ * @short_description: Translation information for a module stream
+ */
+
 enum
 {
   MD_TRANSLATION_VERSION_UNSET = 0,
@@ -38,12 +44,6 @@ enum ModulemdTranslationError
 };
 
 #define MD_TRANSLATION_VERSION_LATEST MD_TRANSLATION_VERSION_1
-
-/**
- * SECTION: modulemd-translation
- * @title: Modulemd.Translation
- * @short_description: Translation information for a module stream
- */
 
 #define MODULEMD_TYPE_TRANSLATION (modulemd_translation_get_type ())
 

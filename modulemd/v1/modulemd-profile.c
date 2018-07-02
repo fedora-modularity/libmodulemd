@@ -17,11 +17,6 @@
 #include "private/modulemd-util.h"
 #include <glib.h>
 
-/**
- * SECTION: modulemd-profile
- * @title: Modulemd.Profile
- * @short_description: Stores profile information for a module stream.
- */
 
 enum
 {
@@ -52,14 +47,7 @@ struct _ModulemdProfile
 
 G_DEFINE_TYPE (ModulemdProfile, modulemd_profile, G_TYPE_OBJECT)
 
-/**
- * modulemd_profile_set_description:
- * @description: (nullable): the profile description.
- *
- * Sets the "description" property.
- *
- * Since: 1.0
- */
+
 void
 modulemd_profile_set_description (ModulemdProfile *self,
                                   const gchar *description)
@@ -76,18 +64,6 @@ modulemd_profile_set_description (ModulemdProfile *self,
 }
 
 
-/**
- * modulemd_profile_get_description:
- *
- * Retrieves the profile description.
- *
- * Returns: A string containing the "description" property.
- *
- * Deprecated: 1.1
- * Use peek_description() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self)
 {
@@ -117,15 +93,6 @@ modulemd_profile_get_localized_description (ModulemdProfile *self,
 }
 
 
-/**
- * modulemd_profile_peek_description:
- *
- * Retrieves the profile description.
- *
- * Returns: A string containing the "description" property.
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_profile_peek_description (ModulemdProfile *self)
 {
@@ -135,15 +102,6 @@ modulemd_profile_peek_description (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_dup_description:
- *
- * Retrieves a copy of the profile description.
- *
- * Returns: A copy of the string containing the "description" property.
- *
- * Since: 1.1
- */
 gchar *
 modulemd_profile_dup_description (ModulemdProfile *self)
 {
@@ -153,14 +111,6 @@ modulemd_profile_dup_description (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_set_name:
- * @name: (nullable): the profile name.
- *
- * Sets the "name" property.
- *
- * Since: 1.0
- */
 void
 modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
 {
@@ -176,18 +126,6 @@ modulemd_profile_set_name (ModulemdProfile *self, const gchar *name)
 }
 
 
-/**
- * modulemd_profile_get_name:
- *
- * Retrieves the profile name.
- *
- * Returns: A string containing the "name" property.
- *
- * Deprecated: 1.1
- * Use peek_name() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self)
 {
@@ -195,15 +133,6 @@ modulemd_profile_get_name (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_peek_name:
- *
- * Retrieves the profile name.
- *
- * Returns: A string containing the "name" property.
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_profile_peek_name (ModulemdProfile *self)
 {
@@ -213,15 +142,6 @@ modulemd_profile_peek_name (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_dup_name:
- *
- * Retrieves a copy of the profile name.
- *
- * Returns: A copy of string containing the "name" property.
- *
- * Since: 1.1
- */
 gchar *
 modulemd_profile_dup_name (ModulemdProfile *self)
 {
@@ -231,15 +151,6 @@ modulemd_profile_dup_name (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_set_rpms:
- * @rpms: (nullable): A #ModuleSimpleSet: The rpms to be installed by this profile.
- *
- * Assigns the set of RPMs that will be installed when this profile is
- * activated.
- *
- * Since: 1.0
- */
 void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
 {
@@ -253,19 +164,6 @@ modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms)
 }
 
 
-/**
- * modulemd_profile_get_rpms:
- *
- * Retrieves the "rpms" for this profile
- *
- * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
- * "rpms" property.
- *
- * Deprecated: 1.1
- * Use peek_rpms() instead.
- *
- * Since: 1.0
- */
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self)
 {
@@ -273,16 +171,6 @@ modulemd_profile_get_rpms (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_peek_rpms:
- *
- * Retrieves the "rpms" for this profile
- *
- * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
- * "rpms" property.
- *
- * Since: 1.1
- */
 ModulemdSimpleSet *
 modulemd_profile_peek_rpms (ModulemdProfile *self)
 {
@@ -292,16 +180,6 @@ modulemd_profile_peek_rpms (ModulemdProfile *self)
 }
 
 
-/**
- * modulemd_profile_dup_rpms:
- *
- * Retrieves a copy of the "rpms" for this profile
- *
- * Returns: (transfer full): a #SimpleSet containing the set of RPMs in the
- * "rpms" property.
- *
- * Since: 1.1
- */
 ModulemdSimpleSet *
 modulemd_profile_dup_rpms (ModulemdProfile *self)
 {
@@ -358,15 +236,6 @@ modulemd_profile_associate_translation (ModulemdProfile *self,
 }
 
 
-/**
- * modulemd_profile_copy:
- *
- * Creates a copy of this profile
- *
- * Returns: (transfer full): a copy of this #ModulemdProfile
- *
- * Since: 1.1
- */
 ModulemdProfile *
 modulemd_profile_copy (ModulemdProfile *self)
 {

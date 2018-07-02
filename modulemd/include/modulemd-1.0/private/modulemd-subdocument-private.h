@@ -27,13 +27,30 @@ G_BEGIN_DECLS
 void
 modulemd_subdocument_set_doctype (ModulemdSubdocument *self, const GType type);
 
+
+/**
+ * modulemd_subdocument_get_doctype:
+ *
+ * Returns: A #GType of the GObject that represents this subdocument
+ *
+ * Since: 1.4
+ */
 const GType
 modulemd_subdocument_get_doctype (ModulemdSubdocument *self);
+
 
 void
 modulemd_subdocument_set_version (ModulemdSubdocument *self,
                                   const guint64 version);
 
+
+/**
+ * modulemd_subdocument_get_version:
+ *
+ * Returns: A 64-bit integer describing the document version
+ *
+ * Since: 1.4
+ */
 const GType
 modulemd_subdocument_get_version (ModulemdSubdocument *self);
 

@@ -19,17 +19,54 @@
 
 G_BEGIN_DECLS
 
+/**
+ * SECTION: modulemd-profile
+ * @title: Modulemd.Profile
+ * @short_description: Stores profile information for a module stream.
+ */
+
 #define MODULEMD_TYPE_PROFILE modulemd_profile_get_type ()
 G_DECLARE_FINAL_TYPE (
   ModulemdProfile, modulemd_profile, MODULEMD, PROFILE, GObject)
 
+
+/**
+ * modulemd_profile_new:
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdProfile. This object
+ * must be freed with g_object_unref().
+ *
+ * Since: 1.0
+ */
 ModulemdProfile *
 modulemd_profile_new (void);
 
+
+/**
+ * modulemd_profile_set_description:
+ * @description: (nullable): the profile description.
+ *
+ * Sets the "description" property.
+ *
+ * Since: 1.0
+ */
 void
 modulemd_profile_set_description (ModulemdProfile *self,
                                   const gchar *description);
 
+
+/**
+ * modulemd_profile_get_description:
+ *
+ * Retrieves the profile description.
+ *
+ * Returns: A string containing the "description" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_description() instead.
+ *
+ * Since: 1.0
+ */
 MMD_DEPRECATED_FOR (modulemd_profile_peek_description)
 const gchar *
 modulemd_profile_get_description (ModulemdProfile *self);
@@ -51,77 +88,180 @@ gchar *
 modulemd_profile_get_localized_description (ModulemdProfile *self,
                                             const gchar *locale);
 
+
+/**
+ * modulemd_profile_peek_description:
+ *
+ * Retrieves the profile description.
+ *
+ * Returns: A string containing the "description" property.
+ *
+ * Since: 1.1
+ */
 const gchar *
 modulemd_profile_peek_description (ModulemdProfile *self);
+
+
+/**
+ * modulemd_profile_dup_description:
+ *
+ * Retrieves a copy of the profile description.
+ *
+ * Returns: A copy of the string containing the "description" property.
+ *
+ * Since: 1.1
+ */
 gchar *
 modulemd_profile_dup_description (ModulemdProfile *self);
 
+
+/**
+ * modulemd_profile_set_name:
+ * @name: (nullable): the profile name.
+ *
+ * Sets the "name" property.
+ *
+ * Since: 1.0
+ */
 void
 modulemd_profile_set_name (ModulemdProfile *self, const gchar *name);
 
+
+/**
+ * modulemd_profile_get_name:
+ *
+ * Retrieves the profile name.
+ *
+ * Returns: A string containing the "name" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_name() instead.
+ *
+ * Since: 1.0
+ */
 MMD_DEPRECATED_FOR (modulemd_profile_peek_name)
 const gchar *
 modulemd_profile_get_name (ModulemdProfile *self);
 
+
+/**
+ * modulemd_profile_peek_name:
+ *
+ * Retrieves the profile name.
+ *
+ * Returns: A string containing the "name" property.
+ *
+ * Since: 1.1
+ */
 const gchar *
 modulemd_profile_peek_name (ModulemdProfile *self);
+
+
+/**
+ * modulemd_profile_dup_name:
+ *
+ * Retrieves a copy of the profile name.
+ *
+ * Returns: A copy of string containing the "name" property.
+ *
+ * Since: 1.1
+ */
 gchar *
 modulemd_profile_dup_name (ModulemdProfile *self);
 
+
+/**
+ * modulemd_profile_set_rpms:
+ * @rpms: (nullable): A #ModuleSimpleSet: The rpms to be installed by this profile.
+ *
+ * Assigns the set of RPMs that will be installed when this profile is
+ * activated.
+ *
+ * Since: 1.0
+ */
 void
 modulemd_profile_set_rpms (ModulemdProfile *self, ModulemdSimpleSet *rpms);
 
+
+/**
+ * modulemd_profile_get_rpms:
+ *
+ * Retrieves the "rpms" for this profile
+ *
+ * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
+ * "rpms" property.
+ *
+ * Deprecated: 1.1
+ * Use peek_rpms() instead.
+ *
+ * Since: 1.0
+ */
 MMD_DEPRECATED_FOR (modulemd_profile_peek_rpms)
 ModulemdSimpleSet *
 modulemd_profile_get_rpms (ModulemdProfile *self);
 
+
+/**
+ * modulemd_profile_peek_rpms:
+ *
+ * Retrieves the "rpms" for this profile
+ *
+ * Returns: (transfer none): a #SimpleSet containing the set of RPMs in the
+ * "rpms" property.
+ *
+ * Since: 1.1
+ */
 ModulemdSimpleSet *
 modulemd_profile_peek_rpms (ModulemdProfile *self);
+
+
+/**
+ * modulemd_profile_dup_rpms:
+ *
+ * Retrieves a copy of the "rpms" for this profile
+ *
+ * Returns: (transfer full): a #SimpleSet containing the set of RPMs in the
+ * "rpms" property.
+ *
+ * Since: 1.1
+ */
 ModulemdSimpleSet *
 modulemd_profile_dup_rpms (ModulemdProfile *self);
 
+
+/**
+ * modulemd_profile_add_rpm:
+ * @rpm: (transfer none) (not nullable): An RPM that will be installed as part
+ * of this profile.
+ *
+ * Since: 1.1
+ */
 void
 modulemd_profile_add_rpm (ModulemdProfile *self, const gchar *rpm);
 
+
+/**
+ * modulemd_profile_remove_rpm:
+ * @rpm: (transfer none) (not nullable): An RPM that will no longer be installed
+ * as part of this profile.
+ *
+ * Since: 1.1
+ */
 void
 modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
 
+
+/**
+ * modulemd_profile_copy:
+ *
+ * Creates a copy of this profile
+ *
+ * Returns: (transfer full): a copy of this #ModulemdProfile
+ *
+ * Since: 1.1
+ */
 ModulemdProfile *
 modulemd_profile_copy (ModulemdProfile *self);
-
-
-/**
- * modulemd_prioritizer_add_index:
- * @index: (transfer none) (not nullable): A #GHashTable of
- * #ModulemdImprovedModule objects whose contents need to be merged depending on
- * priority.
- * @priority: The priority of the YAML stream these were loaded from. Items at
- * the same priority level will attempt to merge on conflict. Items at higher
- * priority levels will replace on conflict. Valid values are 0 - 1000.
- *
- * Returns: TRUE if the objects could be added without generating a conflict at
- * this priority level. If a conflict was detected, this function returns FALSE
- * and @error is set. The internal state is undefined in the case of an error.
- *
- * Since: 1.6
- */
-gboolean
-modulemd_prioritizer_add_index (ModulemdPrioritizer *self,
-                                GHashTable *index,
-                                gint64 priority,
-                                GError **error);
-
-/**
- * modulemd_prioritizer_resolve_index:
- *
- * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
- * A #GHashTable of #ModulemdImprovedModule objects with all priorities
- * resolved. This hash table must be freed with g_hash_table_unref().
- *
- * Since: 1.6
- */
-GHashTable *
-modulemd_prioritizer_resolve_index (ModulemdPrioritizer *self, GError **error);
 
 G_END_DECLS
 

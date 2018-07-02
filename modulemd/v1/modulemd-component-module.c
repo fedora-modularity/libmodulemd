@@ -11,11 +11,6 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-/**
- * SECTION: modulemd-component-module
- * @title: Modulemd.ComponentModule
- * @short_description: A module component that goes into a module stream.
- */
 
 #include "modulemd.h"
 #include "modulemd-component-module.h"
@@ -62,13 +57,7 @@ modulemd_component_module_finalize (GObject *object)
   G_OBJECT_CLASS (modulemd_component_module_parent_class)->finalize (object);
 }
 
-/**
- * modulemd_component_module_set_ref
- * @ref: (nullable): A string: The particular repository commit hash, branch or tag name
- * used in this module.
- *
- * Since: 1.0
- */
+
 void
 modulemd_component_module_set_ref (ModulemdComponentModule *self,
                                    const gchar *ref)
@@ -85,18 +74,6 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
 }
 
 
-/**
- * modulemd_component_module_get_ref:
- *
- * Retrieves the repository ref.
- *
- * Returns: A string containing the repository ref.
- *
- * Deprecated: 1.1
- * Use peek_ref() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_component_module_get_ref (ModulemdComponentModule *self)
 {
@@ -104,15 +81,6 @@ modulemd_component_module_get_ref (ModulemdComponentModule *self)
 }
 
 
-/**
- * modulemd_component_module_peek_ref:
- *
- * Retrieves the repository ref.
- *
- * Returns: A string containing the repository ref.
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_component_module_peek_ref (ModulemdComponentModule *self)
 {
@@ -122,15 +90,6 @@ modulemd_component_module_peek_ref (ModulemdComponentModule *self)
 }
 
 
-/**
- * modulemd_component_module_dup_ref:
- *
- * Retrieves a copy of the repository ref.
- *
- * Returns: A copy of the string containing the repository ref.
- *
- * Since: 1.1
- */
 gchar *
 modulemd_component_module_dup_ref (ModulemdComponentModule *self)
 {
@@ -138,13 +97,6 @@ modulemd_component_module_dup_ref (ModulemdComponentModule *self)
 }
 
 
-/**
- * modulemd_component_module_set_repository
- * @repository: (nullable): A string: The VCS repository with the modulemd file, and other
- * module data.
- *
- * Since: 1.0
- */
 void
 modulemd_component_module_set_repository (ModulemdComponentModule *self,
                                           const gchar *repository)
@@ -161,18 +113,6 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
 }
 
 
-/**
- * modulemd_component_module_get_repository:
- *
- * Retrieves the repository location.
- *
- * Returns: A string containing the repository location.
- *
- * Deprecated: 1.1
- * Use peek_repository() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self)
 {
@@ -182,15 +122,6 @@ modulemd_component_module_get_repository (ModulemdComponentModule *self)
 }
 
 
-/**
- * modulemd_component_module_peek_repository:
- *
- * Retrieves the repository location.
- *
- * Returns: A string containing the repository location.
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_component_module_peek_repository (ModulemdComponentModule *self)
 {
@@ -200,15 +131,6 @@ modulemd_component_module_peek_repository (ModulemdComponentModule *self)
 }
 
 
-/**
- * modulemd_component_module_dup_repository:
- *
- * Retrieves a copy of the repository location.
- *
- * Returns: A copy of the string containing the repository location.
- *
- * Since: 1.1
- */
 gchar *
 modulemd_component_module_dup_repository (ModulemdComponentModule *self)
 {

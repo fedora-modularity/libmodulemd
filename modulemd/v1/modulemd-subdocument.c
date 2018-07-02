@@ -16,14 +16,6 @@
 #include "private/modulemd-subdocument-private.h"
 
 
-/**
- * SECTION: modulemd-subdocument
- * @title: Modulemd.Subdocument
- * @short_description: Contains information about individual YAML subdocuments
- * being parsed for modulemd information.
- */
-
-
 struct _ModulemdSubdocument
 {
   GObject parent_instance;
@@ -72,13 +64,6 @@ modulemd_subdocument_set_doctype (ModulemdSubdocument *self, const GType type)
 }
 
 
-/**
- * modulemd_subdocument_get_doctype:
- *
- * Returns: A #GType of the GObject that represents this subdocument
- *
- * Since: 1.4
- */
 const GType
 modulemd_subdocument_get_doctype (ModulemdSubdocument *self)
 {
@@ -97,13 +82,6 @@ modulemd_subdocument_set_version (ModulemdSubdocument *self,
 }
 
 
-/**
- * modulemd_subdocument_get_version:
- *
- * Returns: A 64-bit integer describing the document version
- *
- * Since: 1.4
- */
 const GType
 modulemd_subdocument_get_version (ModulemdSubdocument *self)
 {
@@ -129,13 +107,6 @@ modulemd_subdocument_set_yaml (ModulemdSubdocument *self, const gchar *yaml)
 }
 
 
-/**
- * modulemd_subdocument_get_yaml:
- *
- * Returns: A string containing the YAML document
- *
- * Since: 1.4
- */
 const gchar *
 modulemd_subdocument_get_yaml (ModulemdSubdocument *self)
 {
@@ -159,13 +130,6 @@ modulemd_subdocument_set_gerror (ModulemdSubdocument *self,
 }
 
 
-/**
- * modulemd_subdocument_get_gerror:
- *
- * Returns: The #GError associated with this subdocument
- *
- * Since: 1.4
- */
 const GError *
 modulemd_subdocument_get_gerror (ModulemdSubdocument *self)
 {

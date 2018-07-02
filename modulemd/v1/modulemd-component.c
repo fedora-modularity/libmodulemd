@@ -14,13 +14,6 @@
 #include "modulemd.h"
 #include "modulemd-component.h"
 
-/**
- * SECTION: modulemd-component
- * @title: Modulemd.Component
- * @short_description: Pure virtual parent class for components that go into a
- * module stream. See #ModulemdComponentRPM and #ModulemdComponentModule for
- * specific types.
- */
 
 enum
 {
@@ -133,14 +126,7 @@ modulemd_component_default_dup_rationale (ModulemdComponent *self)
   return g_strdup (priv->rationale);
 }
 
-/**
- * modulemd_component_set_buildorder:
- * @buildorder: The order to build this component
- *
- * Sets the 'buildorder' property.
- *
- * Since: 1.0
- */
+
 void
 modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
 {
@@ -154,16 +140,7 @@ modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
   klass->set_buildorder (self, buildorder);
 }
 
-/**
- * modulemd_component_get_buildorder:
- *
- * Returns the 'buildorder' property
- *
- * Deprecated: 1.1
- * Use peek_buildorder() instead.
- *
- * Since: 1.0
- */
+
 guint64
 modulemd_component_get_buildorder (ModulemdComponent *self)
 {
@@ -171,13 +148,6 @@ modulemd_component_get_buildorder (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_peek_buildorder:
- *
- * Returns the 'buildorder' property
- *
- * Since: 1.1
- */
 guint64
 modulemd_component_peek_buildorder (ModulemdComponent *self)
 {
@@ -192,14 +162,6 @@ modulemd_component_peek_buildorder (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_set_name:
- * @name: The name of the component
- *
- * Sets the 'name' property.
- *
- * Since: 1.0
- */
 void
 modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
 {
@@ -214,16 +176,6 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
 }
 
 
-/**
- * modulemd_component_get_name:
- *
- * Returns the 'name' property;
- *
- * Deprecated: 1.1
- * Use peek_name() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self)
 {
@@ -231,13 +183,6 @@ modulemd_component_get_name (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_peek_name:
- *
- * Returns the 'name' property;
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_component_peek_name (ModulemdComponent *self)
 {
@@ -252,13 +197,7 @@ modulemd_component_peek_name (ModulemdComponent *self)
   return klass->peek_name (self);
 }
 
-/**
- * modulemd_component_dup_name:
- *
- * Returns a copy of the 'name' property;
- *
- * Since: 1.1
- */
+
 gchar *
 modulemd_component_dup_name (ModulemdComponent *self)
 {
@@ -274,14 +213,6 @@ modulemd_component_dup_name (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_set_rationale:
- * @rationale: The rationale for including this component
- *
- * Sets the 'rationale' property.
- *
- * Since: 1.0
- */
 void
 modulemd_component_set_rationale (ModulemdComponent *self,
                                   const gchar *rationale)
@@ -297,16 +228,6 @@ modulemd_component_set_rationale (ModulemdComponent *self,
 }
 
 
-/**
- * modulemd_component_get_rationale:
- *
- * Returns the 'rationale' property;
- *
- * Deprecated: 1.1
- * Use peek_rationale() instead.
- *
- * Since: 1.0
- */
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self)
 {
@@ -314,13 +235,6 @@ modulemd_component_get_rationale (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_peek_rationale:
- *
- * Returns the 'rationale' property;
- *
- * Since: 1.1
- */
 const gchar *
 modulemd_component_peek_rationale (ModulemdComponent *self)
 {
@@ -335,13 +249,7 @@ modulemd_component_peek_rationale (ModulemdComponent *self)
   return klass->peek_rationale (self);
 }
 
-/**
- * modulemd_component_dup_rationale:
- *
- * Returns a copy of the 'rationale' property;
- *
- * Since: 1.1
- */
+
 gchar *
 modulemd_component_dup_rationale (ModulemdComponent *self)
 {
@@ -357,15 +265,6 @@ modulemd_component_dup_rationale (ModulemdComponent *self)
 }
 
 
-/**
- * modulemd_component_copy:
- *
- * Returns a complete copy of this Component.
- *
- * Returns: (transfer full): A copy of this Component.
- *
- * Since: 1.1
- */
 ModulemdComponent *
 modulemd_component_copy (ModulemdComponent *self)
 {
@@ -508,15 +407,7 @@ modulemd_component_init (ModulemdComponent *self)
 {
 }
 
-/**
- * modulemd_component_new:
- *
- * Allocates a new #ModulemdComponent
- *
- * Return value: a new #ModulemdComponent
- *
- * Since: 1.0
- */
+
 ModulemdComponent *
 modulemd_component_new (void)
 {

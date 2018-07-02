@@ -16,12 +16,6 @@
 #include "modulemd-prioritizer.h"
 #include "private/modulemd-util.h"
 
-/**
- * SECTION: modulemd-prioritizer
- * @title: Modulemd.Prioritizer
- * @short_description: Class to aid in merging module metadata from multiple
- * repositories.
- */
 
 GQuark
 modulemd_prioritizer_error_quark (void)
@@ -80,20 +74,6 @@ modulemd_prioritizer_init (ModulemdPrioritizer *self)
 }
 
 
-/**
- * modulemd_prioritizer_add:
- * @objects: (array zero-terminated=1) (element-type GObject): A #GPtrArray of
- * module-related objects loaded from a modulemd YAML stream.
- * @priority: The priority of the YAML stream these were loaded from. Items at
- * the same priority level will attempt to merge on conflict. Items at higher
- * priority levels will replace on conflict. Valid values are 0 - 1000.
- *
- * Returns: TRUE if the objects could be added without generating a conflict at
- * this priority level. If a conflict was detected, this function returns FALSE
- * and error is set. The internal state is undefined in the case of an error.
- *
- * Since: 1.3
- */
 gboolean
 modulemd_prioritizer_add (ModulemdPrioritizer *self,
                           GPtrArray *objects,
@@ -204,15 +184,6 @@ modulemd_prioritizer_add_index (ModulemdPrioritizer *self,
 }
 
 
-/**
- * modulemd_prioritizer_resolve:
- *
- * Returns: (array zero-terminated=1) (element-type GObject) (transfer container):
- * A #GPtrArray of module-related objects with all priorities resolved. This
- * object must be freed with g_ptr_array_unref().
- *
- * Since: 1.3
- */
 GPtrArray *
 modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
 {

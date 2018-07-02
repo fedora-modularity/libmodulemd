@@ -415,6 +415,7 @@ _parse_translation_entry (yaml_parser_t *parser,
               return NULL;
             }
           done = TRUE;
+          break;
 
 
         case YAML_SCALAR_EVENT:

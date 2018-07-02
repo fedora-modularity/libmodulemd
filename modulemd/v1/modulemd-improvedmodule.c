@@ -411,6 +411,8 @@ modulemd_improvedmodule_serialize (ModulemdImprovedModule *self)
 {
   g_autoptr (GPtrArray) objects = NULL;
   g_autoptr (GPtrArray) keys = NULL;
+  ModulemdModuleStream *stream = NULL;
+  ModulemdTranslation *translation = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
 
@@ -422,9 +424,16 @@ modulemd_improvedmodule_serialize (ModulemdImprovedModule *self)
 
   for (gsize i = 0; i < keys->len; i++)
     {
-      g_ptr_array_add (objects,
-                       modulemd_improvedmodule_get_stream_by_name (
-                         self, g_ptr_array_index (keys, i)));
+      stream = modulemd_improvedmodule_get_stream_by_name (
+        self, g_ptr_array_index (keys, i));
+      g_ptr_array_add (objects, stream);
+
+      /* If there are translated strings associated with this stream, make sure
+       * to include those.
+       */
+      translation = modulemd_modulestream_get_translation (stream);
+      if (translation)
+        g_ptr_array_add (objects, translation);
     }
 
   /* Then write out the default object if it exists */

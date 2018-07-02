@@ -95,6 +95,7 @@ struct _ModulemdModuleStream
   gchar *stream;
   gchar *summary;
   gchar *tracker;
+  ModulemdTranslation *translation;
   guint64 version;
   GHashTable *xmd;
 };
@@ -162,6 +163,8 @@ _modulemd_modulestream_copy_internal (ModulemdModuleStream *dest,
   modulemd_modulestream_set_summary (dest, src->summary);
 
   modulemd_modulestream_set_tracker (dest, src->tracker);
+
+  modulemd_modulestream_set_translation (dest, src->translation);
 
   modulemd_modulestream_set_version (dest, src->version);
 
@@ -2361,6 +2364,62 @@ modulemd_modulestream_peek_tracker (ModulemdModuleStream *self)
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
 
   return self->tracker;
+}
+
+
+void
+modulemd_modulestream_set_translation (ModulemdModuleStream *self,
+                                       ModulemdTranslation *translation)
+{
+  g_return_if_fail (MODULEMD_IS_MODULESTREAM (self));
+  g_return_if_fail (!translation || MODULEMD_IS_TRANSLATION (translation));
+
+  const gchar *module_name = NULL;
+
+  const gchar *module_stream = NULL;
+
+  if (translation)
+    {
+      module_name = modulemd_translation_peek_module_name (translation);
+      module_stream = modulemd_translation_peek_module_stream (translation);
+
+      if (g_strcmp0 (self->name, module_name) ||
+          g_strcmp0 (self->stream, module_stream))
+        {
+          g_warning (
+            "Attempting to assign translations of %s:%s to module stream "
+            "%s:%s",
+            module_name,
+            module_stream,
+            self->name,
+            self->stream);
+          return;
+        }
+    }
+  else
+    {
+      /* If we were passed NULL, just clear the value and return */
+      g_clear_pointer (&self->translation, g_object_unref);
+      return;
+    }
+
+  /* Only set this to a new value if the modified value is higher */
+  if (!self->translation ||
+      modulemd_translation_get_modified (translation) >
+        modulemd_translation_get_modified (self->translation))
+    {
+      g_clear_pointer (&self->translation, g_object_unref);
+      self->translation = modulemd_translation_copy (translation);
+    }
+}
+
+
+ModulemdTranslation *
+modulemd_modulestream_get_translation (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return modulemd_translation_copy (self->translation);
 }
 
 

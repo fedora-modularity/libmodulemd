@@ -21,6 +21,7 @@
 #include "modulemd-profile.h"
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
+#include "modulemd-translation.h"
 
 G_BEGIN_DECLS
 
@@ -319,6 +320,33 @@ modulemd_modulestream_get_tracker (ModulemdModuleStream *self);
 
 const gchar *
 modulemd_modulestream_peek_tracker (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_modulestream_set_translation:
+ * @translation: (transfer none) (nullable): A #ModulemdTranslation associated
+ * with this module and stream which provides translated strings. If the passed
+ * #ModulemdTranslation does not match this module and stream, it will have no
+ * effect, but a warning will be emitted.
+ *
+ * Since: 1.6
+ */
+void
+modulemd_modulestream_set_translation (ModulemdModuleStream *self,
+                                       ModulemdTranslation *translation);
+
+
+/**
+ * modulemd_modulestream_get_translation:
+ *
+ * Returns: (transfer full): A #ModulemdTranslation object associated with this
+ * module and stream.
+ *
+ * Since: 1.6
+ */
+ModulemdTranslation *
+modulemd_modulestream_get_translation (ModulemdModuleStream *self);
+
 
 void
 modulemd_modulestream_set_version (ModulemdModuleStream *self,

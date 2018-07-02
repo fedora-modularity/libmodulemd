@@ -104,7 +104,8 @@ modulemd_translation_copy (ModulemdTranslation *self)
 {
   ModulemdTranslation *copy = NULL;
 
-  if (!self) return NULL;
+  if (!self)
+    return NULL;
 
   g_return_val_if_fail (MODULEMD_IS_TRANSLATION (self), NULL);
 

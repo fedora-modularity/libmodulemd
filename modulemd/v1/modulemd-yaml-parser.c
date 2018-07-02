@@ -210,13 +210,19 @@ static GHashTable *
 module_index_from_data (GPtrArray *data, GError **error)
 {
   GObject *item = NULL;
+  gsize i = 0;
   g_autofree gchar *module_name = NULL;
   g_autoptr (ModulemdImprovedModule) module = NULL;
+  ModulemdImprovedModule *stored_module = NULL;
   ModulemdModuleStream *stream = NULL;
+  g_autoptr (ModulemdModuleStream) retrieved_stream = NULL;
   ModulemdDefaults *defaults = NULL;
   g_autoptr (GHashTable) module_index = NULL;
   GError *merge_error = NULL;
   g_autoptr (GPtrArray) clean_data = NULL;
+  g_autoptr (GPtrArray) translations =
+    g_ptr_array_new_with_free_func (g_object_unref);
+  ModulemdTranslation *translation = NULL;
 
   /* Deduplicate and merge any ModulemdDefaults objects in the list */
   clean_data = modulemd_merge_defaults (data, NULL, FALSE, &merge_error);
@@ -231,11 +237,11 @@ module_index_from_data (GPtrArray *data, GError **error)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   /* Iterate through the data and add the entries to the module_index */
-  for (gsize i = 0; i < clean_data->len; i++)
+  for (i = 0; i < clean_data->len; i++)
     {
       item = g_ptr_array_index (clean_data, i);
 
-      if (G_OBJECT_TYPE (item) == MODULEMD_TYPE_MODULESTREAM)
+      if (MODULEMD_IS_MODULESTREAM (item))
         {
           stream = MODULEMD_MODULESTREAM (item);
           module_name = modulemd_modulestream_get_name (stream);
@@ -251,7 +257,7 @@ module_index_from_data (GPtrArray *data, GError **error)
                                 g_strdup (module_name),
                                 modulemd_improvedmodule_copy (module));
         }
-      else if (G_OBJECT_TYPE (item) == MODULEMD_TYPE_DEFAULTS)
+      else if (MODULEMD_IS_DEFAULTS (item))
         {
           defaults = MODULEMD_DEFAULTS (item);
           module_name = modulemd_defaults_dup_module_name (defaults);
@@ -265,10 +271,55 @@ module_index_from_data (GPtrArray *data, GError **error)
                                 g_strdup (module_name),
                                 modulemd_improvedmodule_copy (module));
         }
+      else if (MODULEMD_IS_TRANSLATION (item))
+        {
+          /* Queue these up to process at the end, because we need to ensure
+           * that the streams they are associated with have been added first
+           */
+          g_ptr_array_add (translations,
+                           g_object_ref (MODULEMD_TRANSLATION (item)));
+        }
 
       g_clear_pointer (&module, g_object_unref);
       g_clear_pointer (&module_name, g_free);
     }
+
+  /* Iterate through the translations and associate them to the appropriate
+   * streams.
+   */
+  for (i = 0; i < translations->len; i++)
+    {
+      translation = g_ptr_array_index (translations, i);
+      stored_module = g_hash_table_lookup (
+        module_index, modulemd_translation_peek_module_name (translation));
+      if (!stored_module)
+        {
+          /* No streams of this module were processed, so ignore this set of
+           * translations.
+           */
+          continue;
+        }
+
+      retrieved_stream = modulemd_improvedmodule_get_stream_by_name (
+        stored_module, modulemd_translation_peek_module_stream (translation));
+      if (!retrieved_stream)
+        {
+          /* This stream of this module wasn't processed, so ignore this set of
+           * translations.
+           */
+          continue;
+        }
+
+      /* Assign this translation to the object.
+       * Note: This will be ignored if there is a higher modified value already
+       * assigned to this object.
+       */
+      modulemd_modulestream_set_translation (retrieved_stream, translation);
+
+      /* Save the updated stream back to the index */
+      modulemd_improvedmodule_add_stream (stored_module, retrieved_stream);
+    }
+
 
   return g_hash_table_ref (module_index);
 }

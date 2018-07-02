@@ -264,6 +264,45 @@ modulemd_translation_test_emitter (TranslationFixture *fixture,
 }
 
 
+static void
+modulemd_translation_test_index (TranslationFixture *fixture,
+                                 gconstpointer user_data)
+{
+  g_autoptr (GHashTable) index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  ModulemdImprovedModule *module = NULL;
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdTranslation) translation = NULL;
+
+  yaml_path = g_strdup_printf ("%s/test_data/translations.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  index = modulemd_index_from_file (yaml_path, &failures, &error);
+  g_assert_nonnull (index);
+
+  g_assert_true (g_hash_table_contains (index, "foo"));
+
+  module = g_hash_table_lookup (index, "foo");
+  g_assert_nonnull (module);
+
+  g_assert_cmpstr (modulemd_improvedmodule_peek_name (module), ==, "foo");
+
+  stream = modulemd_improvedmodule_get_stream_by_name (module, "stream-name");
+  g_assert_nonnull (stream);
+
+  translation = modulemd_modulestream_get_translation (stream);
+  g_assert_nonnull (translation);
+
+  g_assert_cmpstr (
+    modulemd_translation_peek_module_name (translation), ==, "foo");
+  g_assert_cmpstr (
+    modulemd_translation_peek_module_stream (translation), ==, "stream-name");
+  g_assert_cmpuint (
+    modulemd_translation_get_modified (translation), ==, 201805231425llu);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -300,6 +339,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_translation_test_emitter,
+              NULL);
+
+  g_test_add ("/modulemd/translation/test_index",
+              TranslationFixture,
+              NULL,
+              NULL,
+              modulemd_translation_test_index,
               NULL);
 
   return g_test_run ();

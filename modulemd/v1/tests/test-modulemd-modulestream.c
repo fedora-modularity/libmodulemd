@@ -146,6 +146,8 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
 
   /* Read in the v2 spec and test its contents */
   module = modulemd_module_new_from_file (v2_spec_file);
+  g_assert_nonnull (module);
+  g_assert_true (MODULEMD_IS_MODULE (module));
 
   modulestream = modulemd_modulestream_new ();
   g_assert_nonnull (modulestream);

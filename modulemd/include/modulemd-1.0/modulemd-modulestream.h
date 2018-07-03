@@ -460,7 +460,7 @@ modulemd_modulestream_add_dependencies (ModulemdModuleStream *self,
 /**
  * modulemd_modulestream_get_dependencies:
  *
- * Returns: (element-type ModulemdDependencies) (transfer full): The list
+ * Returns: (element-type ModulemdDependencies) (transfer container): The list
  * of dependency objects for this module. This list must be freed with
  * g_ptr_array_unref().
  *
@@ -702,7 +702,7 @@ modulemd_modulestream_set_module_components (ModulemdModuleStream *self,
  *
  * Retrieves the "module-components" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdComponentModule) (transfer full): A hash
+ * Returns: (element-type utf8 ModulemdComponentModule) (transfer container): A hash
  * table containing the "module-components" property. This table must be freed
  * with g_hash_table_unref().
  *
@@ -838,7 +838,7 @@ modulemd_modulestream_set_profiles (ModulemdModuleStream *self,
  *
  * Retrieves the "profiles" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdProfile) (transfer full): A hash
+ * Returns: (element-type utf8 ModulemdProfile) (transfer container): A hash
  * table containing the "profiles" property. This table must be freed with
  * g_hash_table_unref().
  *
@@ -868,7 +868,7 @@ modulemd_modulestream_set_requires (ModulemdModuleStream *self,
  *
  * Retrieves the "requires" for modulemd.
  *
- * Returns: (element-type utf8 utf8) (transfer full): A hash table
+ * Returns: (element-type utf8 utf8) (transfer container): A hash table
  * containing the "requires" property. This function was deprecated and is not
  * valid for modulemd files of version 2 or later. This table must be freed with
  * g_hash_table_unref().
@@ -1010,7 +1010,7 @@ modulemd_modulestream_set_rpm_components (ModulemdModuleStream *self,
  *
  * Retrieves the "rpm-components" for modulemd.
  *
- * Returns: (element-type utf8 ModulemdComponentRpm) (transfer full): A hash
+ * Returns: (element-type utf8 ModulemdComponentRpm) (transfer container): A hash
  * table containing the "rpm-components" property. This table must be freed with
  * g_hash_table_unref().
  *
@@ -1108,7 +1108,7 @@ modulemd_modulestream_add_servicelevel (ModulemdModuleStream *self,
  *
  * Retrieves the service levels for the module
  *
- * Returns: (element-type utf8 ModulemdServiceLevel) (transfer full): A
+ * Returns: (element-type utf8 ModulemdServiceLevel) (transfer container): A
  * hash table containing the service levels. This table must be freed with
  * g_hash_table_unref().
  *
@@ -1335,7 +1335,7 @@ modulemd_modulestream_set_xmd (ModulemdModuleStream *self, GHashTable *xmd);
  *
  * Retrieves the "xmd" for modulemd.
  *
- * Returns: (element-type utf8 GVariant) (transfer full): A hash table
+ * Returns: (element-type utf8 GVariant) (transfer container): A hash table
  * containing the "xmd" property.
  *
  * Since: 1.6

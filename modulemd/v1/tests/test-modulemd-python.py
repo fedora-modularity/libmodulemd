@@ -251,6 +251,28 @@ class TestImprovedModule (unittest.TestCase):
         assert 'document: modulemd-defaults' in yaml_out
         assert 'module: nodejs' in yaml_out
 
+    def test_custom_repo(self):
+        (module_index, failures) = Modulemd.index_from_file(
+            "%s/spec.v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+        assert len(failures) == 0
+
+        foo_module = module_index['foo']
+        assert foo_module
+
+        foo_stream = foo_module.get_stream_by_name('stream-name')
+        assert foo_stream
+
+        rpm_components = foo_stream.get_rpm_components()
+        assert rpm_components
+
+        bar_component = rpm_components['bar']
+        assert bar_component
+
+        repo = bar_component.dup_repository()
+        assert repo
+
+        assert repo == "https://pagure.io/bar.git"
+
 
 if __name__ == '__main__':
     unittest.main()

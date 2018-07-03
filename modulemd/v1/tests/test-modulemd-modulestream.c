@@ -141,6 +141,9 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
   g_autofree gchar *rpm_macros = NULL;
   g_autoptr (ModulemdSimpleSet) rpm_whitelist = NULL;
 
+  g_autoptr (GHashTable) rpm_components = NULL;
+  ModulemdComponentRpm *rpm_component = NULL;
+
   g_autofree gchar *v2_spec_file =
     g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
 
@@ -246,6 +249,17 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
     rpm_artifacts, "xxx-0:1-1.module_deadbeef.i686"));
   g_assert_true (modulemd_simpleset_contains (
     rpm_artifacts, "xyz-0:1-1.module_deadbeef.x86_64"));
+
+  rpm_components = modulemd_modulestream_get_rpm_components (modulestream);
+  g_assert_nonnull (rpm_components);
+
+  rpm_component = g_hash_table_lookup (rpm_components, "bar");
+  g_assert_nonnull (rpm_component);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (rpm_component));
+
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (rpm_component),
+                   ==,
+                   "https://pagure.io/bar.git");
 }
 
 int

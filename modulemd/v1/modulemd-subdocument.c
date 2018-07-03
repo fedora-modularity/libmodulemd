@@ -82,7 +82,7 @@ modulemd_subdocument_set_version (ModulemdSubdocument *self,
 }
 
 
-const GType
+guint64
 modulemd_subdocument_get_version (ModulemdSubdocument *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SUBDOCUMENT (self), 0);

@@ -51,7 +51,7 @@ modulemd_subdocument_set_version (ModulemdSubdocument *self,
  *
  * Since: 1.4
  */
-const GType
+guint64
 modulemd_subdocument_get_version (ModulemdSubdocument *self);
 
 void

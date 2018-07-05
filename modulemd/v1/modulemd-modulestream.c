@@ -2165,6 +2165,8 @@ static void
 modulemd_modulestream_init (ModulemdModuleStream *self)
 {
   /* Allocate the members */
+  self->buildopts = modulemd_buildopts_new ();
+
   self->buildrequires =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 

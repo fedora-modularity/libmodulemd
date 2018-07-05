@@ -83,6 +83,9 @@ modulemd_module_new_from_stream_ext (FILE *stream,
                                      GPtrArray **failures,
                                      GError **error);
 
+ModulemdModule *
+modulemd_module_new_from_modulestream (ModulemdModuleStream *stream);
+
 void
 modulemd_module_dump (ModulemdModule *self, const gchar *yaml_file);
 

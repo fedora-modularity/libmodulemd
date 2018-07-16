@@ -274,5 +274,17 @@ class TestImprovedModule (unittest.TestCase):
         assert repo == "https://pagure.io/bar.git"
 
 
+class TestModuleBuildServiceRequirements (unittest.TestCase):
+
+    def xmd_from_string(self):
+        with open('data.txt', 'r') as myfile:
+            data = myfile.read()
+
+        mmd = Modulemd.Module.new_from_string(data)
+        mbs_xmd = mmd.get_xmd().get('mbs', {})
+
+        assert "buildrequires" in mbs_xmd.keys()
+
+
 if __name__ == '__main__':
     unittest.main()

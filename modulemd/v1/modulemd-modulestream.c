@@ -546,6 +546,15 @@ modulemd_modulestream_get_buildrequires (ModulemdModuleStream *self)
 }
 
 
+GHashTable *
+modulemd_modulestream_peek_buildrequires (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->buildrequires;
+}
+
+
 void
 modulemd_modulestream_set_community (ModulemdModuleStream *self,
                                      const gchar *community)
@@ -604,7 +613,7 @@ modulemd_modulestream_get_content_licenses (ModulemdModuleStream *self)
 }
 
 
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_content_licenses (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -729,7 +738,7 @@ modulemd_modulestream_get_dependencies (ModulemdModuleStream *self)
 }
 
 
-const GPtrArray *
+GPtrArray *
 modulemd_modulestream_peek_dependencies (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -993,6 +1002,15 @@ modulemd_modulestream_get_module_components (ModulemdModuleStream *self)
 }
 
 
+GHashTable *
+modulemd_modulestream_peek_module_components (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->module_components;
+}
+
+
 void
 modulemd_modulestream_set_module_licenses (ModulemdModuleStream *self,
                                            ModulemdSimpleSet *licenses)
@@ -1018,7 +1036,7 @@ modulemd_modulestream_get_module_licenses (ModulemdModuleStream *self)
 }
 
 
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_module_licenses (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -1138,6 +1156,15 @@ modulemd_modulestream_get_profiles (ModulemdModuleStream *self)
 }
 
 
+GHashTable *
+modulemd_modulestream_peek_profiles (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->profiles;
+}
+
+
 void
 modulemd_modulestream_set_requires (ModulemdModuleStream *self,
                                     GHashTable *requires)
@@ -1181,6 +1208,15 @@ modulemd_modulestream_get_requires (ModulemdModuleStream *self)
 }
 
 
+GHashTable *
+modulemd_modulestream_peek_requires (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->requires;
+}
+
+
 void
 modulemd_modulestream_set_rpm_api (ModulemdModuleStream *self,
                                    ModulemdSimpleSet *apis)
@@ -1205,7 +1241,7 @@ modulemd_modulestream_get_rpm_api (ModulemdModuleStream *self)
 }
 
 
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_api (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -1239,7 +1275,7 @@ modulemd_modulestream_get_rpm_artifacts (ModulemdModuleStream *self)
 }
 
 
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_artifacts (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -1332,6 +1368,15 @@ modulemd_modulestream_get_rpm_components (ModulemdModuleStream *self)
 }
 
 
+GHashTable *
+modulemd_modulestream_peek_rpm_components (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->rpm_components;
+}
+
+
 void
 modulemd_modulestream_set_rpm_filter (ModulemdModuleStream *self,
                                       ModulemdSimpleSet *filter)
@@ -1357,7 +1402,7 @@ modulemd_modulestream_get_rpm_filter (ModulemdModuleStream *self)
 }
 
 
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_filter (ModulemdModuleStream *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
@@ -1475,6 +1520,15 @@ modulemd_modulestream_get_servicelevels (ModulemdModuleStream *self)
     }
 
   return servicelevels;
+}
+
+
+GHashTable *
+modulemd_modulestream_peek_servicelevels (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->servicelevels;
 }
 
 
@@ -1714,6 +1768,15 @@ modulemd_modulestream_get_xmd (ModulemdModuleStream *self)
   g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
 
   return _modulemd_hash_table_deep_variant_copy (self->xmd);
+}
+
+
+GHashTable *
+modulemd_modulestream_peek_xmd (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULESTREAM (self), NULL);
+
+  return self->xmd;
 }
 
 

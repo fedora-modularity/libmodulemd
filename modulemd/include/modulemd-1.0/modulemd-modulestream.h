@@ -307,6 +307,20 @@ modulemd_modulestream_get_buildrequires (ModulemdModuleStream *self);
 
 
 /**
+ * modulemd_modulestream_peek_buildrequires: (skip)
+ *
+ * Retrieves the "buildrequires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer none): A hash table
+ * containing the "buildrequires" property.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_buildrequires (ModulemdModuleStream *self);
+
+
+/**
  * modulemd_modulestream_set_community:
  * @community: (nullable) (transfer none): the module community.
  *
@@ -386,7 +400,7 @@ modulemd_modulestream_get_content_licenses (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_content_licenses (ModulemdModuleStream *self);
 
 
@@ -479,7 +493,7 @@ modulemd_modulestream_get_dependencies (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const GPtrArray *
+GPtrArray *
 modulemd_modulestream_peek_dependencies (ModulemdModuleStream *self);
 
 
@@ -713,6 +727,20 @@ modulemd_modulestream_get_module_components (ModulemdModuleStream *self);
 
 
 /**
+ * modulemd_modulestream_peek_module_components: (skip)
+ *
+ * Retrieves the "module-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentModule) (transfer none): A hash
+ * table containing the "module-components" property.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_module_components (ModulemdModuleStream *self);
+
+
+/**
  * modulemd_modulestream_set_module_licenses:
  * @licenses: (transfer none) (nullable): A #ModuleSimpleSet: The licenses under
  * which the components of this module are released.
@@ -751,7 +779,7 @@ modulemd_modulestream_get_module_licenses (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_module_licenses (ModulemdModuleStream *self);
 
 
@@ -849,6 +877,20 @@ modulemd_modulestream_get_profiles (ModulemdModuleStream *self);
 
 
 /**
+ * modulemd_modulestream_peek_profiles: (skip)
+ *
+ * Retrieves the "profiles" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdProfile) (transfer none): A hash
+ * table containing the "profiles" property.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_profiles (ModulemdModuleStream *self);
+
+
+/**
  * modulemd_modulestream_set_requires:
  * @requires: (transfer none) (nullable) (element-type utf8 utf8): The
  * requirements to run this module
@@ -877,6 +919,21 @@ modulemd_modulestream_set_requires (ModulemdModuleStream *self,
  */
 GHashTable *
 modulemd_modulestream_get_requires (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_modulestream_peek_requires: (skip)
+ *
+ * Retrieves the "requires" for modulemd.
+ *
+ * Returns: (element-type utf8 utf8) (transfer none): A hash table
+ * containing the "requires" property. This function was deprecated and is not
+ * valid for modulemd files of version 2 or later.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_requires (ModulemdModuleStream *self);
 
 
 /**
@@ -919,7 +976,7 @@ modulemd_modulestream_get_rpm_api (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_api (ModulemdModuleStream *self);
 
 
@@ -961,7 +1018,7 @@ modulemd_modulestream_get_rpm_artifacts (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_artifacts (ModulemdModuleStream *self);
 
 
@@ -1021,6 +1078,20 @@ modulemd_modulestream_get_rpm_components (ModulemdModuleStream *self);
 
 
 /**
+ * modulemd_modulestream_peek_rpm_components: (skip)
+ *
+ * Retrieves the "rpm-components" for modulemd.
+ *
+ * Returns: (element-type utf8 ModulemdComponentRpm) (transfer none): A hash
+ * table containing the "rpm-components" property.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_rpm_components (ModulemdModuleStream *self);
+
+
+/**
  * modulemd_modulestream_set_rpm_filter:
  * @filter: (transfer none) (nullable): A #ModuleSimpleSet: The set of binary
  * RPM packages that are explicitly filtered out of this module.
@@ -1060,7 +1131,7 @@ modulemd_modulestream_get_rpm_filter (ModulemdModuleStream *self);
  *
  * Since: 1.6
  */
-const ModulemdSimpleSet *
+ModulemdSimpleSet *
 modulemd_modulestream_peek_rpm_filter (ModulemdModuleStream *self);
 
 
@@ -1112,13 +1183,24 @@ modulemd_modulestream_add_servicelevel (ModulemdModuleStream *self,
  * hash table containing the service levels. This table must be freed with
  * g_hash_table_unref().
  *
- * Deprecated: 1.1
- * Use peek_servicelevels() instead.
- *
  * Since: 1.6
  */
 GHashTable *
 modulemd_modulestream_get_servicelevels (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_modulestream_peek_servicelevels: (skip)
+ *
+ * Retrieves the service levels for the module
+ *
+ * Returns: (element-type utf8 ModulemdServiceLevel) (transfer none): A
+ * hash table containing the service levels.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_servicelevels (ModulemdModuleStream *self);
 
 
 /**
@@ -1342,6 +1424,20 @@ modulemd_modulestream_set_xmd (ModulemdModuleStream *self, GHashTable *xmd);
  */
 GHashTable *
 modulemd_modulestream_get_xmd (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_modulestream_peek_xmd: (skip)
+ *
+ * Retrieves the "xmd" for modulemd.
+ *
+ * Returns: (element-type utf8 GVariant) (transfer none): A hash table
+ * containing the "xmd" property.
+ *
+ * Since: 1.6
+ */
+GHashTable *
+modulemd_modulestream_peek_xmd (ModulemdModuleStream *self);
 
 
 /**

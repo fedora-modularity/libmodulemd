@@ -87,21 +87,6 @@ struct _ModulemdModule
 
   /* == Members for backwards-compatibility == */
   GHashTable *rpm_buildopts;
-
-  /* Members to emulate peek() */
-  GHashTable *buildrequires;
-  ModulemdSimpleSet *content_licenses;
-  GPtrArray *dependencies;
-  GHashTable *module_components;
-  ModulemdSimpleSet *module_licenses;
-  GHashTable *profiles;
-  GHashTable *requires;
-  ModulemdSimpleSet *rpm_api;
-  ModulemdSimpleSet *rpm_artifacts;
-  GHashTable *rpm_components;
-  ModulemdSimpleSet *rpm_filter;
-  GHashTable *servicelevels;
-  GHashTable *xmd;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
@@ -292,10 +277,7 @@ modulemd_module_peek_buildrequires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->buildrequires, g_hash_table_unref);
-  self->buildrequires = modulemd_modulestream_get_buildrequires (self->stream);
-
-  return self->buildrequires;
+  return modulemd_modulestream_peek_buildrequires (self->stream);
 }
 
 
@@ -444,11 +426,7 @@ modulemd_module_peek_content_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->content_licenses, g_object_unref);
-  self->content_licenses =
-    modulemd_modulestream_get_content_licenses (self->stream);
-
-  return self->content_licenses;
+  return modulemd_modulestream_peek_content_licenses (self->stream);
 }
 
 
@@ -606,10 +584,7 @@ modulemd_module_peek_dependencies (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->dependencies, g_ptr_array_unref);
-  self->dependencies = modulemd_modulestream_get_dependencies (self->stream);
-
-  return self->dependencies;
+  return modulemd_modulestream_peek_dependencies (self->stream);
 }
 
 
@@ -1002,11 +977,8 @@ modulemd_module_peek_module_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->module_components, g_hash_table_unref);
-  self->module_components =
-    modulemd_modulestream_get_module_components (self->stream);
-
-  return self->module_components;
+  return modulemd_modulestream_peek_module_components (self->stream);
+  ;
 }
 
 
@@ -1085,11 +1057,7 @@ modulemd_module_peek_module_licenses (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->module_licenses, g_object_unref);
-  self->module_licenses =
-    modulemd_modulestream_get_module_licenses (self->stream);
-
-  return self->module_licenses;
+  return modulemd_modulestream_peek_module_licenses (self->stream);
 }
 
 
@@ -1274,10 +1242,7 @@ modulemd_module_peek_profiles (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->profiles, g_hash_table_unref);
-  self->profiles = modulemd_modulestream_get_profiles (self->stream);
-
-  return self->profiles;
+  return modulemd_modulestream_peek_profiles (self->stream);
 }
 
 
@@ -1354,10 +1319,7 @@ modulemd_module_peek_requires (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->requires, g_hash_table_unref);
-  self->requires = modulemd_modulestream_get_requires (self->stream);
-
-  return self->requires;
+  return modulemd_modulestream_peek_requires (self->stream);
 }
 
 
@@ -1433,10 +1395,7 @@ modulemd_module_peek_rpm_api (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->rpm_api, g_object_unref);
-  self->rpm_api = modulemd_modulestream_get_rpm_api (self->stream);
-
-  return self->rpm_api;
+  return modulemd_modulestream_peek_rpm_api (self->stream);
 }
 
 
@@ -1516,10 +1475,7 @@ modulemd_module_peek_rpm_artifacts (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->rpm_artifacts, g_object_unref);
-  self->rpm_artifacts = modulemd_modulestream_get_rpm_artifacts (self->stream);
-
-  return self->rpm_artifacts;
+  return modulemd_modulestream_peek_rpm_artifacts (self->stream);
 }
 
 
@@ -1606,10 +1562,6 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
   g_autofree gchar *rpm_macros = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
-  self->rpm_buildopts =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
   opts = modulemd_modulestream_peek_buildopts (self->stream);
   if (opts)
     {
@@ -1621,6 +1573,10 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
       /* Update the hash table for backwards compatibility */
       g_hash_table_replace (
         self->rpm_buildopts, g_strdup ("macros"), g_strdup (rpm_macros));
+    }
+  else
+    {
+      g_hash_table_remove_all (self->rpm_buildopts);
     }
 
   return self->rpm_buildopts;
@@ -1640,33 +1596,9 @@ modulemd_module_peek_rpm_buildopts (ModulemdModule *self)
 GHashTable *
 modulemd_module_dup_rpm_buildopts (ModulemdModule *self)
 {
-  ModulemdBuildopts *opts = NULL;
-  g_autoptr (GHashTable) rpm_buildopts = NULL;
-  g_autofree gchar *rpm_macros = NULL;
-
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  opts = modulemd_modulestream_peek_buildopts (self->stream);
-  if (opts)
-    {
-      rpm_macros = modulemd_buildopts_get_rpm_macros (opts);
-    }
-
-  rpm_buildopts =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
-  if (rpm_macros)
-    {
-      /* Update the hash table for backwards compatibility */
-      g_hash_table_replace (
-        rpm_buildopts, g_strdup ("macros"), g_strdup (rpm_macros));
-    }
-  else
-    {
-      g_hash_table_remove_all (rpm_buildopts);
-    }
-
-  return g_hash_table_ref (rpm_buildopts);
+  return g_hash_table_ref (modulemd_module_peek_rpm_buildopts (self));
 }
 
 
@@ -1769,11 +1701,7 @@ modulemd_module_peek_rpm_components (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->rpm_components, g_hash_table_unref);
-  self->rpm_components =
-    modulemd_modulestream_get_rpm_components (self->stream);
-
-  return self->rpm_components;
+  return modulemd_modulestream_peek_rpm_components (self->stream);
 }
 
 
@@ -1851,10 +1779,7 @@ modulemd_module_peek_rpm_filter (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->rpm_filter, g_object_unref);
-  self->rpm_filter = modulemd_modulestream_get_rpm_filter (self->stream);
-
-  return self->rpm_filter;
+  return modulemd_modulestream_peek_rpm_filter (self->stream);
 }
 
 
@@ -1968,10 +1893,7 @@ modulemd_module_peek_servicelevels (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->servicelevels, g_hash_table_unref);
-  self->servicelevels = modulemd_modulestream_get_servicelevels (self->stream);
-
-  return self->servicelevels;
+  return modulemd_modulestream_peek_servicelevels (self->stream);
 }
 
 
@@ -2313,10 +2235,8 @@ modulemd_module_peek_xmd (ModulemdModule *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  g_clear_pointer (&self->xmd, g_hash_table_unref);
-  self->xmd = modulemd_modulestream_get_xmd (self->stream);
-
-  return self->xmd;
+  return modulemd_modulestream_peek_xmd (self->stream);
+  ;
 }
 
 
@@ -2642,21 +2562,7 @@ modulemd_module_finalize (GObject *gobject)
 {
   ModulemdModule *self = (ModulemdModule *)gobject;
 
-  g_clear_pointer (&self->buildrequires, g_hash_table_unref);
-  g_clear_pointer (&self->content_licenses, g_object_unref);
-  g_clear_pointer (&self->dependencies, g_ptr_array_unref);
-  g_clear_pointer (&self->module_components, g_hash_table_unref);
-  g_clear_pointer (&self->module_licenses, g_object_unref);
-  g_clear_pointer (&self->profiles, g_hash_table_unref);
-  g_clear_pointer (&self->requires, g_hash_table_unref);
-  g_clear_pointer (&self->rpm_api, g_object_unref);
-  g_clear_pointer (&self->rpm_artifacts, g_object_unref);
   g_clear_pointer (&self->rpm_buildopts, g_hash_table_unref);
-  g_clear_pointer (&self->rpm_components, g_hash_table_unref);
-  g_clear_pointer (&self->rpm_filter, g_object_unref);
-  g_clear_pointer (&self->servicelevels, g_hash_table_unref);
-  g_clear_pointer (&self->xmd, g_hash_table_unref);
-
   g_clear_pointer (&self->stream, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (gobject);
@@ -2947,6 +2853,9 @@ modulemd_module_init (ModulemdModule *self)
 {
   /* Allocate the ModulemdStream that lives under the hood */
   self->stream = modulemd_modulestream_new ();
+
+  self->rpm_buildopts =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 }
 
 /**

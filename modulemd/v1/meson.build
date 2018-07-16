@@ -270,7 +270,7 @@ if valgrind.found()
     test ('test_v1_valgrind', python3,
           env : test_env,
           args : modulemd_valgrind_scripts,
-          timeout : 60)
+          timeout : 300)
 endif
 
 gnome.generate_gir(

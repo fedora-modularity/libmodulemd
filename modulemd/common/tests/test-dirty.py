@@ -24,7 +24,7 @@ repo = git.Repo(script_dir,
 
 # When running in CI, the only reason the git repo could
 # become "dirty" (files differ from their checkout) is if
-# the autoformatted made changes. This should be reported
+# the autoformatter made changes. This should be reported
 # back so the submitter can fix this.
 if (repo.is_dirty()):
     print("Autoformatter was not run before submitting. Please run "

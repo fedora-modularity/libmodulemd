@@ -49,6 +49,7 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
             [
                 'meson',
                 'test',
+                '-t', '10',
                 '--logbase=%s' % test,
                 '--wrap=%s' % valgrind_command,
                 test])

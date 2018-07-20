@@ -14,7 +14,8 @@
 #ifndef MODULEMD_PRIORITIZER_H
 #define MODULEMD_PRIORITIZER_H
 
-#include "modulemd.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

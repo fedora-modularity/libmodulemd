@@ -14,7 +14,9 @@
 #ifndef _MODULEMD_SERVICELEVEL_H
 #define _MODULEMD_SERVICELEVEL_H
 
-#include "modulemd.h"
+#include "modulemd-deprecated.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

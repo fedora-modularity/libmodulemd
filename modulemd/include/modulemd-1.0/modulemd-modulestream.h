@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "modulemd.h"
+#include "modulemd-buildopts.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"
@@ -22,6 +22,8 @@
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"
 #include "modulemd-translation.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

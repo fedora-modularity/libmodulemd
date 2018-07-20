@@ -14,7 +14,9 @@
 #ifndef MODULEMD_DEPENDENCIES_H
 #define MODULEMD_DEPENDENCIES_H
 
-#include "modulemd.h"
+#include <glib-object.h>
+
+#include "modulemd-deprecated.h"
 
 G_BEGIN_DECLS
 

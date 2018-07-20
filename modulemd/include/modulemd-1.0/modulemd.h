@@ -20,18 +20,6 @@
  * @short_description: Functions for managing Module Metadata
  */
 
-#ifdef MMD_DISABLE_DEPRECATION_WARNINGS
-#define MMD_DEPRECATED extern
-#define MMD_DEPRECATED_FOR(f) extern
-#define MMD_UNAVAILABLE(maj, min) extern
-#define MMD_DEPRECATED_TYPE_FOR(f)
-#else
-#define MMD_DEPRECATED G_DEPRECATED extern
-#define MMD_DEPRECATED_FOR(f) G_DEPRECATED_FOR (f) extern
-#define MMD_DEPRECATED_TYPE_FOR(f) G_DEPRECATED_FOR (f)
-#define MMD_UNAVAILABLE(maj, min) G_UNAVAILABLE (maj, min) extern
-#endif
-
 
 #include <glib.h>
 #include <glib-object.h>
@@ -43,6 +31,7 @@
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
+#include "modulemd-deprecated.h"
 #include "modulemd-improvedmodule.h"
 #include "modulemd-intent.h"
 #include "modulemd-module.h"

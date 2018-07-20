@@ -14,7 +14,7 @@
 #ifndef MODULEMD_SIMPLESET_H
 #define MODULEMD_SIMPLESET_H
 
-#include "modulemd.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

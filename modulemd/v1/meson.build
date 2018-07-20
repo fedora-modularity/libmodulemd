@@ -265,6 +265,11 @@ test ('test_v1_release_modulemd_python', python3,
       env : test_release_env,
       args : modulemd_python_scripts)
 
+import_header_script = find_program('tests/test-import-headers.sh')
+test ('test_v1_import_headers', import_header_script,
+      env : test_env,
+      args : modulemd_v1_hdrs)
+
 if valgrind.found()
     modulemd_valgrind_scripts = files('tests/test-valgrind.py')
     test ('test_v1_valgrind', python3,

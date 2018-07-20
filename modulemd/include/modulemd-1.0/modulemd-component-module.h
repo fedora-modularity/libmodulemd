@@ -14,9 +14,11 @@
 #ifndef MODULEMD_COMPONENT_MODULE_H
 #define MODULEMD_COMPONENT_MODULE_H
 
-#include "modulemd.h"
 #include "modulemd-component.h"
+#include "modulemd-deprecated.h"
 #include "modulemd-simpleset.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

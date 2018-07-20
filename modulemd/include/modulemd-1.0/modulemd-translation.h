@@ -13,8 +13,9 @@
 
 #pragma once
 
-#include "modulemd.h"
 #include "modulemd-translation-entry.h"
+
+#include <stdio.h>
 #include <glib-object.h>
 
 G_BEGIN_DECLS

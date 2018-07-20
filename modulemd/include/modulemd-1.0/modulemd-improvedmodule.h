@@ -13,9 +13,11 @@
 
 #pragma once
 
-#include "modulemd.h"
+#include "modulemd-buildopts.h"
 #include "modulemd-modulestream.h"
 #include "modulemd-defaults.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

@@ -72,6 +72,7 @@ modulemd_v1_hdrs = files(
     'include/modulemd-1.0/modulemd-component-rpm.h',
     'include/modulemd-1.0/modulemd-defaults.h',
     'include/modulemd-1.0/modulemd-dependencies.h',
+    'include/modulemd-1.0/modulemd-deprecated.h',
     'include/modulemd-1.0/modulemd-improvedmodule.h',
     'include/modulemd-1.0/modulemd-intent.h',
     'include/modulemd-1.0/modulemd-module.h',

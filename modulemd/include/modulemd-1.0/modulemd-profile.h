@@ -14,8 +14,11 @@
 #ifndef MODULEMD_PROFILE_H
 #define MODULEMD_PROFILE_H
 
-#include "modulemd.h"
+#include "modulemd-deprecated.h"
 #include "modulemd-prioritizer.h"
+#include "modulemd-simpleset.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

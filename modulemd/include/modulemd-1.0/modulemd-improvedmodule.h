@@ -11,11 +11,11 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#pragma once
+
 #include "modulemd.h"
 #include "modulemd-modulestream.h"
 #include "modulemd-defaults.h"
-
-#pragma once
 
 G_BEGIN_DECLS
 

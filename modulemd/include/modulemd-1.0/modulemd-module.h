@@ -19,6 +19,7 @@
 #include "modulemd-component-rpm.h"
 #include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
+#include "modulemd-modulestream.h"
 #include "modulemd-profile.h"
 #include "modulemd-servicelevel.h"
 #include "modulemd-simpleset.h"

@@ -30,13 +30,13 @@ EOF
 
   cat $header.c
 
-  echo "gcc \`pkgconf --cflags gobject-2.0\` \
-            \`pkgconf --cflags yaml-0.1\` \
+  echo "gcc \`pkg-config --cflags gobject-2.0\` \
+            \`pkg-config --cflags yaml-0.1\` \
             -I `dirname $arg` \
             -o $header.out \
             $header.c"
-  gcc `pkgconf --cflags gobject-2.0` \
-      `pkgconf --cflags yaml-0.1` \
+  gcc `pkg-config --cflags gobject-2.0` \
+      `pkg-config --cflags yaml-0.1` \
       -I `dirname $arg` \
       -o $header.out \
       $header.c

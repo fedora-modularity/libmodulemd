@@ -268,51 +268,46 @@ _emit_defaults_intents (yaml_emitter_t *emitter,
                         ModulemdDefaults *defaults,
                         GError **error)
 {
-  gboolean result = FALSE;
+  MODULEMD_INIT_TRACE
   g_autofree gchar *name = NULL;
-  yaml_event_t event;
+  MMD_INIT_YAML_EVENT (event);
   GHashTable *intents = NULL;
   g_autoptr (GPtrArray) keys = NULL;
   ModulemdIntent *intent = NULL;
 
   g_debug ("TRACE: entering _emit_defaults_intents");
+  intents = modulemd_defaults_peek_intents (defaults);
+  if (!intents || !g_hash_table_size (intents))
+    return TRUE;
+
 
   name = g_strdup ("intents");
-  MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+  MMD_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
   /* Start the map */
   yaml_mapping_start_event_initialize (
     &event, NULL, NULL, 1, YAML_BLOCK_MAPPING_STYLE);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
+  MMD_EMIT_WITH_EXIT (
     emitter, &event, error, "Error starting intents mapping");
 
-  intents = modulemd_defaults_peek_intents (defaults);
   keys = _modulemd_ordered_str_keys (intents, _modulemd_strcmp_sort);
 
   for (gsize i = 0; i < keys->len; i++)
     {
       name = g_strdup (g_ptr_array_index (keys, i));
       intent = g_hash_table_lookup (intents, name);
-      MMD_YAML_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
+      MMD_EMIT_SCALAR (&event, name, YAML_PLAIN_SCALAR_STYLE);
 
       if (!_emit_intent (emitter, intent, error))
-        {
-          MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not write out intents");
-        }
+        return FALSE;
     }
 
 
   /* End the map */
   yaml_mapping_end_event_initialize (&event);
-  YAML_EMITTER_EMIT_WITH_ERROR_RETURN (
-    emitter, &event, error, "Error ending intents mapping");
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Error ending intents mapping");
 
-  result = TRUE;
-error:
-  yaml_event_delete (&event);
-
-  g_debug ("TRACE: exiting _emit_defaults_intents");
-  return result;
+  return TRUE;
 }
 
 

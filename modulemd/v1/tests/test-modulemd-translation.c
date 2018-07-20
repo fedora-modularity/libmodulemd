@@ -369,7 +369,7 @@ modulemd_translation_test_index (TranslationFixture *fixture,
     "モジュールの例です。\n      profiles:\n        default: "
     "プロファイルの例\n...\n---\ndocument: modulemd-defaults\nversion: "
     "1\ndata:\n  module: foo\n  stream: stream-name\n  profiles:\n    "
-    "stream_name: [default]\n  intents: {}\n...\n");
+    "stream_name: [default]\n...\n");
 
   /* Test specific translations */
   g_assert_cmpstr (modulemd_modulestream_get_localized_summary (stream, "ja"),

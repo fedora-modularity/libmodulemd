@@ -104,7 +104,7 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
 
 /**
  * modulemd_index_from_file:
- * @yaml_file: A YAML file containing the module metadata and other related
+ * @yaml_string: A YAML file containing the module metadata and other related
  * information such as default streams.
  * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
  * An array containing any subdocuments from the YAML file that failed to
@@ -112,7 +112,7 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
  * @error: (out): A #GError containing additional information if this function
  * fails.
  *
- * Allocates a #GPtrArray of various supported subdocuments from a file.
+ * Allocates a #GHashTable of module data from a file.
  *
  * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
  * A #GHashTable containing all of the subdocuments from a YAML file, indexed
@@ -181,7 +181,7 @@ modulemd_objects_from_string_ext (const gchar *yaml_string,
  * @error: (out): A #GError containing additional information if this function
  * fails.
  *
- * Allocates a #GPtrArray of various supported subdocuments from a file.
+ * Allocates a #GHashTable of module data from a string.
  *
  * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
  * A #GHashTable containing all of the subdocuments from a YAML file, indexed
@@ -250,7 +250,7 @@ modulemd_objects_from_stream_ext (FILE *stream,
  * @error: (out): A #GError containing additional information if this function
  * fails.
  *
- * Allocates a #GPtrArray of various supported subdocuments from a file.
+ * Allocates a #GHashTable of module data from a stream.
  *
  * Returns: (element-type utf8 ModulemdImprovedModule) (transfer container):
  * A #GHashTable containing all of the subdocuments from a YAML file, indexed

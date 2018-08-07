@@ -24,7 +24,7 @@ G_BEGIN_DECLS
 
 /**
  * SECTION: modulemd-component-rpm
- * @title: Modulemd.ComponentModule
+ * @title: Modulemd.ComponentRpm
  * @short_description: An RPM component that goes into a module stream.
  */
 

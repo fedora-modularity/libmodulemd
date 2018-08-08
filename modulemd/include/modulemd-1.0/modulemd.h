@@ -104,7 +104,7 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
 
 /**
  * modulemd_index_from_file:
- * @yaml_string: A YAML file containing the module metadata and other related
+ * @yaml_file: A YAML file containing the module metadata and other related
  * information such as default streams.
  * @failures: (element-type ModulemdSubdocument) (transfer container) (out):
  * An array containing any subdocuments from the YAML file that failed to

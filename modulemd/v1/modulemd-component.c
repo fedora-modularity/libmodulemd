@@ -33,7 +33,7 @@ GParamSpec *component_properties[COMPONENT_N_PROPS] = {
 /* Private structure definition */
 typedef struct
 {
-  guint64 buildorder;
+  gint64 buildorder;
   gchar *name;
   gchar *rationale;
 } ModulemdComponentPrivate;
@@ -44,7 +44,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (ModulemdComponent,
 
 static void
 modulemd_component_default_set_buildorder (ModulemdComponent *self,
-                                           guint64 buildorder)
+                                           gint64 buildorder)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT (self));
   ModulemdComponentPrivate *priv =
@@ -54,8 +54,8 @@ modulemd_component_default_set_buildorder (ModulemdComponent *self,
   priv->buildorder = buildorder;
 }
 
-static guint64
-modulemd_component_default_peek_buildorder (ModulemdComponent *self)
+static gint64
+modulemd_component_default_get_buildorder (ModulemdComponent *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), 0);
   ModulemdComponentPrivate *priv =
@@ -128,7 +128,7 @@ modulemd_component_default_dup_rationale (ModulemdComponent *self)
 
 
 void
-modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
+modulemd_component_set_buildorder (ModulemdComponent *self, gint64 buildorder)
 {
   ModulemdComponentClass *klass;
 
@@ -141,14 +141,14 @@ modulemd_component_set_buildorder (ModulemdComponent *self, guint64 buildorder)
 }
 
 
-guint64
+gint64
 modulemd_component_get_buildorder (ModulemdComponent *self)
 {
   return modulemd_component_peek_buildorder (self);
 }
 
 
-guint64
+gint64
 modulemd_component_peek_buildorder (ModulemdComponent *self)
 {
   ModulemdComponentClass *klass;
@@ -361,7 +361,7 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->finalize = modulemd_component_finalize;
 
   klass->set_buildorder = modulemd_component_default_set_buildorder;
-  klass->peek_buildorder = modulemd_component_default_peek_buildorder;
+  klass->peek_buildorder = modulemd_component_default_get_buildorder;
 
   klass->set_name = modulemd_component_default_set_name;
   klass->peek_name = modulemd_component_default_peek_name;

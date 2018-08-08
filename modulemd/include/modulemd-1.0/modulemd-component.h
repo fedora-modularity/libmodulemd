@@ -36,8 +36,8 @@ struct _ModulemdComponentClass
   GObjectClass parent_instance;
 
   /* Virtual Public Members */
-  void (*set_buildorder) (ModulemdComponent *self, guint64 buildorder);
-  guint64 (*peek_buildorder) (ModulemdComponent *self);
+  void (*set_buildorder) (ModulemdComponent *self, gint64 buildorder);
+  gint64 (*peek_buildorder) (ModulemdComponent *self);
 
   void (*set_name) (ModulemdComponent *self, const gchar *name);
   const gchar *(*peek_name) (ModulemdComponent *self);
@@ -79,8 +79,7 @@ modulemd_component_new (void);
  * Since: 1.0
  */
 void
-modulemd_component_set_buildorder (ModulemdComponent *self,
-                                   guint64 buildorder);
+modulemd_component_set_buildorder (ModulemdComponent *self, gint64 buildorder);
 
 
 /**
@@ -88,13 +87,9 @@ modulemd_component_set_buildorder (ModulemdComponent *self,
  *
  * Returns the 'buildorder' property
  *
- * Deprecated: 1.1
- * Use peek_buildorder() instead.
- *
  * Since: 1.0
  */
-MMD_DEPRECATED_FOR (modulemd_component_peek_buildorder)
-guint64
+gint64
 modulemd_component_get_buildorder (ModulemdComponent *self);
 
 
@@ -105,7 +100,7 @@ modulemd_component_get_buildorder (ModulemdComponent *self);
  *
  * Since: 1.1
  */
-guint64
+gint64
 modulemd_component_peek_buildorder (ModulemdComponent *self);
 
 

@@ -3009,13 +3009,12 @@ void
 modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
                                        GPtrArray **data)
 {
-  GError *error = NULL;
+  g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) to_convert = NULL;
 
   if (!parse_yaml_file (yaml_file, &to_convert, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
-      g_error_free (error);
       return;
     }
 
@@ -3135,13 +3134,12 @@ void
 modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
                                          GPtrArray **data)
 {
-  GError *error = NULL;
+  g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) to_convert = NULL;
 
   if (!parse_yaml_string (yaml_string, &to_convert, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
-      g_error_free (error);
       return;
     }
 

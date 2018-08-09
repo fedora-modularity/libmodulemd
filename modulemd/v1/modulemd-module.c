@@ -3010,13 +3010,20 @@ modulemd_module_new_all_from_file_ext (const gchar *yaml_file,
                                        GPtrArray **data)
 {
   GError *error = NULL;
+  g_autoptr (GPtrArray) to_convert = NULL;
 
-  if (!parse_yaml_file (yaml_file, data, NULL, &error))
+  if (!parse_yaml_file (yaml_file, &to_convert, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
+
+  /* For backwards-compatibility, we need to return Modulemd.Module objects,
+   * not Modulemd.ModuleStream objects
+   */
+  if (data)
+    *data = mmd_yaml_convert_modulestreams (to_convert);
 }
 
 
@@ -3129,13 +3136,20 @@ modulemd_module_new_all_from_string_ext (const gchar *yaml_string,
                                          GPtrArray **data)
 {
   GError *error = NULL;
+  g_autoptr (GPtrArray) to_convert = NULL;
 
-  if (!parse_yaml_string (yaml_string, data, NULL, &error))
+  if (!parse_yaml_string (yaml_string, &to_convert, NULL, &error))
     {
       g_debug ("Error parsing YAML: %s", error->message);
       g_error_free (error);
       return;
     }
+
+  /* For backwards-compatibility, we need to return Modulemd.Module objects,
+   * not Modulemd.ModuleStream objects
+   */
+  if (data)
+    *data = mmd_yaml_convert_modulestreams (to_convert);
 }
 
 

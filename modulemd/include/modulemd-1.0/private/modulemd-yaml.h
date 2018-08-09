@@ -270,6 +270,9 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 ModulemdModule **
 mmd_yaml_dup_modules (GPtrArray *objects);
 
+GPtrArray *
+mmd_yaml_convert_modulestreams (GPtrArray *objects);
+
 gboolean
 parse_yaml_file (const gchar *path,
                  GPtrArray **data,

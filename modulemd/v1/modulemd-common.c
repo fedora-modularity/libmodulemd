@@ -27,35 +27,6 @@ modulemd_objects_from_file (const gchar *yaml_file, GError **error)
 }
 
 
-static GPtrArray *
-convert_modulestream_to_module (GPtrArray *objects)
-{
-  GPtrArray *compat_data = NULL;
-  GObject *object = NULL;
-  gsize i;
-
-
-  compat_data = g_ptr_array_new_full (objects->len, g_object_unref);
-
-  for (i = 0; i < objects->len; i++)
-    {
-      object = g_ptr_array_index (objects, i);
-      if (MODULEMD_IS_MODULESTREAM (object))
-        {
-          g_ptr_array_add (objects,
-                           modulemd_module_new_from_modulestream (
-                             MODULEMD_MODULESTREAM (object)));
-        }
-      else
-        {
-          g_ptr_array_add (compat_data, g_object_ref (object));
-        }
-    }
-
-  return compat_data;
-}
-
-
 GPtrArray *
 modulemd_objects_from_file_ext (const gchar *yaml_file,
                                 GPtrArray **failures,
@@ -73,7 +44,7 @@ modulemd_objects_from_file_ext (const gchar *yaml_file,
   /* For backwards-compatibility, we need to return Modulemd.Module objects,
    * not Modulemd.ModuleStream objects
    */
-  compat_data = convert_modulestream_to_module (data);
+  compat_data = mmd_yaml_convert_modulestreams (data);
 
   return compat_data;
 }
@@ -114,7 +85,7 @@ modulemd_objects_from_stream_ext (FILE *stream,
   /* For backwards-compatibility, we need to return Modulemd.Module objects,
    * not Modulemd.ModuleStream objects
    */
-  compat_data = convert_modulestream_to_module (data);
+  compat_data = mmd_yaml_convert_modulestreams (data);
 
   return compat_data;
 }
@@ -155,7 +126,7 @@ modulemd_objects_from_string_ext (const gchar *yaml_string,
   /* For backwards-compatibility, we need to return Modulemd.Module objects,
    * not Modulemd.ModuleStream objects
    */
-  compat_data = convert_modulestream_to_module (data);
+  compat_data = mmd_yaml_convert_modulestreams (data);
 
   return compat_data;
 }

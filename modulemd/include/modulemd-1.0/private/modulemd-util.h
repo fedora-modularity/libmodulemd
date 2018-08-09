@@ -87,6 +87,10 @@ GHashTable *
 module_index_from_data (GPtrArray *data, GError **error);
 
 
+GPtrArray *
+convert_modulestream_to_module (GPtrArray *objects);
+
+
 G_END_DECLS
 
 #endif /* MODULEMD_UTIL_H */

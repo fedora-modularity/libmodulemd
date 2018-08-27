@@ -90,22 +90,28 @@ data:
     # the runtime block so that it matches the stream the module was built
     # against.  Multiple builds result in multiple output modulemd files.
     # See below for an example.
-    # TODO: Provides, conflicts, obsoletes, recommends, etc.
-    #       Do we even need those?
+    # Provides also support stream expansion and indicate what modules names
+    # and streams are provided.  Just like with dependencies, streams can
+    # be inclusive or exclusive lists, with an empty list meaning that any
+    # stream of that module name is provided.
     # The example below illustrates how to build the same module in four
     # different ways, with varying build time and runtime dependencies.
     dependencies:
         # Build on all available platforms except for f27, f28 and epel7
         # After build, the runtime dependency will match the one used for
         # the build.
+        # In this situation this module also provides "onestream:1".
         - buildrequires:
               platform: [-f27, -f28, -epel7]
           requires:
               platform: [-f27, -f28, -epel7]
+          provides:
+              onestream: [v1]
         # For platform:f27 perform two builds, one with buildtools:v1, another
         # with buildtools:v2 in the buildroot.  Both will also utilize
         # compatible:v3.  At runtime, buildtools isn't required and either
         # compatible:v3 or compatible:v4 can be installed.
+        # We also provide "multiplestreams:v1" and "multiplestreams:v2".
         - buildrequires:
               platform: [f27]
               buildtools: [v1, v2]
@@ -113,18 +119,25 @@ data:
           requires:
               platform: [f27]
               compatible: [v3, v4]
+          provides:
+              multiplestreams: [v1, v2]
         # For platform:f28 builds, require either runtime:a or runtime:b at
         # runtime.  Only one build is performed.
+        # Provides any stream of the module "anystream".
         - buildrequires:
               platform: [f28]
           requires:
               platform: [f28]
               runtime: [a, b]
+          provides:
+              anystream: []
         # For platform:epel7, build against against all available extras
         # streams and moreextras:foo and moreextras:bar.  The number of builds
         # in this case will be 2 * <the number of extras streams available>.
         # At runtime, both extras and moreextras will match whatever stream was
         # used for build.
+        # Provides any stream of the module "exceptstreams" with the exception
+        # of "exceptstreams:v3" and "exceptstreams:v4".
         - buildrequires:
               platform: [epel7]
               extras: []
@@ -133,6 +146,8 @@ data:
               platform: [epel7]
               extras: []
               moreextras: [foo, bar]
+          provides:
+              exceptstreams: [~v3, ~v4]
     # References to external resources, typically upstream, optional
     references:
         # Upstream community website, if it exists, optional

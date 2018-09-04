@@ -124,8 +124,11 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
 #define MMD_EMIT_WITH_EXIT(emitter, event, _error, ...)                       \
   do                                                                          \
     {                                                                         \
+      int _ret;                                                               \
       g_debug ("Emitter event: %s", mmd_yaml_get_event_name ((event)->type)); \
-      if (!yaml_emitter_emit (emitter, event))                                \
+      _ret = yaml_emitter_emit (emitter, event);                              \
+      (event)->type = 0;                                                      \
+      if (!_ret)                                                              \
         {                                                                     \
           g_debug (__VA_ARGS__);                                              \
           g_set_error (_error,                                                \

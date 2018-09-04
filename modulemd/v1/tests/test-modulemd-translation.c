@@ -393,6 +393,25 @@ modulemd_translation_test_index (TranslationFixture *fixture,
                    "プロファイルの例");
 }
 
+static void
+modulemd_translation_test_missing_summary (TranslationFixture *fixture,
+                                           gconstpointer user_data)
+{
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
+  g_autofree gchar *yaml = NULL;
+
+  translation = modulemd_translation_new_full (
+    "modulename", "modulestream", 1, 201809041500);
+
+  entry = modulemd_translation_entry_new ("en_US");
+  modulemd_translation_add_entry (translation, entry);
+
+  yaml = modulemd_translation_dumps (translation, &error);
+  g_assert_null (yaml);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -437,6 +456,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_translation_test_index,
+              NULL);
+
+  g_test_add ("/modulemd/translation/test_missing_summary",
+              TranslationFixture,
+              NULL,
+              NULL,
+              modulemd_translation_test_missing_summary,
               NULL);
 
   return g_test_run ();

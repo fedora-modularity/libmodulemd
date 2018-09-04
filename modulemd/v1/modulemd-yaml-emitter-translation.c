@@ -245,10 +245,26 @@ _emit_translation_entry (yaml_emitter_t *emitter,
 
   name = g_strdup ("summary");
   value = modulemd_translation_entry_get_summary (entry);
+  if (!value)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Translation entry missing summary field.");
+      return FALSE;
+    }
   MMD_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
   name = g_strdup ("description");
   value = modulemd_translation_entry_get_description (entry);
+  if (!value)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Translation entry missing description field.");
+      return FALSE;
+    }
   MMD_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
   /* Profile Descriptions */

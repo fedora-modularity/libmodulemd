@@ -201,6 +201,21 @@ class TestIssues(unittest.TestCase):
         component.set_buildorder(5)
         assert component.props.buildorder == 5
 
+    def test_issue80(self):
+        mmd_translation = Modulemd.Translation(module_name="modulename",
+                                               module_stream="modulestream",
+                                               mdversion=1,
+                                               modified=201809041500)
+        entry = Modulemd.TranslationEntry(locale='en_US')
+        mmd_translation.add_entry(entry)
+
+        # Would crash attempting to dump to YAML
+        try:
+            yaml_output = mmd_translation.dumps()
+        except GLib.GError as err:
+            # A proper exception is expected here
+            pass
+
 
 class TestIntent(unittest.TestCase):
 

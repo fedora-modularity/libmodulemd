@@ -188,6 +188,19 @@ class TestIssues(unittest.TestCase):
             "%s/mod-defaults/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
         print(defs)
 
+    def test_issue77(self):
+        # This would crash on a type constraint accepting a signed value
+        component = Modulemd.ComponentRpm(name="pkg1",
+                                          rationale="Just because",
+                                          buildorder=-1)
+        assert component.props.buildorder == -1
+
+        component.props.buildorder = -2
+        assert component.get_buildorder() == -2
+
+        component.set_buildorder(5)
+        assert component.props.buildorder == 5
+
 
 class TestIntent(unittest.TestCase):
 

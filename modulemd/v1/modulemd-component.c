@@ -294,7 +294,7 @@ modulemd_component_set_property (GObject *gobject,
   switch (property_id)
     {
     case COMPONENT_PROP_BUILDORDER:
-      modulemd_component_set_buildorder (self, g_value_get_uint64 (value));
+      modulemd_component_set_buildorder (self, g_value_get_int64 (value));
       break;
 
     case COMPONENT_PROP_NAME:
@@ -322,7 +322,7 @@ modulemd_component_get_property (GObject *gobject,
   switch (property_id)
     {
     case COMPONENT_PROP_BUILDORDER:
-      g_value_set_uint64 (value, modulemd_component_peek_buildorder (self));
+      g_value_set_int64 (value, modulemd_component_peek_buildorder (self));
       break;
 
     case COMPONENT_PROP_NAME:
@@ -375,13 +375,13 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   klass->copy = NULL;
 
   component_properties[COMPONENT_PROP_BUILDORDER] =
-    g_param_spec_uint64 ("buildorder",
-                         "Build order",
-                         "The buildorder index for this component.",
-                         0,
-                         G_MAXUINT64,
-                         0,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+    g_param_spec_int64 ("buildorder",
+                        "Build order",
+                        "The buildorder index for this component.",
+                        G_MININT64,
+                        G_MAXINT64,
+                        0,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   component_properties[COMPONENT_PROP_NAME] =
     g_param_spec_string ("name",

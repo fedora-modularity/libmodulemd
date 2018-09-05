@@ -1798,11 +1798,11 @@ modulemd_modulestream_get_nsvc (ModulemdModuleStream *self)
   if (context)
     {
       nsvc = g_strdup_printf (
-        "%s:%s:%" PRIx64 ":%s", name, stream, version, context);
+        "%s:%s:%" PRIu64 ":%s", name, stream, version, context);
     }
   else
     {
-      nsvc = g_strdup_printf ("%s:%s:%" PRIx64, name, stream, version);
+      nsvc = g_strdup_printf ("%s:%s:%" PRIu64, name, stream, version);
     }
 
   return nsvc;

@@ -216,6 +216,56 @@ class TestIssues(unittest.TestCase):
             # A proper exception is expected here
             pass
 
+    def test_issue85(self):
+        """
+        Component module refs are lost when dumping to YAML
+        """
+        mmd = Modulemd.Module().new_from_string("""
+document: modulemd
+version: 1
+data:
+    summary: A test module in all its beautiful beauty.
+    description: This module demonstrates how to write simple modulemd files And can be used for testing the build and release pipeline.
+    license:
+        module: [ MIT ]
+    dependencies:
+        buildrequires:
+            platform: el8
+        requires:
+            platform: el8
+    references:
+        community: https://fedoraproject.org/wiki/Modularity
+        documentation: https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules
+        tracker: https://taiga.fedorainfracloud.org/project/modularity
+    profiles:
+        default:
+            rpms:
+                - acl
+    api:
+        rpms:
+            - acl
+    components:
+        rpms:
+            acl:
+                rationale: needed
+                ref: rhel-8.0
+        modules:
+            testmodule:
+                ref: private-x
+                rationale: Testing module inclusion.
+                buildorder: 10
+""")
+        assert mmd.get_module_components(
+        )['testmodule'].peek_ref() == 'private-x'
+
+        mmd2 = Modulemd.Module.copy(mmd)
+        assert mmd2.get_module_components(
+        )['testmodule'].peek_ref() == 'private-x'
+
+        mmd3 = Modulemd.Module.new_from_string(mmd.dumps())
+        assert mmd3.get_module_components(
+        )['testmodule'].peek_ref() == 'private-x'
+
 
 class TestIntent(unittest.TestCase):
 

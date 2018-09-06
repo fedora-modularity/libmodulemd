@@ -352,7 +352,7 @@ modulemd_translation_test_index (TranslationFixture *fixture,
     "dependency of xxx.\n        buildorder: 10\n    modules:\n      "
     "includedmodule:\n        rationale: Included in the stack, just "
     "because.\n        repository: https://pagure.io/includedmodule.git\n     "
-    "   ref: https://pagure.io/includedmodule.git\n        buildorder: 100\n  "
+    "   ref: somecoolbranchname\n        buildorder: 100\n  "
     "artifacts:\n    rpms:\n    - bar-0:1.23-1.module_deadbeef.x86_64\n    - "
     "bar-devel-0:1.23-1.module_deadbeef.x86_64\n    - "
     "bar-extras-0:1.23-1.module_deadbeef.x86_64\n    - "

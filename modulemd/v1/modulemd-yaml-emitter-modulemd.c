@@ -1355,7 +1355,7 @@ _emit_modulemd_module_components (yaml_emitter_t *emitter,
     }
 
   /* Ref */
-  value = modulemd_component_module_dup_repository (module_component);
+  value = modulemd_component_module_dup_ref (module_component);
   if (value)
     {
       name = g_strdup ("ref");

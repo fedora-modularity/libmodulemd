@@ -34,6 +34,7 @@
       </para>
     </partintro>
     <xi:include href="xml/modulemd.xml"/>
+    <xi:include href="xml/modulemd-buildopts.xml"/>
     <xi:include href="xml/modulemd-component.xml"/>
     <xi:include href="xml/modulemd-component-module.xml"/>
     <xi:include href="xml/modulemd-component-rpm.xml"/>

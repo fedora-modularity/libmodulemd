@@ -1,0 +1,24 @@
+# Document type identifier
+document: modulemd-defaults
+
+# Module metadata format version
+version: 2
+
+data:
+    # Module name that the defaults are for, required.
+    module: foo
+
+    # Module stream that is the default for the module, optional.
+    stream: x.y
+
+    # The system intent that this default applies to, optional.
+    # If this is omitted, these are the general defaults. If it is provided,
+    # these are the defaults that apply to a system assigned this intent.
+    intent: server
+
+    # Module profiles indexed by the stream name, optional
+    # This is a dictionary of stream names to a list of default profiles to be
+    # installed.
+    profiles:
+        'x.y': []
+        bar: [baz, snafu]

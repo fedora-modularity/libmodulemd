@@ -60,6 +60,11 @@ modulemd_prioritizer_class_init (ModulemdPrioritizerClass *klass)
   object_class->set_property = NULL;
 }
 
+static GPtrArray *
+_deduplicate_module_streams (const GPtrArray *first,
+                             const GPtrArray *second,
+                             GError **error);
+
 static void
 _modulemd_ptr_array_unref (gpointer ptr)
 {
@@ -82,7 +87,10 @@ modulemd_prioritizer_add (ModulemdPrioritizer *self,
 {
   GPtrArray *current_objects = NULL;
   g_autoptr (GPtrArray) concat_objects = NULL;
+  g_autoptr (GPtrArray) deduped_objects = NULL;
   g_autoptr (GPtrArray) merged_objects = NULL;
+  g_autoptr (ModulemdSimpleSet) nsvcs = modulemd_simpleset_new ();
+  g_autofree gchar *nsvc = NULL;
   gint64 *prio = NULL;
   gsize i;
 
@@ -142,14 +150,17 @@ modulemd_prioritizer_add (ModulemdPrioritizer *self,
         }
     }
 
-  for (i = 0; i < objects->len; i++)
+  deduped_objects =
+    _deduplicate_module_streams (concat_objects, objects, error);
+  if (!deduped_objects)
     {
-      g_ptr_array_add (concat_objects,
-                       g_object_ref (g_ptr_array_index (objects, i)));
+      /* Something went wrong. Return the error here. */
+      g_clear_pointer (&prio, g_free);
+      return FALSE;
     }
 
   merged_objects =
-    modulemd_merge_defaults (concat_objects, NULL, FALSE, error);
+    modulemd_merge_defaults (deduped_objects, NULL, FALSE, error);
   if (!merged_objects)
     {
       /* Something went wrong. Return the error here. */
@@ -188,18 +199,18 @@ GPtrArray *
 modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
 {
   g_autoptr (GPtrArray) current = NULL;
-  g_autoptr (GPtrArray) next = NULL;
+  g_autoptr (GPtrArray) prev = NULL;
   g_autoptr (GPtrArray) tmp = NULL;
+  g_autoptr (GPtrArray) deduped_objects = NULL;
   g_autoptr (GList) priority_levels = NULL;
   GList *current_level = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_PRIORITIZER (self), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  current_level = priority_levels =
-    _modulemd_ordered_int64_keys (self->priorities);
+  priority_levels = _modulemd_ordered_int64_keys (self->priorities);
 
-  if (!current_level)
+  if (!priority_levels)
     {
       /* Nothing has been added to the resolver. */
       g_set_error (error,
@@ -210,30 +221,142 @@ modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
       return NULL;
     }
 
-  current = g_ptr_array_ref (
-    g_hash_table_lookup (self->priorities, priority_levels->data));
+  /* Go through the merge from highest priority down to lowest. */
+  current_level = g_list_last (priority_levels);
 
-  while (current_level->next)
+  current = g_ptr_array_ref (
+    g_hash_table_lookup (self->priorities, current_level->data));
+
+  while (current_level->prev)
     {
-      next = g_ptr_array_ref (
-        g_hash_table_lookup (self->priorities, current_level->next->data));
+      prev = g_ptr_array_ref (
+        g_hash_table_lookup (self->priorities, current_level->prev->data));
 
       /* Merge the values, replacing any conflicts */
-      tmp = modulemd_merge_defaults (current, next, TRUE, error);
+      tmp = modulemd_merge_defaults (prev, current, TRUE, error);
       if (!tmp)
         {
           /* Something went wrong with the merge. Return the error */
           return NULL;
         }
-      g_clear_pointer (&current, g_ptr_array_unref);
-      current = g_ptr_array_ref (tmp);
-      g_clear_pointer (&tmp, g_ptr_array_unref);
-      g_clear_pointer (&next, g_ptr_array_unref);
 
-      current_level = current_level->next;
+      /* Deduplicate after the merge */
+      deduped_objects = _deduplicate_module_streams (tmp, NULL, error);
+      if (!deduped_objects)
+        {
+          /* Something went wrong. Return the error here. */
+          return NULL;
+        }
+
+      g_clear_pointer (&current, g_ptr_array_unref);
+      current = g_ptr_array_ref (deduped_objects);
+      g_clear_pointer (&tmp, g_ptr_array_unref);
+      g_clear_pointer (&deduped_objects, g_ptr_array_unref);
+      g_clear_pointer (&prev, g_ptr_array_unref);
+
+      current_level = current_level->prev;
     }
 
   return g_ptr_array_ref (current);
+}
+
+static GPtrArray *
+_deduplicate_module_streams (const GPtrArray *first,
+                             const GPtrArray *second,
+                             GError **error)
+{
+  GObject *object = NULL;
+  g_autoptr (GPtrArray) deduplicated = NULL;
+  g_autoptr (ModulemdSimpleSet) nsvcs = modulemd_simpleset_new ();
+  g_autofree gchar *nsvc = NULL;
+  gssize reserved_size, i;
+
+  g_return_val_if_fail (first, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  /* Assume the common case that there are no duplicates and preallocate
+   * space to hold the entire set.
+   */
+  reserved_size = first->len;
+  if (second)
+    {
+      reserved_size += second->len;
+    }
+
+  deduplicated = g_ptr_array_new_full (reserved_size, g_object_unref);
+
+  /* We check the second list here as a preventative measure. In a proper
+   * implementation of this, we'd do a full check of the module stream entries
+   * to ensure that they don't have the same NSVC but different content. For
+   * now, however, we'll just assume that the second list has the right data
+   * since it's likely to be newer.
+   */
+  if (second)
+    for (i = 0; i < second->len; i++)
+      {
+        object = g_ptr_array_index (second, i);
+
+        if (MODULEMD_IS_MODULE (object))
+          {
+            nsvc = modulemd_module_dup_nsvc (MODULEMD_MODULE (object));
+          }
+        else if (MODULEMD_IS_MODULESTREAM (object))
+          {
+            nsvc =
+              modulemd_modulestream_get_nsvc (MODULEMD_MODULESTREAM (object));
+          }
+        if (nsvc)
+          {
+            if (modulemd_simpleset_contains (nsvcs, nsvc))
+              {
+                /* We've seen this NSVC before; skip it */
+                continue;
+              }
+
+            /* Save this NSVC so we don't add it twice */
+            modulemd_simpleset_add (nsvcs, nsvc);
+            g_clear_pointer (&nsvc, g_free);
+          }
+
+        g_ptr_array_add (deduplicated, g_object_ref (object));
+      }
+
+  /* For the 'first' list, go through in reverse order, because this may be
+   * called after the modulemd_merge_defaults() routine has already
+   * concatenated the higher-priority list. This will ensure that the
+   * other list wins any merge disputes.
+   */
+  for (i = (gsize)first->len - 1; i >= 0; i--)
+    {
+      object = g_ptr_array_index (first, i);
+
+      if (MODULEMD_IS_MODULE (object))
+        {
+          nsvc = modulemd_module_dup_nsvc (MODULEMD_MODULE (object));
+        }
+      else if (MODULEMD_IS_MODULESTREAM (object))
+        {
+          nsvc =
+            modulemd_modulestream_get_nsvc (MODULEMD_MODULESTREAM (object));
+        }
+
+      if (nsvc)
+        {
+          if (modulemd_simpleset_contains (nsvcs, nsvc))
+            {
+              /* We've seen this NSVC before; skip it */
+              continue;
+            }
+
+          /* Save this NSVC so we don't add it twice */
+          modulemd_simpleset_add (nsvcs, nsvc);
+          g_clear_pointer (&nsvc, g_free);
+        }
+
+      g_ptr_array_add (deduplicated, g_object_ref (object));
+    }
+
+  return g_ptr_array_ref (deduplicated);
 }
 
 

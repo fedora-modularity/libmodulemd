@@ -718,7 +718,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
 
 
   /* HTTPD */
-  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
   g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
@@ -760,7 +760,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
     g_hash_table_lookup (htable, "9.0"), "supermegaultra"));
 
   /* POSTGRESQL */
-  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
   g_assert_cmpstr (
     modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
   g_assert_cmpstr (
@@ -900,7 +900,7 @@ modulemd_defaults_test_index_prioritizer (DefaultsFixture *fixture,
 
 
   /* HTTPD */
-  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
   g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
@@ -942,7 +942,7 @@ modulemd_defaults_test_index_prioritizer (DefaultsFixture *fixture,
     g_hash_table_lookup (htable, "9.0"), "supermegaultra"));
 
   /* POSTGRESQL */
-  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
   g_assert_cmpstr (
     modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
   g_assert_cmpstr (

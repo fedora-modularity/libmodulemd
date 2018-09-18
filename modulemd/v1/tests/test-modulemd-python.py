@@ -279,8 +279,7 @@ data:
         prioritizer.add(objects_from_repo_b, 0)
         supposedly_merged_objects = prioritizer.resolve()
 
-        # I would expect all three of these to be the same length... but they
-        # are not.
+        # Since they are all duplicates, they should be the same size.
         assert len(objects_from_repo_a) == len(objects_from_repo_b)
         assert len(objects_from_repo_a) == len(supposedly_merged_objects)
 
@@ -290,8 +289,7 @@ data:
         prioritizer.add(objects_from_repo_b, 1)
         supposedly_merged_objects = prioritizer.resolve()
 
-        # I would expect all three of these to be the same length... but they
-        # are not.
+        # Since they are all duplicates, they should be the same size.
         assert len(objects_from_repo_a) == len(objects_from_repo_b)
         assert len(objects_from_repo_a) == len(supposedly_merged_objects)
 

@@ -175,7 +175,6 @@ class TestIssues(unittest.TestCase):
         assert mmd.peek_rpm_buildopts() != {}
         assert mmd.peek_rpm_buildopts()['macros'] == '%my_macro 1'
         dumped = mmd.dumps()
-        print("YAML:\n%s" % dumped, file=sys.stderr)
         mmd2 = Modulemd.Module.new_from_string(dumped)
         assert mmd2.peek_rpm_buildopts() != {}
         assert mmd2.peek_rpm_buildopts()['macros'] == '%my_macro 1'
@@ -186,7 +185,7 @@ class TestIssues(unittest.TestCase):
         # double-freeing memory.
         defs = Modulemd.Module.new_all_from_file_ext(
             "%s/mod-defaults/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
-        print(defs)
+        assert defs
 
     def test_issue77(self):
         # This would crash on a type constraint accepting a signed value
@@ -265,6 +264,34 @@ data:
         mmd3 = Modulemd.Module.new_from_string(mmd.dumps())
         assert mmd3.get_module_components(
         )['testmodule'].peek_ref() == 'private-x'
+
+    def test_issue88(self):
+        # Here, load the same file twice.
+        # All entries in these two lists should be duplicates of each other.
+        objects_from_repo_a = Modulemd.objects_from_file(
+            '%s/test_data/issue88.yaml' % os.getenv('MESON_SOURCE_ROOT'))
+        objects_from_repo_b = Modulemd.objects_from_file(
+            '%s/test_data/issue88.yaml' % os.getenv('MESON_SOURCE_ROOT'))
+
+        # Test at the same priority level
+        prioritizer = Modulemd.Prioritizer()
+        prioritizer.add(objects_from_repo_a, 0)
+        prioritizer.add(objects_from_repo_b, 0)
+        supposedly_merged_objects = prioritizer.resolve()
+
+        # Since they are all duplicates, they should be the same size.
+        assert len(objects_from_repo_a) == len(objects_from_repo_b)
+        assert len(objects_from_repo_a) == len(supposedly_merged_objects)
+
+        # Test at different priorities
+        prioritizer = Modulemd.Prioritizer()
+        prioritizer.add(objects_from_repo_a, 0)
+        prioritizer.add(objects_from_repo_b, 1)
+        supposedly_merged_objects = prioritizer.resolve()
+
+        # Since they are all duplicates, they should be the same size.
+        assert len(objects_from_repo_a) == len(objects_from_repo_b)
+        assert len(objects_from_repo_a) == len(supposedly_merged_objects)
 
 
 class TestIntent(unittest.TestCase):

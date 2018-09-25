@@ -447,10 +447,9 @@ modulemd_yaml_test_artifact_validation (YamlFixture *fixture,
   g_assert_null (error);
   g_assert_nonnull (failures);
   g_assert_cmpint (failures->len, ==, 1);
-  g_assert_cmpstr (
+  g_assert_true (g_str_has_prefix (
     modulemd_subdocument_get_gerror (g_ptr_array_index (failures, 0))->message,
-    ==,
-    "RPM artifacts not in NEVRA format");
+    "RPM artifacts not in NEVRA format ["));
 }
 
 

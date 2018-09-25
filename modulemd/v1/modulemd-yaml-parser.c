@@ -414,8 +414,8 @@ _parse_yaml (yaml_parser_t *parser,
                   *error =
                     g_error_copy (modulemd_subdocument_get_gerror (document));
                 }
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Parse error during preprocessing");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Parse error during preprocessing");
             }
 
           /* Add all valid documents to the list */
@@ -434,8 +434,8 @@ _parse_yaml (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN_RETHROW (
-            error, "Unexpected YAML event during preprocessing");
+          MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+            error, event, "Unexpected YAML event during preprocessing");
           break;
         }
 
@@ -673,7 +673,10 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                       g_set_error (&error,
                                    MODULEMD_YAML_ERROR,
                                    MODULEMD_YAML_ERROR_PARSE,
-                                   "Document type is not recognized");
+                                   "Document type is not recognized "
+                                   "[line %zu col %zu]",
+                                   event.start_mark.line,
+                                   event.start_mark.column);
                     }
 
                   g_debug (
@@ -842,7 +845,8 @@ _parse_subdocument (ModulemdSubdocument *subdocument,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event at toplevel");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event at toplevel");
           break;
         }
 
@@ -869,14 +873,15 @@ _parse_modulemd_date (yaml_parser_t *parser, GDate **_date, GError **error)
   YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
   if (event.type != YAML_SCALAR_EVENT)
     {
-      MMD_YAML_ERROR_RETURN (error, "Failed to parse date");
+      MMD_YAML_ERROR_EVENT_RETURN (error, event, "Failed to parse date");
     }
 
   strv = g_strsplit ((const gchar *)event.data.scalar.value, "-", 4);
 
   if (!strv[0] || !strv[1] || !strv[2])
     {
-      MMD_YAML_ERROR_RETURN (error, "Date not in the form YYYY-MM-DD");
+      MMD_YAML_ERROR_EVENT_RETURN (
+        error, event, "Date not in the form YYYY-MM-DD");
     }
 
   *_date = g_date_new_dmy (g_ascii_strtoull (strv[2], NULL, 10), /* Day */
@@ -927,15 +932,16 @@ _simpleset_from_sequence (yaml_parser_t *parser,
         case YAML_SCALAR_EVENT:
           if (!started)
             {
-              MMD_YAML_ERROR_RETURN (
-                error, "Received scalar where sequence expected");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Received scalar where sequence expected");
             }
           modulemd_simpleset_add (set, (const gchar *)event.data.scalar.value);
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in sequence");
           break;
         }
       yaml_event_delete (&event);
@@ -988,8 +994,8 @@ _hashtable_from_mapping (yaml_parser_t *parser,
         case YAML_SCALAR_EVENT:
           if (!started)
             {
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Received scalar where mapping expected");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Received scalar where mapping expected");
             }
           name = g_strdup ((const gchar *)event.data.scalar.value);
           YAML_PARSER_PARSE_WITH_ERROR_RETURN (
@@ -997,8 +1003,8 @@ _hashtable_from_mapping (yaml_parser_t *parser,
           if (value_event.type != YAML_SCALAR_EVENT)
             {
               g_free (name);
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Non-scalar value for dictionary.");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, value_event, "Non-scalar value for dictionary.");
             }
           value = g_strdup ((const gchar *)value_event.data.scalar.value);
           yaml_event_delete (&value_event);
@@ -1011,7 +1017,8 @@ _hashtable_from_mapping (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in sequence");
           break;
         }
 

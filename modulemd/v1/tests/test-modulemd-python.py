@@ -48,7 +48,8 @@ class TestStandard(unittest.TestCase):
             assert failure.props.gerror.code == 3
 
         assert failures[
-            0].props.gerror.message == 'Document type is not recognized'
+            0].props.gerror.message.startswith(
+                'Document type is not recognized [')
         assert failures[
             1].props.gerror.message == 'Document type was specified more than once'
         assert failures[
@@ -56,9 +57,11 @@ class TestStandard(unittest.TestCase):
         assert failures[
             3].props.gerror.message == 'Document type was not a scalar value'
         assert failures[
-            4].props.gerror.message == 'Document type is not recognized'
+            4].props.gerror.message.startswith(
+                'Document type is not recognized [')
         assert failures[
-            5].props.gerror.message == 'Document type is not recognized'
+            5].props.gerror.message.startswith(
+                'Document type is not recognized [')
         assert failures[
             6].props.gerror.message == 'Unknown modulemd defaults version'
 
@@ -79,7 +82,8 @@ class TestStandard(unittest.TestCase):
         assert len(failures) == 1
 
         assert failures[
-            0].props.gerror.message == 'Received scalar where sequence expected'
+            0].props.gerror.message.startswith(
+                'Received scalar where sequence expected [')
 
 
 class TestDefaults(unittest.TestCase):

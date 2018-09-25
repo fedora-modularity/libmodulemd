@@ -177,7 +177,8 @@ _parse_module_stream (yaml_parser_t *parser,
                   g_strcmp0 ((const gchar *)value_event.data.scalar.value,
                              "modulemd"))
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Unknown document type");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Unknown document type");
                 }
               yaml_event_delete (&value_event);
             }
@@ -191,14 +192,16 @@ _parse_module_stream (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Unknown modulemd version");
                 }
 
               mdversion = g_ascii_strtoull (
                 (const gchar *)value_event.data.scalar.value, NULL, 10);
               if (!mdversion)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Unknown modulemd version");
                 }
               yaml_event_delete (&value_event);
 
@@ -207,8 +210,10 @@ _parse_module_stream (yaml_parser_t *parser,
                   /* Preprocessing and real parser don't match!
                    * This should be impossible
                    */
-                  MMD_YAML_ERROR_RETURN (
-                    error, "ModuleMD version doesn't match preprocessing");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error,
+                    event,
+                    "ModuleMD version doesn't match preprocessing");
                 }
               modulemd_modulestream_set_mdversion (modulestream, mdversion);
             }
@@ -224,13 +229,15 @@ _parse_module_stream (yaml_parser_t *parser,
             {
               g_debug ("Unexpected key in root: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in root");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in root");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in root");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in root");
           break;
         }
       yaml_event_delete (&event);
@@ -283,7 +290,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse module name");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module name");
                 }
 
               modulemd_modulestream_set_name (
@@ -299,8 +307,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module stream");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module stream");
                 }
 
               modulemd_modulestream_set_stream (
@@ -316,15 +324,16 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module version");
                 }
 
               version = g_ascii_strtoull (
                 (const gchar *)value_event.data.scalar.value, NULL, 10);
               if (!version)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Unknown module version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Unknown module version");
                 }
 
               modulemd_modulestream_set_version (modulestream, version);
@@ -340,8 +349,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module context");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module context");
                 }
 
               modulemd_modulestream_set_context (
@@ -356,8 +365,10 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (
-                    error, "Failed to parse module artifact architecture");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error,
+                    value_event,
+                    "Failed to parse module artifact architecture");
                 }
 
               modulemd_modulestream_set_arch (
@@ -374,8 +385,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module summary");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module summary");
                 }
 
               modulemd_modulestream_set_summary (
@@ -392,8 +403,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module description");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module description");
                 }
 
               modulemd_modulestream_set_description (
@@ -409,16 +420,17 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                   MD_VERSION_1)
                 {
                   /* EOL is not supported in v2 or later; use servicelevel */
-                  MMD_YAML_ERROR_RETURN (
+                  MMD_YAML_ERROR_EVENT_RETURN (
                     error,
+                    event,
                     "EOL is not supported in v2 or later; use servicelevel");
                 }
 
               /* Get the EOL date */
               if (!_parse_modulemd_date (parser, &eol, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Failed to parse module EOL date");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Failed to parse module EOL date");
                 }
 
               modulemd_modulestream_set_eol (modulestream, eol);
@@ -515,13 +527,15 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
             {
               g_debug ("Unexpected key in data: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in data");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in data");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in data");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in data");
           break;
         }
 
@@ -570,7 +584,8 @@ _parse_modulemd_licenses (ModulemdModuleStream *modulestream,
           /* Each scalar event represents a license type */
           if (!_simpleset_from_sequence (parser, &set, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid sequence");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid sequence");
             }
 
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "module"))
@@ -584,7 +599,8 @@ _parse_modulemd_licenses (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown license type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown license type");
             }
 
           g_clear_pointer (&set, g_object_unref);
@@ -592,7 +608,8 @@ _parse_modulemd_licenses (ModulemdModuleStream *modulestream,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in licenses");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in licenses");
           break;
         }
 
@@ -626,18 +643,18 @@ _parse_modulemd_xmd (ModulemdModuleStream *modulestream,
   YAML_PARSER_PARSE_WITH_ERROR_RETURN (parser, &event, error, "Parser error");
   if (!(event.type == YAML_MAPPING_START_EVENT))
     {
-      MMD_YAML_ERROR_RETURN (error, "Invalid mapping");
+      MMD_YAML_ERROR_EVENT_RETURN (error, event, "Invalid mapping");
     }
   yaml_event_delete (&event);
 
   if (!parse_raw_yaml_mapping (parser, &variant, error))
     {
-      MMD_YAML_ERROR_RETURN (error, "Invalid raw mapping");
+      MMD_YAML_ERROR_EVENT_RETURN (error, event, "Invalid raw mapping");
     }
 
   if (!g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
     {
-      MMD_YAML_ERROR_RETURN (error, "XMD wasn't a dictionary");
+      MMD_YAML_ERROR_EVENT_RETURN (error, event, "XMD wasn't a dictionary");
     }
 
   xmd = g_hash_table_new_full (
@@ -693,7 +710,8 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
         case YAML_SCALAR_EVENT:
           if (!_hashtable_from_mapping (parser, &reqs, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid mapping");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid mapping");
             }
 
           if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
@@ -708,7 +726,8 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown dependency type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown dependency type");
             }
 
           g_clear_pointer (&reqs, g_hash_table_unref);
@@ -716,7 +735,8 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in deps");
           break;
         }
 
@@ -769,15 +789,16 @@ _parse_modulemd_deps_v2 (ModulemdModuleStream *modulestream,
         case YAML_MAPPING_START_EVENT:
           if (!_parse_modulemd_v2_dep (modulestream, parser, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Failed to parse requires/buildrequires");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Failed to parse requires/buildrequires");
               break;
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in deps");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in deps");
           break;
         }
 
@@ -848,23 +869,25 @@ _parse_modulemd_v2_dep (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Dependency map had key other than "
-                                     "'requires' or 'buildrequires'");
+              MMD_YAML_ERROR_EVENT_RETURN (error,
+                                           event,
+                                           "Dependency map had key other than "
+                                           "'requires' or 'buildrequires'");
             }
 
           if (!_parse_modulemd_v2_dep_map (
                 modulestream, parser, reqtype, dep, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Error processing dependency map.");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Error processing dependency map.");
             }
 
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in v2_dep");
           break;
         }
 
@@ -920,16 +943,16 @@ _parse_modulemd_v2_dep_map (ModulemdModuleStream *modulestream,
         case YAML_SCALAR_EVENT:
           if (!in_map)
             {
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Unexpected YAML event in v2_dep_map");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected YAML event in v2_dep_map");
             }
 
           module_name = g_strdup ((const gchar *)event.data.scalar.value);
 
           if (!_simpleset_from_sequence (parser, &set, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                             "Could not parse set of streams");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Could not parse set of streams");
             }
           dep_set = (const gchar **)modulemd_simpleset_dup (set);
 
@@ -956,7 +979,8 @@ _parse_modulemd_v2_dep_map (ModulemdModuleStream *modulestream,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in v2_dep_map");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in v2_dep_map");
           break;
         }
 
@@ -1097,14 +1121,16 @@ _parse_modulemd_profiles (ModulemdModuleStream *modulestream,
           if (!_parse_modulemd_profile (parser, name, &profile, error))
             {
               g_free (name);
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid profile");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid profile");
             }
           g_hash_table_insert (profiles, name, profile);
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in profiles");
           break;
         }
 
@@ -1164,8 +1190,8 @@ _parse_modulemd_profile (yaml_parser_t *parser,
               /* Get the set of RPMs */
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Could not parse profile RPMs");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Could not parse profile RPMs");
                 }
               modulemd_profile_set_rpms (profile, set);
               g_object_unref (set);
@@ -1178,7 +1204,8 @@ _parse_modulemd_profile (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "No value for description");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "No value for description");
                 }
 
               modulemd_profile_set_description (
@@ -1189,13 +1216,15 @@ _parse_modulemd_profile (yaml_parser_t *parser,
           else
             {
               /* Unknown field in profile */
-              MMD_YAML_ERROR_RETURN (error, "Unknown key in profile body");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown key in profile body");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in profiles");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in profiles");
           break;
         }
 
@@ -1249,19 +1278,21 @@ _parse_modulemd_api (ModulemdModuleStream *modulestream,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (error, "Parse error in API");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Parse error in API");
                 }
               modulemd_modulestream_set_rpm_api (modulestream, set);
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown API type");
+              MMD_YAML_ERROR_EVENT_RETURN (error, event, "Unknown API type");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in api");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in api");
           break;
         }
 
@@ -1313,20 +1344,22 @@ _parse_modulemd_filters (ModulemdModuleStream *modulestream,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                                 "Parse error in filters");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Parse error in filters");
                 }
               modulemd_modulestream_set_rpm_filter (modulestream, set);
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown filter type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown filter type");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in filters");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in filters");
           break;
         }
 
@@ -1380,19 +1413,21 @@ _parse_modulemd_buildopts (ModulemdModuleStream *modulestream,
             {
               if (!_parse_modulemd_rpm_buildopts (buildopts, parser, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Parse error in RPM buildopts");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Parse error in RPM buildopts");
                 }
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown buildopt type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown buildopt type");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in buildopts");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in buildopts");
           break;
         }
 
@@ -1446,8 +1481,8 @@ _parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
         case YAML_SCALAR_EVENT:
           if (!in_mapping)
             {
-              MMD_YAML_ERROR_RETURN (
-                error, "Received a scalar when a map was expected.");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Received a scalar when a map was expected.");
               break;
             }
 
@@ -1457,7 +1492,8 @@ _parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse RPM macros");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse RPM macros");
                 }
               modulemd_buildopts_set_rpm_macros (
                 buildopts, (const gchar *)value_event.data.scalar.value);
@@ -1468,22 +1504,23 @@ _parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Parse error in RPM whitelist");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Parse error in RPM whitelist");
                 }
               modulemd_buildopts_set_rpm_whitelist_simpleset (buildopts, set);
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown RPM buildopt key");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown RPM buildopt key");
             }
 
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in RPM buildopts");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in RPM buildopts");
           break;
         }
       yaml_event_delete (&event);
@@ -1534,8 +1571,8 @@ _parse_modulemd_components (ModulemdModuleStream *modulestream,
             {
               if (!_parse_modulemd_rpm_components (parser, &components, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Could not parse RPM components");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Could not parse RPM components");
                 }
               modulemd_modulestream_set_rpm_components (modulestream,
                                                         components);
@@ -1547,8 +1584,8 @@ _parse_modulemd_components (ModulemdModuleStream *modulestream,
               if (!_parse_modulemd_modulestream_components (
                     parser, &components, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Could not parse module components");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Could not parse module components");
                 }
               modulemd_modulestream_set_module_components (modulestream,
                                                            components);
@@ -1556,13 +1593,15 @@ _parse_modulemd_components (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown component type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown component type");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in components");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in components");
           break;
         }
 
@@ -1615,8 +1654,8 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
           name = g_strdup ((const gchar *)event.data.scalar.value);
           if (!_parse_modulemd_rpm_component (parser, name, &component, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                             "Parse error in RPM component");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Parse error in RPM component");
             }
 
           /* Set this key and value to the hash table */
@@ -1626,7 +1665,8 @@ _parse_modulemd_rpm_components (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in sequence");
           break;
         }
 
@@ -1687,8 +1727,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse buildorder value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse buildorder value");
                 }
 
               buildorder = g_ascii_strtoull (
@@ -1706,8 +1746,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse rationale value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse rationale value");
                 }
 
               modulemd_component_set_rationale (
@@ -1722,8 +1762,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Error parsing component arches");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Error parsing component arches");
                 }
               modulemd_component_rpm_set_arches (component, set);
             }
@@ -1735,7 +1775,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse cache value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse cache value");
                 }
 
               modulemd_component_rpm_set_cache (
@@ -1749,8 +1790,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Error parsing multilib arches");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Error parsing multilib arches");
                 }
               modulemd_component_rpm_set_multilib (component, set);
             }
@@ -1761,7 +1802,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse ref value");
                 }
 
               modulemd_component_rpm_set_ref (
@@ -1777,8 +1819,8 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse repository value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse repository value");
                 }
 
               modulemd_component_rpm_set_repository (
@@ -1789,14 +1831,16 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in component");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in component");
             }
 
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in component");
           break;
         }
 
@@ -1853,8 +1897,8 @@ _parse_modulemd_modulestream_components (yaml_parser_t *parser,
           if (!_parse_modulemd_modulestream_component (
                 parser, name, &component, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (
-                error, "Parse error in module component");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Parse error in module component");
             }
 
           /* Set this key and value to the hash table */
@@ -1864,7 +1908,8 @@ _parse_modulemd_modulestream_components (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in sequence");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in sequence");
           break;
         }
 
@@ -1924,8 +1969,8 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse buildorder value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse buildorder value");
                 }
 
               buildorder = g_ascii_strtoull (
@@ -1943,8 +1988,8 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse rationale value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse rationale value");
                 }
 
               modulemd_component_set_rationale (
@@ -1960,7 +2005,8 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse ref value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse ref value");
                 }
 
               modulemd_component_module_set_ref (
@@ -1976,8 +2022,8 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse repository value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse repository value");
                 }
 
               modulemd_component_module_set_repository (
@@ -1988,14 +2034,16 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in component");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in component");
             }
 
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in component");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in component");
           break;
         }
 
@@ -2048,28 +2096,30 @@ _parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
             {
               if (!_simpleset_from_sequence (parser, &set, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (error,
-                                                 "Parse error in artifacts");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Parse error in artifacts");
                 }
 
               if (!modulemd_simpleset_validate_contents (
                     set, modulemd_validate_nevra, NULL))
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "RPM artifacts not in NEVRA format");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, event, "RPM artifacts not in NEVRA format");
                 }
 
               modulemd_modulestream_set_rpm_artifacts (modulestream, set);
             }
           else
             {
-              MMD_YAML_ERROR_RETURN (error, "Unknown artifact type");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown artifact type");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in artifacts");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in artifacts");
           break;
         }
 
@@ -2128,15 +2178,16 @@ _parse_modulemd_servicelevels (ModulemdModuleStream *modulestream,
           if (!_parse_modulemd_servicelevel (parser, name, &sl, error))
             {
               g_free (name);
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid service level");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid service level");
             }
           g_hash_table_insert (servicelevels, name, sl);
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in service levels");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in service levels");
           break;
         }
 
@@ -2195,8 +2246,8 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
               /* Get the EOL date */
               if (!_parse_modulemd_date (parser, &eol, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Failed to parse EOL date in service level");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Failed to parse EOL date in service level");
                 }
 
               modulemd_servicelevel_set_eol (sl, eol);
@@ -2206,15 +2257,15 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
           else
             {
               /* Unknown field in service level */
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Unknown key in service level body");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unknown key in service level body");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in service level");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in service level");
           break;
         }
 

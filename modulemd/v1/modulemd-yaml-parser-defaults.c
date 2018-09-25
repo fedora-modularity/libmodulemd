@@ -115,7 +115,8 @@ _parse_defaults (yaml_parser_t *parser,
                              "modulemd-defaults"))
                 {
                   yaml_event_delete (&value_event);
-                  MMD_YAML_ERROR_RETURN (error, "Document type mismatch");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, event, "Document type mismatch");
                 }
               yaml_event_delete (&value_event);
             }
@@ -128,7 +129,8 @@ _parse_defaults (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Unknown modulemd version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Unknown modulemd version");
                 }
 
               mdversion = g_ascii_strtoull (
@@ -136,8 +138,8 @@ _parse_defaults (yaml_parser_t *parser,
               yaml_event_delete (&value_event);
               if (!mdversion)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Unknown modulemd defaults version");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, event, "Unknown modulemd defaults version");
                 }
 
               if (mdversion != version)
@@ -145,8 +147,9 @@ _parse_defaults (yaml_parser_t *parser,
                   /* Preprocessing and real parser don't match!
                    * This should be impossible
                    */
-                  MMD_YAML_ERROR_RETURN (
+                  MMD_YAML_ERROR_EVENT_RETURN (
                     error,
+                    event,
                     "ModuleMD defaults version doesn't match preprocessing");
                 }
               modulemd_defaults_set_version (defaults, mdversion);
@@ -163,13 +166,15 @@ _parse_defaults (yaml_parser_t *parser,
             {
               g_debug ("Unexpected key in root: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in root");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in root");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in root");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in root");
           break;
         }
 
@@ -235,7 +240,8 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error, "Failed to parse module name");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module name");
                 }
 
               modulemd_defaults_set_module_name (
@@ -251,8 +257,8 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse module stream");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, value_event, "Failed to parse module stream");
                 }
 
               modulemd_defaults_set_default_stream (
@@ -278,7 +284,8 @@ _parse_defaults_data (ModulemdDefaults *defaults,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Unexpected YAML event in data");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in data");
           break;
         }
 
@@ -334,8 +341,8 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
           if (!in_map)
             {
               /* We got a scalar where we expected a map */
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Malformed YAML in intent profiles");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Malformed YAML in intent profiles");
               break;
             }
 
@@ -344,7 +351,8 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
 
           if (!_simpleset_from_sequence (parser, &set, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid sequence");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid sequence");
             }
           modulemd_defaults_assign_profiles_for_stream (
             defaults, stream_name, set);
@@ -354,8 +362,8 @@ _parse_defaults_profiles (ModulemdDefaults *defaults,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in default profiles");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in default profiles");
           break;
         }
       yaml_event_delete (&event);
@@ -407,7 +415,8 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
           if (!in_map)
             {
               /* We got a scalar where we expected a map */
-              MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Malformed YAML in intents");
               break;
             }
 
@@ -417,7 +426,8 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
                               &intent,
                               error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Could not parse intent");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Could not parse intent");
               break;
             }
 
@@ -428,7 +438,8 @@ _parse_defaults_intents (ModulemdDefaults *defaults,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Malformed YAML in intents");
           break;
         }
       yaml_event_delete (&event);
@@ -480,7 +491,8 @@ _parse_intent (yaml_parser_t *parser,
           if (!in_map)
             {
               /* We got a scalar where we expected a map */
-              MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Malformed YAML in intents");
               break;
             }
 
@@ -493,8 +505,10 @@ _parse_intent (yaml_parser_t *parser,
                 parser, &value_event, error, "Parser error");
               if (value_event.type != YAML_SCALAR_EVENT)
                 {
-                  MMD_YAML_ERROR_RETURN (
-                    error, "Failed to parse default module stream");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error,
+                    value_event,
+                    "Failed to parse default module stream");
                 }
 
               modulemd_intent_set_default_stream (
@@ -507,14 +521,15 @@ _parse_intent (yaml_parser_t *parser,
             {
               if (!_parse_intent_profiles (_intent, parser, error))
                 {
-                  MMD_YAML_ERROR_RETURN_RETHROW (
-                    error, "Could not parse intent profiles");
+                  MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                    error, event, "Could not parse intent profiles");
                 }
             }
           else
             {
               /* Unexpected key in the map */
-              MMD_YAML_ERROR_RETURN (error, "Unexpected key in intent");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected key in intent");
               break;
             }
 
@@ -522,7 +537,8 @@ _parse_intent (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error, "Malformed YAML in intents");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Malformed YAML in intents");
           break;
         }
       yaml_event_delete (&event);
@@ -577,8 +593,8 @@ _parse_intent_profiles (ModulemdIntent *intent,
           if (!in_map)
             {
               /* We got a scalar where we expected a map */
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Malformed YAML in intent profiles");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Malformed YAML in intent profiles");
               break;
             }
 
@@ -587,7 +603,8 @@ _parse_intent_profiles (ModulemdIntent *intent,
 
           if (!_simpleset_from_sequence (parser, &set, error))
             {
-              MMD_YAML_ERROR_RETURN_RETHROW (error, "Invalid sequence");
+              MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
+                error, event, "Invalid sequence");
             }
           modulemd_intent_assign_profiles_for_stream (
             intent, stream_name, set);
@@ -597,8 +614,8 @@ _parse_intent_profiles (ModulemdIntent *intent,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in intent profiles");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in intent profiles");
           break;
         }
       yaml_event_delete (&event);

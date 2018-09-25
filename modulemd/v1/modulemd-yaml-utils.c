@@ -109,23 +109,23 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
             case YAML_MAPPING_START_EVENT:
               if (!parse_raw_yaml_mapping (parser, &value, error))
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse mapping value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, event, "Failed to parse mapping value");
                 }
               break;
 
             case YAML_SEQUENCE_START_EVENT:
               if (!parse_raw_yaml_sequence (parser, &value, error))
                 {
-                  MMD_YAML_ERROR_RETURN (error,
-                                         "Failed to parse sequence value");
+                  MMD_YAML_ERROR_EVENT_RETURN (
+                    error, event, "Failed to parse sequence value");
                 }
               break;
 
             default:
               /* We received a YAML event we shouldn't expect at this level */
-              MMD_YAML_ERROR_RETURN (error,
-                                     "Unexpected YAML event in raw mapping");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Unexpected YAML event in raw mapping");
               break;
             }
 
@@ -137,8 +137,8 @@ parse_raw_yaml_mapping (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in raw mapping");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in raw mapping");
           break;
         }
 
@@ -193,21 +193,23 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
         case YAML_MAPPING_START_EVENT:
           if (!parse_raw_yaml_mapping (parser, &value, error))
             {
-              MMD_YAML_ERROR_RETURN (error, "Failed to parse mapping value");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Failed to parse mapping value");
             }
           break;
 
         case YAML_SEQUENCE_START_EVENT:
           if (!parse_raw_yaml_sequence (parser, &value, error))
             {
-              MMD_YAML_ERROR_RETURN (error, "Failed to parse sequence value");
+              MMD_YAML_ERROR_EVENT_RETURN (
+                error, event, "Failed to parse sequence value");
             }
           break;
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (error,
-                                 "Unexpected YAML event in raw sequence");
+          MMD_YAML_ERROR_EVENT_RETURN (
+            error, event, "Unexpected YAML event in raw sequence");
           break;
         }
 
@@ -328,7 +330,7 @@ emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error)
       g_debug ("Unhandled variant type: %s",
                g_variant_get_type_string (variant));
       event.type = YAML_NO_EVENT;
-      MMD_YAML_ERROR_RETURN (error, "Unhandled variant type");
+      MMD_YAML_ERROR_EVENT_RETURN (error, event, "Unhandled variant type");
     }
 
   result = TRUE;

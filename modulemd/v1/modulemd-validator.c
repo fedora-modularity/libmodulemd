@@ -11,11 +11,15 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#define _POSIX_SOURCE  /* for fdopen() */
+
 #include "modulemd.h"
 #include "private/modulemd-yaml.h"
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <locale.h>
+#include <stdio.h>
 
 /* TODO: implement internationalization */
 
@@ -94,6 +98,102 @@ set_verbosity (const gchar *option_name,
   return TRUE;
 }
 
+static gchar *
+run_fedmod_lint (ModulemdSubdocument *doc,
+                 const gchar *fedmod)
+{
+  gint mmd_fd;
+  FILE *mmd_file = NULL;
+  g_autofree gchar *mmd_filename = NULL;
+  gint retval;
+  gchar *fedmod_lint_output = NULL;
+  const gchar *argv[] = {fedmod, "fedmod", "lint", NULL};
+
+  g_return_val_if_fail (doc != NULL, NULL);
+  g_return_val_if_fail (fedmod != NULL, NULL);
+
+  mmd_fd = g_file_open_tmp ("fedmod-lint-XXXXXX",
+                            &mmd_filename,
+                            NULL);
+
+  if (mmd_fd < 0)
+    {
+      g_warning ("Couldn't open temporary file for linting.");
+      goto exit;
+    }
+
+  mmd_file = fdopen (mmd_fd, "w");
+
+  if (! mmd_file)
+    {
+      g_warning ("Couldn't associate temp file stream for linting.");
+      goto exit;
+    }
+
+  retval = fprintf (mmd_file, "%s", modulemd_subdocument_get_yaml (doc));
+
+  if (retval < 0)
+    {
+      g_warning ("Couldn't write MMD to temp file for linting.");
+      goto exit;
+    }
+
+  argv[3] = mmd_filename;
+
+  g_spawn_sync (NULL,
+                (gchar **) argv,
+                NULL,
+                G_SPAWN_STDERR_TO_DEV_NULL | G_SPAWN_FILE_AND_ARGV_ZERO,
+                NULL,
+                NULL,
+                &fedmod_lint_output,
+                NULL,
+                NULL,
+                NULL);
+
+exit:
+  if (mmd_file)
+    {
+      fclose (mmd_file);
+    }
+  else if (mmd_fd >= 0)
+    {
+      g_close (mmd_fd, NULL);
+    }
+
+  if (mmd_filename)
+    {
+      g_unlink (mmd_filename);
+    }
+
+  return fedmod_lint_output;
+}
+
+static void
+summarize_failures (ModulemdSubdocument *doc,
+                    const gchar *fedmod)
+{
+  g_autofree gchar *details = NULL;
+  g_return_if_fail (doc != NULL);
+
+  if (fedmod)
+    {
+      details = run_fedmod_lint (doc, fedmod);
+    }
+
+  if (! details)
+    {
+      /* Either 'fedmod' isn't available or something went wrong running
+       * 'fedmod lint', fall back to displaying the failed YAML document. */
+      details = g_strdup (modulemd_subdocument_get_yaml (doc));
+    }
+
+  fprintf (stdout,
+           "\nFailed subdocument (%s): \n%s\n",
+           modulemd_subdocument_get_gerror (doc)->message,
+           details);
+}
+
 static GOptionEntry entries[] = { { "quiet",
                                     'q',
                                     G_OPTION_FLAG_NO_ARG,
@@ -134,6 +234,7 @@ main (int argc, char *argv[])
   g_autoptr (GPtrArray) objects = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   ModulemdSubdocument *doc = NULL;
+  g_autofree gchar *fedmod = NULL;
   setlocale (LC_ALL, "");
 
   context = g_option_context_new ("FILES - Simple modulemd YAML validator");
@@ -150,6 +251,8 @@ main (int argc, char *argv[])
                "At least one file must be specified on the command-line\n");
       return EXIT_FAILURE;
     }
+
+  fedmod = g_find_program_in_path ("fedmod");
 
   for (gsize i = 0; options.filenames[i]; i++)
     {
@@ -178,10 +281,7 @@ main (int argc, char *argv[])
               for (gsize i = 0; i < failures->len; i++)
                 {
                   doc = (ModulemdSubdocument *)g_ptr_array_index (failures, i);
-                  fprintf (stdout,
-                           "\nFailed subdocument (%s): \n%s\n",
-                           modulemd_subdocument_get_gerror (doc)->message,
-                           modulemd_subdocument_get_yaml (doc));
+                  summarize_failures (doc, fedmod);
                 }
             }
           all_valid = FALSE;

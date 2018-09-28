@@ -139,7 +139,7 @@ void
 modulemd_improvedmodule_add_stream (ModulemdImprovedModule *self,
                                     ModulemdModuleStream *stream)
 {
-  g_autofree gchar *stream_name = NULL;
+  g_autofree gchar *nsvc = NULL;
   g_return_if_fail (MODULEMD_IS_IMPROVEDMODULE (self));
   g_return_if_fail (MODULEMD_IS_MODULESTREAM (stream));
 
@@ -150,20 +150,28 @@ modulemd_improvedmodule_add_stream (ModulemdImprovedModule *self,
       return;
     }
 
-  stream_name = modulemd_modulestream_get_stream (stream);
-  if (!stream_name)
+  nsvc = modulemd_modulestream_get_nsvc (stream);
+  if (!nsvc)
     {
       /* The stream name is usually filled in by the build system, so if we're
        * handling a user-edited libmodulemd file, just fill this field with
        * unique placeholder data.
        */
-      stream_name =
+      nsvc =
         g_strdup_printf ("__unknown_%d__", g_hash_table_size (self->streams));
     }
 
-  g_hash_table_replace (self->streams,
-                        g_strdup (stream_name),
-                        modulemd_modulestream_copy (stream));
+  g_hash_table_replace (
+    self->streams, g_strdup (nsvc), modulemd_modulestream_copy (stream));
+}
+
+
+static gboolean
+_key_startswith (gpointer _key, gpointer _value, gpointer user_data)
+{
+  g_return_val_if_fail (_key && user_data, FALSE);
+
+  return !(strncmp (_key, user_data, strlen (user_data)));
 }
 
 
@@ -171,15 +179,28 @@ ModulemdModuleStream *
 modulemd_improvedmodule_get_stream_by_name (ModulemdImprovedModule *self,
                                             const gchar *stream_name)
 {
+  g_autofree gchar *ns = NULL;
   g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
 
-  if (!g_hash_table_contains (self->streams, stream_name))
+  ns = g_strdup_printf ("%s:%s", self->name, stream_name);
+
+  return g_object_ref (g_hash_table_find (self->streams, _key_startswith, ns));
+}
+
+
+ModulemdModuleStream *
+modulemd_improvedmodule_get_stream_by_nsvc (ModulemdImprovedModule *self,
+                                            const gchar *nsvc)
+{
+  g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
+
+  if (!g_hash_table_contains (self->streams, nsvc))
     {
       return NULL;
     }
 
   return modulemd_modulestream_copy (
-    g_hash_table_lookup (self->streams, stream_name));
+    g_hash_table_lookup (self->streams, nsvc));
 }
 
 
@@ -189,6 +210,39 @@ modulemd_improvedmodule_get_streams (ModulemdImprovedModule *self)
   g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
 
   return g_hash_table_ref (self->streams);
+}
+
+
+GPtrArray *
+modulemd_improvedmodule_get_streams_by_name (ModulemdImprovedModule *self,
+                                             const gchar *stream_name)
+{
+  GHashTableIter iter;
+  g_autoptr (GPtrArray) streams = NULL;
+  g_autofree gchar *ns = NULL;
+  gpointer key, value;
+
+  g_return_val_if_fail (MODULEMD_IS_IMPROVEDMODULE (self), NULL);
+
+  /* Assume the common case of a single stream object per name */
+  streams = g_ptr_array_new_with_free_func (g_object_unref);
+
+  ns = g_strdup_printf ("%s:%s", self->name, stream_name);
+  g_hash_table_iter_init (&iter, self->streams);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (!(strncmp (key, ns, strlen (ns))))
+        {
+          g_ptr_array_add (
+            streams,
+            modulemd_modulestream_copy (MODULEMD_MODULESTREAM (value)));
+        }
+    }
+
+  if (streams->len == 0)
+    return NULL;
+
+  return g_ptr_array_ref (streams);
 }
 
 
@@ -321,7 +375,7 @@ modulemd_improvedmodule_serialize (ModulemdImprovedModule *self)
 
   for (gsize i = 0; i < keys->len; i++)
     {
-      stream = modulemd_improvedmodule_get_stream_by_name (
+      stream = modulemd_improvedmodule_get_stream_by_nsvc (
         self, g_ptr_array_index (keys, i));
       g_ptr_array_add (objects, stream);
 

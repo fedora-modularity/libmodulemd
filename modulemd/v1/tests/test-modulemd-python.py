@@ -299,6 +299,29 @@ data:
         assert len(objects_from_repo_a) == len(supposedly_merged_objects)
 
 
+class TestPrioritizer(unittest.TestCase):
+
+    def test_latest_version(self):
+        # Load YAML with two versions of the same (name, stream, context)
+        objects = Modulemd.objects_from_file(
+            '%s/test_data/latest_version.yaml' %
+            os.getenv('MESON_SOURCE_ROOT'))
+
+        prioritizer = Modulemd.Prioritizer()
+        prioritizer.add(objects, 0)
+
+        supposedly_merged_objects = prioritizer.resolve()
+
+        # There should only be the latest one in the list
+        print(supposedly_merged_objects)
+
+        assert len(supposedly_merged_objects) == 1
+        assert supposedly_merged_objects[0].props.name == 'foo'
+        assert supposedly_merged_objects[0].props.stream == 'stream-name'
+        assert supposedly_merged_objects[0].props.context == 'c0ffee43'
+        assert supposedly_merged_objects[0].props.version == 20180928144203
+
+
 class TestIntent(unittest.TestCase):
 
     def test_basic(self):

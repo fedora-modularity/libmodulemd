@@ -342,7 +342,7 @@ class TestIndexParser (unittest.TestCase):
 
         streams = module_index['django'].get_streams()
 
-        assert '1.6' in streams
+        assert 'django:1.6:20180307130104:c2c572ec' in streams
 
 
 class TestImprovedModule (unittest.TestCase):
@@ -369,7 +369,8 @@ class TestImprovedModule (unittest.TestCase):
         foo_module = module_index['foo']
         assert foo_module
 
-        foo_stream = foo_module.get_stream_by_name('stream-name')
+        foo_stream = foo_module.get_stream_by_nsvc(
+            'foo:stream-name:20160927144203:c0ffee43')
         assert foo_stream
 
         rpm_components = foo_stream.get_rpm_components()

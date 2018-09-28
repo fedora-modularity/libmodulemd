@@ -368,11 +368,13 @@ module_index_from_data (GPtrArray *data, GError **error)
 {
   GObject *item = NULL;
   gsize i = 0;
+  gsize j = 0;
   g_autofree gchar *module_name = NULL;
   g_autoptr (ModulemdImprovedModule) module = NULL;
   ModulemdImprovedModule *stored_module = NULL;
   ModulemdModuleStream *stream = NULL;
-  g_autoptr (ModulemdModuleStream) retrieved_stream = NULL;
+  g_autoptr (GPtrArray) retrieved_streams = NULL;
+  ModulemdModuleStream *retrieved_stream = NULL;
   ModulemdDefaults *defaults = NULL;
   g_autoptr (GHashTable) module_index = NULL;
   GError *merge_error = NULL;
@@ -457,9 +459,9 @@ module_index_from_data (GPtrArray *data, GError **error)
           continue;
         }
 
-      retrieved_stream = modulemd_improvedmodule_get_stream_by_name (
+      retrieved_streams = modulemd_improvedmodule_get_streams_by_name (
         stored_module, modulemd_translation_peek_module_stream (translation));
-      if (!retrieved_stream)
+      if (!retrieved_streams)
         {
           /* This stream of this module wasn't processed, so ignore this set of
            * translations.
@@ -467,14 +469,20 @@ module_index_from_data (GPtrArray *data, GError **error)
           continue;
         }
 
-      /* Assign this translation to the object.
-       * Note: This will be ignored if there is a higher modified value already
-       * assigned to this object.
-       */
-      modulemd_modulestream_set_translation (retrieved_stream, translation);
+      for (j = 0; j < retrieved_streams->len; j++)
+        {
+          retrieved_stream = g_ptr_array_index (retrieved_streams, j);
 
-      /* Save the updated stream back to the index */
-      modulemd_improvedmodule_add_stream (stored_module, retrieved_stream);
+          /* Assign this translation to the object.
+           * Note: This will be ignored if there is a higher modified value already
+           * assigned to this object.
+           */
+          modulemd_modulestream_set_translation (retrieved_stream,
+                                                 translation);
+
+          /* Save the updated stream back to the index */
+          modulemd_improvedmodule_add_stream (stored_module, retrieved_stream);
+        }
     }
 
 

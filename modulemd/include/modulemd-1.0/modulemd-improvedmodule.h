@@ -69,13 +69,34 @@ modulemd_improvedmodule_add_stream (ModulemdImprovedModule *self,
  * @stream_name: The name of the stream to retrieve.
  *
  * Returns: (transfer full): A #ModulemModuleStream representing the requested
- * module stream. NULL if the stream name was not found.
+ * module stream. NULL if the stream name was not found. If there is more than
+ * one version and/or context for this stream, it will return one in a
+ * non-deterministic manner. This function remains for backwards-compatibility,
+ * but it should never be used.
  *
  * Since: 1.6
+ *
+ * Deprecated: 1.7
+ * Use get_stream_by_nsvc() or get_streams_by_name() instead.
  */
+MMD_DEPRECATED_FOR (modulemd_improvedmodule_get_stream_by_nsvc)
 ModulemdModuleStream *
 modulemd_improvedmodule_get_stream_by_name (ModulemdImprovedModule *self,
                                             const gchar *stream_name);
+
+
+/**
+ * modulemd_improvedmodule_get_stream_by_nsvc:
+ * @nsvc: The NSVC of the stream to retrieve.
+ *
+ * Returns: (transfer full): A #ModulemModuleStream representing the requested
+ * module stream. NULL if the stream (name, version, context) was not found.
+ *
+ * Since: 1.7
+ */
+ModulemdModuleStream *
+modulemd_improvedmodule_get_stream_by_nsvc (ModulemdImprovedModule *self,
+                                            const gchar *nsvc);
 
 
 /**
@@ -89,6 +110,22 @@ modulemd_improvedmodule_get_stream_by_name (ModulemdImprovedModule *self,
  */
 GHashTable *
 modulemd_improvedmodule_get_streams (ModulemdImprovedModule *self);
+
+/**
+ * modulemd_improvedmodule_get_streams_by_name:
+ * @stream_name: The name of the stream to retrieve
+ *
+ * Returns: (element-type ModulemdModuleStream) (transfer container): A
+ * #GPtrArray containing all #ModulemModuleStream objects for this module which
+ * matches the requested stream_name. Returns NULL if no streams matched this
+ * name.
+ * This #GPtrArray must be freed with g_ptr_array_unref().
+ *
+ * Since: 1.6
+ */
+GPtrArray *
+modulemd_improvedmodule_get_streams_by_name (ModulemdImprovedModule *self,
+                                             const gchar *stream_name);
 
 
 /**

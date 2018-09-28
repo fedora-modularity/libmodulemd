@@ -64,6 +64,8 @@ static GPtrArray *
 _deduplicate_module_streams (const GPtrArray *first,
                              const GPtrArray *second,
                              GError **error);
+static GPtrArray *
+_latest_module_streams (const GPtrArray *streams, GError **error);
 
 static void
 _modulemd_ptr_array_unref (gpointer ptr)
@@ -202,6 +204,7 @@ modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
   g_autoptr (GPtrArray) prev = NULL;
   g_autoptr (GPtrArray) tmp = NULL;
   g_autoptr (GPtrArray) deduped_objects = NULL;
+  g_autoptr (GPtrArray) latest_objects = NULL;
   g_autoptr (GList) priority_levels = NULL;
   GList *current_level = NULL;
 
@@ -257,7 +260,14 @@ modulemd_prioritizer_resolve (ModulemdPrioritizer *self, GError **error)
       current_level = current_level->prev;
     }
 
-  return g_ptr_array_ref (current);
+  /* Ensure that we have only the highest Version for each
+   * (module_name, module_stream, context) object in the list
+   */
+  latest_objects = _latest_module_streams (current, error);
+
+  /* TODO: Sort items */
+
+  return g_ptr_array_ref (latest_objects);
 }
 
 static GPtrArray *
@@ -357,6 +367,105 @@ _deduplicate_module_streams (const GPtrArray *first,
     }
 
   return g_ptr_array_ref (deduplicated);
+}
+
+
+static GPtrArray *
+_latest_module_streams (const GPtrArray *streams, GError **error)
+{
+  GObject *item = NULL;
+  GObject *prev_item = NULL;
+  g_autoptr (GPtrArray) prio_streams = NULL;
+  g_autoptr (GHashTable) nsc_index = NULL;
+  g_autofree gchar *nsc = NULL;
+  guint64 version, prev_version;
+  gsize i, idx;
+  GHashTableIter iter;
+  gpointer key;
+
+  g_return_val_if_fail (streams, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  prio_streams = g_ptr_array_new_full (streams->len, g_object_unref);
+
+  nsc_index = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  for (i = 0; i < streams->len; i++)
+    {
+      item = g_ptr_array_index (streams, i);
+      g_return_val_if_fail (item && G_IS_OBJECT (item), NULL);
+
+      if (!MODULEMD_IS_MODULE (item) && !MODULEMD_IS_MODULESTREAM (item))
+        {
+          /* No special handling for other object types */
+          g_ptr_array_add (prio_streams, g_object_ref (item));
+          continue;
+        }
+
+      if (MODULEMD_IS_MODULE (item))
+        {
+          nsc = g_strdup_printf (
+            "%s:%s:%s",
+            modulemd_module_get_name (MODULEMD_MODULE (item)),
+            modulemd_module_get_stream (MODULEMD_MODULE (item)),
+            modulemd_module_get_context (MODULEMD_MODULE (item)));
+          version = modulemd_module_get_version (MODULEMD_MODULE (item));
+        }
+
+      else if (MODULEMD_IS_MODULESTREAM (item))
+        {
+          nsc = g_strdup_printf (
+            "%s:%s:%s",
+            modulemd_modulestream_get_name (MODULEMD_MODULESTREAM (item)),
+            modulemd_modulestream_get_stream (MODULEMD_MODULESTREAM (item)),
+            modulemd_modulestream_get_context (MODULEMD_MODULESTREAM (item)));
+          version =
+            modulemd_modulestream_get_version (MODULEMD_MODULESTREAM (item));
+        }
+
+      if (g_hash_table_lookup_extended (nsc_index, nsc, NULL, (void *)&idx))
+        {
+          prev_item = g_ptr_array_index (streams, idx);
+
+          if (MODULEMD_IS_MODULE (item))
+            {
+              prev_version =
+                modulemd_module_get_version (MODULEMD_MODULE (prev_item));
+            }
+          else if (MODULEMD_IS_MODULESTREAM (item))
+            {
+              prev_version = modulemd_modulestream_get_version (
+                MODULEMD_MODULESTREAM (prev_item));
+            }
+          else
+            {
+              /* This should never happen */
+              g_return_val_if_reached (NULL);
+            }
+
+          if (version > prev_version)
+            {
+              /* Update the hash table with the index of the newer version */
+              g_hash_table_replace (nsc_index, g_strdup (nsc), (void *)i);
+            }
+        }
+      else
+        {
+          /* This is the first time we've seen this name, stream and context */
+          g_hash_table_replace (nsc_index, g_strdup (nsc), (void *)i);
+        }
+
+      g_clear_pointer (&nsc, g_free);
+    }
+
+
+  g_hash_table_iter_init (&iter, nsc_index);
+  while (g_hash_table_iter_next (&iter, &key, (void *)&idx))
+    {
+      g_ptr_array_add (prio_streams,
+                       g_object_ref (g_ptr_array_index (streams, idx)));
+    }
+
+  return g_ptr_array_ref (prio_streams);
 }
 
 

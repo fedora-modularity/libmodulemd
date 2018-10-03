@@ -275,14 +275,14 @@ data:
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
                 # Optional, defaults to all available arches.
-                arches: [ i686, x86_64 ]
+                arches: [i686, x86_64]
                 # A list of architectures with multilib
                 # installs, i.e. both i686 and x86_64
                 # versions will be installed on x86_64.
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
                 # Optional, defaults to no multilib.
-                multilib: [ x86_64 ]
+                multilib: [x86_64]
             xyz:
                 rationale: xyz is a bundled dependency of xxx.
                 # Build order group

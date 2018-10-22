@@ -54,7 +54,6 @@ test_env.set('G_MESSAGES_DEBUG', 'all')
 test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
 test_env.set ('MODULEMD_VERSION', libmodulemd_version)
-test_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
 test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
 
 # Test env with release values
@@ -63,7 +62,6 @@ test_release_env.set('G_MESSAGES_DEBUG', 'all')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 test_release_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
 test_release_env.set ('MODULEMD_VERSION', libmodulemd_version)
-test_release_env.set ('MODULEMD_NSVERSION', '.'.join([libmodulemd_version_array[0], '0']))
 test_release_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
 
 test_v1_modulemd_buildopts = executable(

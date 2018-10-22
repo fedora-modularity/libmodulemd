@@ -18,7 +18,7 @@ import sys
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', os.getenv('MODULEMD_NSVERSION'))
+    gi.require_version('Modulemd', '1.0')
     from gi.repository import Modulemd
     from gi.repository import GLib
 except ImportError:

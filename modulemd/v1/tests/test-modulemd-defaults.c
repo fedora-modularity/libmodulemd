@@ -412,6 +412,7 @@ modulemd_defaults_test_copy (DefaultsFixture *fixture, gconstpointer user_data)
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
   orig = modulemd_defaults_new_from_file (yaml_path, &error);
+  g_assert_nonnull (orig);
 
   copy = modulemd_defaults_copy (orig);
   g_assert_nonnull (copy);

@@ -27,6 +27,7 @@ test_cflags = [
   '-Wmissing-prototypes',
   '-Wstrict-prototypes',
   '-Wuninitialized',
+  ['-Werror=format-security', '-Werror=format=2'], # Must be checked together
   '-Werror=implicit',
   '-Werror=init-self',
   '-Werror=main',
@@ -38,7 +39,7 @@ test_cflags = [
   '-DG_LOG_DOMAIN="libmodulemd"',
 ]
 foreach cflag: test_cflags
-  if cc.has_argument(cflag)
+  if cc.has_multi_arguments(cflag)
     add_project_arguments(cflag, language : 'c')
   endif
 endforeach

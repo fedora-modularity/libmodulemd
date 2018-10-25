@@ -31,7 +31,8 @@ class TestStandard(unittest.TestCase):
 
     def test_version(self):
         # Make sure that we are linking against the correct version
-        assert os.getenv('MODULEMD_VERSION') == Modulemd.get_version()
+        expected_version = os.getenv('MODULEMD_VERSION')
+        assert expected_version is None or expected_version == Modulemd.get_version()
 
     def test_failures(self):
         (objects, failures) = Modulemd.objects_from_file_ext(

@@ -9,6 +9,16 @@
 # For more information on the license, see COPYING.
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
+test_installed_lib = get_option('test_installed_lib')
+
+if test_installed_lib
+    # If we're just running the tests on a library that's already installed,
+    # don't bother building it again.
+    build_lib = disabler()
+else
+    build_lib = declare_dependency()
+endif
+
 modulemd_v1_lib = library(
     'modulemd',
     sources : modulemd_v1_srcs,
@@ -16,19 +26,31 @@ modulemd_v1_lib = library(
     dependencies : [
         gobject,
         yaml,
+        build_lib,
     ],
     install : true,
     soversion: libmodulemd_version_array[0],
     version: libmodulemd_version,
 )
 
-modulemd_v1_dep = declare_dependency(
-    include_directories : v1_include_dirs,
-    link_with : modulemd_v1_lib,
-    dependencies : [
-        gobject,
-    ]
-)
+if test_installed_lib
+    # Run tests against an installed library instead of in-tree
+    modulemd_v1_dep = declare_dependency(
+        include_directories : v1_include_dirs,
+        dependencies : [
+            gobject,
+            dependency('modulemd'),
+        ]
+    )
+else
+    modulemd_v1_dep = declare_dependency(
+        include_directories : v1_include_dirs,
+        link_with : modulemd_v1_lib,
+        dependencies : [
+            gobject,
+        ]
+    )
+endif
 
 
 modulemd_validator = executable(
@@ -66,6 +88,7 @@ test_v1_modulemd_buildopts = executable(
     ],
     install : false,
 )
+
 test('test_v1_modulemd_buildopts', test_v1_modulemd_buildopts,
      env : test_env)
 test('test_v1_release_modulemd_buildopts', test_v1_modulemd_buildopts,
@@ -251,9 +274,17 @@ test('test_v1_release_modulemd_yaml', test_v1_modulemd_yaml,
 
 # Test env with fatal warnings and criticals
 py_test_env = test_env
-py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
-py_test_env.set ('MODULEMD_VERSION', libmodulemd_version)
-py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
+
+if not test_installed_lib
+    # If we're testing an installed version, we want to use the default
+    # locations for these paths.
+    py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
+    py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
+
+    # This test is just to catch whether we are accidentally not testing
+    # the built version.
+    py_test_env.set ('MODULEMD_VERSION', libmodulemd_version)
+endif
 
 # Test env with release values
 py_test_release_env = py_test_env

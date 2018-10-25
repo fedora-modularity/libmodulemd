@@ -1,0 +1,11 @@
+#!/usr/bin/sh
+
+set -e
+
+echo "Creating tarball. This may take a while."
+
+MMD_SKIP_VALGRIND=True ninja dist > /dev/null
+
+ln -sf ../meson-dist/ ./rpmbuild/SOURCES
+
+rpmbuild @BUILDFLAG@ libmodulemd.spec --define "_topdir $(pwd)/rpmbuild"

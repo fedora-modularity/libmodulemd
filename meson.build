@@ -55,6 +55,19 @@ spec_tmpl = find_program('spec_tmpl.sh')
 
 specfile_template = files('libmodulemd.spec.in')
 
+mkdir = find_program('mkdir')
+
+rpmsetup_target = custom_target(
+    'rpmsetup',
+    command: [
+        mkdir, '-p',
+        'rpmbuild/BUILD',
+        'rpmbuild/RPMS',
+        'rpmbuild/SPECS',
+        'rpmbuild/SRPMS'],
+    output: 'rpmbuild',
+)
+
 spec_target = custom_target(
     'specfile',
     capture: true,
@@ -62,6 +75,27 @@ spec_target = custom_target(
     command: [spec_tmpl, meson.project_version(), '@INPUT@'],
     input: specfile_template,
     output: 'libmodulemd.spec',
+    depends: rpmsetup_target,
+)
+
+rpm_cdata = configuration_data()
+rpm_cdata.set('VERSION', meson.project_version())
+rpm_cdata.set('BUILDFLAG', '-bb')
+
+srpm_cdata = configuration_data()
+srpm_cdata.set('VERSION', meson.project_version())
+srpm_cdata.set('BUILDFLAG', '-bs')
+
+configure_file(
+    input: 'make_rpms.sh.in',
+    output: 'make_srpm.sh',
+    configuration: srpm_cdata,
+)
+
+configure_file(
+    input: 'make_rpms.sh.in',
+    output: 'make_rpms.sh',
+    configuration: rpm_cdata,
 )
 
 subdir('modulemd')

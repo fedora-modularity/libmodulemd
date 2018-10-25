@@ -47,22 +47,16 @@ install_headers(
   subdir : v1_header_path,
 )
 
-# Test env with fatal warnings and criticals
-test_env = environment()
-test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
-test_env.set('G_MESSAGES_DEBUG', 'all')
-test_env.set ('MESON_SOURCE_ROOT', meson.source_root())
-test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
-test_env.set ('MODULEMD_VERSION', libmodulemd_version)
-test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
 
 # Test env with release values
 test_release_env = environment()
 test_release_env.set('G_MESSAGES_DEBUG', 'all')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
-test_release_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
-test_release_env.set ('MODULEMD_VERSION', libmodulemd_version)
-test_release_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
+
+
+# Test env with fatal warnings and criticals
+test_env = test_release_env
+test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
 test_v1_modulemd_buildopts = executable(
     'test_v1_modulemd_buildopts',
@@ -255,12 +249,22 @@ test('test_v1_modulemd_yaml', test_v1_modulemd_yaml,
 test('test_v1_release_modulemd_yaml', test_v1_modulemd_yaml,
      env : test_release_env)
 
+# Test env with fatal warnings and criticals
+py_test_env = test_env
+py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v1')
+py_test_env.set ('MODULEMD_VERSION', libmodulemd_version)
+py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v1')
+
+# Test env with release values
+py_test_release_env = py_test_env
+py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+
 modulemd_python_scripts = files('tests/test-modulemd-python.py')
 test ('test_v1_modulemd_python', python3,
-      env : test_env,
+      env : py_test_env,
       args : modulemd_python_scripts)
 test ('test_v1_release_modulemd_python', python3,
-      env : test_release_env,
+      env : py_test_release_env,
       args : modulemd_python_scripts)
 
 import_header_script = find_program('tests/test-import-headers.sh')

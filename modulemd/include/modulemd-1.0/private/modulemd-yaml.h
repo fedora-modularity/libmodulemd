@@ -129,9 +129,12 @@ typedef gboolean (*ModulemdParsingFunc) (yaml_parser_t *parser,
                          formatted,                                           \
                          event.start_mark.line + 1,                           \
                          event.start_mark.column + 1);                        \
-      g_debug (formatted2);                                                   \
-      g_set_error (                                                           \
-        _error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_PARSE, formatted2);  \
+      g_debug ("%s", formatted2);                                             \
+      g_set_error (_error,                                                    \
+                   MODULEMD_YAML_ERROR,                                       \
+                   MODULEMD_YAML_ERROR_PARSE,                                 \
+                   "%s",                                                      \
+                   formatted2);                                               \
       result = FALSE;                                                         \
       goto error;                                                             \
     }                                                                         \

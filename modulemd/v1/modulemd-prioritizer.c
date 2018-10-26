@@ -405,9 +405,9 @@ _latest_module_streams (const GPtrArray *streams, GError **error)
         {
           nsc = g_strdup_printf (
             "%s:%s:%s",
-            modulemd_module_get_name (MODULEMD_MODULE (item)),
-            modulemd_module_get_stream (MODULEMD_MODULE (item)),
-            modulemd_module_get_context (MODULEMD_MODULE (item)));
+            modulemd_module_peek_name (MODULEMD_MODULE (item)),
+            modulemd_module_peek_stream (MODULEMD_MODULE (item)),
+            modulemd_module_peek_context (MODULEMD_MODULE (item)));
           version = modulemd_module_get_version (MODULEMD_MODULE (item));
         }
 
@@ -415,9 +415,9 @@ _latest_module_streams (const GPtrArray *streams, GError **error)
         {
           nsc = g_strdup_printf (
             "%s:%s:%s",
-            modulemd_modulestream_get_name (MODULEMD_MODULESTREAM (item)),
-            modulemd_modulestream_get_stream (MODULEMD_MODULESTREAM (item)),
-            modulemd_modulestream_get_context (MODULEMD_MODULESTREAM (item)));
+            modulemd_modulestream_peek_name (MODULEMD_MODULESTREAM (item)),
+            modulemd_modulestream_peek_stream (MODULEMD_MODULESTREAM (item)),
+            modulemd_modulestream_peek_context (MODULEMD_MODULESTREAM (item)));
           version =
             modulemd_modulestream_get_version (MODULEMD_MODULESTREAM (item));
         }

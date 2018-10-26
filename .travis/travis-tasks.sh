@@ -25,4 +25,26 @@ pushd coverity
 
 popd #coverity
 
+
+# Always install and run the installed RPM tests last so we don't pollute the
+# testing environment above.
+
+meson --buildtype=debug build_rpm
+pushd build_rpm
+
+ninja
+./make_rpms.sh
+dnf -y install rpmbuild/RPMS/*/*.rpm
+
+popd #build_rpm
+
+
+meson --buildtype=debug -Dtest_installed_lib=true installed_lib_tests
+pushd installed_lib_tests
+
+# Run the tests against the installed RPMs
+ninja test
+
+popd #installed_lib_tests
+
 popd #builddir

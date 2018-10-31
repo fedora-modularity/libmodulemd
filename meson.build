@@ -51,6 +51,9 @@ gobject = dependency('gobject-2.0')
 yaml = dependency('yaml-0.1')
 gtkdoc = dependency('gtk-doc')
 
+sh = find_program('sh')
+sed = find_program('sed')
+
 spec_tmpl = find_program('spec_tmpl.sh')
 
 specfile_template = files('libmodulemd.spec.in')
@@ -72,7 +75,7 @@ spec_target = custom_target(
     'specfile',
     capture: true,
     build_always: true,
-    command: [spec_tmpl, meson.project_version(), '@INPUT@'],
+    command: [sh, spec_tmpl, meson.project_version(), '@INPUT@'],
     input: specfile_template,
     output: 'libmodulemd.spec',
     depends: rpmsetup_target,

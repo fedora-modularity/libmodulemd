@@ -55,19 +55,10 @@ parse_yaml_file (const gchar *path,
   FILE *yaml_file = NULL;
   yaml_parser_t parser;
 
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (path, FALSE);
+
   g_debug ("TRACE: entering parse_yaml_file");
-
-  if (error != NULL && *error != NULL)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
-    }
-
-  if (!path)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "Path not supplied.");
-    }
 
   yaml_parser_initialize (&parser);
 
@@ -111,19 +102,10 @@ parse_yaml_string (const gchar *yaml,
   gboolean result = FALSE;
   yaml_parser_t parser;
 
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (yaml, FALSE);
+
   g_debug ("TRACE: entering parse_yaml_string");
-
-  if (error != NULL && *error != NULL)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
-    }
-
-  if (!yaml)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "String not supplied.");
-    }
 
   yaml_parser_initialize (&parser);
 
@@ -154,19 +136,10 @@ parse_yaml_stream (FILE *stream,
   gboolean result = FALSE;
   yaml_parser_t parser;
 
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (stream, FALSE);
+
   g_debug ("TRACE: entering parse_yaml_stream");
-
-  if (error != NULL && *error != NULL)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "GError is initialized.");
-    }
-
-  if (!stream)
-    {
-      MMD_ERROR_RETURN_FULL (
-        error, MODULEMD_YAML_ERROR_PROGRAMMING, "Stream not supplied.");
-    }
 
   yaml_parser_initialize (&parser);
 

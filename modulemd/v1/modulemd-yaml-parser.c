@@ -434,8 +434,8 @@ _parse_yaml (yaml_parser_t *parser,
 
         default:
           /* We received a YAML event we shouldn't expect at this level */
-          MMD_YAML_ERROR_RETURN (
-            error, "Unexpected YAML event during preprocessing");
+          MMD_YAML_ERROR_RETURN (error,
+                                 "Unexpected YAML event during preprocessing");
           break;
         }
 

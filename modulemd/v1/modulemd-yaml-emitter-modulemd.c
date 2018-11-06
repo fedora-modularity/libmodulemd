@@ -949,8 +949,6 @@ _emit_modulemd_profile_entry (yaml_emitter_t *emitter,
 
   result = TRUE;
 error:
-  g_free (name);
-  g_free (description);
   return result;
 }
 

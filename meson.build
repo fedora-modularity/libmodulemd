@@ -10,7 +10,7 @@
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 project('modulemd', 'c',
-        version : '1.7.0',
+        version : '2.0.0',
         default_options : [
           'buildtype=debugoptimized',
           'c_std=c11',

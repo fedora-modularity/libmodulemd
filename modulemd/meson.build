@@ -32,6 +32,7 @@ if not valgrind.found()
 endif
 
 build_api_v1 = get_option('build_api_v1')
+build_api_v2 = get_option('build_api_v2')
 
 modulemd_v1_srcs = files(
     'v1/modulemd-buildopts.c',
@@ -86,7 +87,7 @@ modulemd_v1_hdrs = files(
     'include/modulemd-1.0/modulemd-translation-entry.h',
 )
 
-modulemd_priv_hdrs = files(
+modulemd_v1_priv_hdrs = files(
     'include/modulemd-1.0/private/modulemd-improvedmodule-private.h',
     'include/modulemd-1.0/private/modulemd-private.h',
     'include/modulemd-1.0/private/modulemd-profile-private.h',
@@ -114,8 +115,28 @@ test_v1_srcs = files(
     'v1/tests/test-modulemd-yaml.c',
 )
 
-libmodulemd_version = meson.project_version()
-libmodulemd_version_array = libmodulemd_version.split('.')
+libmodulemd_v1_version = '1.7.0'
+
+
+modulemd_v2_srcs = files(
+    'v2/modulemd-service-level.c',
+)
+
+modulemd_v2_hdrs = files(
+    'include/modulemd-2.0/modulemd-service-level.h',
+)
+
+modulemd_v2_priv_hdrs = files(
+    'v2/tests/test-modulemd-service-level.c',
+)
+
+test_v2_srcs = files(
+)
+
+v2_include_dirs = include_directories ('include/modulemd-2.0')
+
+
+libmodulemd_v2_version = meson.project_version()
 
 # Fake test to ensure that all sources and headers are formatted properly
 clang_args = [ '-i' ]
@@ -123,8 +144,12 @@ test('clang_format', clang_format,
      args : clang_args +
             modulemd_v1_srcs +
             modulemd_v1_hdrs +
-            modulemd_priv_hdrs +
-            test_v1_srcs)
+            modulemd_v1_priv_hdrs +
+            test_v1_srcs +
+            modulemd_v2_srcs +
+            modulemd_v2_hdrs +
+            modulemd_v2_priv_hdrs +
+            test_v2_srcs)
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 autopep8_args = [ '--in-place', '-a', '-a' ]
@@ -148,3 +173,23 @@ endif
 if build_api_v1
     subdir('v1')
 endif
+
+if build_api_v2
+    subdir('v2')
+endif
+
+xcdata = configuration_data()
+xcdata.set('VERSION', meson.project_version())
+configure_file(
+  input : 'version.xml.in',
+  output : 'version.xml',
+  configuration : xcdata
+)
+
+gnome.gtkdoc(
+    'modulemd',
+    install_dir: 'modulemd',
+    src_dir : './',
+    main_xml : 'modulemd-docs.xml',
+    install : true
+)

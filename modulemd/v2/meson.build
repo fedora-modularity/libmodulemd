@@ -1,0 +1,117 @@
+# This file is part of libmodulemd
+# Copyright (C) 2017-2018 Stephen Gallagher
+#
+# Fedora-License-Identifier: MIT
+# SPDX-2.0-License-Identifier: MIT
+# SPDX-3.0-License-Identifier: MIT
+#
+# This program is free software.
+# For more information on the license, see COPYING.
+# For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
+
+# -- Library -- #
+
+test_installed_lib = get_option('test_installed_lib')
+
+if test_installed_lib
+    # If we're just running the tests on a library that's already installed,
+    # don't bother building it again.
+    build_lib = disabler()
+else
+    build_lib = declare_dependency()
+endif
+
+modulemd_v2_lib = library(
+    'modulemd',
+    sources : modulemd_v2_srcs,
+    include_directories : v2_include_dirs,
+    dependencies : [
+        gobject,
+        yaml,
+        build_lib,
+    ],
+    install : true,
+    version: libmodulemd_v2_version,
+)
+
+if test_installed_lib
+    # Run tests against an installed library instead of in-tree
+    modulemd_v2_dep = declare_dependency(
+        include_directories : v2_include_dirs,
+        dependencies : [
+            gobject,
+            dependency(
+                'modulemd',
+                version: ['>= 2.0.0', '< 3.0.0']
+            ),
+        ]
+    )
+else
+    modulemd_v2_dep = declare_dependency(
+        include_directories : v2_include_dirs,
+        link_with : modulemd_v2_lib,
+        dependencies : [
+            gobject,
+        ]
+    )
+endif
+
+v2_header_path = 'modulemd-2.0'
+
+install_headers(
+  modulemd_v2_hdrs,
+  subdir : v2_header_path,
+)
+
+
+# --- TESTS --- #
+
+# Test env with release values
+test_release_env = environment()
+test_release_env.set('G_MESSAGES_DEBUG', 'all')
+test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+
+
+# Test env with fatal warnings and criticals
+test_env = test_release_env
+test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+
+# -- Test Modulemd.ServiceLevel -- #
+test_v2_servicelevel = executable(
+    'service_level_v2',
+    'tests/test-modulemd-service-level.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    install : false,
+)
+test('service_level_v2_debug', test_v2_servicelevel,
+     env : test_env)
+test('service_level_v2_release', test_v2_servicelevel,
+     env : test_release_env)
+
+
+# --- GOBject Introspection -- #
+
+gnome.generate_gir(
+    modulemd_v2_lib,
+    sources : modulemd_v2_srcs + modulemd_v2_hdrs,
+    nsversion : '2.0',
+    namespace : 'Modulemd',
+    symbol_prefix : 'modulemd_',
+    identifier_prefix : 'Modulemd',
+    includes : [
+        'GObject-2.0',
+    ],
+    install : true,
+)
+
+pkg.generate(
+    libraries : modulemd_v2_lib,
+    subdirs : v2_header_path,
+    version : libmodulemd_v2_version,
+    name : 'modulemd',
+    filebase : 'modulemd',
+    description : 'Module metadata manipulation library',
+    requires: [ 'glib-2.0', 'gobject-2.0' ],
+)

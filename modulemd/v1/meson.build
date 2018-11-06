@@ -29,8 +29,7 @@ modulemd_v1_lib = library(
         build_lib,
     ],
     install : true,
-    soversion: libmodulemd_version_array[0],
-    version: libmodulemd_version,
+    version: libmodulemd_v1_version,
 )
 
 if test_installed_lib
@@ -39,7 +38,10 @@ if test_installed_lib
         include_directories : v1_include_dirs,
         dependencies : [
             gobject,
-            dependency('modulemd'),
+            dependency(
+                'modulemd',
+                version: ['>= 1.0.0', '< 2.0.0']
+            ),
         ]
     )
 else
@@ -283,7 +285,7 @@ if not test_installed_lib
 
     # This test is just to catch whether we are accidentally not testing
     # the built version.
-    py_test_env.set ('MODULEMD_VERSION', libmodulemd_version)
+    py_test_env.set ('MODULEMD_VERSION', libmodulemd_v1_version)
 endif
 
 # Test env with release values
@@ -314,7 +316,7 @@ endif
 gnome.generate_gir(
     modulemd_v1_lib,
     sources : modulemd_v1_srcs + modulemd_v1_hdrs,
-    nsversion : '.'.join([libmodulemd_version_array[0], '0']),
+    nsversion : '1.0',
     namespace : 'Modulemd',
     symbol_prefix : 'modulemd_',
     identifier_prefix : 'Modulemd',
@@ -324,32 +326,17 @@ gnome.generate_gir(
     install : true,
     )
 
-xcdata = configuration_data()
-xcdata.set('VERSION', libmodulemd_version)
-configure_file(
-  input : 'version.xml.in',
-  output : 'version.xml',
-  configuration : xcdata
-)
-
 cdata = configuration_data()
-cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
+cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_v1_version)
 configure_file(
   output : 'config.h',
   configuration : cdata
 )
 
-gnome.gtkdoc(
-    'modulemd-1.0',
-    install_dir: 'modulemd-1.0',
-    src_dir : './',
-    main_xml : 'modulemd-docs.xml',
-    install : true)
-
 pkg.generate(
     libraries : modulemd_v1_lib,
     subdirs : v1_header_path,
-    version : libmodulemd_version,
+    version : libmodulemd_v1_version,
     name : 'modulemd',
     filebase : 'modulemd',
     description : 'Module metadata manipulation library',

@@ -100,7 +100,7 @@ export MMD_SKIP_VALGRIND=1
 %{_datadir}/gir-1.0/Modulemd-1.0.gir
 %dir %{_datadir}/gtk-doc
 %dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/modulemd-1.0/
+%{_datadir}/gtk-doc/html/modulemd/
 
 
 %changelog

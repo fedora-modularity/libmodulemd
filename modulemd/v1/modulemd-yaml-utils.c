@@ -26,9 +26,14 @@ int
 _write_yaml_string (void *data, unsigned char *buffer, size_t size)
 {
   modulemd_yaml_string *yaml_string = (modulemd_yaml_string *)data;
+  gsize total;
 
-  yaml_string->str =
-    g_realloc_n (yaml_string->str, yaml_string->len + size + 1, sizeof (char));
+  if (!g_size_checked_add (&total, yaml_string->len, size + 1))
+    {
+      return 0;
+    }
+
+  yaml_string->str = g_realloc_n (yaml_string->str, total, sizeof (char));
 
   memcpy (yaml_string->str + yaml_string->len, buffer, size);
   yaml_string->len += size;

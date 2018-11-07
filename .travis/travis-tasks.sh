@@ -5,14 +5,14 @@ set -e
 
 pushd /builddir/
 
-meson --buildtype=debug -Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} travis
+meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=true -Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} travis
 
 ninja -C travis test
 if [ $? != 0 ]; then
     cat /builddir/travis/meson-logs/testlog.txt
 fi
 
-meson --buildtype=debug coverity
+meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=true coverity
 pushd coverity
 
 # The coverity scan script returns an error despite succeeding...
@@ -29,7 +29,7 @@ popd #coverity
 # Always install and run the installed RPM tests last so we don't pollute the
 # testing environment above.
 
-meson --buildtype=debug build_rpm
+meson --buildtype=debug -Dbuild_api_v1=true build_rpm
 pushd build_rpm
 
 ninja
@@ -39,7 +39,7 @@ dnf -y install rpmbuild/RPMS/*/*.rpm
 popd #build_rpm
 
 
-meson --buildtype=debug -Dtest_installed_lib=true installed_lib_tests
+meson --buildtype=debug -Dbuild_api_v1=true -Dtest_installed_lib=true installed_lib_tests
 pushd installed_lib_tests
 
 # Run the tests against the installed RPMs

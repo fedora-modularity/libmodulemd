@@ -134,6 +134,10 @@ test_v2_srcs = files(
     'v2/tests/test-modulemd-service-level.c',
 )
 
+test_v2_python_scripts = files(
+    'v2/tests/ModulemdTests/servicelevel.py',
+)
+
 v2_include_dirs = include_directories ('include/modulemd-2.0')
 
 
@@ -156,7 +160,8 @@ test('clang_format', clang_format,
 autopep8_args = [ '--in-place', '-a', '-a' ]
 autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
                            'common/tests/test-dirty.py',
-                           'v1/tests/test-valgrind.py') ]
+                           'v1/tests/test-valgrind.py') +
+                     test_v2_python_scripts ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
 

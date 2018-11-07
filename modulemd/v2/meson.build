@@ -71,12 +71,30 @@ test_release_env = environment()
 test_release_env.set('G_MESSAGES_DEBUG', 'all')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 
-
 # Test env with fatal warnings and criticals
 test_env = test_release_env
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
-# -- Test Modulemd.ServiceLevel -- #
+# Python test env with fatal warnings and criticals
+py_test_env = test_env
+
+if not test_installed_lib
+    # If we're testing an installed version, we want to use the default
+    # locations for these paths.
+    py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v2')
+    py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v2')
+
+    # This test is just to catch whether we are accidentally not testing
+    # the built version.
+    py_test_env.set ('MODULEMD_VERSION', libmodulemd_v2_version)
+endif
+
+# Python test env with release values
+py_test_release_env = py_test_env
+py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+
+
+# -- Test Modulemd.ServiceLevel (C) -- #
 test_v2_servicelevel = executable(
     'service_level_v2',
     'tests/test-modulemd-service-level.c',
@@ -97,6 +115,15 @@ if valgrind.found()
           args : modulemd_valgrind_scripts,
           timeout : 300)
 endif
+
+# -- Test Modulemd.ServiceLevel (Python) -- #
+service_level_python_script = files('tests/ModulemdTests/servicelevel.py')
+test ('service_level_python_debug', python3,
+      env : py_test_env,
+      args : service_level_python_script)
+test ('service_level_python_release', python3,
+      env : py_test_release_env,
+      args : service_level_python_script)
 
 
 # --- GOBject Introspection -- #

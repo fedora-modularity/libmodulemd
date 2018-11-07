@@ -131,6 +131,7 @@ modulemd_v2_priv_hdrs = files(
 )
 
 test_v2_srcs = files(
+    'v2/tests/test-modulemd-service-level.c',
 )
 
 v2_include_dirs = include_directories ('include/modulemd-2.0')

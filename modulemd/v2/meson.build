@@ -90,6 +90,14 @@ test('service_level_v2_debug', test_v2_servicelevel,
 test('service_level_v2_release', test_v2_servicelevel,
      env : test_release_env)
 
+if valgrind.found()
+    modulemd_valgrind_scripts = files('tests/test-valgrind.py')
+    test ('test_v2_valgrind', python3,
+          env : test_env,
+          args : modulemd_valgrind_scripts,
+          timeout : 300)
+endif
+
 
 # --- GOBject Introspection -- #
 

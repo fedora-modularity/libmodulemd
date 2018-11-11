@@ -150,3 +150,20 @@ pkg.generate(
     description : 'Module metadata manipulation library',
     requires: [ 'glib-2.0', 'gobject-2.0' ],
 )
+
+xcdata = configuration_data()
+xcdata.set('VERSION', meson.project_version())
+configure_file(
+  input : 'version.xml.in',
+  output : 'version.xml',
+  configuration : xcdata
+)
+
+gnome.gtkdoc(
+    'modulemd-2.0',
+    install_dir: 'modulemd-2.0',
+    src_dir : './modulemd/v2',
+    main_xml : 'modulemd-v2-docs.xml',
+    install : true,
+)
+

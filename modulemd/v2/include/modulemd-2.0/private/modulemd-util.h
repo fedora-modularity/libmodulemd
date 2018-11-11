@@ -17,6 +17,15 @@
 
 G_BEGIN_DECLS
 
+/**
+ * SECTION: modulemd-util
+ * @title: Modulemd Utility Functions
+ * @stability: private
+ * @short_description: Provides private utility functions for use within
+ * libmodulemd.
+ */
+
+
 typedef struct _modulemd_tracer
 {
   gchar *function_name;

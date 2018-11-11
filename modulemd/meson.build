@@ -66,37 +66,37 @@ modulemd_v1_srcs = files(
 )
 
 modulemd_v1_hdrs = files(
-    'include/modulemd-1.0/modulemd.h',
-    'include/modulemd-1.0/modulemd-buildopts.h',
-    'include/modulemd-1.0/modulemd-component.h',
-    'include/modulemd-1.0/modulemd-component-module.h',
-    'include/modulemd-1.0/modulemd-component-rpm.h',
-    'include/modulemd-1.0/modulemd-defaults.h',
-    'include/modulemd-1.0/modulemd-dependencies.h',
-    'include/modulemd-1.0/modulemd-deprecated.h',
-    'include/modulemd-1.0/modulemd-improvedmodule.h',
-    'include/modulemd-1.0/modulemd-intent.h',
-    'include/modulemd-1.0/modulemd-module.h',
-    'include/modulemd-1.0/modulemd-modulestream.h',
-    'include/modulemd-1.0/modulemd-prioritizer.h',
-    'include/modulemd-1.0/modulemd-profile.h',
-    'include/modulemd-1.0/modulemd-simpleset.h',
-    'include/modulemd-1.0/modulemd-servicelevel.h',
-    'include/modulemd-1.0/modulemd-subdocument.h',
-    'include/modulemd-1.0/modulemd-translation.h',
-    'include/modulemd-1.0/modulemd-translation-entry.h',
+    'v1/include/modulemd-1.0/modulemd.h',
+    'v1/include/modulemd-1.0/modulemd-buildopts.h',
+    'v1/include/modulemd-1.0/modulemd-component.h',
+    'v1/include/modulemd-1.0/modulemd-component-module.h',
+    'v1/include/modulemd-1.0/modulemd-component-rpm.h',
+    'v1/include/modulemd-1.0/modulemd-defaults.h',
+    'v1/include/modulemd-1.0/modulemd-dependencies.h',
+    'v1/include/modulemd-1.0/modulemd-deprecated.h',
+    'v1/include/modulemd-1.0/modulemd-improvedmodule.h',
+    'v1/include/modulemd-1.0/modulemd-intent.h',
+    'v1/include/modulemd-1.0/modulemd-module.h',
+    'v1/include/modulemd-1.0/modulemd-modulestream.h',
+    'v1/include/modulemd-1.0/modulemd-prioritizer.h',
+    'v1/include/modulemd-1.0/modulemd-profile.h',
+    'v1/include/modulemd-1.0/modulemd-simpleset.h',
+    'v1/include/modulemd-1.0/modulemd-servicelevel.h',
+    'v1/include/modulemd-1.0/modulemd-subdocument.h',
+    'v1/include/modulemd-1.0/modulemd-translation.h',
+    'v1/include/modulemd-1.0/modulemd-translation-entry.h',
 )
 
 modulemd_v1_priv_hdrs = files(
-    'include/modulemd-1.0/private/modulemd-improvedmodule-private.h',
-    'include/modulemd-1.0/private/modulemd-private.h',
-    'include/modulemd-1.0/private/modulemd-profile-private.h',
-    'include/modulemd-1.0/private/modulemd-subdocument-private.h',
-    'include/modulemd-1.0/private/modulemd-util.h',
-    'include/modulemd-1.0/private/modulemd-yaml.h',
+    'v1/include/modulemd-1.0/private/modulemd-improvedmodule-private.h',
+    'v1/include/modulemd-1.0/private/modulemd-private.h',
+    'v1/include/modulemd-1.0/private/modulemd-profile-private.h',
+    'v1/include/modulemd-1.0/private/modulemd-subdocument-private.h',
+    'v1/include/modulemd-1.0/private/modulemd-util.h',
+    'v1/include/modulemd-1.0/private/modulemd-yaml.h',
 )
 
-v1_include_dirs = include_directories ('include/modulemd-1.0')
+v1_include_dirs = include_directories ('v1/include/modulemd-1.0')
 
 test_v1_srcs = files(
     'v1/tests/test-modulemd-buildopts.c',
@@ -124,12 +124,12 @@ modulemd_v2_srcs = files(
 )
 
 modulemd_v2_hdrs = files(
-    'include/modulemd-2.0/modulemd-service-level.h',
+    'v2/include/modulemd-2.0/modulemd-service-level.h',
 )
 
 modulemd_v2_priv_hdrs = files(
-    'include/modulemd-2.0/private/glib-extensions.h',
-    'include/modulemd-2.0/private/modulemd-util.h',
+    'v2/include/modulemd-2.0/private/glib-extensions.h',
+    'v2/include/modulemd-2.0/private/modulemd-util.h',
 )
 
 test_v2_srcs = files(
@@ -140,7 +140,7 @@ test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/servicelevel.py',
 )
 
-v2_include_dirs = include_directories ('include/modulemd-2.0')
+v2_include_dirs = include_directories ('v2/include/modulemd-2.0')
 
 
 libmodulemd_v2_version = meson.project_version()
@@ -186,18 +186,3 @@ if build_api_v2
     subdir('v2')
 endif
 
-xcdata = configuration_data()
-xcdata.set('VERSION', meson.project_version())
-configure_file(
-  input : 'version.xml.in',
-  output : 'version.xml',
-  configuration : xcdata
-)
-
-gnome.gtkdoc(
-    'modulemd',
-    install_dir: 'modulemd',
-    src_dir : './',
-    main_xml : 'modulemd-docs.xml',
-    install : true
-)

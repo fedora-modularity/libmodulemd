@@ -21,6 +21,7 @@ G_BEGIN_DECLS
 /**
  * SECTION: modulemd-service-level
  * @title: Modulemd.ServiceLevel
+ * @stability: stable
  * @short_description: Provides lifecycle information for a module stream.
  */
 

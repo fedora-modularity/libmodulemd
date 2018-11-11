@@ -26,17 +26,13 @@
     </copyright>
   </bookinfo>
 
-  <reference id="modulemd">
+  <reference id="modulemd-1.0">
     <title>libmodulemd</title>
     <partintro>
       <para>
         API Documentation for libmodulemd.
       </para>
     </partintro>
-    <chapter>
-      <title>Modulemd 2.0</title>
-        <xi:include href="xml/modulemd-service-level.xml"/>
-    </chapter>
     <chapter>
       <title>Modulemd 1.0 (Deprecated)</title>
         <xi:include href="xml/modulemd.xml"/>

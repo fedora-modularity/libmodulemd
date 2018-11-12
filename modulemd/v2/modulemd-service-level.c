@@ -12,8 +12,13 @@
  */
 
 #include <glib.h>
+#include <yaml.h>
 
 #include "modulemd-service-level.h"
+#include "private/glib-extensions.h"
+#include "private/modulemd-service-level-private.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
 
 #define SL_DEFAULT_STRING "__NAME_UNSET__"
 
@@ -248,4 +253,94 @@ static void
 modulemd_service_level_init (ModulemdServiceLevel *self)
 {
   self->eol = g_date_new ();
+}
+
+
+/* === YAML Functions === */
+
+ModulemdServiceLevel *
+modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE
+  MMD_INIT_YAML_EVENT (event)
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  GDate *eol = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Read in the name of the service level */
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (error, event, "Missing service level name");
+    }
+  sl = modulemd_service_level_new ((const gchar *)event.data.scalar.value);
+  yaml_event_delete (&event);
+
+  /* Read in any supplementary attributes of the service level,
+   * such as 'eol'
+   */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          /* This is the start of the service level content. */
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          /* We're done processing the service level content */
+          in_map = FALSE;
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              /* We must be in the map before we handle scalars */
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Missing mapping in service level");
+              break;
+            }
+          /* Only "eol" is supported right now */
+          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "eol"))
+            {
+              /* Get the EOL date */
+              eol = modulemd_yaml_parse_date (parser, &nested_error);
+              if (!eol)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse EOL date in service level: %s",
+                    nested_error->message);
+                }
+
+              modulemd_service_level_set_eol (sl, eol);
+              g_date_free (eol);
+            }
+          else
+            {
+              /* Unknown field in service level */
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unknown key in service level body");
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error, event, "Unexpected YAML event in service level");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return g_object_ref (sl);
 }

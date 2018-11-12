@@ -14,7 +14,6 @@
 #pragma once
 
 #include <glib-object.h>
-#include "private/glib-extensions.h"
 
 G_BEGIN_DECLS
 
@@ -138,5 +137,6 @@ modulemd_service_level_get_eol (ModulemdServiceLevel *self);
  */
 gchar *
 modulemd_service_level_get_eol_string (ModulemdServiceLevel *self);
+
 
 G_END_DECLS

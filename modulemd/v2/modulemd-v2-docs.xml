@@ -34,10 +34,18 @@
       </para>
     </partintro>
     <chapter>
-      <title>Modulemd 2.0</title>
+      <title>Modulemd 2.0 Public API</title>
         <xi:include href="xml/modulemd-service-level.xml"/>
+    </chapter>
+    <chapter>
+      <title>Modulemd 2.0 Private Object Methods</title>
+       <xi:include href="xml/modulemd-service-level-private.xml"/>
+    </chapter>
+    <chapter>
+      <title>Modulemd 2.0 Private Developer Utilities</title>
         <xi:include href="xml/modulemd-util.xml"/>
+        <xi:include href="xml/modulemd-yaml.xml"/>
+        <xi:include href="xml/test-utils.xml"/>
     </chapter>
   </reference>
-
 </book>

@@ -121,6 +121,7 @@ libmodulemd_v1_version = '1.7.0'
 modulemd_v2_srcs = files(
     'v2/modulemd-service-level.c',
     'v2/modulemd-util.c',
+    'v2/modulemd-yaml-util.c',
 )
 
 modulemd_v2_hdrs = files(
@@ -129,11 +130,18 @@ modulemd_v2_hdrs = files(
 
 modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/glib-extensions.h',
+    'v2/include/modulemd-2.0/private/modulemd-service-level-private.h',
     'v2/include/modulemd-2.0/private/modulemd-util.h',
+    'v2/include/modulemd-2.0/private/modulemd-yaml.h',
 )
 
 test_v2_srcs = files(
     'v2/tests/test-modulemd-service-level.c',
+    'v2/tests/test-utils.c',
+)
+
+test_v2_priv_hdrs = files(
+    'v2/include/modulemd-2.0/private/test-utils.h',
 )
 
 test_v2_python_scripts = files(
@@ -156,7 +164,8 @@ test('clang_format', clang_format,
             modulemd_v2_srcs +
             modulemd_v2_hdrs +
             modulemd_v2_priv_hdrs +
-            test_v2_srcs)
+            test_v2_srcs +
+            test_v2_priv_hdrs)
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 autopep8_args = [ '--in-place', '-a', '-a' ]

@@ -11,11 +11,16 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include "modulemd-service-level.h"
-
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <locale.h>
 #include <signal.h>
+
+#include "modulemd-service-level.h"
+#include "private/glib-extensions.h"
+#include "private/modulemd-service-level-private.h"
+#include "private/modulemd-yaml.h"
+#include "private/test-utils.h"
 
 typedef struct _ServiceLevelFixture
 {
@@ -256,6 +261,41 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_null (modulemd_service_level_get_eol (sl));
 }
 
+static void
+service_level_test_parse_yaml (ServiceLevelFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_PARSER (parser)
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  GDate *eol = NULL;
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/sl_with_eol.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (yaml_stream);
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  /* Advance the parser past STREAM_START, DOCUMENT_START and MAPPING_START */
+  parser_skip_headers (&parser);
+
+  sl = modulemd_service_level_parse_yaml (&parser, &error);
+  g_assert_nonnull (sl);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
+  g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "sl_name");
+  g_assert_nonnull (modulemd_service_level_get_eol (sl));
+
+  eol = modulemd_service_level_get_eol (sl);
+  g_assert_cmpint (g_date_get_year (eol), ==, 2018);
+  g_assert_cmpint (g_date_get_month (eol), ==, 7);
+  g_assert_cmpint (g_date_get_day (eol), ==, 11);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -286,6 +326,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               service_level_test_get_set_eol,
+              NULL);
+
+  g_test_add ("/modulemd/v2/servicelevel/yaml",
+              ServiceLevelFixture,
+              NULL,
+              NULL,
+              service_level_test_parse_yaml,
               NULL);
 
   return g_test_run ();

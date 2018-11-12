@@ -52,6 +52,7 @@ else
         link_with : modulemd_v2_lib,
         dependencies : [
             gobject,
+            yaml,
         ]
     )
 endif
@@ -94,12 +95,29 @@ py_test_release_env = py_test_env
 py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
 
+# --- Test utility library --- #
+test_utils_lib = library(
+    'modulemd_tests',
+    sources : [
+        'tests/test-utils.c',
+    ],
+    include_directories : v2_include_dirs,
+    dependencies : [
+        gobject,
+        yaml,
+    ],
+    install : false,
+)
+
 # -- Test Modulemd.ServiceLevel (C) -- #
 test_v2_servicelevel = executable(
     'service_level_v2',
     'tests/test-modulemd-service-level.c',
     dependencies : [
         modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
     ],
     install : false,
 )

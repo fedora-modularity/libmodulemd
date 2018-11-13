@@ -275,7 +275,7 @@ modulemd_service_level_init (ModulemdServiceLevel *self)
 ModulemdServiceLevel *
 modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
 {
-  MODULEMD_INIT_TRACE
+  MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean in_map = FALSE;
@@ -364,6 +364,7 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
                                   yaml_emitter_t *emitter,
                                   GError **error)
 {
+  MODULEMD_INIT_TRACE ();
   int ret;
   g_autoptr (GError) nested_error = NULL;
   g_autofree gchar *eol_string = NULL;

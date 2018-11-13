@@ -21,26 +21,10 @@ import xml.etree.ElementTree as ET
 if os.getenv('MMD_SKIP_VALGRIND'):
     sys.exit(77)
 
-tests = [
-    'test_v1_modulemd_buildopts',
-    'test_v1_modulemd_component',
-    'test_v1_modulemd_defaults',
-    'test_v1_modulemd_dependencies',
-    'test_v1_modulemd_intent',
-    'test_v1_modulemd_module',
-    'test_v1_modulemd_modulestream',
-    'test_v1_modulemd_regressions',
-    'test_v1_modulemd_servicelevel',
-    'test_v1_modulemd_simpleset',
-    'test_v1_modulemd_subdocument',
-    'test_v1_modulemd_translation_entry',
-    'test_v1_modulemd_yaml',
-]
-
 failed = False
 
 with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
-    for test in tests:
+    for test in sys.argv[1:]:
         valgrind_command = "/usr/bin/valgrind " \
                            "--leak-check=full " \
                            "--xml=yes " \

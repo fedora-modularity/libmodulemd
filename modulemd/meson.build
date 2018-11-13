@@ -171,7 +171,7 @@ test('clang_format', clang_format,
 autopep8_args = [ '--in-place', '-a', '-a' ]
 autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
                            'common/tests/test-dirty.py',
-                           'v1/tests/test-valgrind.py') +
+                           'common/tests/test-valgrind.py') +
                      test_v2_python_scripts ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
@@ -187,12 +187,30 @@ if test_dirty_git
          args: dirty_repo_scripts)
 endif
 
+valgrind_tests = []
+
 if build_api_v1
     subdir('v1')
     import_header_script = find_program('common/tests/test-import-headers.sh')
     test ('test_v1_import_headers', import_header_script,
           env : test_env,
           args : modulemd_v1_hdrs)
+
+    valgrind_tests = valgrind_tests + [
+        'test_v1_modulemd_buildopts',
+        'test_v1_modulemd_component',
+        'test_v1_modulemd_defaults',
+        'test_v1_modulemd_dependencies',
+        'test_v1_modulemd_intent',
+        'test_v1_modulemd_module',
+        'test_v1_modulemd_modulestream',
+        'test_v1_modulemd_regressions',
+        'test_v1_modulemd_servicelevel',
+        'test_v1_modulemd_simpleset',
+        'test_v1_modulemd_subdocument',
+        'test_v1_modulemd_translation_entry',
+        'test_v1_modulemd_yaml',
+    ]
 endif
 
 if build_api_v2
@@ -201,5 +219,15 @@ if build_api_v2
     test ('test_v2_import_headers', import_header_script,
           env : test_env,
           args : modulemd_v2_hdrs)
+    valgrind_tests = valgrind_tests + [
+        'service_level_v2_debug',
+    ]
 endif
 
+if valgrind.found()
+    modulemd_valgrind_scripts = files('common/tests/test-valgrind.py')
+    test ('valgrind', python3,
+          env : test_env,
+          args : modulemd_valgrind_scripts + valgrind_tests,
+          timeout : 600)
+endif

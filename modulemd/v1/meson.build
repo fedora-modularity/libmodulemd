@@ -300,14 +300,6 @@ test ('test_v1_release_modulemd_python', python3,
       env : py_test_release_env,
       args : modulemd_python_scripts)
 
-if valgrind.found()
-    modulemd_valgrind_scripts = files('tests/test-valgrind.py')
-    test ('test_v1_valgrind', python3,
-          env : test_env,
-          args : modulemd_valgrind_scripts,
-          timeout : 300)
-endif
-
 gnome.generate_gir(
     modulemd_v1_lib,
     sources : modulemd_v1_srcs + modulemd_v1_hdrs,

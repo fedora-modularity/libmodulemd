@@ -110,6 +110,40 @@ service_level_test_construct (ServiceLevelFixture *fixture,
 
 
 static void
+service_level_test_copy (ServiceLevelFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_autoptr (ModulemdServiceLevel) sl_copy = NULL;
+  g_autofree gchar *eol_string = NULL;
+
+  /* Test copying a service level with no EOL */
+  sl = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
+  g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "foo");
+  g_assert_null (modulemd_service_level_get_eol (sl));
+
+  sl_copy = modulemd_service_level_copy (sl);
+  g_assert_nonnull (sl_copy);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_copy));
+  g_assert_cmpstr (modulemd_service_level_get_name (sl_copy), ==, "foo");
+  g_assert_null (modulemd_service_level_get_eol (sl_copy));
+  g_clear_object (&sl_copy);
+
+  /* Test copying a service level with an EOL */
+  modulemd_service_level_set_eol_ymd (sl, 2018, 11, 13);
+
+  sl_copy = modulemd_service_level_copy (sl);
+  g_assert_nonnull (sl_copy);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_copy));
+  g_assert_cmpstr (modulemd_service_level_get_name (sl_copy), ==, "foo");
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_copy));
+  eol_string = modulemd_service_level_get_eol_string (sl_copy);
+  g_assert_cmpstr (eol_string, ==, "2018-11-13");
+}
+
+
+static void
 service_level_test_get_name (ServiceLevelFixture *fixture,
                              gconstpointer user_data)
 {
@@ -319,6 +353,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               service_level_test_get_name,
+              NULL);
+
+  g_test_add ("/modulemd/v2/servicelevel/copy",
+              ServiceLevelFixture,
+              NULL,
+              NULL,
+              service_level_test_copy,
               NULL);
 
   g_test_add ("/modulemd/v2/servicelevel/get_set_eol",

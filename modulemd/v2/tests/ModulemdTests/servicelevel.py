@@ -81,6 +81,32 @@ class TestServiceLevel(unittest.TestCase):
         sl = Modulemd.ServiceLevel(name=None)
         signal.signal(signal.SIGTRAP, saved_signal)
 
+    def test_copy(self):
+        sl = Modulemd.ServiceLevel.new('foo')
+        assert sl
+        assert sl.props.name == 'foo'
+        assert sl.get_name() == 'foo'
+        assert sl.props.eol is None
+        assert sl.get_eol() is None
+        assert sl.get_eol_string() is None
+
+        sl_copy = sl.copy()
+        assert sl_copy
+        assert sl_copy.props.name == 'foo'
+        assert sl_copy.get_name() == 'foo'
+        assert sl_copy.props.eol is None
+        assert sl_copy.get_eol() is None
+        assert sl_copy.get_eol_string() is None
+
+        sl.set_eol_ymd(2018, 11, 13)
+        sl_copy = sl.copy()
+        assert sl_copy
+        assert sl_copy.props.name == 'foo'
+        assert sl_copy.get_name() == 'foo'
+        assert sl_copy.props.eol is not None
+        assert sl_copy.get_eol() is not None
+        assert sl_copy.get_eol_string() == '2018-11-13'
+
     def test_get_name(self):
         sl = Modulemd.ServiceLevel.new('foo')
 

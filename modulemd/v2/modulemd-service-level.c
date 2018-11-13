@@ -56,6 +56,20 @@ modulemd_service_level_new (const gchar *name)
 }
 
 
+ModulemdServiceLevel *
+modulemd_service_level_copy (ModulemdServiceLevel *self)
+{
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (self), NULL);
+
+  sl = modulemd_service_level_new (modulemd_service_level_get_name (self));
+
+  modulemd_service_level_set_eol (sl, modulemd_service_level_get_eol (self));
+
+  return g_object_ref (sl);
+}
+
+
 static void
 modulemd_service_level_finalize (GObject *object)
 {

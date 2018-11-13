@@ -189,9 +189,17 @@ endif
 
 if build_api_v1
     subdir('v1')
+    import_header_script = find_program('common/tests/test-import-headers.sh')
+    test ('test_v1_import_headers', import_header_script,
+          env : test_env,
+          args : modulemd_v1_hdrs)
 endif
 
 if build_api_v2
     subdir('v2')
+    import_header_script = find_program('common/tests/test-import-headers.sh')
+    test ('test_v2_import_headers', import_header_script,
+          env : test_env,
+          args : modulemd_v2_hdrs)
 endif
 

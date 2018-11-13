@@ -40,7 +40,8 @@ enum ModulemdYamlError
   MODULEMD_YAML_ERROR_UNPARSEABLE,
   MODULEMD_YAML_ERROR_PARSE,
   MODULEMD_YAML_ERROR_EMIT,
-  MODULEMD_YAML_ERROR_MISSING_REQUIRED
+  MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+  MODULEMD_YAML_ERROR_EVENT_INIT
 };
 
 typedef struct _modulemd_yaml_string
@@ -50,7 +51,7 @@ typedef struct _modulemd_yaml_string
 } modulemd_yaml_string;
 
 int
-_write_yaml_string (void *data, unsigned char *buffer, size_t size);
+write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
 void
 modulemd_yaml_string_free (modulemd_yaml_string *yaml_string);
@@ -73,10 +74,18 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   g_auto (yaml_parser_t) _parser;                                             \
   yaml_parser_initialize (&_parser);
 
+#define MMD_INIT_YAML_EMITTER(_emitter)                                       \
+  g_auto (yaml_emitter_t) _emitter;                                           \
+  yaml_emitter_initialize (&_emitter);
+
 #define MMD_INIT_YAML_EVENT(_event)                                           \
   g_auto (yaml_event_t) _event;                                               \
   memset (&(_event), 0, sizeof (yaml_event_t));
 
+#define MMD_INIT_YAML_STRING(_emitter, _string)                               \
+  g_autoptr (modulemd_yaml_string) yaml_string =                              \
+    g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string);
 
 #define YAML_PARSER_PARSE_WITH_EXIT(_parser, _event, _error)                  \
   do                                                                          \
@@ -91,6 +100,27 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
           return NULL;                                                        \
         }                                                                     \
       g_debug ("Parser event: %s", mmd_yaml_get_event_name ((_event)->type)); \
+    }                                                                         \
+  while (0)
+
+
+#define MMD_EMIT_WITH_EXIT(_emitter, _event, _error, ...)                     \
+  do                                                                          \
+    {                                                                         \
+      int _ret;                                                               \
+      g_debug ("Emitter event: %s",                                           \
+               mmd_yaml_get_event_name ((_event)->type));                     \
+      _ret = yaml_emitter_emit (_emitter, _event);                            \
+      (_event)->type = 0;                                                     \
+      if (!_ret)                                                              \
+        {                                                                     \
+          g_debug (__VA_ARGS__);                                              \
+          g_set_error (_error,                                                \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       __VA_ARGS__);                                          \
+          return FALSE;                                                       \
+        }                                                                     \
     }                                                                         \
   while (0)
 
@@ -113,6 +143,46 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
       return NULL;                                                            \
     }                                                                         \
   while (0)
+
+
+gboolean
+mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error);
+
+gboolean
+mmd_emitter_end_stream (yaml_emitter_t *emitter, GError **error);
+
+
+gboolean
+mmd_emitter_start_document (yaml_emitter_t *emitter, GError **error);
+
+gboolean
+mmd_emitter_end_document (yaml_emitter_t *emitter, GError **error);
+
+
+gboolean
+mmd_emitter_start_mapping (yaml_emitter_t *emitter,
+                           yaml_mapping_style_t style,
+                           GError **error);
+
+gboolean
+mmd_emitter_end_mapping (yaml_emitter_t *emitter, GError **error);
+
+
+gboolean
+mmd_emitter_start_sequence (yaml_emitter_t *emitter,
+                            yaml_sequence_style_t style,
+                            GError **error);
+
+gboolean
+mmd_emitter_end_sequence (yaml_emitter_t *emitter, GError **error);
+
+
+gboolean
+mmd_emitter_scalar (yaml_emitter_t *emitter,
+                    const gchar *scalar,
+                    yaml_scalar_style_t style,
+                    GError **error);
+
 
 /**
  * modulemd_yaml_parse_date:

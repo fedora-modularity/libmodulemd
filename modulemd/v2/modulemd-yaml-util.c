@@ -32,7 +32,7 @@ modulemd_yaml_string_free (modulemd_yaml_string *yaml_string)
 
 
 int
-_write_yaml_string (void *data, unsigned char *buffer, size_t size)
+write_yaml_string (void *data, unsigned char *buffer, size_t size)
 {
   modulemd_yaml_string *yaml_string = (modulemd_yaml_string *)data;
   gsize total;
@@ -82,6 +82,223 @@ mmd_yaml_get_event_name (yaml_event_type_t type)
 
   /* Should be unreachable */
   return "Unknown YAML Event";
+}
+
+
+gboolean
+mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  yaml_emitter_set_unicode (emitter, TRUE);
+
+  ret = yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the stream start event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (
+    emitter, &event, error, "Could not start the YAML stream");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_end_stream (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_stream_end_event_initialize (&event);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the stream end event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not end the YAML stream");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_start_document (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_document_start_event_initialize (&event, NULL, NULL, NULL, 0);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the document start event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (
+    emitter, &event, error, "Could not start the YAML document");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_end_document (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_document_end_event_initialize (&event, 0);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the document end event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (
+    emitter, &event, error, "Could not end the YAML document");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_start_mapping (yaml_emitter_t *emitter,
+                           yaml_mapping_style_t style,
+                           GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_mapping_start_event_initialize (&event, NULL, NULL, 1, style);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the mapping start event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not start the mapping");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_end_mapping (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_mapping_end_event_initialize (&event);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the mapping end event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not end the mapping");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_start_sequence (yaml_emitter_t *emitter,
+                            yaml_sequence_style_t style,
+                            GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_sequence_start_event_initialize (&event, NULL, NULL, 1, style);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the sequence start event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not start the sequence");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_end_sequence (yaml_emitter_t *emitter, GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_sequence_end_event_initialize (&event);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the sequence end event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not end the sequence");
+
+  return TRUE;
+}
+
+
+gboolean
+mmd_emitter_scalar (yaml_emitter_t *emitter,
+                    const gchar *scalar,
+                    yaml_scalar_style_t style,
+                    GError **error)
+{
+  int ret;
+  MMD_INIT_YAML_EVENT (event)
+
+  ret = yaml_scalar_event_initialize (&event,
+                                      NULL,
+                                      NULL,
+                                      (yaml_char_t *)scalar,
+                                      (int)strlen (scalar),
+                                      1,
+                                      1,
+                                      style);
+  if (!ret)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   "Could not initialize the scalar event");
+      return FALSE;
+    }
+
+  MMD_EMIT_WITH_EXIT (emitter, &event, error, "Could not emit scalar value");
+
+  return TRUE;
 }
 
 

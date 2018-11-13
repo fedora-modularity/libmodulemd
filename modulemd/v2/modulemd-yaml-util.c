@@ -89,7 +89,7 @@ gboolean
 mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   yaml_emitter_set_unicode (emitter, TRUE);
 
@@ -114,7 +114,7 @@ gboolean
 mmd_emitter_end_stream (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_stream_end_event_initialize (&event);
   if (!ret)
@@ -136,7 +136,7 @@ gboolean
 mmd_emitter_start_document (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_document_start_event_initialize (&event, NULL, NULL, NULL, 0);
   if (!ret)
@@ -159,7 +159,7 @@ gboolean
 mmd_emitter_end_document (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_document_end_event_initialize (&event, 0);
   if (!ret)
@@ -184,7 +184,7 @@ mmd_emitter_start_mapping (yaml_emitter_t *emitter,
                            GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_mapping_start_event_initialize (&event, NULL, NULL, 1, style);
   if (!ret)
@@ -206,7 +206,7 @@ gboolean
 mmd_emitter_end_mapping (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_mapping_end_event_initialize (&event);
   if (!ret)
@@ -230,7 +230,7 @@ mmd_emitter_start_sequence (yaml_emitter_t *emitter,
                             GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_sequence_start_event_initialize (&event, NULL, NULL, 1, style);
   if (!ret)
@@ -252,7 +252,7 @@ gboolean
 mmd_emitter_end_sequence (yaml_emitter_t *emitter, GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_sequence_end_event_initialize (&event);
   if (!ret)
@@ -277,7 +277,7 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
                     GError **error)
 {
   int ret;
-  MMD_INIT_YAML_EVENT (event)
+  MMD_INIT_YAML_EVENT (event);
 
   ret = yaml_scalar_event_initialize (&event,
                                       NULL,

@@ -72,20 +72,20 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 #define MMD_INIT_YAML_PARSER(_parser)                                         \
   g_auto (yaml_parser_t) _parser;                                             \
-  yaml_parser_initialize (&_parser);
+  yaml_parser_initialize (&_parser)
 
 #define MMD_INIT_YAML_EMITTER(_emitter)                                       \
   g_auto (yaml_emitter_t) _emitter;                                           \
-  yaml_emitter_initialize (&_emitter);
+  yaml_emitter_initialize (&_emitter)
 
 #define MMD_INIT_YAML_EVENT(_event)                                           \
   g_auto (yaml_event_t) _event;                                               \
-  memset (&(_event), 0, sizeof (yaml_event_t));
+  memset (&(_event), 0, sizeof (yaml_event_t))
 
 #define MMD_INIT_YAML_STRING(_emitter, _string)                               \
   g_autoptr (modulemd_yaml_string) yaml_string =                              \
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
-  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string);
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
 #define YAML_PARSER_PARSE_WITH_EXIT(_parser, _event, _error)                  \
   do                                                                          \

@@ -301,7 +301,7 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GError) error = NULL;
-  MMD_INIT_YAML_PARSER (parser)
+  MMD_INIT_YAML_PARSER (parser);
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   GDate *eol = NULL;
@@ -337,8 +337,8 @@ service_level_test_emit_yaml (ServiceLevelFixture *fixture,
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GError) error = NULL;
-  MMD_INIT_YAML_EMITTER (emitter)
-  MMD_INIT_YAML_STRING (&emitter, yaml_string)
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
 
   /* Service Level without EOL */
   sl = modulemd_service_level_new ("foo");

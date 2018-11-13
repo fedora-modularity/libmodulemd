@@ -331,6 +331,60 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
 }
 
 
+static void
+service_level_test_emit_yaml (ServiceLevelFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter)
+  MMD_INIT_YAML_STRING (&emitter, yaml_string)
+
+  /* Service Level without EOL */
+  sl = modulemd_service_level_new ("foo");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+
+  g_assert_true (modulemd_service_level_emit_yaml (sl, &emitter, &error));
+
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str, ==, "---\nfoo: {}\n...\n");
+
+  /* Service Level with EOL */
+  g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
+  yaml_emitter_delete (&emitter);
+  yaml_emitter_initialize (&emitter);
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
+  yaml_emitter_set_output (&emitter, write_yaml_string, (void *)yaml_string);
+
+  modulemd_service_level_set_eol_ymd (sl, 2018, 11, 13);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+
+  g_assert_true (modulemd_service_level_emit_yaml (sl, &emitter, &error));
+
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (
+    yaml_string->str, ==, "---\nfoo:\n  eol: 2018-11-13\n...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -369,11 +423,18 @@ main (int argc, char *argv[])
               service_level_test_get_set_eol,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/yaml",
+  g_test_add ("/modulemd/v2/servicelevel/yaml/parse",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_parse_yaml,
+              NULL);
+
+  g_test_add ("/modulemd/v2/servicelevel/yaml/emit",
+              ServiceLevelFixture,
+              NULL,
+              NULL,
+              service_level_test_emit_yaml,
               NULL);
 
   return g_test_run ();

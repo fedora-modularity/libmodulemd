@@ -358,3 +358,72 @@ modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
 
   return g_object_ref (sl);
 }
+
+gboolean
+modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
+                                  yaml_emitter_t *emitter,
+                                  GError **error)
+{
+  int ret;
+  g_autoptr (GError) nested_error = NULL;
+  g_autofree gchar *eol_string = NULL;
+  MMD_INIT_YAML_EVENT (event)
+
+  /* Emit the Service Level Name */
+  ret = mmd_emitter_scalar (emitter,
+                            modulemd_service_level_get_name (self),
+                            YAML_PLAIN_SCALAR_STYLE,
+                            &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Failed to emit service level name: ");
+      return FALSE;
+    }
+
+  /* Start the mapping for additional attributes of this service level */
+  ret = mmd_emitter_start_mapping (
+    emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Failed to start service level mapping: ");
+      return FALSE;
+    }
+
+  /* Add service level attributes if available */
+  if (modulemd_service_level_get_eol (self) != NULL)
+    {
+      ret = mmd_emitter_scalar (
+        emitter, "eol", YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      if (!ret)
+        {
+          g_propagate_prefixed_error (
+            error, nested_error, "Failed to emit EOL key: ");
+          return FALSE;
+        }
+
+      eol_string = modulemd_service_level_get_eol_string (self);
+      ret = mmd_emitter_scalar (
+        emitter, eol_string, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      if (!ret)
+        {
+          g_propagate_prefixed_error (error,
+                                      nested_error,
+                                      "Failed to emit EOL string [%s]: ",
+                                      eol_string);
+          return FALSE;
+        }
+    }
+
+  /* End the mapping */
+  ret = mmd_emitter_end_mapping (emitter, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Failed to end service level mapping: ");
+      return FALSE;
+    }
+
+  return TRUE;
+}

@@ -40,7 +40,7 @@ modulemd_trace_free (modulemd_tracer *tracer);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_tracer, modulemd_trace_free);
 
-#define MODULEMD_INIT_TRACE()                                                \
+#define MODULEMD_INIT_TRACE()                                                 \
   g_autoptr (modulemd_tracer) tracer = modulemd_trace_init (__func__);        \
   do                                                                          \
     {                                                                         \

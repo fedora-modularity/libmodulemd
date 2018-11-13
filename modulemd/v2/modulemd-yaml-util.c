@@ -279,6 +279,7 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
   int ret;
   MMD_INIT_YAML_EVENT (event);
 
+  g_debug ("SCALAR: %s", scalar);
   ret = yaml_scalar_event_initialize (&event,
                                       NULL,
                                       NULL,

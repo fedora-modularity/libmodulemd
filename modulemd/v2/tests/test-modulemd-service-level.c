@@ -138,7 +138,7 @@ service_level_test_copy (ServiceLevelFixture *fixture, gconstpointer user_data)
   g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_copy));
   g_assert_cmpstr (modulemd_service_level_get_name (sl_copy), ==, "foo");
   g_assert_nonnull (modulemd_service_level_get_eol (sl_copy));
-  eol_string = modulemd_service_level_get_eol_string (sl_copy);
+  eol_string = modulemd_service_level_get_eol_as_string (sl_copy);
   g_assert_cmpstr (eol_string, ==, "2018-11-13");
 }
 
@@ -201,7 +201,7 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
 
   /* Test that get_eol() returns NULL at first */
   g_assert_null (modulemd_service_level_get_eol (sl));
-  g_assert_null (modulemd_service_level_get_eol_string (sl));
+  g_assert_null (modulemd_service_level_get_eol_as_string (sl));
 
 
   /* Test looking up the EOL by object properties returns NULL */
@@ -232,7 +232,7 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_cmpint (g_date_compare (eol, copied_eol), ==, 0);
   g_clear_pointer (&copied_eol, g_date_free);
 
-  eol_string = modulemd_service_level_get_eol_string (sl);
+  eol_string = modulemd_service_level_get_eol_as_string (sl);
   g_assert_nonnull (eol_string);
   g_assert_cmpstr (eol_string, ==, "2018-11-07");
   g_clear_pointer (&eol_string, g_free);
@@ -256,7 +256,7 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_cmpint (g_date_compare (eol, copied_eol), ==, 0);
   g_clear_pointer (&copied_eol, g_date_free);
 
-  eol_string = modulemd_service_level_get_eol_string (sl);
+  eol_string = modulemd_service_level_get_eol_as_string (sl);
   g_assert_nonnull (eol_string);
   g_assert_cmpstr (eol_string, ==, "2018-11-07");
   g_clear_pointer (&eol_string, g_free);
@@ -285,7 +285,7 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   modulemd_service_level_set_eol_ymd (sl, 2018, 11, 7);
   returned_eol = modulemd_service_level_get_eol (sl);
   g_assert_nonnull (returned_eol);
-  eol_string = modulemd_service_level_get_eol_string (sl);
+  eol_string = modulemd_service_level_get_eol_as_string (sl);
   g_assert_nonnull (eol_string);
   g_assert_cmpstr (eol_string, ==, "2018-11-07");
   g_clear_pointer (&eol_string, g_free);

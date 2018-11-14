@@ -174,7 +174,7 @@ modulemd_service_level_get_eol (ModulemdServiceLevel *self)
 
 
 gchar *
-modulemd_service_level_get_eol_string (ModulemdServiceLevel *self)
+modulemd_service_level_get_eol_as_string (ModulemdServiceLevel *self)
 {
   if (self->eol && g_date_valid (self->eol))
     {
@@ -404,7 +404,7 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
           return FALSE;
         }
 
-      eol_string = modulemd_service_level_get_eol_string (self);
+      eol_string = modulemd_service_level_get_eol_as_string (self);
       ret = mmd_emitter_scalar (
         emitter, eol_string, YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)

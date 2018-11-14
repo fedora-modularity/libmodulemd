@@ -127,7 +127,7 @@ GDate *
 modulemd_service_level_get_eol (ModulemdServiceLevel *self);
 
 /**
- * modulemd_service_level_get_eol_string:
+ * modulemd_service_level_get_eol_as_string:
  * @self: This #ModulemdServiceLevel
  *
  * Returns: (transfer full) (nullable): The end date of the service level as a
@@ -136,7 +136,7 @@ modulemd_service_level_get_eol (ModulemdServiceLevel *self);
  * Since: 2.0
  */
 gchar *
-modulemd_service_level_get_eol_string (ModulemdServiceLevel *self);
+modulemd_service_level_get_eol_as_string (ModulemdServiceLevel *self);
 
 
 G_END_DECLS

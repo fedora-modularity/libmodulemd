@@ -36,7 +36,7 @@ class TestServiceLevel(unittest.TestCase):
         assert sl.get_name() == 'foo'
         assert sl.props.eol is None
         assert sl.get_eol() is None
-        assert sl.get_eol_string() is None
+        assert sl.get_eol_as_string() is None
 
         # Test that standard object instatiation works with a name
         sl = Modulemd.ServiceLevel(name='foo')
@@ -45,7 +45,7 @@ class TestServiceLevel(unittest.TestCase):
         assert sl.get_name() == 'foo'
         assert sl.props.eol is None
         assert sl.get_eol() is None
-        assert sl.get_eol_string() is None
+        assert sl.get_eol_as_string() is None
 
         # Test that standard object instantiation works with a name and EOL
         sl = Modulemd.ServiceLevel(
@@ -62,8 +62,8 @@ class TestServiceLevel(unittest.TestCase):
         assert sl.get_eol().get_day() == 7
         assert sl.get_eol().get_month() == 11
         assert sl.get_eol().get_year() == 2018
-        assert sl.get_eol_string() is not None
-        assert sl.get_eol_string() == '2018-11-07'
+        assert sl.get_eol_as_string() is not None
+        assert sl.get_eol_as_string() == '2018-11-07'
 
         # Test that we fail if we call new() with a None name
         try:
@@ -88,7 +88,7 @@ class TestServiceLevel(unittest.TestCase):
         assert sl.get_name() == 'foo'
         assert sl.props.eol is None
         assert sl.get_eol() is None
-        assert sl.get_eol_string() is None
+        assert sl.get_eol_as_string() is None
 
         sl_copy = sl.copy()
         assert sl_copy
@@ -96,7 +96,7 @@ class TestServiceLevel(unittest.TestCase):
         assert sl_copy.get_name() == 'foo'
         assert sl_copy.props.eol is None
         assert sl_copy.get_eol() is None
-        assert sl_copy.get_eol_string() is None
+        assert sl_copy.get_eol_as_string() is None
 
         sl.set_eol_ymd(2018, 11, 13)
         sl_copy = sl.copy()
@@ -105,7 +105,7 @@ class TestServiceLevel(unittest.TestCase):
         assert sl_copy.get_name() == 'foo'
         assert sl_copy.props.eol is not None
         assert sl_copy.get_eol() is not None
-        assert sl_copy.get_eol_string() == '2018-11-13'
+        assert sl_copy.get_eol_as_string() == '2018-11-13'
 
     def test_get_name(self):
         sl = Modulemd.ServiceLevel.new('foo')
@@ -134,7 +134,7 @@ class TestServiceLevel(unittest.TestCase):
             assert returned_eol.get_day() == eol.get_day()
             assert returned_eol.get_month() == eol.get_month()
             assert returned_eol.get_year() == eol.get_year()
-        assert sl.get_eol_string() == '2018-11-07'
+        assert sl.get_eol_as_string() == '2018-11-07'
 
         # Test the set_eol_ymd() method
         sl.set_eol_ymd(2019, 12, 3)
@@ -144,7 +144,7 @@ class TestServiceLevel(unittest.TestCase):
             assert returned_eol.get_day() == 3
             assert returned_eol.get_month() == 12
             assert returned_eol.get_year() == 2019
-        assert sl.get_eol_string() == '2019-12-03'
+        assert sl.get_eol_as_string() == '2019-12-03'
 
         # Try setting some invalid dates
         # An initialized but unset date

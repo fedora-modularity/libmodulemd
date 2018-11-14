@@ -115,8 +115,6 @@ test_v1_srcs = files(
     'v1/tests/test-modulemd-yaml.c',
 )
 
-libmodulemd_v1_version = '1.7.0'
-
 
 modulemd_v2_srcs = files(
     'v2/modulemd-service-level.c',

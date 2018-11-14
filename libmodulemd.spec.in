@@ -1,5 +1,8 @@
+%global libmodulemd_version @VERSION@
+%global libmodulemd_v1_version @V1_VERSION@
+
 Name:           libmodulemd
-Version:        @VERSION@
+Version:        %{libmodulemd_version}
 Release:        0%{?dist}.@DATETIME@
 Summary:        Module metadata manipulation library
 
@@ -39,8 +42,6 @@ Obsoletes: python3-modulemd < 1.3.4
 %description -n python3-%{name}
 Python 3 bindings for %{name}
 
-Also provides utility module ModulemdUtils.
-
 
 %package devel
 Summary:        Development files for libmodulemd
@@ -51,12 +52,48 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Development files for libmodulemd.
 
 
+%package -n compat-libmodulemd1
+Summary: Compatibility package for libmodulemd 1.x
+Version: %{libmodulemd_v1_version}
+Obsoletes: libmodulemd < 2
+Provides: libmodulemd = %{libmodulemd_v1_version}-%{release}
+Provides: libmodulemd%{?_isa} = %{libmodulemd_v1_version}-%{release}
+
+%description -n compat-libmodulemd1
+Compatibility library for libmodulemd 1.x
+
+
+%package -n compat-libmodulemd1-devel
+Summary: Compatibility development package for libmodulemd 1.x
+Version: %{libmodulemd_v1_version}
+Requires: compat-libmodulemd1 = %{version}-%{release}
+Conflicts: %{name}-devel
+Obsoletes: libmodulemd-devel < 2
+Provides: libmodulemd-devel = %{version}-%{release}
+RemovePathPostfixes: .compat
+
+
+%description -n compat-libmodulemd1-devel
+Development files for libmodulemd 1.x
+
+
+%package -n python3-compat-libmodulemd1
+Summary: Python 3 bindings for %{name}
+Version: %{libmodulemd_v1_version}
+BuildArch: noarch
+Requires: compat-libmodulemd1 = %{version}-%{release}
+Requires: python3-gobject-base
+
+%description -n python3-compat-libmodulemd1
+Python 3 bindings for compat-libmodulemd1
+
+
 %prep
-%autosetup -p1 -n modulemd-%{version}
+%autosetup -p1 -n modulemd-%{libmodulemd_version}
 
 
 %build
-%meson -Ddeveloper_build=false
+%meson -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=true
 %meson_build
 
 
@@ -76,31 +113,51 @@ export MMD_SKIP_VALGRIND=1
 %install
 %meson_install
 
-
-%ldconfig_scriptlets
+ln -s libmodulemd.so.%{libmodulemd_v1_version} \
+      %{buildroot}%{_libdir}/%{name}.so.compat
 
 
 %files
 %license COPYING
 %doc README.md
 %{_bindir}/modulemd-validator
+%{_libdir}/%{name}.so.2*
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/Modulemd-2.0.typelib
+
+%files devel
+%{_libdir}/%{name}.so
+%{_libdir}/pkgconfig/modulemd-2.0.pc
+%{_includedir}/modulemd-2.0/
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/Modulemd-2.0.gir
+%dir %{_datadir}/gtk-doc
+%dir %{_datadir}/gtk-doc/html
+%{_datadir}/gtk-doc/html/modulemd-2.0/
+
+
+%files -n python3-%{name}
+
+%files -n python3-compat-libmodulemd1
+
+%files -n compat-libmodulemd1
+%license COPYING
+%doc README.md
 %{_libdir}/%{name}.so.1*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-1.0.typelib
 
 
-%files -n python3-%{name}
 
-
-%files devel
-%{_libdir}/%{name}.so
+%files -n compat-libmodulemd1-devel
+%{_libdir}/%{name}.so.compat
 %{_libdir}/pkgconfig/modulemd.pc
 %{_includedir}/modulemd/
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/Modulemd-1.0.gir
 %dir %{_datadir}/gtk-doc
 %dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/modulemd/
+%{_datadir}/gtk-doc/html/modulemd-1.0/
 
 
 %changelog

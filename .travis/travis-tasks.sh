@@ -34,17 +34,40 @@ pushd build_rpm
 
 ninja
 ./make_rpms.sh
-dnf -y install rpmbuild/RPMS/*/*.rpm
+
+createrepo_c rpmbuild/RPMS/
+
+dnf -y install --nogpgcheck \
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python3-compat-libmodulemd1 \
+               compat-libmodulemd1-devel \
+               --exclude libmodulemd
 
 popd #build_rpm
 
-
-meson --buildtype=debug -Dbuild_api_v1=true -Dtest_installed_lib=true installed_lib_tests
-pushd installed_lib_tests
+meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=false -Dtest_installed_lib=true installed_lib_tests_v1
+pushd installed_lib_tests_v1
 
 # Run the tests against the installed RPMs
 ninja test
 
-popd #installed_lib_tests
+popd #installed_lib_tests_v1
+
+
+pushd build_rpm
+dnf -y install --nogpgcheck \
+               --allowerasing \
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python3-libmodulemd \
+               "libmodulemd-devel > 2"
+popd
+
+meson --buildtype=debug -Dbuild_api_v1=false -Dbuild_api_v2=true -Dtest_installed_lib=true installed_lib_tests_v2
+pushd installed_lib_tests_v2
+
+# Run the tests against the installed RPMs
+ninja test
+
+popd #installed_lib_tests_v2
 
 popd #builddir

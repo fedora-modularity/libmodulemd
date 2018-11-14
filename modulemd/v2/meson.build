@@ -40,9 +40,9 @@ if test_installed_lib
         include_directories : v2_include_dirs,
         dependencies : [
             gobject,
+            yaml,
             dependency(
-                'modulemd',
-                version: ['>= 2.0.0', '< 3.0.0']
+                'modulemd-2.0',
             ),
         ]
     )
@@ -156,8 +156,8 @@ pkg.generate(
     libraries : modulemd_v2_lib,
     subdirs : v2_header_path,
     version : libmodulemd_v2_version,
-    name : 'modulemd',
-    filebase : 'modulemd',
+    name : 'modulemd-2.0',
+    filebase : 'modulemd-2.0',
     description : 'Module metadata manipulation library',
     requires: [ 'glib-2.0', 'gobject-2.0' ],
 )

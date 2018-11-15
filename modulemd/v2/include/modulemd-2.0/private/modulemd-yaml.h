@@ -201,4 +201,18 @@ GDate *
 modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error);
 
 
+/**
+ * modulemd_yaml_parse_string:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a string scalar entry.
+ * @error: (out): A #GError that will return the reason for a parsing or validation error.
+ *
+ * Returns: (transfer full): A newly-allocated gchar * representing the parsed value.
+ * NULL if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+gchar *
+modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
+
+
 G_END_DECLS

@@ -21,9 +21,11 @@ else
     build_lib = declare_dependency()
 endif
 
+enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_v2_hdrs)
+
 modulemd_v2_lib = library(
     'modulemd',
-    sources : modulemd_v2_srcs,
+    sources : modulemd_v2_srcs + enums,
     include_directories : v2_include_dirs,
     dependencies : [
         gobject,
@@ -189,6 +191,33 @@ test ('translation_entry_python_debug', python3,
 test ('translation_entry_python_release', python3,
       env : py_test_release_env,
       args : translation_entry_python_script)
+
+
+# -- Test Modulemd.Defaults (C) -- #
+test_v2_defaults = executable(
+    'defaults_v2',
+    'tests/test-modulemd-defaults.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('defaults_v2_debug', test_v2_defaults,
+     env : test_env)
+test('defaults_v2_release', test_v2_defaults,
+     env : test_release_env)
+
+# -- Test Modulemd.Defaults (Python) -- #
+defaults_python_script = files('tests/ModulemdTests/defaults.py')
+test ('defaults_python_debug', python3,
+      env : py_test_env,
+      args : defaults_python_script)
+test ('defaults_python_release', python3,
+      env : py_test_release_env,
+      args : defaults_python_script)
 
 
 # --- GOBject Introspection -- #

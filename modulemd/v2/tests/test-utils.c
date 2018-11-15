@@ -18,6 +18,15 @@
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
+int modulemd_test_signal;
+
+void
+modulemd_test_signal_handler (int sig_num)
+{
+  modulemd_test_signal = sig_num;
+}
+
+
 void
 parser_skip_headers (yaml_parser_t *parser)
 {

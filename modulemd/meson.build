@@ -117,6 +117,8 @@ test_v1_srcs = files(
 
 
 modulemd_v2_srcs = files(
+    'v2/modulemd-defaults.c',
+    'v2/modulemd-defaults-v1.c',
     'v2/modulemd-profile.c',
     'v2/modulemd-service-level.c',
     'v2/modulemd-translation-entry.c',
@@ -125,6 +127,8 @@ modulemd_v2_srcs = files(
 )
 
 modulemd_v2_hdrs = files(
+    'v2/include/modulemd-2.0/modulemd-defaults.h',
+    'v2/include/modulemd-2.0/modulemd-defaults-v1.h',
     'v2/include/modulemd-2.0/modulemd-profile.h',
     'v2/include/modulemd-2.0/modulemd-service-level.h',
     'v2/include/modulemd-2.0/modulemd-translation-entry.h',
@@ -140,6 +144,7 @@ modulemd_v2_priv_hdrs = files(
 )
 
 test_v2_srcs = files(
+    'v2/tests/test-modulemd-defaults.c',
     'v2/tests/test-modulemd-profile.c',
     'v2/tests/test-modulemd-service-level.c',
     'v2/tests/test-modulemd-translation-entry.c',
@@ -152,6 +157,7 @@ test_v2_priv_hdrs = files(
 
 test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/base.py',
+    'v2/tests/ModulemdTests/defaults.py',
     'v2/tests/ModulemdTests/profile.py',
     'v2/tests/ModulemdTests/servicelevel.py',
     'v2/tests/ModulemdTests/translationentry.py',

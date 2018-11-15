@@ -26,6 +26,16 @@ G_BEGIN_DECLS
  */
 
 
+#define MODULEMD_ERROR modulemd_error_quark ()
+GQuark
+modulemd_error_quark (void);
+
+enum ModulemdError
+{
+  MODULEMD_ERROR_UPGRADE,
+  MODULEMD_ERROR_VALIDATE
+};
+
 typedef struct _modulemd_tracer
 {
   gchar *function_name;

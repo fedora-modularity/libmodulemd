@@ -15,8 +15,29 @@
 
 #include <glib.h>
 #include <locale.h>
+#include <yaml.h>
 
 G_BEGIN_DECLS
+
+typedef struct _CommonMmdTestFixture
+{
+} CommonMmdTestFixture;
+
+extern int modulemd_test_signal;
+
+
+/**
+ * modulemd_test_signal_handler:
+ * @sig_num: The signal received
+ *
+ * Sets the global variable modulemd_test_signal with the value of the signal
+ * that was received.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_test_signal_handler (int sig_num);
+
 
 /**
  * SECTION: test-utils

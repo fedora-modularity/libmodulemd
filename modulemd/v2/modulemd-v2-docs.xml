@@ -35,6 +35,7 @@
     </partintro>
     <chapter>
       <title>Modulemd 2.0 Public API</title>
+        <xi:include href="xml/modulemd-defaults.xml"/>
         <xi:include href="xml/modulemd-service-level.xml"/>
         <xi:include href="xml/modulemd-translation-entry.xml"/>
     </chapter>

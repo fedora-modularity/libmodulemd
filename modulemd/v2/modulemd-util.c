@@ -14,6 +14,13 @@
 #include "private/modulemd-util.h"
 
 
+GQuark
+modulemd_error_quark (void)
+{
+  return g_quark_from_static_string ("modulemd-error-quark");
+}
+
+
 modulemd_tracer *
 modulemd_trace_init (const gchar *function_name)
 {

@@ -68,6 +68,7 @@ class TestServiceLevel(unittest.TestCase):
         # Test that we fail if we call new() with a None name
         try:
             sl = Modulemd.ServiceLevel.new(None)
+            assert False
         except TypeError as e:
             assert 'does not allow None as a value' in e.__str__()
 

@@ -327,3 +327,17 @@ modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error)
                          g_ascii_strtoull (strv[1], NULL, 10), /* Month */
                          g_ascii_strtoull (strv[0], NULL, 10)); /* Year */
 }
+
+gchar *
+modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (error, event, "String was not a scalar");
+    }
+
+  return g_strdup ((const gchar *)event.data.scalar.value);
+}

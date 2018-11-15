@@ -49,3 +49,16 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_tracer, modulemd_trace_free);
   while (0)
 
 G_END_DECLS
+
+
+GHashTable *
+modulemd_hash_table_deep_str_copy (GHashTable *orig);
+
+gint
+modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
+
+GPtrArray *
+modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
+
+gchar **
+modulemd_ordered_str_keys_as_strv (GHashTable *htable);

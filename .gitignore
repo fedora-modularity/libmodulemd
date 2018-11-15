@@ -9,6 +9,7 @@
 /*.rej
 /*.tab.c
 /*~
+__pycache__/
 /.*.sw[nop]
 /.dirstamp
 /.gitignore

@@ -126,6 +126,23 @@ test('service_level_v2_debug', test_v2_servicelevel,
 test('service_level_v2_release', test_v2_servicelevel,
      env : test_release_env)
 
+# -- Test Modulemd.TranslationEntry (C) -- #
+test_v2_translationentry = executable(
+    'translation_entry_v2',
+    'tests/test-modulemd-translation-entry.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('translation_entry_v2_debug', test_v2_translationentry,
+     env : test_env)
+test('translation_entry_v2_release', test_v2_translationentry,
+     env : test_release_env)
+
 
 # -- Test Modulemd.ServiceLevel (Python) -- #
 service_level_python_script = files('tests/ModulemdTests/servicelevel.py')
@@ -135,6 +152,16 @@ test ('service_level_python_debug', python3,
 test ('service_level_python_release', python3,
       env : py_test_release_env,
       args : service_level_python_script)
+
+
+# -- Test Modulemd.TranslationEntry (Python) -- #
+translation_entry_python_script = files('tests/ModulemdTests/translationentry.py')
+test ('translation_entry_python_debug', python3,
+      env : py_test_env,
+      args : translation_entry_python_script)
+test ('translation_entry_python_release', python3,
+      env : py_test_release_env,
+      args : translation_entry_python_script)
 
 
 # --- GOBject Introspection -- #

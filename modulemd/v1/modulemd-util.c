@@ -483,6 +483,7 @@ module_index_from_data (GPtrArray *data, GError **error)
           /* Save the updated stream back to the index */
           modulemd_improvedmodule_add_stream (stored_module, retrieved_stream);
         }
+      g_clear_pointer (&retrieved_streams, g_ptr_array_unref);
     }
 
 

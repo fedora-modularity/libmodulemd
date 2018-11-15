@@ -2031,6 +2031,7 @@ modulemd_modulestream_finalize (GObject *gobject)
   g_clear_pointer (&self->stream, g_free);
   g_clear_pointer (&self->summary, g_free);
   g_clear_pointer (&self->tracker, g_free);
+  g_clear_pointer (&self->translation, g_object_unref);
   g_clear_pointer (&self->xmd, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_modulestream_parent_class)->finalize (gobject);

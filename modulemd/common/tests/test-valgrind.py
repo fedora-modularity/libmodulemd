@@ -23,8 +23,31 @@ if os.getenv('MMD_SKIP_VALGRIND'):
 
 failed = False
 
+# Get the list of tests to run
+proc_result = subprocess.run(['meson', 'test', '--list'],
+                             capture_output=True,
+                             encoding='utf-8')
+if proc_result.returncode != 0:
+    sys.exit(2)
+
+unfiltered_tests = proc_result.stdout.split('\n')
+tests = []
+for test in unfiltered_tests:
+    if (not test or
+        test.endswith('_python') or
+        test.endswith('_python_debug') or
+        test.endswith('_release') or
+        test.endswith('_import_headers') or
+        'v1_release' in test or
+        test == 'autopep8' or
+        test == 'clang_format' or
+        test == 'test_dirty_repo' or
+            test == 'valgrind'):
+        continue
+    tests.append(test)
+
 with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
-    for test in sys.argv[1:]:
+    for test in tests:
         valgrind_command = "/usr/bin/valgrind " \
                            "--leak-check=full " \
                            "--xml=yes " \

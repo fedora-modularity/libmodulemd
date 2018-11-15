@@ -127,7 +127,7 @@ modulemd_translation_test_yaml (TranslationFixture *fixture,
   g_autoptr (GError) error = NULL;
   g_autofree gchar *yaml_path = NULL;
   ModulemdTranslation *translation = NULL;
-  ModulemdTranslationEntry *entry = NULL;
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
   g_autofree gchar *module_name;
   g_autofree gchar *module_stream;
   guint64 mdversion, modified;
@@ -179,7 +179,7 @@ modulemd_translation_test_import (TranslationFixture *fixture,
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (GError) error = NULL;
   g_autofree gchar *yaml_path = NULL;
-  ModulemdTranslationEntry *entry = NULL;
+  g_autoptr (ModulemdTranslationEntry) entry = NULL;
   g_autofree gchar *module_name;
   g_autofree gchar *module_stream;
   guint64 mdversion, modified;
@@ -278,6 +278,7 @@ modulemd_translation_test_index (TranslationFixture *fixture,
   g_autoptr (GHashTable) profiles = NULL;
   ModulemdProfile *profile = NULL;
   g_autofree gchar *result_yaml = NULL;
+  g_autofree gchar *localized = NULL;
 
   yaml_path = g_strdup_printf ("%s/test_data/translations.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
@@ -372,13 +373,13 @@ modulemd_translation_test_index (TranslationFixture *fixture,
     "stream_name: [default]\n...\n");
 
   /* Test specific translations */
-  g_assert_cmpstr (modulemd_modulestream_get_localized_summary (stream, "ja"),
-                   ==,
-                   "モジュールの例");
-  g_assert_cmpstr (
-    modulemd_modulestream_get_localized_description (stream, "ja"),
-    ==,
-    "モジュールの例です。");
+  localized = modulemd_modulestream_get_localized_summary (stream, "ja");
+  g_assert_cmpstr (localized, ==, "モジュールの例");
+  g_clear_pointer (&localized, g_free);
+
+  localized = modulemd_modulestream_get_localized_description (stream, "ja");
+  g_assert_cmpstr (localized, ==, "モジュールの例です。");
+  g_clear_pointer (&localized, g_free);
 
   profiles = modulemd_modulestream_get_profiles (stream);
   g_assert_nonnull (profiles);
@@ -388,9 +389,9 @@ modulemd_translation_test_index (TranslationFixture *fixture,
   profile = g_hash_table_lookup (profiles, "default");
   g_assert_nonnull (profile);
 
-  g_assert_cmpstr (modulemd_profile_get_localized_description (profile, "ja"),
-                   ==,
-                   "プロファイルの例");
+  localized = modulemd_profile_get_localized_description (profile, "ja");
+  g_assert_cmpstr (localized, ==, "プロファイルの例");
+  g_clear_pointer (&localized, g_free);
 }
 
 static void

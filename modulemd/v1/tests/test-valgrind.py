@@ -33,6 +33,7 @@ tests = [
     'test_v1_modulemd_servicelevel',
     'test_v1_modulemd_simpleset',
     'test_v1_modulemd_subdocument',
+    'test_v1_modulemd_translation',
     'test_v1_modulemd_translation_entry',
     'test_v1_modulemd_yaml',
 ]

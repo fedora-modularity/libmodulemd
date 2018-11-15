@@ -1226,9 +1226,6 @@ modulemd_modulestream_set_stream (ModulemdModuleStream *self,
  * Returns: A string containing the "stream" property. This string must be freed
  * with g_free().
  *
- * Deprecated: 1.1
- * Use peek_stream() instead.
- *
  * Since: 1.6
  */
 gchar *

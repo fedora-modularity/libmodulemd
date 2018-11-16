@@ -1,0 +1,8 @@
+---
+default:
+    description: An example profile for tests
+    rpms:
+        - bar
+        - bar-extras
+        - baz
+...

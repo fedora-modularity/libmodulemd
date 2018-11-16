@@ -185,6 +185,20 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 
 
 /**
+ * mmd_emitter_strv:
+ * @emitter: (intout): A yaml emitter object positioned at the beginning of a value place to emit a sequence.
+ * @list: A list that will be emitted to the YAML emitter
+ * @error: (out): A #GError that will return the reason for an emitting error.
+ *
+ * Returns: A boolean whether emitting the sequence was succesful.
+ *
+ * Since: 2.0
+ */
+gboolean
+mmd_emitter_strv (yaml_emitter_t *emitter, const GStrv list, GError **error);
+
+
+/**
  * modulemd_yaml_parse_date:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * date (YYYY-MM-DD) scalar entry.
@@ -213,6 +227,21 @@ modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error);
  */
 gchar *
 modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
+
+
+/**
+ * modulemd_yaml_parse_string_set:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a sequence with string scalars.
+ * @error: (out): A #GError that will return the reason for a parsing or validation error.
+ *
+ * Returns: (transfer full): A newly-allocated GHashtTable * representing the parsed value.
+ * All parsed sequence entries are added as keys in the hashtable.
+ * NULL if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+GHashTable *
+modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
 
 
 G_END_DECLS

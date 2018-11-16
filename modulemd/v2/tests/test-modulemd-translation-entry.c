@@ -441,8 +441,8 @@ translation_entry_test_profile_descriptions (TranslationEntryFixture *fixture,
   /* Assert we start with 0 profiles */
   profile_names = modulemd_translation_entry_get_profiles_as_strv (te);
   g_assert_cmpint (g_strv_length (profile_names), ==, 0);
-  g_assert_false (g_strv_contains (profile_names, "test1"));
-  g_assert_false (g_strv_contains (profile_names, "test2"));
+  g_assert_false (g_strv_contains ((const gchar **)profile_names, "test1"));
+  g_assert_false (g_strv_contains ((const gchar **)profile_names, "test2"));
   g_assert_null (
     modulemd_translation_entry_get_profile_description (te, "test1"));
   g_assert_null (
@@ -453,8 +453,8 @@ translation_entry_test_profile_descriptions (TranslationEntryFixture *fixture,
   modulemd_translation_entry_set_profile_description (te, "test1", "foobar");
   profile_names = modulemd_translation_entry_get_profiles_as_strv (te);
   g_assert_cmpint (g_strv_length (profile_names), ==, 1);
-  g_assert_true (g_strv_contains (profile_names, "test1"));
-  g_assert_false (g_strv_contains (profile_names, "test2"));
+  g_assert_true (g_strv_contains ((const gchar **)profile_names, "test1"));
+  g_assert_false (g_strv_contains ((const gchar **)profile_names, "test2"));
   g_assert_cmpstr (
     modulemd_translation_entry_get_profile_description (te, "test1"),
     ==,
@@ -467,8 +467,8 @@ translation_entry_test_profile_descriptions (TranslationEntryFixture *fixture,
   modulemd_translation_entry_set_profile_description (te, "test2", "barfoo");
   profile_names = modulemd_translation_entry_get_profiles_as_strv (te);
   g_assert_cmpint (g_strv_length (profile_names), ==, 2);
-  g_assert_true (g_strv_contains (profile_names, "test1"));
-  g_assert_true (g_strv_contains (profile_names, "test2"));
+  g_assert_true (g_strv_contains ((const gchar **)profile_names, "test1"));
+  g_assert_true (g_strv_contains ((const gchar **)profile_names, "test2"));
   g_assert_cmpstr (
     modulemd_translation_entry_get_profile_description (te, "test1"),
     ==,

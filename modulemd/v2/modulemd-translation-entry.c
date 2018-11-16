@@ -481,7 +481,7 @@ modulemd_translation_entry_parse_yaml (yaml_parser_t *parser, GError **error)
   return g_steal_pointer (&te);
 }
 
-gboolean
+static gboolean
 modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
                                                yaml_emitter_t *emitter,
                                                GError **error)

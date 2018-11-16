@@ -12,6 +12,7 @@
 # For more information on free software, see
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
+import sys
 try:
     import unittest
     import gi
@@ -23,10 +24,10 @@ except ImportError:
     # python modules
     sys.exit(77)
 
-import signal
+from base import TestBase
 
 
-class TestServiceLevel(unittest.TestCase):
+class TestServiceLevel(TestBase):
 
     def test_constructors(self):
         # Test that the new() function works
@@ -73,14 +74,12 @@ class TestServiceLevel(unittest.TestCase):
             assert 'does not allow None as a value' in e.__str__()
 
         # Test that we fail if object is instantiated without a name
-        saved_signal = signal.signal(signal.SIGTRAP, lambda sig, frame: None)
-        sl = Modulemd.ServiceLevel()
-        signal.signal(signal.SIGTRAP, saved_signal)
+        with self.expect_signal():
+            sl = Modulemd.ServiceLevel()
 
         # Test that we fail if object is instantiated with a None name
-        saved_signal = signal.signal(signal.SIGTRAP, lambda sig, frame: None)
-        sl = Modulemd.ServiceLevel(name=None)
-        signal.signal(signal.SIGTRAP, saved_signal)
+        with self.expect_signal():
+            sl = Modulemd.ServiceLevel(name=None)
 
     def test_copy(self):
         sl = Modulemd.ServiceLevel.new('foo')
@@ -115,9 +114,8 @@ class TestServiceLevel(unittest.TestCase):
         assert sl.props.name == 'foo'
 
         # This property is not writable, make sure it fails to attempt it
-        saved_signal = signal.signal(signal.SIGTRAP, lambda sig, frame: None)
-        sl.props.name = 'bar'
-        signal.signal(signal.SIGTRAP, saved_signal)
+        with self.expect_signal():
+            sl.props.name = 'bar'
 
     def test_get_set_eol(self):
         sl = Modulemd.ServiceLevel.new('foo')
@@ -158,6 +156,7 @@ class TestServiceLevel(unittest.TestCase):
         sl.set_eol_ymd(2011, 2, 31)
         assert sl.get_eol() is None
         assert sl.props.eol is None
+
 
 if __name__ == '__main__':
     unittest.main()

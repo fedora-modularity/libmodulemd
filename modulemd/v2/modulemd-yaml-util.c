@@ -303,6 +303,46 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 }
 
 
+gboolean
+mmd_emitter_strv (yaml_emitter_t *emitter, const GStrv list, GError **error)
+{
+  int ret;
+  g_autoptr (GError) nested_error = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  int numentries = g_strv_length (list);
+
+  ret = mmd_emitter_start_sequence (
+    emitter, YAML_BLOCK_SEQUENCE_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Failed to emit list start: ");
+      return FALSE;
+    }
+
+  for (int i = 0; i < numentries; i++)
+    {
+      ret = mmd_emitter_scalar (
+        emitter, list[i], YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      if (!ret)
+        {
+          g_propagate_prefixed_error (
+            error, nested_error, "Failed to emit list entry: ");
+          return FALSE;
+        }
+    }
+
+  ret = mmd_emitter_end_sequence (emitter, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Failed to emit list end: ");
+      return FALSE;
+    }
+  return TRUE;
+}
+
+
 GDate *
 modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error)
 {
@@ -340,4 +380,44 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
     }
 
   return g_strdup ((const gchar *)event.data.scalar.value);
+}
+
+GHashTable *
+modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  gboolean in_list = FALSE;
+  g_autoptr (GHashTable) result =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_START_EVENT: in_list = TRUE; break;
+
+        case YAML_SEQUENCE_END_EVENT:
+          if (!in_list)
+            MMD_YAML_ERROR_EVENT_EXIT (error, event, "Unexpected end of list");
+          in_list = FALSE;
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          g_hash_table_add (result,
+                            g_strdup ((const gchar *)event.data.scalar.value));
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error, event, "Unspected YAML event in list");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return g_steal_pointer (&result);
 }

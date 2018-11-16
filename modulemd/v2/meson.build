@@ -109,6 +109,23 @@ test_utils_lib = library(
     install : false,
 )
 
+# -- Test Modulemd.TranslationEntry (C) -- #
+test_v2_profile = executable(
+    'profile_v2',
+    'tests/test-modulemd-profile.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('profile_v2_debug', test_v2_profile,
+     env : test_env)
+test('profile_v2_release', test_v2_profile,
+     env : test_release_env)
+
 # -- Test Modulemd.ServiceLevel (C) -- #
 test_v2_servicelevel = executable(
     'service_level_v2',
@@ -142,6 +159,16 @@ test('translation_entry_v2_debug', test_v2_translationentry,
      env : test_env)
 test('translation_entry_v2_release', test_v2_translationentry,
      env : test_release_env)
+
+
+# -- Test Modulemd.Profile (Python) -- #
+profile_python_script = files('tests/ModulemdTests/profile.py')
+test ('profile_python_debug', python3,
+      env : py_test_env,
+      args : profile_python_script)
+test ('profile_python_release', python3,
+      env : py_test_release_env,
+      args : profile_python_script)
 
 
 # -- Test Modulemd.ServiceLevel (Python) -- #

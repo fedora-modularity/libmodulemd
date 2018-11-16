@@ -117,6 +117,7 @@ test_v1_srcs = files(
 
 
 modulemd_v2_srcs = files(
+    'v2/modulemd-profile.c',
     'v2/modulemd-service-level.c',
     'v2/modulemd-translation-entry.c',
     'v2/modulemd-util.c',
@@ -124,12 +125,14 @@ modulemd_v2_srcs = files(
 )
 
 modulemd_v2_hdrs = files(
+    'v2/include/modulemd-2.0/modulemd-profile.h',
     'v2/include/modulemd-2.0/modulemd-service-level.h',
     'v2/include/modulemd-2.0/modulemd-translation-entry.h',
 )
 
 modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/glib-extensions.h',
+    'v2/include/modulemd-2.0/private/modulemd-profile-private.h',
     'v2/include/modulemd-2.0/private/modulemd-service-level-private.h',
     'v2/include/modulemd-2.0/private/modulemd-translation-entry-private.h',
     'v2/include/modulemd-2.0/private/modulemd-util.h',
@@ -137,6 +140,7 @@ modulemd_v2_priv_hdrs = files(
 )
 
 test_v2_srcs = files(
+    'v2/tests/test-modulemd-profile.c',
     'v2/tests/test-modulemd-service-level.c',
     'v2/tests/test-modulemd-translation-entry.c',
     'v2/tests/test-utils.c',
@@ -148,8 +152,9 @@ test_v2_priv_hdrs = files(
 
 test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/base.py',
-    'v2/tests/ModulemdTests/translationentry.py',
+    'v2/tests/ModulemdTests/profile.py',
     'v2/tests/ModulemdTests/servicelevel.py',
+    'v2/tests/ModulemdTests/translationentry.py',
 )
 
 v2_include_dirs = include_directories ('v2/include/modulemd-2.0')

@@ -81,7 +81,7 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                             failed = True
 
                         elif error_child.text == 'InvalidFree':
-                            print("Invalid free() detetected in %s" % test,
+                            print("Invalid free() detected in %s" % test,
                                   file=sys.stderr)
                             failed = True
 

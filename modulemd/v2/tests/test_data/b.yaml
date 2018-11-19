@@ -1,0 +1,11 @@
+---
+rpms:
+    macros: |
+        %demomacro 1
+        %demomacro2 %{demomacro}23
+    whitelist:
+        - fooscl-1-bar
+        - fooscl-1-baz
+        - xxx
+        - xyz
+...

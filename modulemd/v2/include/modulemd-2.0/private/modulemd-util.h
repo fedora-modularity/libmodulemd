@@ -64,6 +64,12 @@ G_END_DECLS
 GHashTable *
 modulemd_hash_table_deep_str_copy (GHashTable *orig);
 
+GHashTable *
+modulemd_hash_table_deep_set_copy (GHashTable *orig);
+
+GHashTable *
+modulemd_hash_table_deep_str_set_copy (GHashTable *orig);
+
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
 
@@ -72,3 +78,6 @@ modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
 
 gchar **
 modulemd_ordered_str_keys_as_strv (GHashTable *htable);
+
+void
+modulemd_hash_table_unref (void *table);

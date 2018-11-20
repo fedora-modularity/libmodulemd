@@ -21,6 +21,7 @@ G_BEGIN_DECLS
 /**
  * SECTION: modulemd-defaults
  * @title: Modulemd.Defaults
+ * @stability: stable
  * @short_description: Parent class for Default documents.
  * See #ModulemdDefaultsV1 for a specific type.
  */

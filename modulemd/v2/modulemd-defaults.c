@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
+#include "private/modulemd-defaults-private.h"
 #include "private/modulemd-util.h"
 
 #define DEF_DEFAULT_NAME_STRING "__NAME_UNSET__"
@@ -196,7 +197,7 @@ modulemd_defaults_get_mdversion (ModulemdDefaults *self)
 }
 
 
-static void
+void
 modulemd_defaults_set_module_name (ModulemdDefaults *self,
                                    const gchar *module_name)
 {

@@ -95,6 +95,13 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
   yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
+#define MMD_REINIT_YAML_STRING(_emitter, _string)                             \
+  yaml_emitter_delete (_emitter);                                             \
+  yaml_emitter_initialize (_emitter);                                         \
+  g_clear_pointer (&_string, modulemd_yaml_string_free);                      \
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));               \
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
+
 #define YAML_PARSER_PARSE_WITH_EXIT_FULL(_parser, _returnval, _event, _error) \
   do                                                                          \
     {                                                                         \

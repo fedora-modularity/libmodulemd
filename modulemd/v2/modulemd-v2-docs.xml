@@ -37,6 +37,7 @@
       <title>Modulemd 2.0 Public API</title>
         <xi:include href="xml/modulemd-buildopts.xml"/>
         <xi:include href="xml/modulemd-defaults.xml"/>
+        <xi:include href="xml/modulemd-defaults-v1.xml"/>
         <xi:include href="xml/modulemd-dependencies.xml"/>
         <xi:include href="xml/modulemd-profile.xml"/>
         <xi:include href="xml/modulemd-service-level.xml"/>
@@ -46,6 +47,8 @@
       <title>Modulemd 2.0 Private Object Methods</title>
        <xi:include href="xml/modulemd-buildopts-private.xml"/>
        <xi:include href="xml/modulemd-dependencies-private.xml"/>
+       <xi:include href="xml/modulemd-defaults-private.xml"/>
+       <xi:include href="xml/modulemd-defaults-v1-private.xml"/>
        <xi:include href="xml/modulemd-profile-private.xml"/>
        <xi:include href="xml/modulemd-service-level-private.xml"/>
        <xi:include href="xml/modulemd-translation-entry-private.xml"/>

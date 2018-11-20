@@ -274,6 +274,33 @@ test ('defaults_python_release', python3,
       args : defaults_python_script)
 
 
+# -- Test Modulemd.DefaultsV1 (C) -- #
+test_v2_defaultsv1 = executable(
+    'defaultsv1_v2',
+    'tests/test-modulemd-defaults-v1.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('defaultsv1_v2_debug', test_v2_defaultsv1,
+     env : test_env)
+test('defaultsv1_v2_release', test_v2_defaultsv1,
+     env : test_release_env)
+
+# -- Test Modulemd.DefaultsV1 (Python) -- #
+defaultsv1_python_script = files('tests/ModulemdTests/defaultsv1.py')
+test ('defaultsv1_python_debug', python3,
+      env : py_test_env,
+      args : defaultsv1_python_script)
+test ('defaultsv1_python_release', python3,
+      env : py_test_release_env,
+      args : defaultsv1_python_script)
+
+
 # --- GOBject Introspection -- #
 
 gnome.generate_gir(

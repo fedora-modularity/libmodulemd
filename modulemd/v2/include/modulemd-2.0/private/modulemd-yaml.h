@@ -33,6 +33,14 @@ G_BEGIN_DECLS
 GQuark
 modulemd_yaml_error_quark (void);
 
+enum ModulemdYamlDocumentType
+{
+  MODULEMD_YAML_DOC_UNKNOWN = 0,
+  MODULEMD_YAML_DOC_MODULESTREAM,
+  MODULEMD_YAML_DOC_DEFAULTS,
+  MODULEMD_YAML_DOC_TRANSLATIONS
+};
+
 enum ModulemdYamlError
 {
   MODULEMD_YAML_ERROR_OPEN,
@@ -87,7 +95,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
   yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
-#define YAML_PARSER_PARSE_WITH_EXIT(_parser, _event, _error)                  \
+#define YAML_PARSER_PARSE_WITH_EXIT_FULL(_parser, _returnval, _event, _error) \
   do                                                                          \
     {                                                                         \
       if (!yaml_parser_parse (_parser, _event))                               \
@@ -97,14 +105,21 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                                MODULEMD_YAML_ERROR,                           \
                                MODULEMD_YAML_ERROR_UNPARSEABLE,               \
                                "Parser error");                               \
-          return NULL;                                                        \
+          return _returnval;                                                  \
         }                                                                     \
       g_debug ("Parser event: %s", mmd_yaml_get_event_name ((_event)->type)); \
     }                                                                         \
   while (0)
 
+#define YAML_PARSER_PARSE_WITH_EXIT_BOOL(_parser, _event, _error)             \
+  YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, FALSE, _event, _error)
+#define YAML_PARSER_PARSE_WITH_EXIT_INT(_parser, _event, _error)              \
+  YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, 0, _event, _error)
+#define YAML_PARSER_PARSE_WITH_EXIT(_parser, _event, _error)                  \
+  YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, NULL, _event, _error)
 
-#define MMD_EMIT_WITH_EXIT(_emitter, _event, _error, ...)                     \
+
+#define MMD_EMIT_WITH_EXIT_FULL(_emitter, _returnval, _event, _error, ...)    \
   do                                                                          \
     {                                                                         \
       int _ret;                                                               \
@@ -119,13 +134,17 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                        MODULEMD_YAML_ERROR,                                   \
                        MODULEMD_YAML_ERROR_EMIT,                              \
                        __VA_ARGS__);                                          \
-          return FALSE;                                                       \
+          return _returnval;                                                  \
         }                                                                     \
     }                                                                         \
   while (0)
 
+#define MMD_EMIT_WITH_EXIT(_emitter, _event, _error, ...)                     \
+  MMD_EMIT_WITH_EXIT_FULL (_emitter, FALSE, _event, _error, __VA_ARGS__)
+#define MMD_EMIT_WITH_EXIT_PTR(_emitter, _event, _error, ...)                 \
+  MMD_EMIT_WITH_EXIT_FULL (_emitter, NULL, _event, _error, __VA_ARGS__)
 
-#define MMD_YAML_ERROR_EVENT_EXIT(_error, _event, ...)                        \
+#define MMD_YAML_ERROR_EVENT_EXIT_FULL(_error, _event, _returnval, ...)       \
   do                                                                          \
     {                                                                         \
       g_autofree gchar *formatted = g_strdup_printf (__VA_ARGS__);            \
@@ -140,10 +159,18 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                    MODULEMD_YAML_ERROR_PARSE,                                 \
                    "%s",                                                      \
                    formatted2);                                               \
-      return NULL;                                                            \
+      return _returnval;                                                      \
     }                                                                         \
   while (0)
 
+#define MMD_YAML_ERROR_EVENT_EXIT(_error, _event, ...)                        \
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, NULL, __VA_ARGS__)
+
+#define MMD_YAML_ERROR_EVENT_EXIT_BOOL(_error, _event, ...)                   \
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, FALSE, __VA_ARGS__)
+
+#define MMD_YAML_ERROR_EVENT_EXIT_INT(_error, _event, ...)                    \
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, 0, __VA_ARGS__)
 
 gboolean
 mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error);
@@ -234,6 +261,22 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
 
 
 /**
+ * modulemd_yaml_parse_uint64:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * uint64 scalar entry.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Returns: (transfer full): A 64-bit unsigned integer representing the parsed
+ * value. Returns 0 if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+guint64
+modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error);
+
+
+/**
  * modulemd_yaml_parse_string_set:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a sequence with string scalars.
  * @error: (out): A #GError that will return the reason for a parsing or validation error.
@@ -247,5 +290,55 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
 GHashTable *
 modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
 
+
+/**
+ * modulemd_yaml_parse_document_type:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * yaml subdocument immediately prior to a YAML_DOCUMENT_START_EVENT.
+ * @doctype: (out): The type of document that was encountered.
+ * @mdversion: (out): The metadata version of this document.
+ * @data: (out) (transfer full): A string representation of the YAML under the
+ * "data" section in the document.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Reads through a YAML subdocument to retrieve the document type, metadata
+ * version and the data section.
+ *
+ * Returns: TRUE if the document parsed successfully. FALSE if an error was
+ * encountered and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_yaml_parse_document_type (yaml_parser_t *parser,
+                                   enum ModulemdYamlDocumentType *doctype,
+                                   guint64 *mdversion,
+                                   gchar **data,
+                                   GError **error);
+
+
+/**
+ * modulemd_yaml_emit_document_headers:
+ * @emitter: (inout): A libyaml emitter object that is positioned where the
+ * YAML_DOCUMENT_START_EVENT should occur (so this must be after either a
+ * YAML_STREAM_START_EVENT or YAML_DOCUMENT_END_EVENT).
+ * @doctype: (in): The document type (see #ModulemdYamlDocumentType)
+ * @mdversion: (in): The metadata version for this document
+ * @error: (out): A #GError that will return the reason for failing to emit.
+ *
+ * Creates the YAML header and returns @emitter positioned just before the
+ * YAML_MAPPING_START for the "data:" section.
+ *
+ * Returns: TRUE if the document emitted successfully. FALSE if an error was
+ * encountered and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
+                                     enum ModulemdYamlDocumentType doctype,
+                                     guint64 mdversion,
+                                     GError **error);
 
 G_END_DECLS

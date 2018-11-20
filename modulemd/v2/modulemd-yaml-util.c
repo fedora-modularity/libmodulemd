@@ -13,6 +13,8 @@
 
 #include <glib.h>
 #include <yaml.h>
+#include <inttypes.h>
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
 
@@ -384,6 +386,22 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
   return g_strdup ((const gchar *)event.data.scalar.value);
 }
 
+
+guint64
+modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+
+  YAML_PARSER_PARSE_WITH_EXIT_INT (parser, &event, error);
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_INT (error, event, "String was not a scalar");
+    }
+
+  return g_ascii_strtoull ((const gchar *)event.data.scalar.value, NULL, 10);
+}
+
+
 GHashTable *
 modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 {
@@ -422,4 +440,274 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
     }
 
   return g_steal_pointer (&result);
+}
+
+
+static gchar *
+modulemd_yaml_parse_data (yaml_parser_t *parser, GError **error);
+
+
+gboolean
+modulemd_yaml_parse_document_type (yaml_parser_t *parser,
+                                   enum ModulemdYamlDocumentType *_doctype,
+                                   guint64 *_mdversion,
+                                   gchar **_data,
+                                   GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
+  guint64 mdversion = 0;
+  g_autofree gchar *data = NULL;
+  g_autofree gchar *doctype_scalar = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  /* The first event must be the document start */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_DOCUMENT_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Parser is not at the start of a document");
+    }
+  yaml_event_delete (&event);
+
+  /* The second event must be the mapping start */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Document did not start with a mappping");
+    }
+  yaml_event_delete (&event);
+
+  /* Now process through the document top-level */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_str_equal (event.data.scalar.value, "document"))
+            {
+              if (doctype != MODULEMD_YAML_DOC_UNKNOWN)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error, event, "Document type encountered twice.");
+                }
+
+              doctype_scalar =
+                modulemd_yaml_parse_string (parser, &nested_error);
+              if (!doctype_scalar)
+                {
+                  g_propagate_error (error, nested_error);
+                  return FALSE;
+                }
+
+              if (g_str_equal (doctype_scalar, "modulemd"))
+                {
+                  doctype = MODULEMD_YAML_DOC_MODULESTREAM;
+                }
+              else if (g_str_equal (doctype_scalar, "modulemd-defaults"))
+                {
+                  doctype = MODULEMD_YAML_DOC_DEFAULTS;
+                }
+              else if (g_str_equal (doctype_scalar, "modulemd-translations"))
+                {
+                  doctype = MODULEMD_YAML_DOC_TRANSLATIONS;
+                }
+              else
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error, event, "Document type %s unknown.", doctype_scalar);
+                }
+
+              g_clear_pointer (&doctype_scalar, g_free);
+            }
+          else if (g_str_equal (event.data.scalar.value, "version"))
+            {
+              if (mdversion != 0)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error, event, "Metadata version encountered twice.");
+                }
+
+              mdversion = modulemd_yaml_parse_uint64 (parser, &nested_error);
+              if (!mdversion)
+                {
+                  g_propagate_error (error, nested_error);
+                  return FALSE;
+                }
+            }
+          else if (g_str_equal (event.data.scalar.value, "data"))
+            {
+              data = modulemd_yaml_parse_data (parser, &nested_error);
+              if (!data)
+                {
+                  g_propagate_error (error, nested_error);
+                  return FALSE;
+                }
+            }
+
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error, event, "Unexpected YAML event in document metadata.");
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  /* The final event must be the document end */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_DOCUMENT_END_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Document did not end. It just goes on forever...");
+    }
+  yaml_event_delete (&event);
+
+
+  if (doctype == MODULEMD_YAML_DOC_UNKNOWN)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           "No document type specified");
+      return FALSE;
+    }
+
+  if (!mdversion)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           "No metadata version specified");
+      return FALSE;
+    }
+
+  if (!data)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           "No data section provided");
+      return FALSE;
+    }
+
+  *_doctype = doctype;
+  *_mdversion = mdversion;
+  *_data = g_steal_pointer (&data);
+
+  return TRUE;
+}
+
+
+static gchar *
+modulemd_yaml_parse_data (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  gboolean done = FALSE;
+  gsize depth = 0;
+
+  /* Start the YAML stream */
+  yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
+  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error starting stream");
+
+  yaml_document_start_event_initialize (&event, NULL, NULL, NULL, 0);
+  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error starting document");
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      /* Read in all the YAML from the data section */
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_START_EVENT:
+        case YAML_MAPPING_START_EVENT: depth++; break;
+
+        case YAML_SEQUENCE_END_EVENT:
+        case YAML_MAPPING_END_EVENT:
+          depth--;
+          /* Fall through intentionally */
+
+        default:
+          if (depth == 0)
+            done = TRUE;
+          break;
+        }
+
+      /* Copy this event to the string */
+      MMD_EMIT_WITH_EXIT_PTR (
+        &emitter, &event, error, "Error storing YAML event");
+    }
+
+  yaml_document_end_event_initialize (&event, 0);
+  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error ending document");
+
+  yaml_stream_end_event_initialize (&event);
+  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error ending stream");
+
+  return g_strdup (yaml_string->str);
+}
+
+
+static const gchar *
+modulemd_yaml_get_doctype_string (enum ModulemdYamlDocumentType doctype)
+{
+  switch (doctype)
+    {
+    case MODULEMD_YAML_DOC_MODULESTREAM: return "modulemd";
+
+    case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
+
+    case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
+
+    default: return NULL;
+    }
+}
+
+
+gboolean
+modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
+                                     enum ModulemdYamlDocumentType doctype,
+                                     guint64 mdversion,
+                                     GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  const gchar *doctype_string = modulemd_yaml_get_doctype_string (doctype);
+  g_autofree gchar *mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
+
+  if (!mmd_emitter_start_document (emitter, error))
+    return FALSE;
+
+  if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
+    return FALSE;
+
+  if (!mmd_emitter_scalar (
+        emitter, "document", YAML_PLAIN_SCALAR_STYLE, error))
+    return FALSE;
+
+  if (!mmd_emitter_scalar (
+        emitter, doctype_string, YAML_PLAIN_SCALAR_STYLE, error))
+    return FALSE;
+
+  if (!mmd_emitter_scalar (emitter, "version", YAML_PLAIN_SCALAR_STYLE, error))
+    return FALSE;
+
+  if (!mmd_emitter_scalar (
+        emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))
+    return FALSE;
+
+  if (!mmd_emitter_scalar (emitter, "data", YAML_PLAIN_SCALAR_STYLE, error))
+    return FALSE;
+
+  return TRUE;
 }

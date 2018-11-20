@@ -63,6 +63,53 @@ modulemd_hash_table_deep_str_copy (GHashTable *orig)
   return new;
 }
 
+
+GHashTable *
+modulemd_hash_table_deep_set_copy (GHashTable *orig)
+{
+  GHashTable *new;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_return_val_if_fail (orig, NULL);
+
+  new = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
+
+  g_hash_table_iter_init (&iter, orig);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_add (new, g_strdup ((const gchar *)key));
+    }
+
+  return new;
+}
+
+
+GHashTable *
+modulemd_hash_table_deep_str_set_copy (GHashTable *orig)
+{
+  GHashTable *new;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_return_val_if_fail (orig, NULL);
+
+  new = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
+
+  g_hash_table_iter_init (&iter, orig);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      g_hash_table_insert (new,
+                           g_strdup ((const gchar *)key),
+                           modulemd_hash_table_deep_set_copy (value));
+    }
+
+  return new;
+}
+
+
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
 {
@@ -98,4 +145,14 @@ modulemd_ordered_str_keys_as_strv (GHashTable *htable)
   gchar **result = (gchar **)keys->pdata;
   g_ptr_array_free (keys, FALSE);
   return result;
+}
+
+
+void
+modulemd_hash_table_unref (void *table)
+{
+  if (!table)
+    return;
+
+  g_hash_table_unref ((GHashTable *)table);
 }

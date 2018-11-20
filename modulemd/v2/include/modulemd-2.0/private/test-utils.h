@@ -62,4 +62,21 @@ modulemd_test_signal_handler (int sig_num);
 void
 parser_skip_headers (yaml_parser_t *parser);
 
+
+/**
+ * parser_skip_document_start:
+ * @parser: (inout): A libyaml parser object that has been initialized with an
+ * input source.
+ *
+ * This function will advance the parser object past the initial STREAM_START,
+ * and DOCUMENT_START events to the first real entry in the first mapping
+ * of the YAML stream. This is intended for unit tests to move the parser
+ * location to the start of the object representation to be tested.
+ *
+ * Since: 2.0
+ */
+void
+parser_skip_document_start (yaml_parser_t *parser);
+
+
 G_END_DECLS

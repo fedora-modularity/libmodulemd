@@ -383,7 +383,8 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
 
       rpms = modulemd_profile_get_rpms_as_strv (self);
 
-      ret = mmd_emitter_strv (emitter, rpms, &nested_error);
+      ret = mmd_emitter_strv (
+        emitter, YAML_BLOCK_SEQUENCE_STYLE, rpms, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

@@ -1,0 +1,6 @@
+---
+buildrequires:
+    platform: [-f27, -f28, -epel7]
+requires:
+    platform: [-f27, -f28, -epel7]
+...

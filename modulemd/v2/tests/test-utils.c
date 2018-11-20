@@ -28,12 +28,12 @@ modulemd_test_signal_handler (int sig_num)
 
 
 void
-parser_skip_headers (yaml_parser_t *parser)
+parser_skip_document_start (yaml_parser_t *parser)
 {
   int result;
   MMD_INIT_YAML_EVENT (event);
 
-  /* Advance the parser past STREAM_START, DOCUMENT_START and MAPPING_START */
+  /* Advance the parser past STREAM_START and DOCUMENT_START */
   result = yaml_parser_parse (parser, &event);
   g_assert_cmpint (result, ==, 1);
   g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
@@ -41,6 +41,17 @@ parser_skip_headers (yaml_parser_t *parser)
   result = yaml_parser_parse (parser, &event);
   g_assert_cmpint (result, ==, 1);
   g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+}
+
+
+void
+parser_skip_headers (yaml_parser_t *parser)
+{
+  int result;
+  MMD_INIT_YAML_EVENT (event);
+
+  /* Advance the parser past STREAM_START, DOCUMENT_START and MAPPING_START */
+  parser_skip_document_start (parser);
 
   result = yaml_parser_parse (parser, &event);
   g_assert_cmpint (result, ==, 1);

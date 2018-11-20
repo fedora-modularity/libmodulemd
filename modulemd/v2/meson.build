@@ -112,6 +112,23 @@ test_utils_lib = library(
 )
 
 # -- Test Modulemd.TranslationEntry (C) -- #
+test_v2_dependencies = executable(
+    'dependencies_v2',
+    'tests/test-modulemd-dependencies.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('dependencies_v2_debug', test_v2_dependencies,
+     env : test_env)
+test('dependencies_v2_release', test_v2_dependencies,
+     env : test_release_env)
+
+# -- Test Modulemd.TranslationEntry (C) -- #
 test_v2_profile = executable(
     'profile_v2',
     'tests/test-modulemd-profile.c',
@@ -161,6 +178,16 @@ test('translation_entry_v2_debug', test_v2_translationentry,
      env : test_env)
 test('translation_entry_v2_release', test_v2_translationentry,
      env : test_release_env)
+
+
+# -- Test Modulemd.Dependencies (Python) -- #
+dependencies_python_script = files('tests/ModulemdTests/dependencies.py')
+test ('dependencies_python_debug', python3,
+      env : py_test_env,
+      args : dependencies_python_script)
+test ('dependencies_python_release', python3,
+      env : py_test_release_env,
+      args : dependencies_python_script)
 
 
 # -- Test Modulemd.Profile (Python) -- #

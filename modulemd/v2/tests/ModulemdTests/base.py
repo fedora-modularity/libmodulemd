@@ -14,6 +14,7 @@
 
 from contextlib import contextmanager
 import signal
+import os
 import unittest
 
 
@@ -29,11 +30,23 @@ class TestBase(unittest.TestCase):
         self._caught_signal = True
 
     @contextmanager
-    def expect_signal(self, expected_signal=signal.SIGTRAP):
+    def expect_signal(
+            self,
+            expected_signal=signal.SIGTRAP,
+            only_on_fatal_warnings=False):
+        expect_signal = (not only_on_fatal_warnings) or self.warnings_fatal
+
         self._caught_signal = False
 
         saved_signal = signal.signal(expected_signal, self._catch_signal)
         yield None
         signal.signal(expected_signal, saved_signal)
-        if not self._caught_signal:
+        if not self._caught_signal and expect_signal:
             raise AssertionError("No signal got caught")
+        elif self._caught_signal and not expect_signal:
+            raise AssertionError("Signal caught in non-warning state")
+
+    @property
+    def warnings_fatal(self):
+        gdebug = os.getenv("G_DEBUG", "").split(",")
+        return "fatal-warnings" in gdebug

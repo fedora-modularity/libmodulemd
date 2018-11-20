@@ -187,7 +187,8 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 /**
  * mmd_emitter_strv:
  * @emitter: (intout): A yaml emitter object positioned at the beginning of a value place to emit a sequence.
- * @list: A list that will be emitted to the YAML emitter
+ * @seq_style: (in): The YAML sequence style for the output.
+ * @list: A list that will be emitted to the YAML emitter.
  * @error: (out): A #GError that will return the reason for an emitting error.
  *
  * Returns: A boolean whether emitting the sequence was succesful.
@@ -195,7 +196,10 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
  * Since: 2.0
  */
 gboolean
-mmd_emitter_strv (yaml_emitter_t *emitter, const GStrv list, GError **error);
+mmd_emitter_strv (yaml_emitter_t *emitter,
+                  yaml_sequence_style_t seq_style,
+                  const GStrv list,
+                  GError **error);
 
 
 /**

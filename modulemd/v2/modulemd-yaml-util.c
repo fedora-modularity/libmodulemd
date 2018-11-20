@@ -304,15 +304,17 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 
 
 gboolean
-mmd_emitter_strv (yaml_emitter_t *emitter, const GStrv list, GError **error)
+mmd_emitter_strv (yaml_emitter_t *emitter,
+                  yaml_sequence_style_t seq_style,
+                  const GStrv list,
+                  GError **error)
 {
   int ret;
   g_autoptr (GError) nested_error = NULL;
   MMD_INIT_YAML_EVENT (event);
   int numentries = g_strv_length (list);
 
-  ret = mmd_emitter_start_sequence (
-    emitter, YAML_BLOCK_SEQUENCE_STYLE, &nested_error);
+  ret = mmd_emitter_start_sequence (emitter, seq_style, &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (

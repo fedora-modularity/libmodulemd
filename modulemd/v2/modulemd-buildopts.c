@@ -354,7 +354,8 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
 
       whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (self);
 
-      ret = mmd_emitter_strv (emitter, whitelist, &nested_error);
+      ret = mmd_emitter_strv (
+        emitter, YAML_BLOCK_SEQUENCE_STYLE, whitelist, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

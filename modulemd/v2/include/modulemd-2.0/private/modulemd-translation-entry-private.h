@@ -29,7 +29,8 @@
 /**
  * modulemd_translation_entry_parse_yaml:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
- * Translation Entry entry in the YAML document.
+ * Translation Entry's mapping entry in the YAML document.
+ * locale: (int): A string with the locale for the current translation entry.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -40,7 +41,9 @@
  * Since: 2.0
  */
 ModulemdTranslationEntry *
-modulemd_translation_entry_parse_yaml (yaml_parser_t *parser, GError **error);
+modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
+                                       const gchar *locale,
+                                       GError **error);
 
 /**
  * modulemd_translation_entry_emitter_yaml:

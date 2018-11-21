@@ -1,7 +1,6 @@
 ---
-en_GB:
-    summary: An example module
-    description: An example module.
-    profiles:
-        profile_a: An example profile
+summary: An example module
+description: An example module.
+profiles:
+    profile_a: An example profile
 ...

@@ -276,6 +276,15 @@ test ('dependencies_python_release', python3,
       env : py_test_release_env,
       args : dependencies_python_script)
 
+# -- Test Modulemd.ModuleStream (Python) -- #
+modulestream_python_script = files('tests/ModulemdTests/modulestream.py')
+test ('modulestream_python_debug', python3,
+      env : py_test_env,
+      args : modulestream_python_script)
+test ('modulestream_python_release', python3,
+      env : py_test_release_env,
+      args : modulestream_python_script)
+
 
 # -- Test Modulemd.Profile (Python) -- #
 profile_python_script = files('tests/ModulemdTests/profile.py')

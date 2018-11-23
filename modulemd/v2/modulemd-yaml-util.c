@@ -387,6 +387,21 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
 }
 
 
+gint64
+modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+
+  YAML_PARSER_PARSE_WITH_EXIT_INT (parser, &event, error);
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_INT (error, event, "String was not a scalar");
+    }
+
+  return g_ascii_strtoll ((const gchar *)event.data.scalar.value, NULL, 10);
+}
+
+
 guint64
 modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
 {

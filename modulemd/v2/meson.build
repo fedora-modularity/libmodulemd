@@ -128,6 +128,49 @@ test('buildopts_v2_debug', test_v2_buildopts,
 test('buildopts_v2_release', test_v2_buildopts,
      env : test_release_env)
 
+# -- Test Modulemd.ComponentModule (C) -- #
+test_v2_component_module = executable(
+    'component_module_v2',
+    'tests/test-modulemd-component-module.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('component_module_v2_debug', test_v2_component_module,
+     env : test_env)
+test('component_module_v2_release', test_v2_component_module,
+     env : test_release_env)
+
+# -- Test Modulemd.ComponentRpm (Python) -- #
+componentrpm_python_script = files('tests/ModulemdTests/componentrpm.py')
+test ('componentrpm_python_debug', python3,
+      env : py_test_env,
+      args : componentrpm_python_script)
+test ('componentrpm_python_release', python3,
+      env : py_test_release_env,
+      args : componentrpm_python_script)
+
+# -- Test Modulemd.ComponentRpm (C) -- #
+test_v2_component_rpm = executable(
+    'component_rpm_v2',
+    'tests/test-modulemd-component-rpm.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('component_rpm_v2_debug', test_v2_component_rpm,
+     env : test_env)
+test('component_rpm_v2_release', test_v2_component_rpm,
+     env : test_release_env)
+
 # -- Test Modulemd.Dependencies (C) -- #
 test_v2_dependencies = executable(
     'dependencies_v2',

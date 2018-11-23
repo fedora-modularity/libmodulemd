@@ -118,6 +118,9 @@ test_v1_srcs = files(
 
 modulemd_v2_srcs = files(
     'v2/modulemd-buildopts.c',
+    'v2/modulemd-component.c',
+    'v2/modulemd-component-module.c',
+    'v2/modulemd-component-rpm.c',
     'v2/modulemd-defaults.c',
     'v2/modulemd-defaults-v1.c',
     'v2/modulemd-dependencies.c',
@@ -131,6 +134,9 @@ modulemd_v2_srcs = files(
 
 modulemd_v2_hdrs = files(
     'v2/include/modulemd-2.0/modulemd-buildopts.h',
+    'v2/include/modulemd-2.0/modulemd-component.h',
+    'v2/include/modulemd-2.0/modulemd-component-module.h',
+    'v2/include/modulemd-2.0/modulemd-component-rpm.h',
     'v2/include/modulemd-2.0/modulemd-defaults.h',
     'v2/include/modulemd-2.0/modulemd-defaults-v1.h',
     'v2/include/modulemd-2.0/modulemd-dependencies.h',
@@ -143,6 +149,9 @@ modulemd_v2_hdrs = files(
 modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/glib-extensions.h',
     'v2/include/modulemd-2.0/private/modulemd-buildopts-private.h',
+    'v2/include/modulemd-2.0/private/modulemd-component-private.h',
+    'v2/include/modulemd-2.0/private/modulemd-component-module-private.h',
+    'v2/include/modulemd-2.0/private/modulemd-component-rpm-private.h',
     'v2/include/modulemd-2.0/private/modulemd-dependencies-private.h',
     'v2/include/modulemd-2.0/private/modulemd-profile-private.h',
     'v2/include/modulemd-2.0/private/modulemd-defaults-private.h',
@@ -156,6 +165,8 @@ modulemd_v2_priv_hdrs = files(
 
 test_v2_srcs = files(
     'v2/tests/test-modulemd-buildopts.c',
+    'v2/tests/test-modulemd-component-module.c',
+    'v2/tests/test-modulemd-component-rpm.c',
     'v2/tests/test-modulemd-defaults.c',
     'v2/tests/test-modulemd-defaults-v1.c',
     'v2/tests/test-modulemd-dependencies.c',
@@ -173,6 +184,7 @@ test_v2_priv_hdrs = files(
 test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/base.py',
     'v2/tests/ModulemdTests/buildopts.py',
+    'v2/tests/ModulemdTests/componentrpm.py',
     'v2/tests/ModulemdTests/defaults.py',
     'v2/tests/ModulemdTests/defaultsv1.py',
     'v2/tests/ModulemdTests/dependencies.py',

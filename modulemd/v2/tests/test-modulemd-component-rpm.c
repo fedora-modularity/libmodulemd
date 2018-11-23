@@ -1,0 +1,318 @@
+/*
+ * This file is part of libmodulemd
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Fedora-License-Identifier: MIT
+ * SPDX-2.0-License-Identifier: MIT
+ * SPDX-3.0-License-Identifier: MIT
+ *
+ * This program is free software.
+ * For more information on the license, see COPYING.
+ * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
+ */
+
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <locale.h>
+#include <signal.h>
+
+#include "modulemd-component.h"
+#include "modulemd-component-rpm.h"
+#include "private/glib-extensions.h"
+#include "private/modulemd-component-rpm-private.h"
+#include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
+#include "private/test-utils.h"
+
+typedef struct _ComponentRpmFixture
+{
+} ComponentRpmFixture;
+
+
+static void
+component_rpm_test_construct (ComponentRpmFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  ModulemdComponent *mc = NULL;
+
+  /* Test that the new() function works */
+  r = modulemd_component_rpm_new ("testcomponent");
+  mc = MODULEMD_COMPONENT (r);
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 0);
+  g_assert_cmpstr (modulemd_component_get_name (mc), ==, "testcomponent");
+  g_assert_null (modulemd_component_get_rationale (mc));
+  g_assert_null (modulemd_component_rpm_get_ref (r));
+  g_assert_null (modulemd_component_rpm_get_repository (r));
+  g_assert_null (modulemd_component_rpm_get_cache (r));
+  mc = NULL;
+  g_clear_object (&r);
+
+  /* Test that object instantiation works */
+  r =
+    g_object_new (MODULEMD_TYPE_COMPONENT_RPM, "name", "testcomponent2", NULL);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  g_clear_object (&r);
+
+  /* Instantiate with some argument */
+  r = g_object_new (MODULEMD_TYPE_COMPONENT_RPM,
+                    "buildorder",
+                    42,
+                    "name",
+                    "testmodule",
+                    "rationale",
+                    "Testing all the stuff",
+                    "ref",
+                    "someref",
+                    "repository",
+                    "somerepo",
+                    "cache",
+                    "somecache",
+                    NULL);
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  mc = MODULEMD_COMPONENT (r);
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 42);
+  g_assert_cmpstr (modulemd_component_get_name (mc), ==, "testmodule");
+  g_assert_cmpstr (
+    modulemd_component_get_rationale (mc), ==, "Testing all the stuff");
+  g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "someref");
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (r), ==, "somerepo");
+  g_assert_cmpstr (modulemd_component_rpm_get_cache (r), ==, "somecache");
+  mc = NULL;
+  g_clear_object (&r);
+}
+
+
+static void
+component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r_orig = NULL;
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_auto (GStrv) list = NULL;
+  ModulemdComponent *mc = NULL;
+
+  r_orig = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_orig), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_orig),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_orig, "someref");
+  modulemd_component_rpm_set_repository (r_orig, "somerepo");
+  modulemd_component_rpm_set_cache (r_orig, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_orig, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_orig, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_orig, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_orig, "s390x");
+  g_assert_nonnull (r_orig);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r_orig));
+
+  r = MODULEMD_COMPONENT_RPM (
+    modulemd_component_copy (MODULEMD_COMPONENT (r_orig), NULL));
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  mc = MODULEMD_COMPONENT (r);
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 42);
+  g_assert_cmpstr (modulemd_component_get_name (mc), ==, "testmodule");
+  g_assert_cmpstr (
+    modulemd_component_get_rationale (mc), ==, "Testing all the stuff");
+  g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "someref");
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (r), ==, "somerepo");
+  g_assert_cmpstr (modulemd_component_rpm_get_cache (r), ==, "somecache");
+
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "i686");
+  g_assert_cmpstr (list[1], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "ppc64le");
+  g_assert_cmpstr (list[1], ==, "s390x");
+  g_clear_pointer (&list, g_strfreev);
+
+  mc = NULL;
+  g_clear_object (&r);
+
+  r = MODULEMD_COMPONENT_RPM (
+    modulemd_component_copy (MODULEMD_COMPONENT (r_orig), "renamedrpm"));
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  mc = MODULEMD_COMPONENT (r);
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 42);
+  g_assert_cmpstr (modulemd_component_get_name (mc), ==, "renamedrpm");
+  g_assert_cmpstr (
+    modulemd_component_get_rationale (mc), ==, "Testing all the stuff");
+  g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "someref");
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (r), ==, "somerepo");
+  g_assert_cmpstr (modulemd_component_rpm_get_cache (r), ==, "somecache");
+
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "i686");
+  g_assert_cmpstr (list[1], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "ppc64le");
+  g_assert_cmpstr (list[1], ==, "s390x");
+  g_clear_pointer (&list, g_strfreev);
+
+  mc = NULL;
+  g_clear_object (&r);
+}
+
+
+static void
+component_rpm_test_emit_yaml (ComponentRpmFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  r = modulemd_component_rpm_new ("testcomponent");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_component_rpm_emit_yaml (r, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str, ==, "---\ntestcomponent: {}\n...\n");
+
+  g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
+  yaml_emitter_delete (&emitter);
+  yaml_emitter_initialize (&emitter);
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
+  yaml_emitter_set_output (&emitter, write_yaml_string, (void *)yaml_string);
+
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r), "testrationale");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r), 42);
+  modulemd_component_rpm_set_repository (r, "testrepository");
+  modulemd_component_rpm_set_ref (r, "testref");
+  modulemd_component_rpm_set_cache (r, "testcache");
+  modulemd_component_rpm_add_restricted_arch (r, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r, "i686");
+  modulemd_component_rpm_add_multilib_arch (r, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r, "s390x");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_component_rpm_emit_yaml (r, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (
+    yaml_string->str,
+    ==,
+    "---\ntestcomponent:\n  rationale: testrationale\n  repository: "
+    "testrepository\n  cache: testcache\n  ref: testref\n  buildorder: 42\n  "
+    "arches: [i686, x86_64]\n  multilib: [ppc64le, s390x]\n...\n");
+}
+
+
+static void
+component_rpm_test_parse_yaml (ComponentRpmFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_autoptr (GError) error = NULL;
+  int result;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  g_autofree gchar *yaml_path = NULL;
+  g_auto (GStrv) list = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  yaml_path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/cr.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (yaml_stream);
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  parser_skip_headers (&parser);
+  result = yaml_parser_parse (&parser, &event);
+  g_assert_cmpint (result, ==, 1);
+  g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
+  yaml_event_delete (&event);
+
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", &error);
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  g_assert_cmpstr (
+    modulemd_component_get_name (MODULEMD_COMPONENT (r)), ==, "bar");
+  g_assert_cmpstr (modulemd_component_get_rationale (MODULEMD_COMPONENT (r)),
+                   ==,
+                   "We need this to demonstrate stuff.");
+  g_assert_cmpint (
+    modulemd_component_get_buildorder (MODULEMD_COMPONENT (r)), ==, 100);
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (r),
+                   ==,
+                   "https://pagure.io/bar.git");
+  g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "26ca0c0");
+  g_assert_cmpstr (
+    modulemd_component_rpm_get_cache (r), ==, "https://example.com/cache");
+
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "i686");
+  g_assert_cmpstr (list[1], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 1);
+  g_assert_cmpstr (list[0], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+}
+
+
+int
+main (int argc, char *argv[])
+{
+  setlocale (LC_ALL, "");
+
+  g_test_init (&argc, &argv, NULL);
+  g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
+
+  // Define the tests.
+  g_test_add ("/modulemd/v2/component/module/construct",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/module/copy",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_copy,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/module/yaml/emit",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_emit_yaml,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/module/yaml/parse",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_parse_yaml,
+              NULL);
+
+  return g_test_run ();
+}

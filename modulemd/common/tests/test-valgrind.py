@@ -25,7 +25,7 @@ failed = False
 
 # Get the list of tests to run
 proc_result = subprocess.run(['meson', 'test', '--list'],
-                             capture_output=True,
+                             stdout=subprocess.PIPE,
                              encoding='utf-8')
 if proc_result.returncode != 0:
     sys.exit(2)

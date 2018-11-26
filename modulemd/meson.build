@@ -144,6 +144,7 @@ modulemd_v2_hdrs = files(
     'v2/include/modulemd-2.0/modulemd-defaults.h',
     'v2/include/modulemd-2.0/modulemd-defaults-v1.h',
     'v2/include/modulemd-2.0/modulemd-dependencies.h',
+    'v2/include/modulemd-2.0/modulemd-deprecated.h',
     'v2/include/modulemd-2.0/modulemd-module-stream.h',
     'v2/include/modulemd-2.0/modulemd-module-stream-v1.h',
     'v2/include/modulemd-2.0/modulemd-module-stream-v2.h',

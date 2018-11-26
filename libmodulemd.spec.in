@@ -143,8 +143,11 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 
 
 %files -n python3-%{name}
+%{python3_sitearch}/gi/overrides/
+
 
 %files -n python3-compat-libmodulemd1
+
 
 %files -n compat-libmodulemd1
 %license COPYING
@@ -152,7 +155,6 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %{_libdir}/%{name}.so.1*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-1.0.typelib
-
 
 
 %files -n compat-libmodulemd1-devel

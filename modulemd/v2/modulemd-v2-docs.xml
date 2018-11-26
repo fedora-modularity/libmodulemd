@@ -41,6 +41,7 @@
         <xi:include href="xml/modulemd-dependencies.xml"/>
         <xi:include href="xml/modulemd-profile.xml"/>
         <xi:include href="xml/modulemd-service-level.xml"/>
+        <xi:include href="xml/modulemd-translation.xml"/>
         <xi:include href="xml/modulemd-translation-entry.xml"/>
     </chapter>
     <chapter>
@@ -51,6 +52,7 @@
        <xi:include href="xml/modulemd-defaults-v1-private.xml"/>
        <xi:include href="xml/modulemd-profile-private.xml"/>
        <xi:include href="xml/modulemd-service-level-private.xml"/>
+       <xi:include href="xml/modulemd-translation-private.xml"/>
        <xi:include href="xml/modulemd-translation-entry-private.xml"/>
     </chapter>
     <chapter>

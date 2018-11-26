@@ -373,7 +373,9 @@ modulemd_translation_entry_parse_yaml_profiles (yaml_parser_t *parser,
 }
 
 ModulemdTranslationEntry *
-modulemd_translation_entry_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
+                                       const gchar *locale,
+                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -386,15 +388,7 @@ modulemd_translation_entry_parse_yaml (yaml_parser_t *parser, GError **error)
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  /* Read in the locale of the translation entry */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-  if (event.type != YAML_SCALAR_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Missing translation entry locale");
-    }
-  te = modulemd_translation_entry_new ((const gchar *)event.data.scalar.value);
-  yaml_event_delete (&event);
+  te = modulemd_translation_entry_new (locale);
 
   /* Read in any supplementary attributes of the translation entry
    */

@@ -500,10 +500,10 @@ translation_entry_test_parse_yaml (TranslationEntryFixture *fixture,
 
   yaml_parser_set_input_file (&parser, yaml_stream);
 
-  /* Advance the parser past STREAM_START, DOCUMENT_START and MAPPING_START */
-  parser_skip_headers (&parser);
+  /* Advance the parser past STREAM_START and DOCUMENT_START */
+  parser_skip_document_start (&parser);
 
-  te = modulemd_translation_entry_parse_yaml (&parser, &error);
+  te = modulemd_translation_entry_parse_yaml (&parser, "en_GB", &error);
   g_assert_nonnull (te);
   g_assert_true (MODULEMD_IS_TRANSLATION_ENTRY (te));
   g_assert_cmpstr (modulemd_translation_entry_get_locale (te), ==, "en_GB");

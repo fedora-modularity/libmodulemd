@@ -179,6 +179,23 @@ test('service_level_v2_debug', test_v2_servicelevel,
 test('service_level_v2_release', test_v2_servicelevel,
      env : test_release_env)
 
+# -- Test Modulemd.Translation (C) -- #
+test_v2_translation = executable(
+    'translation_v2',
+    'tests/test-modulemd-translation.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('translation_v2_debug', test_v2_translation,
+     env : test_env)
+test('translation_v2_release', test_v2_translation,
+     env : test_release_env)
+
 # -- Test Modulemd.TranslationEntry (C) -- #
 test_v2_translationentry = executable(
     'translation_entry_v2',
@@ -235,6 +252,16 @@ test ('service_level_python_debug', python3,
 test ('service_level_python_release', python3,
       env : py_test_release_env,
       args : service_level_python_script)
+
+
+# -- Test Modulemd.Translation (Python) -- #
+translation_python_script = files('tests/ModulemdTests/translation.py')
+test ('translation__python_debug', python3,
+      env : py_test_env,
+      args : translation_python_script)
+test ('translation__python_release', python3,
+      env : py_test_release_env,
+      args : translation_python_script)
 
 
 # -- Test Modulemd.TranslationEntry (Python) -- #

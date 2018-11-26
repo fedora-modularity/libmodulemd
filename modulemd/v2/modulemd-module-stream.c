@@ -11,11 +11,14 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include <errno.h>
+#include <inttypes.h>
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
 
 typedef struct
 {
@@ -61,6 +64,176 @@ modulemd_module_stream_new (guint64 mdversion,
       /* Other versions have not yet been implemented */
       return NULL;
     }
+}
+
+
+static ModulemdModuleStream *
+modulemd_module_stream_read_yaml (yaml_parser_t *parser,
+                                  const gchar *module_name,
+                                  const gchar *module_stream,
+                                  GError **error);
+
+
+ModulemdModuleStream *
+modulemd_module_stream_read_file (const gchar *path,
+                                  const gchar *module_name,
+                                  const gchar *module_stream,
+                                  GError **error)
+{
+  MMD_INIT_YAML_PARSER (parser);
+  g_autoptr (FILE) yaml_stream = NULL;
+  gint err;
+
+  g_return_val_if_fail (path, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  errno = 0;
+  yaml_stream = g_fopen (path, "rb");
+  err = errno;
+
+  if (!yaml_stream)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_FILE_ACCESS,
+                   "%s",
+                   g_strerror (err));
+      return NULL;
+    }
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  return modulemd_module_stream_read_yaml (
+    &parser, module_name, module_stream, error);
+}
+
+
+ModulemdModuleStream *
+modulemd_module_stream_read_string (const gchar *yaml_string,
+                                    const gchar *module_name,
+                                    const gchar *module_stream,
+                                    GError **error)
+{
+  MMD_INIT_YAML_PARSER (parser);
+
+  g_return_val_if_fail (yaml_string, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
+
+  return modulemd_module_stream_read_yaml (
+    &parser, module_name, module_stream, error);
+}
+
+
+ModulemdModuleStream *
+modulemd_module_stream_read_stream (FILE *stream,
+                                    const gchar *module_name,
+                                    const gchar *module_stream,
+                                    GError **error)
+{
+  MMD_INIT_YAML_PARSER (parser);
+  yaml_parser_set_input_file (&parser, stream);
+
+  return modulemd_module_stream_read_yaml (
+    &parser, module_name, module_stream, error);
+}
+
+
+static ModulemdModuleStream *
+modulemd_module_stream_read_yaml (yaml_parser_t *parser,
+                                  const gchar *module_name,
+                                  const gchar *module_stream,
+                                  GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
+  guint64 mdversion = 0;
+  g_autofree gchar *data = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+
+  /* The first event must be the stream start */
+  if (!yaml_parser_parse (parser, &event))
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           "Parser error");
+      return NULL;
+    }
+  if (event.type != YAML_STREAM_START_EVENT)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PARSE,
+                           "YAML didn't begin with STREAM_START.");
+      return NULL;
+    }
+  yaml_event_delete (&event);
+
+  if (!modulemd_yaml_parse_document_type (
+        parser, &doctype, &mdversion, &data, &nested_error))
+    {
+      g_propagate_prefixed_error (
+        error,
+        nested_error,
+        "Parse error identifying document type and version: ");
+      return NULL;
+    }
+
+  if (doctype != MODULEMD_YAML_DOC_MODULESTREAM)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_PARSE,
+                   "Expected `document: modulemd`, got %d",
+                   doctype);
+      return NULL;
+    }
+
+  /* TODO: Read mdversion and parse 'data' with the appropriate subclass */
+  switch (mdversion)
+    {
+    case MD_MODULESTREAM_VERSION_ONE:
+      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v1_parse_yaml (data)); */
+      break;
+
+    case MD_MODULESTREAM_VERSION_TWO:
+      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v2_parse_yaml (data)); */
+      break;
+
+    default:
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_PARSE,
+                   "Unknown ModuleStream version: %" PRIu64,
+                   mdversion);
+      break;
+    }
+
+  /* The last event must be the stream end */
+  if (!yaml_parser_parse (parser, &event))
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PARSE,
+                           "YAML contained more than a single subdocument");
+      return NULL;
+    }
+
+  if (event.type != YAML_STREAM_END_EVENT)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           "Parser error");
+      return NULL;
+    }
+  yaml_event_delete (&event);
+
+  return stream;
 }
 
 

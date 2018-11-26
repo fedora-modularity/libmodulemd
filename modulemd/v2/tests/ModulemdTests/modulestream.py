@@ -152,6 +152,17 @@ class TestModuleStream(TestBase):
             assert copied_stream.props.context == "c0ffee42"
             assert copied_stream.get_context() == "c0ffee42"
 
+    def test_yaml(self):
+        for version in [
+                Modulemd.ModuleStreamVersionEnum.ONE,
+                Modulemd.ModuleStreamVersionEnum.TWO]:
+            yaml = "---\ndocument: modulemd\nversion: %d\ndata: {}\n...\n" % version
+            stream = Modulemd.ModuleStream.read_string(yaml)
+
+            # TODO: once the child classes are implemented, this should be
+            # valid.
+            assert stream is None
+
 
 if __name__ == '__main__':
     unittest.main()

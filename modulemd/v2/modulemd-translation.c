@@ -20,6 +20,7 @@
 #include "private/glib-extensions.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-translation-entry-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -453,8 +454,7 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser, GError **error)
 
 
 ModulemdTranslation *
-modulemd_translation_parse_yaml (const gchar *data,
-                                 guint64 version,
+modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                  GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -467,27 +467,12 @@ modulemd_translation_parse_yaml (const gchar *data,
   g_autofree gchar *value = NULL;
   guint64 modified;
   g_autoptr (GHashTable) entries = NULL;
+  guint64 version = modulemd_subdocument_info_get_mdversion (subdoc);
+
+  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
+    return NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  yaml_parser_set_input_string (
-    &parser, (const unsigned char *)data, strlen (data));
-
-  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
-  if (event.type != YAML_STREAM_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Data did not begin with a STREAM_START.");
-    }
-  yaml_event_delete (&event);
-
-  /* The second event must be the document start */
-  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
-  if (event.type != YAML_DOCUMENT_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Data did not begin with a STREAM_START.");
-    }
-  yaml_event_delete (&event);
 
   /* Create a translation with placeholder module info. */
   t = modulemd_translation_new (

@@ -17,6 +17,7 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -148,11 +149,9 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                                   GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
-  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
-  guint64 mdversion = 0;
-  g_autofree gchar *data = NULL;
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
   /* The first event must be the stream start */
   if (!yaml_parser_parse (parser, &event))
@@ -173,8 +172,8 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
-  if (!modulemd_yaml_parse_document_type (
-        parser, &doctype, &mdversion, &data, &nested_error))
+  subdoc = modulemd_yaml_parse_document_type (parser);
+  if (subdoc == NULL)
     {
       g_propagate_prefixed_error (
         error,
@@ -183,18 +182,19 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       return NULL;
     }
 
-  if (doctype != MODULEMD_YAML_DOC_MODULESTREAM)
+  if (modulemd_subdocument_info_get_doctype (subdoc) !=
+      MODULEMD_YAML_DOC_MODULESTREAM)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
                    MODULEMD_YAML_ERROR_PARSE,
                    "Expected `document: modulemd`, got %d",
-                   doctype);
+                   modulemd_subdocument_info_get_doctype (subdoc));
       return NULL;
     }
 
   /* TODO: Read mdversion and parse 'data' with the appropriate subclass */
-  switch (mdversion)
+  switch (modulemd_subdocument_info_get_mdversion (subdoc))
     {
     case MD_MODULESTREAM_VERSION_ONE:
       /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v1_parse_yaml (data)); */
@@ -209,7 +209,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                    MODULEMD_YAML_ERROR,
                    MODULEMD_YAML_ERROR_PARSE,
                    "Unknown ModuleStream version: %" PRIu64,
-                   mdversion);
+                   modulemd_subdocument_info_get_mdversion (subdoc));
       break;
     }
 

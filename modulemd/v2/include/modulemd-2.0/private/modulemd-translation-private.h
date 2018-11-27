@@ -17,6 +17,7 @@
 #include <yaml.h>
 
 #include "modulemd-profile.h"
+#include "modulemd-subdocument-info.h"
 
 /**
  * SECTION: modulemd-profile-private
@@ -42,9 +43,8 @@ modulemd_translation_get_modified (ModulemdTranslation *self);
 
 /**
  * modulemd_translation_parse_yaml:
- * @data: (in): A YAML string in the format of those returned from
- * modulemd_yaml_parse_data()
- * @version: (in): The "version" attribute from the modulemd_yaml_parse_data()
+ * @parser: (in) (transfer full): A libyaml parser positioned at the start of the data contents
+ * for a Translation.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -55,8 +55,7 @@ modulemd_translation_get_modified (ModulemdTranslation *self);
  * Since: 2.0
  */
 ModulemdTranslation *
-modulemd_translation_parse_yaml (const gchar *data,
-                                 guint64 version,
+modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                  GError **error);
 
 /**

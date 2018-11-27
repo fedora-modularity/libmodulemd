@@ -17,6 +17,7 @@
 #include <yaml.h>
 
 #include "modulemd-service-level.h"
+#include "modulemd-subdocument-info.h"
 
 G_BEGIN_DECLS
 
@@ -318,27 +319,16 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
  * modulemd_yaml_parse_document_type:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * yaml subdocument immediately prior to a YAML_DOCUMENT_START_EVENT.
- * @doctype: (out): The type of document that was encountered.
- * @mdversion: (out): The metadata version of this document.
- * @data: (out) (transfer full): A string representation of the YAML under the
- * "data" section in the document.
- * @error: (out): A #GError that will return the reason for a parsing or
- * validation error.
  *
  * Reads through a YAML subdocument to retrieve the document type, metadata
  * version and the data section.
  *
- * Returns: TRUE if the document parsed successfully. FALSE if an error was
- * encountered and sets @error appropriately.
+ * Returns: (transfer full): A SubdocumentInfo with information on the parse results.
  *
  * Since: 2.0
  */
-gboolean
-modulemd_yaml_parse_document_type (yaml_parser_t *parser,
-                                   enum ModulemdYamlDocumentType *doctype,
-                                   guint64 *mdversion,
-                                   gchar **data,
-                                   GError **error);
+ModulemdSubdocumentInfo *
+modulemd_yaml_parse_document_type (yaml_parser_t *parser);
 
 
 /**

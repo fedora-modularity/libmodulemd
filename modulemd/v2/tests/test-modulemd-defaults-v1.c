@@ -20,6 +20,7 @@
 #include "private/glib-extensions.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-translation-entry-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -279,12 +280,9 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
   int yaml_ret;
-  gboolean ret;
-  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
-  guint64 mdversion = 0;
-  g_autofree gchar *data = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
 
   /* Validate that we can read the specification without issues */
@@ -303,17 +301,29 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
   yaml_event_delete (&event);
 
-  ret = modulemd_yaml_parse_document_type (
-    &parser, &doctype, &mdversion, &data, &error);
-  g_assert_true (ret);
-  g_assert_null (error);
+  subdoc = modulemd_yaml_parse_document_type (&parser);
+  g_assert_nonnull (subdoc);
+  g_assert_null (modulemd_subdocument_info_get_gerror (subdoc));
 
-  g_assert_cmpint (doctype, ==, MODULEMD_YAML_DOC_DEFAULTS);
-  g_assert_cmpint (mdversion, ==, MD_DEFAULTS_VERSION_ONE);
-  g_assert_nonnull (data);
+  g_assert_cmpint (modulemd_subdocument_info_get_doctype (subdoc),
+                   ==,
+                   MODULEMD_YAML_DOC_DEFAULTS);
+  g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc),
+                   ==,
+                   MD_DEFAULTS_VERSION_ONE);
+  g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
+  g_assert_cmpstr (
+    modulemd_subdocument_info_get_yaml (subdoc),
+    ==,
+    "document: modulemd-defaults\nversion: 1\ndata:\n  module: "
+    "foo\n  "
+    "stream: x.y\n  profiles:\n    'x.y': []\n    bar: [baz, snafu]\n  "
+    "intents:\n    desktop:\n      stream: y.z\n      profiles:\n        "
+    "'y.z': [blah]\n        'x.y': [other]\n    server:\n      stream: x.y\n  "
+    "    profiles:\n        'x.y': []\n");
 
   /* Parse the data section and validate the content */
-  defaults = modulemd_defaults_v1_parse_yaml (data, &error);
+  defaults = modulemd_defaults_v1_parse_yaml (subdoc, &error);
   g_assert_nonnull (defaults);
   g_assert_null (error);
 

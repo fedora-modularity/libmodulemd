@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <yaml.h>
 #include <inttypes.h>
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -458,25 +459,36 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 }
 
 
-static gchar *
-modulemd_yaml_parse_data (yaml_parser_t *parser, GError **error);
+static gboolean
+modulemd_yaml_parse_data (yaml_parser_t *parser,
+                          yaml_emitter_t *emitter,
+                          GError **error);
 
 
-gboolean
-modulemd_yaml_parse_document_type (yaml_parser_t *parser,
-                                   enum ModulemdYamlDocumentType *_doctype,
-                                   guint64 *_mdversion,
-                                   gchar **_data,
-                                   GError **error)
+static gboolean
+modulemd_yaml_parse_document_type_internal (
+  yaml_parser_t *parser,
+  enum ModulemdYamlDocumentType *_doctype,
+  guint64 *_mdversion,
+  yaml_emitter_t *emitter,
+  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
+  gboolean had_data = FALSE;
   enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
   guint64 mdversion = 0;
-  g_autofree gchar *data = NULL;
   g_autofree gchar *doctype_scalar = NULL;
+  g_autofree gchar *mdversion_string = NULL;
   g_autoptr (GError) nested_error = NULL;
+
+  if (!mmd_emitter_start_stream (emitter, &nested_error))
+    {
+      g_propagate_prefixed_error (
+        error, nested_error, "Error emitting stream: ");
+      return FALSE;
+    }
 
   /* The first event must be the document start */
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
@@ -485,6 +497,8 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
         error, event, "Parser is not at the start of a document");
     }
+  MMD_EMIT_WITH_EXIT_FULL (
+    emitter, FALSE, &event, error, "Error starting stream");
   yaml_event_delete (&event);
 
   /* The second event must be the mapping start */
@@ -494,17 +508,30 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
         error, event, "Document did not start with a mappping");
     }
+  MMD_EMIT_WITH_EXIT_FULL (
+    emitter, FALSE, &event, error, "Error starting mapping");
   yaml_event_delete (&event);
 
   /* Now process through the document top-level */
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
       switch (event.type)
         {
-        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+        case YAML_MAPPING_END_EVENT:
+          if (!mmd_emitter_end_mapping (emitter, error))
+            return FALSE;
+          done = TRUE;
+          break;
 
         case YAML_SCALAR_EVENT:
+          if (!mmd_emitter_scalar (emitter,
+                                   (const gchar *)event.data.scalar.value,
+                                   YAML_PLAIN_SCALAR_STYLE,
+                                   error))
+            return FALSE;
+
           if (g_str_equal (event.data.scalar.value, "document"))
             {
               if (doctype != MODULEMD_YAML_DOC_UNKNOWN)
@@ -520,6 +547,11 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
                   g_propagate_error (error, nested_error);
                   return FALSE;
                 }
+              if (!mmd_emitter_scalar (emitter,
+                                       (const gchar *)doctype_scalar,
+                                       YAML_PLAIN_SCALAR_STYLE,
+                                       error))
+                return FALSE;
 
               if (g_str_equal (doctype_scalar, "modulemd"))
                 {
@@ -555,15 +587,17 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
                   g_propagate_error (error, nested_error);
                   return FALSE;
                 }
+              /* TODO: Emit this scalar */
+              mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
+              if (!mmd_emitter_scalar (
+                    emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))
+                return FALSE;
             }
           else if (g_str_equal (event.data.scalar.value, "data"))
             {
-              data = modulemd_yaml_parse_data (parser, &nested_error);
-              if (!data)
-                {
-                  g_propagate_error (error, nested_error);
-                  return FALSE;
-                }
+              had_data = TRUE;
+              if (!modulemd_yaml_parse_data (parser, emitter, &nested_error))
+                return FALSE;
             }
 
           break;
@@ -583,8 +617,12 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
         error, event, "Document did not end. It just goes on forever...");
     }
+  MMD_EMIT_WITH_EXIT_FULL (
+    emitter, FALSE, &event, error, "Error ending document");
   yaml_event_delete (&event);
 
+  if (!mmd_emitter_end_stream (emitter, error))
+    return FALSE;
 
   if (doctype == MODULEMD_YAML_DOC_UNKNOWN)
     {
@@ -604,7 +642,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
       return FALSE;
     }
 
-  if (!data)
+  if (!had_data)
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
@@ -615,32 +653,48 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser,
 
   *_doctype = doctype;
   *_mdversion = mdversion;
-  *_data = g_steal_pointer (&data);
 
   return TRUE;
 }
 
 
-static gchar *
-modulemd_yaml_parse_data (yaml_parser_t *parser, GError **error)
+ModulemdSubdocumentInfo *
+modulemd_yaml_parse_document_type (yaml_parser_t *parser)
+{
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  g_autoptr (ModulemdSubdocumentInfo) s = modulemd_subdocument_info_new ();
+  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
+  guint64 mdversion = 0;
+  g_autoptr (GError) error = NULL;
+
+  if (!modulemd_yaml_parse_document_type_internal (
+        parser, &doctype, &mdversion, &emitter, &error))
+    {
+      modulemd_subdocument_info_set_gerror (s, error);
+    }
+
+  modulemd_subdocument_info_set_doctype (s, doctype);
+  modulemd_subdocument_info_set_mdversion (s, mdversion);
+  modulemd_subdocument_info_set_yaml (s, yaml_string->str);
+
+  return g_steal_pointer (&s);
+}
+
+
+static gboolean
+modulemd_yaml_parse_data (yaml_parser_t *parser,
+                          yaml_emitter_t *emitter,
+                          GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
-  MMD_INIT_YAML_EMITTER (emitter);
-  MMD_INIT_YAML_STRING (&emitter, yaml_string);
   gboolean done = FALSE;
   gsize depth = 0;
 
-  /* Start the YAML stream */
-  yaml_stream_start_event_initialize (&event, YAML_UTF8_ENCODING);
-  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error starting stream");
-
-  yaml_document_start_event_initialize (&event, NULL, NULL, NULL, 0);
-  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error starting document");
-
   while (!done)
     {
-      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
 
       /* Read in all the YAML from the data section */
       switch (event.type)
@@ -660,17 +714,11 @@ modulemd_yaml_parse_data (yaml_parser_t *parser, GError **error)
         }
 
       /* Copy this event to the string */
-      MMD_EMIT_WITH_EXIT_PTR (
-        &emitter, &event, error, "Error storing YAML event");
+      MMD_EMIT_WITH_EXIT_FULL (
+        emitter, FALSE, &event, error, "Error storing YAML event");
     }
 
-  yaml_document_end_event_initialize (&event, 0);
-  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error ending document");
-
-  yaml_stream_end_event_initialize (&event);
-  MMD_EMIT_WITH_EXIT_PTR (&emitter, &event, error, "Error ending stream");
-
-  return g_strdup (yaml_string->str);
+  return TRUE;
 }
 
 

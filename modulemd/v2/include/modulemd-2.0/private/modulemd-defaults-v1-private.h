@@ -16,6 +16,7 @@
 #include <glib-object.h>
 #include <yaml.h>
 #include "modulemd-defaults-v1.h"
+#include "modulemd-subdocument-info.h"
 
 G_BEGIN_DECLS
 
@@ -29,8 +30,8 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_defaults_v1_parse_yaml:
- * @data: (in): A YAML string in the format of those returned from
- * modulemd_yaml_parse_data()
+ * @parser: (in) (transfer full): A libyaml parser positioned at the start of the data contents
+ * for a Translation.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -41,7 +42,8 @@ G_BEGIN_DECLS
  * Since: 2.0
  */
 ModulemdDefaultsV1 *
-modulemd_defaults_v1_parse_yaml (const gchar *data, GError **error);
+modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 GError **error);
 
 
 /**

@@ -179,6 +179,7 @@ test_v2_srcs = files(
     'v2/tests/test-modulemd-defaults.c',
     'v2/tests/test-modulemd-defaults-v1.c',
     'v2/tests/test-modulemd-dependencies.c',
+    'v2/tests/test-modulemd-modulestream.c',
     'v2/tests/test-modulemd-profile.c',
     'v2/tests/test-modulemd-service-level.c',
     'v2/tests/test-modulemd-translation.c',

@@ -188,6 +188,23 @@ test('dependencies_v2_debug', test_v2_dependencies,
 test('dependencies_v2_release', test_v2_dependencies,
      env : test_release_env)
 
+# -- Test Modulemd.Modulestream (C) -- #
+test_v2_modulestream = executable(
+    'modulestream_v2',
+    'tests/test-modulemd-modulestream.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('modulestream_v2_debug', test_v2_modulestream,
+     env : test_env)
+test('modulestream_v2_release', test_v2_modulestream,
+     env : test_release_env)
+
 # -- Test Modulemd.Profile (C) -- #
 test_v2_profile = executable(
     'profile_v2',

@@ -11,13 +11,15 @@ except ImportError:
 
 from base import TestBase
 
+modulestream_versions = [
+    Modulemd.ModuleStreamVersionEnum.ONE,
+    Modulemd.ModuleStreamVersionEnum.TWO]
+
 
 class TestModuleStream(TestBase):
 
     def test_constructors(self):
-        for version in [
-                Modulemd.ModuleStreamVersionEnum.ONE,
-                Modulemd.ModuleStreamVersionEnum.TWO]:
+        for version in modulestream_versions:
 
             # Test that the new() function works
             stream = Modulemd.ModuleStream.new(version, 'foo', 'latest')
@@ -83,9 +85,7 @@ class TestModuleStream(TestBase):
                     Modulemd.ModuleStreamVersionEnum.LATEST + 1)
 
     def test_copy(self):
-        for version in [
-                Modulemd.ModuleStreamVersionEnum.ONE,
-                Modulemd.ModuleStreamVersionEnum.TWO]:
+        for version in modulestream_versions:
 
             # Test that copying a stream with a stream name works
             stream = Modulemd.ModuleStream.new(version, 'foo', 'stable')
@@ -152,10 +152,31 @@ class TestModuleStream(TestBase):
             assert copied_stream.props.context == "c0ffee42"
             assert copied_stream.get_context() == "c0ffee42"
 
+    def test_nsvc(self):
+        for version in modulestream_versions:
+            # First test that NSVC is None for a module with no name
+            stream = Modulemd.ModuleStream.new(version)
+            assert stream.get_nsvc_as_string() is None
+
+            # Next, test for no stream name
+            stream = Modulemd.ModuleStream.new(version, 'modulename')
+            assert stream.get_nsvc_as_string() is None
+
+            # Now with valid module and stream names
+            stream = Modulemd.ModuleStream.new(
+                version, 'modulename', 'streamname')
+            assert stream.get_nsvc_as_string() == 'modulename:streamname:0'
+
+            # Add a version number
+            stream.props.version = 42
+            assert stream.get_nsvc_as_string() == 'modulename:streamname:42'
+
+            # Add a context
+            stream.props.context = 'deadbeef'
+            assert stream.get_nsvc_as_string() == 'modulename:streamname:42:deadbeef'
+
     def test_yaml(self):
-        for version in [
-                Modulemd.ModuleStreamVersionEnum.ONE,
-                Modulemd.ModuleStreamVersionEnum.TWO]:
+        for version in modulestream_versions:
             yaml = "---\ndocument: modulemd\nversion: %d\ndata: {}\n...\n" % version
             stream = Modulemd.ModuleStream.read_string(yaml)
 

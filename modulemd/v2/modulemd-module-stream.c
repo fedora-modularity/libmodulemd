@@ -515,6 +515,40 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self)
 }
 
 
+gchar *
+modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), 0);
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  gchar *nsvc = NULL;
+
+  if (!priv->module_name || !priv->stream_name)
+    {
+      /* Mandatory field is missing */
+      return NULL;
+    }
+
+  if (priv->context)
+    {
+      nsvc = g_strdup_printf ("%s:%s:%" PRIu64 ":%s",
+                              priv->module_name,
+                              priv->stream_name,
+                              priv->version,
+                              priv->context);
+    }
+  else
+    {
+      nsvc = g_strdup_printf (
+        "%s:%s:%" PRIu64, priv->module_name, priv->stream_name, priv->version);
+    }
+
+  return nsvc;
+}
+
+
 static void
 modulemd_module_stream_get_property (GObject *object,
                                      guint prop_id,

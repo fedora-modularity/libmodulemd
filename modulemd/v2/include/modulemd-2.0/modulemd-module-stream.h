@@ -326,4 +326,17 @@ const gchar *
 modulemd_module_stream_get_context (ModulemdModuleStream *self);
 
 
+/**
+ * modulemd_module_stream_get_nsvc_as_string:
+ * @self: (in): This #ModulemdModuleStream.
+ *
+ * Returns: (transfer full): The NSVC (name:stream:version[:context]) of this
+ * module stream. NULL if module name or stream stream is unknown.
+ *
+ * Since: 2.0
+ */
+gchar *
+modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
+
+
 G_END_DECLS

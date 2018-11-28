@@ -71,7 +71,7 @@ modulemd_dependencies_add_buildtime_stream (ModulemdDependencies *self,
 
 
 /**
- * modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module:
+ * modulemd_dependencies_set_empty_buildtime_dependencies_for_module:
  * @self: This #ModuleDependencies
  * @module_name: The name of the module to add dependencies on.
  *
@@ -80,7 +80,7 @@ modulemd_dependencies_add_buildtime_stream (ModulemdDependencies *self,
  * Since: 2.0
  */
 void
-modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module (
+modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
   ModulemdDependencies *self, const gchar *module_name);
 
 
@@ -128,7 +128,7 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
 
 
 /**
- * modulemd_dependencies_set_empty_runtime_default_dependencies_for_module:
+ * modulemd_dependencies_set_empty_runtime_dependencies_for_module:
  * @self: This #ModuleDependencies
  * @module_name: The name of the module to add dependencies on.
  *
@@ -137,7 +137,7 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
  * Since: 2.0
  */
 void
-modulemd_dependencies_set_empty_runtime_default_dependencies_for_module (
+modulemd_dependencies_set_empty_runtime_dependencies_for_module (
   ModulemdDependencies *self, const gchar *module_name);
 
 

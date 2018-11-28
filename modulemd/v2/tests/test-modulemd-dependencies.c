@@ -83,10 +83,10 @@ dependencies_test_dependencies (DependenciesFixture *fixture,
   modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream2");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream1");
-  modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module (
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
     d, "defbuild");
-  modulemd_dependencies_set_empty_runtime_default_dependencies_for_module (
-    d, "defrun");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d,
+                                                                   "defrun");
 
   list = modulemd_dependencies_get_buildtime_modules_as_strv (d);
   g_assert_nonnull (list);
@@ -165,12 +165,12 @@ dependencies_test_copy (DependenciesFixture *fixture, gconstpointer user_data)
 
   modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream2");
   modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
-  modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module (
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
     d, "builddef");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream3");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream4");
-  modulemd_dependencies_set_empty_runtime_default_dependencies_for_module (
-    d, "rundef");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d,
+                                                                   "rundef");
 
   d_copy = modulemd_dependencies_copy (d);
   g_assert_nonnull (d_copy);
@@ -299,12 +299,12 @@ dependencies_test_emit_yaml (DependenciesFixture *fixture,
   yaml_emitter_set_output (&emitter, write_yaml_string, (void *)yaml_string);
   modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream2");
   modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
-  modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module (
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
     d, "builddef");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream3");
   modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream4");
-  modulemd_dependencies_set_empty_runtime_default_dependencies_for_module (
-    d, "rundef");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d,
+                                                                   "rundef");
 
   g_assert_true (mmd_emitter_start_stream (&emitter, &error));
   g_assert_true (mmd_emitter_start_document (&emitter, &error));

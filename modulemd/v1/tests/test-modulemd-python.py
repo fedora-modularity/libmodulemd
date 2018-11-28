@@ -298,6 +298,54 @@ data:
         assert len(objects_from_repo_a) == len(objects_from_repo_b)
         assert len(objects_from_repo_a) == len(supposedly_merged_objects)
 
+    def test_issue94(self):
+        # Verify that we can read in a module stream with a zero module
+        # version.
+        stream = Modulemd.ModuleStream.new()
+        stream.import_from_string("""
+document: modulemd
+version: 1
+data:
+    name: foo
+    stream: bar
+    version: 0
+    summary: A test module in all its beautiful beauty.
+    description: This module demonstrates how to write simple modulemd files And can be used for testing the build and release pipeline.
+    license:
+        module: [ MIT ]
+    dependencies:
+        buildrequires:
+            platform: el8
+        requires:
+            platform: el8
+    references:
+        community: https://fedoraproject.org/wiki/Modularity
+        documentation: https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules
+        tracker: https://taiga.fedorainfracloud.org/project/modularity
+    profiles:
+        default:
+            rpms:
+                - acl
+    api:
+        rpms:
+            - acl
+    components:
+        rpms:
+            acl:
+                rationale: needed
+                ref: rhel-8.0
+        modules:
+            testmodule:
+                ref: private-x
+                rationale: Testing module inclusion.
+                buildorder: 10
+""")
+        assert stream is not None
+        assert stream.props.version == 0
+
+        # Verify that get_nsvc() works with a zeroed module version
+        assert stream.get_nsvc() == 'foo:bar:0'
+
 
 class TestPrioritizer(unittest.TestCase):
 

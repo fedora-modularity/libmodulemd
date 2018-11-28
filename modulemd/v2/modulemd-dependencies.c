@@ -128,7 +128,7 @@ modulemd_dependencies_add_buildtime_stream (ModulemdDependencies *self,
 
 
 void
-modulemd_dependencies_set_empty_buildtime_default_dependencies_for_module (
+modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
   ModulemdDependencies *self, const gchar *module_name)
 {
   g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
@@ -171,7 +171,7 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
 
 
 void
-modulemd_dependencies_set_empty_runtime_default_dependencies_for_module (
+modulemd_dependencies_set_empty_runtime_dependencies_for_module (
   ModulemdDependencies *self, const gchar *module_name)
 {
   g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));

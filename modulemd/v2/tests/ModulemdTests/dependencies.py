@@ -62,10 +62,10 @@ class TestDependencies(TestBase):
 
         d_orig.add_buildtime_stream("buildmod1", "stream2")
         d_orig.add_buildtime_stream("buildmod1", "stream1")
-        d_orig.set_empty_buildtime_default_dependencies_for_module("builddef")
+        d_orig.set_empty_buildtime_dependencies_for_module("builddef")
         d_orig.add_runtime_stream("runmod1", "stream3")
         d_orig.add_runtime_stream("runmod1", "stream4")
-        d_orig.set_empty_runtime_default_dependencies_for_module("rundef")
+        d_orig.set_empty_runtime_dependencies_for_module("rundef")
 
         d = d_orig.copy()
         assert d

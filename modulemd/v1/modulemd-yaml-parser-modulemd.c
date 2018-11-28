@@ -262,6 +262,7 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
   gboolean done = FALSE;
   guint64 version;
   GDate *eol = NULL;
+  char *endptr = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_debug ("TRACE: entering _parse_modulemd_data");
@@ -329,9 +330,11 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
                 }
 
               version = g_ascii_strtoull (
-                (const gchar *)value_event.data.scalar.value, NULL, 10);
-              if (!version)
+                (const gchar *)value_event.data.scalar.value, &endptr, 10);
+              if (!version &&
+                  endptr == (const gchar *)value_event.data.scalar.value)
                 {
+                  /* Could not convert to an integer */
                   MMD_YAML_ERROR_EVENT_RETURN (
                     error, value_event, "Unknown module version");
                 }

@@ -1789,7 +1789,7 @@ modulemd_modulestream_get_nsvc (ModulemdModuleStream *self)
   guint64 version = modulemd_modulestream_get_version (self);
   const gchar *context = modulemd_modulestream_peek_context (self);
 
-  if (!name || !stream || !version)
+  if (!name || !stream)
     {
       /* Mandatory field is missing */
       return NULL;

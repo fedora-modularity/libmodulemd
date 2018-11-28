@@ -33,7 +33,8 @@ modulemd_error_quark (void);
 enum ModulemdError
 {
   MODULEMD_ERROR_UPGRADE,
-  MODULEMD_ERROR_VALIDATE
+  MODULEMD_ERROR_VALIDATE,
+  MODULEMD_ERROR_FILE_ACCESS
 };
 
 typedef struct _modulemd_tracer

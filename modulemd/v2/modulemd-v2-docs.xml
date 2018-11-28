@@ -42,6 +42,9 @@
         <xi:include href="xml/modulemd-defaults.xml"/>
         <xi:include href="xml/modulemd-defaults-v1.xml"/>
         <xi:include href="xml/modulemd-dependencies.xml"/>
+        <xi:include href="xml/modulemd-module-stream.xml"/>
+        <xi:include href="xml/modulemd-module-stream-v1.xml"/>
+        <xi:include href="xml/modulemd-module-stream-v2.xml"/>
         <xi:include href="xml/modulemd-profile.xml"/>
         <xi:include href="xml/modulemd-service-level.xml"/>
         <xi:include href="xml/modulemd-translation.xml"/>
@@ -56,6 +59,7 @@
        <xi:include href="xml/modulemd-dependencies-private.xml"/>
        <xi:include href="xml/modulemd-defaults-private.xml"/>
        <xi:include href="xml/modulemd-defaults-v1-private.xml"/>
+       <xi:include href="xml/modulemd-module-stream-private.xml"/>
        <xi:include href="xml/modulemd-profile-private.xml"/>
        <xi:include href="xml/modulemd-service-level-private.xml"/>
        <xi:include href="xml/modulemd-translation-private.xml"/>

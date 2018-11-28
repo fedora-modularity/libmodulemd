@@ -188,6 +188,23 @@ test('dependencies_v2_debug', test_v2_dependencies,
 test('dependencies_v2_release', test_v2_dependencies,
      env : test_release_env)
 
+# -- Test Modulemd.Modulestream (C) -- #
+test_v2_modulestream = executable(
+    'modulestream_v2',
+    'tests/test-modulemd-modulestream.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('modulestream_v2_debug', test_v2_modulestream,
+     env : test_env)
+test('modulestream_v2_release', test_v2_modulestream,
+     env : test_release_env)
+
 # -- Test Modulemd.Profile (C) -- #
 test_v2_profile = executable(
     'profile_v2',
@@ -275,6 +292,15 @@ test ('dependencies_python_debug', python3,
 test ('dependencies_python_release', python3,
       env : py_test_release_env,
       args : dependencies_python_script)
+
+# -- Test Modulemd.ModuleStream (Python) -- #
+modulestream_python_script = files('tests/ModulemdTests/modulestream.py')
+test ('modulestream_python_debug', python3,
+      env : py_test_env,
+      args : modulestream_python_script)
+test ('modulestream_python_release', python3,
+      env : py_test_release_env,
+      args : modulestream_python_script)
 
 
 # -- Test Modulemd.Profile (Python) -- #

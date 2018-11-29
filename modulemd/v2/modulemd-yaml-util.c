@@ -445,6 +445,14 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
         case YAML_SCALAR_EVENT:
           g_hash_table_add (result,
                             g_strdup ((const gchar *)event.data.scalar.value));
+
+          if (!in_list)
+            {
+              /* We got a scalar instead of a sequence. Treat it as a list with
+               * a single entry
+               */
+              done = TRUE;
+            }
           break;
 
         default:

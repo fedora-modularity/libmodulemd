@@ -198,6 +198,11 @@ modulemd_buildopts_init (ModulemdBuildopts *self)
 
 /* === YAML Functions === */
 
+static gboolean
+modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
+                                        ModulemdBuildopts *buildopts,
+                                        GError **error);
+
 ModulemdBuildopts *
 modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
 {
@@ -205,27 +210,13 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  g_autofree gchar *value;
-  g_autoptr (ModulemdBuildopts) b = NULL;
+  g_autoptr (ModulemdBuildopts) buildopts = NULL;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  /* Read the "rpm" constant */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-  if (event.type != YAML_SCALAR_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (error, event, "Missing buildopts constant");
-    }
-  if (!g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Missing 'rpms' constant for buildopts");
-    }
-  b = modulemd_buildopts_new ();
-  yaml_event_delete (&event);
+  buildopts = modulemd_buildopts_new ();
 
-  /* Read in additional attributes */
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
@@ -241,20 +232,83 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in buildopts entry");
+            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+              error, event, "Missing mapping in buildopts");
+
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              if (!modulemd_buildopts_parse_rpm_buildopts (
+                    parser, buildopts, &nested_error))
+                {
+                  g_propagate_error (error, nested_error);
+                  return NULL;
+                }
+            }
+          else
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Unexpected key in buildopts: %s",
+                (const gchar *)event.data.scalar.value);
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT (error,
+                                     event,
+                                     "Unexpected YAML event in buildopts: %s",
+                                     mmd_yaml_get_event_name (event.type));
+          break;
+        }
+
+      yaml_event_delete (&event);
+    }
+  return g_steal_pointer (&buildopts);
+}
+
+static gboolean
+modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
+                                        ModulemdBuildopts *buildopts,
+                                        GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  g_autofree gchar *value = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  /* Read in RPM attributes */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
+
+        case YAML_MAPPING_END_EVENT:
+          in_map = FALSE;
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+              error, event, "Missing mapping in buildopts rpms entry");
 
           if (g_str_equal (event.data.scalar.value, "whitelist"))
             {
-              g_hash_table_unref (b->whitelist);
-              b->whitelist =
+              g_hash_table_unref (buildopts->whitelist);
+              buildopts->whitelist =
                 modulemd_yaml_parse_string_set (parser, &nested_error);
-              if (b->whitelist == NULL)
+              if (buildopts->whitelist == NULL)
                 {
-                  MMD_YAML_ERROR_EVENT_EXIT (
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
                     error,
                     event,
-                    "Failed to parse whitelist list in buildopts: %s",
+                    "Failed to parse whitelist list in buildopts rpms: %s",
                     nested_error->message);
                 }
             }
@@ -262,30 +316,33 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
+                MMD_YAML_ERROR_EVENT_EXIT_BOOL (
                   error,
                   event,
                   "Failed to parse rpm_macros in buildopts: %s",
                   nested_error->message);
-              modulemd_buildopts_set_rpm_macros (b, value);
+              modulemd_buildopts_set_rpm_macros (buildopts, value);
               g_clear_pointer (&value, g_free);
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
                 error, event, "Unknown key in buildopts body");
             }
           break;
 
         default:
-          MMD_YAML_ERROR_EVENT_EXIT (
-            error, event, "Unexpected YAML event in buildopts");
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in rpm buildopts: %s",
+            mmd_yaml_get_event_name (event.type));
           break;
         }
 
       yaml_event_delete (&event);
     }
-  return g_steal_pointer (&b);
+  return TRUE;
 }
 
 

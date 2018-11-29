@@ -274,6 +274,7 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
   g_autofree gchar *yaml_path = NULL;
   g_auto (GStrv) rpms = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
+  g_autofree gchar *name = NULL;
   yaml_path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/p.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
@@ -285,7 +286,12 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
 
   parser_skip_headers (&parser);
 
-  p = modulemd_profile_parse_yaml (&parser, &error);
+  /* Parse the name */
+  name = modulemd_yaml_parse_string (&parser, &error);
+  g_assert_nonnull (name);
+  g_assert_cmpstr (name, ==, "default");
+
+  p = modulemd_profile_parse_yaml (&parser, name, &error);
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "default");

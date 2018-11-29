@@ -82,7 +82,7 @@ modulemd_subdocument_info_set_yaml (ModulemdSubdocumentInfo *self,
 {
   g_return_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self));
 
-  printf ("Setting YAML: %s\n", yaml);
+  g_debug ("Setting YAML: %s\n", yaml);
 
   g_clear_pointer (&self->contents, g_free);
   self->contents = g_strdup (yaml);

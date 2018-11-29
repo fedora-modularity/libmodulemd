@@ -73,8 +73,7 @@ modulemd_hash_table_deep_set_copy (GHashTable *orig)
 
   g_return_val_if_fail (orig, NULL);
 
-  new = g_hash_table_new_full (
-    g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
+  new = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   g_hash_table_iter_init (&iter, orig);
   while (g_hash_table_iter_next (&iter, &key, &value))

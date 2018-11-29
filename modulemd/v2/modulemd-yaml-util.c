@@ -498,7 +498,7 @@ modulemd_yaml_parse_document_type_internal (
         error, event, "Parser is not at the start of a document");
     }
   MMD_EMIT_WITH_EXIT_FULL (
-    emitter, FALSE, &event, error, "Error starting stream");
+    emitter, FALSE, &event, error, "Error starting document");
   yaml_event_delete (&event);
 
   /* The second event must be the mapping start */
@@ -582,12 +582,14 @@ modulemd_yaml_parse_document_type_internal (
                 }
 
               mdversion = modulemd_yaml_parse_uint64 (parser, &nested_error);
-              if (!mdversion)
+              if (nested_error)
                 {
+                  /* If we got a parsing error, report it. Otherwise, continue
+                   * and we'll catch the invalid mdversion further on
+                   */
                   g_propagate_error (error, nested_error);
                   return FALSE;
                 }
-              /* TODO: Emit this scalar */
               mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
               if (!mmd_emitter_scalar (
                     emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))

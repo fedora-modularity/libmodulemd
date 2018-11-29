@@ -43,8 +43,8 @@ modulemd_translation_get_modified (ModulemdTranslation *self);
 
 /**
  * modulemd_translation_parse_yaml:
- * @parser: (in) (transfer full): A libyaml parser positioned at the start of the data contents
- * for a Translation.
+ * @subdoc: (in): A #ModulemdSubdocumentInfo representing a translation
+ * document
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *

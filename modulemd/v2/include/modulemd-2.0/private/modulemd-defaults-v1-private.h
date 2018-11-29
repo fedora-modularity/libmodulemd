@@ -30,8 +30,8 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_defaults_v1_parse_yaml:
- * @parser: (in) (transfer full): A libyaml parser positioned at the start of the data contents
- * for a Translation.
+ * @subdoc: (in): A #ModulemdSubdocumentInfo representing a defaults document
+ * of metadata version 1.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *

@@ -107,12 +107,10 @@ modulemd_subdocument_info_set_gerror (ModulemdSubdocumentInfo *self,
   g_clear_pointer (&self->error, g_error_free);
   if (error)
     {
-      fprintf (stderr, "Setting subdoc error: %s\n", error->message);
       self->error = g_error_copy (error);
     }
   else
     {
-      fprintf (stderr, "Clearing subdoc error\n");
       self->error = NULL;
     }
 }
@@ -172,6 +170,8 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
                                            GError **error)
 {
   g_return_val_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
   MMD_INIT_YAML_EVENT (event);
   MODULEMD_INIT_TRACE ();
   gsize depth = 0;

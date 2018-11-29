@@ -115,7 +115,15 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                                "Parser error");                               \
           return _returnval;                                                  \
         }                                                                     \
-      g_debug ("Parser event: %s", mmd_yaml_get_event_name ((_event)->type)); \
+      if ((_event)->type == YAML_SCALAR_EVENT)                                \
+        g_debug ("Parser event: %s: %s",                                      \
+                 mmd_yaml_get_event_name ((_event)->type),                    \
+                 (const gchar *)event.data.scalar.value);                     \
+      else                                                                    \
+        {                                                                     \
+          g_debug ("Parser event: %s",                                        \
+                   mmd_yaml_get_event_name ((_event)->type));                 \
+        }                                                                     \
     }                                                                         \
   while (0)
 

@@ -155,3 +155,14 @@ modulemd_hash_table_unref (void *table)
 
   g_hash_table_unref ((GHashTable *)table);
 }
+
+GVariant *
+modulemd_variant_deep_copy (GVariant *variant)
+{
+  const GVariantType *data_type = g_variant_get_type (variant);
+  gsize data_size = g_variant_get_size (variant);
+  gconstpointer data = g_variant_get_data (variant);
+
+  return g_variant_ref_sink (
+    g_variant_new_from_data (data_type, data, data_size, TRUE, NULL, NULL));
+}

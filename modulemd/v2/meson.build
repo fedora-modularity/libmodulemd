@@ -90,6 +90,10 @@ if not test_installed_lib
     # This test is just to catch whether we are accidentally not testing
     # the built version.
     py_test_env.set ('MODULEMD_VERSION', libmodulemd_v2_version)
+else
+    # Add an env var to exercise the Python overrides, which can only be done
+    # against installed libs.
+    py_test_env.set ('MMD_TEST_INSTALLED_LIBS', 'TRUE')
 endif
 
 # Python test env with release values

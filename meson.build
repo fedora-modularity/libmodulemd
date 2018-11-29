@@ -109,3 +109,4 @@ configure_file(
 )
 
 subdir('modulemd')
+subdir('bindings/python')

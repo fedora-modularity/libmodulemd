@@ -80,5 +80,8 @@ modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
 gchar **
 modulemd_ordered_str_keys_as_strv (GHashTable *htable);
 
+GVariant *
+modulemd_variant_deep_copy (GVariant *variant);
+
 void
 modulemd_hash_table_unref (void *table);

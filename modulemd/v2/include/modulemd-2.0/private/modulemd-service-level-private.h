@@ -30,6 +30,7 @@
  * modulemd_service_level_parse_yaml:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * Service Level entry in the YAML document.
+ * @name: (in): The name of this service level.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -40,7 +41,9 @@
  * Since: 2.0
  */
 ModulemdServiceLevel *
-modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error);
+modulemd_service_level_parse_yaml (yaml_parser_t *parser,
+                                   const gchar *name,
+                                   GError **error);
 
 /**
  * modulemd_service_level_emitter_yaml:

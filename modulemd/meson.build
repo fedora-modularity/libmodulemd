@@ -129,6 +129,7 @@ modulemd_v2_srcs = files(
     'v2/modulemd-module-stream-v2.c',
     'v2/modulemd-profile.c',
     'v2/modulemd-service-level.c',
+    'v2/modulemd-subdocument-info.c',
     'v2/modulemd-translation.c',
     'v2/modulemd-translation-entry.c',
     'v2/modulemd-util.c',
@@ -148,6 +149,7 @@ modulemd_v2_hdrs = files(
     'v2/include/modulemd-2.0/modulemd-module-stream-v2.h',
     'v2/include/modulemd-2.0/modulemd-profile.h',
     'v2/include/modulemd-2.0/modulemd-service-level.h',
+    'v2/include/modulemd-2.0/modulemd-subdocument-info.h',
     'v2/include/modulemd-2.0/modulemd-translation.h',
     'v2/include/modulemd-2.0/modulemd-translation-entry.h',
 )
@@ -166,6 +168,7 @@ modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/modulemd-module-stream-v1-private.h',
     'v2/include/modulemd-2.0/private/modulemd-module-stream-v2-private.h',
     'v2/include/modulemd-2.0/private/modulemd-service-level-private.h',
+    'v2/include/modulemd-2.0/private/modulemd-subdocument-info-private.h',
     'v2/include/modulemd-2.0/private/modulemd-translation-private.h',
     'v2/include/modulemd-2.0/private/modulemd-translation-entry-private.h',
     'v2/include/modulemd-2.0/private/modulemd-util.h',

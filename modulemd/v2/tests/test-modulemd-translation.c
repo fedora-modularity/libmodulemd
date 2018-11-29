@@ -16,11 +16,13 @@
 #include <locale.h>
 #include <signal.h>
 
+#include "modulemd-subdocument-info.h"
 #include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-yaml.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/test-utils.h"
 
 typedef struct _TranslationFixture
@@ -234,12 +236,9 @@ translation_test_parse_yaml (TranslationFixture *fixture,
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (ModulemdTranslation) t = NULL;
   int yaml_ret;
-  gboolean ret;
-  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
-  guint64 mdversion = 0;
-  g_autofree gchar *data = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
 
   /* Validate that we can read the specification without issues */
@@ -258,16 +257,17 @@ translation_test_parse_yaml (TranslationFixture *fixture,
   g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
   yaml_event_delete (&event);
 
-  ret = modulemd_yaml_parse_document_type (
-    &parser, &doctype, &mdversion, &data, &error);
-  g_assert_true (ret);
-  g_assert_null (error);
+  subdoc = modulemd_yaml_parse_document_type (&parser);
+  g_assert_nonnull (subdoc);
+  g_assert_null (modulemd_subdocument_info_get_gerror (subdoc));
 
-  g_assert_cmpint (doctype, ==, MODULEMD_YAML_DOC_TRANSLATIONS);
-  g_assert_cmpint (mdversion, ==, 1);
-  g_assert_nonnull (data);
+  g_assert_cmpint (modulemd_subdocument_info_get_doctype (subdoc),
+                   ==,
+                   MODULEMD_YAML_DOC_TRANSLATIONS);
+  g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 1);
+  g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
 
-  t = modulemd_translation_parse_yaml (data, mdversion, &error);
+  t = modulemd_translation_parse_yaml (subdoc, &error);
   g_assert_no_error (error);
   g_assert_null (error);
   g_assert_nonnull (t);
@@ -275,7 +275,9 @@ translation_test_parse_yaml (TranslationFixture *fixture,
   g_assert_true (modulemd_translation_validate (t, &error));
   g_assert_null (error);
 
-  g_assert_cmpint (modulemd_translation_get_version (t), ==, mdversion);
+  g_assert_cmpint (modulemd_translation_get_version (t),
+                   ==,
+                   modulemd_subdocument_info_get_mdversion (subdoc));
 }
 
 

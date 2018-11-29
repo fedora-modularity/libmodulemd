@@ -47,6 +47,7 @@
         <xi:include href="xml/modulemd-module-stream-v2.xml"/>
         <xi:include href="xml/modulemd-profile.xml"/>
         <xi:include href="xml/modulemd-service-level.xml"/>
+        <xi:include href="xml/modulemd-subdocument-info.xml"/>
         <xi:include href="xml/modulemd-translation.xml"/>
         <xi:include href="xml/modulemd-translation-entry.xml"/>
     </chapter>
@@ -62,6 +63,7 @@
        <xi:include href="xml/modulemd-module-stream-private.xml"/>
        <xi:include href="xml/modulemd-profile-private.xml"/>
        <xi:include href="xml/modulemd-service-level-private.xml"/>
+       <xi:include href="xml/modulemd-subdocument-info-private.xml"/>
        <xi:include href="xml/modulemd-translation-private.xml"/>
        <xi:include href="xml/modulemd-translation-entry-private.xml"/>
     </chapter>

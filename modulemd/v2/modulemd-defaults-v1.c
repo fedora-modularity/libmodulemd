@@ -14,6 +14,7 @@
 #include "modulemd-defaults-v1.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -434,7 +435,8 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
                                    GError **error);
 
 ModulemdDefaultsV1 *
-modulemd_defaults_v1_parse_yaml (const gchar *data, GError **error)
+modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_PARSER (parser);
@@ -446,27 +448,9 @@ modulemd_defaults_v1_parse_yaml (const gchar *data, GError **error)
   g_autofree gchar *scalar = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  yaml_parser_set_input_string (
-    &parser, (const unsigned char *)data, strlen (data));
 
-  /* The first event must be the stream start */
-  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
-  if (event.type != YAML_STREAM_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Data did not begin with a STREAM_START.");
-    }
-  yaml_event_delete (&event);
-
-  /* The second event must be the document start */
-  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
-  if (event.type != YAML_DOCUMENT_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Data did not begin with a STREAM_START.");
-    }
-  yaml_event_delete (&event);
-
+  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
+    return NULL;
 
   /* Create a module with a placeholder name. We'll verify that this has been
    * changed before we return it. This is because we can't guarantee that we

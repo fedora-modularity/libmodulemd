@@ -241,7 +241,7 @@ dependencies_test_parse_yaml (DependenciesFixture *fixture,
 
   yaml_parser_set_input_file (&parser, yaml_stream);
 
-  parser_skip_document_start (&parser);
+  parser_skip_headers (&parser);
 
   d = modulemd_dependencies_parse_yaml (&parser, &error);
   g_assert_nonnull (d);

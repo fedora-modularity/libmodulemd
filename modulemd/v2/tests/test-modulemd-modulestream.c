@@ -13,13 +13,6 @@ typedef struct _ModuleStreamFixture
 {
 } ModuleStreamFixture;
 
-gboolean signaled = FALSE;
-
-static void
-sigtrap_handler (int sig_num)
-{
-  signaled = TRUE;
-}
 
 static void
 module_stream_test_construct (ModuleStreamFixture *fixture,

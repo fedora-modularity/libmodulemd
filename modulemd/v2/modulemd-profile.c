@@ -233,7 +233,9 @@ modulemd_profile_init (ModulemdProfile *self)
 /* === YAML Functions === */
 
 ModulemdProfile *
-modulemd_profile_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_profile_parse_yaml (yaml_parser_t *parser,
+                             const gchar *name,
+                             GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -245,14 +247,7 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser, GError **error)
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  /* Read the profile name */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-  if (event.type != YAML_SCALAR_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (error, event, "Missing profile name");
-    }
-  p = modulemd_profile_new ((const gchar *)event.data.scalar.value);
-  yaml_event_delete (&event);
+  p = modulemd_profile_new (name);
 
   /* Read in additional attributes */
   while (!done)

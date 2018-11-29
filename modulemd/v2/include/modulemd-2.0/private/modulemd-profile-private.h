@@ -30,6 +30,7 @@
  * modulemd_profile_parse_yaml:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * Profile entry in the YAML document.
+ * @name: (in): The name of this profile.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -40,7 +41,9 @@
  * Since: 2.0
  */
 ModulemdProfile *
-modulemd_profile_parse_yaml (yaml_parser_t *parser, GError **error);
+modulemd_profile_parse_yaml (yaml_parser_t *parser,
+                             const gchar *name,
+                             GError **error);
 
 /**
  * modulemd_profile_emitter_yaml:

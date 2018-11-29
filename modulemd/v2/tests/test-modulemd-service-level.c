@@ -304,6 +304,7 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
   MMD_INIT_YAML_PARSER (parser);
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
+  g_autofree gchar *name = NULL;
   GDate *eol = NULL;
   yaml_path =
     g_strdup_printf ("%s/modulemd/v2/tests/test_data/sl_with_eol.yaml",
@@ -318,7 +319,12 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
   /* Advance the parser past STREAM_START, DOCUMENT_START and MAPPING_START */
   parser_skip_headers (&parser);
 
-  sl = modulemd_service_level_parse_yaml (&parser, &error);
+  /* Read the name */
+  name = modulemd_yaml_parse_string (&parser, &error);
+  g_assert_nonnull (name);
+  g_assert_cmpstr (name, ==, "sl_name");
+
+  sl = modulemd_service_level_parse_yaml (&parser, name, &error);
   g_assert_nonnull (sl);
   g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
   g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "sl_name");

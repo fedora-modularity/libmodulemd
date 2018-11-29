@@ -273,7 +273,9 @@ modulemd_service_level_init (ModulemdServiceLevel *self)
 /* === YAML Functions === */
 
 ModulemdServiceLevel *
-modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_service_level_parse_yaml (yaml_parser_t *parser,
+                                   const gchar *name,
+                                   GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -285,14 +287,7 @@ modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  /* Read in the name of the service level */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-  if (event.type != YAML_SCALAR_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (error, event, "Missing service level name");
-    }
-  sl = modulemd_service_level_new ((const gchar *)event.data.scalar.value);
-  yaml_event_delete (&event);
+  sl = modulemd_service_level_new (name);
 
   /* Read in any supplementary attributes of the service level,
    * such as 'eol'
@@ -309,6 +304,12 @@ modulemd_service_level_parse_yaml (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_MAPPING_END_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unexpected MAPPING_END in service level");
+              break;
+            }
           /* We're done processing the service level content */
           in_map = FALSE;
           done = TRUE;

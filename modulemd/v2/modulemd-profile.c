@@ -239,7 +239,7 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser, GError **error)
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  g_autofree gchar *value;
+  g_autofree gchar *value = NULL;
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (GError) nested_error = NULL;
 

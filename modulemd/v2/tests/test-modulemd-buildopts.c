@@ -216,7 +216,7 @@ buildopts_test_parse_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
 
   yaml_parser_set_input_file (&parser, yaml_stream);
 
-  parser_skip_headers (&parser);
+  parser_skip_document_start (&parser);
 
   b = modulemd_buildopts_parse_yaml (&parser, &error);
   g_assert_nonnull (b);

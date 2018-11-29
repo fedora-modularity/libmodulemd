@@ -360,6 +360,8 @@ modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error)
       MMD_YAML_ERROR_EVENT_EXIT (error, event, "Date was not a scalar");
     }
 
+  g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
+
   strv = g_strsplit ((const gchar *)event.data.scalar.value, "-", 4);
 
   if (!strv[0] || !strv[1] || !strv[2])
@@ -383,6 +385,8 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
     {
       MMD_YAML_ERROR_EVENT_EXIT (error, event, "String was not a scalar");
     }
+
+  g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
 
   return g_strdup ((const gchar *)event.data.scalar.value);
 }
@@ -414,6 +418,8 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
       MMD_YAML_ERROR_EVENT_EXIT_INT (error, event, "String was not a scalar");
     }
 
+  g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
+
   return g_ascii_strtoull ((const gchar *)event.data.scalar.value, NULL, 10);
 }
 
@@ -443,6 +449,7 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_SCALAR_EVENT:
+          g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
           g_hash_table_add (result,
                             g_strdup ((const gchar *)event.data.scalar.value));
 

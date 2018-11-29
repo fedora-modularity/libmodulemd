@@ -324,7 +324,6 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error)
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  gboolean in_map = FALSE;
   g_autofree gchar *value = NULL;
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (GError) nested_error = NULL;
@@ -339,17 +338,9 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error)
 
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in dependencies entry");
           if (g_str_equal (event.data.scalar.value, "buildrequires"))
             {
               g_hash_table_unref (d->buildtime_deps);

@@ -30,4 +30,39 @@ G_BEGIN_DECLS
  */
 
 
+/**
+ * modulemd_module_stream_v1_parse_yaml:
+ * @parser: (inout): A yaml parser positioned at the start of the data subsection
+ * of a modulemd v1 YAML document.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleStreamV1 object
+ * read from the YAML. NULL if a parse or validation error occurred and sets
+ * @error appropriately.
+ *
+ * Since: 2.0
+ */
+ModulemdModuleStreamV1 *
+modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error);
+
+/**
+ * modulemd_module_stream_v1_emit_yaml:
+ * @self: This #ModulemdModuleStreamV1 object
+ * @emitter: (inout): A libyaml emitter object positioned where the data
+ * section of a #ModulemdModuleStreamV1 belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an emission or
+ * validation error.
+ *
+ * Returns: TRUE if the stream was emitted successfully. FALSE and sets
+ * @error appropriately if the YAML could not be emitted.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_module_stream_v1_emit_yaml (ModulemdModuleStreamV1 *self,
+                                     yaml_emitter_t *emitter,
+                                     GError **error);
+
+
 G_END_DECLS

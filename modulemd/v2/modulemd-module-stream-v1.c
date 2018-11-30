@@ -18,7 +18,18 @@
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-profile.h"
+#include "modulemd-service-level.h"
+#include "private/glib-extensions.h"
+#include "private/modulemd-buildopts-private.h"
+#include "private/modulemd-component-rpm-private.h"
+#include "private/modulemd-component-module-private.h"
+#include "private/modulemd-dependencies-private.h"
+#include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-module-stream-v1-private.h"
+#include "private/modulemd-profile-private.h"
+#include "private/modulemd-service-level-private.h"
 #include "private/modulemd-util.h"
+#include "private/modulemd-yaml.h"
 
 struct _ModulemdModuleStreamV1
 {
@@ -410,6 +421,16 @@ modulemd_module_stream_v1_add_content_license (ModulemdModuleStreamV1 *self,
 }
 
 
+static void
+modulemd_module_stream_v1_replace_content_licenses (
+  ModulemdModuleStreamV1 *self, GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  MODULEMD_REPLACE_SET (self->content_licenses, set);
+}
+
+
 void
 modulemd_module_stream_v1_add_module_license (ModulemdModuleStreamV1 *self,
                                               const gchar *license)
@@ -420,6 +441,16 @@ modulemd_module_stream_v1_add_module_license (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_add (self->module_licenses, g_strdup (license));
+}
+
+
+static void
+modulemd_module_stream_v1_replace_module_licenses (
+  ModulemdModuleStreamV1 *self, GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  MODULEMD_REPLACE_SET (self->module_licenses, set);
 }
 
 
@@ -526,6 +557,16 @@ modulemd_module_stream_v1_add_rpm_api (ModulemdModuleStreamV1 *self,
 }
 
 
+static void
+modulemd_module_stream_v1_replace_rpm_api (ModulemdModuleStreamV1 *self,
+                                           GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  MODULEMD_REPLACE_SET (self->rpm_api, set);
+}
+
+
 void
 modulemd_module_stream_v1_remove_rpm_api (ModulemdModuleStreamV1 *self,
                                           const gchar *rpm)
@@ -557,6 +598,16 @@ modulemd_module_stream_v1_add_rpm_artifact (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_add (self->rpm_artifacts, g_strdup (nevr));
+}
+
+
+static void
+modulemd_module_stream_v1_replace_rpm_artifacts (ModulemdModuleStreamV1 *self,
+                                                 GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  MODULEMD_REPLACE_SET (self->rpm_artifacts, set);
 }
 
 
@@ -593,6 +644,16 @@ modulemd_module_stream_v1_add_rpm_filter (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_add (self->rpm_filters, g_strdup (rpm));
+}
+
+
+static void
+modulemd_module_stream_v1_replace_rpm_filters (ModulemdModuleStreamV1 *self,
+                                               GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  MODULEMD_REPLACE_SET (self->rpm_filters, set);
 }
 
 
@@ -706,6 +767,24 @@ modulemd_module_stream_v1_add_buildtime_requirement (
 }
 
 
+static void
+modulemd_module_stream_v1_replace_buildtime_deps (ModulemdModuleStreamV1 *self,
+                                                  GHashTable *deps)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  if (deps)
+    {
+      g_hash_table_unref (self->buildtime_deps);
+      self->buildtime_deps = modulemd_hash_table_deep_str_copy (deps);
+    }
+  else
+    {
+      g_hash_table_remove_all (self->buildtime_deps);
+    }
+}
+
+
 void
 modulemd_module_stream_v1_add_runtime_requirement (
   ModulemdModuleStreamV1 *self,
@@ -717,6 +796,24 @@ modulemd_module_stream_v1_add_runtime_requirement (
 
   g_hash_table_replace (
     self->runtime_deps, g_strdup (module_name), g_strdup (module_stream));
+}
+
+
+static void
+modulemd_module_stream_v1_replace_runtime_deps (ModulemdModuleStreamV1 *self,
+                                                GHashTable *deps)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  if (deps)
+    {
+      g_hash_table_unref (self->runtime_deps);
+      self->runtime_deps = modulemd_hash_table_deep_str_copy (deps);
+    }
+  else
+    {
+      g_hash_table_remove_all (self->runtime_deps);
+    }
 }
 
 
@@ -960,4 +1057,1220 @@ modulemd_module_stream_v1_init (ModulemdModuleStreamV1 *self)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->runtime_deps =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_licenses (yaml_parser_t *parser,
+                                          ModulemdModuleStreamV1 *modulestream,
+                                          GError **error);
+
+static gboolean
+modulemd_module_stream_v1_parse_servicelevels (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error);
+
+static gboolean
+modulemd_module_stream_v1_parse_deps (yaml_parser_t *parser,
+                                      ModulemdModuleStreamV1 *modulestream,
+                                      GError **error);
+
+static gboolean
+modulemd_module_stream_v1_parse_refs (yaml_parser_t *parser,
+                                      ModulemdModuleStreamV1 *modulestream,
+                                      GError **error);
+
+static gboolean
+modulemd_module_stream_v1_parse_profiles (yaml_parser_t *parser,
+                                          ModulemdModuleStreamV1 *modulestream,
+                                          GError **error);
+
+static gboolean
+modulemd_module_stream_v1_parse_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error);
+
+static GVariant *
+modulemd_module_stream_v1_parse_raw (yaml_parser_t *parser,
+                                     ModulemdModuleStreamV1 *modulestream,
+                                     GError **error);
+
+
+ModulemdModuleStreamV1 *
+modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdModuleStreamV1) modulestream = NULL;
+  g_autoptr (GHashTable) set = NULL;
+  g_autoptr (ModulemdBuildopts) buildopts = NULL;
+  g_autoptr (GVariant) xmd = NULL;
+  g_autoptr (GDate) eol = NULL;
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+
+  guint64 version;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  modulestream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  /* Read the MAPPING_START */
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (
+        error, event, "Data section did not begin with a map.");
+    }
+
+  /* Process through the mapping */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          /* Mapping Keys */
+
+          /* Module Name */
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "name"))
+            {
+              MMD_SET_PARSED_YAML_STRING (
+                parser,
+                error,
+                modulemd_module_stream_set_module_name,
+                MODULEMD_MODULE_STREAM (modulestream));
+            }
+
+          /* Module Stream Name */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "stream"))
+            {
+              MMD_SET_PARSED_YAML_STRING (
+                parser,
+                error,
+                modulemd_module_stream_set_stream_name,
+                MODULEMD_MODULE_STREAM (modulestream));
+            }
+
+          /* Module Version */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "version"))
+            {
+              version = modulemd_yaml_parse_uint64 (parser, &nested_error);
+              if (nested_error)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+
+              modulemd_module_stream_set_version (
+                MODULEMD_MODULE_STREAM (modulestream), version);
+            }
+
+          /* Module Context */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "context"))
+            {
+              MMD_SET_PARSED_YAML_STRING (
+                parser,
+                error,
+                modulemd_module_stream_set_context,
+                MODULEMD_MODULE_STREAM (modulestream));
+            }
+
+          /* Module Artifact Architecture */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "arch"))
+            {
+              MMD_SET_PARSED_YAML_STRING (parser,
+                                          error,
+                                          modulemd_module_stream_v1_set_arch,
+                                          modulestream);
+            }
+
+          /* Module Summary */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "summary"))
+            {
+              MMD_SET_PARSED_YAML_STRING (
+                parser,
+                error,
+                modulemd_module_stream_v1_set_summary,
+                modulestream);
+            }
+
+          /* Module Description */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "description"))
+            {
+              MMD_SET_PARSED_YAML_STRING (
+                parser,
+                error,
+                modulemd_module_stream_v1_set_description,
+                modulestream);
+            }
+
+          /* Service Levels */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "servicelevels"))
+            {
+              if (!modulemd_module_stream_v1_parse_servicelevels (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* Licences */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "license"))
+            {
+              if (!modulemd_module_stream_v1_parse_licenses (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* Extensible Metadata */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value, "xmd"))
+            {
+              xmd = modulemd_module_stream_v1_parse_raw (
+                parser, modulestream, &nested_error);
+              if (!xmd)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+              modulemd_module_stream_v1_set_xmd (modulestream, xmd);
+              xmd = NULL;
+            }
+
+          /* Dependencies */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "dependencies"))
+            {
+              if (!modulemd_module_stream_v1_parse_deps (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* References */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "references"))
+            {
+              if (!modulemd_module_stream_v1_parse_refs (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* Profiles */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "profiles"))
+            {
+              if (!modulemd_module_stream_v1_parse_profiles (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* API */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value, "api"))
+            {
+              set = modulemd_yaml_parse_string_set_from_map (
+                parser, "rpms", &nested_error);
+              modulemd_module_stream_v1_replace_rpm_api (modulestream, set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          /* Filter */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "filter"))
+            {
+              set = modulemd_yaml_parse_string_set_from_map (
+                parser, "rpms", &nested_error);
+              modulemd_module_stream_v1_replace_rpm_filters (modulestream,
+                                                             set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          /* Build Options */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "buildopts"))
+            {
+              buildopts =
+                modulemd_buildopts_parse_yaml (parser, &nested_error);
+              if (!buildopts)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+
+              modulemd_module_stream_v1_set_buildopts (modulestream,
+                                                       buildopts);
+              g_clear_object (&buildopts);
+            }
+
+          /* Components */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "components"))
+            {
+              if (!modulemd_module_stream_v1_parse_components (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+
+          /* Artifacts */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "artifacts"))
+            {
+              set = modulemd_yaml_parse_string_set_from_map (
+                parser, "rpms", &nested_error);
+              if (!set)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+              modulemd_module_stream_v1_replace_rpm_artifacts (modulestream,
+                                                               set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          /* EOL (Deprecated) */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value, "eol"))
+            {
+              eol = modulemd_yaml_parse_date (parser, &nested_error);
+              if (!eol)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse EOL date in data: %s",
+                    nested_error->message);
+                }
+
+              /* We store EOL as the "rawhide" service level, according to the
+               * spec.
+               */
+              sl = modulemd_service_level_new ("rawhide");
+              modulemd_service_level_set_eol (sl, eol);
+              modulemd_module_stream_v1_add_servicelevel (modulestream, sl);
+
+              g_clear_object (&sl);
+              g_clear_pointer (&eol, g_date_free);
+            }
+
+
+          /* Unknown key */
+          else
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Unexpected key in data: %s",
+                (const gchar *)event.data.scalar.value);
+            }
+          break;
+
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in ModuleStreamV1: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+
+  /* Make sure that mandatory fields are present */
+  if (!modulemd_module_stream_v1_get_summary (modulestream, "C"))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Summary is missing");
+      return NULL;
+    }
+
+  if (!modulemd_module_stream_v1_get_description (modulestream, "C"))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Description is missing");
+      return NULL;
+    }
+
+  if (!g_hash_table_size (modulestream->module_licenses))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Module license is missing");
+      return NULL;
+    }
+
+
+  return g_steal_pointer (&modulestream);
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_licenses (yaml_parser_t *parser,
+                                          ModulemdModuleStreamV1 *modulestream,
+                                          GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) set = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the mapping */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          if (in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "Unexpected extra MAPPING_START event in licenses");
+            }
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Unexpected MAPPING_END event in licenses");
+            }
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Received scalar outside of mapping");
+            }
+
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "module"))
+            {
+              set = modulemd_yaml_parse_string_set (parser, &nested_error);
+              if (!set)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+              modulemd_module_stream_v1_replace_module_licenses (modulestream,
+                                                                 set);
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "content"))
+            {
+              set = modulemd_yaml_parse_string_set (parser, &nested_error);
+              modulemd_module_stream_v1_replace_content_licenses (modulestream,
+                                                                  set);
+            }
+          else
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "Unexpected key in licenses: %s",
+                (const gchar *)event.data.scalar.value);
+              break;
+            }
+
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in licenses: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_servicelevels (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  const gchar *name = NULL;
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the mapping */
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT:
+          if (in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "Unexpected extra MAPPING_START event in servicelevels");
+            }
+          in_map = TRUE;
+          break;
+
+        case YAML_MAPPING_END_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Unexpected MAPPING_END event in servicelevels");
+            }
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Received scalar outside of mapping");
+            }
+
+          name = (const gchar *)event.data.scalar.value;
+
+          sl = modulemd_service_level_parse_yaml (parser, name, &nested_error);
+          if (!sl)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          modulemd_module_stream_v1_add_servicelevel (modulestream, sl);
+          g_clear_object (&sl);
+
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in servicelevels: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+static gboolean
+modulemd_module_stream_v1_parse_deps (yaml_parser_t *parser,
+                                      ModulemdModuleStreamV1 *modulestream,
+                                      GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (ModulemdDependencies) deps = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) deptable = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the sequence */
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of SEQUENCE_START in dependencies.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_str_equal ((const gchar *)event.data.scalar.value,
+                           "buildrequires"))
+            {
+              deptable =
+                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+              if (!deptable)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+              modulemd_module_stream_v1_replace_buildtime_deps (modulestream,
+                                                                deptable);
+              g_clear_pointer (&deptable, g_hash_table_unref);
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "requires"))
+            {
+              deptable =
+                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+              if (!deptable)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+              modulemd_module_stream_v1_replace_runtime_deps (modulestream,
+                                                              deptable);
+              g_clear_pointer (&deptable, g_hash_table_unref);
+            }
+
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in dependencies: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_refs (yaml_parser_t *parser,
+                                      ModulemdModuleStreamV1 *modulestream,
+                                      GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autofree gchar *scalar = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the map */
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in dependencies.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_str_equal ((const gchar *)event.data.scalar.value,
+                           "community"))
+            {
+              scalar = modulemd_yaml_parse_string (parser, &nested_error);
+              if (!scalar)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+
+              modulemd_module_stream_v1_set_community (modulestream, scalar);
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "documentation"))
+            {
+              scalar = modulemd_yaml_parse_string (parser, &nested_error);
+              if (!scalar)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+
+              modulemd_module_stream_v1_set_documentation (modulestream,
+                                                           scalar);
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "tracker"))
+            {
+              scalar = modulemd_yaml_parse_string (parser, &nested_error);
+              if (!scalar)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+
+              modulemd_module_stream_v1_set_tracker (modulestream, scalar);
+            }
+
+          else
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "Unknown key in references: %s",
+                (const gchar *)event.data.scalar.value);
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in dependencies: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_profiles (yaml_parser_t *parser,
+                                          ModulemdModuleStreamV1 *modulestream,
+                                          GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the map */
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in profiles.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          profile = modulemd_profile_parse_yaml (
+            parser, (const gchar *)event.data.scalar.value, &nested_error);
+          if (!profile)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          modulemd_module_stream_v1_add_profile (modulestream, profile);
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in dependencies: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_rpm_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error);
+static gboolean
+modulemd_module_stream_v1_parse_module_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error);
+
+
+static gboolean
+modulemd_module_stream_v1_parse_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* Process through the sequence */
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in components.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              if (!modulemd_module_stream_v1_parse_rpm_components (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "modules"))
+            {
+              if (!modulemd_module_stream_v1_parse_module_components (
+                    parser, modulestream, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+            }
+
+          break;
+
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in components: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_rpm_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdComponentRpm) component = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in rpm components.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          component = modulemd_component_rpm_parse_yaml (
+            parser, (const gchar *)event.data.scalar.value, &nested_error);
+          if (!component)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in RPM component: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v1_parse_module_components (
+  yaml_parser_t *parser, ModulemdModuleStreamV1 *modulestream, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdComponentModule) component = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in module components.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          component = modulemd_component_module_parse_yaml (
+            parser, (const gchar *)event.data.scalar.value, &nested_error);
+          if (!component)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error,
+            event,
+            "Unexpected YAML event in module component: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static GVariant *
+mmd_variant_from_scalar (const gchar *scalar);
+
+static GVariant *
+mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
+
+static GVariant *
+mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
+
+static GVariant *
+modulemd_module_stream_v1_parse_raw (yaml_parser_t *parser,
+                                     ModulemdModuleStreamV1 *modulestream,
+                                     GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GVariant) variant = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+  switch (event.type)
+    {
+    case YAML_SCALAR_EVENT:
+      variant =
+        mmd_variant_from_scalar ((const gchar *)event.data.scalar.value);
+      if (!variant)
+        {
+          MMD_YAML_ERROR_EVENT_EXIT (error, event, "Error parsing scalar");
+        }
+      break;
+
+    case YAML_MAPPING_START_EVENT:
+      variant = mmd_variant_from_mapping (parser, &nested_error);
+      break;
+
+    default:
+      MMD_YAML_ERROR_EVENT_EXIT (error,
+                                 event,
+                                 "Unexpected YAML event in raw parsing: %s",
+                                 mmd_yaml_get_event_name (event.type));
+      break;
+    }
+
+  return g_steal_pointer (&variant);
+}
+
+
+static GVariant *
+mmd_variant_from_scalar (const gchar *scalar)
+{
+  MODULEMD_INIT_TRACE ();
+  GVariant *variant = NULL;
+
+  g_debug ("Variant from scalar: %s", scalar);
+
+  g_return_val_if_fail (scalar, NULL);
+
+  /* Treat "TRUE" and "FALSE" as boolean values */
+  if (g_str_equal (scalar, "TRUE"))
+    {
+      variant = g_variant_new_boolean (TRUE);
+    }
+  else if (g_str_equal (scalar, "FALSE"))
+    {
+      variant = g_variant_new_boolean (FALSE);
+    }
+
+  else if (scalar)
+    {
+      /* Any value we don't handle specifically becomes a string */
+      variant = g_variant_new_string (scalar);
+    }
+
+  return g_variant_ref_sink (variant);
+}
+
+
+static GVariant *
+mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  gboolean done = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
+
+  g_autoptr (GVariantDict) dict = NULL;
+  g_autoptr (GVariant) value = NULL;
+  g_autofree gchar *key = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  dict = g_variant_dict_new (NULL);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* All mapping keys must be scalars */
+          key = g_strdup ((const gchar *)event.data.scalar.value);
+
+          YAML_PARSER_PARSE_WITH_EXIT (parser, &value_event, error);
+
+          switch (value_event.type)
+            {
+            case YAML_SCALAR_EVENT:
+              value = mmd_variant_from_scalar (
+                (const gchar *)value_event.data.scalar.value);
+              if (!value)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error, event, "Error parsing scalar");
+                }
+              break;
+
+            case YAML_MAPPING_START_EVENT:
+              value = mmd_variant_from_mapping (parser, &nested_error);
+              if (!value)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                }
+              break;
+
+            case YAML_SEQUENCE_START_EVENT:
+              value = mmd_variant_from_sequence (parser, &nested_error);
+              if (!value)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                }
+              break;
+
+            default:
+              /* We received a YAML event we shouldn't expect at this level */
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Unexpected YAML event in inner raw mapping: %s",
+                mmd_yaml_get_event_name (value_event.type));
+              break;
+            }
+
+          yaml_event_delete (&value_event);
+          g_variant_dict_insert_value (dict, key, value);
+          g_clear_pointer (&key, g_free);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in raw mapping: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  return g_variant_ref_sink (g_variant_dict_end (dict));
+}
+
+
+static GVariant *
+mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  gboolean done = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+
+  g_auto (GVariantBuilder) builder;
+  g_autoptr (GVariant) value = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_END_EVENT:
+          /* We've processed the whole sequence */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          value =
+            mmd_variant_from_scalar ((const gchar *)event.data.scalar.value);
+          if (!value)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (error, event, "Error parsing scalar");
+            }
+          break;
+
+        case YAML_MAPPING_START_EVENT:
+          value = mmd_variant_from_mapping (parser, &nested_error);
+          if (!value)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+          break;
+
+        case YAML_SEQUENCE_START_EVENT:
+          value = mmd_variant_from_sequence (parser, &nested_error);
+          if (!value)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in raw sequence: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+
+      g_variant_builder_add_value (&builder, g_variant_ref (value));
+
+      yaml_event_delete (&event);
+    }
+
+  return g_variant_ref_sink (g_variant_builder_end (&builder));
 }

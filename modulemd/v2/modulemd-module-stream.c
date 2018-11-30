@@ -17,6 +17,7 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
@@ -199,7 +200,23 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   switch (modulemd_subdocument_info_get_mdversion (subdoc))
     {
     case MD_MODULESTREAM_VERSION_ONE:
-      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v1_parse_yaml (data)); */
+      if (!modulemd_subdocument_info_get_data_parser (
+            subdoc, &stream_parser, &nested_error))
+        {
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MODULEMD_YAML_ERROR_PARSE,
+                       "data section not found in subdocument");
+          return NULL;
+        }
+
+      stream = MODULEMD_MODULE_STREAM (
+        modulemd_module_stream_v1_parse_yaml (&stream_parser, &nested_error));
+      if (!stream)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
       break;
 
     case MD_MODULESTREAM_VERSION_TWO:
@@ -217,7 +234,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
         modulemd_module_stream_v2_parse_yaml (&stream_parser, &nested_error));
       if (!stream)
         {
-          g_propagate_error (error, nested_error);
+          g_propagate_error (error, g_steal_pointer (&nested_error));
           return NULL;
         }
       break;

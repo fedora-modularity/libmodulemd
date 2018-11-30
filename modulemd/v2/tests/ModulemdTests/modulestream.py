@@ -485,8 +485,7 @@ class TestModuleStream(TestBase):
             assert xmd['outer_key'][1]['inner_key'] == 'another_scalar'
 
     def test_v2_yaml(self):
-        for version in modulestream_versions:
-            yaml = """
+        yaml = """
 ---
 document: modulemd
 version: 2
@@ -622,6 +621,232 @@ data:
         can_bool: TRUE
 ...
 """
+        stream = Modulemd.ModuleStream.read_string(yaml)
+
+        assert stream is not None
+        assert stream.props.module_name == 'modulename'
+        assert stream.props.stream_name == 'streamname'
+        assert stream.props.version == 1
+        assert stream.props.context == 'c0ffe3'
+        assert stream.props.arch == 'x86_64'
+        assert stream.get_summary(locale="C") == "Module Summary"
+        assert stream.get_description(
+            locale="C") == "Module Description"
+
+        assert 'rpm_a' in stream.get_rpm_api()
+        assert 'rpm_b' in stream.get_rpm_api()
+
+        assert 'rpm_c' in stream.get_rpm_filters()
+
+        assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts()
+
+        assert 'rawhide' in stream.get_servicelevel_names()
+        assert 'production' in stream.get_servicelevel_names()
+
+        sl = stream.get_servicelevel('rawhide')
+        assert sl is not None
+        assert sl.props.name == 'rawhide'
+        assert sl.props.eol is None
+
+        sl = stream.get_servicelevel('production')
+        assert sl is not None
+        assert sl.props.name == 'production'
+        assert sl.props.eol is not None
+        assert sl.get_eol_as_string() == '2099-12-31'
+
+        assert 'BSD' in stream.get_content_licenses()
+        assert 'GPLv2+' in stream.get_content_licenses()
+        assert 'MIT' in stream.get_module_licenses()
+
+        assert len(stream.get_dependencies()) == 4
+
+        assert stream.props.community == 'http://www.example.com/'
+        assert stream.props.documentation == 'http://www.example.com/'
+        assert stream.props.tracker == 'http://www.example.com/'
+
+        assert len(stream.get_profile_names()) == 5
+
+        buildopts = stream.get_buildopts()
+        assert buildopts is not None
+
+        assert '%demomacro 1\n%demomacro2 %{demomacro}23\n' == buildopts.props.rpm_macros
+        assert 'fooscl-1-bar' in buildopts.get_rpm_whitelist()
+        assert 'fooscl-1-baz' in buildopts.get_rpm_whitelist()
+        assert 'xxx' in buildopts.get_rpm_whitelist()
+        assert 'xyz' in buildopts.get_rpm_whitelist()
+
+        if os.getenv('MMD_TEST_INSTALLED_LIB'):
+            # The XMD python tests can only be run against the installed
+            # lib because the overrides that translate between python and
+            # GVariant must be installed in
+            # /usr/lib/python*/site-packages/gi/overrides
+            # or they are not included when importing Modulemd
+            xmd = stream.get_xmd()
+            assert xmd is not None
+
+            assert 'some_key' in xmd
+            assert xmd['some_key'] == 'some_data'
+
+            assert 'some_list' in xmd
+
+            assert 'a' in xmd['some_list']
+            assert 'b' in xmd['some_list']
+
+            assert 'some_dict' in xmd
+            assert 'a' in xmd['some_dict']
+            assert xmd['some_dict']['a'] == 'alpha'
+
+            assert 'some_other_dict' in xmd['some_dict']
+            assert 'yet_another_key' in xmd[
+                'some_dict']['some_other_dict']
+            assert 'silly' in xmd['some_dict'][
+                'some_other_dict']['yet_another_key']
+
+            assert 'can_bool' in xmd
+            assert xmd['can_bool'] is True
+
+        # Validate a trivial modulemd
+        trivial_yaml = """
+---
+document: modulemd
+version: 2
+data:
+    summary: Trivial Summary
+    description: Trivial Description
+    license:
+        module: MIT
+...
+"""
+
+        stream = Modulemd.ModuleStream.read_string(trivial_yaml)
+        assert stream
+
+        # Sanity check of spec.v2.yaml
+        stream = Modulemd.ModuleStream.read_file(
+            "%s/spec.v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+        assert stream
+
+    def test_v1_yaml(self):
+        for version in modulestream_versions:
+            yaml = """
+---
+document: modulemd
+version: 1
+data:
+  name: modulename
+  stream: streamname
+  version: 1
+  context: c0ffe3
+  arch: x86_64
+  summary: Module Summary
+  description: Module Description
+  api:
+    rpms:
+      - rpm_a
+      - rpm_b
+  filter:
+    rpms: rpm_c
+
+  artifacts:
+    rpms:
+      - bar-0:1.23-1.module_deadbeef.x86_64
+
+  eol: 2033-08-04
+  servicelevels:
+    foo: {}
+    production:
+      eol: 2099-12-31
+
+  license:
+    content:
+      - BSD
+      - GPLv2+
+    module: MIT
+
+  dependencies:
+        buildrequires:
+            platform: and-its-stream-name
+            extra-build-env: and-its-stream-name-too
+        requires:
+            runtimeplatform: and-its-stream-name-2
+
+  references:
+        community: http://www.example.com/
+        documentation: http://www.example.com/
+        tracker: http://www.example.com/
+  profiles:
+        default:
+            rpms:
+                - bar
+                - bar-extras
+                - baz
+        container:
+            rpms:
+                - bar
+                - bar-devel
+        minimal:
+            description: Minimal profile installing only the bar package.
+            rpms:
+                - bar
+        buildroot:
+            rpms:
+                - bar-devel
+        srpm-buildroot:
+            rpms:
+                - bar-extras
+  buildopts:
+        rpms:
+            macros: |
+                %demomacro 1
+                %demomacro2 %{demomacro}23
+            whitelist:
+                - fooscl-1-bar
+                - fooscl-1-baz
+                - xxx
+                - xyz
+  components:
+        rpms:
+            bar:
+                rationale: We need this to demonstrate stuff.
+                repository: https://pagure.io/bar.git
+                cache: https://example.com/cache
+                ref: 26ca0c0
+            baz:
+                rationale: This one is here to demonstrate other stuff.
+            xxx:
+                rationale: xxx demonstrates arches and multilib.
+                arches: [i686, x86_64]
+                multilib: [x86_64]
+            xyz:
+                rationale: xyz is a bundled dependency of xxx.
+                buildorder: 10
+        modules:
+            includedmodule:
+                rationale: Included in the stack, just because.
+                repository: https://pagure.io/includedmodule.git
+                ref: somecoolbranchname
+                buildorder: 100
+  xmd:
+        some_key: some_data
+        some_list:
+            - a
+            - b
+        some_dict:
+            a: alpha
+            b: beta
+            some_other_list:
+                - c
+                - d
+            some_other_dict:
+                another_key: more_data
+                yet_another_key:
+                    - this
+                    - is
+                    - getting
+                    - silly
+        can_bool: TRUE
+...
+"""
             stream = Modulemd.ModuleStream.read_string(yaml)
 
             assert stream is not None
@@ -647,6 +872,11 @@ data:
             sl = stream.get_servicelevel('rawhide')
             assert sl is not None
             assert sl.props.name == 'rawhide'
+            assert sl.get_eol_as_string() == '2033-08-04'
+
+            sl = stream.get_servicelevel('foo')
+            assert sl is not None
+            assert sl.props.name == 'foo'
             assert sl.props.eol is None
 
             sl = stream.get_servicelevel('production')
@@ -659,7 +889,20 @@ data:
             assert 'GPLv2+' in stream.get_content_licenses()
             assert 'MIT' in stream.get_module_licenses()
 
-            assert len(stream.get_dependencies()) == 4
+            buildrequires = stream.get_buildtime_modules()
+            assert len(buildrequires) == 2
+            assert 'platform' in buildrequires
+            assert stream.get_buildtime_requirement_stream(
+                'platform') == 'and-its-stream-name'
+            assert 'extra-build-env' in buildrequires
+            assert stream.get_buildtime_requirement_stream(
+                'extra-build-env') == 'and-its-stream-name-too'
+
+            requires = stream.get_runtime_modules()
+            assert len(requires) == 1
+            assert 'runtimeplatform' in requires
+            assert stream.get_runtime_requirement_stream(
+                'runtimeplatform') == 'and-its-stream-name-2'
 
             assert stream.props.community == 'http://www.example.com/'
             assert stream.props.documentation == 'http://www.example.com/'
@@ -710,7 +953,7 @@ data:
             trivial_yaml = """
 ---
 document: modulemd
-version: 2
+version: 1
 data:
   summary: Trivial Summary
   description: Trivial Description
@@ -722,9 +965,9 @@ data:
             stream = Modulemd.ModuleStream.read_string(trivial_yaml)
             assert stream
 
-            # Sanity check of spec.v2.yaml
+            # Sanity check of spec.v1.yaml
             stream = Modulemd.ModuleStream.read_file(
-                "%s/spec.v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+                "%s/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
             assert stream
 
 

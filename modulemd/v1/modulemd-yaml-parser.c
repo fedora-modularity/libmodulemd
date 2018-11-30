@@ -208,7 +208,7 @@ parse_module_index_from_file (const gchar *path,
   if (!_parse_yaml (&parser, &data, failures, &nested_error))
     {
       g_debug ("Could not parse YAML: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 
@@ -216,7 +216,7 @@ parse_module_index_from_file (const gchar *path,
   if (!module_index)
     {
       g_debug ("Could not get module_index: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 
@@ -263,7 +263,7 @@ parse_module_index_from_string (const gchar *yaml,
   if (!_parse_yaml (&parser, &data, failures, &nested_error))
     {
       g_debug ("Could not parse YAML: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 
@@ -271,7 +271,7 @@ parse_module_index_from_string (const gchar *yaml,
   if (!module_index)
     {
       g_debug ("Could not get module_index: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 
@@ -316,7 +316,7 @@ parse_module_index_from_stream (FILE *iostream,
   if (!_parse_yaml (&parser, &data, failures, &nested_error))
     {
       g_debug ("Could not parse YAML: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 
@@ -324,7 +324,7 @@ parse_module_index_from_stream (FILE *iostream,
   if (!module_index)
     {
       g_debug ("Could not get module_index: %s", nested_error->message);
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 

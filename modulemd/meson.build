@@ -237,7 +237,8 @@ test('clang_format', clang_format,
 autopep8_args = [ '--in-place', '-a', '-a' ]
 autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
                            'common/tests/test-dirty.py',
-                           'common/tests/test-valgrind.py') +
+                           'common/tests/test-valgrind.py',
+                           '../bindings/python/gi/overrides/Modulemd.py') +
                      test_v2_python_scripts ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)

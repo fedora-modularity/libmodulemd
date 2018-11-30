@@ -192,6 +192,23 @@ test('dependencies_v2_debug', test_v2_dependencies,
 test('dependencies_v2_release', test_v2_dependencies,
      env : test_release_env)
 
+# -- Test Modulemd.Module (C) -- #
+test_v2_module = executable(
+    'module_v2',
+    'tests/test-modulemd-module.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('module_v2_debug', test_v2_module,
+     env : test_env)
+test('module_v2_release', test_v2_module,
+     env : test_release_env)
+
 # -- Test Modulemd.Modulestream (C) -- #
 test_v2_modulestream = executable(
     'modulestream_v2',

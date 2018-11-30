@@ -142,7 +142,7 @@ modulemd_module_stream_v2_get_community (ModulemdModuleStreamV2 *self);
 /**
  * modulemd_module_stream_v2_set_description:
  * @self: (in): This #ModulemdModuleStreamV2 object.
- * @description: (in): The untranslated description of this module.
+ * @description: (in) (nullable): The untranslated description of this module.
  *
  * Set the module description.
  *
@@ -156,13 +156,19 @@ modulemd_module_stream_v2_set_description (ModulemdModuleStreamV2 *self,
 /**
  * modulemd_module_stream_v2_get_description:
  * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @locale: (in) (nullable): The name of the locale to use when translating
+ * the string. If NULL, it will determine the locale with a system call to
+ * setlocale(LC_MESSAGES, NULL) and return the that. If the caller wants the
+ * untranslated string, they should pass "C" for the locale.
  *
- * Returns: (transfer none): The module description.
+ * Returns: (transfer none): The module description, translated to the
+ * requested locale if available.
  *
  * Since: 2.0
  */
 const gchar *
-modulemd_module_stream_v2_get_description (ModulemdModuleStreamV2 *self);
+modulemd_module_stream_v2_get_description (ModulemdModuleStreamV2 *self,
+                                           const gchar *locale);
 
 
 /**
@@ -194,7 +200,7 @@ modulemd_module_stream_v2_get_documentation (ModulemdModuleStreamV2 *self);
 /**
  * modulemd_module_stream_v2_set_summary:
  * @self: (in): This #ModulemdModuleStreamV2 object.
- * @summary: (in): The untranslated summary of this module.
+ * @summary: (in) (nullable): The untranslated summary of this module.
  *
  * Set the module summary.
  *
@@ -208,13 +214,19 @@ modulemd_module_stream_v2_set_summary (ModulemdModuleStreamV2 *self,
 /**
  * modulemd_module_stream_v2_get_summary:
  * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @locale: (in) (nullable): The name of the locale to use when translating
+ * the string. If NULL, it will determine the locale with a system call to
+ * setlocale(LC_MESSAGES, NULL) and return the that. If the caller wants the
+ * untranslated string, they should pass "C" for the locale.
  *
- * Returns: (transfer none): The module summary.
+ * Returns: (transfer none): The module summary, translated to the requested
+ * locale if available.
  *
  * Since: 2.0
  */
 const gchar *
-modulemd_module_stream_v2_get_summary (ModulemdModuleStreamV2 *self);
+modulemd_module_stream_v2_get_summary (ModulemdModuleStreamV2 *self,
+                                       const gchar *locale);
 
 
 /**

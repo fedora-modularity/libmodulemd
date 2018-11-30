@@ -33,7 +33,8 @@ G_DECLARE_FINAL_TYPE (
  * modulemd_profile_new:
  * @name: (not nullable): The name of this profile.
  *
- * Returns: (transfer full): A newly-allocated #ModuleProfile. This object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModuleProfile. This object must
+ * be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -70,7 +71,7 @@ modulemd_profile_get_name (ModulemdProfile *self);
 /**
  * modulemd_profile_set_description:
  * @self: This #ModulemdProfile
- * @description: The description of this profile in the C.UTF-8 locale.
+ * @description: (nullable): The description of this profile in the C locale.
  *
  * Since: 2.0
  */
@@ -82,19 +83,26 @@ modulemd_profile_set_description (ModulemdProfile *self,
 /**
  * modulemd_profile_get_description:
  * @self: This #ModulemdProfile
+ * @locale: (in) (nullable): The name of the locale to use when translating
+ * the string. If NULL, it will determine the locale with a system call to
+ * setlocale(LC_MESSAGES, NULL) and return the that. If the caller wants the
+ * untranslated string, they should pass "C" for the locale.
  *
- * Returns: (transfer none): The description of this profile translated into the language specified by the locale if it is available, otherwise it returns the C.UTF-8 original.
+ * Returns: (transfer none): The description of this profile translated into
+ * the language specified by the locale if it is available, otherwise it
+ * returns the C.UTF-8 original.
  *
  * Since: 2.0
  */
 const gchar *
-modulemd_profile_get_description (ModulemdProfile *self);
+modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale);
 
 
 /**
  * modulemd_profile_add_rpm:
  * @self: This #ModulemdProfile
- * @rpm: The name of a binary RPM that should be installed when this profile is selected for installation.
+ * @rpm: The name of a binary RPM that should be installed when this profile is
+ * selected for installation.
  *
  * Since: 2.0
  */
@@ -117,7 +125,8 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
  * modulemd_profile_get_rpms_as_strv: (rename-to modulemd_profile_get_rpms)
  * @self: This #ModulemdProfile
  *
- * Returns: (transfer full): An ordered list of binary RPMS that would be installed when this profile is selected for installation.
+ * Returns: (transfer full): An ordered list of binary RPMS that would be
+ * installed when this profile is selected for installation.
  *
  * Since: 2.0
  */

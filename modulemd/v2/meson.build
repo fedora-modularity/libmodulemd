@@ -71,6 +71,7 @@ install_headers(
 
 # Test env with release values
 test_release_env = environment()
+test_release_env.set('LC_ALL', 'C')
 test_release_env.set('G_MESSAGES_DEBUG', 'all')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 

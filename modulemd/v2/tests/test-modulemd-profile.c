@@ -45,28 +45,16 @@ profile_test_construct (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_assert_null (modulemd_profile_get_description (p));
+  g_assert_null (modulemd_profile_get_description (p, "C"));
   rpms = modulemd_profile_get_rpms_as_strv (p);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 0);
   g_clear_object (&p);
 
-  /* Test that object instantiation works wiht a name */
+  /* Test that object instantiation works with a name */
   p = g_object_new (MODULEMD_TYPE_PROFILE, "name", "testprofile", NULL);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_clear_object (&p);
-
-  /* Test instantiation works with name and description */
-  p = g_object_new (MODULEMD_TYPE_PROFILE,
-                    "name",
-                    "testprofile",
-                    "description",
-                    "A test",
-                    NULL);
-  g_assert_true (MODULEMD_IS_PROFILE (p));
-  g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_assert_cmpstr (modulemd_profile_get_description (p), ==, "A test");
   g_clear_object (&p);
 
   /* Test that we abort with a NULL name to new() */
@@ -103,7 +91,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_assert_null (modulemd_profile_get_description (p));
+  g_assert_null (modulemd_profile_get_description (p, "C"));
   rpms = modulemd_profile_get_rpms_as_strv (p);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 0);
@@ -113,7 +101,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p_copy);
   g_assert_true (MODULEMD_IS_PROFILE (p_copy));
   g_assert_cmpstr (modulemd_profile_get_name (p_copy), ==, "testprofile");
-  g_assert_null (modulemd_profile_get_description (p_copy));
+  g_assert_null (modulemd_profile_get_description (p_copy, "C"));
   rpms = modulemd_profile_get_rpms_as_strv (p_copy);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 0);
@@ -127,7 +115,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_assert_cmpstr (modulemd_profile_get_description (p), ==, "a test");
+  g_assert_cmpstr (modulemd_profile_get_description (p, "C"), ==, "a test");
   rpms = modulemd_profile_get_rpms_as_strv (p);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 0);
@@ -137,7 +125,8 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p_copy);
   g_assert_true (MODULEMD_IS_PROFILE (p_copy));
   g_assert_cmpstr (modulemd_profile_get_name (p_copy), ==, "testprofile");
-  g_assert_cmpstr (modulemd_profile_get_description (p_copy), ==, "a test");
+  g_assert_cmpstr (
+    modulemd_profile_get_description (p_copy, "C"), ==, "a test");
   rpms = modulemd_profile_get_rpms_as_strv (p_copy);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 0);
@@ -151,7 +140,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
-  g_assert_null (modulemd_profile_get_description (p));
+  g_assert_null (modulemd_profile_get_description (p, "C"));
   rpms = modulemd_profile_get_rpms_as_strv (p);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 1);
@@ -162,7 +151,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p_copy);
   g_assert_true (MODULEMD_IS_PROFILE (p_copy));
   g_assert_cmpstr (modulemd_profile_get_name (p_copy), ==, "testprofile");
-  g_assert_null (modulemd_profile_get_description (p_copy));
+  g_assert_null (modulemd_profile_get_description (p_copy, "C"));
   rpms = modulemd_profile_get_rpms_as_strv (p_copy);
   g_assert_nonnull (rpms);
   g_assert_cmpint (g_strv_length (rpms), ==, 1);
@@ -201,30 +190,21 @@ profile_test_get_set_description (ProfileFixture *fixture,
                                   gconstpointer user_data)
 {
   g_autoptr (ModulemdProfile) p = NULL;
-  g_autofree gchar *description;
 
   p = modulemd_profile_new ("testprofile");
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
 
-  g_assert_null (modulemd_profile_get_description (p));
-  g_object_get (p, "description", &description, NULL);
-  g_assert_null (description);
-  g_clear_pointer (&description, g_free);
+  g_assert_null (modulemd_profile_get_description (p, "C"));
 
   /* Set a description */
   modulemd_profile_set_description (p, "Some description");
   g_assert_cmpstr (
-    modulemd_profile_get_description (p), ==, "Some description");
-  g_object_get (p, "description", &description, NULL);
-  g_assert_cmpstr (description, ==, "Some description");
-  g_clear_pointer (&description, g_free);
+    modulemd_profile_get_description (p, "C"), ==, "Some description");
 
   /* Clear the description */
   modulemd_profile_set_description (p, NULL);
-  g_object_get (p, "description", &description, NULL);
-  g_assert_null (description);
-  g_clear_pointer (&description, g_free);
+  g_assert_null (modulemd_profile_get_description (p, "C"));
 }
 
 static void
@@ -295,8 +275,9 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "default");
-  g_assert_cmpstr (
-    modulemd_profile_get_description (p), ==, "An example profile for tests");
+  g_assert_cmpstr (modulemd_profile_get_description (p, NULL),
+                   ==,
+                   "An example profile for tests");
   rpms = modulemd_profile_get_rpms_as_strv (p);
   g_assert_cmpint (g_strv_length (rpms), ==, 3);
   g_assert_cmpstr (rpms[0], ==, "bar");

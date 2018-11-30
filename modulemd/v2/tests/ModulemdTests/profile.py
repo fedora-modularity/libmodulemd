@@ -34,7 +34,6 @@ class TestProfile(TestBase):
         assert p
         assert p.props.name == 'testprofile'
         assert p.get_name() == 'testprofile'
-        assert p.props.description is None
         assert p.get_description() is None
         assert p.get_rpms() == []
 
@@ -43,17 +42,7 @@ class TestProfile(TestBase):
         assert p
         assert p.props.name == 'testprofile'
         assert p.get_name() == 'testprofile'
-        assert p.props.description is None
         assert p.get_description() is None
-        assert p.get_rpms() == []
-
-        # Test that init works with name and description
-        p = Modulemd.Profile(name='testprofile', description='A test profile')
-        assert p
-        assert p.props.name == 'testprofile'
-        assert p.get_name() == 'testprofile'
-        assert p.props.description == 'A test profile'
-        assert p.get_description() == 'A test profile'
         assert p.get_rpms() == []
 
         # Test that we fail without name
@@ -73,7 +62,6 @@ class TestProfile(TestBase):
         assert p
         assert p.props.name == 'testprofile'
         assert p.get_name() == 'testprofile'
-        assert p.props.description is None
         assert p.get_description() is None
         assert p.get_rpms() == []
 
@@ -86,7 +74,6 @@ class TestProfile(TestBase):
         assert p
         assert p.props.name == 'testprofile'
         assert p.get_name() == 'testprofile'
-        assert p.props.description == 'Test profile'
         assert p.get_description() == 'Test profile'
         assert p.get_rpms() == ['test1', 'test2', 'test3']
 
@@ -102,19 +89,12 @@ class TestProfile(TestBase):
     def test_get_set_description(self):
         p = Modulemd.Profile(name='testprofile')
 
-        assert p.props.description is None
         assert p.get_description() is None
 
         p.set_description('foobar')
-        assert p.props.description == 'foobar'
         assert p.get_description() == 'foobar'
 
-        p.props.description = 'barfoo'
-        assert p.props.description == 'barfoo'
-        assert p.get_description() == 'barfoo'
-
-        p.props.description = None
-        assert p.props.description is None
+        p.set_description(None)
         assert p.get_description() is None
 
     def test_rpms(self):

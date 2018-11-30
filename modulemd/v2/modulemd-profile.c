@@ -39,7 +39,6 @@ enum
   PROP_0,
 
   PROP_NAME,
-  PROP_DESCRIPTION,
 
   N_PROPS
 };
@@ -62,8 +61,8 @@ modulemd_profile_copy (ModulemdProfile *self)
 
   p = modulemd_profile_new (modulemd_profile_get_name (self));
 
-  modulemd_profile_set_description (p,
-                                    modulemd_profile_get_description (self));
+  modulemd_profile_set_description (
+    p, modulemd_profile_get_description (self, NULL));
 
   g_hash_table_unref (p->rpms);
   p->rpms = g_hash_table_ref (self->rpms);
@@ -116,15 +115,15 @@ modulemd_profile_set_description (ModulemdProfile *self,
 
   g_clear_pointer (&self->description, g_free);
   self->description = g_strdup (description);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DESCRIPTION]);
 }
 
 
 const gchar *
-modulemd_profile_get_description (ModulemdProfile *self)
+modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
+
+  /* TODO: retrieve translated strings */
 
   return self->description;
 }
@@ -168,9 +167,6 @@ modulemd_profile_get_property (GObject *object,
     case PROP_NAME:
       g_value_set_string (value, modulemd_profile_get_name (self));
       break;
-    case PROP_DESCRIPTION:
-      g_value_set_string (value, modulemd_profile_get_description (self));
-      break;
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -188,9 +184,6 @@ modulemd_profile_set_property (GObject *object,
     {
     case PROP_NAME:
       modulemd_profile_set_name (self, g_value_get_string (value));
-      break;
-    case PROP_DESCRIPTION:
-      modulemd_profile_set_description (self, g_value_get_string (value));
       break;
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -212,12 +205,6 @@ modulemd_profile_class_init (ModulemdProfileClass *klass)
     "The name of this profile.",
     P_DEFAULT_STRING,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
-  properties[PROP_DESCRIPTION] =
-    g_param_spec_string ("description",
-                         "Description",
-                         "The untranslated description of this profile",
-                         P_DEFAULT_STRING,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -344,7 +331,7 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
       return FALSE;
     }
 
-  if (modulemd_profile_get_description (self) != NULL)
+  if (modulemd_profile_get_description (self, NULL) != NULL)
     {
       ret = mmd_emitter_scalar (
         emitter, "description", YAML_PLAIN_SCALAR_STYLE, &nested_error);
@@ -358,7 +345,7 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
         }
 
       ret = mmd_emitter_scalar (emitter,
-                                modulemd_profile_get_description (self),
+                                modulemd_profile_get_description (self, NULL),
                                 YAML_PLAIN_SCALAR_STYLE,
                                 &nested_error);
       if (!ret)

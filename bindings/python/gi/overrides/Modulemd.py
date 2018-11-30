@@ -72,7 +72,7 @@ class ModulemdUtil():
         if not isinstance(d, dict):
             raise TypeError('Only dictionaries are supported for mappings')
 
-        d_variant = dict_values(d)
+        d_variant = ModulemdUtil.dict_values(d)
         return GLib.Variant('a{sv}', d_variant)
 
     def dict_values(d):

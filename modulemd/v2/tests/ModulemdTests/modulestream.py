@@ -466,7 +466,7 @@ class TestModuleStream(TestBase):
         )[0].get_runtime_modules()
 
     def test_xmd(self):
-        if os.getenv('MMD_TEST_INSTALLED_LIB'):
+        if '_overrides_module' in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib
             # because the overrides that translate between python and GVariant
             # must be installed in /usr/lib/python*/site-packages/gi/overrides

@@ -245,23 +245,16 @@ class TestModuleStream(TestBase):
             stream = Modulemd.ModuleStream.new(version)
 
             # Check the defaults
-            assert stream.props.description is None
-            assert stream.get_description() is None
-
-            # Test property setting
-            stream.props.description = 'A description'
-            assert stream.props.description == 'A description'
-            assert stream.get_description() == 'A description'
+            assert stream.get_description(locale="C") is None
 
             # Test set_description()
             stream.set_description('A different description')
-            assert stream.props.description == 'A different description'
-            assert stream.get_description() == 'A different description'
+            assert stream.get_description(
+                locale="C") == 'A different description'
 
             # Test setting it to None
-            stream.props.description = None
-            assert stream.props.description is None
-            assert stream.get_description() is None
+            stream.set_description(None)
+            assert stream.get_description(locale="C") is None
 
     def test_documentation(self):
         for version in modulestream_versions:
@@ -291,23 +284,15 @@ class TestModuleStream(TestBase):
             stream = Modulemd.ModuleStream.new(version)
 
             # Check the defaults
-            assert stream.props.summary is None
-            assert stream.get_summary() is None
-
-            # Test property setting
-            stream.props.summary = 'A summary'
-            assert stream.props.summary == 'A summary'
-            assert stream.get_summary() == 'A summary'
+            assert stream.get_summary(locale="C") is None
 
             # Test set_summary()
             stream.set_summary('A different summary')
-            assert stream.props.summary == 'A different summary'
-            assert stream.get_summary() == 'A different summary'
+            assert stream.get_summary(locale="C") == 'A different summary'
 
             # Test setting it to None
-            stream.props.summary = None
-            assert stream.props.summary is None
-            assert stream.get_summary() is None
+            stream.set_summary(None)
+            assert stream.get_summary(locale="C") is None
 
     def test_tracker(self):
         for version in modulestream_versions:

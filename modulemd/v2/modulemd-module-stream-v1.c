@@ -66,9 +66,7 @@ enum
   PROP_ARCH,
   PROP_BUILDOPTS,
   PROP_COMMUNITY,
-  PROP_DESCRIPTION,
   PROP_DOCUMENTATION,
-  PROP_SUMMARY,
   PROP_TRACKER,
   N_PROPS
 };
@@ -210,15 +208,16 @@ modulemd_module_stream_v1_set_description (ModulemdModuleStreamV1 *self,
 
   g_clear_pointer (&self->description, g_free);
   self->description = g_strdup (description);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DESCRIPTION]);
 }
 
 
 const gchar *
-modulemd_module_stream_v1_get_description (ModulemdModuleStreamV1 *self)
+modulemd_module_stream_v1_get_description (ModulemdModuleStreamV1 *self,
+                                           const gchar *locale)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), NULL);
+
+  /* TODO: retrieve translated strings */
 
   return self->description;
 }
@@ -254,15 +253,16 @@ modulemd_module_stream_v1_set_summary (ModulemdModuleStreamV1 *self,
 
   g_clear_pointer (&self->summary, g_free);
   self->summary = g_strdup (summary);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DESCRIPTION]);
 }
 
 
 const gchar *
-modulemd_module_stream_v1_get_summary (ModulemdModuleStreamV1 *self)
+modulemd_module_stream_v1_get_summary (ModulemdModuleStreamV1 *self,
+                                       const gchar *locale)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), NULL);
+
+  /* TODO: retrieve translated strings */
 
   return self->summary;
 }
@@ -824,18 +824,9 @@ modulemd_module_stream_v1_get_property (GObject *object,
                           modulemd_module_stream_v1_get_community (self));
       break;
 
-    case PROP_DESCRIPTION:
-      g_value_set_string (value,
-                          modulemd_module_stream_v1_get_description (self));
-      break;
-
     case PROP_DOCUMENTATION:
       g_value_set_string (value,
                           modulemd_module_stream_v1_get_documentation (self));
-      break;
-
-    case PROP_SUMMARY:
-      g_value_set_string (value, modulemd_module_stream_v1_get_summary (self));
       break;
 
     case PROP_TRACKER:
@@ -870,18 +861,9 @@ modulemd_module_stream_v1_set_property (GObject *object,
                                                g_value_get_string (value));
       break;
 
-    case PROP_DESCRIPTION:
-      modulemd_module_stream_v1_set_description (self,
-                                                 g_value_get_string (value));
-      break;
-
     case PROP_DOCUMENTATION:
       modulemd_module_stream_v1_set_documentation (self,
                                                    g_value_get_string (value));
-      break;
-
-    case PROP_SUMMARY:
-      modulemd_module_stream_v1_set_summary (self, g_value_get_string (value));
       break;
 
     case PROP_TRACKER:
@@ -926,24 +908,10 @@ modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 
-  properties[PROP_DESCRIPTION] = g_param_spec_string (
-    "description",
-    "Module Description",
-    "The description of this module",
-    NULL,
-    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
-
   properties[PROP_DOCUMENTATION] = g_param_spec_string (
     "documentation",
     "Module Documentation Website",
     "The website address of the upstream documentation for this module",
-    NULL,
-    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
-
-  properties[PROP_SUMMARY] = g_param_spec_string (
-    "summary",
-    "Module Summary",
-    "The short description of this module",
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 

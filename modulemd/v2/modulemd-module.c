@@ -241,7 +241,7 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
   gsize i = 0;
   ModulemdModuleStream *stream = NULL;
   g_autoptr (GPtrArray) streams =
-    g_ptr_array_new (); /* Explicitly not setting a free func */
+    g_ptr_array_new_with_free_func (g_object_unref);
 
   for (i = 0; i < self->streams->len; i++)
     {
@@ -251,7 +251,7 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
                         stream_name))
         continue;
 
-      g_ptr_array_add (streams, stream);
+      g_ptr_array_add (streams, g_object_ref (stream));
     }
 
   g_ptr_array_sort (streams, compare_streams);

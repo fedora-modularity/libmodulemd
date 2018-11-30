@@ -112,9 +112,6 @@ class ModulemdUtil():
 if "ModuleStreamV2" in dir(Modulemd):
     class ModuleStreamV2(Modulemd.ModuleStreamV2):
 
-        def __new__(cls, module_name=None, module_stream=None):
-            return Modulemd.ModuleStreamV2.new(module_name, module_stream)
-
         def set_xmd(self, xmd):
             super().set_xmd(ModulemdUtil.python_to_variant(xmd))
 
@@ -129,9 +126,6 @@ if "ModuleStreamV2" in dir(Modulemd):
 
 if "ModuleStreamV1" in dir(Modulemd):
     class ModuleStreamV1(Modulemd.ModuleStreamV1):
-
-        def __new__(cls, module_name=None, module_stream=None):
-            return Modulemd.ModuleStreamV1.new(module_name, module_stream)
 
         def set_xmd(self, xmd):
             super().set_xmd(ModulemdUtil.python_to_variant(xmd))

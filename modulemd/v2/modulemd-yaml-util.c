@@ -449,7 +449,8 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_SCALAR_EVENT:
-          g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
+          g_debug ("Parsing scalar: %s",
+                   (const gchar *)event.data.scalar.value);
           g_hash_table_add (result,
                             g_strdup ((const gchar *)event.data.scalar.value));
 

@@ -177,7 +177,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_propagate_prefixed_error (
         error,
-        nested_error,
+        g_steal_pointer (&nested_error),
         "Parse error identifying document type and version: ");
       return NULL;
     }

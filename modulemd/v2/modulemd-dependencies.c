@@ -418,7 +418,7 @@ modulemd_dependencies_emit_yaml_nested_set_value (GHashTable *values,
     {
       g_propagate_prefixed_error (
         error,
-        nested_error,
+        g_steal_pointer (&nested_error),
         "Failed to start dependencies nested mapping values: ");
       return FALSE;
     }
@@ -432,7 +432,7 @@ modulemd_dependencies_emit_yaml_nested_set_value (GHashTable *values,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to start dependencies nested mapping entry: ");
           return FALSE;
         }
@@ -443,7 +443,7 @@ modulemd_dependencies_emit_yaml_nested_set_value (GHashTable *values,
     {
       g_propagate_prefixed_error (
         error,
-        nested_error,
+        g_steal_pointer (&nested_error),
         "Failed to end dependencies nested mapping values: ");
       return FALSE;
     }
@@ -469,7 +469,9 @@ modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
   if (!ret)
     {
       g_propagate_prefixed_error (
-        error, nested_error, "Failed to start dependencies nested mapping: ");
+        error,
+        g_steal_pointer (&nested_error),
+        "Failed to start dependencies nested mapping: ");
       return FALSE;
     }
 
@@ -481,7 +483,9 @@ modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit dependencies nested key: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit dependencies nested key: ");
           return FALSE;
         }
 
@@ -491,7 +495,7 @@ modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to emit dependencies nested sequence: ");
           return FALSE;
         }
@@ -500,8 +504,9 @@ modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end dependencies nested mapping");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end dependencies nested mapping");
       return FALSE;
     }
 
@@ -529,8 +534,9 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to start dependencies mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to start dependencies mapping: ");
       return FALSE;
     }
 
@@ -542,7 +548,7 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to emit dependencies buildrequires key: ");
           return FALSE;
         }
@@ -553,7 +559,7 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to emit buildtime dependencies rpms: ");
           return FALSE;
         }
@@ -567,7 +573,7 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to emit dependencies run-requires key: ");
           return FALSE;
         }
@@ -577,7 +583,9 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit runtime dependencies rpms: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit runtime dependencies rpms: ");
           return FALSE;
         }
     }
@@ -585,8 +593,9 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end dependencies mapping");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end dependencies mapping");
       return FALSE;
     }
   return TRUE;

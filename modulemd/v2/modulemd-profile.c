@@ -333,8 +333,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
                             &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit profile name: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit profile name: ");
       return FALSE;
     }
 
@@ -342,8 +343,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to start profile mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to start profile mapping: ");
       return FALSE;
     }
 
@@ -354,7 +356,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile description key: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit profile description key: ");
           return FALSE;
         }
 
@@ -365,7 +369,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile description value: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit profile description value: ");
           return FALSE;
         }
     }
@@ -376,8 +382,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
         emitter, "rpms", YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile rpms key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit profile rpms key: ");
           return FALSE;
         }
 
@@ -387,8 +394,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
         emitter, YAML_BLOCK_SEQUENCE_STYLE, rpms, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile rpms: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit profile rpms: ");
           return FALSE;
         }
     }
@@ -396,8 +404,9 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end profile mapping");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end profile mapping");
       return FALSE;
     }
   return TRUE;

@@ -552,7 +552,7 @@ modulemd_yaml_parse_document_type_internal (
                 modulemd_yaml_parse_string (parser, &nested_error);
               if (!doctype_scalar)
                 {
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
                 }
               if (!mmd_emitter_scalar (emitter,
@@ -595,7 +595,7 @@ modulemd_yaml_parse_document_type_internal (
                   /* If we got a parsing error, report it. Otherwise, continue
                    * and we'll catch the invalid mdversion further on
                    */
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
                 }
               mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);

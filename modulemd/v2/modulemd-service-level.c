@@ -378,8 +378,9 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
                             &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit service level name: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit service level name: ");
       return FALSE;
     }
 
@@ -388,8 +389,9 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to start service level mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to start service level mapping: ");
       return FALSE;
     }
 
@@ -400,8 +402,9 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
         emitter, "eol", YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit EOL key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit EOL key: ");
           return FALSE;
         }
 
@@ -411,7 +414,7 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
       if (!ret)
         {
           g_propagate_prefixed_error (error,
-                                      nested_error,
+                                      g_steal_pointer (&nested_error),
                                       "Failed to emit EOL string [%s]: ",
                                       eol_string);
           return FALSE;
@@ -422,8 +425,9 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end service level mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end service level mapping: ");
       return FALSE;
     }
 

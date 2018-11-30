@@ -491,16 +491,18 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
     emitter, "profiles", YAML_PLAIN_SCALAR_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit profiles key: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit profiles key: ");
       return FALSE;
     }
   ret = mmd_emitter_start_mapping (
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit profiles start: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit profiles start: ");
       return FALSE;
     }
 
@@ -511,8 +513,9 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
         emitter, (const gchar *)key, YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit profile key: ");
           return FALSE;
         }
 
@@ -520,8 +523,9 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
         emitter, (const gchar *)value, YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profile value: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit profile value: ");
           return FALSE;
         }
     }
@@ -529,8 +533,9 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit profiles end: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit profiles end: ");
       return FALSE;
     }
   return TRUE;
@@ -552,8 +557,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
                             &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit translation entry locale: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit translation entry locale: ");
       return FALSE;
     }
   /* Start the mapping for additional attributes of this translation entry */
@@ -562,7 +568,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
   if (!ret)
     {
       g_propagate_prefixed_error (
-        error, nested_error, "Failed to start translation entry mapping: ");
+        error,
+        g_steal_pointer (&nested_error),
+        "Failed to start translation entry mapping: ");
       return FALSE;
     }
 
@@ -573,8 +581,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
         emitter, "summary", YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit summary key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit summary key: ");
           return FALSE;
         }
 
@@ -585,7 +594,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit translation entry summary: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit translation entry summary: ");
           return FALSE;
         }
     }
@@ -596,8 +607,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
         emitter, "description", YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit description key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit description key: ");
           return FALSE;
         }
 
@@ -610,7 +622,7 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
         {
           g_propagate_prefixed_error (
             error,
-            nested_error,
+            g_steal_pointer (&nested_error),
             "Failed to emit translation entry description: ");
           return FALSE;
         }
@@ -622,8 +634,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
         self, emitter, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit profiles: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit profiles: ");
           return FALSE;
         }
     }
@@ -632,8 +645,9 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end translation entry mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end translation entry mapping: ");
       return FALSE;
     }
 

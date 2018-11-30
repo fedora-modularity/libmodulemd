@@ -362,7 +362,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
   if (!ret)
     {
       g_propagate_prefixed_error (
-        error, nested_error, "Failed to emit buildopts 'rpms' constant: ");
+        error,
+        g_steal_pointer (&nested_error),
+        "Failed to emit buildopts 'rpms' constant: ");
       return FALSE;
     }
 
@@ -370,8 +372,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to start buildopts mapping: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to start buildopts mapping: ");
       return FALSE;
     }
 
@@ -381,8 +384,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
         emitter, "macros", YAML_PLAIN_SCALAR_STYLE, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit buildopts macros key: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit buildopts macros key: ");
           return FALSE;
         }
 
@@ -393,7 +397,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit buildopts macros value: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit buildopts macros value: ");
           return FALSE;
         }
     }
@@ -405,7 +411,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
       if (!ret)
         {
           g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit buildopts whitelist key: ");
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit buildopts whitelist key: ");
           return FALSE;
         }
 
@@ -415,8 +423,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
         emitter, YAML_BLOCK_SEQUENCE_STYLE, whitelist, &nested_error);
       if (!ret)
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Failed to emit buildopts whitelist: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit buildopts whitelist: ");
           return FALSE;
         }
     }
@@ -424,8 +433,9 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
   if (!ret)
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Failed to end buildopts mapping");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end buildopts mapping");
       return FALSE;
     }
   return TRUE;

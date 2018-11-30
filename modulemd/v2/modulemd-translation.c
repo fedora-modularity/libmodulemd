@@ -611,8 +611,9 @@ modulemd_translation_emit_yaml_entries (ModulemdTranslation *self,
       if (!modulemd_translation_entry_emit_yaml (
             (ModulemdTranslationEntry *)value, emitter, &nested_error))
         {
-          g_propagate_prefixed_error (
-            error, nested_error, "Error emitting translation entry: ");
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Error emitting translation entry: ");
           return FALSE;
         }
     }
@@ -634,8 +635,9 @@ modulemd_translation_emit_yaml (ModulemdTranslation *self,
 
   if (!modulemd_translation_validate (self, &nested_error))
     {
-      g_propagate_prefixed_error (
-        error, nested_error, "Translation object failed validation: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Translation object failed validation: ");
       return FALSE;
     }
 

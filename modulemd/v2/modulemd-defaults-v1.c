@@ -110,7 +110,7 @@ modulemd_defaults_v1_validate (ModulemdDefaults *self, GError **error)
              ->validate (self, &nested_error);
   if (!result)
     {
-      g_propagate_error (error, nested_error);
+      g_propagate_error (error, g_steal_pointer (&nested_error));
     }
 
   return TRUE;
@@ -531,7 +531,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               if (!modulemd_defaults_v1_parse_yaml_profiles (
                     &parser, defaults->profile_defaults, &nested_error))
                 {
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
             }
@@ -540,7 +540,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               if (!modulemd_defaults_v1_parse_intents (
                     &parser, defaults, &nested_error))
                 {
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
             }
@@ -724,7 +724,7 @@ modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
           if (!modulemd_defaults_v1_parse_intent (
                 parser, &default_stream, &profile_set, &nested_error))
             {
-              g_propagate_error (error, nested_error);
+              g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
 
@@ -812,7 +812,7 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
               if (!modulemd_defaults_v1_parse_yaml_profiles (
                     parser, profile_defaults, &nested_error))
                 {
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
                 }
             }
@@ -865,8 +865,9 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
   if (!modulemd_defaults_validate (MODULEMD_DEFAULTS (self), &nested_error))
     {
       /* Validation failed */
-      g_propagate_prefixed_error (
-        error, nested_error, "Defaults object failed validation: ");
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Defaults object failed validation: ");
       return FALSE;
     }
 

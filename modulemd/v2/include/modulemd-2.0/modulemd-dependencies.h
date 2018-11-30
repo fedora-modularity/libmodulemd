@@ -85,7 +85,7 @@ modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
 
 
 /**
- * modulemd_dependencies_get_buildtime_modules_as_strv:
+ * modulemd_dependencies_get_buildtime_modules_as_strv: (rename-to modulemd_dependencies_get_buildtime_modules)
  * @self: This #ModulemdDependencies
  *
  * Returns: (transfer full): An ordered list of module names of build-time dependencies.
@@ -98,7 +98,7 @@ modulemd_dependencies_get_buildtime_modules_as_strv (
 
 
 /**
- * modulemd_dependencies_get_buildtime_streams_as_strv:
+ * modulemd_dependencies_get_buildtime_streams_as_strv: (rename-to modulemd_dependencies_get_buildtime_streams)
  * @self: This #ModulemdDependencies
  * @module: The name of the module.
  *
@@ -142,7 +142,7 @@ modulemd_dependencies_set_empty_runtime_dependencies_for_module (
 
 
 /**
- * modulemd_dependencies_get_runtime_modules_as_strv:
+ * modulemd_dependencies_get_runtime_modules_as_strv: (rename-to modulemd_dependencies_get_runtime_modules)
  * @self: This #ModulemdDependencies
  *
  * Returns: (transfer full): An ordered list of module names of run-time dependencies.
@@ -154,7 +154,7 @@ modulemd_dependencies_get_runtime_modules_as_strv (ModulemdDependencies *self);
 
 
 /**
- * modulemd_dependencies_get_runtime_streams_as_strv:
+ * modulemd_dependencies_get_runtime_streams_as_strv: (rename-to modulemd_dependencies_get_runtime_streams)
  * @self: This #ModulemdDependencies
  * @module: The name of the module.
  *

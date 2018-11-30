@@ -41,14 +41,14 @@ class TestTranslation(TestBase):
             modified=42)
         assert t
         assert t.validate()
-        assert t.get_locales_as_strv() == []
+        assert t.get_locales() == []
 
     def test_copy(self):
         t_orig = Modulemd.Translation.new(1, "testmodule", "teststream", 42)
         t = t_orig.copy()
         assert t
         assert t.validate()
-        assert t.get_locales_as_strv() == []
+        assert t.get_locales() == []
 
 
 if __name__ == '__main__':

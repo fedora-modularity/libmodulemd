@@ -44,8 +44,8 @@ class TestComponentRpm(TestBase):
         assert rpm.get_repository() is None
         assert rpm.props.cache is None
         assert rpm.get_cache() is None
-        assert rpm.get_arches_as_strv() == []
-        assert rpm.get_multilib_arches_as_strv() == []
+        assert rpm.get_arches() == []
+        assert rpm.get_multilib_arches() == []
 
         # Test that object instantiation works
         rpm = ComponentRpm(
@@ -68,8 +68,8 @@ class TestComponentRpm(TestBase):
         assert rpm.get_repository() == 'somerepo'
         assert rpm.props.cache == 'somecache'
         assert rpm.get_cache() == 'somecache'
-        assert rpm.get_arches_as_strv() == []
-        assert rpm.get_multilib_arches_as_strv() == []
+        assert rpm.get_arches() == []
+        assert rpm.get_multilib_arches() == []
 
     def test_copy(self):
         rpm_orig = ComponentRpm(
@@ -98,9 +98,9 @@ class TestComponentRpm(TestBase):
         assert rpm.get_repository() == 'somerepo'
         assert rpm.props.cache == 'somecache'
         assert rpm.get_cache() == 'somecache'
-        self.assertListEqual(rpm.get_arches_as_strv(), ['i386', 'x86_64'])
+        self.assertListEqual(rpm.get_arches(), ['i386', 'x86_64'])
         self.assertListEqual(
-            rpm.get_multilib_arches_as_strv(), [
+            rpm.get_multilib_arches(), [
                 'ppc64le', 's390x'])
 
     def test_arches(self):
@@ -109,10 +109,10 @@ class TestComponentRpm(TestBase):
 
         rpm.add_restricted_arch('x86_64')
         rpm.add_restricted_arch('i386')
-        self.assertListEqual(rpm.get_arches_as_strv(), ['i386', 'x86_64'])
+        self.assertListEqual(rpm.get_arches(), ['i386', 'x86_64'])
 
         rpm.reset_arches()
-        self.assertListEqual(rpm.get_arches_as_strv(), [])
+        self.assertListEqual(rpm.get_arches(), [])
 
     def test_multilib(self):
         rpm = ComponentRpm.new("testrpm")
@@ -121,11 +121,11 @@ class TestComponentRpm(TestBase):
         rpm.add_multilib_arch('ppc64le')
         rpm.add_multilib_arch('s390x')
         self.assertListEqual(
-            rpm.get_multilib_arches_as_strv(), [
+            rpm.get_multilib_arches(), [
                 'ppc64le', 's390x'])
 
         rpm.reset_multilib_arches()
-        self.assertListEqual(rpm.get_multilib_arches_as_strv(), [])
+        self.assertListEqual(rpm.get_multilib_arches(), [])
 
 
 if __name__ == '__main__':

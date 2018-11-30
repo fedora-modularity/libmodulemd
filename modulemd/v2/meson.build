@@ -422,7 +422,7 @@ test ('defaultsv1_python_release', python3,
 
 gnome.generate_gir(
     modulemd_v2_lib,
-    sources : modulemd_v2_srcs + modulemd_v2_hdrs,
+    sources : modulemd_v2_srcs + modulemd_v2_hdrs + ['include/modulemd-2.0/private/gi-binding-renames.h'],
     nsversion : '2.0',
     namespace : 'Modulemd',
     symbol_prefix : 'modulemd_',

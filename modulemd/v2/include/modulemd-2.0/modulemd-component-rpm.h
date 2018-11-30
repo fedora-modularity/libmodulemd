@@ -72,7 +72,7 @@ modulemd_component_rpm_reset_arches (ModulemdComponentRpm *self);
 
 
 /**
- * modulemd_component_rpm_get_arches_as_strv:
+ * modulemd_component_rpm_get_arches_as_strv: (rename-to modulemd_component_rpm_get_arches)
  * @self: This #ModulemdComponentRpm object.
  *
  * Returns: (transfer full): A list of architectures on which this RPM should be available.
@@ -110,7 +110,7 @@ modulemd_component_rpm_reset_multilib_arches (ModulemdComponentRpm *self);
 
 
 /**
- * modulemd_component_rpm_get_multilib_arches_as_strv:
+ * modulemd_component_rpm_get_multilib_arches_as_strv: (rename-to modulemd_component_rpm_get_multilib_arches)
  * @self: This #ModulemdComponentRpm object.
  *
  * Returns: (transfer full): A list of architectures on which multilib should be available.

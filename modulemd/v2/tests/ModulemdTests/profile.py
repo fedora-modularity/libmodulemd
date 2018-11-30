@@ -36,7 +36,7 @@ class TestProfile(TestBase):
         assert p.get_name() == 'testprofile'
         assert p.props.description is None
         assert p.get_description() is None
-        assert p.get_rpms_as_strv() == []
+        assert p.get_rpms() == []
 
         # Test that keywork name is accepted
         p = Modulemd.Profile(name='testprofile')
@@ -45,7 +45,7 @@ class TestProfile(TestBase):
         assert p.get_name() == 'testprofile'
         assert p.props.description is None
         assert p.get_description() is None
-        assert p.get_rpms_as_strv() == []
+        assert p.get_rpms() == []
 
         # Test that init works with name and description
         p = Modulemd.Profile(name='testprofile', description='A test profile')
@@ -54,7 +54,7 @@ class TestProfile(TestBase):
         assert p.get_name() == 'testprofile'
         assert p.props.description == 'A test profile'
         assert p.get_description() == 'A test profile'
-        assert p.get_rpms_as_strv() == []
+        assert p.get_rpms() == []
 
         # Test that we fail without name
         with self.assertRaises(TypeError) as cm:
@@ -75,7 +75,7 @@ class TestProfile(TestBase):
         assert p.get_name() == 'testprofile'
         assert p.props.description is None
         assert p.get_description() is None
-        assert p.get_rpms_as_strv() == []
+        assert p.get_rpms() == []
 
         p_orig.set_description('Test profile')
         p.add_rpm('test2')
@@ -88,7 +88,7 @@ class TestProfile(TestBase):
         assert p.get_name() == 'testprofile'
         assert p.props.description == 'Test profile'
         assert p.get_description() == 'Test profile'
-        assert p.get_rpms_as_strv() == ['test1', 'test2', 'test3']
+        assert p.get_rpms() == ['test1', 'test2', 'test3']
 
     def test_get_name(self):
         p = Modulemd.Profile(name='testprofile')
@@ -120,20 +120,20 @@ class TestProfile(TestBase):
     def test_rpms(self):
         p = Modulemd.Profile(name='testprofile')
 
-        assert p.get_rpms_as_strv() == []
+        assert p.get_rpms() == []
 
         p.add_rpm('test2')
-        assert p.get_rpms_as_strv() == ['test2']
+        assert p.get_rpms() == ['test2']
 
         p.add_rpm('test3')
         p.add_rpm('test1')
-        assert p.get_rpms_as_strv() == ['test1', 'test2', 'test3']
+        assert p.get_rpms() == ['test1', 'test2', 'test3']
 
         p.add_rpm('test2')
-        assert p.get_rpms_as_strv() == ['test1', 'test2', 'test3']
+        assert p.get_rpms() == ['test1', 'test2', 'test3']
 
         p.remove_rpm('test1')
-        assert p.get_rpms_as_strv() == ['test2', 'test3']
+        assert p.get_rpms() == ['test2', 'test3']
 
 
 if __name__ == '__main__':

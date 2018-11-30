@@ -32,33 +32,33 @@ class TestDependencies(TestBase):
         # Test that the new() function works
         d = Modulemd.Dependencies.new()
         assert d
-        assert d.get_buildtime_modules_as_strv() == []
+        assert d.get_buildtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_buildtime_streams_as_strv("foobar123")
-        assert d.get_runtime_modules_as_strv() == []
+            d.get_buildtime_streams("foobar123")
+        assert d.get_runtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_runtime_streams_as_strv("foobar123")
+            d.get_runtime_streams("foobar123")
 
         # Test that keywork name is accepted
         d = Modulemd.Dependencies()
         assert d
-        assert d.get_buildtime_modules_as_strv() == []
+        assert d.get_buildtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_buildtime_streams_as_strv("foobar123")
-        assert d.get_runtime_modules_as_strv() == []
+            d.get_buildtime_streams("foobar123")
+        assert d.get_runtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_runtime_streams_as_strv("foobar123")
+            d.get_runtime_streams("foobar123")
 
     def test_copy(self):
         d_orig = Modulemd.Dependencies()
         d = d_orig.copy()
         assert d
-        assert d.get_buildtime_modules_as_strv() == []
+        assert d.get_buildtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_buildtime_streams_as_strv("foobar123")
-        assert d.get_runtime_modules_as_strv() == []
+            d.get_buildtime_streams("foobar123")
+        assert d.get_runtime_modules() == []
         with self.expect_signal(only_on_fatal_warnings=True):
-            d.get_runtime_streams_as_strv("foobar123")
+            d.get_runtime_streams("foobar123")
 
         d_orig.add_buildtime_stream("buildmod1", "stream2")
         d_orig.add_buildtime_stream("buildmod1", "stream1")
@@ -69,13 +69,13 @@ class TestDependencies(TestBase):
 
         d = d_orig.copy()
         assert d
-        assert d.get_buildtime_modules_as_strv() == ['builddef', 'buildmod1']
-        assert d.get_buildtime_streams_as_strv('builddef') == []
-        assert d.get_buildtime_streams_as_strv(
+        assert d.get_buildtime_modules() == ['builddef', 'buildmod1']
+        assert d.get_buildtime_streams('builddef') == []
+        assert d.get_buildtime_streams(
             'buildmod1') == ['stream1', 'stream2']
-        assert d.get_runtime_modules_as_strv() == ['rundef', 'runmod1']
-        assert d.get_runtime_streams_as_strv('rundef') == []
-        assert d.get_runtime_streams_as_strv(
+        assert d.get_runtime_modules() == ['rundef', 'runmod1']
+        assert d.get_runtime_streams('rundef') == []
+        assert d.get_runtime_streams(
             'runmod1') == ['stream3', 'stream4']
 
 

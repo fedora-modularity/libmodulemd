@@ -37,7 +37,6 @@ enum
   PROP_0,
 
   PROP_NAME,
-  PROP_EOL,
 
   N_PROPS
 };
@@ -117,7 +116,6 @@ modulemd_service_level_set_eol (ModulemdServiceLevel *self, GDate *date)
   if (!date || !g_date_valid (date))
     {
       g_date_clear (self->eol, 1);
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_EOL]);
       return;
     }
 
@@ -127,7 +125,6 @@ modulemd_service_level_set_eol (ModulemdServiceLevel *self, GDate *date)
       g_date_set_year (self->eol, g_date_get_year (date));
       g_date_set_month (self->eol, g_date_get_month (date));
       g_date_set_day (self->eol, g_date_get_day (date));
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_EOL]);
     }
 }
 
@@ -202,10 +199,6 @@ modulemd_service_level_get_property (GObject *object,
       g_value_set_string (value, modulemd_service_level_get_name (self));
       break;
 
-    case PROP_EOL:
-      g_value_set_boxed (value, modulemd_service_level_get_eol (self));
-      break;
-
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -223,10 +216,6 @@ modulemd_service_level_set_property (GObject *object,
     {
     case PROP_NAME:
       modulemd_service_level_set_name (self, g_value_get_string (value));
-      break;
-
-    case PROP_EOL:
-      modulemd_service_level_set_eol (self, g_value_get_boxed (value));
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -249,15 +238,6 @@ modulemd_service_level_class_init (ModulemdServiceLevelClass *klass)
     "A human-readable name for this servicelevel",
     SL_DEFAULT_STRING,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
-
-  properties[PROP_EOL] =
-    g_param_spec_boxed ("eol",
-                        "End of Life",
-                        "An ISO-8601 compatible YYYY-MM-DD value "
-                        "representing the end-of-life date of this service "
-                        "level.",
-                        G_TYPE_DATE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }

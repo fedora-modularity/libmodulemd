@@ -35,7 +35,6 @@ class TestServiceLevel(TestBase):
         assert sl
         assert sl.props.name == 'foo'
         assert sl.get_name() == 'foo'
-        assert sl.props.eol is None
         assert sl.get_eol() is None
         assert sl.get_eol_as_string() is None
 
@@ -44,27 +43,8 @@ class TestServiceLevel(TestBase):
         assert sl
         assert sl.props.name == 'foo'
         assert sl.get_name() == 'foo'
-        assert sl.props.eol is None
         assert sl.get_eol() is None
         assert sl.get_eol_as_string() is None
-
-        # Test that standard object instantiation works with a name and EOL
-        sl = Modulemd.ServiceLevel(
-            name='foo',
-            eol=GLib.Date.new_dmy(7, 11, 2018))
-        assert sl
-        assert sl.props.name == 'foo'
-        assert sl.get_name() == 'foo'
-        assert sl.props.eol is not None
-        assert sl.props.eol.get_day() == 7
-        assert sl.props.eol.get_month() == 11
-        assert sl.props.eol.get_year() == 2018
-        assert sl.get_eol() is not None
-        assert sl.get_eol().get_day() == 7
-        assert sl.get_eol().get_month() == 11
-        assert sl.get_eol().get_year() == 2018
-        assert sl.get_eol_as_string() is not None
-        assert sl.get_eol_as_string() == '2018-11-07'
 
         # Test that we fail if we call new() with a None name
         try:
@@ -86,7 +66,6 @@ class TestServiceLevel(TestBase):
         assert sl
         assert sl.props.name == 'foo'
         assert sl.get_name() == 'foo'
-        assert sl.props.eol is None
         assert sl.get_eol() is None
         assert sl.get_eol_as_string() is None
 
@@ -94,7 +73,6 @@ class TestServiceLevel(TestBase):
         assert sl_copy
         assert sl_copy.props.name == 'foo'
         assert sl_copy.get_name() == 'foo'
-        assert sl_copy.props.eol is None
         assert sl_copy.get_eol() is None
         assert sl_copy.get_eol_as_string() is None
 
@@ -103,7 +81,6 @@ class TestServiceLevel(TestBase):
         assert sl_copy
         assert sl_copy.props.name == 'foo'
         assert sl_copy.get_name() == 'foo'
-        assert sl_copy.props.eol is not None
         assert sl_copy.get_eol() is not None
         assert sl_copy.get_eol_as_string() == '2018-11-13'
 
@@ -122,27 +99,26 @@ class TestServiceLevel(TestBase):
 
         # Test that EOL is initialized to None
         assert sl.get_eol() is None
-        assert sl.props.eol is None
 
         # Test the set_eol() method
         eol = GLib.Date.new_dmy(7, 11, 2018)
         sl.set_eol(eol)
 
-        for returned_eol in [sl.get_eol(), sl.props.eol]:
-            assert returned_eol is not None
-            assert returned_eol.get_day() == eol.get_day()
-            assert returned_eol.get_month() == eol.get_month()
-            assert returned_eol.get_year() == eol.get_year()
+        returned_eol = sl.get_eol()
+        assert returned_eol is not None
+        assert returned_eol.get_day() == eol.get_day()
+        assert returned_eol.get_month() == eol.get_month()
+        assert returned_eol.get_year() == eol.get_year()
         assert sl.get_eol_as_string() == '2018-11-07'
 
         # Test the set_eol_ymd() method
         sl.set_eol_ymd(2019, 12, 3)
 
-        for returned_eol in [sl.get_eol(), sl.props.eol]:
-            assert returned_eol is not None
-            assert returned_eol.get_day() == 3
-            assert returned_eol.get_month() == 12
-            assert returned_eol.get_year() == 2019
+        returned_eol = sl.get_eol()
+        assert returned_eol is not None
+        assert returned_eol.get_day() == 3
+        assert returned_eol.get_month() == 12
+        assert returned_eol.get_year() == 2019
         assert sl.get_eol_as_string() == '2019-12-03'
 
         # Try setting some invalid dates
@@ -150,12 +126,10 @@ class TestServiceLevel(TestBase):
         eol = GLib.Date.new()
         sl.set_eol(eol)
         assert sl.get_eol() is None
-        assert sl.props.eol is None
 
         # There is no February 31
         sl.set_eol_ymd(2011, 2, 31)
         assert sl.get_eol() is None
-        assert sl.props.eol is None
 
 
 if __name__ == '__main__':

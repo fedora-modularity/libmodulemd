@@ -292,7 +292,7 @@ modulemd_module_stream_v1_remove_rpm_component (ModulemdModuleStreamV1 *self,
 
 
 /**
- * modulemd_module_stream_v1_get_module_component_names_as_strv:
+ * modulemd_module_stream_v1_get_module_component_names_as_strv: (rename-to modulemd_module_stream_v1_get_module_component_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of module component names included
@@ -305,7 +305,7 @@ modulemd_module_stream_v1_get_module_component_names_as_strv (
   ModulemdModuleStreamV1 *self);
 
 /**
- * modulemd_module_stream_v1_get_rpm_component_names_as_strv:
+ * modulemd_module_stream_v1_get_rpm_component_names_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_component_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of RPM component names included
@@ -400,7 +400,7 @@ modulemd_module_stream_v1_remove_module_license (ModulemdModuleStreamV1 *self,
 
 
 /**
- * modulemd_module_stream_v1_get_content_licenses_as_strv:
+ * modulemd_module_stream_v1_get_content_licenses_as_strv: (rename-to modulemd_module_stream_v1_get_content_licenses)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of licenses under which one or
@@ -414,7 +414,7 @@ modulemd_module_stream_v1_get_content_licenses_as_strv (
 
 
 /**
- * modulemd_module_stream_v1_get_module_licenses_as_strv:
+ * modulemd_module_stream_v1_get_module_licenses_as_strv: (rename-to modulemd_module_stream_v1_get_module_licenses)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of licenses under which this
@@ -454,7 +454,7 @@ modulemd_module_stream_v1_clear_profiles (ModulemdModuleStreamV1 *self);
 
 
 /**
- * modulemd_module_stream_v1_get_profile_names_as_strv:
+ * modulemd_module_stream_v1_get_profile_names_as_strv: (rename-to modulemd_module_stream_v1_get_profile_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of profile names associated with
@@ -508,7 +508,7 @@ modulemd_module_stream_v1_remove_rpm_api (ModulemdModuleStreamV1 *self,
 
 
 /**
- * modulemd_module_stream_v1_get_rpm_api_as_strv:
+ * modulemd_module_stream_v1_get_rpm_api_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_api)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of binary RPM names that forms
@@ -545,7 +545,7 @@ modulemd_module_stream_v1_remove_rpm_artifact (ModulemdModuleStreamV1 *self,
 
 
 /**
- * modulemd_module_stream_v1_get_rpm_artifacts_as_strv:
+ * modulemd_module_stream_v1_get_rpm_artifacts_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_artifacts)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of RPM NEVRs are included in this
@@ -583,7 +583,7 @@ modulemd_module_stream_v1_remove_rpm_filter (ModulemdModuleStreamV1 *self,
 
 
 /**
- * modulemd_module_stream_v1_get_rpm_filters_as_strv:
+ * modulemd_module_stream_v1_get_rpm_filters_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_filters)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of binary RPM names that are
@@ -623,7 +623,7 @@ modulemd_module_stream_v1_clear_servicelevels (ModulemdModuleStreamV1 *self);
 
 
 /**
- * modulemd_module_stream_v1_get_servicelevel_names_as_strv:
+ * modulemd_module_stream_v1_get_servicelevel_names_as_strv: (rename-to modulemd_module_stream_v1_get_servicelevel_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of servicelevel names associated with
@@ -747,7 +747,7 @@ modulemd_module_stream_v1_remove_runtime_requirement (
 
 
 /**
- * modulemd_module_stream_v1_get_buildtime_modules_as_strv:
+ * modulemd_module_stream_v1_get_buildtime_modules_as_strv: (rename-to modulemd_module_stream_v1_get_buildtime_modules)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of module names that this module
@@ -761,7 +761,7 @@ modulemd_module_stream_v1_get_buildtime_modules_as_strv (
 
 
 /**
- * modulemd_module_stream_v1_get_runtime_modules_as_strv:
+ * modulemd_module_stream_v1_get_runtime_modules_as_strv: (rename-to modulemd_module_stream_v1_get_runtime_modules)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Returns: (transfer full): An ordered list of module names that this module

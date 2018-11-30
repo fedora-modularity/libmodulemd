@@ -34,14 +34,14 @@ class TestBuildopts(TestBase):
         assert b
         assert b.props.rpm_macros is None
         assert b.get_rpm_macros() is None
-        assert b.get_rpm_whitelist_as_strv() == []
+        assert b.get_rpm_whitelist() == []
 
         # Test that init works with rpm_macros
         b = Modulemd.Buildopts(rpm_macros='Test macros')
         assert b
         assert b.props.rpm_macros == 'Test macros'
         assert b.get_rpm_macros() == 'Test macros'
-        assert b.get_rpm_whitelist_as_strv() == []
+        assert b.get_rpm_whitelist() == []
 
     def test_copy(self):
         b_orig = Modulemd.Buildopts()
@@ -49,7 +49,7 @@ class TestBuildopts(TestBase):
         assert b
         assert b.props.rpm_macros is None
         assert b.get_rpm_macros() is None
-        assert b.get_rpm_whitelist_as_strv() == []
+        assert b.get_rpm_whitelist() == []
 
         b_orig.set_rpm_macros('Test macros')
         b.add_rpm_to_whitelist('test2')
@@ -60,7 +60,7 @@ class TestBuildopts(TestBase):
         assert b
         assert b.props.rpm_macros == 'Test macros'
         assert b.get_rpm_macros() == 'Test macros'
-        assert b.get_rpm_whitelist_as_strv() == ['test1', 'test2', 'test3']
+        assert b.get_rpm_whitelist() == ['test1', 'test2', 'test3']
 
     def test_get_set_rpm_macros(self):
         b = Modulemd.Buildopts()
@@ -83,20 +83,20 @@ class TestBuildopts(TestBase):
     def test_whitelist(self):
         b = Modulemd.Buildopts()
 
-        assert b.get_rpm_whitelist_as_strv() == []
+        assert b.get_rpm_whitelist() == []
 
         b.add_rpm_to_whitelist('test2')
-        assert b.get_rpm_whitelist_as_strv() == ['test2']
+        assert b.get_rpm_whitelist() == ['test2']
 
         b.add_rpm_to_whitelist('test3')
         b.add_rpm_to_whitelist('test1')
-        assert b.get_rpm_whitelist_as_strv() == ['test1', 'test2', 'test3']
+        assert b.get_rpm_whitelist() == ['test1', 'test2', 'test3']
 
         b.add_rpm_to_whitelist('test2')
-        assert b.get_rpm_whitelist_as_strv() == ['test1', 'test2', 'test3']
+        assert b.get_rpm_whitelist() == ['test1', 'test2', 'test3']
 
         b.remove_rpm_from_whitelist('test1')
-        assert b.get_rpm_whitelist_as_strv() == ['test2', 'test3']
+        assert b.get_rpm_whitelist() == ['test2', 'test3']
 
 
 if __name__ == '__main__':

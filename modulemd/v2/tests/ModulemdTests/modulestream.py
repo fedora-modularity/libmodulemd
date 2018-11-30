@@ -159,24 +159,24 @@ class TestModuleStream(TestBase):
         for version in modulestream_versions:
             # First test that NSVC is None for a module with no name
             stream = Modulemd.ModuleStream.new(version)
-            assert stream.get_nsvc_as_string() is None
+            assert stream.get_nsvc() is None
 
             # Next, test for no stream name
             stream = Modulemd.ModuleStream.new(version, 'modulename')
-            assert stream.get_nsvc_as_string() is None
+            assert stream.get_nsvc() is None
 
             # Now with valid module and stream names
             stream = Modulemd.ModuleStream.new(
                 version, 'modulename', 'streamname')
-            assert stream.get_nsvc_as_string() == 'modulename:streamname:0'
+            assert stream.get_nsvc() == 'modulename:streamname:0'
 
             # Add a version number
             stream.props.version = 42
-            assert stream.get_nsvc_as_string() == 'modulename:streamname:42'
+            assert stream.get_nsvc() == 'modulename:streamname:42'
 
             # Add a context
             stream.props.context = 'deadbeef'
-            assert stream.get_nsvc_as_string() == 'modulename:streamname:42:deadbeef'
+            assert stream.get_nsvc() == 'modulename:streamname:42:deadbeef'
 
     def test_arch(self):
         for version in modulestream_versions:
@@ -339,7 +339,7 @@ class TestModuleStream(TestBase):
             # Add an RPM component to a stream
             rpm_comp = Modulemd.ComponentRpm(name='rpmcomponent')
             stream.add_component(rpm_comp)
-            assert 'rpmcomponent' in stream.get_rpm_component_names_as_strv()
+            assert 'rpmcomponent' in stream.get_rpm_component_names()
             retrieved_comp = stream.get_rpm_component('rpmcomponent')
             assert retrieved_comp
             assert retrieved_comp.props.name == 'rpmcomponent'
@@ -347,7 +347,7 @@ class TestModuleStream(TestBase):
             # Add a Module component to a stream
             mod_comp = Modulemd.ComponentModule(name='modulecomponent')
             stream.add_component(mod_comp)
-            assert 'modulecomponent' in stream.get_module_component_names_as_strv()
+            assert 'modulecomponent' in stream.get_module_component_names()
             retrieved_comp = stream.get_module_component('modulecomponent')
             assert retrieved_comp
             assert retrieved_comp.props.name == 'modulecomponent'
@@ -363,10 +363,10 @@ class TestModuleStream(TestBase):
             stream = Modulemd.ModuleStream.new(version)
 
             stream.add_content_license('GPLv2+')
-            assert 'GPLv2+' in stream.get_content_licenses_as_strv()
+            assert 'GPLv2+' in stream.get_content_licenses()
 
             stream.add_module_license('MIT')
-            assert 'MIT' in stream.get_module_licenses_as_strv()
+            assert 'MIT' in stream.get_module_licenses()
 
             stream.remove_content_license('GPLv2+')
             stream.remove_module_license('MIT')
@@ -379,43 +379,43 @@ class TestModuleStream(TestBase):
             profile.add_rpm('sssd-client')
 
             stream.add_profile(profile)
-            assert len(stream.get_profile_names_as_strv()) == 1
-            assert 'client' in stream.get_profile_names_as_strv()
+            assert len(stream.get_profile_names()) == 1
+            assert 'client' in stream.get_profile_names()
             assert 'sssd-client' in stream.get_profile(
-                'client').get_rpms_as_strv()
+                'client').get_rpms()
 
             stream.clear_profiles()
-            assert len(stream.get_profile_names_as_strv()) == 0
+            assert len(stream.get_profile_names()) == 0
 
     def test_rpm_api(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version, 'sssd')
 
             stream.add_rpm_api('sssd-common')
-            assert 'sssd-common' in stream.get_rpm_api_as_strv()
+            assert 'sssd-common' in stream.get_rpm_api()
 
             stream.remove_rpm_api('sssd-common')
-            assert len(stream.get_rpm_api_as_strv()) == 0
+            assert len(stream.get_rpm_api()) == 0
 
     def test_rpm_artifacts(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
             stream.add_rpm_artifact('bar-0:1.23-1.module_deadbeef.x86_64')
-            assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts_as_strv()
+            assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts()
 
             stream.remove_rpm_artifact('bar-0:1.23-1.module_deadbeef.x86_64')
-            assert len(stream.get_rpm_artifacts_as_strv()) == 0
+            assert len(stream.get_rpm_artifacts()) == 0
 
     def test_rpm_filters(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
             stream.add_rpm_filter('bar')
-            assert 'bar' in stream.get_rpm_filters_as_strv()
+            assert 'bar' in stream.get_rpm_filters()
 
             stream.remove_rpm_filter('bar')
-            assert len(stream.get_rpm_filters_as_strv()) == 0
+            assert len(stream.get_rpm_filters()) == 0
 
     def test_servicelevels(self):
         for version in modulestream_versions:
@@ -425,7 +425,7 @@ class TestModuleStream(TestBase):
 
             stream.add_servicelevel(sl)
 
-            assert 'rawhide' in stream.get_servicelevel_names_as_strv()
+            assert 'rawhide' in stream.get_servicelevel_names()
 
             retrieved_sl = stream.get_servicelevel('rawhide')
             assert retrieved_sl.props.name == 'rawhide'
@@ -449,15 +449,15 @@ class TestModuleStream(TestBase):
         stream = Modulemd.ModuleStreamV1.new()
         stream.add_buildtime_requirement('testmodule', 'stable')
 
-        assert len(stream.get_buildtime_modules_as_strv()) == 1
-        assert 'testmodule' in stream.get_buildtime_modules_as_strv()
+        assert len(stream.get_buildtime_modules()) == 1
+        assert 'testmodule' in stream.get_buildtime_modules()
 
         assert stream.get_buildtime_requirement_stream('testmodule') == \
             'stable'
 
         stream.add_runtime_requirement('testmodule', 'latest')
-        assert len(stream.get_runtime_modules_as_strv()) == 1
-        assert 'testmodule' in stream.get_runtime_modules_as_strv()
+        assert len(stream.get_runtime_modules()) == 1
+        assert 'testmodule' in stream.get_runtime_modules()
         assert stream.get_runtime_requirement_stream('testmodule') == 'latest'
 
     def test_v2_dependencies(self):
@@ -472,13 +472,13 @@ class TestModuleStream(TestBase):
         assert len(stream.get_dependencies()) == 1
 
         assert 'foo' in stream.get_dependencies(
-        )[0].get_buildtime_modules_as_strv()
+        )[0].get_buildtime_modules()
 
         assert 'stable' in stream.get_dependencies(
-        )[0].get_buildtime_streams_as_strv('foo')
+        )[0].get_buildtime_streams('foo')
 
         assert 'bar' in stream.get_dependencies(
-        )[0].get_runtime_modules_as_strv()
+        )[0].get_runtime_modules()
 
     def test_xmd(self):
         if os.getenv('MMD_TEST_INSTALLED_LIB'):

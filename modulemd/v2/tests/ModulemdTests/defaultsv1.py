@@ -93,9 +93,9 @@ class TestDefaults(TestBase):
         defs.add_default_profile_for_stream(
             "latest", "server", "server_intent")
 
-        assert "client" in defs.get_default_profiles_for_stream_as_strv(
+        assert "client" in defs.get_default_profiles_for_stream(
             "latest")
-        assert "client" in defs.get_default_profiles_for_stream_as_strv(
+        assert "client" in defs.get_default_profiles_for_stream(
             "latest")
 
     def test_validate(self):

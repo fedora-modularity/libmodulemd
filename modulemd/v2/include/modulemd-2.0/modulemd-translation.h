@@ -88,7 +88,7 @@ modulemd_translation_set_modified (ModulemdTranslation *self,
 
 
 /**
- * modulemd_translation_get_locales_as_strv:
+ * modulemd_translation_get_locales_as_strv: (rename-to modulemd_translation_get_locales)
  * @self: This #ModulemdTranslation
  *
  * Returns: (transfer full): An ordered list of locales known to this Modulemd.Translation.

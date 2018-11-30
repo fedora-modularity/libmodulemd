@@ -81,7 +81,7 @@ modulemd_defaults_v1_get_default_stream (ModulemdDefaultsV1 *self,
 
 
 /**
- * modulemd_defaults_v1_get_streams_with_default_profiles_as_strv:
+ * modulemd_defaults_v1_get_streams_with_default_profiles_as_strv: (rename-to modulemd_defaults_v1_get_streams_with_default_profiles)
  * @self: (in): This #ModulemdDefaultsV1 object.
  * @intent: (in) (nullable): The name of the system intent whose stream
  * profiles will be retrieved. If left NULL or the specified intent has no
@@ -157,7 +157,7 @@ modulemd_defaults_v1_remove_default_profiles_for_stream (
 
 
 /**
- * modulemd_defaults_v1_get_default_profiles_for_stream_as_strv:
+ * modulemd_defaults_v1_get_default_profiles_for_stream_as_strv: (rename-to modulemd_defaults_v1_get_default_profiles_for_stream)
  * @self: (in): This #ModulemdDefaultsV1 object.
  * @stream_name: (in): The name of the string to retrieve the default profiles
  * for.

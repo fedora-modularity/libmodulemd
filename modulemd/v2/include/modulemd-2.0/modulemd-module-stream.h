@@ -327,7 +327,7 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self);
 
 
 /**
- * modulemd_module_stream_get_nsvc_as_string:
+ * modulemd_module_stream_get_nsvc_as_string: (rename-to modulemd_module_stream_get_nsvc)
  * @self: (in): This #ModulemdModuleStream.
  *
  * Returns: (transfer full): The NSVC (name:stream:version[:context]) of this

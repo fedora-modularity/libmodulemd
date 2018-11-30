@@ -38,7 +38,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() is None
         assert te.props.description is None
         assert te.get_description() is None
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that keyword arg locale is accepted
@@ -50,7 +50,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() is None
         assert te.props.description is None
         assert te.get_description() is None
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that init works with locale and summary
@@ -62,7 +62,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() == 'foobar'
         assert te.props.description is None
         assert te.get_description() is None
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that init works with locale and description
@@ -74,7 +74,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() is None
         assert te.props.description == 'barfoo'
         assert te.get_description() == 'barfoo'
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that init works with locale, summary and description
@@ -89,7 +89,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() == 'foobar'
         assert te.props.description == 'barfoo'
         assert te.get_description() == 'barfoo'
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that init works with locale, unicode summary and unicode
@@ -105,7 +105,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() == '(┛ಠ_ಠ)┛彡┻━┻'
         assert te.props.description == '(┛ಠ_ಠ)┛彡'
         assert te.get_description() == '(┛ಠ_ಠ)┛彡'
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         # Test that we fail if we call new() with a None locale
@@ -133,7 +133,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() is None
         assert te.props.description is None
         assert te.get_description() is None
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test") is None
 
         te_orig.set_summary('foobar')
@@ -149,7 +149,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_summary() == 'foobar'
         assert te.props.description == 'barfoo'
         assert te.get_description() == 'barfoo'
-        assert te.get_profiles_as_strv() == ['test1', 'test2']
+        assert te.get_profiles() == ['test1', 'test2']
         assert te.get_profile_description('test') is None
         assert te.get_profile_description('test1') == 'brown fox'
         assert te.get_profile_description('test2') == 'jumped'
@@ -208,28 +208,28 @@ class TestTranslationEntry(TestBase):
 
         assert te.props.locale == 'en_US'
         assert te.get_locale() == 'en_US'
-        assert te.get_profiles_as_strv() == []
+        assert te.get_profiles() == []
         assert te.get_profile_description("test1") is None
         assert te.get_profile_description("test2") is None
         assert te.get_profile_description("test3") is None
 
         # Add a profile
         te.set_profile_description("test1", "foobar")
-        assert te.get_profiles_as_strv() == ['test1']
+        assert te.get_profiles() == ['test1']
         assert te.get_profile_description("test1") == 'foobar'
         assert te.get_profile_description("test2") is None
         assert te.get_profile_description("test3") is None
 
         # Add a second profile
         te.set_profile_description("test2", "barfoo")
-        assert te.get_profiles_as_strv() == ['test1', 'test2']
+        assert te.get_profiles() == ['test1', 'test2']
         assert te.get_profile_description("test1") == 'foobar'
         assert te.get_profile_description("test2") == 'barfoo'
         assert te.get_profile_description("test3") is None
 
         # Add a third one that is supposed to go before the others
         te.set_profile_description("test3", "foobarfoo")
-        assert te.get_profiles_as_strv() == ['test1', 'test2', 'test3']
+        assert te.get_profiles() == ['test1', 'test2', 'test3']
         assert te.get_profile_description("test1") == 'foobar'
         assert te.get_profile_description("test2") == 'barfoo'
         assert te.get_profile_description("test3") == 'foobarfoo'

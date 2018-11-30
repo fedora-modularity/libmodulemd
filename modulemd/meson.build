@@ -177,6 +177,7 @@ modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/modulemd-translation-entry-private.h',
     'v2/include/modulemd-2.0/private/modulemd-util.h',
     'v2/include/modulemd-2.0/private/modulemd-yaml.h',
+    'v2/include/modulemd-2.0/private/gi-binding-renames.h',
 )
 
 test_v2_srcs = files(

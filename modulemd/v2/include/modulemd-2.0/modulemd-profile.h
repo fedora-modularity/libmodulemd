@@ -114,7 +114,7 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
 
 
 /**
- * modulemd_profile_get_rpms_as_strv:
+ * modulemd_profile_get_rpms_as_strv: (rename-to modulemd_profile_get_rpms)
  * @self: This #ModulemdProfile
  *
  * Returns: (transfer full): An ordered list of binary RPMS that would be installed when this profile is selected for installation.

@@ -84,7 +84,7 @@ modulemd_module_get_all_streams (ModulemdModule *self);
 
 
 /**
- * modulemd_module_get_streams_by_stream_name_as_list:
+ * modulemd_module_get_streams_by_stream_name_as_list: (rename-to modulemd_module_get_streams_by_stream_name)
  * @self: This #ModulemdModule object
  * @stream_name: The name of the stream to retrieve
  *

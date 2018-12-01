@@ -475,6 +475,65 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 }
 
 
+GHashTable *
+modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
+                                         const gchar *key,
+                                         GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  gboolean in_map = FALSE;
+  g_autoptr (GHashTable) set = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
+
+        case YAML_MAPPING_END_EVENT:
+          if (!in_map)
+            MMD_YAML_ERROR_EVENT_EXIT (error, event, "Unexpected end of map");
+          in_map = FALSE;
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          if (!in_map)
+            MMD_YAML_ERROR_EVENT_EXIT (
+              error, event, "Unexpected scalar outside of map.");
+
+          if (g_str_equal ((const gchar *)event.data.scalar.value, key))
+            {
+              set = modulemd_yaml_parse_string_set (parser, &nested_error);
+              if (!set)
+                {
+                  g_propagate_error (error, nested_error);
+                  return NULL;
+                }
+            }
+          else
+            {
+              /* Encountered a key other than the expected one. */
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unexpected key in map");
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error, event, "Unspected YAML event in map");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+  return g_steal_pointer (&set);
+}
+
+
 static gboolean
 modulemd_yaml_parse_data (yaml_parser_t *parser,
                           yaml_emitter_t *emitter,

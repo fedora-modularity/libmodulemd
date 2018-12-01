@@ -188,6 +188,22 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 #define MMD_YAML_ERROR_EVENT_EXIT_INT(_error, _event, ...)                    \
   MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, 0, __VA_ARGS__)
 
+#define MMD_SET_PARSED_YAML_STRING(_parser, _error, _fn, _obj)                \
+  do                                                                          \
+    {                                                                         \
+      GError *_nested_error = NULL;                                           \
+      g_autofree gchar *_scalar =                                             \
+        modulemd_yaml_parse_string (_parser, &_nested_error);                 \
+      if (!_scalar)                                                           \
+        {                                                                     \
+          g_propagate_error (_error, _nested_error);                          \
+          return NULL;                                                        \
+        }                                                                     \
+      _fn (_obj, _scalar);                                                    \
+      g_clear_pointer (&_scalar, g_free);                                     \
+    }                                                                         \
+  while (0)
+
 gboolean
 mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error);
 

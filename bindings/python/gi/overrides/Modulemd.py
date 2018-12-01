@@ -118,10 +118,12 @@ if float(Modulemd._version) >= 2:
     class ModuleStreamV2(Modulemd.ModuleStreamV2):
 
         def set_xmd(self, xmd):
-            super().set_xmd(ModulemdUtil.python_to_variant(xmd))
+            super(
+                ModuleStreamV2, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd))
 
         def get_xmd(self):
-            variant_xmd = super().get_xmd()
+            variant_xmd = super(ModuleStreamV2, self).get_xmd()
             return variant_xmd.unpack()
 
     ModuleStreamV2 = override(ModuleStreamV2)
@@ -130,10 +132,12 @@ if float(Modulemd._version) >= 2:
     class ModuleStreamV1(Modulemd.ModuleStreamV1):
 
         def set_xmd(self, xmd):
-            super().set_xmd(ModulemdUtil.python_to_variant(xmd))
+            super(
+                ModuleStreamV1, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd))
 
         def get_xmd(self):
-            variant_xmd = super().get_xmd()
+            variant_xmd = super(ModuleStreamV1, self).get_xmd()
             return variant_xmd.unpack()
 
     ModuleStreamV1 = override(ModuleStreamV1)
@@ -143,14 +147,19 @@ if float(Modulemd._version) >= 2:
 
         def set_eol(self, eol):
             if (isinstance(eol, datetime.date)):
-                return super().set_eol_ymd(eol.year, eol.month, eol.day)
+                return super(
+                    ServiceLevel,
+                    self).set_eol_ymd(
+                    eol.year,
+                    eol.month,
+                    eol.day)
 
             raise TypeError(
                 "Expected datetime.date, but got %s." % (
                     type(eol).__name__))
 
         def get_eol(self):
-            eol = super().get_eol()
+            eol = super(ServiceLevel, self).get_eol()
             if eol is None:
                 return None
 

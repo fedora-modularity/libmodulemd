@@ -364,6 +364,25 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
 
 
 /**
+ * modulemd_yaml_parse_string_string_map:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * map containing a scalar/scalar key/value pairs.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Function for retrieving a hash table from a str/str map such as
+ * data.dependencies in ModuleStreamV1.
+ *
+ * Returns: (transfer full): A newly-allocated GHashtTable * representing the
+ * parsed values. NULL if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+GHashTable *
+modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
+
+
+/**
  * modulemd_yaml_parse_document_type:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * yaml subdocument immediately prior to a YAML_DOCUMENT_START_EVENT.

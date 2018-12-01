@@ -85,3 +85,19 @@ modulemd_variant_deep_copy (GVariant *variant);
 
 void
 modulemd_hash_table_unref (void *table);
+
+
+#define MODULEMD_REPLACE_SET(_dest, _set)                                     \
+  do                                                                          \
+    {                                                                         \
+      if (_set)                                                               \
+        {                                                                     \
+          g_clear_pointer (&_dest, g_hash_table_unref);                       \
+          _dest = modulemd_hash_table_deep_set_copy (set);                    \
+        }                                                                     \
+      else                                                                    \
+        {                                                                     \
+          g_hash_table_remove_all (_dest);                                    \
+        }                                                                     \
+    }                                                                         \
+  while (0)

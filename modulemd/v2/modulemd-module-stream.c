@@ -17,6 +17,7 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -149,6 +150,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                                   GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (stream_parser);
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
@@ -201,7 +203,23 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       break;
 
     case MD_MODULESTREAM_VERSION_TWO:
-      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v2_parse_yaml (data)); */
+      if (!modulemd_subdocument_info_get_data_parser (
+            subdoc, &stream_parser, &nested_error))
+        {
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MODULEMD_YAML_ERROR_PARSE,
+                       "data section not found in subdocument");
+          return NULL;
+        }
+
+      stream = MODULEMD_MODULE_STREAM (
+        modulemd_module_stream_v2_parse_yaml (&stream_parser, &nested_error));
+      if (!stream)
+        {
+          g_propagate_error (error, nested_error);
+          return NULL;
+        }
       break;
 
     default:
@@ -233,7 +251,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
-  return stream;
+  return g_steal_pointer (&stream);
 }
 
 

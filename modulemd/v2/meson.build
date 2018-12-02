@@ -210,6 +210,23 @@ test('module_v2_debug', test_v2_module,
 test('module_v2_release', test_v2_module,
      env : test_release_env)
 
+# -- Test Modulemd.ModuleIndex (C) -- #
+test_v2_module_index = executable(
+    'module_index_v2',
+    'tests/test-modulemd-moduleindex.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('module_index_v2_debug', test_v2_module_index,
+     env : test_env)
+test('module_index_v2_release', test_v2_module_index,
+     env : test_release_env)
+
 # -- Test Modulemd.Modulestream (C) -- #
 test_v2_modulestream = executable(
     'modulestream_v2',
@@ -314,6 +331,15 @@ test ('dependencies_python_debug', python3,
 test ('dependencies_python_release', python3,
       env : py_test_release_env,
       args : dependencies_python_script)
+
+# -- Test Modulemd.ModuleIndex (Python) -- #
+moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
+test ('moduleindex_python_debug', python3,
+      env : py_test_env,
+      args : moduleindex_python_script)
+test ('moduleindex_python_release', python3,
+      env : py_test_release_env,
+      args : moduleindex_python_script)
 
 # -- Test Modulemd.ModuleStream (Python) -- #
 modulestream_python_script = files('tests/ModulemdTests/modulestream.py')

@@ -239,4 +239,10 @@ modulemd_translation_entry_get_profiles (ModulemdTranslationEntry *self);
 GStrv
 modulemd_translation_get_locales (ModulemdTranslation *self);
 
+/**
+ * modulemd_module_index_get_module_names: (skip)
+ */
+GStrv
+modulemd_module_index_get_module_names (ModulemdModuleIndex *self);
+
 G_END_DECLS

@@ -68,15 +68,29 @@ modulemd_module_add_translation (ModulemdModule *self,
 
 
 /**
+ * modulemd_module_get_translated_streams:
+ * @self: This #ModulemdModule object
+ *
+ * Returns: (transfer container): A list of streams for which translations have
+ * been added, sorted by stream name.
+ *
+ * Since: 2.0
+ */
+GPtrArray *
+modulemd_module_get_translated_streams (ModulemdModule *self);
+
+
+/**
  * modulemd_module_get_translations:
  * @self: This #ModulemdModule object
+ * @stream: The stream to look up translations for.
  *
  * Returns: (transfer none): The set of translations attached to streams.
  *
  * Since: 2.0
  */
-GHashTable *
-modulemd_module_get_translations (ModulemdModule *self);
+ModulemdTranslation *
+modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
 
 
 /**

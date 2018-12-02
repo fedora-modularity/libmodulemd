@@ -24,6 +24,10 @@ class TestBase(unittest.TestCase):
         super(TestBase, self).__init__(*args, **kwargs)
         self._caught_signal = False
 
+    @property
+    def source_root(self):
+        return os.getenv("MESON_SOURCE_ROOT")
+
     def _catch_signal(self, *sigargs):
         if self._caught_signal:
             raise AssertionError("Multiple signals were caught")

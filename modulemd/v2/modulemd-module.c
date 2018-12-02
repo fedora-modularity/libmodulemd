@@ -358,8 +358,16 @@ modulemd_module_add_translation (ModulemdModule *self,
 }
 
 
-GHashTable *
-modulemd_module_get_translations (ModulemdModule *self)
+GPtrArray *
+modulemd_module_get_translated_streams (ModulemdModule *self)
 {
-  return self->translations;
+  return modulemd_ordered_str_keys (self->translations,
+                                    (GCompareFunc)g_strcmp0);
+}
+
+
+ModulemdTranslation *
+modulemd_module_get_translation (ModulemdModule *self, const gchar *stream)
+{
+  return g_hash_table_lookup (self->translations, stream);
 }

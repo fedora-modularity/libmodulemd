@@ -257,6 +257,12 @@ translation_test_parse_yaml (TranslationFixture *fixture,
   g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
   yaml_event_delete (&event);
 
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
   subdoc = modulemd_yaml_parse_document_type (&parser);
   g_assert_nonnull (subdoc);
   g_assert_null (modulemd_subdocument_info_get_gerror (subdoc));

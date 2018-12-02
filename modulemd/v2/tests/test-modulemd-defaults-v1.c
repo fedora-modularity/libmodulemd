@@ -301,6 +301,12 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
   yaml_event_delete (&event);
 
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
   subdoc = modulemd_yaml_parse_document_type (&parser);
   g_assert_nonnull (subdoc);
   g_assert_null (modulemd_subdocument_info_get_gerror (subdoc));
@@ -315,7 +321,7 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_assert_cmpstr (
     modulemd_subdocument_info_get_yaml (subdoc),
     ==,
-    "document: modulemd-defaults\nversion: 1\ndata:\n  module: "
+    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  module: "
     "foo\n  "
     "stream: x.y\n  profiles:\n    'x.y': []\n    bar: [baz, snafu]\n  "
     "intents:\n    desktop:\n      stream: y.z\n      profiles:\n        "

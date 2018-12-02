@@ -476,12 +476,6 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 
 
 static gboolean
-modulemd_yaml_parse_data (yaml_parser_t *parser,
-                          yaml_emitter_t *emitter,
-                          GError **error);
-
-
-static gboolean
 modulemd_yaml_parse_document_type_internal (
   yaml_parser_t *parser,
   enum ModulemdYamlDocumentType *_doctype,
@@ -498,6 +492,7 @@ modulemd_yaml_parse_document_type_internal (
   g_autofree gchar *doctype_scalar = NULL;
   g_autofree gchar *mdversion_string = NULL;
   g_autoptr (GError) nested_error = NULL;
+  int depth = 0;
 
   if (!mmd_emitter_start_stream (emitter, &nested_error))
     {
@@ -527,6 +522,7 @@ modulemd_yaml_parse_document_type_internal (
   MMD_EMIT_WITH_EXIT_FULL (
     emitter, FALSE, &event, error, "Error starting mapping");
   yaml_event_delete (&event);
+  depth++;
 
   /* Now process through the document top-level */
   while (!done)
@@ -538,17 +534,28 @@ modulemd_yaml_parse_document_type_internal (
         case YAML_MAPPING_END_EVENT:
           if (!mmd_emitter_end_mapping (emitter, error))
             return FALSE;
-          done = TRUE;
+          depth--;
+          if (depth == 0)
+            {
+              done = TRUE;
+            }
+          break;
+
+        case YAML_MAPPING_START_EVENT:
+          if (!mmd_emitter_start_mapping (
+                emitter, event.data.mapping_start.style, error))
+            return FALSE;
+          depth++;
           break;
 
         case YAML_SCALAR_EVENT:
           if (!mmd_emitter_scalar (emitter,
                                    (const gchar *)event.data.scalar.value,
-                                   YAML_PLAIN_SCALAR_STYLE,
+                                   event.data.scalar.style,
                                    error))
             return FALSE;
 
-          if (g_str_equal (event.data.scalar.value, "document"))
+          if (depth == 1 && g_str_equal (event.data.scalar.value, "document"))
             {
               if (doctype != MODULEMD_YAML_DOC_UNKNOWN)
                 {
@@ -589,7 +596,8 @@ modulemd_yaml_parse_document_type_internal (
 
               g_clear_pointer (&doctype_scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "version"))
+          else if (depth == 1 &&
+                   g_str_equal (event.data.scalar.value, "version"))
             {
               if (mdversion != 0)
                 {
@@ -611,18 +619,19 @@ modulemd_yaml_parse_document_type_internal (
                     emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))
                 return FALSE;
             }
-          else if (g_str_equal (event.data.scalar.value, "data"))
+          else if (depth == 1 && g_str_equal (event.data.scalar.value, "data"))
             {
               had_data = TRUE;
-              if (!modulemd_yaml_parse_data (parser, emitter, &nested_error))
-                return FALSE;
             }
 
           break;
 
         default:
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error, event, "Unexpected YAML event in document metadata.");
+          /* Anything else, we just re-emit into the subdocument */
+          MMD_EMIT_WITH_EXIT_FULL (
+            emitter, FALSE, &event, error, "Error re-emiting event");
+          ;
+          break;
         }
 
       yaml_event_delete (&event);
@@ -689,6 +698,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
   if (!modulemd_yaml_parse_document_type_internal (
         parser, &doctype, &mdversion, &emitter, &error))
     {
+      printf ("Setting error: %s\n", error->message);
       modulemd_subdocument_info_set_gerror (s, error);
     }
 
@@ -697,46 +707,6 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
   modulemd_subdocument_info_set_yaml (s, yaml_string->str);
 
   return g_steal_pointer (&s);
-}
-
-
-static gboolean
-modulemd_yaml_parse_data (yaml_parser_t *parser,
-                          yaml_emitter_t *emitter,
-                          GError **error)
-{
-  MODULEMD_INIT_TRACE ();
-  MMD_INIT_YAML_EVENT (event);
-  gboolean done = FALSE;
-  gsize depth = 0;
-
-  while (!done)
-    {
-      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
-
-      /* Read in all the YAML from the data section */
-      switch (event.type)
-        {
-        case YAML_SEQUENCE_START_EVENT:
-        case YAML_MAPPING_START_EVENT: depth++; break;
-
-        case YAML_SEQUENCE_END_EVENT:
-        case YAML_MAPPING_END_EVENT:
-          depth--;
-          /* Fall through intentionally */
-
-        default:
-          if (depth == 0)
-            done = TRUE;
-          break;
-        }
-
-      /* Copy this event to the string */
-      MMD_EMIT_WITH_EXIT_FULL (
-        emitter, FALSE, &event, error, "Error storing YAML event");
-    }
-
-  return TRUE;
 }
 
 

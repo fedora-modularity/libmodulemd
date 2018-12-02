@@ -1321,6 +1321,7 @@ modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
                 }
               modulemd_module_stream_v2_replace_module_licenses (modulestream,
                                                                  set);
+              g_clear_pointer (&set, g_hash_table_unref);
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "content"))
@@ -1328,6 +1329,7 @@ modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
               set = modulemd_yaml_parse_string_set (parser, &nested_error);
               modulemd_module_stream_v2_replace_content_licenses (modulestream,
                                                                   set);
+              g_clear_pointer (&set, g_hash_table_unref);
             }
           else
             {
@@ -1537,6 +1539,7 @@ modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
                 }
 
               modulemd_module_stream_v2_set_community (modulestream, scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
@@ -1551,6 +1554,7 @@ modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
 
               modulemd_module_stream_v2_set_documentation (modulestream,
                                                            scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
@@ -1564,6 +1568,7 @@ modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
                 }
 
               modulemd_module_stream_v2_set_tracker (modulestream, scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else
@@ -1634,6 +1639,7 @@ modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
             }
 
           modulemd_module_stream_v2_add_profile (modulestream, profile);
+          g_clear_pointer (&profile, g_object_unref);
           break;
 
         default:
@@ -1768,6 +1774,9 @@ modulemd_module_stream_v2_parse_rpm_components (
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
+          modulemd_module_stream_v2_add_component (
+            modulestream, (ModulemdComponent *)component);
+          g_clear_pointer (&component, g_object_unref);
           break;
 
         default:
@@ -1824,6 +1833,9 @@ modulemd_module_stream_v2_parse_module_components (
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
+          modulemd_module_stream_v2_add_component (
+            modulestream, (ModulemdComponent *)component);
+          g_clear_pointer (&component, g_object_unref);
           break;
 
         default:

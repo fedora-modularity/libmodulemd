@@ -109,6 +109,7 @@ modulemd_module_stream_v1_finalize (GObject *object)
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->documentation, g_free);
   g_clear_pointer (&self->summary, g_free);
+  g_clear_pointer (&self->tracker, g_free);
 
   /* Internal Data Structures */
   g_clear_pointer (&self->module_components, g_hash_table_unref);
@@ -1492,6 +1493,7 @@ modulemd_module_stream_v1_parse_licenses (yaml_parser_t *parser,
                 }
               modulemd_module_stream_v1_replace_module_licenses (modulestream,
                                                                  set);
+              g_clear_pointer (&set, g_hash_table_unref);
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "content"))
@@ -1730,6 +1732,7 @@ modulemd_module_stream_v1_parse_refs (yaml_parser_t *parser,
                 }
 
               modulemd_module_stream_v1_set_community (modulestream, scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
@@ -1744,6 +1747,7 @@ modulemd_module_stream_v1_parse_refs (yaml_parser_t *parser,
 
               modulemd_module_stream_v1_set_documentation (modulestream,
                                                            scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
@@ -1757,6 +1761,7 @@ modulemd_module_stream_v1_parse_refs (yaml_parser_t *parser,
                 }
 
               modulemd_module_stream_v1_set_tracker (modulestream, scalar);
+              g_clear_pointer (&scalar, g_free);
             }
 
           else
@@ -1827,6 +1832,7 @@ modulemd_module_stream_v1_parse_profiles (yaml_parser_t *parser,
             }
 
           modulemd_module_stream_v1_add_profile (modulestream, profile);
+          g_clear_pointer (&profile, g_object_unref);
           break;
 
         default:
@@ -1961,6 +1967,9 @@ modulemd_module_stream_v1_parse_rpm_components (
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
+          modulemd_module_stream_v1_add_component (
+            modulestream, (ModulemdComponent *)component);
+          g_clear_pointer (&component, g_object_unref);
           break;
 
         default:
@@ -2017,6 +2026,9 @@ modulemd_module_stream_v1_parse_module_components (
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
+          modulemd_module_stream_v1_add_component (
+            modulestream, (ModulemdComponent *)component);
+          g_clear_pointer (&component, g_object_unref);
           break;
 
         default:

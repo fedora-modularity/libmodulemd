@@ -29,6 +29,7 @@ typedef struct
   gchar *stream_name;
   guint64 version;
   gchar *context;
+  ModulemdTranslation *translation;
 } ModulemdModuleStreamPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ModulemdModuleStream,
@@ -281,6 +282,7 @@ modulemd_module_stream_finalize (GObject *object)
   g_clear_pointer (&priv->module_name, g_free);
   g_clear_pointer (&priv->stream_name, g_free);
   g_clear_pointer (&priv->context, g_free);
+  g_clear_pointer (&priv->translation, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_module_stream_parent_class)->finalize (object);
 }
@@ -328,6 +330,8 @@ modulemd_module_stream_default_copy (ModulemdModuleStream *self,
     copy, modulemd_module_stream_get_version (self));
   modulemd_module_stream_set_context (
     copy, modulemd_module_stream_get_context (self));
+  modulemd_module_stream_associate_translation (
+    copy, modulemd_module_stream_get_translation (self));
 
   return g_steal_pointer (&copy);
 }
@@ -717,4 +721,54 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
 static void
 modulemd_module_stream_init (ModulemdModuleStream *self)
 {
+}
+
+
+void
+modulemd_module_stream_associate_translation (ModulemdModuleStream *self,
+                                              ModulemdTranslation *translation)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM (self));
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  g_clear_pointer (&priv->translation, g_object_unref);
+  if (translation != NULL)
+    priv->translation = g_object_ref (translation);
+}
+
+
+ModulemdTranslation *
+modulemd_module_stream_get_translation (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  return priv->translation;
+}
+
+
+ModulemdTranslationEntry *
+modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
+                                              const gchar *locale)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
+
+  if (locale == NULL)
+    return NULL;
+
+  if (g_str_equal (locale, "C"))
+    return NULL;
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  if (priv->translation == NULL)
+    return NULL;
+
+  return modulemd_translation_get_translation_entry (priv->translation,
+                                                     locale);
 }

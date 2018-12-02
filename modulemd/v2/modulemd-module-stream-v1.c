@@ -17,6 +17,7 @@
 #include "modulemd-component-rpm.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
+#include "modulemd-translation-entry.h"
 #include "modulemd-profile.h"
 #include "modulemd-service-level.h"
 #include "private/glib-extensions.h"
@@ -230,7 +231,12 @@ modulemd_module_stream_v1_get_description (ModulemdModuleStreamV1 *self,
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), NULL);
 
-  /* TODO: retrieve translated strings */
+  ModulemdTranslationEntry *entry =
+    modulemd_module_stream_get_translation_entry (
+      MODULEMD_MODULE_STREAM (self), locale);
+  if (entry != NULL &&
+      modulemd_translation_entry_get_description (entry) != NULL)
+    return modulemd_translation_entry_get_description (entry);
 
   return self->description;
 }
@@ -275,7 +281,11 @@ modulemd_module_stream_v1_get_summary (ModulemdModuleStreamV1 *self,
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), NULL);
 
-  /* TODO: retrieve translated strings */
+  ModulemdTranslationEntry *entry =
+    modulemd_module_stream_get_translation_entry (
+      MODULEMD_MODULE_STREAM (self), locale);
+  if (entry != NULL && modulemd_translation_entry_get_summary (entry) != NULL)
+    return modulemd_translation_entry_get_summary (entry);
 
   return self->summary;
 }

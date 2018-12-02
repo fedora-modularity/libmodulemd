@@ -17,6 +17,8 @@
 #include "modulemd-module.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-translation-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -28,6 +30,7 @@ struct _ModulemdModule
 
   GPtrArray *streams;
   ModulemdDefaults *defaults;
+  GHashTable *translations;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
@@ -84,6 +87,7 @@ modulemd_module_finalize (GObject *object)
   g_clear_pointer (&self->module_name, g_free);
   g_clear_object (&self->defaults);
   g_clear_pointer (&self->streams, g_ptr_array_unref);
+  g_clear_pointer (&self->translations, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (object);
 }
@@ -172,6 +176,8 @@ static void
 modulemd_module_init (ModulemdModule *self)
 {
   self->streams = g_ptr_array_new_full (0, g_object_unref);
+  self->translations =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 }
 
 
@@ -206,8 +212,12 @@ void
 modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
 {
   ModulemdModuleStream *old = NULL;
+  ModulemdTranslation *translation = NULL;
+  ModulemdModuleStream *newstream = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (stream);
+  g_return_if_fail (g_str_equal (
+    modulemd_module_stream_get_module_name (stream), self->module_name));
 
   old = modulemd_module_get_stream_by_NSVC (
     self,
@@ -221,8 +231,15 @@ modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
       old = NULL;
     }
 
-  g_ptr_array_add (self->streams,
-                   modulemd_module_stream_copy (stream, NULL, NULL));
+  newstream = modulemd_module_stream_copy (stream, NULL, NULL);
+  g_ptr_array_add (self->streams, newstream);
+
+  translation = g_hash_table_lookup (
+    self->translations, modulemd_module_stream_get_stream_name (stream));
+  if (translation != NULL)
+    {
+      modulemd_module_stream_associate_translation (newstream, translation);
+    }
 }
 
 
@@ -306,4 +323,43 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
     }
 
   return NULL;
+}
+
+
+void
+modulemd_module_add_translation (ModulemdModule *self,
+                                 ModulemdTranslation *translation)
+{
+  gsize i;
+  ModulemdModuleStream *stream = NULL;
+  ModulemdTranslation *newtrans = NULL;
+
+  g_return_if_fail (
+    g_str_equal (modulemd_translation_get_module_name (translation),
+                 modulemd_module_get_module_name (self)));
+
+  newtrans = modulemd_translation_copy (translation);
+
+  g_hash_table_replace (
+    self->translations,
+    g_strdup (modulemd_translation_get_module_stream (translation)),
+    newtrans);
+
+  for (i = 0; i < self->streams->len; i++)
+    {
+      stream = (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
+
+      if (!g_str_equal (modulemd_translation_get_module_stream (newtrans),
+                        modulemd_module_stream_get_stream_name (stream)))
+        continue;
+
+      modulemd_module_stream_associate_translation (stream, newtrans);
+    }
+}
+
+
+GHashTable *
+modulemd_module_get_translations (ModulemdModule *self)
+{
+  return self->translations;
 }

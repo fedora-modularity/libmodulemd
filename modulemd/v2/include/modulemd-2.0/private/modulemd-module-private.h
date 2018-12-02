@@ -17,6 +17,7 @@
 #include <yaml.h>
 
 #include "modulemd-module.h"
+#include "modulemd-translation.h"
 
 /**
  * SECTION: modulemd-module-private
@@ -51,6 +52,31 @@ modulemd_module_new (const gchar *module_name);
 void
 modulemd_module_set_defaults (ModulemdModule *self,
                               ModulemdDefaults *defaults);
+
+
+/**
+ * modulemd_module_associate_translation:
+ * @self: This #ModulemdModule object
+ * @translation: (in): A #ModulemdTranslation object which is copied into the
+ * #ModulemdModule object.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_add_translation (ModulemdModule *self,
+                                 ModulemdTranslation *translation);
+
+
+/**
+ * modulemd_module_get_translations:
+ * @self: This #ModulemdModule object
+ *
+ * Returns: (transfer none): The set of translations attached to streams.
+ *
+ * Since: 2.0
+ */
+GHashTable *
+modulemd_module_get_translations (ModulemdModule *self);
 
 
 /**

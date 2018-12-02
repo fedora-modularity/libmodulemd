@@ -124,30 +124,58 @@ static void
 module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdModule) m = modulemd_module_new ("testmodule");
+  g_autoptr (ModulemdTranslation) t = NULL;
+  g_autoptr (ModulemdTranslationEntry) te = NULL;
   ModulemdModuleStream *stream = NULL;
   GPtrArray *list = NULL;
+
+  /* Create a translation pre-adding streams */
+  te = modulemd_translation_entry_new ("nl_NL");
+  modulemd_translation_entry_set_summary (te, "Een test omschrijving");
+  t = modulemd_translation_new (1, "testmodule", "stream1", 42);
+  modulemd_translation_set_translation_entry (t, te);
+  g_clear_pointer (&te, g_object_unref);
+  modulemd_module_add_translation (m, t);
+  g_clear_pointer (&t, g_object_unref);
 
   /* Create and add some streams to cross */
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 1);
   modulemd_module_stream_set_context (stream, "context1");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "Stream 1");
   modulemd_module_add_stream (m, stream);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 3);
   modulemd_module_stream_set_context (stream, "context2");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "Stream 1");
   modulemd_module_add_stream (m, stream);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 1);
   modulemd_module_stream_set_context (stream, "context2");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "Stream 1");
   modulemd_module_add_stream (m, stream);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream2");
   modulemd_module_stream_set_version (stream, 42);
   modulemd_module_stream_set_context (stream, "context42");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "Stream 2");
   modulemd_module_add_stream (m, stream);
   g_clear_object (&stream);
+
+  /* Create a translation post-adding streams */
+  te = modulemd_translation_entry_new ("en_GB");
+  modulemd_translation_entry_set_summary (te, "A test summary");
+  t = modulemd_translation_new (1, "testmodule", "stream2", 42);
+  modulemd_translation_set_translation_entry (t, te);
+  g_clear_pointer (&te, g_object_unref);
+  modulemd_module_add_translation (m, t);
+  g_clear_pointer (&t, g_object_unref);
 
   /* Verify that we get all streams */
   list = modulemd_module_get_all_streams (m);
@@ -193,6 +221,14 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 1);
   g_assert_cmpstr (
     modulemd_module_stream_get_context (stream), ==, "context1");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_summary (
+                     MODULEMD_MODULE_STREAM_V2 (stream), NULL),
+                   ==,
+                   "Stream 1");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_summary (
+                     MODULEMD_MODULE_STREAM_V2 (stream), "nl_NL"),
+                   ==,
+                   "Een test omschrijving");
   stream = modulemd_module_get_stream_by_NSVC (m, "stream1", 1, "context2");
   g_assert_nonnull (stream);
   g_assert_cmpstr (
@@ -209,6 +245,21 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 3);
   g_assert_cmpstr (
     modulemd_module_stream_get_context (stream), ==, "context2");
+  stream = modulemd_module_get_stream_by_NSVC (m, "stream2", 42, "context42");
+  g_assert_nonnull (stream);
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (stream), ==, "stream2");
+  g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 42);
+  g_assert_cmpstr (
+    modulemd_module_stream_get_context (stream), ==, "context42");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_summary (
+                     MODULEMD_MODULE_STREAM_V2 (stream), NULL),
+                   ==,
+                   "Stream 2");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_summary (
+                     MODULEMD_MODULE_STREAM_V2 (stream), "en_GB"),
+                   ==,
+                   "A test summary");
 }
 
 

@@ -15,6 +15,8 @@
 
 #include <glib-object.h>
 #include "modulemd-module-stream.h"
+#include "modulemd-translation.h"
+#include "modulemd-translation-entry.h"
 
 G_BEGIN_DECLS
 
@@ -38,6 +40,17 @@ modulemd_module_stream_set_module_name (ModulemdModuleStream *self,
 void
 modulemd_module_stream_set_stream_name (ModulemdModuleStream *self,
                                         const gchar *stream_name);
+
+void
+modulemd_module_stream_associate_translation (
+  ModulemdModuleStream *self, ModulemdTranslation *translation);
+
+ModulemdTranslation *
+modulemd_module_stream_get_translation (ModulemdModuleStream *self);
+
+ModulemdTranslationEntry *
+modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
+                                              const gchar *locale);
 
 
 /* Some macros used for copy operations */

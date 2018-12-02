@@ -205,7 +205,21 @@ modulemd_module_get_defaults (ModulemdModule *self)
 void
 modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
 {
+  ModulemdModuleStream *old = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (stream);
+
+  old = modulemd_module_get_stream_by_NSVC (
+    self,
+    modulemd_module_stream_get_stream_name (stream),
+    modulemd_module_stream_get_version (stream),
+    modulemd_module_stream_get_context (stream));
+  if (old != NULL)
+    {
+      /* First, drop the existing stream */
+      g_ptr_array_remove (self->streams, old);
+      old = NULL;
+    }
 
   g_ptr_array_add (self->streams,
                    modulemd_module_stream_copy (stream, NULL, NULL));

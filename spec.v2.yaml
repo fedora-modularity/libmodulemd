@@ -10,7 +10,7 @@ data:
     # Module update stream, optional
     # Typically filled in by the buildsystem, using the VCS branch name
     # as the name of the stream.
-    stream: stream-name
+    stream: latest
     # Module version, integer, optional, cannot be negative
     # Typically filled in by the buildsystem, using the VCS commit
     # timestamp.  Module version defines upgrade path for the particular

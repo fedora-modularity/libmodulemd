@@ -441,7 +441,7 @@ class TestImprovedModule (unittest.TestCase):
         assert foo_module
 
         foo_stream = foo_module.get_stream_by_nsvc(
-            'foo:stream-name:20160927144203:c0ffee43')
+            'foo:latest:20160927144203:c0ffee43')
         assert foo_stream
 
         rpm_components = foo_stream.get_rpm_components()

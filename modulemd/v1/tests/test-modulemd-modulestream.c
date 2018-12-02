@@ -182,7 +182,7 @@ modulemd_stream_test_basic (StreamFixture *fixture, gconstpointer user_data)
 
   g_assert_cmpstr (name, ==, "foo");
 
-  g_assert_cmpstr (stream, ==, "stream-name");
+  g_assert_cmpstr (stream, ==, "latest");
 
   g_assert_cmpuint (version, ==, 20160927144203);
 

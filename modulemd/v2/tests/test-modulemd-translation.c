@@ -153,8 +153,8 @@ translation_test_copy (TranslationFixture *fixture, gconstpointer user_data)
 
   te = modulemd_translation_entry_new ("en_US");
   modulemd_translation_entry_set_summary (te, "Some summary");
-  modulemd_translation_set_translation_entry (t, g_steal_pointer (&te));
-  g_assert_null (te);
+  modulemd_translation_set_translation_entry (t, te);
+  g_clear_pointer (&te, g_object_unref);
 
   t_copy = modulemd_translation_copy (t);
   g_assert_nonnull (t_copy);
@@ -213,7 +213,8 @@ translation_test_translations (TranslationFixture *fixture,
   t = modulemd_translation_new (1, "testmodule", "teststream", 5);
   te = modulemd_translation_entry_new ("en_US");
   modulemd_translation_entry_set_summary (te, "Some summary");
-  modulemd_translation_set_translation_entry (t, g_steal_pointer (&te));
+  modulemd_translation_set_translation_entry (t, te);
+  g_clear_pointer (&te, g_object_unref);
 
   locales = modulemd_translation_get_locales_as_strv (t);
   g_assert_nonnull (locales);
@@ -309,8 +310,8 @@ translation_test_emit_yaml (TranslationFixture *fixture,
   modulemd_translation_entry_set_description (te, "Test description");
   modulemd_translation_entry_set_profile_description (
     te, "testprofile", "Test Profile Description");
-  modulemd_translation_set_translation_entry (t, g_steal_pointer (&te));
-  g_assert_null (te);
+  modulemd_translation_set_translation_entry (t, te);
+  g_clear_pointer (&te, g_object_unref);
 
   MMD_REINIT_YAML_STRING (&emitter, yaml_string);
   g_assert_true (mmd_emitter_start_stream (&emitter, &error));

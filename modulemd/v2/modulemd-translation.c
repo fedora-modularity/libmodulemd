@@ -93,8 +93,7 @@ modulemd_translation_copy (ModulemdTranslation *self)
   g_hash_table_iter_init (&iter, self->translation_entries);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      modulemd_translation_set_translation_entry (
-        t, modulemd_translation_entry_copy (value));
+      modulemd_translation_set_translation_entry (t, value);
     }
 
   return g_steal_pointer (&t);
@@ -265,7 +264,7 @@ modulemd_translation_set_translation_entry (
   g_hash_table_insert (
     self->translation_entries,
     g_strdup (modulemd_translation_entry_get_locale (translation_entry)),
-    translation_entry);
+    modulemd_translation_entry_copy (translation_entry));
 }
 
 

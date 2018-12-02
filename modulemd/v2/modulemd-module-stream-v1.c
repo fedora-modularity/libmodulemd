@@ -28,6 +28,7 @@
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-profile-private.h"
 #include "private/modulemd-service-level-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -1095,9 +1096,11 @@ modulemd_module_stream_v1_parse_raw (yaml_parser_t *parser,
 
 
 ModulemdModuleStreamV1 *
-modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_module_stream_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                      GError **error)
 {
   MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_PARSER (parser);
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   g_autoptr (GError) nested_error = NULL;
@@ -1108,6 +1111,9 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
   g_autoptr (GDate) eol = NULL;
   g_autoptr (ModulemdServiceLevel) sl = NULL;
 
+  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
+    return NULL;
+
   guint64 version;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -1115,7 +1121,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
   modulestream = modulemd_module_stream_v1_new (NULL, NULL);
 
   /* Read the MAPPING_START */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
   if (event.type != YAML_MAPPING_START_EVENT)
     {
       MMD_YAML_ERROR_EVENT_EXIT (
@@ -1125,7 +1131,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
   /* Process through the mapping */
   while (!done)
     {
-      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+      YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
 
       switch (event.type)
         {
@@ -1138,7 +1144,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           if (g_str_equal ((const gchar *)event.data.scalar.value, "name"))
             {
               MMD_SET_PARSED_YAML_STRING (
-                parser,
+                &parser,
                 error,
                 modulemd_module_stream_set_module_name,
                 MODULEMD_MODULE_STREAM (modulestream));
@@ -1149,7 +1155,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "stream"))
             {
               MMD_SET_PARSED_YAML_STRING (
-                parser,
+                &parser,
                 error,
                 modulemd_module_stream_set_stream_name,
                 MODULEMD_MODULE_STREAM (modulestream));
@@ -1159,7 +1165,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "version"))
             {
-              version = modulemd_yaml_parse_uint64 (parser, &nested_error);
+              version = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1175,7 +1181,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "context"))
             {
               MMD_SET_PARSED_YAML_STRING (
-                parser,
+                &parser,
                 error,
                 modulemd_module_stream_set_context,
                 MODULEMD_MODULE_STREAM (modulestream));
@@ -1185,7 +1191,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "arch"))
             {
-              MMD_SET_PARSED_YAML_STRING (parser,
+              MMD_SET_PARSED_YAML_STRING (&parser,
                                           error,
                                           modulemd_module_stream_v1_set_arch,
                                           modulestream);
@@ -1196,7 +1202,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "summary"))
             {
               MMD_SET_PARSED_YAML_STRING (
-                parser,
+                &parser,
                 error,
                 modulemd_module_stream_v1_set_summary,
                 modulestream);
@@ -1207,7 +1213,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "description"))
             {
               MMD_SET_PARSED_YAML_STRING (
-                parser,
+                &parser,
                 error,
                 modulemd_module_stream_v1_set_description,
                 modulestream);
@@ -1218,7 +1224,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "servicelevels"))
             {
               if (!modulemd_module_stream_v1_parse_servicelevels (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1230,7 +1236,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "license"))
             {
               if (!modulemd_module_stream_v1_parse_licenses (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1241,7 +1247,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "xmd"))
             {
               xmd = modulemd_module_stream_v1_parse_raw (
-                parser, modulestream, &nested_error);
+                &parser, modulestream, &nested_error);
               if (!xmd)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1256,7 +1262,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "dependencies"))
             {
               if (!modulemd_module_stream_v1_parse_deps (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1268,7 +1274,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "references"))
             {
               if (!modulemd_module_stream_v1_parse_refs (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1280,7 +1286,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "profiles"))
             {
               if (!modulemd_module_stream_v1_parse_profiles (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1291,7 +1297,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "api"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                parser, "rpms", &nested_error);
+                &parser, "rpms", &nested_error);
               modulemd_module_stream_v1_replace_rpm_api (modulestream, set);
               g_clear_pointer (&set, g_hash_table_unref);
             }
@@ -1301,7 +1307,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "filter"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                parser, "rpms", &nested_error);
+                &parser, "rpms", &nested_error);
               modulemd_module_stream_v1_replace_rpm_filters (modulestream,
                                                              set);
               g_clear_pointer (&set, g_hash_table_unref);
@@ -1312,7 +1318,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "buildopts"))
             {
               buildopts =
-                modulemd_buildopts_parse_yaml (parser, &nested_error);
+                modulemd_buildopts_parse_yaml (&parser, &nested_error);
               if (!buildopts)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1329,7 +1335,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "components"))
             {
               if (!modulemd_module_stream_v1_parse_components (
-                    parser, modulestream, &nested_error))
+                    &parser, modulestream, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1341,7 +1347,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
                                 "artifacts"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                parser, "rpms", &nested_error);
+                &parser, "rpms", &nested_error);
               if (!set)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1355,7 +1361,7 @@ modulemd_module_stream_v1_parse_yaml (yaml_parser_t *parser, GError **error)
           /* EOL (Deprecated) */
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "eol"))
             {
-              eol = modulemd_yaml_parse_date (parser, &nested_error);
+              eol = modulemd_yaml_parse_date (&parser, &nested_error);
               if (!eol)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT (

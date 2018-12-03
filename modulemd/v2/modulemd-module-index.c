@@ -358,7 +358,7 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
   ModulemdModule *module = NULL;
   gsize i;
   g_autoptr (GPtrArray) modules =
-    modulemd_ordered_str_keys (self->modules, (GCompareFunc)g_strcmp0);
+    modulemd_ordered_str_keys (self->modules, modulemd_strcmp_sort);
 
   if (!mmd_emitter_start_stream (emitter, error))
     return FALSE;

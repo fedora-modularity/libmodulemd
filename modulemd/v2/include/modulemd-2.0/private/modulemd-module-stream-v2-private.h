@@ -16,6 +16,7 @@
 #include <glib-object.h>
 #include <yaml.h>
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-subdocument-info.h"
 
 
 G_BEGIN_DECLS
@@ -32,8 +33,8 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_module_stream_v2_parse_yaml:
- * @parser: (inout): A yaml parser positioned at the start of the data subsection
- * of a modulemd v2 YAML document.
+ * @subdoc: (in): A #ModulemdSubdocumentInfo representing a stream v2
+ * document
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -44,7 +45,8 @@ G_BEGIN_DECLS
  * Since: 2.0
  */
 ModulemdModuleStreamV2 *
-modulemd_module_stream_v2_parse_yaml (yaml_parser_t *parser, GError **error);
+modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                      GError **error);
 
 /**
  * modulemd_module_stream_v2_emit_yaml:

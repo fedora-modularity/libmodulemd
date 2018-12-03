@@ -6,6 +6,8 @@
 #include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-module-stream-v1-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -136,6 +138,106 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
     }
 }
 
+static void
+module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_autoptr (GError) error = NULL;
+  gboolean ret;
+  MMD_INIT_YAML_PARSER (parser);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  yaml_path =
+    g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (yaml_stream);
+
+  /* First parse it */
+  yaml_parser_set_input_file (&parser, yaml_stream);
+  g_assert_true (yaml_parser_parse (&parser, &event));
+  g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
+  yaml_event_delete (&event);
+  g_assert_true (yaml_parser_parse (&parser, &event));
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
+  subdoc = modulemd_yaml_parse_document_type (&parser);
+  g_assert_nonnull (subdoc);
+  g_assert_null (modulemd_subdocument_info_get_gerror (subdoc));
+
+  g_assert_cmpint (modulemd_subdocument_info_get_doctype (subdoc),
+                   ==,
+                   MODULEMD_YAML_DOC_MODULESTREAM);
+  g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 1);
+  g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
+
+  stream = modulemd_module_stream_v1_parse_yaml (subdoc, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  /* Then dump it */
+  g_debug ("Starting dumping");
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  ret = modulemd_module_stream_v1_emit_yaml (stream, &emitter, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  ret = mmd_emitter_end_stream (&emitter, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  g_assert_nonnull (yaml_string->str);
+
+  g_assert_cmpstr (
+    yaml_string->str,
+    ==,
+    "---\ndocument: modulemd\nversion: 1\ndata:\n  name: foo\n  stream: "
+    "stream-name\n  version: 20160927144203\n  context: c0ffee43\n  arch: "
+    "x86_64\n  summary: An example module\n  description: A module for the "
+    "demonstration of the metadata format. Also, the obligatory\n    lorem "
+    "ipsum dolor sit amet goes right here.\n  servicelevels:\n    "
+    "bug_fixes:\n      eol: 2077-10-23\n    rawhide:\n      eol: 2077-10-23\n "
+    "   security_fixes:\n      eol: 2077-10-23\n    stable_api:\n      eol: "
+    "2077-10-23\n  license:\n    module:\n    - MIT\n    content:\n    - "
+    "Beerware\n    - GPLv2+\n    - zlib\n  xmd:\n    some_key: some_data\n  "
+    "dependencies:\n    buildrequires:\n      extra-build-env: "
+    "and-its-stream-name-too\n      platform: and-its-stream-name\n    "
+    "requires:\n      platform: and-its-stream-name\n  references:\n    "
+    "community: http://www.example.com/\n    documentation: "
+    "http://www.example.com/\n    tracker: http://www.example.com/\n  "
+    "profiles:\n    buildroot:\n      rpms:\n      - bar-devel\n    "
+    "container:\n      rpms:\n      - bar\n      - bar-devel\n    default:\n  "
+    "    rpms:\n      - bar\n      - bar-extras\n      - baz\n    minimal:\n  "
+    "    description: Minimal profile installing only the bar package.\n      "
+    "rpms:\n      - bar\n    srpm-buildroot:\n      rpms:\n      - "
+    "bar-extras\n  api:\n    rpms:\n    - bar\n    - bar-devel\n    - "
+    "bar-extras\n    - baz\n    - xxx\n  filter:\n    rpms:\n    - "
+    "baz-nonfoo\n  buildopts:\n    rpms:\n      macros: >\n        %demomacro "
+    "1\n\n        %demomacro2 %{demomacro}23\n  components:\n    rpms:\n      "
+    "bar:\n        rationale: We need this to demonstrate stuff.\n        "
+    "repository: https://pagure.io/bar.git\n        cache: "
+    "https://example.com/cache\n        ref: 26ca0c0\n      baz:\n        "
+    "rationale: This one is here to demonstrate other stuff.\n      xxx:\n    "
+    "    rationale: xxx demonstrates arches and multilib.\n        arches: "
+    "[i686, x86_64]\n        multilib: [x86_64]\n      xyz:\n        "
+    "rationale: xyz is a bundled dependency of xxx.\n        buildorder: 10\n "
+    "   modules:\n      includedmodule:\n        rationale: Included in the "
+    "stack, just because.\n        repository: "
+    "https://pagure.io/includedmodule.git\n        ref: somecoolbranchname\n  "
+    "      buildorder: 100\n  artifacts:\n    rpms:\n    - "
+    "bar-0:1.23-1.module_deadbeef.x86_64\n    - "
+    "bar-devel-0:1.23-1.module_deadbeef.x86_64\n    - "
+    "bar-extras-0:1.23-1.module_deadbeef.x86_64\n    - "
+    "baz-0:42-42.module_deadbeef.x86_64\n    - "
+    "xxx-0:1-1.module_deadbeef.i686\n    - xxx-0:1-1.module_deadbeef.x86_64\n "
+    "   - xyz-0:1-1.module_deadbeef.x86_64\n...\n");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -157,6 +259,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_copy,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/parse_dump",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_parse_dump,
               NULL);
 
   return g_test_run ();

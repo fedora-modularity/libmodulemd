@@ -51,8 +51,8 @@ modulemd_module_stream_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 /**
  * modulemd_module_stream_v1_emit_yaml:
  * @self: This #ModulemdModuleStreamV1 object
- * @emitter: (inout): A libyaml emitter object positioned where the data
- * section of a #ModulemdModuleStreamV1 belongs in the YAML document.
+ * @emitter: (inout): A libyaml emitter object positioned where a Module Stream
+ * document belongs.
  * @error: (out): A #GError that will return the reason for an emission or
  * validation error.
  *

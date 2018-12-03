@@ -421,4 +421,183 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
                                      guint64 mdversion,
                                      GError **error);
 
+/**
+ * modulemd_yaml_emit_variant:
+ * @emitter: (inout): A libyaml emitter object that is positioned where the
+ * variant should occur.
+ * @variant: (in): The variant to emit. It must be either a boolean, string,
+ * array or dictionary.
+ * @error: (out): A #GError that will return the reason for failing to emit.
+ *
+ * Returns: TRUE if the variant emitted succesfully. FALSE if an error was
+ * encountered and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
+                            GVariant *variant,
+                            GError **error);
+
+
+/* A set of macros for simple emitting of common elements */
+#define NON_EMPTY_TABLE(table) (g_hash_table_size (table) != 0)
+
+#define EMIT_SCALAR(emitter, error, value)                                    \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_scalar (                                               \
+            emitter, value, YAML_PLAIN_SCALAR_STYLE, error))                  \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+#define EMIT_KEY_VALUE(emitter, error, key, value)                            \
+  do                                                                          \
+    {                                                                         \
+      if (value == NULL)                                                      \
+        {                                                                     \
+          g_set_error (error,                                                 \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       "Value for key %s was NULL on emit",                   \
+                       key);                                                  \
+          return FALSE;                                                       \
+        }                                                                     \
+      EMIT_SCALAR (emitter, error, key);                                      \
+      EMIT_SCALAR (emitter, error, value);                                    \
+    }                                                                         \
+  while (0)
+
+
+#define EMIT_KEY_VALUE_IF_SET(emitter, error, key, value)                     \
+  do                                                                          \
+    {                                                                         \
+      if (value != NULL)                                                      \
+        {                                                                     \
+          EMIT_KEY_VALUE (emitter, error, key, value);                        \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_MAPPING_START_WITH_STYLE(emitter, error, style)                  \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_start_mapping (emitter, style, error))                 \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+#define EMIT_MAPPING_START(emitter, error)                                    \
+  EMIT_MAPPING_START_WITH_STYLE (emitter, error, YAML_BLOCK_MAPPING_STYLE)
+
+#define EMIT_MAPPING_END(emitter, error)                                      \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_end_mapping (emitter, error))                          \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+#define EMIT_SEQUENCE_START_WITH_STYLE(emitter, error, style)                 \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_start_sequence (emitter, style, error))                \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+#define EMIT_SEQUENCE_START(emitter, error)                                   \
+  EMIT_SEQUENCE_START_WITH_STYLE (emitter, error, YAML_BLOCK_SEQUENCE_STYLE)
+
+#define EMIT_SEQUENCE_END(emitter, error)                                     \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_end_sequence (emitter, error))                         \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+#define EMIT_HASHTABLE_VALUES_IF_NON_EMPTY(                                   \
+  emitter, error, key, table, emitfn)                                         \
+  do                                                                          \
+    {                                                                         \
+      if (NON_EMPTY_TABLE (table))                                            \
+        {                                                                     \
+          EMIT_SCALAR (emitter, error, key);                                  \
+          EMIT_MAPPING_START (emitter, error);                                \
+          gsize i;                                                            \
+          g_autoptr (GPtrArray) keys =                                        \
+            modulemd_ordered_str_keys (table, modulemd_strcmp_sort);          \
+          for (i = 0; i < keys->len; i++)                                     \
+            {                                                                 \
+              if (!emitfn (                                                   \
+                    g_hash_table_lookup (table, g_ptr_array_index (keys, i)), \
+                    emitter,                                                  \
+                    error))                                                   \
+                return FALSE;                                                 \
+            }                                                                 \
+          EMIT_MAPPING_END (emitter, error);                                  \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY(emitter, error, key, table)    \
+  do                                                                          \
+    {                                                                         \
+      if (NON_EMPTY_TABLE (table))                                            \
+        {                                                                     \
+          EMIT_SCALAR (emitter, error, key);                                  \
+          EMIT_MAPPING_START (emitter, error);                                \
+          gsize i;                                                            \
+          g_autoptr (GPtrArray) keys =                                        \
+            modulemd_ordered_str_keys (table, modulemd_strcmp_sort);          \
+          for (i = 0; i < keys->len; i++)                                     \
+            {                                                                 \
+              EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));      \
+              EMIT_SCALAR (                                                   \
+                emitter,                                                      \
+                error,                                                        \
+                g_hash_table_lookup (table, g_ptr_array_index (keys, i)));    \
+            }                                                                 \
+          EMIT_MAPPING_END (emitter, error);                                  \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_STRING_SET(emitter, error, key, table)                           \
+  do                                                                          \
+    {                                                                         \
+      if (!NON_EMPTY_TABLE (table))                                           \
+        {                                                                     \
+          g_set_error (error,                                                 \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       "String set for key %s was empty on emit",             \
+                       key);                                                  \
+          return FALSE;                                                       \
+        }                                                                     \
+      EMIT_SCALAR (emitter, error, key);                                      \
+      EMIT_SEQUENCE_START (emitter, error);                                   \
+      gsize i;                                                                \
+      g_autoptr (GPtrArray) keys =                                            \
+        modulemd_ordered_str_keys (table, modulemd_strcmp_sort);              \
+      for (i = 0; i < keys->len; i++)                                         \
+        {                                                                     \
+          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));          \
+        }                                                                     \
+      EMIT_SEQUENCE_END (emitter, error);                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_STRING_SET_IF_NON_EMPTY(emitter, error, key, table)              \
+  do                                                                          \
+    {                                                                         \
+      if (NON_EMPTY_TABLE (table))                                            \
+        {                                                                     \
+          EMIT_STRING_SET (emitter, error, key, table);                       \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
 G_END_DECLS

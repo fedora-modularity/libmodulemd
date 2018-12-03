@@ -71,12 +71,24 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
   /* Third: some streams */
   stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
     "testmodule1", "teststream1");
+  modulemd_module_stream_v1_set_summary (MODULEMD_MODULE_STREAM_V1 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v1_set_description (
+    MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
+  modulemd_module_stream_v1_add_module_license (
+    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
   g_assert_true (
     modulemd_module_index_add_module_stream (index, stream, &error));
   g_assert_no_error (error);
   g_clear_pointer (&stream, g_object_unref);
   stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
     "testmodule1", "teststream2");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "A second stream");
+  modulemd_module_stream_v2_set_description (
+    MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
+  modulemd_module_stream_v2_add_module_license (
+    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
   g_assert_true (
     modulemd_module_index_add_module_stream (index, stream, &error));
   g_assert_no_error (error);
@@ -94,7 +106,10 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
     "testmodule1\n...\n---\ndocument: modulemd-translations\nversion: "
     "1\ndata:\n  module: testmodule1\n  stream: teststream1\n  modified: 42\n "
     " translations:\n  - nl_NL\n  - summary: Een test omschrijving\n  - "
-    "ro_TA\n  - summary: Testsummary in ro_TA\n...\n");
+    "ro_TA\n  - summary: Testsummary in ro_TA\n...\n---\ndocument: "
+    "modulemd\nversion: 1\ndata:\n  name: testmodule1\n  stream: "
+    "teststream1\n  summary: A test stream\n  description: A test stream's "
+    "description\n  license:\n    module:\n    - Beerware\n...\n");
 }
 
 

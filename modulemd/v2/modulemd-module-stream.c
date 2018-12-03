@@ -772,3 +772,41 @@ modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
   return modulemd_translation_get_translation_entry (priv->translation,
                                                      locale);
 }
+
+
+gboolean
+modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
+                                       yaml_emitter_t *emitter,
+                                       GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  g_autofree gchar *version_string = NULL;
+
+  if (modulemd_module_stream_get_version (self) != 0)
+    {
+      version_string = g_strdup_printf (
+        "%" PRIu64, modulemd_module_stream_get_version (self));
+    }
+
+  /* Emit document headers */
+  if (!modulemd_yaml_emit_document_headers (
+        emitter,
+        MODULEMD_YAML_DOC_MODULESTREAM,
+        modulemd_module_stream_get_mdversion (self),
+        error))
+    return FALSE;
+
+  /* Start data: */
+  EMIT_MAPPING_START (emitter, error);
+
+  EMIT_KEY_VALUE_IF_SET (
+    emitter, error, "name", modulemd_module_stream_get_module_name (self));
+  EMIT_KEY_VALUE_IF_SET (
+    emitter, error, "stream", modulemd_module_stream_get_stream_name (self));
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "version", version_string);
+  EMIT_KEY_VALUE_IF_SET (
+    emitter, error, "context", modulemd_module_stream_get_context (self));
+
+  /* The rest of the fields will be emitted by the version-specific emitters */
+  return TRUE;
+}

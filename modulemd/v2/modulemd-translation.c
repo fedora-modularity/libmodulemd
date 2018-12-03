@@ -642,7 +642,6 @@ modulemd_translation_emit_yaml (ModulemdTranslation *self,
 
   modified_string =
     g_strdup_printf ("%" PRIu64, modulemd_translation_get_modified (self));
-  ;
 
   /* Emit document headers */
   if (!modulemd_yaml_emit_document_headers (

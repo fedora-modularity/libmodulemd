@@ -466,7 +466,7 @@ class TestModuleStream(TestBase):
         )[0].get_runtime_modules()
 
     def test_xmd(self):
-        if os.getenv('MMD_TEST_INSTALLED_LIB'):
+        if '_overrides_module' in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib
             # because the overrides that translate between python and GVariant
             # must be installed in /usr/lib/python*/site-packages/gi/overrides
@@ -646,12 +646,12 @@ data:
         sl = stream.get_servicelevel('rawhide')
         assert sl is not None
         assert sl.props.name == 'rawhide'
-        assert sl.props.eol is None
+        assert sl.get_eol() is None
 
         sl = stream.get_servicelevel('production')
         assert sl is not None
         assert sl.props.name == 'production'
-        assert sl.props.eol is not None
+        assert sl.get_eol() is not None
         assert sl.get_eol_as_string() == '2099-12-31'
 
         assert 'BSD' in stream.get_content_licenses()
@@ -877,12 +877,12 @@ data:
             sl = stream.get_servicelevel('foo')
             assert sl is not None
             assert sl.props.name == 'foo'
-            assert sl.props.eol is None
+            assert sl.get_eol() is None
 
             sl = stream.get_servicelevel('production')
             assert sl is not None
             assert sl.props.name == 'production'
-            assert sl.props.eol is not None
+            assert sl.get_eol() is not None
             assert sl.get_eol_as_string() == '2099-12-31'
 
             assert 'BSD' in stream.get_content_licenses()

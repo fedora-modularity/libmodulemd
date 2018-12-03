@@ -36,9 +36,14 @@ Modulemd = get_introspection_module('Modulemd')
 from six import text_type
 from gi.repository import GLib
 
+import datetime
+
+
 __all__ = []
 
+
 class ModulemdUtil():
+
     def variant_str(s):
         """ Converts a string to a GLib.Variant
         """
@@ -108,39 +113,60 @@ class ModulemdUtil():
         else:
             raise TypeError('Cannot convert unknown type')
 
+if float(Modulemd._version) >= 2:
 
-if "ModuleStreamV2" in dir(Modulemd):
     class ModuleStreamV2(Modulemd.ModuleStreamV2):
 
-        def __new__(cls, module_name=None, module_stream=None):
-            return Modulemd.ModuleStreamV2.new(module_name, module_stream)
-
         def set_xmd(self, xmd):
-            super().set_xmd(ModulemdUtil.python_to_variant(xmd))
+            super(
+                ModuleStreamV2, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd))
 
         def get_xmd(self):
-            variant_xmd = super().get_xmd()
+            variant_xmd = super(ModuleStreamV2, self).get_xmd()
             return variant_xmd.unpack()
-
 
     ModuleStreamV2 = override(ModuleStreamV2)
     __all__.append(ModuleStreamV2)
 
-
-if "ModuleStreamV1" in dir(Modulemd):
     class ModuleStreamV1(Modulemd.ModuleStreamV1):
 
-        def __new__(cls, module_name=None, module_stream=None):
-            return Modulemd.ModuleStreamV1.new(module_name, module_stream)
-
         def set_xmd(self, xmd):
-            super().set_xmd(ModulemdUtil.python_to_variant(xmd))
+            super(
+                ModuleStreamV1, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd))
 
         def get_xmd(self):
-            variant_xmd = super().get_xmd()
+            variant_xmd = super(ModuleStreamV1, self).get_xmd()
             return variant_xmd.unpack()
-
 
     ModuleStreamV1 = override(ModuleStreamV1)
     __all__.append(ModuleStreamV1)
 
+    class ServiceLevel(Modulemd.ServiceLevel):
+
+        def set_eol(self, eol):
+            if (isinstance(eol, datetime.date)):
+                return super(
+                    ServiceLevel,
+                    self).set_eol_ymd(
+                    eol.year,
+                    eol.month,
+                    eol.day)
+
+            raise TypeError(
+                "Expected datetime.date, but got %s." % (
+                    type(eol).__name__))
+
+        def get_eol(self):
+            eol = super(ServiceLevel, self).get_eol()
+            if eol is None:
+                return None
+
+            return datetime.date(
+                eol.get_year(),
+                eol.get_month(),
+                eol.get_day())
+
+    ServiceLevel = override(ServiceLevel)
+    __all__.append(ServiceLevel)

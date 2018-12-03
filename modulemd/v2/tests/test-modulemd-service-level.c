@@ -39,7 +39,6 @@ service_level_test_construct (ServiceLevelFixture *fixture,
                               gconstpointer user_data)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
-  g_autoptr (GDate) eol = NULL;
 
 
   /* Test that the new() function works */
@@ -60,23 +59,6 @@ service_level_test_construct (ServiceLevelFixture *fixture,
   g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
   g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "bar");
   g_assert_null (modulemd_service_level_get_eol (sl));
-  g_clear_object (&sl);
-
-
-  /* Test that standard object instantiation works with a name and EOL */
-  eol = g_date_new_dmy (7, 11, 2018);
-
-  // clang-format off
-  sl = g_object_new (MODULEMD_TYPE_SERVICE_LEVEL,
-                     "name", "bar",
-                     "eol", eol,
-                     NULL);
-  // clang-format on
-  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
-  g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "bar");
-  g_assert_nonnull (modulemd_service_level_get_eol (sl));
-  g_assert_cmpint (
-    g_date_compare (eol, modulemd_service_level_get_eol (sl)), ==, 0);
   g_clear_object (&sl);
 
 
@@ -204,15 +186,6 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_null (modulemd_service_level_get_eol_as_string (sl));
 
 
-  /* Test looking up the EOL by object properties returns NULL */
-  // clang-format off
-  g_object_get (sl,
-                "eol", &eol,
-                NULL);
-  // clang-format on
-  g_assert_null (eol);
-
-
   /* Set the EOL with the set_eol() method */
   eol = g_date_new_dmy (7, 11, 2018);
   modulemd_service_level_set_eol (sl, eol);
@@ -221,16 +194,6 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_nonnull (returned_eol);
   g_assert_true (g_date_valid (returned_eol));
   g_assert_cmpint (g_date_compare (eol, returned_eol), ==, 0);
-
-  // clang-format off
-  g_object_get(sl,
-               "eol", &copied_eol,
-               NULL);
-  // clang-format on
-  g_assert_nonnull (copied_eol);
-  g_assert_true (g_date_valid (copied_eol));
-  g_assert_cmpint (g_date_compare (eol, copied_eol), ==, 0);
-  g_clear_pointer (&copied_eol, g_date_free);
 
   eol_string = modulemd_service_level_get_eol_as_string (sl);
   g_assert_nonnull (eol_string);
@@ -246,16 +209,6 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_assert_true (g_date_valid (returned_eol));
   g_assert_cmpint (g_date_compare (eol, returned_eol), ==, 0);
 
-  // clang-format off
-  g_object_get(sl,
-               "eol", &copied_eol,
-               NULL);
-  // clang-format on
-  g_assert_nonnull (copied_eol);
-  g_assert_true (g_date_valid (copied_eol));
-  g_assert_cmpint (g_date_compare (eol, copied_eol), ==, 0);
-  g_clear_pointer (&copied_eol, g_date_free);
-
   eol_string = modulemd_service_level_get_eol_as_string (sl);
   g_assert_nonnull (eol_string);
   g_assert_cmpstr (eol_string, ==, "2018-11-07");
@@ -266,13 +219,6 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_clear_pointer (&eol, g_date_free);
   eol = g_date_new ();
   modulemd_service_level_set_eol (sl, eol);
-  g_assert_null (modulemd_service_level_get_eol (sl));
-
-  // clang-format off
-  g_object_set (sl,
-                "eol", eol,
-                NULL);
-  // clang-format on
   g_assert_null (modulemd_service_level_get_eol (sl));
 
   modulemd_service_level_set_eol_ymd (sl, 2018, 2, 31);

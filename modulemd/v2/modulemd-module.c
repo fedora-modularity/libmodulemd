@@ -185,9 +185,11 @@ modulemd_module_set_defaults (ModulemdModule *self, ModulemdDefaults *defaults)
   if (defaults == NULL)
     return;
 
-  if (!g_str_equal (modulemd_defaults_get_module_name (defaults),
-                    modulemd_module_get_module_name (self)))
-    return; /* Silently ignore it */
+  /* We should never get a defaults object added whose module name doesn't
+   * match.
+   */
+  g_return_if_fail (g_str_equal (modulemd_defaults_get_module_name (defaults),
+                                 modulemd_module_get_module_name (self)));
 
   self->defaults = modulemd_defaults_copy (defaults);
 }

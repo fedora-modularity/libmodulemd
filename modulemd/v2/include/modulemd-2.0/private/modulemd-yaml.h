@@ -188,6 +188,22 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 #define MMD_YAML_ERROR_EVENT_EXIT_INT(_error, _event, ...)                    \
   MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, 0, __VA_ARGS__)
 
+#define MMD_SET_PARSED_YAML_STRING(_parser, _error, _fn, _obj)                \
+  do                                                                          \
+    {                                                                         \
+      GError *_nested_error = NULL;                                           \
+      g_autofree gchar *_scalar =                                             \
+        modulemd_yaml_parse_string (_parser, &_nested_error);                 \
+      if (!_scalar)                                                           \
+        {                                                                     \
+          g_propagate_error (_error, _nested_error);                          \
+          return NULL;                                                        \
+        }                                                                     \
+      _fn (_obj, _scalar);                                                    \
+      g_clear_pointer (&_scalar, g_free);                                     \
+    }                                                                         \
+  while (0)
+
 gboolean
 mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error);
 
@@ -321,6 +337,49 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error);
  */
 GHashTable *
 modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
+
+
+/**
+ * modulemd_yaml_parse_string_set_from_map:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * map containing a single key which is a sequence with string scalars.
+ * @key: (in): The key in a single-key mapping whose contents should be
+ * returned as a string set.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Function for retrieving a string set from a single-key map such as
+ * data.artifacts, data.api or data.filter from a module stream document.
+ *
+ * Returns: (transfer full): A newly-allocated GHashtTable * representing the
+ * parsed values. All parsed sequence entries are added as keys in the
+ * hashtable. NULL if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+GHashTable *
+modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
+                                         const gchar *key,
+                                         GError **error);
+
+
+/**
+ * modulemd_yaml_parse_string_string_map:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * map containing a scalar/scalar key/value pairs.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Function for retrieving a hash table from a str/str map such as
+ * data.dependencies in ModuleStreamV1.
+ *
+ * Returns: (transfer full): A newly-allocated GHashtTable * representing the
+ * parsed values. NULL if a parse error occured and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
+GHashTable *
+modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
 
 
 /**

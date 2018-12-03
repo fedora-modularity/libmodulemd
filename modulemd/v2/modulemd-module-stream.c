@@ -17,6 +17,8 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-module-stream-v1-private.h"
+#include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -149,6 +151,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                                   GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (stream_parser);
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
@@ -216,11 +219,23 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   switch (modulemd_subdocument_info_get_mdversion (subdoc))
     {
     case MD_MODULESTREAM_VERSION_ONE:
-      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v1_parse_yaml (data)); */
+      stream = MODULEMD_MODULE_STREAM (
+        modulemd_module_stream_v1_parse_yaml (subdoc, &nested_error));
+      if (!stream)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
       break;
 
     case MD_MODULESTREAM_VERSION_TWO:
-      /* stream = MODULEMD_MODULESTREAM(modulemd_module_stream_v2_parse_yaml (data)); */
+      stream = MODULEMD_MODULE_STREAM (
+        modulemd_module_stream_v2_parse_yaml (subdoc, &nested_error));
+      if (!stream)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
       break;
 
     default:
@@ -252,7 +267,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
-  return stream;
+  return g_steal_pointer (&stream);
 }
 
 

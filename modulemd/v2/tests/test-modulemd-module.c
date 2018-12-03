@@ -30,13 +30,7 @@ typedef struct _ModuleFixture
 {
 } ModuleFixture;
 
-gboolean signaled = FALSE;
-
-static void
-sigtrap_handler (int sig_num)
-{
-  signaled = TRUE;
-}
+extern int modulemd_test_signal;
 
 static void
 module_test_construct (ModuleFixture *fixture, gconstpointer user_data)
@@ -66,24 +60,24 @@ module_test_construct (ModuleFixture *fixture, gconstpointer user_data)
   g_clear_object (&m);
 
   /* Test that we abort with a NULL name to new() */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
+  modulemd_test_signal = 0;
+  signal (SIGTRAP, modulemd_test_signal_handler);
   m = modulemd_module_new (NULL);
-  g_assert_true (signaled);
+  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
   g_clear_object (&m);
 
   /* Test that we abort if we instantiate without a name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
+  modulemd_test_signal = 0;
+  signal (SIGTRAP, modulemd_test_signal_handler);
   m = g_object_new (MODULEMD_TYPE_MODULE, NULL);
-  g_assert_true (signaled);
+  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
   g_clear_object (&m);
 
   /* test that we abort if we instantiate with a NULL name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
+  modulemd_test_signal = 0;
+  signal (SIGTRAP, modulemd_test_signal_handler);
   m = g_object_new (MODULEMD_TYPE_MODULE, "module-name", NULL, NULL);
-  g_assert_true (signaled);
+  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
   g_clear_object (&m);
 }
 
@@ -97,13 +91,16 @@ module_test_defaults (ModuleFixture *fixture, gconstpointer user_data)
 
   m = modulemd_module_new ("testmodule");
 
+  /* Verify that setting defaults that don't match this module name fails and
+   * aborts with SIGTRAP
+   */
   d = modulemd_defaults_v1_new ("test");
   g_assert_nonnull (d);
-  modulemd_module_set_defaults (m, MODULEMD_DEFAULTS (d));
 
-  d_got = modulemd_module_get_defaults (m);
-  /* Should have been ignored: module name doesn't match */
-  g_assert_null (d_got);
+  modulemd_test_signal = 0;
+  signal (SIGTRAP, modulemd_test_signal_handler);
+  modulemd_module_set_defaults (m, MODULEMD_DEFAULTS (d));
+  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
   g_clear_object (&d);
 
   d = modulemd_defaults_v1_new ("testmodule");

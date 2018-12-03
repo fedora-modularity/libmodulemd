@@ -172,6 +172,25 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
+  /* The second event must be the document start */
+  if (!yaml_parser_parse (parser, &event))
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           "Parser error");
+      return NULL;
+    }
+  if (event.type != YAML_DOCUMENT_START_EVENT)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_PARSE,
+                           "YAML didn't begin with STREAM_START.");
+      return NULL;
+    }
+  yaml_event_delete (&event);
+
   subdoc = modulemd_yaml_parse_document_type (parser);
   if (subdoc == NULL)
     {

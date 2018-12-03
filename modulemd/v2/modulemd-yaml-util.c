@@ -501,16 +501,12 @@ modulemd_yaml_parse_document_type_internal (
       return FALSE;
     }
 
-  /* The first event must be the document start */
-  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
-  if (event.type != YAML_DOCUMENT_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error, event, "Parser is not at the start of a document");
-    }
-  MMD_EMIT_WITH_EXIT_FULL (
-    emitter, FALSE, &event, error, "Error starting document");
-  yaml_event_delete (&event);
+  /*
+   * We should assume the initial document start is consumed by the Index.
+   * But we still emit it.
+   */
+  if (!mmd_emitter_start_document (emitter, error))
+    return FALSE;
 
   /* The second event must be the mapping start */
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);

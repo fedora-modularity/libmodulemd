@@ -363,8 +363,7 @@ modulemd_module_add_translation (ModulemdModule *self,
 GPtrArray *
 modulemd_module_get_translated_streams (ModulemdModule *self)
 {
-  return modulemd_ordered_str_keys (self->translations,
-                                    (GCompareFunc)g_strcmp0);
+  return modulemd_ordered_str_keys (self->translations, modulemd_strcmp_sort);
 }
 
 

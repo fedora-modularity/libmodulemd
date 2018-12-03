@@ -731,6 +731,21 @@ modulemd_module_stream_v2_add_dependencies (ModulemdModuleStreamV2 *self,
 }
 
 
+static void
+modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
+                                                GPtrArray *array)
+{
+  gsize i;
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  for (i = 0; i < array->len; i++)
+    {
+      modulemd_module_stream_v2_add_dependencies (
+        self, g_ptr_array_index (array, i));
+    }
+}
+
+
 GPtrArray *
 modulemd_module_stream_v2_get_dependencies (ModulemdModuleStreamV2 *self)
 {
@@ -829,6 +844,54 @@ modulemd_module_stream_v2_set_property (GObject *object,
     }
 }
 
+static ModulemdModuleStream *
+modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
+                                const gchar *module_name,
+                                const gchar *module_stream)
+{
+  ModulemdModuleStreamV2 *v2_self = NULL;
+  g_autoptr (ModulemdModuleStreamV2) copy = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
+  v2_self = MODULEMD_MODULE_STREAM_V2 (self);
+
+  copy = MODULEMD_MODULE_STREAM_V2 (
+    MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v2_parent_class)
+      ->copy (self, module_name, module_stream));
+
+  /* Properties */
+  STREAM_COPY_IF_SET (v2, copy, v2_self, arch);
+  STREAM_COPY_IF_SET (v2, copy, v2_self, buildopts);
+  STREAM_COPY_IF_SET (v2, copy, v2_self, community);
+  STREAM_COPY_IF_SET_WITH_LOCALE (v2, copy, v2_self, description);
+  STREAM_COPY_IF_SET (v2, copy, v2_self, documentation);
+  STREAM_COPY_IF_SET_WITH_LOCALE (v2, copy, v2_self, summary);
+  STREAM_COPY_IF_SET (v2, copy, v2_self, tracker);
+
+  /* Internal Data Structures: With replace function */
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, content_licenses);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, module_licenses);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_api);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_artifacts);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_filters);
+
+  /* Internal Data Structures: With add on value */
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v2_self, rpm_components, modulemd_module_stream_v2_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v2_self, module_components, modulemd_module_stream_v2_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v2_self, profiles, modulemd_module_stream_v2_add_profile);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v2_self, servicelevels, modulemd_module_stream_v2_add_servicelevel);
+
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, dependencies);
+
+  if (v2_self->xmd != NULL)
+    modulemd_module_stream_v2_set_xmd (copy, g_variant_ref (v2_self->xmd));
+
+  return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
+}
+
 static void
 modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
 {
@@ -841,6 +904,7 @@ modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
   object_class->set_property = modulemd_module_stream_v2_set_property;
 
   stream_class->get_mdversion = modulemd_module_stream_v2_get_mdversion;
+  stream_class->copy = modulemd_module_stream_v2_copy;
 
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",

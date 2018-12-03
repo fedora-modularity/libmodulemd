@@ -973,6 +973,56 @@ modulemd_module_stream_v1_set_property (GObject *object,
     }
 }
 
+
+static ModulemdModuleStream *
+modulemd_module_stream_v1_copy (ModulemdModuleStream *self,
+                                const gchar *module_name,
+                                const gchar *module_stream)
+{
+  ModulemdModuleStreamV1 *v1_self = NULL;
+  g_autoptr (ModulemdModuleStreamV1) copy = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), NULL);
+  v1_self = MODULEMD_MODULE_STREAM_V1 (self);
+
+  copy = MODULEMD_MODULE_STREAM_V1 (
+    MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v1_parent_class)
+      ->copy (self, module_name, module_stream));
+
+  /* Properties */
+  STREAM_COPY_IF_SET (v1, copy, v1_self, arch);
+  STREAM_COPY_IF_SET (v1, copy, v1_self, buildopts);
+  STREAM_COPY_IF_SET (v1, copy, v1_self, community);
+  STREAM_COPY_IF_SET_WITH_LOCALE (v1, copy, v1_self, description);
+  STREAM_COPY_IF_SET (v1, copy, v1_self, documentation);
+  STREAM_COPY_IF_SET_WITH_LOCALE (v1, copy, v1_self, summary);
+  STREAM_COPY_IF_SET (v1, copy, v1_self, tracker);
+
+  /* Internal Data Structures: With replace function */
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, content_licenses);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, module_licenses);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, rpm_api);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, rpm_artifacts);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, rpm_filters);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, buildtime_deps);
+  STREAM_REPLACE_HASHTABLE (v1, copy, v1_self, runtime_deps);
+
+  /* Internal Data Structures: With add on value */
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_self, rpm_components, modulemd_module_stream_v1_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_self, module_components, modulemd_module_stream_v1_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_self, profiles, modulemd_module_stream_v1_add_profile);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_self, servicelevels, modulemd_module_stream_v1_add_servicelevel);
+
+  if (v1_self->xmd != NULL)
+    modulemd_module_stream_v1_set_xmd (copy, g_variant_ref (v1_self->xmd));
+
+  return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
+}
+
+
 static void
 modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
 {
@@ -985,6 +1035,7 @@ modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
   object_class->set_property = modulemd_module_stream_v1_set_property;
 
   stream_class->get_mdversion = modulemd_module_stream_v1_get_mdversion;
+  stream_class->copy = modulemd_module_stream_v1_copy;
 
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",

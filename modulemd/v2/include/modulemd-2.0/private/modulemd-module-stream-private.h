@@ -17,6 +17,7 @@
 #include "modulemd-module-stream.h"
 #include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
+#include "private/modulemd-yaml.h"
 
 G_BEGIN_DECLS
 
@@ -94,5 +95,10 @@ modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
         }                                                                     \
     }                                                                         \
   while (0)
+
+gboolean
+modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
+                                       yaml_emitter_t *emitter,
+                                       GError **error);
 
 G_END_DECLS

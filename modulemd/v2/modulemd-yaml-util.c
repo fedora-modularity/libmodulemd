@@ -872,3 +872,61 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
 
   return TRUE;
 }
+
+
+gboolean
+modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
+                            GVariant *variant,
+                            GError **error)
+{
+  GVariantIter iter;
+  g_autofree gchar *key = NULL;
+  g_autoptr (GVariant) value = NULL;
+
+  if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING))
+    {
+      EMIT_SCALAR (emitter, error, g_variant_get_string (variant, NULL));
+    }
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
+    {
+      if (g_variant_get_boolean (variant))
+        EMIT_SCALAR (emitter, error, "TRUE");
+      else
+        EMIT_SCALAR (emitter, error, "FALSE");
+    }
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
+    {
+      EMIT_MAPPING_START (emitter, error);
+      g_variant_iter_init (&iter, variant);
+      while (g_variant_iter_next (&iter, "{sv}", &key, &value))
+        {
+          EMIT_SCALAR (emitter, error, key);
+          if (!modulemd_yaml_emit_variant (emitter, value, error))
+            return FALSE;
+          g_clear_pointer (&key, g_free);
+          g_clear_pointer (&value, g_variant_unref);
+        }
+      EMIT_MAPPING_END (emitter, error);
+    }
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_ARRAY))
+    {
+      EMIT_SEQUENCE_START (emitter, error);
+      g_variant_iter_init (&iter, variant);
+      while (g_variant_iter_next (&iter, "{v}", &value))
+        {
+          if (!modulemd_yaml_emit_variant (emitter, value, error))
+            return FALSE;
+          g_clear_pointer (&value, g_variant_unref);
+        }
+      EMIT_SEQUENCE_END (emitter, error);
+    }
+  else
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EMIT,
+                   "Unhandled variant type");
+      return FALSE;
+    }
+  return TRUE;
+}

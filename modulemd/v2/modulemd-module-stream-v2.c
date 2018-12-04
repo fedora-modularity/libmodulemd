@@ -2115,6 +2115,8 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
   g_auto (GVariantBuilder) builder;
   g_autoptr (GVariant) value = NULL;
   g_autoptr (GError) nested_error = NULL;
+  gboolean empty_array = TRUE;
+  GVariant *result = NULL;
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
 
@@ -2166,12 +2168,29 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
           break;
         }
 
-      g_variant_builder_add_value (&builder, g_variant_ref (value));
+      if (value)
+        {
+          g_variant_builder_add_value (&builder, g_variant_ref (value));
+          empty_array = FALSE;
+        }
 
       yaml_event_delete (&event);
     }
 
-  return g_variant_ref_sink (g_variant_builder_end (&builder));
+  if (empty_array)
+    {
+      /* If we got an empty array, treat it as a zero-length array of
+       * GVariants
+       */
+      result = g_variant_new ("av", NULL);
+    }
+  else
+    {
+      /* Otherwise, finish it up */
+      result = g_variant_builder_end (&builder);
+    }
+
+  return g_variant_ref_sink (result);
 }
 
 gboolean

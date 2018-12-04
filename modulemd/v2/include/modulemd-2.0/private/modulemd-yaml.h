@@ -443,6 +443,8 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
 /* A set of macros for simple emitting of common elements */
 #define NON_EMPTY_TABLE(table) (g_hash_table_size (table) != 0)
 
+#define NON_EMPTY_ARRAY(array) (array->len != 0)
+
 #define EMIT_SCALAR(emitter, error, value)                                    \
   do                                                                          \
     {                                                                         \
@@ -596,6 +598,40 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
       if (NON_EMPTY_TABLE (table))                                            \
         {                                                                     \
           EMIT_STRING_SET (emitter, error, key, table);                       \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_ARRAY_VALUES(emitter, error, key, array, emitfn)                 \
+  do                                                                          \
+    {                                                                         \
+      if (!NON_EMPTY_ARRAY (array))                                           \
+        {                                                                     \
+          g_set_error (error,                                                 \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       "Array for key %s was empty on emit",                  \
+                       key);                                                  \
+          return FALSE;                                                       \
+        }                                                                     \
+      EMIT_SCALAR (emitter, error, key);                                      \
+      EMIT_SEQUENCE_START (emitter, error);                                   \
+      gsize i;                                                                \
+      for (i = 0; i < array->len; i++)                                        \
+        {                                                                     \
+          if (!emitfn (g_ptr_array_index (array, i), emitter, error))         \
+            return FALSE;                                                     \
+        }                                                                     \
+      EMIT_SEQUENCE_END (emitter, error);                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_ARRAY_VALUES_IF_NON_EMPTY(emitter, error, key, array, emitfn)    \
+  do                                                                          \
+    {                                                                         \
+      if (NON_EMPTY_ARRAY (array))                                            \
+        {                                                                     \
+          EMIT_ARRAY_VALUES (emitter, error, key, array, emitfn);             \
         }                                                                     \
     }                                                                         \
   while (0)

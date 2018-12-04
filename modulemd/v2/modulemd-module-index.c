@@ -336,7 +336,9 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
       else if (modulemd_module_stream_get_mdversion (stream) ==
                MD_MODULESTREAM_VERSION_TWO)
         {
-          /* TODO: Emit stream v2 */
+          if (!modulemd_module_stream_v2_emit_yaml (
+                MODULEMD_MODULE_STREAM_V2 (stream), emitter, error))
+            return FALSE;
         }
       else
         {

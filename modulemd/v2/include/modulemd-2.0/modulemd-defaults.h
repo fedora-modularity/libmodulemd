@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 /**
  * ModulemdDefaultsVersionEnum:
+ * @MD_DEFAULTS_VERSION_ERROR: Represents an error handling mdversion.
  * @MD_DEFAULTS_VERSION_ONE: Represents v1 of the #Modulemd.Defaults metadata
  * format.
  * @MD_DEFAULTS_VERSION_LATEST: Represents the highest-supported version of the
@@ -37,6 +38,8 @@ G_BEGIN_DECLS
  */
 typedef enum
 {
+  MD_DEFAULTS_VERSION_ERROR = -1,
+
   MD_DEFAULTS_VERSION_UNSET = 0,
 
   MD_DEFAULTS_VERSION_ONE = 1,

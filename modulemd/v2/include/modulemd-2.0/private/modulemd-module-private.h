@@ -42,16 +42,35 @@ modulemd_module_new (const gchar *module_name);
 
 /**
  * modulemd_module_set_defaults:
- * @self: This #ModulemdModule object
- * @defaults: A #ModulemdDefaults object to associate with this #ModulemdModule. If the
- * module_name in the #ModulemdDefaults object does not match this module, it will be silently
- * ignored.
+ * @self: (in): This #ModulemdModule object
+ * @defaults: (in): A #ModulemdDefaults object to associate with this
+ * #ModulemdModule. If the module_name in the #ModulemdDefaults object does not
+ * match this module, it will be rejected.
+ * @index_mdversion: (in): The #ModulemdDefaultsVersionEnum of the highest
+ * defaults version added so far in the #ModulemdModuleIndex. If non-zero,
+ * perform an upgrade to this version while adding @defaults to @self. If
+ * the @defaults already has a higher version, just copy it.
+ * @error: (out): A #GError containing information about why this fucntion
+ * failed.
+ *
+ * This function takes a defaults object, upgrades it to @index_mdversion if it
+ * is lower and adds it to the #ModulemdModule. If it cannot upgrade it safely
+ * or the defaults are not for this module, it will return an appropriate
+ * error.
+ *
+ * Returns: The mdversion of the defaults that were added. Returns
+ * MD_DEFAULTS_VERSION_ERROR and sets @error if the default name didn't match
+ * or the Defaults object couldn't be upgraded successfully to
+ * the @index_mdversion. Returns MD_DEFAULTS_VERSION_UNSET if @defaults was
+ * NULL.
  *
  * Since: 2.0
  */
-void
+ModulemdDefaultsVersionEnum
 modulemd_module_set_defaults (ModulemdModule *self,
-                              ModulemdDefaults *defaults);
+                              ModulemdDefaults *defaults,
+                              ModulemdDefaultsVersionEnum index_mdversion,
+                              GError **error);
 
 
 /**

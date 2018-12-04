@@ -181,23 +181,71 @@ modulemd_module_init (ModulemdModule *self)
 }
 
 
-void
-modulemd_module_set_defaults (ModulemdModule *self, ModulemdDefaults *defaults)
+ModulemdDefaultsVersionEnum
+modulemd_module_set_defaults (ModulemdModule *self,
+                              ModulemdDefaults *defaults,
+                              ModulemdDefaultsVersionEnum index_mdversion,
+                              GError **error)
 {
-  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_autoptr (ModulemdDefaults) upgraded_defaults = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), MD_DEFAULTS_VERSION_ERROR);
 
   g_clear_object (&self->defaults);
-
   if (defaults == NULL)
-    return;
+    {
+      /* If we are empty here, return MD_DEFAULTS_VERSION_UNSET so the
+       * function reports success and does not influence further upgrades.
+       */
+      return MD_DEFAULTS_VERSION_UNSET;
+    }
 
   /* We should never get a defaults object added whose module name doesn't
    * match.
    */
-  g_return_if_fail (g_str_equal (modulemd_defaults_get_module_name (defaults),
-                                 modulemd_module_get_module_name (self)));
+  if (g_strcmp0 (modulemd_defaults_get_module_name (defaults),
+                 modulemd_module_get_module_name (self)) != 0)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "Attempted to add defaults for module '%s' to module '%s'",
+                   modulemd_defaults_get_module_name (defaults),
+                   modulemd_module_get_module_name (self));
+      return MD_DEFAULTS_VERSION_ERROR;
+    }
 
-  self->defaults = modulemd_defaults_copy (defaults);
+  /* For Modulemd.ModuleIndex, we always want all entries to have the same
+   * version, so that merges can be performed. If this Defaults object has a
+   * lower mdversion than the Index, upgrade it to that version.
+   *
+   * We only call this if the mdversion is definitely lower, because the
+   * upgrade() routine is not designed to handle downgrades.
+   */
+  if (modulemd_defaults_get_mdversion (defaults) < index_mdversion)
+    {
+      upgraded_defaults =
+        modulemd_defaults_upgrade (defaults, index_mdversion, &nested_error);
+      if (!upgraded_defaults)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return MD_DEFAULTS_VERSION_ERROR;
+        }
+    }
+  else
+    {
+      /* The new defaults were of the same or a higher version, so just copy it
+       * and return that. The ModulemdModuleIndex will handle upgrading other
+       * Defaults in the index to match.
+       */
+      upgraded_defaults = modulemd_defaults_copy (defaults);
+    }
+
+  /* Return the mdversion we saved so that the Index can check to see if we
+   * need to upgrade other modules to match.
+   */
+  self->defaults = g_steal_pointer (&upgraded_defaults);
+  return modulemd_defaults_get_mdversion (self->defaults);
 }
 
 

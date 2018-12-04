@@ -32,6 +32,8 @@ struct _ModulemdModuleIndex
   GObject parent_instance;
 
   GHashTable *modules;
+
+  ModulemdDefaultsVersionEnum defaults_mdversion;
 };
 
 G_DEFINE_TYPE (ModulemdModuleIndex, modulemd_module_index, G_TYPE_OBJECT)
@@ -555,16 +557,86 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
 }
 
 
+static gboolean
+modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
+                                        ModulemdDefaultsVersionEnum mdversion,
+                                        GError **error);
+
 gboolean
 modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
                                     ModulemdDefaults *defaults,
                                     GError **error)
 {
+  g_autoptr (GError) nested_error = NULL;
+  ModulemdDefaultsVersionEnum mdversion = MD_DEFAULTS_VERSION_UNSET;
+
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
-  modulemd_module_set_defaults (
+  mdversion = modulemd_module_set_defaults (
     get_or_create_module (self, modulemd_defaults_get_module_name (defaults)),
-    defaults);
+    defaults,
+    self->defaults_mdversion,
+    &nested_error);
+  if (mdversion == MD_DEFAULTS_VERSION_ERROR)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
+  if (mdversion > self->defaults_mdversion)
+    {
+      /* Upgrade any defaults we've already seen to this version */
+      g_debug ("Upgrading all defaults to version %i", mdversion);
+      if (!modulemd_module_index_upgrade_defaults (
+            self, mdversion, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
+                                        ModulemdDefaultsVersionEnum mdversion,
+                                        GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  g_autoptr (ModulemdModule) module = NULL;
+  g_autoptr (ModulemdDefaults) defaults = NULL;
+  ModulemdDefaultsVersionEnum returned_mdversion = MD_DEFAULTS_VERSION_UNSET;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_hash_table_iter_init (&iter, self->modules);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module = g_object_ref (MODULEMD_MODULE (value));
+      defaults = g_object_ref (modulemd_module_get_defaults (module));
+
+      /* Skip any module without defaults */
+      if (!defaults)
+        continue;
+
+      returned_mdversion = modulemd_module_set_defaults (
+        module, defaults, self->defaults_mdversion, &nested_error);
+      if (returned_mdversion != mdversion)
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Error upgrading previously-added defaults: ");
+          return FALSE;
+        }
+      g_clear_object (&defaults);
+      g_clear_object (&module);
+    }
+
+  self->defaults_mdversion = mdversion;
+
   return TRUE;
 }
 

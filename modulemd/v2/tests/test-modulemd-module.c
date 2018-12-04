@@ -87,32 +87,43 @@ module_test_defaults (ModuleFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdModule) m = NULL;
   g_autoptr (ModulemdDefaultsV1) d = NULL;
+  g_autoptr (GError) nested_error = NULL;
   ModulemdDefaults *d_got = NULL;
 
   m = modulemd_module_new ("testmodule");
 
   /* Verify that setting defaults that don't match this module name fails and
-   * aborts with SIGTRAP
+   * returns an error
    */
   d = modulemd_defaults_v1_new ("test");
   g_assert_nonnull (d);
 
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  modulemd_module_set_defaults (m, MODULEMD_DEFAULTS (d));
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
+  g_assert_cmpint (
+    modulemd_module_set_defaults (
+      m, MODULEMD_DEFAULTS (d), MD_DEFAULTS_VERSION_UNSET, &nested_error),
+    ==,
+    MD_DEFAULTS_VERSION_ERROR);
+  g_assert_nonnull (nested_error);
   g_clear_object (&d);
+  g_clear_pointer (&nested_error, g_error_free);
 
   d = modulemd_defaults_v1_new ("testmodule");
   g_assert_nonnull (d);
-  modulemd_module_set_defaults (m, MODULEMD_DEFAULTS (d));
+  g_assert_cmpint (
+    modulemd_module_set_defaults (
+      m, MODULEMD_DEFAULTS (d), MD_DEFAULTS_VERSION_UNSET, NULL),
+    ==,
+    MD_DEFAULTS_VERSION_ONE);
 
   d_got = modulemd_module_get_defaults (m);
   g_assert_nonnull (d_got);
   g_assert_cmpstr (
     modulemd_defaults_get_module_name (d_got), ==, "testmodule");
 
-  modulemd_module_set_defaults (m, NULL);
+  g_assert_cmpint (
+    modulemd_module_set_defaults (m, NULL, MD_DEFAULTS_VERSION_UNSET, NULL),
+    ==,
+    MD_DEFAULTS_VERSION_UNSET);
   g_assert_null (modulemd_module_get_defaults (m));
 }
 

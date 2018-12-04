@@ -109,7 +109,11 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
     "ro_TA\n  - summary: Testsummary in ro_TA\n...\n---\ndocument: "
     "modulemd\nversion: 1\ndata:\n  name: testmodule1\n  stream: "
     "teststream1\n  summary: A test stream\n  description: A test stream's "
-    "description\n  license:\n    module:\n    - Beerware\n...\n");
+    "description\n  license:\n    module:\n    - "
+    "Beerware\n...\n---\ndocument: modulemd\nversion: 2\ndata:\n  name: "
+    "testmodule1\n  stream: teststream2\n  summary: A second stream\n  "
+    "description: A second stream's description\n  license:\n    module:\n    "
+    "- Beerware\n...\n");
 }
 
 

@@ -96,7 +96,10 @@ modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
 /**
  * modulemd_module_add_stream:
  * @self: This #ModulemdModule object
- * @stream: A #ModulemdModuleStream object to associate with this #ModulemdModule.
+ * @stream: A #ModulemdModuleStream object to associate with this
+ * #ModulemdModule. A stream added to a #ModulemdModule must have a module
+ * name and stream name set on it or it will be rejected.
+ *
  *
  * Since: 2.0
  */

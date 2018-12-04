@@ -181,13 +181,14 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 /**
  * modulemd_module_index_add_module_stream:
  * @self: This #ModulemdModuleIndex
- * @stream: The #ModulemdModuleStream to add to the index.
+ * @stream: The #ModulemdModuleStream to add to the index. The stream added
+ * must have a module name and stream name set on it or it will be rejected.
  * @error: (out): A #GError containing the reason the #ModulemdModuleStream
  * object could not be added or NULL if the function succeeded.
  *
  * Returns: TRUE if the #ModulemdModule was added succesfully. If the stream
- * already existed in the index, it will be replaced by the new one. On failure,
- * returns FALSE and sets error appropriately.
+ * already existed in the index, it will be replaced by the new one. On
+ * failure, returns FALSE and sets error appropriately.
  *
  * Since: 2.0
  */

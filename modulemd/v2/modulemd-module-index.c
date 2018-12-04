@@ -497,6 +497,17 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
+  if (!modulemd_module_stream_get_module_name (stream) ||
+      !modulemd_module_stream_get_stream_name (stream))
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "The module and stream names are required when adding to "
+                   "ModuleIndex.");
+      return FALSE;
+    }
+
   modulemd_module_add_stream (
     get_or_create_module (self,
                           modulemd_module_stream_get_module_name (stream)),

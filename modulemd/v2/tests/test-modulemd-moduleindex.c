@@ -71,6 +71,8 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
   /* Third: some streams */
   stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
     "testmodule1", "teststream1");
+  modulemd_module_stream_set_version (stream, 1);
+  modulemd_module_stream_set_context (stream, "deadbeef");
   modulemd_module_stream_v1_set_summary (MODULEMD_MODULE_STREAM_V1 (stream),
                                          "A test stream");
   modulemd_module_stream_v1_set_description (
@@ -83,6 +85,8 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
   g_clear_pointer (&stream, g_object_unref);
   stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
     "testmodule1", "teststream2");
+  modulemd_module_stream_set_version (stream, 2);
+  modulemd_module_stream_set_context (stream, "c0ff33");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "A second stream");
   modulemd_module_stream_v2_set_description (
@@ -108,10 +112,12 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
     " translations:\n  - nl_NL\n  - summary: Een test omschrijving\n  - "
     "ro_TA\n  - summary: Testsummary in ro_TA\n...\n---\ndocument: "
     "modulemd\nversion: 1\ndata:\n  name: testmodule1\n  stream: "
-    "teststream1\n  summary: A test stream\n  description: A test stream's "
+    "teststream1\n  version: 1\n  context: deadbeef\n  summary: A test "
+    "stream\n  description: A test stream's "
     "description\n  license:\n    module:\n    - "
     "Beerware\n...\n---\ndocument: modulemd\nversion: 2\ndata:\n  name: "
-    "testmodule1\n  stream: teststream2\n  summary: A second stream\n  "
+    "testmodule1\n  stream: teststream2\n  version: 2\n  context: c0ff33\n  "
+    "summary: A second stream\n  "
     "description: A second stream's description\n  license:\n    module:\n    "
     "- Beerware\n...\n");
 }

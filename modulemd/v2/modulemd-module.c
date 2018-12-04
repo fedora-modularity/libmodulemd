@@ -218,8 +218,10 @@ modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
   ModulemdModuleStream *newstream = NULL;
   g_return_if_fail (MODULEMD_IS_MODULE (self));
   g_return_if_fail (stream);
-  g_return_if_fail (g_str_equal (
-    modulemd_module_stream_get_module_name (stream), self->module_name));
+  g_return_if_fail (modulemd_module_stream_get_module_name (stream));
+  g_return_if_fail (modulemd_module_stream_get_stream_name (stream));
+  g_return_if_fail (g_strcmp0 (modulemd_module_stream_get_module_name (stream),
+                               self->module_name) == 0);
 
   old = modulemd_module_get_stream_by_NSVC (
     self,
@@ -309,16 +311,16 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
       under_consideration =
         (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
 
-      if (!g_str_equal (
+      if (g_strcmp0 (
             modulemd_module_stream_get_stream_name (under_consideration),
-            stream_name))
+            stream_name) != 0)
         continue;
 
       if (modulemd_module_stream_get_version (under_consideration) != version)
         continue;
 
-      if (!g_str_equal (
-            modulemd_module_stream_get_context (under_consideration), context))
+      if (g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
+                     context) != 0)
         continue;
 
       return under_consideration;

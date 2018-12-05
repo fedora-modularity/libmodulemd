@@ -418,7 +418,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
           g_assert_not_reached ();
         }
 
-      g_object_unref (&current_stream);
+      g_object_unref (current_stream);
       current_stream = g_steal_pointer (&updated_stream);
       current_mdversion =
         modulemd_module_stream_get_mdversion (current_stream);

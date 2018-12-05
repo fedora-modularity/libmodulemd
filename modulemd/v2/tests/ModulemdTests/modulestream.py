@@ -514,15 +514,11 @@ data:
     - BSD
   dependencies:
   - buildrequires:
-      ModuleA:
-      - streamZ
-      ModuleB:
-      - streamY
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
     requires:
-      ModuleA:
-      - streamZ
-      ModuleB:
-      - streamY
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
 ...
 """)
 

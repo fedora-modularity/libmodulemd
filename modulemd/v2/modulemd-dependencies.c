@@ -394,6 +394,7 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error)
 static gboolean
 modulemd_dependencies_emit_yaml_nested_set_value (GHashTable *values,
                                                   yaml_emitter_t *emitter,
+                                                  yaml_sequence_style_t style,
                                                   GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -403,8 +404,7 @@ modulemd_dependencies_emit_yaml_nested_set_value (GHashTable *values,
   GHashTableIter iter;
   gpointer key;
 
-  ret = mmd_emitter_start_sequence (
-    emitter, YAML_BLOCK_SEQUENCE_STYLE, &nested_error);
+  ret = mmd_emitter_start_sequence (emitter, style, &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (
@@ -481,7 +481,7 @@ modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
         }
 
       ret = modulemd_dependencies_emit_yaml_nested_set_value (
-        (GHashTable *)value, emitter, &nested_error);
+        (GHashTable *)value, emitter, YAML_FLOW_SEQUENCE_STYLE, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

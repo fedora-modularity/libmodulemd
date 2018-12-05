@@ -31,6 +31,42 @@ G_BEGIN_DECLS
  */
 
 
+struct _ModulemdModuleStreamV2
+{
+  GObject parent_instance;
+
+  /* Properties */
+  gchar *arch;
+  ModulemdBuildopts *buildopts;
+  gchar *community;
+  gchar *description;
+  gchar *documentation;
+  gchar *summary;
+  gchar *tracker;
+
+  /* Internal Data Structures */
+  GHashTable *module_components; /* <string, Modulemd.ComponentModule */
+  GHashTable *rpm_components; /* <string, Modulemd.ComponentRpm> */
+
+  GHashTable *content_licenses; /* string set */
+  GHashTable *module_licenses; /* string set */
+
+  GHashTable *profiles; /* <string, Modulemd.Profile> */
+
+  GHashTable *rpm_api; /* string set */
+
+  GHashTable *rpm_artifacts; /* string set */
+
+  GHashTable *rpm_filters; /* string set */
+
+  GHashTable *servicelevels; /* <string, Modulemd.ServiceLevel */
+
+  GPtrArray *dependencies; /* <Modulemd.Dependencies> */
+
+  GVariant *xmd;
+};
+
+
 /**
  * modulemd_module_stream_v2_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a stream v2

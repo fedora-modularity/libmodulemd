@@ -356,16 +356,164 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 }
 
 
+static ModulemdModuleStream *
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
+                                      GError **error);
+
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
                                 GError **error)
 {
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (ModulemdModuleStream) current_stream = NULL;
+  g_autoptr (ModulemdModuleStream) updated_stream = NULL;
+  guint64 current_mdversion = modulemd_module_stream_get_mdversion (self);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
   g_return_val_if_fail (
     mdversion && mdversion <= MD_MODULESTREAM_VERSION_LATEST, NULL);
-  /* TODO */
-  return NULL;
+
+  if (!mdversion)
+    {
+      /* If target mdversion is unspecified, set it to the latest */
+      mdversion = MD_MODULESTREAM_VERSION_LATEST;
+    }
+
+  if (mdversion < current_mdversion)
+    {
+      /* Downgrades are not supported */
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_UPGRADE,
+                           "ModuleStream downgrades are not supported.");
+      return NULL;
+    }
+
+  if (current_mdversion == mdversion)
+    {
+      /* If we're already on the requested version, just make a copy */
+      return modulemd_module_stream_copy (self, NULL, NULL);
+    }
+
+  current_stream = g_object_ref (self);
+
+  while (current_mdversion != mdversion)
+    {
+      switch (current_mdversion)
+        {
+        case 1:
+          /* Upgrade to ModuleStreamV2 */
+          updated_stream = modulemd_module_stream_upgrade_to_v2 (
+            current_stream, &nested_error);
+          if (!updated_stream)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+          break;
+
+        default:
+          /* If we get here, it means we failed to address an upgrade. */
+          g_assert_not_reached ();
+        }
+
+      g_object_unref (&current_stream);
+      current_stream = g_steal_pointer (&updated_stream);
+      current_mdversion =
+        modulemd_module_stream_get_mdversion (current_stream);
+    }
+
+  return g_steal_pointer (&current_stream);
+}
+
+
+static ModulemdModuleStream *
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
+                                      GError **error)
+{
+  ModulemdModuleStreamV1 *v1_stream = NULL;
+  g_autoptr (ModulemdModuleStreamV2) copy = NULL;
+  g_autoptr (ModulemdDependencies) deps = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (from), NULL);
+  v1_stream = MODULEMD_MODULE_STREAM_V1 (from);
+
+  copy = modulemd_module_stream_v2_new (
+    modulemd_module_stream_get_module_name (from),
+    modulemd_module_stream_get_stream_name (from));
+
+
+  /* Parent class copy */
+  modulemd_module_stream_set_version (
+    MODULEMD_MODULE_STREAM (copy), modulemd_module_stream_get_version (from));
+  modulemd_module_stream_set_context (
+    MODULEMD_MODULE_STREAM (copy), modulemd_module_stream_get_context (from));
+  modulemd_module_stream_associate_translation (
+    MODULEMD_MODULE_STREAM (copy),
+    modulemd_module_stream_get_translation (from));
+
+  /* Copy all attributes that are the same as V1 */
+
+  /* Properties */
+  STREAM_UPGRADE_IF_SET (v1, v2, copy, v1_stream, arch);
+  STREAM_UPGRADE_IF_SET (v1, v2, copy, v1_stream, buildopts);
+  STREAM_UPGRADE_IF_SET (v1, v2, copy, v1_stream, community);
+  STREAM_UPGRADE_IF_SET_WITH_LOCALE (v1, v2, copy, v1_stream, description);
+  STREAM_UPGRADE_IF_SET (v1, v2, copy, v1_stream, documentation);
+  STREAM_UPGRADE_IF_SET_WITH_LOCALE (v1, v2, copy, v1_stream, summary);
+  STREAM_UPGRADE_IF_SET (v1, v2, copy, v1_stream, tracker);
+
+  /* Internal Data Structures: With replace function */
+  STREAM_REPLACE_HASHTABLE (v2, copy, v1_stream, content_licenses);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v1_stream, module_licenses);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v1_stream, rpm_api);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v1_stream, rpm_artifacts);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v1_stream, rpm_filters);
+
+  /* Internal Data Structures: With add on value */
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_stream, rpm_components, modulemd_module_stream_v2_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (copy,
+                                 v1_stream,
+                                 module_components,
+                                 modulemd_module_stream_v2_add_component);
+  COPY_HASHTABLE_BY_VALUE_ADDER (
+    copy, v1_stream, profiles, modulemd_module_stream_v2_add_profile);
+  COPY_HASHTABLE_BY_VALUE_ADDER (copy,
+                                 v1_stream,
+                                 servicelevels,
+                                 modulemd_module_stream_v2_add_servicelevel);
+
+
+  if (v1_stream->xmd != NULL)
+    modulemd_module_stream_v2_set_xmd (copy, g_variant_ref (v1_stream->xmd));
+
+
+  /* Upgrade the Dependencies */
+  deps = modulemd_dependencies_new ();
+
+  /* Add the build-time deps */
+  g_hash_table_iter_init (&iter, v1_stream->buildtime_deps);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      modulemd_dependencies_add_buildtime_stream (deps, key, value);
+    }
+
+  /* Add the run-time deps */
+  g_hash_table_iter_init (&iter, v1_stream->runtime_deps);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      modulemd_dependencies_add_runtime_stream (deps, key, value);
+    }
+
+  /* Add the Dependencies to this ModuleStreamV2 */
+  modulemd_module_stream_v2_add_dependencies (copy, deps);
+
+
+  return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }
 
 

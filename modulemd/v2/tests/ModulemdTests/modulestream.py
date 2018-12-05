@@ -484,6 +484,48 @@ class TestModuleStream(TestBase):
             assert 'inner_key' in xmd['outer_key'][1]
             assert xmd['outer_key'][1]['inner_key'] == 'another_scalar'
 
+    def test_upgrade(self):
+        v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
+        v1_stream.set_summary("Summary")
+        v1_stream.set_description("Description")
+        v1_stream.add_module_license("BSD")
+
+        v1_stream.add_buildtime_requirement("ModuleA", "streamZ")
+        v1_stream.add_buildtime_requirement("ModuleB", "streamY")
+        v1_stream.add_runtime_requirement("ModuleA", "streamZ")
+        v1_stream.add_runtime_requirement("ModuleB", "streamY")
+
+        v2_stream = v1_stream.upgrade(Modulemd.ModuleStreamVersionEnum.LATEST)
+        self.assertIsNotNone(v2_stream)
+
+        idx = Modulemd.ModuleIndex.new()
+        idx.add_module_stream(v2_stream)
+
+        self.assertEquals(idx.dump_to_string(), """---
+document: modulemd
+version: 2
+data:
+  name: SuperModule
+  stream: latest
+  summary: Summary
+  description: Description
+  license:
+    module:
+    - BSD
+  dependencies:
+  - buildrequires:
+      ModuleA:
+      - streamZ
+      ModuleB:
+      - streamY
+    requires:
+      ModuleA:
+      - streamZ
+      ModuleB:
+      - streamY
+...
+""")
+
     def test_v2_yaml(self):
         yaml = """
 ---

@@ -33,41 +33,6 @@
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
-struct _ModulemdModuleStreamV1
-{
-  GObject parent_instance;
-
-  /* Properties */
-  gchar *arch;
-  ModulemdBuildopts *buildopts;
-  gchar *community;
-  gchar *description;
-  gchar *documentation;
-  gchar *summary;
-  gchar *tracker;
-
-  /* Internal Data Structures */
-  GHashTable *rpm_components; /* <string, Modulemd.ComponentRpm> */
-  GHashTable *module_components; /* <string, Modulemd.ComponentModule */
-
-  GHashTable *content_licenses; /* string set */
-  GHashTable *module_licenses; /* string set */
-
-  GHashTable *profiles; /* <string, Modulemd.Profile> */
-
-  GHashTable *rpm_api; /* string set */
-
-  GHashTable *rpm_artifacts; /* string set */
-
-  GHashTable *rpm_filters; /* string set */
-
-  GHashTable *servicelevels; /* <string, Modulemd.ServiceLevel */
-
-  GHashTable *buildtime_deps; /* <string, string> */
-  GHashTable *runtime_deps; /* <string, string> */
-
-  GVariant *xmd;
-};
 
 G_DEFINE_TYPE (ModulemdModuleStreamV1,
                modulemd_module_stream_v1,

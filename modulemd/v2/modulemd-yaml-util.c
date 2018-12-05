@@ -912,7 +912,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
     {
       EMIT_SEQUENCE_START (emitter, error);
       g_variant_iter_init (&iter, variant);
-      while (g_variant_iter_next (&iter, "{v}", &value))
+      while (g_variant_iter_next (&iter, "v", &value))
         {
           if (!modulemd_yaml_emit_variant (emitter, value, error))
             return FALSE;
@@ -929,4 +929,214 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
       return FALSE;
     }
   return TRUE;
+}
+
+GVariant *
+mmd_variant_from_scalar (const gchar *scalar)
+{
+  MODULEMD_INIT_TRACE ();
+  GVariant *variant = NULL;
+
+  g_debug ("Variant from scalar: %s", scalar);
+
+  g_return_val_if_fail (scalar, NULL);
+
+  /* Treat "TRUE" and "FALSE" as boolean values */
+  if (g_str_equal (scalar, "TRUE"))
+    {
+      variant = g_variant_new_boolean (TRUE);
+    }
+  else if (g_str_equal (scalar, "FALSE"))
+    {
+      variant = g_variant_new_boolean (FALSE);
+    }
+
+  else if (scalar)
+    {
+      /* Any value we don't handle specifically becomes a string */
+      variant = g_variant_new_string (scalar);
+    }
+
+  return g_variant_ref_sink (variant);
+}
+
+
+GVariant *
+mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  gboolean done = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_EVENT (value_event);
+
+  g_autoptr (GVariantDict) dict = NULL;
+  g_autoptr (GVariant) value = NULL;
+  g_autofree gchar *key = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  dict = g_variant_dict_new (NULL);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT:
+          /* We've processed the whole dictionary */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          /* All mapping keys must be scalars */
+          key = g_strdup ((const gchar *)event.data.scalar.value);
+
+          YAML_PARSER_PARSE_WITH_EXIT (parser, &value_event, error);
+
+          switch (value_event.type)
+            {
+            case YAML_SCALAR_EVENT:
+              value = mmd_variant_from_scalar (
+                (const gchar *)value_event.data.scalar.value);
+              if (!value)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error, event, "Error parsing scalar");
+                }
+              break;
+
+            case YAML_MAPPING_START_EVENT:
+              value = mmd_variant_from_mapping (parser, &nested_error);
+              if (!value)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                }
+              break;
+
+            case YAML_SEQUENCE_START_EVENT:
+              value = mmd_variant_from_sequence (parser, &nested_error);
+              if (!value)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                }
+              break;
+
+            default:
+              /* We received a YAML event we shouldn't expect at this level */
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Unexpected YAML event in inner raw mapping: %s",
+                mmd_yaml_get_event_name (value_event.type));
+              break;
+            }
+
+          yaml_event_delete (&value_event);
+          g_variant_dict_insert_value (dict, key, value);
+          g_clear_pointer (&key, g_free);
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in raw mapping: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  return g_variant_ref_sink (g_variant_dict_end (dict));
+}
+
+
+GVariant *
+mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  gboolean done = FALSE;
+  MMD_INIT_YAML_EVENT (event);
+
+  g_auto (GVariantBuilder) builder;
+  g_autoptr (GVariant) value = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  gboolean empty_array = TRUE;
+  GVariant *result = NULL;
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_SEQUENCE_END_EVENT:
+          /* We've processed the whole sequence */
+          done = TRUE;
+          break;
+
+        case YAML_SCALAR_EVENT:
+          value =
+            mmd_variant_from_scalar ((const gchar *)event.data.scalar.value);
+          if (!value)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (error, event, "Error parsing scalar");
+            }
+          break;
+
+        case YAML_MAPPING_START_EVENT:
+          value = mmd_variant_from_mapping (parser, &nested_error);
+          if (!value)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+          break;
+
+        case YAML_SEQUENCE_START_EVENT:
+          value = mmd_variant_from_sequence (parser, &nested_error);
+          if (!value)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+          break;
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in raw sequence: %s",
+            mmd_yaml_get_event_name (event.type));
+          break;
+        }
+
+      if (value)
+        {
+          g_variant_builder_add_value (&builder, g_variant_ref (value));
+          empty_array = FALSE;
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  if (empty_array)
+    {
+      /* If we got an empty array, treat it as a zero-length array of
+       * GVariants
+       */
+      result = g_variant_new ("av", NULL);
+    }
+  else
+    {
+      /* Otherwise, finish it up */
+      result = g_variant_builder_end (&builder);
+    }
+
+  return g_variant_ref_sink (result);
 }

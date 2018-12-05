@@ -152,28 +152,40 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   modulemd_module_stream_set_context (stream, "context1");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  modulemd_module_add_stream (m, stream);
+  g_assert_cmpint (modulemd_module_add_stream (
+                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 3);
   modulemd_module_stream_set_context (stream, "context2");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  modulemd_module_add_stream (m, stream);
+  g_assert_cmpint (modulemd_module_add_stream (
+                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 1);
   modulemd_module_stream_set_context (stream, "context2");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  modulemd_module_add_stream (m, stream);
+  g_assert_cmpint (modulemd_module_add_stream (
+                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream2");
   modulemd_module_stream_set_version (stream, 42);
   modulemd_module_stream_set_context (stream, "context42");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 2");
-  modulemd_module_add_stream (m, stream);
+  g_assert_cmpint (modulemd_module_add_stream (
+                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
   /* Create a translation post-adding streams */

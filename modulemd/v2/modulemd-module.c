@@ -258,18 +258,62 @@ modulemd_module_get_defaults (ModulemdModule *self)
 }
 
 
-void
-modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
+ModulemdModuleStreamVersionEnum
+modulemd_module_add_stream (ModulemdModule *self,
+                            ModulemdModuleStream *stream,
+                            ModulemdModuleStreamVersionEnum index_mdversion,
+                            GError **error)
 {
   ModulemdModuleStream *old = NULL;
   ModulemdTranslation *translation = NULL;
   ModulemdModuleStream *newstream = NULL;
-  g_return_if_fail (MODULEMD_IS_MODULE (self));
-  g_return_if_fail (stream);
-  g_return_if_fail (modulemd_module_stream_get_module_name (stream));
-  g_return_if_fail (modulemd_module_stream_get_stream_name (stream));
-  g_return_if_fail (g_strcmp0 (modulemd_module_stream_get_module_name (stream),
-                               self->module_name) == 0);
+  g_autoptr (GError) nested_error = NULL;
+  const gchar *module_name = NULL;
+  const gchar *stream_name = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self),
+                        MD_MODULESTREAM_VERSION_ERROR);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (stream),
+                        MD_MODULESTREAM_VERSION_ERROR);
+
+  module_name = modulemd_module_stream_get_module_name (stream);
+  stream_name = modulemd_module_stream_get_stream_name (stream);
+
+  if (!module_name)
+    {
+      g_set_error (
+        error,
+        MODULEMD_ERROR,
+        MODULEMD_ERROR_VALIDATE,
+        "Attempted to add stream with no module name to module '%s'",
+        modulemd_module_get_module_name (self));
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
+
+  if (!stream_name)
+    {
+      g_set_error (
+        error,
+        MODULEMD_ERROR,
+        MODULEMD_ERROR_VALIDATE,
+        "Attempted to add stream with no stream name to module '%s'",
+        modulemd_module_get_module_name (self));
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
+
+  /* We should never get a stream object added whose module name doesn't
+   * match.
+   */
+  if (g_strcmp0 (module_name, modulemd_module_get_module_name (self)) != 0)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "Attempted to add stream for module '%s' to module '%s'",
+                   stream_name,
+                   modulemd_module_get_module_name (self));
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
 
   old = modulemd_module_get_stream_by_NSVC (
     self,
@@ -283,7 +327,27 @@ modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
       old = NULL;
     }
 
-  newstream = modulemd_module_stream_copy (stream, NULL, NULL);
+  if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
+    {
+      /* If the stream we were passed is of a lower version than the index has
+       * seen before, upgrade it to the index version.
+       *
+       * We only call this if the mdversion is definitely lower, because the
+       * upgrade() routine is not designed to handle downgrades.
+       */
+      newstream = modulemd_module_stream_upgrade (
+        stream, index_mdversion, &nested_error);
+      if (!newstream)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return MD_MODULESTREAM_VERSION_ERROR;
+        }
+    }
+  else
+    {
+      newstream = modulemd_module_stream_copy (stream, NULL, NULL);
+    }
+
   g_ptr_array_add (self->streams, newstream);
 
   translation = g_hash_table_lookup (
@@ -292,6 +356,8 @@ modulemd_module_add_stream (ModulemdModule *self, ModulemdModuleStream *stream)
     {
       modulemd_module_stream_associate_translation (newstream, translation);
     }
+
+  return modulemd_module_stream_get_mdversion (newstream);
 }
 
 
@@ -421,4 +487,69 @@ ModulemdTranslation *
 modulemd_module_get_translation (ModulemdModule *self, const gchar *stream)
 {
   return g_hash_table_lookup (self->translations, stream);
+}
+
+
+gboolean
+modulemd_module_upgrade_streams (ModulemdModule *self,
+                                 ModulemdModuleStreamVersionEnum mdversion,
+                                 GError **error)
+{
+  g_autoptr (GPtrArray) new_streams = NULL;
+  ModulemdModuleStreamVersionEnum current_mdversion;
+  g_autoptr (ModulemdModuleStream) modulestream = NULL;
+  g_autoptr (ModulemdModuleStream) upgraded_stream = NULL;
+  g_autofree gchar *nsvc = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
+
+  new_streams = g_ptr_array_new_full (self->streams->len, g_object_unref);
+
+  for (guint i = 0; i < self->streams->len; i++)
+    {
+      modulestream = g_object_ref (
+        MODULEMD_MODULE_STREAM (g_ptr_array_index (self->streams, i)));
+      current_mdversion = modulemd_module_stream_get_mdversion (modulestream);
+      nsvc = modulemd_module_stream_get_nsvc_as_string (modulestream);
+
+      if (current_mdversion <= MD_MODULESTREAM_VERSION_UNSET)
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "ModuleStream %s had invalid mdversion %i",
+                       nsvc,
+                       current_mdversion);
+          return FALSE;
+        }
+      if (current_mdversion == mdversion)
+        {
+          /* Already at the right version, so just add it to the new list */
+          g_ptr_array_add (new_streams, g_steal_pointer (&modulestream));
+        }
+      else
+        {
+          upgraded_stream = modulemd_module_stream_upgrade (
+            modulestream, mdversion, &nested_error);
+          if (!upgraded_stream)
+            {
+              g_propagate_prefixed_error (error,
+                                          g_steal_pointer (&nested_error),
+                                          "Error upgrading module stream %s",
+                                          nsvc);
+              return FALSE;
+            }
+          g_ptr_array_add (new_streams, g_steal_pointer (&upgraded_stream));
+        }
+
+      g_clear_pointer (&nsvc, g_free);
+      g_clear_object (&modulestream);
+    }
+
+  /* Replace the old stream list with the new one */
+  g_ptr_array_unref (self->streams);
+  self->streams = g_steal_pointer (&new_streams);
+
+  return TRUE;
 }

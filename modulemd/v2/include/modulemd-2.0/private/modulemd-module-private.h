@@ -19,6 +19,9 @@
 #include "modulemd-module.h"
 #include "modulemd-translation.h"
 
+
+G_BEGIN_DECLS
+
 /**
  * SECTION: modulemd-module-private
  * @title: Modulemd.Module (Private)
@@ -117,11 +120,49 @@ modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
  * @self: This #ModulemdModule object
  * @stream: A #ModulemdModuleStream object to associate with this
  * #ModulemdModule. A stream added to a #ModulemdModule must have a module
- * name and stream name set on it or it will be rejected.
+ * name and stream name set on it or it will be rejected. If the module name
+ * does not match this module, it will also be rejected.
+ * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum of the highest
+ * stream version added so far in the #ModulemdModuleIndex. If non-zero,
+ * perform an upgrade to this version while adding @stream to @self. If
+ * the @stream already has the same or a higher version, just copy it.
+ * @error: (out): A #GError containing information about why this fucntion
+ * failed.
  *
+ * This function takes a stream object, upgrades it to index_mdversion if
+ * needed and then adds it to the #ModulemdModule. If it cannot upgrade it
+ * safely or the defaults are not for this module, it will return an
+ * appropriate error.
+ *
+ * Returns: The mdversion of the stream that was added. Returns
+ * MD_MODULE_STREAM_VERSION_ERROR and sets @error if the module name didn't
+ * match, the module and stream names were unset or the stream object couldn't
+ * be upgraded successfully to the @index_mdversion. Returns
+ * MD_MODULE_STREAM_VERSION_UNSET if @stream was NULL.
  *
  * Since: 2.0
  */
-void
+ModulemdModuleStreamVersionEnum
 modulemd_module_add_stream (ModulemdModule *self,
-                            ModulemdModuleStream *stream);
+                            ModulemdModuleStream *stream,
+                            ModulemdModuleStreamVersionEnum index_mdversion,
+                            GError **error);
+
+
+/**
+ * modulemd_module_upgrade_streams:
+ * @self: This #ModulemdModule object
+ * @mdversion: The metadata version to upgrade to
+ * @error: (out): A #GError containing the reason a stream failed to upgrade.
+ *
+ * Returns: TRUE if all upgrades completed successfully. FALSE and sets @error
+ * if an upgrade error occurs, including attempts to downgrade a stream.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_module_upgrade_streams (ModulemdModule *self,
+                                 ModulemdModuleStreamVersionEnum mdversion,
+                                 GError **error);
+
+G_END_DECLS

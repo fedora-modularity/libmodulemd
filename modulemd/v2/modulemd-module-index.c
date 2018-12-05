@@ -34,6 +34,7 @@ struct _ModulemdModuleIndex
   GHashTable *modules;
 
   ModulemdDefaultsVersionEnum defaults_mdversion;
+  ModulemdModuleStreamVersionEnum stream_mdversion;
 };
 
 G_DEFINE_TYPE (ModulemdModuleIndex, modulemd_module_index, G_TYPE_OBJECT)
@@ -531,11 +532,19 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 }
 
 
+static gboolean
+modulemd_module_index_upgrade_streams (
+  ModulemdModuleIndex *self,
+  ModulemdModuleStreamVersionEnum mdversion,
+  GError **error);
+
 gboolean
 modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
                                          ModulemdModuleStream *stream,
                                          GError **error)
 {
+  g_autoptr (GError) nested_error = NULL;
+  ModulemdModuleStreamVersionEnum mdversion = MD_MODULESTREAM_VERSION_UNSET;
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
   if (!modulemd_module_stream_get_module_name (stream) ||
@@ -549,10 +558,73 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
       return FALSE;
     }
 
-  modulemd_module_add_stream (
+  mdversion = modulemd_module_add_stream (
     get_or_create_module (self,
                           modulemd_module_stream_get_module_name (stream)),
-    stream);
+    stream,
+    self->stream_mdversion,
+    &nested_error);
+
+  if (mdversion == MD_MODULESTREAM_VERSION_ERROR)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
+  if (mdversion > self->stream_mdversion)
+    {
+      /* Upgrade any streams we've already seen to this version */
+      g_debug ("Upgrading all streams to version %i", mdversion);
+      if (!modulemd_module_index_upgrade_streams (
+            self, mdversion, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_index_upgrade_streams (
+  ModulemdModuleIndex *self,
+  ModulemdModuleStreamVersionEnum mdversion,
+  GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  g_autoptr (ModulemdModule) module = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_hash_table_iter_init (&iter, self->modules);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module = g_object_ref (MODULEMD_MODULE (value));
+
+      /* Skip any module without streams */
+      if (modulemd_module_get_all_streams (module)->len == 0)
+        {
+          g_clear_object (&module);
+          continue;
+        }
+
+      if (!modulemd_module_upgrade_streams (module, mdversion, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Error upgrading streams for module %s",
+            modulemd_module_get_module_name (module));
+          return FALSE;
+        }
+
+      g_clear_object (&module);
+    }
+
+  self->stream_mdversion = mdversion;
+
   return TRUE;
 }
 

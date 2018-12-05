@@ -316,9 +316,9 @@ dependencies_test_emit_yaml (DependenciesFixture *fixture,
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\n- buildrequires:\n    builddef: []\n    buildmod1:\n "
-                   "   - stream1\n    - stream2\n  requires:\n    rundef: "
-                   "[]\n    runmod1:\n    - stream3\n    - stream4\n...\n");
+                   "---\n- buildrequires:\n    builddef: []\n    buildmod1: "
+                   "[stream1, stream2]\n  requires:\n    rundef: "
+                   "[]\n    runmod1: [stream3, stream4]\n...\n");
 }
 
 int

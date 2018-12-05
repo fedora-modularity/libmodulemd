@@ -32,40 +32,6 @@
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
-struct _ModulemdModuleStreamV2
-{
-  GObject parent_instance;
-
-  /* Properties */
-  gchar *arch;
-  ModulemdBuildopts *buildopts;
-  gchar *community;
-  gchar *description;
-  gchar *documentation;
-  gchar *summary;
-  gchar *tracker;
-
-  /* Internal Data Structures */
-  GHashTable *module_components; /* <string, Modulemd.ComponentModule */
-  GHashTable *rpm_components; /* <string, Modulemd.ComponentRpm> */
-
-  GHashTable *content_licenses; /* string set */
-  GHashTable *module_licenses; /* string set */
-
-  GHashTable *profiles; /* <string, Modulemd.Profile> */
-
-  GHashTable *rpm_api; /* string set */
-
-  GHashTable *rpm_artifacts; /* string set */
-
-  GHashTable *rpm_filters; /* string set */
-
-  GHashTable *servicelevels; /* <string, Modulemd.ServiceLevel */
-
-  GPtrArray *dependencies; /* <Modulemd.Dependencies> */
-
-  GVariant *xmd;
-};
 
 G_DEFINE_TYPE (ModulemdModuleStreamV2,
                modulemd_module_stream_v2,
@@ -427,7 +393,7 @@ modulemd_module_stream_v2_add_content_license (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_content_licenses (
   ModulemdModuleStreamV2 *self, GHashTable *set)
 {
@@ -450,7 +416,7 @@ modulemd_module_stream_v2_add_module_license (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_module_licenses (
   ModulemdModuleStreamV2 *self, GHashTable *set)
 {
@@ -563,7 +529,7 @@ modulemd_module_stream_v2_add_rpm_api (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_rpm_api (ModulemdModuleStreamV2 *self,
                                            GHashTable *set)
 {
@@ -607,7 +573,7 @@ modulemd_module_stream_v2_add_rpm_artifact (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_rpm_artifacts (ModulemdModuleStreamV2 *self,
                                                  GHashTable *set)
 {
@@ -653,7 +619,7 @@ modulemd_module_stream_v2_add_rpm_filter (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_rpm_filters (ModulemdModuleStreamV2 *self,
                                                GHashTable *set)
 {
@@ -741,7 +707,7 @@ modulemd_module_stream_v2_add_dependencies (ModulemdModuleStreamV2 *self,
 }
 
 
-static void
+void
 modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
                                                 GPtrArray *array)
 {

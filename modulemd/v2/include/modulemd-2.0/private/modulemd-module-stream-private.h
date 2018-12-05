@@ -18,6 +18,8 @@
 #include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
 #include "private/modulemd-yaml.h"
+#include "private/modulemd-module-stream-v1-private.h"
+#include "private/modulemd-module-stream-v2-private.h"
 
 G_BEGIN_DECLS
 
@@ -53,6 +55,30 @@ ModulemdTranslationEntry *
 modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
                                               const gchar *locale);
 
+void
+modulemd_module_stream_v2_replace_content_licenses (
+  ModulemdModuleStreamV2 *self, GHashTable *set);
+
+void
+modulemd_module_stream_v2_replace_module_licenses (
+  ModulemdModuleStreamV2 *self, GHashTable *set);
+
+void
+modulemd_module_stream_v2_replace_rpm_api (ModulemdModuleStreamV2 *self,
+                                           GHashTable *set);
+
+void
+modulemd_module_stream_v2_replace_rpm_artifacts (ModulemdModuleStreamV2 *self,
+                                                 GHashTable *set);
+
+void
+modulemd_module_stream_v2_replace_rpm_filters (ModulemdModuleStreamV2 *self,
+                                               GHashTable *set);
+
+void
+modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
+                                                GPtrArray *array);
+
 
 /* Some macros used for copy operations */
 #define STREAM_COPY_IF_SET(version, dest, src, property)                      \
@@ -64,6 +90,15 @@ modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
     }                                                                         \
   while (0)
 
+#define STREAM_UPGRADE_IF_SET(oldversion, newversion, dest, src, property)    \
+  do                                                                          \
+    {                                                                         \
+      if (modulemd_module_stream_##oldversion##_get_##property (src) != NULL) \
+        modulemd_module_stream_##newversion##_set_##property (                \
+          dest, modulemd_module_stream_##oldversion##_get_##property (src));  \
+    }                                                                         \
+  while (0)
+
 #define STREAM_COPY_IF_SET_WITH_LOCALE(version, dest, src, property)          \
   do                                                                          \
     {                                                                         \
@@ -72,6 +107,18 @@ modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
         modulemd_module_stream_##version##_set_##property (                   \
           dest,                                                               \
           modulemd_module_stream_##version##_get_##property (src, "C"));      \
+    }                                                                         \
+  while (0)
+
+#define STREAM_UPGRADE_IF_SET_WITH_LOCALE(                                    \
+  oldversion, newversion, dest, src, property)                                \
+  do                                                                          \
+    {                                                                         \
+      if (modulemd_module_stream_##oldversion##_get_##property (src, "C") !=  \
+          NULL)                                                               \
+        modulemd_module_stream_##newversion##_set_##property (                \
+          dest,                                                               \
+          modulemd_module_stream_##oldversion##_get_##property (src, "C"));   \
     }                                                                         \
   while (0)
 

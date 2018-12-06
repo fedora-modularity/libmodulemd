@@ -957,7 +957,7 @@ mmd_variant_from_scalar (const gchar *scalar)
       variant = g_variant_new_string (scalar);
     }
 
-  return g_variant_ref_sink (variant);
+  return variant;
 }
 
 
@@ -1010,6 +1010,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
               if (!value)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
                 }
               break;
 
@@ -1018,6 +1019,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
               if (!value)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
                 }
               break;
 
@@ -1032,7 +1034,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
             }
 
           yaml_event_delete (&value_event);
-          g_variant_dict_insert_value (dict, key, value);
+          g_variant_dict_insert_value (dict, key, g_steal_pointer (&value));
           g_clear_pointer (&key, g_free);
           break;
 
@@ -1049,7 +1051,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
       yaml_event_delete (&event);
     }
 
-  return g_variant_ref_sink (g_variant_dict_end (dict));
+  return g_variant_dict_end (dict);
 }
 
 
@@ -1118,7 +1120,7 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
 
       if (value)
         {
-          g_variant_builder_add_value (&builder, g_variant_ref (value));
+          g_variant_builder_add_value (&builder, g_steal_pointer (&value));
           empty_array = FALSE;
         }
 
@@ -1138,5 +1140,5 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
       result = g_variant_builder_end (&builder);
     }
 
-  return g_variant_ref_sink (result);
+  return result;
 }

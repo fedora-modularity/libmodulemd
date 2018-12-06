@@ -532,12 +532,6 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 }
 
 
-static gboolean
-modulemd_module_index_upgrade_streams (
-  ModulemdModuleIndex *self,
-  ModulemdModuleStreamVersionEnum mdversion,
-  GError **error);
-
 gboolean
 modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
                                          ModulemdModuleStream *stream,
@@ -587,7 +581,7 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
 }
 
 
-static gboolean
+gboolean
 modulemd_module_index_upgrade_streams (
   ModulemdModuleIndex *self,
   ModulemdModuleStreamVersionEnum mdversion,
@@ -597,6 +591,17 @@ modulemd_module_index_upgrade_streams (
   gpointer key, value;
   g_autoptr (ModulemdModule) module = NULL;
   g_autoptr (GError) nested_error = NULL;
+
+  if (mdversion < self->stream_mdversion)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_UPGRADE,
+                   "Downgrades not permitted. mdversion %i < current %i",
+                   mdversion,
+                   self->stream_mdversion);
+      return FALSE;
+    }
 
   g_hash_table_iter_init (&iter, self->modules);
   while (g_hash_table_iter_next (&iter, &key, &value))
@@ -628,11 +633,6 @@ modulemd_module_index_upgrade_streams (
   return TRUE;
 }
 
-
-static gboolean
-modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
-                                        ModulemdDefaultsVersionEnum mdversion,
-                                        GError **error);
 
 gboolean
 modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
@@ -671,7 +671,7 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
 }
 
 
-static gboolean
+gboolean
 modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
                                         ModulemdDefaultsVersionEnum mdversion,
                                         GError **error)
@@ -682,6 +682,27 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
   g_autoptr (ModulemdDefaults) defaults = NULL;
   ModulemdDefaultsVersionEnum returned_mdversion = MD_DEFAULTS_VERSION_UNSET;
   g_autoptr (GError) nested_error = NULL;
+
+  if (mdversion < self->defaults_mdversion)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_UPGRADE,
+                   "Downgrades not permitted. mdversion %i < current %i",
+                   mdversion,
+                   self->defaults_mdversion);
+      return FALSE;
+    }
+
+  if (mdversion > MD_DEFAULTS_VERSION_LATEST)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_UPGRADE,
+                   "Unknown Defaults metadata version %i",
+                   mdversion);
+      return FALSE;
+    }
 
   g_hash_table_iter_init (&iter, self->modules);
   while (g_hash_table_iter_next (&iter, &key, &value))

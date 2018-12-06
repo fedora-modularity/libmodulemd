@@ -259,4 +259,41 @@ modulemd_module_index_get_defaults_mdversion (ModulemdModuleIndex *self);
 ModulemdModuleStreamVersionEnum
 modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self);
 
+
+/**
+ * modulemd_module_index_upgrade_streams:
+ * @self: This #ModulemdModuleIndex
+ * @mdversion: The #ModulemdModuleStream metadata version to upgrade to.
+ * @error: (out): A #GError that contains information on why the index could
+ * not be upgraded in the event of an error.
+ *
+ * Upgrades all #ModulemdModuleStream objects in this index to @mdversion if
+ * they are not already at that version.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_module_index_upgrade_streams (
+  ModulemdModuleIndex *self,
+  ModulemdModuleStreamVersionEnum mdversion,
+  GError **error);
+
+
+/**
+ * modulemd_module_index_upgrade_defaults:
+ * @self: This #ModulemdModuleIndex
+ * @mdversion: The #ModulemdDefaults metadata version to upgrade to.
+ * @error: (out): A #GError that contains information on why the index could
+ * not be upgraded in the event of an error.
+ *
+ * Upgrades all #ModulemdDefaults objects in this index to @mdversion if they
+ * are not already at that version.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
+                                        ModulemdDefaultsVersionEnum mdversion,
+                                        GError **error);
+
 G_END_DECLS

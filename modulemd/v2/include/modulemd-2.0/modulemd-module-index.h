@@ -128,7 +128,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
  *
  * Since: 2.0
  */
-const gchar *
+gchar *
 modulemd_module_index_dump_to_string (ModulemdModuleIndex *self,
                                       GError **error);
 

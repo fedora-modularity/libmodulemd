@@ -497,25 +497,28 @@ modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
 
 
   /* Upgrade the Dependencies */
-  deps = modulemd_dependencies_new ();
-
-  /* Add the build-time deps */
-  g_hash_table_iter_init (&iter, v1_stream->buildtime_deps);
-  while (g_hash_table_iter_next (&iter, &key, &value))
+  if (g_hash_table_size (v1_stream->buildtime_deps) > 0 ||
+      g_hash_table_size (v1_stream->runtime_deps) > 0)
     {
-      modulemd_dependencies_add_buildtime_stream (deps, key, value);
+      deps = modulemd_dependencies_new ();
+
+      /* Add the build-time deps */
+      g_hash_table_iter_init (&iter, v1_stream->buildtime_deps);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          modulemd_dependencies_add_buildtime_stream (deps, key, value);
+        }
+
+      /* Add the run-time deps */
+      g_hash_table_iter_init (&iter, v1_stream->runtime_deps);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          modulemd_dependencies_add_runtime_stream (deps, key, value);
+        }
+
+      /* Add the Dependencies to this ModuleStreamV2 */
+      modulemd_module_stream_v2_add_dependencies (copy, deps);
     }
-
-  /* Add the run-time deps */
-  g_hash_table_iter_init (&iter, v1_stream->runtime_deps);
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      modulemd_dependencies_add_runtime_stream (deps, key, value);
-    }
-
-  /* Add the Dependencies to this ModuleStreamV2 */
-  modulemd_module_stream_v2_add_dependencies (copy, deps);
-
 
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }

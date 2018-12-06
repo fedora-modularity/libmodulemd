@@ -371,8 +371,6 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
   guint64 current_mdversion = modulemd_module_stream_get_mdversion (self);
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
-  g_return_val_if_fail (
-    mdversion && mdversion <= MD_MODULESTREAM_VERSION_LATEST, NULL);
 
   if (!mdversion)
     {
@@ -415,7 +413,13 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
         default:
           /* If we get here, it means we failed to address an upgrade. */
-          g_assert_not_reached ();
+          g_set_error (
+            error,
+            MODULEMD_ERROR,
+            MODULEMD_ERROR_UPGRADE,
+            "Cannot upgrade beyond metadata version %" G_GUINT64_FORMAT,
+            current_mdversion);
+          return NULL;
         }
 
       g_object_unref (current_stream);

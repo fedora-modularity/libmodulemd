@@ -234,3 +234,29 @@ gboolean
 modulemd_module_index_add_translation (ModulemdModuleIndex *self,
                                        ModulemdTranslation *translation,
                                        GError **error);
+
+/**
+ * modulemd_module_index_get_defaults_mdversion:
+ * @self: This #ModulemdModuleIndex
+ *
+ * Returns: The metadata version of #ModulemdDefaults in use for this index.
+ *
+ * Since: 2.0
+ */
+ModulemdDefaultsVersionEnum
+modulemd_module_index_get_defaults_mdversion (ModulemdModuleIndex *self);
+
+
+/**
+ * modulemd_module_index_get_stream_mdversion:
+ * @self: This #ModulemdModuleIndex
+ *
+ * Returns: The metadata version of #ModulemdModuleStream in use for this
+ * index.
+ *
+ * Since: 2.0
+ */
+ModulemdModuleStreamVersionEnum
+modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self);
+
+G_END_DECLS

@@ -726,3 +726,17 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
     translation);
   return TRUE;
 }
+
+
+ModulemdDefaultsVersionEnum
+modulemd_module_index_get_defaults_mdversion (ModulemdModuleIndex *self)
+{
+  return self->defaults_mdversion;
+}
+
+
+ModulemdModuleStreamVersionEnum
+modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self)
+{
+  return self->stream_mdversion;
+}

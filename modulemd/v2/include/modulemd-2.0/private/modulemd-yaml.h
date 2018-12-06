@@ -444,7 +444,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
  * mmd_variant_from_scalar:
  * @scalar: (in): A string or boolean value to read into a #GVariant
  *
- * Returns: (transfer full): A newly-allocated #GVariant representing a string
+ * Returns: (transfer full): A new, floating #GVariant representing a string
  * or boolean value matching the scalar passed in.
  *
  * Since: 2.0
@@ -458,7 +458,7 @@ mmd_variant_from_scalar (const gchar *scalar);
  * @parser: (inout): A YAML parser positioned just after a MAPPING_START
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
- * Returns: (transfer full): A newly-allocated #GVariant representing a hash
+ * Returns: (transfer full): A new, floating #GVariant representing a hash
  * table with string keys and #GVariant values.
  *
  * Since: 2.0
@@ -472,7 +472,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
  * @parser: (inout): A YAML parser positioned just after a SEQUENCE_START
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
- * Returns: (transfer full): A newly-allocated #GVariant representing a list of
+ * Returns: (transfer full): A new, floating #GVariant representing a list of
  * #GVariant values.
  *
  * Since: 2.0

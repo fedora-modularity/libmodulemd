@@ -1148,8 +1148,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
-              modulemd_module_stream_v2_set_xmd (modulestream, xmd);
-              xmd = NULL;
+              modulemd_module_stream_v2_set_xmd (modulestream,
+                                                 g_steal_pointer (&xmd));
             }
 
           /* Dependencies */
@@ -1935,6 +1935,8 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
                                  mmd_yaml_get_event_name (event.type));
       break;
     }
+
+  g_variant_ref_sink (variant);
 
   return g_steal_pointer (&variant);
 }

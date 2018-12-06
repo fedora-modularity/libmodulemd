@@ -24,8 +24,45 @@ G_BEGIN_DECLS
  * SECTION: modulemd-module-index
  * @title: Modulemd.ModuleIndex
  * @stability: stable
- * @short_description: A simplistic wrapper around GHashTable to ensure
- * type-safety for [Modulemd.Module](Modulemd.Module.md) objects.
+ * @short_description: The primary interface to dealing with repodata in the
+ * module metadata format.
+ *
+ * This object provides an interface to the complete metadata read from a
+ * repository or manually added to this object.
+ *
+ * NOTE: When adding or updating this object from YAML, all objects imported
+ * will be automatically upgraded to match the highest version of that object
+ * that is seen. This means that if the repository has a mix of
+ * #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects, the index will
+ * contain only #ModulemdModuleStreamV2. You can check the versions the index
+ * upgraded to with the modulemd_module_index_get_stream_mdversion() and
+ * modulemd_module_index_get_defaults_mdversion(). If your application would
+ * prefer to always work with a particular stream or defaults version (such as
+ * to avoid extra branching logic), the modulemd_module_index_upgrade_streams()
+ * and modulemd_module_index_upgrade_defaults() functions can be used to force
+ * the contents of the index to upgrade to those versions.
+ *
+ * Interacting with #ModulemdModuleIndex is relatively simple. A common Python
+ * example for working with Fedora repodata might be (assuming the metadata has
+ * already been read into strings):
+ *
+ * |[<!-- language="Python" -->
+ * fedora_repo_index = Modulemd.ModuleIndex.new()
+ * fedora_repo_index.update_from_string(fedora_modulemd)
+ *
+ * # Get the list of all module names in the index
+ * module_names = fedora_repo_index.get_module_names()
+ *
+ * # Retrieve information about a particular module from the index
+ * module = fedora_repo_index.get_module('module_name')
+ * ]|
+ *
+ * See the #ModulemdModule documentation for details on retrieving information
+ * about specific modules, including how to get #ModulemdDefaults information
+ * and retrieve individual #ModulemdModuleStream objects.
+ *
+ * See the #ModulemdModuleIndexMerger documentation for details on merging
+ * #ModulemdModuleIndex objects from separate repositories together.
  */
 
 #define MODULEMD_TYPE_MODULE_INDEX (modulemd_module_index_get_type ())

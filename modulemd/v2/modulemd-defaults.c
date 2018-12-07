@@ -23,6 +23,7 @@
 typedef struct
 {
   gchar *module_name;
+  guint64 modified;
 } ModulemdDefaultsPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ModulemdDefaults,
@@ -194,6 +195,29 @@ modulemd_defaults_get_mdversion (ModulemdDefaults *self)
   g_return_val_if_fail (klass->get_mdversion, 0);
 
   return klass->get_mdversion (self);
+}
+
+void
+modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified)
+{
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+
+  ModulemdDefaultsPrivate *priv =
+    modulemd_defaults_get_instance_private (self);
+
+  priv->modified = modified;
+}
+
+
+guint64
+modulemd_defaults_get_modified (ModulemdDefaults *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS, 0);
+
+  ModulemdDefaultsPrivate *priv =
+    modulemd_defaults_get_instance_private (self);
+
+  return priv->modified;
 }
 
 

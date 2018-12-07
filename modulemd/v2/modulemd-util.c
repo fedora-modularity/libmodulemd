@@ -133,6 +133,43 @@ modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig)
 }
 
 
+gboolean
+modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b)
+{
+  g_autoptr (GPtrArray) set_a = NULL;
+  g_autoptr (GPtrArray) set_b = NULL;
+
+
+  if (g_hash_table_size (a) != g_hash_table_size (b))
+    {
+      /* If they have a different number of strings in the set, they can't
+       * be identical.
+       */
+      return FALSE;
+    }
+
+  set_a = modulemd_ordered_str_keys (a, modulemd_strcmp_sort);
+  set_b = modulemd_ordered_str_keys (b, modulemd_strcmp_sort);
+
+  for (guint i = 0; i < set_a->len; i++)
+    {
+      /* These are guaranteed to be returned ordered, so we can
+       * assume that any difference at any index means that the
+       * lists are not identical.
+       */
+      if (!g_str_equal (g_ptr_array_index (set_a, i),
+                        g_ptr_array_index (set_a, i)))
+        {
+          /* No match, so this simpleset is not equal */
+          return FALSE;
+        }
+    }
+
+  /* If we made it here, everything must have matched */
+  return TRUE;
+}
+
+
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
 {

@@ -326,6 +326,28 @@ modulemd_defaults_dup_intents (ModulemdDefaults *self);
 
 
 /**
+ * modulemd_defaults_set_modified:
+ *
+ * Sets the modified field for these defaults.
+ *
+ * Since: 1.8
+ */
+void
+modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified);
+
+
+/**
+ * modulemd_defaults_get_modified:
+ *
+ * Returns: The modified field for these defaults.
+ *
+ * Since: 1.8
+ */
+guint64
+modulemd_defaults_get_modified (ModulemdDefaults *self);
+
+
+/**
  * modulemd_defaults_new_from_file:
  * @yaml_file: A YAML file containing the module metadata and other related
  * information such as default streams.

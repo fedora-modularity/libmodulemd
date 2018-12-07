@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include <errno.h>
 #include <glib.h>
 #include <yaml.h>
 
@@ -204,8 +205,6 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
   MMD_INIT_YAML_EVENT (event);
 
-  *failures = g_ptr_array_new_full (0, g_object_unref);
-
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
   if (event.type != YAML_STREAM_START_EVENT)
     MMD_YAML_ERROR_EVENT_EXIT_BOOL (
@@ -395,11 +394,26 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
                                         GPtrArray **failures,
                                         GError **error)
 {
+  if (*failures == NULL)
+    *failures = g_ptr_array_new_full (0, g_object_unref);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
+  int saved_errno;
   g_autoptr (FILE) yaml_stream = NULL;
 
   yaml_stream = g_fopen (yaml_file, "rb");
+  saved_errno = errno;
+
+  if (yaml_stream == NULL)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_YAML_ERROR_OPEN,
+                   "Failed to open file: %s",
+                   g_strerror (saved_errno));
+      return FALSE;
+    }
 
   return modulemd_module_index_update_from_stream (
     self, yaml_stream, failures, error);
@@ -412,7 +426,17 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
                                           GPtrArray **failures,
                                           GError **error)
 {
+  if (*failures == NULL)
+    *failures = g_ptr_array_new_full (0, g_object_unref);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  if (!yaml_string)
+    {
+      g_set_error (
+        error, MODULEMD_ERROR, MODULEMD_YAML_ERROR_OPEN, "No string provided");
+      return FALSE;
+    }
 
   MMD_INIT_YAML_PARSER (parser);
 
@@ -430,7 +454,17 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
                                           GPtrArray **failures,
                                           GError **error)
 {
+  if (*failures == NULL)
+    *failures = g_ptr_array_new_full (0, g_object_unref);
+
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  if (!yaml_stream)
+    {
+      g_set_error (
+        error, MODULEMD_ERROR, MODULEMD_YAML_ERROR_OPEN, "No stream provided");
+      return FALSE;
+    }
 
   MMD_INIT_YAML_PARSER (parser);
 

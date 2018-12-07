@@ -189,6 +189,29 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
 }
 
 
+static void
+module_index_test_read_mixed (ModuleIndexFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+
+  index = modulemd_module_index_new ();
+
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -211,6 +234,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_index_test_read,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/index/read/mixed",
+              ModuleIndexFixture,
+              NULL,
+              NULL,
+              module_index_test_read_mixed,
               NULL);
 
   return g_test_run ();

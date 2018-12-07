@@ -158,6 +158,7 @@ _emit_defaults_data (yaml_emitter_t *emitter,
   yaml_event_t event;
   gchar *name = NULL;
   gchar *value = NULL;
+  guint64 modified;
 
   g_debug ("TRACE: entering _emit_defaults_data");
 
@@ -173,6 +174,16 @@ _emit_defaults_data (yaml_emitter_t *emitter,
   value = modulemd_defaults_dup_module_name (defaults);
   MMD_YAML_EMIT_STR_STR_DICT (&event, name, value, YAML_PLAIN_SCALAR_STYLE);
 
+  /* Modified field */
+  modified = modulemd_defaults_get_modified (defaults);
+  if (modified)
+    {
+      name = g_strdup ("modified");
+      value = g_strdup_printf ("%" PRIu64, modified);
+
+      MMD_YAML_EMIT_STR_STR_DICT (
+        &event, name, value, YAML_PLAIN_SCALAR_STYLE);
+    }
 
   /* Module default stream */
   value = modulemd_defaults_dup_default_stream (defaults);

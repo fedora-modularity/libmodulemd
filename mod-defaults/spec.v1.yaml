@@ -5,6 +5,11 @@ version: 1
 data:
     # Module name that the defaults are for, required.
     module: foo
+    # A 64-bit unsigned integer. Use YYYYMMDDHHMM to easily identify the last
+    # modification time. Use UTC for consistency.
+    # When merging, entries with a newer 'modified' value will override any
+    # earlier values. (optional)
+    modified: 201812071200
     # Module stream that is the default for the module, optional.
     stream: x.y
     # Module profiles indexed by the stream name, optional

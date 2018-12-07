@@ -212,6 +212,7 @@ _parse_defaults_data (ModulemdDefaults *defaults,
   MMD_INIT_YAML_EVENT (value_event);
   gboolean done = FALSE;
   gboolean result = FALSE;
+  guint64 modified;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_debug ("TRACE: entering _parse_defaults_data");
@@ -247,6 +248,30 @@ _parse_defaults_data (ModulemdDefaults *defaults,
               modulemd_defaults_set_module_name (
                 defaults, (const gchar *)value_event.data.scalar.value);
               yaml_event_delete (&value_event);
+            }
+
+          /* Modified field */
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "modified"))
+            {
+              YAML_PARSER_PARSE_WITH_EXIT (parser, &value_event, error);
+              if (value_event.type != YAML_SCALAR_EVENT)
+                {
+                  MMD_YAML_SET_ERROR (error, "Failed to parse modified value");
+                  return FALSE;
+                }
+
+              modified = g_ascii_strtoull (
+                (const gchar *)value_event.data.scalar.value, NULL, 10);
+              yaml_event_delete (&value_event);
+
+              if (!modified)
+                {
+                  MMD_YAML_SET_ERROR (error, "Unknown modified version");
+                  return FALSE;
+                }
+
+              modulemd_defaults_set_modified (defaults, modified);
             }
 
           /* Module default stream */

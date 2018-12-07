@@ -779,6 +779,140 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
 
 
 static void
+modulemd_defaults_test_prioritizer_modified (DefaultsFixture *fixture,
+                                             gconstpointer user_data)
+{
+  g_autofree gchar *yaml_base_path = NULL;
+  g_autofree gchar *yaml_override_path = NULL;
+  g_autoptr (GPtrArray) base_objects = NULL;
+  g_autoptr (GPtrArray) override_objects = NULL;
+  g_autoptr (GPtrArray) merged_objects = NULL;
+  g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
+  g_autoptr (GError) error = NULL;
+  GHashTable *htable = NULL;
+  ModulemdDefaults *defaults = NULL;
+  gboolean result;
+
+  yaml_base_path = g_strdup_printf ("%s/test_data/defaults/merging-base.yaml",
+                                    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_base_path);
+
+  base_objects = modulemd_objects_from_file (yaml_base_path, &error);
+  g_assert_nonnull (base_objects);
+  g_assert_cmpint (base_objects->len, ==, 7);
+
+  yaml_override_path =
+    g_strdup_printf ("%s/test_data/defaults/overriding-modified.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_override_path);
+
+  override_objects = modulemd_objects_from_file (yaml_override_path, &error);
+  g_assert_nonnull (override_objects);
+  g_assert_cmpint (override_objects->len, ==, 3);
+
+
+  /* Test that importing the base objects work. These objects include several
+   * exact duplicates which will be cleaned up by this process.
+   */
+
+  prioritizer = modulemd_prioritizer_new ();
+  result = modulemd_prioritizer_add (prioritizer, base_objects, 0, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /*
+   * Test that importing the base objects works again. This will be a worst-
+   * case scenario where all of the values being imported are duplicated.
+   */
+  result = modulemd_prioritizer_add (prioritizer, base_objects, 0, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /*
+   * Test that importing the overrides at the same priority level succeeds.
+   *
+   * These objects have several conflicts with the base objects, but the
+   * modified field overrides it.
+   */
+  result = modulemd_prioritizer_add (prioritizer, override_objects, 0, &error);
+  g_assert_true (result);
+
+
+  /* Merge all of the results together */
+  merged_objects = modulemd_prioritizer_resolve (prioritizer, &error);
+  g_assert_nonnull (merged_objects);
+  g_assert_cmpint (merged_objects->len, ==, 3);
+
+
+  /* HTTPD */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 0));
+  g_assert_cmpstr (modulemd_defaults_peek_module_name (defaults), ==, "httpd");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 2);
+  g_assert_true (g_hash_table_contains (htable, "2.2"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "server"));
+  g_assert_true (g_hash_table_contains (htable, "2.4"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.4"), "server"));
+  g_assert_false (g_hash_table_contains (htable, "2.8"));
+
+  /* NODEJS */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 1));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "9.0");
+  g_assert_cmpint (
+    g_hash_table_size (modulemd_defaults_peek_profile_defaults (defaults)),
+    ==,
+    3);
+
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
+  g_assert_true (g_hash_table_contains (htable, "6.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "6.0"), "default"));
+  g_assert_true (g_hash_table_contains (htable, "8.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.0"), "minimal"));
+  g_assert_true (g_hash_table_contains (htable, "9.0"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "9.0"), "supermegaultra"));
+
+  /* POSTGRESQL */
+  defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 2));
+  g_assert_cmpstr (
+    modulemd_defaults_peek_module_name (defaults), ==, "postgresql");
+  g_assert_cmpstr (
+    modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
+  htable = modulemd_defaults_peek_profile_defaults (defaults);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 1);
+  g_assert_true (g_hash_table_contains (htable, "8.1"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.1"), "server"));
+  g_assert_true (
+    modulemd_simpleset_contains (g_hash_table_lookup (htable, "8.1"), "foo"));
+}
+
+
+static void
 modulemd_defaults_test_index_prioritizer (DefaultsFixture *fixture,
                                           gconstpointer user_data)
 {
@@ -1111,6 +1245,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               modulemd_defaults_test_prioritizer,
+              NULL);
+
+  g_test_add ("/modulemd/defaults/modulemd_defaults_test_prioritizer_modified",
+              DefaultsFixture,
+              NULL,
+              NULL,
+              modulemd_defaults_test_prioritizer_modified,
               NULL);
 
   g_test_add ("/modulemd/defaults/modulemd_defaults_test_index_prioritizer",

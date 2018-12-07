@@ -33,6 +33,7 @@ struct _ModulemdDefaults
   gchar *default_stream;
   GHashTable *intents;
   GHashTable *profile_defaults;
+  guint64 modified;
 };
 
 G_DEFINE_TYPE (ModulemdDefaults, modulemd_defaults, G_TYPE_OBJECT)
@@ -346,6 +347,21 @@ modulemd_defaults_dup_intents (ModulemdDefaults *self)
     }
 
   return g_hash_table_ref (intents);
+}
+
+
+void
+modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified)
+{
+  g_return_if_fail (MODULEMD_IS_DEFAULTS (self));
+  self->modified = modified;
+}
+
+
+guint64
+modulemd_defaults_get_modified (ModulemdDefaults *self)
+{
+  return self->modified;
 }
 
 
@@ -675,6 +691,8 @@ modulemd_defaults_copy (ModulemdDefaults *self)
                                  modulemd_defaults_peek_version (self));
   modulemd_defaults_set_module_name (
     new_defaults, modulemd_defaults_peek_module_name (self));
+  modulemd_defaults_set_modified (new_defaults,
+                                  modulemd_defaults_get_modified (self));
   modulemd_defaults_set_default_stream (
     new_defaults, modulemd_defaults_peek_default_stream (self));
   modulemd_defaults_set_profile_defaults (
@@ -716,6 +734,26 @@ modulemd_defaults_merge (ModulemdDefaults *first,
        */
       return modulemd_defaults_copy (second);
     }
+
+  /* Compare modified values */
+  if (modulemd_defaults_get_modified (first) >
+      modulemd_defaults_get_modified (second))
+    {
+      /* If first has a higher modified value, return a copy of it */
+      return modulemd_defaults_copy (first);
+    }
+  else if (modulemd_defaults_get_modified (second) >
+           modulemd_defaults_get_modified (first))
+    {
+      /* If second has a higher modified value, return a copy of it */
+      return modulemd_defaults_copy (second);
+    }
+
+
+  /* They had the same 'modified' value (such as both zero, for
+   * backwards-compatibility with 1.7.x and older.
+   * Merge them as best we can.
+   */
 
   /* First check for incompatibilities with the streams */
   if (g_strcmp0 (modulemd_defaults_peek_default_stream (first),

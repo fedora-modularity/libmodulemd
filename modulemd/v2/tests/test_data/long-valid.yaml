@@ -15,6 +15,12 @@ data:
     6: [default]
     8: [default]
     9: [default]
+  intents:
+    server:
+      stream: 8
+      profiles:
+        6: [server]
+        8: [server]
 ...
 ---
 document: modulemd-defaults

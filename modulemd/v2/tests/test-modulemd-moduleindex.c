@@ -197,6 +197,7 @@ module_index_test_read_mixed (ModuleIndexFixture *fixture,
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
+  g_autofree gchar *output = NULL;
 
   index = modulemd_module_index_new ();
 
@@ -209,6 +210,11 @@ module_index_test_read_mixed (ModuleIndexFixture *fixture,
     index, yaml_path, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* Verify that we can output it cleanly */
+  output = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_nonnull (output);
+  g_assert_null (error);
 }
 
 

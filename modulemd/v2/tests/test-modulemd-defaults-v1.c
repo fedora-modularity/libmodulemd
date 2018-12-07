@@ -321,12 +321,11 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_assert_cmpstr (
     modulemd_subdocument_info_get_yaml (subdoc),
     ==,
-    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  module: "
-    "foo\n  "
-    "stream: x.y\n  profiles:\n    'x.y': []\n    bar: [baz, snafu]\n  "
-    "intents:\n    desktop:\n      stream: y.z\n      profiles:\n        "
-    "'y.z': [blah]\n        'x.y': [other]\n    server:\n      stream: x.y\n  "
-    "    profiles:\n        'x.y': []\n");
+    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  module: foo\n  "
+    "modified: 201812071200\n  stream: x.y\n  profiles:\n    'x.y': []\n    "
+    "bar: [baz, snafu]\n  intents:\n    desktop:\n      stream: y.z\n      "
+    "profiles:\n        'y.z': [blah]\n        'x.y': [other]\n    server:\n  "
+    "    stream: x.y\n      profiles:\n        'x.y': []\n");
 
   /* Parse the data section and validate the content */
   defaults = modulemd_defaults_v1_parse_yaml (subdoc, &error);

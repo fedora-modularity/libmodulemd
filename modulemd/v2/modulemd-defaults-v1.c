@@ -11,6 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include <glib.h>
+#include <inttypes.h>
 #include "modulemd-defaults-v1.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
@@ -446,6 +448,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   gboolean done = FALSE;
   gboolean in_map = FALSE;
   g_autofree gchar *scalar = NULL;
+  guint64 modified;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
@@ -505,6 +508,20 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                                  scalar);
               g_clear_pointer (&scalar, g_free);
             }
+          else if (g_str_equal (event.data.scalar.value, "modified"))
+            {
+              modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
+              if (nested_error)
+                MMD_YAML_ERROR_EVENT_EXIT (
+                  error,
+                  event,
+                  "Failed to parse modified in defaults data: %s",
+                  nested_error->message);
+
+              modulemd_defaults_set_modified (MODULEMD_DEFAULTS (defaults),
+                                              modified);
+            }
+
           else if (g_str_equal (event.data.scalar.value, "stream"))
             {
               if (modulemd_defaults_v1_get_default_stream (defaults, NULL))
@@ -861,6 +878,8 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
   MODULEMD_INIT_TRACE ();
   g_autoptr (GError) nested_error = NULL;
   const gchar *default_stream = NULL;
+  guint64 modified;
+  g_autofree gchar *modified_string = NULL;
 
   if (!modulemd_defaults_validate (MODULEMD_DEFAULTS (self), &nested_error))
     {
@@ -895,6 +914,14 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
         YAML_PLAIN_SCALAR_STYLE,
         error))
     return FALSE;
+
+  /* The modified field is optional */
+  modified = modulemd_defaults_get_modified (MODULEMD_DEFAULTS (self));
+  if (modified)
+    {
+      modified_string = g_strdup_printf ("%" PRIu64, modified);
+      EMIT_KEY_VALUE (emitter, error, "modified", modified_string);
+    }
 
   /* The default stream is optional */
   default_stream = modulemd_defaults_v1_get_default_stream (self, NULL);

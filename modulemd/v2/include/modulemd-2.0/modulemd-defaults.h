@@ -150,4 +150,29 @@ modulemd_defaults_get_module_name (ModulemdDefaults *self);
 guint64
 modulemd_defaults_get_mdversion (ModulemdDefaults *self);
 
+
+/**
+ * modulemd_defaults_set_modified:
+ * @self: (in): This #ModulemdDefaults object
+ * @modified: (in): The last modified time represented as a 64-bit integer
+ * (such as 201807011200)
+ *
+ * Since: 2.0
+ */
+void
+modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified);
+
+
+/**
+ * modulemd_defaults_get_modified:
+ * @self: (in): This #ModulemdDefaults object
+ *
+ * Returns: The last modified time represented as a 64-bit integer
+ * (such as 201807011200)
+ *
+ * Since: 2.0
+ */
+guint64
+modulemd_defaults_get_modified (ModulemdDefaults *self);
+
 G_END_DECLS

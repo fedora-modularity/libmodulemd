@@ -129,6 +129,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
+  ModulemdSubdocumentInfo *subdoc = NULL;
   g_autofree gchar *yaml_path = NULL;
 
   /* Read the specification files all in */
@@ -171,6 +172,22 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* A stream that has nonsense in "data" */
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/broken_stream.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 1);
+  subdoc = g_ptr_array_index (failures, 0);
+  g_assert_cmpstr (modulemd_subdocument_info_get_yaml (subdoc),
+                   ==,
+                   "---\ndocument: modulemd\nversion: 2\ndata: foobar\n...\n");
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+  g_clear_pointer (&error, g_error_free);
 
   /* A non-existing file */
   yaml_path =

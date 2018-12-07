@@ -228,7 +228,12 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
             {
               /* Initial parsing worked, parse further */
               if (!add_subdoc (self, subdoc, error))
-                return FALSE;
+                {
+                  modulemd_subdocument_info_set_gerror (subdoc, *error);
+                  g_clear_pointer (error, g_error_free);
+                  /* Add to failures and ignore */
+                  g_ptr_array_add (*failures, g_steal_pointer (&subdoc));
+                }
               g_clear_pointer (&subdoc, g_object_unref);
             }
           break;

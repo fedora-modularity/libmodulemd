@@ -95,8 +95,8 @@ modulemd_defaults_v1_copy (ModulemdDefaults *self)
 
   /* Copy intent profile_defaults table */
   g_clear_pointer (&copy->intent_default_profiles, g_hash_table_unref);
-  copy->intent_default_profiles =
-    modulemd_hash_table_deep_str_set_copy (v1_self->intent_default_profiles);
+  copy->intent_default_profiles = modulemd_hash_table_deep_str_str_set_copy (
+    v1_self->intent_default_profiles);
 
   return MODULEMD_DEFAULTS (g_steal_pointer (&copy));
 }

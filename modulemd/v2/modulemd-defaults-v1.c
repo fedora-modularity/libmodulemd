@@ -214,7 +214,7 @@ modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
       return modulemd_ordered_str_keys_as_strv (self->profile_defaults);
     }
 
-  profile_set = g_hash_table_lookup (self->profile_defaults, intent);
+  profile_set = g_hash_table_lookup (self->intent_default_profiles, intent);
   if (profile_set)
     {
       return modulemd_ordered_str_keys_as_strv (profile_set);

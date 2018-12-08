@@ -283,6 +283,8 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  g_auto (GStrv) streams = NULL;
+  g_auto (GStrv) default_profiles = NULL;
 
 
   /* Validate that we can read the specification without issues */
@@ -334,6 +336,44 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
 
   g_assert_true (
     modulemd_defaults_validate (MODULEMD_DEFAULTS (defaults), &error));
+
+  /* Validate individual pieces */
+  g_assert_cmpstr (
+    modulemd_defaults_get_module_name (MODULEMD_DEFAULTS (defaults)),
+    ==,
+    "foo");
+
+  g_assert_cmpint (
+    modulemd_defaults_get_modified (MODULEMD_DEFAULTS (defaults)),
+    ==,
+    201812071200);
+
+  g_assert_cmpstr (
+    modulemd_defaults_v1_get_default_stream (defaults, NULL), ==, "x.y");
+
+  streams = modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
+    defaults, NULL);
+  g_assert_nonnull (streams);
+
+  g_assert_cmpstr (streams[0], ==, "bar");
+  g_assert_cmpstr (streams[1], ==, "x.y");
+  g_assert_null (streams[2]);
+
+  default_profiles =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      defaults, "bar", NULL);
+  g_assert_nonnull (default_profiles);
+  g_assert_cmpstr (default_profiles[0], ==, "baz");
+  g_assert_cmpstr (default_profiles[1], ==, "snafu");
+  g_assert_null (default_profiles[2]);
+  g_clear_pointer (&default_profiles, g_strfreev);
+
+  default_profiles =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      defaults, "x.y", NULL);
+  g_assert_nonnull (default_profiles);
+  g_assert_null (default_profiles[0]);
+  g_clear_pointer (&default_profiles, g_strfreev);
 }
 
 

@@ -71,6 +71,9 @@ modulemd_hash_table_deep_set_copy (GHashTable *orig);
 GHashTable *
 modulemd_hash_table_deep_str_set_copy (GHashTable *orig);
 
+GHashTable *
+modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig);
+
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
 

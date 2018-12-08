@@ -84,9 +84,14 @@ modulemd_defaults_v1_copy (ModulemdDefaults *self)
   copy = MODULEMD_DEFAULTS_V1 (
     MODULEMD_DEFAULTS_CLASS (modulemd_defaults_v1_parent_class)->copy (self));
 
+  /* Copy the default stream */
   modulemd_defaults_v1_set_default_stream (
     copy, modulemd_defaults_v1_get_default_stream (v1_self, NULL), NULL);
 
+  /* Copy the profile defaults table */
+  g_clear_pointer (&copy->profile_defaults, g_hash_table_unref);
+  copy->profile_defaults =
+    modulemd_hash_table_deep_str_set_copy (v1_self->profile_defaults);
 
   /* Copy intent default_stream table */
   g_clear_pointer (&copy->intent_default_streams, g_hash_table_unref);

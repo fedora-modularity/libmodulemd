@@ -227,6 +227,25 @@ test('module_index_v2_debug', test_v2_module_index,
 test('module_index_v2_release', test_v2_module_index,
      env : test_release_env)
 
+
+# -- Test Modulemd.ModuleIndexMerger (C) -- #
+test_v2_module_index_merger = executable(
+    'module_index_merger_v2',
+    'tests/test-modulemd-merger.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test('module_index_merger_v2_debug', test_v2_module_index_merger,
+     env : test_env)
+test('module_index_merger_v2_release', test_v2_module_index_merger,
+     env : test_release_env)
+
+
 # -- Test Modulemd.Modulestream (C) -- #
 test_v2_modulestream = executable(
     'modulestream_v2',
@@ -349,6 +368,16 @@ test ('modulestream_python_debug', python3,
 test ('modulestream_python_release', python3,
       env : py_test_release_env,
       args : modulestream_python_script)
+
+
+# -- Test Modulemd.ModuleIndexMerger (Python) -- #
+merger_python_script = files('tests/ModulemdTests/merger.py')
+test ('merger_python_debug', python3,
+      env : py_test_env,
+      args : merger_python_script)
+test ('merger_python_release', python3,
+      env : py_test_release_env,
+      args : merger_python_script)
 
 
 # -- Test Modulemd.Profile (Python) -- #

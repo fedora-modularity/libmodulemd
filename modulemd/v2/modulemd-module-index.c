@@ -19,8 +19,10 @@
 #include "modulemd-subdocument-info.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-module-index-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-translation-private.h"
@@ -746,6 +748,150 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
     get_or_create_module (self,
                           modulemd_translation_get_module_name (translation)),
     translation);
+  return TRUE;
+}
+
+
+gboolean
+modulemd_module_index_merge (ModulemdModuleIndex *from,
+                             ModulemdModuleIndex *into,
+                             gboolean override,
+                             GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  GHashTableIter iter;
+  gpointer key, value;
+  const gchar *module_name = NULL;
+  const gchar *trans_stream = NULL;
+  ModulemdModule *module = NULL;
+  ModulemdModule *into_module = NULL;
+  GPtrArray *streams = NULL;
+  ModulemdModuleStream *stream = NULL;
+  g_autoptr (GPtrArray) translations = NULL;
+  ModulemdTranslation *translation = NULL;
+  ModulemdTranslation *current_translation = NULL;
+  ModulemdDefaults *defaults = NULL;
+  ModulemdDefaults *into_defaults = NULL;
+  g_autoptr (ModulemdDefaults) merged_defaults = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  guint i;
+  g_autoptr (GPtrArray) translated_stream_names = NULL;
+  gchar *translated_stream_name = NULL;
+
+
+  /* Loop through each module in the Index */
+  g_hash_table_iter_init (&iter, from->modules);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (const gchar *)key;
+      g_debug ("Merging module %s", module_name);
+
+      module = MODULEMD_MODULE (value);
+      into_module = get_or_create_module (into, module_name);
+
+      /* Copy all module streams for this module
+       * The module streams have "version" and "context" to disambiguate them,
+       * so we have documented that if there are two modules with differing
+       * content and the same NSVC, the operation is undefined.
+       * As such, we'll just assume it's safe to add every stream. If there are
+       * duplicates, they'll be deduplicated by replacing the previously-
+       * existing entry.
+       */
+      g_debug ("Prioritizer: merging streams for %s", module_name);
+      streams = modulemd_module_get_all_streams (module);
+      for (i = 0; i < streams->len; i++)
+        {
+          stream = g_ptr_array_index (streams, i);
+
+          if (!modulemd_module_index_add_module_stream (
+                into, stream, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+        }
+
+
+      /* Merge any defaults entry for this module */
+      g_debug ("Prioritizer: merging defaults for %s", module_name);
+      defaults = modulemd_module_get_defaults (module);
+      into_defaults = modulemd_module_get_defaults (into_module);
+      if (override)
+        {
+          /* If we've been told to override (we're at a higher priority level),
+           * then just replace the current defaults with the new one
+           */
+          if (!modulemd_module_index_add_defaults (
+                into, defaults, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+        }
+      else if (defaults && !into_defaults)
+        {
+          /* There are no defaults on the target module yet. Copy these */
+          if (!modulemd_module_index_add_defaults (
+                into, defaults, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+        }
+      else
+        {
+          merged_defaults =
+            modulemd_defaults_merge (defaults, into_defaults, &nested_error);
+          if (!merged_defaults)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          /* Add the new, merged defaults to the index */
+          if (!modulemd_module_index_add_defaults (
+                into, merged_defaults, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+          g_clear_object (&merged_defaults);
+        }
+
+      /* Merge translations for this module */
+      g_debug ("Prioritizer: merging translations for %s", module_name);
+      translated_stream_names =
+        modulemd_module_get_translated_streams (module);
+      for (i = 0; i < translated_stream_names->len; i++)
+        {
+          translated_stream_name =
+            g_ptr_array_index (translated_stream_names, i);
+          translation =
+            modulemd_module_get_translation (module, translated_stream_name);
+          trans_stream = modulemd_translation_get_module_stream (translation);
+          current_translation =
+            modulemd_module_get_translation (into_module, trans_stream);
+
+          if (!current_translation ||
+              modulemd_translation_get_modified (translation) >
+                modulemd_translation_get_modified (current_translation))
+            {
+              /* There was no translation for this stream name or we just found
+               * a newer version of it, so set it on the index.
+               */
+              if (!modulemd_module_index_add_translation (
+                    into, translation, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+            }
+        }
+      g_clear_pointer (&translated_stream_names, g_ptr_array_unref);
+
+      g_debug ("Prioritizer: all documents merged for %s", module_name);
+      g_clear_pointer (&translations, g_ptr_array_unref);
+    }
   return TRUE;
 }
 

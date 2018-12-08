@@ -170,6 +170,7 @@ modulemd_v2_priv_hdrs = files(
     'v2/include/modulemd-2.0/private/modulemd-defaults-private.h',
     'v2/include/modulemd-2.0/private/modulemd-defaults-v1-private.h',
     'v2/include/modulemd-2.0/private/modulemd-module-private.h',
+    'v2/include/modulemd-2.0/private/modulemd-module-index-private.h',
     'v2/include/modulemd-2.0/private/modulemd-module-stream-private.h',
     'v2/include/modulemd-2.0/private/modulemd-module-stream-v1-private.h',
     'v2/include/modulemd-2.0/private/modulemd-module-stream-v2-private.h',

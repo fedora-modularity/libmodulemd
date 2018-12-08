@@ -354,15 +354,38 @@ GStrv
 modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
   ModulemdDefaultsV1 *self, const gchar *stream_name, const gchar *intent)
 {
-  g_autoptr (GHashTable) profile_table = NULL;
+  GHashTable *profile_table = NULL;
   GHashTable *profiles = NULL;
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS_V1 (self), NULL);
   g_return_val_if_fail (stream_name, NULL);
 
-  profile_table = g_hash_table_ref (
-    modulemd_defaults_v1_get_or_create_profile_table (self, intent));
 
-  profiles = g_hash_table_lookup (profile_table, stream_name);
+  if (intent)
+    {
+      /* Get or create the profile table for this intent */
+      profile_table =
+        g_hash_table_lookup (self->intent_default_profiles, intent);
+      if (profile_table)
+        {
+          /* See if this stream name appears in the profile defaults
+           * for this intent
+           */
+          profiles = g_hash_table_lookup (profile_table, stream_name);
+        }
+
+      if (profiles)
+        {
+          return modulemd_ordered_str_keys_as_strv (profiles);
+        }
+
+      /* We didn't find this profile in the intents, try the fallback
+       * defaults
+       */
+    }
+
+
+  /* These are the fallback defaults */
+  profiles = g_hash_table_lookup (self->profile_defaults, stream_name);
   if (!profiles)
     return NULL;
 

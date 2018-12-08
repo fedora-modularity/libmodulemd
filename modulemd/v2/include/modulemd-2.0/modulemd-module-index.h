@@ -223,9 +223,15 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
  * @error: (out): A #GError containing the reason the #ModulemdModuleStream
  * object could not be added or NULL if the function succeeded.
  *
+ * Add a #ModuleStream to the #ModuleIndex. While being added, the
+ * #ModuleStream will be upgraded to MD_MODULESTREAM_VERSION_LATEST to ensure
+ * that merges done with #ModulemdModuleIndexMerger will always occur between
+ * streams of the same version. If this upgrade cannot be performed, the
+ * function will return @error set appropriately.
+ *
  * Returns: TRUE if the #ModulemdModule was added succesfully. If the stream
  * already existed in the index, it will be replaced by the new one. On
- * failure, returns FALSE and sets error appropriately.
+ * failure, returns FALSE and sets @error appropriately.
  *
  * Since: 2.0
  */

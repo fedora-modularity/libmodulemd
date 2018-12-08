@@ -34,5 +34,24 @@ void
 modulemd_defaults_set_module_name (ModulemdDefaults *self,
                                    const gchar *module_name);
 
+/**
+ * modulemd_defaults_merge:
+ * @from: (in): A #ModulemdDefaults object to merge from
+ * @into: (in): A #ModulemdDefaults object being merged into
+ * @error: (out): A #GError containing the reason for an unresolvable merge
+ * conflict
+ *
+ * Performs a merge of two #ModulemdDefaults objects. See the documentation for
+ * #ModulemdModuleIndexMerger for details on the merge algorithm used.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdDefaults containing the
+ * merged values of @from and @into.
+ *
+ * Since: 2.0
+ */
+ModulemdDefaults *
+modulemd_defaults_merge (ModulemdDefaults *from,
+                         ModulemdDefaults *into,
+                         GError **error);
 
 G_END_DECLS

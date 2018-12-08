@@ -64,4 +64,11 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
                                 yaml_emitter_t *emitter,
                                 GError **error);
 
+
+ModulemdDefaults *
+modulemd_defaults_v1_merge (const gchar *module_name,
+                            ModulemdDefaultsV1 *from,
+                            ModulemdDefaultsV1 *into,
+                            GError **error);
+
 G_END_DECLS

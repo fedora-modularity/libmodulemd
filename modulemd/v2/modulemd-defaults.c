@@ -16,6 +16,7 @@
 #include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
 #include "private/modulemd-defaults-private.h"
+#include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-util.h"
 
 #define DEF_DEFAULT_NAME_STRING "__NAME_UNSET__"
@@ -328,4 +329,73 @@ modulemd_defaults_class_init (ModulemdDefaultsClass *klass)
 static void
 modulemd_defaults_init (ModulemdDefaults *self)
 {
+}
+
+
+ModulemdDefaults *
+modulemd_defaults_merge (ModulemdDefaults *from,
+                         ModulemdDefaults *into,
+                         GError **error)
+{
+  g_autoptr (ModulemdDefaults) merged_defaults = NULL;
+  guint64 mdversion;
+  const gchar *module_name = NULL;
+  guint64 from_modified;
+  guint64 into_modified;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (from), NULL);
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (into), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  /* TODO: Upgrade defaults if either is a different mdversion. Right now, we
+   * only have a single version of this document, so there's no need to worry
+   * about it. For now, treat it as a failure so we don't forget to update this
+   * location if we add a new version.
+   */
+
+  mdversion = modulemd_defaults_get_mdversion (into);
+  g_return_val_if_fail (modulemd_defaults_get_mdversion (from) == mdversion,
+                        NULL);
+  g_return_val_if_fail (mdversion == MD_DEFAULTS_VERSION_ONE, NULL);
+
+  from_modified = modulemd_defaults_get_modified (from);
+  into_modified = modulemd_defaults_get_modified (into);
+
+  if (from_modified > into_modified)
+    {
+      /* Just return 'from' if it has a higher modified value */
+      return modulemd_defaults_copy (from);
+    }
+  else if (into_modified > from_modified)
+    {
+      /* Just return 'into' if it has a higher modified value */
+      return modulemd_defaults_copy (into);
+    }
+
+  /* Modified value is the same, so we need to merge */
+
+  module_name = modulemd_defaults_get_module_name (into);
+  if (!g_str_equal (module_name, modulemd_defaults_get_module_name (from)))
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "Module name mismatch in merge: %s != %s",
+                   module_name,
+                   modulemd_defaults_get_module_name (from));
+      return NULL;
+    }
+
+  merged_defaults = modulemd_defaults_v1_merge (module_name,
+                                                MODULEMD_DEFAULTS_V1 (from),
+                                                MODULEMD_DEFAULTS_V1 (into),
+                                                &nested_error);
+  if (!merged_defaults)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  return g_steal_pointer (&merged_defaults);
 }

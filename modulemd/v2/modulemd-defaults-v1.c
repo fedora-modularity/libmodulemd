@@ -1138,3 +1138,270 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
 
   return TRUE;
 }
+
+static gboolean
+modulemd_defaults_v1_merge_intent_profiles (
+  GHashTable *from_profile_defaults,
+  GHashTable *merged_profile_defaults,
+  GError **error);
+static GHashTable *
+modulemd_defaults_v1_copy_intent_profiles (GHashTable *intent_profiles);
+
+
+ModulemdDefaults *
+modulemd_defaults_v1_merge (const gchar *module_name,
+                            ModulemdDefaultsV1 *from,
+                            ModulemdDefaultsV1 *into,
+                            GError **error)
+{
+  const gchar *into_default_stream;
+  const gchar *from_default_stream;
+  g_autoptr (ModulemdDefaultsV1) merged = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  GHashTable *intent_profiles = NULL;
+  GHashTable *merged_intent_profiles = NULL;
+  g_autoptr (GHashTable) intent_profile_defaults = NULL;
+  gchar *intent_name = NULL;
+  gchar *intent_default_stream = NULL;
+  gchar *merged_default_stream = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  merged = modulemd_defaults_v1_new (module_name);
+
+  /* Merge the default streams */
+  into_default_stream = modulemd_defaults_v1_get_default_stream (into, NULL);
+  from_default_stream = modulemd_defaults_v1_get_default_stream (from, NULL);
+
+  if (into_default_stream && !from_default_stream)
+    {
+      modulemd_defaults_v1_set_default_stream (
+        merged, into_default_stream, NULL);
+    }
+  else if (from_default_stream && !into_default_stream)
+    {
+      modulemd_defaults_v1_set_default_stream (
+        merged, from_default_stream, NULL);
+    }
+  else if (into_default_stream && from_default_stream)
+    {
+      if (!g_str_equal (into_default_stream, from_default_stream))
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "Module stream mismatch in merge: %s != %s",
+                       into_default_stream,
+                       from_default_stream);
+          return NULL;
+        }
+      modulemd_defaults_v1_set_default_stream (
+        merged, into_default_stream, NULL);
+    }
+  else
+    {
+      /* Both values were NULL.
+       * Nothing to do, leave it blank.
+       */
+    }
+
+
+  /* == Merge profile defaults == */
+
+  /* Iterate through 'into' and add them to merged_defaults */
+  if (!modulemd_defaults_v1_merge_intent_profiles (
+        into->profile_defaults, merged->profile_defaults, &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  /* Iterate through 'from' and see if there are additions or conflicts */
+  if (!modulemd_defaults_v1_merge_intent_profiles (
+        from->profile_defaults, merged->profile_defaults, &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  /* == Merge intent defaults == */
+
+  /* Merge intent default stream values */
+
+  /* Iterate through 'into' and add them to merged_defaults */
+  g_hash_table_iter_init (&iter, into->intent_default_streams);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      intent_name = (gchar *)key;
+      intent_default_stream = (gchar *)value;
+
+      g_hash_table_insert (merged->intent_default_streams,
+                           g_strdup (intent_name),
+                           g_strdup (intent_default_stream));
+    }
+
+  /* Iterate through 'from', adding any new values and checking the existing
+   * ones for equivalence.
+   */
+  g_hash_table_iter_init (&iter, from->intent_default_streams);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      intent_name = (gchar *)key;
+      intent_default_stream = (gchar *)value;
+      merged_default_stream =
+        g_hash_table_lookup (merged->intent_default_streams, intent_name);
+
+      if (!merged_default_stream)
+        {
+          /* New entry, just add it */
+          g_hash_table_insert (merged->intent_default_streams,
+                               g_strdup (intent_name),
+                               g_strdup (intent_default_stream));
+          continue;
+        }
+
+      if (!g_str_equal (intent_default_stream, merged_default_stream))
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "Profile default stream mismatch in intents: %s != %s",
+                       intent_default_stream,
+                       merged_default_stream);
+          return NULL;
+        }
+    }
+
+
+  /* Merge intent default profile values */
+
+  /* First copy 'into' to 'merged' */
+  g_hash_table_iter_init (&iter, into->intent_default_profiles);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      intent_name = (gchar *)key;
+      intent_profiles = (GHashTable *)value;
+
+      intent_profile_defaults =
+        modulemd_defaults_v1_copy_intent_profiles (intent_profiles);
+
+      g_hash_table_insert (merged->intent_default_profiles,
+                           g_strdup (intent_name),
+                           g_steal_pointer (&intent_profile_defaults));
+    }
+
+  /* Now copy 'from" into merged, checking for conflicts */
+  g_hash_table_iter_init (&iter, from->intent_default_profiles);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      intent_name = (gchar *)key;
+      intent_profiles = (GHashTable *)value;
+      merged_intent_profiles =
+        g_hash_table_lookup (merged->intent_default_profiles, intent_name);
+
+      if (!merged_intent_profiles)
+        {
+          intent_profile_defaults =
+            modulemd_defaults_v1_copy_intent_profiles (intent_profiles);
+
+          /* This wasn't in 'into', so just add it */
+          g_hash_table_insert (merged->intent_default_profiles,
+                               g_strdup (intent_name),
+                               g_steal_pointer (&intent_profile_defaults));
+          continue;
+        }
+
+      /* Go through each of the profile defaults and see if they're additive or
+       * conflicting
+       */
+      if (!modulemd_defaults_v1_merge_intent_profiles (
+            intent_profiles, merged_intent_profiles, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+    }
+
+
+  return MODULEMD_DEFAULTS (g_steal_pointer (&merged));
+}
+
+
+static GHashTable *
+modulemd_defaults_v1_copy_intent_profiles (GHashTable *intent_profiles)
+{
+  g_autoptr (GHashTable) intent_profile_defaults = NULL;
+  gchar *stream_name = NULL;
+  GHashTable *profile_defaults = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+
+
+  intent_profile_defaults = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
+
+  g_hash_table_iter_init (&iter, intent_profiles);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      stream_name = (gchar *)key;
+      profile_defaults = (GHashTable *)value;
+
+      /* Copy the profile defaults */
+      g_hash_table_insert (
+        intent_profile_defaults,
+        g_strdup (stream_name),
+        modulemd_hash_table_deep_set_copy (profile_defaults));
+    }
+
+  return g_steal_pointer (&intent_profile_defaults);
+}
+
+static gboolean
+modulemd_defaults_v1_merge_intent_profiles (
+  GHashTable *from_profile_defaults,
+  GHashTable *merged_profile_defaults,
+  GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *stream_name = NULL;
+  GHashTable *from_profiles = NULL;
+  GHashTable *merged_profiles = NULL;
+
+  g_hash_table_iter_init (&iter, from_profile_defaults);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      stream_name = (gchar *)key;
+      from_profiles = (GHashTable *)value;
+      merged_profiles =
+        g_hash_table_lookup (merged_profile_defaults, stream_name);
+
+      if (!merged_profiles)
+        {
+          /* Didn't appear in the profiles list, so just add it to merged */
+          g_hash_table_insert (
+            merged_profile_defaults,
+            g_strdup (stream_name),
+            modulemd_hash_table_deep_set_copy (from_profiles));
+          continue;
+        }
+
+      /* Check to see if they match */
+      if (!modulemd_hash_table_sets_are_equal (from_profiles, merged_profiles))
+        {
+          /* The profile sets differed. This is an unresolvable merge
+           * conflict
+           */
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "Profile default mismatch in stream: %s",
+                       stream_name);
+          return FALSE;
+        }
+
+      /* They were a complete match, so no need to add it a second time */
+    }
+
+  return TRUE;
+}

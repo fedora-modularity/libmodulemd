@@ -660,9 +660,8 @@ modulemd_defaults_v1_parse_yaml_profiles (yaml_parser_t *parser,
 
           g_hash_table_replace (profile_defaults,
                                 g_strdup (stream_name),
-                                g_hash_table_ref (profile_set));
+                                g_steal_pointer (&profile_set));
           g_clear_pointer (&stream_name, g_free);
-          g_clear_pointer (&profile_set, g_hash_table_unref);
           break;
 
 

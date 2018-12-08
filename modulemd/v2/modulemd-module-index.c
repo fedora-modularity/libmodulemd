@@ -325,7 +325,7 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
   GPtrArray *streams = modulemd_module_get_all_streams (module);
 
   /*
-   * Make sure we get a stable sorting by sorting jsut before dumping.
+   * Make sure we get a stable sorting by sorting just before dumping.
    */
   g_ptr_array_sort (streams, compare_stream_SVC);
 
@@ -708,11 +708,12 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
       module = g_object_ref (MODULEMD_MODULE (value));
-      defaults = g_object_ref (modulemd_module_get_defaults (module));
+      defaults = modulemd_module_get_defaults (module);
 
       /* Skip any module without defaults */
       if (!defaults)
         continue;
+      g_object_ref (defaults);
 
       returned_mdversion = modulemd_module_set_defaults (
         module, defaults, self->defaults_mdversion, &nested_error);

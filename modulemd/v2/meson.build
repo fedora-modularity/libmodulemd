@@ -23,6 +23,13 @@ endif
 
 enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_v2_hdrs)
 
+cdata = configuration_data()
+cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_v2_version)
+configure_file(
+  output : 'config.h',
+  configuration : cdata
+)
+
 modulemd_v2_lib = library(
     'modulemd',
     sources : modulemd_v2_srcs + enums,

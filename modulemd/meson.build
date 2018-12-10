@@ -117,6 +117,7 @@ test_v1_srcs = files(
 
 
 modulemd_v2_srcs = files(
+    'v2/modulemd.c',
     'v2/modulemd-buildopts.c',
     'v2/modulemd-component.c',
     'v2/modulemd-component-module.c',
@@ -140,6 +141,7 @@ modulemd_v2_srcs = files(
 )
 
 modulemd_v2_hdrs = files(
+    'v2/include/modulemd-2.0/modulemd.h',
     'v2/include/modulemd-2.0/modulemd-buildopts.h',
     'v2/include/modulemd-2.0/modulemd-component.h',
     'v2/include/modulemd-2.0/modulemd-component-module.h',

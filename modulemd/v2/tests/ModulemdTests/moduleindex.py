@@ -55,9 +55,9 @@ class TestModuleIndex(TestBase):
             self.assertTrue(res)
             self.assertListEqual(failures, [])
 
-        res, failures = idx.update_from_file(
-            path.join(self.source_root, "modulemd/v2/tests/test_data/te.yaml"))
-        self.assertTrue(res)
+        res, failures = idx.update_from_file(path.join(
+            self.source_root, "modulemd/v2/tests/test_data/te.yaml"))
+        self.assertFalse(res)
         self.assertEqual(len(failures), 1)
         self.assertIn(
             "No document type specified", str(

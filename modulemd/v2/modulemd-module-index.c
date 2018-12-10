@@ -207,6 +207,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
                                           GError **error)
 {
   gboolean done = FALSE;
+  gboolean all_passed = TRUE;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
   MMD_INIT_YAML_EVENT (event);
 
@@ -228,6 +229,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
             {
               /* Add to failures and ignore */
               g_ptr_array_add (*failures, g_steal_pointer (&subdoc));
+              all_passed = FALSE;
             }
           else
             {
@@ -238,6 +240,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
                   g_clear_pointer (error, g_error_free);
                   /* Add to failures and ignore */
                   g_ptr_array_add (*failures, g_steal_pointer (&subdoc));
+                  all_passed = FALSE;
                 }
               g_clear_pointer (&subdoc, g_object_unref);
             }
@@ -254,7 +257,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
       yaml_event_delete (&event);
     }
 
-  return TRUE;
+  return all_passed;
 }
 
 

@@ -91,11 +91,11 @@ modulemd_module_index_new (void);
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
  * @error: (out): A GError containing additional information if this function
- * fails.
+ * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets failures
- * and error approriately if any of the YAML subdocuments were invalid or if
- * there was a parse error.
+ * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * there was a fatal parse error.
  *
  * Since: 2.0
  */
@@ -115,11 +115,11 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
  * @error: (out): A GError containing additional information if this function
- * fails.
+ * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets failures
- * and error approriately if any of the YAML subdocuments were invalid or if
- * there was a parse error.
+ * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * there was a fatal parse error.
  *
  * Since: 2.0
  */
@@ -139,11 +139,11 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
  * @error: (out): A GError containing additional information if this function
- * fails.
+ * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets failures
- * and error approriately if any of the YAML subdocuments were invalid or if
- * there was a parse error.
+ * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * there was a fatal parse error.
  *
  * Since: 2.0
  */

@@ -23,6 +23,7 @@
 #include "modulemd-module-stream-v2.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -180,7 +181,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path =
     g_strdup_printf ("%s/modulemd/v2/tests/test_data/broken_stream.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
-  g_assert_true (modulemd_module_index_update_from_file (
+  g_assert_false (modulemd_module_index_update_from_file (
     index, yaml_path, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 1);
@@ -227,7 +228,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
    */
   yaml_path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/te.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
-  g_assert_true (modulemd_module_index_update_from_file (
+  g_assert_false (modulemd_module_index_update_from_file (
     index, yaml_path, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 1);

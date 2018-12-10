@@ -20,7 +20,8 @@ project('modulemd', 'c',
         license : 'MIT',
         meson_version : '>=0.44.0')
 
-libmodulemd_v1_version = '1.7.1'
+libmodulemd_v1_version = '1.8.0'
+libmodulemd_v2_version = meson.project_version()
 
 cc = meson.get_compiler('c')
 test_cflags = [

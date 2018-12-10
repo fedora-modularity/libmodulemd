@@ -228,8 +228,6 @@ test_v2_python_scripts = files(
 v2_include_dirs = include_directories ('v2/include/modulemd-2.0')
 
 
-libmodulemd_v2_version = meson.project_version()
-
 # Fake test to ensure that all sources and headers are formatted properly
 clang_args = [ '-i' ]
 test('clang_format', clang_format,

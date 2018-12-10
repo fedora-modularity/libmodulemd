@@ -52,40 +52,40 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Development files for libmodulemd.
 
 
-%package -n compat-libmodulemd1
+%package -n libmodulemd1
 Summary: Compatibility package for libmodulemd 1.x
 Version: %{libmodulemd_v1_version}
 Obsoletes: libmodulemd < 2
 Provides: libmodulemd = %{libmodulemd_v1_version}-%{release}
 Provides: libmodulemd%{?_isa} = %{libmodulemd_v1_version}-%{release}
 
-%description -n compat-libmodulemd1
+%description -n libmodulemd1
 Compatibility library for libmodulemd 1.x
 
 
-%package -n compat-libmodulemd1-devel
+%package -n libmodulemd1-devel
 Summary: Compatibility development package for libmodulemd 1.x
 Version: %{libmodulemd_v1_version}
-Requires: compat-libmodulemd1 = %{version}-%{release}
+Requires: libmodulemd1%{?_isa} = %{version}-%{release}
 Conflicts: %{name}-devel
 Obsoletes: libmodulemd-devel < 2
 Provides: libmodulemd-devel = %{version}-%{release}
 RemovePathPostfixes: .compat
 
 
-%description -n compat-libmodulemd1-devel
+%description -n libmodulemd1-devel
 Development files for libmodulemd 1.x
 
 
-%package -n python3-compat-libmodulemd1
+%package -n python3-libmodulemd1
 Summary: Python 3 bindings for %{name}
 Version: %{libmodulemd_v1_version}
 BuildArch: noarch
-Requires: compat-libmodulemd1 = %{version}-%{release}
+Requires: libmodulemd1 = %{version}-%{release}
 Requires: python3-gobject-base
 
-%description -n python3-compat-libmodulemd1
-Python 3 bindings for compat-libmodulemd1
+%description -n python3-libmodulemd1
+Python 3 bindings for libmodulemd1
 
 
 %prep
@@ -146,10 +146,10 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %{python3_sitearch}/gi/overrides/
 
 
-%files -n python3-compat-libmodulemd1
+%files -n python3-libmodulemd1
 
 
-%files -n compat-libmodulemd1
+%files -n libmodulemd1
 %license COPYING
 %doc README.md
 %{_libdir}/%{name}.so.1*
@@ -157,7 +157,7 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %{_libdir}/girepository-1.0/Modulemd-1.0.typelib
 
 
-%files -n compat-libmodulemd1-devel
+%files -n libmodulemd1-devel
 %{_libdir}/%{name}.so.compat
 %{_libdir}/pkgconfig/modulemd.pc
 %{_includedir}/modulemd/

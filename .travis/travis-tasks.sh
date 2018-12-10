@@ -73,8 +73,8 @@ createrepo_c rpmbuild/RPMS/
 
 dnf -y install --nogpgcheck \
                --repofrompath libmodulemd-travis,rpmbuild/RPMS \
-               python3-compat-libmodulemd1 \
-               compat-libmodulemd1-devel \
+               python3-libmodulemd1 \
+               libmodulemd1-devel \
                --exclude libmodulemd
 
 popd #build_rpm

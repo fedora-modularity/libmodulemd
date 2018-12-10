@@ -172,3 +172,5 @@ modulemd_translation_entry_set_profile_description (
 const gchar *
 modulemd_translation_entry_get_profile_description (
   ModulemdTranslationEntry *self, const gchar *profile_name);
+
+G_END_DECLS

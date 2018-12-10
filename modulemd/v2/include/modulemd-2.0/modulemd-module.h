@@ -127,3 +127,5 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
  */
 ModulemdDefaults *
 modulemd_module_get_defaults (ModulemdModule *self);
+
+G_END_DECLS

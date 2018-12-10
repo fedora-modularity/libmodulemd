@@ -55,3 +55,5 @@ modulemd_subdocument_info_get_yaml (ModulemdSubdocumentInfo *self);
  */
 const GError *
 modulemd_subdocument_info_get_gerror (ModulemdSubdocumentInfo *self);
+
+G_END_DECLS

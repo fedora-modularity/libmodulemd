@@ -123,3 +123,5 @@ modulemd_translation_set_translation_entry (
 ModulemdTranslationEntry *
 modulemd_translation_get_translation_entry (ModulemdTranslation *self,
                                             const gchar *locale);
+
+G_END_DECLS

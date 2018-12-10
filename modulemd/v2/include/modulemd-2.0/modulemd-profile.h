@@ -132,3 +132,5 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
  */
 gchar **
 modulemd_profile_get_rpms_as_strv (ModulemdProfile *self);
+
+G_END_DECLS

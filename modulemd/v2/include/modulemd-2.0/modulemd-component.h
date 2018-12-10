@@ -109,3 +109,5 @@ modulemd_component_set_rationale (ModulemdComponent *self,
  */
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
+
+G_END_DECLS

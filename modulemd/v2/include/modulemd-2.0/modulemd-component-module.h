@@ -91,3 +91,5 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
  */
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self);
+
+G_END_DECLS

@@ -191,3 +191,5 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
  */
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self);
+
+G_END_DECLS

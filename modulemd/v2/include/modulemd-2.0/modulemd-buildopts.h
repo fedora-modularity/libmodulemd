@@ -112,3 +112,5 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
  */
 gchar **
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self);
+
+G_END_DECLS

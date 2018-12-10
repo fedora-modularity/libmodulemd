@@ -165,3 +165,5 @@ modulemd_dependencies_get_runtime_modules_as_strv (ModulemdDependencies *self);
 GStrv
 modulemd_dependencies_get_runtime_streams_as_strv (ModulemdDependencies *self,
                                                    const gchar *module);
+
+G_END_DECLS

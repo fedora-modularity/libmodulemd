@@ -35,6 +35,7 @@ component_rpm_test_construct (ComponentRpmFixture *fixture,
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
   ModulemdComponent *mc = NULL;
+  gint64 buildorder = 42;
 
   /* Test that the new() function works */
   r = modulemd_component_rpm_new ("testcomponent");
@@ -57,24 +58,20 @@ component_rpm_test_construct (ComponentRpmFixture *fixture,
   g_clear_object (&r);
 
   /* Instantiate with some argument */
+  // clang-format off
   r = g_object_new (MODULEMD_TYPE_COMPONENT_RPM,
-                    "buildorder",
-                    42,
-                    "name",
-                    "testmodule",
-                    "rationale",
-                    "Testing all the stuff",
-                    "ref",
-                    "someref",
-                    "repository",
-                    "somerepo",
-                    "cache",
-                    "somecache",
+                    "buildorder", buildorder,
+                    "name", "testmodule",
+                    "rationale", "Testing all the stuff",
+                    "ref", "someref",
+                    "repository", "somerepo",
+                    "cache", "somecache",
                     NULL);
+  // clang-format on
   g_assert_nonnull (r);
   g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
   mc = MODULEMD_COMPONENT (r);
-  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 42);
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, buildorder);
   g_assert_cmpstr (modulemd_component_get_name (mc), ==, "testmodule");
   g_assert_cmpstr (
     modulemd_component_get_rationale (mc), ==, "Testing all the stuff");

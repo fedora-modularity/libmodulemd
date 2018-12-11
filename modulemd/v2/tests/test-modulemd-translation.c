@@ -44,6 +44,8 @@ translation_test_construct (TranslationFixture *fixture,
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   g_auto (GStrv) locales;
+  guint64 translation_version = 1;
+  guint64 modified = 3;
 
   /* Test that the new() function works */
   t = modulemd_translation_new (1, "testmodule", "teststream", 2);
@@ -60,14 +62,13 @@ translation_test_construct (TranslationFixture *fixture,
   g_clear_object (&t);
 
   /* Test that object_new works */
+  // clang-format off
   t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "version",
-                    1,
-                    "module_name",
-                    "testmod",
-                    "module_stream",
-                    "teststr",
+                    "version", translation_version,
+                    "module_name", "testmod",
+                    "module_stream", "teststr",
                     NULL);
+  //clang-format on
   g_assert_nonnull (t);
   g_assert_true (MODULEMD_IS_TRANSLATION (t));
   g_assert_cmpint (modulemd_translation_get_version (t), ==, 1);
@@ -77,49 +78,55 @@ translation_test_construct (TranslationFixture *fixture,
   g_clear_object (&t);
 
   /* Test that object_new works with modified */
+  // clang-format off
   t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "version",
-                    1,
-                    "module_name",
-                    "testmod",
-                    "module_stream",
-                    "teststr",
-                    "modified",
-                    3,
+                    "version", translation_version,
+                    "module_name", "testmod",
+                    "module_stream", "teststr",
+                    "modified", modified,
                     NULL);
+  // clang-format on
   g_assert_nonnull (t);
   g_assert_true (MODULEMD_IS_TRANSLATION (t));
-  g_assert_cmpint (modulemd_translation_get_version (t), ==, 1);
+  g_assert_cmpint (
+    modulemd_translation_get_version (t), ==, translation_version);
   g_assert_cmpstr (modulemd_translation_get_module_name (t), ==, "testmod");
   g_assert_cmpstr (modulemd_translation_get_module_stream (t), ==, "teststr");
-  g_assert_cmpint (modulemd_translation_get_modified (t), ==, 3);
+  g_assert_cmpint (modulemd_translation_get_modified (t), ==, modified);
   g_clear_object (&t);
 
   /* Test that object_new does not work without a version */
   signaled = FALSE;
   signal (SIGTRAP, sigtrap_handler);
+  // clang-format off
   t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "module_name",
-                    "testmod",
-                    "module_stream",
-                    "teststr",
+                    "module_name", "testmod",
+                    "module_stream", "teststr",
                     NULL);
+  // clang-format on
   g_assert_true (signaled);
   g_clear_object (&t);
 
   /* Test that object_new does not work without a name */
   signaled = FALSE;
   signal (SIGTRAP, sigtrap_handler);
-  t = g_object_new (
-    MODULEMD_TYPE_TRANSLATION, "version", 1, "module_stream", "teststr", NULL);
+  // clang-format off
+  t = g_object_new (MODULEMD_TYPE_TRANSLATION,
+                    "version", translation_version,
+                    "module_stream", "teststr", NULL);
+  // clang-format on
   g_assert_true (signaled);
   g_clear_object (&t);
 
   /* Test that object_new does not work without a stream */
   signaled = FALSE;
   signal (SIGTRAP, sigtrap_handler);
-  t = g_object_new (
-    MODULEMD_TYPE_TRANSLATION, "version", 1, "module_name", "testmod", NULL);
+  // clang-format off
+  t = g_object_new (MODULEMD_TYPE_TRANSLATION,
+                    "version", translation_version,
+                    "module_name", "testmod",
+                    NULL);
+  // clang-format on
   g_assert_true (signaled);
   g_clear_object (&t);
 }

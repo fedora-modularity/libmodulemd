@@ -42,6 +42,7 @@ component_module_test_construct (ComponentModuleFixture *fixture,
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
   ModulemdComponent *mc = NULL;
+  gint64 buildorder = 42;
 
   /* Test that the new() function works */
   m = modulemd_component_module_new ("testmodule");
@@ -63,22 +64,19 @@ component_module_test_construct (ComponentModuleFixture *fixture,
   g_clear_object (&m);
 
   /* Instantiate with some argument */
+  // clang-format off
   m = g_object_new (MODULEMD_TYPE_COMPONENT_MODULE,
-                    "buildorder",
-                    42,
-                    "name",
-                    "testmodule",
-                    "rationale",
-                    "Testing all the stuff",
-                    "ref",
-                    "someref",
-                    "repository",
-                    "somerepo",
+                    "buildorder", buildorder,
+                    "name", "testmodule",
+                    "rationale", "Testing all the stuff",
+                    "ref", "someref",
+                    "repository", "somerepo",
                     NULL);
+  // clang-format on
   g_assert_nonnull (m);
   g_assert_true (MODULEMD_IS_COMPONENT_MODULE (m));
   mc = MODULEMD_COMPONENT (m);
-  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, 42);
+  g_assert_cmpint (modulemd_component_get_buildorder (mc), ==, buildorder);
   g_assert_cmpstr (modulemd_component_get_name (mc), ==, "testmodule");
   g_assert_cmpstr (
     modulemd_component_get_rationale (mc), ==, "Testing all the stuff");

@@ -611,13 +611,11 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
       yaml_event_delete (&event);
     }
 
-  /* Make sure we have a real module name set */
-  if (g_str_equal (
-        modulemd_defaults_get_module_name (MODULEMD_DEFAULTS (defaults)),
-        DEFAULT_PLACEHOLDER))
+  if (!modulemd_defaults_validate (MODULEMD_DEFAULTS (defaults),
+                                   &nested_error))
     {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Defaults did not specify a module name.");
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
     }
 
   return g_steal_pointer (&defaults);

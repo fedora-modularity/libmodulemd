@@ -151,6 +151,17 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
       return FALSE;
     }
 
+  /* Make sure we have a real module name set */
+  if (g_str_equal (modulemd_defaults_get_module_name (self),
+                   DEFAULT_PLACEHOLDER))
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_VALIDATE,
+                           "Defaults did not specify a module name.");
+      return FALSE;
+    }
+
   return TRUE;
 }
 

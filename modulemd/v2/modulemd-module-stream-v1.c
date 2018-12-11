@@ -874,6 +874,45 @@ modulemd_module_stream_v1_get_xmd (ModulemdModuleStreamV1 *self)
 }
 
 
+static gboolean
+modulemd_module_stream_v1_validate (ModulemdModuleStream *self, GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *nevra = NULL;
+  ModulemdModuleStreamV1 *v1_self = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), FALSE);
+  v1_self = MODULEMD_MODULE_STREAM_V1 (self);
+
+  if (!MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v1_parent_class)
+         ->validate (self, error))
+    {
+      return FALSE;
+    }
+
+  /* Iterate through the artifacts and validate that they are in the proper
+   * NEVRA format
+   */
+  g_hash_table_iter_init (&iter, v1_self->rpm_artifacts);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      nevra = (gchar *)key;
+      if (!modulemd_validate_nevra (nevra))
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "Artifact '%s' was not in valid N-E:V-R.A format.",
+                       nevra);
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
+
 static void
 modulemd_module_stream_v1_get_property (GObject *object,
                                         guint prop_id,
@@ -1011,6 +1050,7 @@ modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
 
   stream_class->get_mdversion = modulemd_module_stream_v1_get_mdversion;
   stream_class->copy = modulemd_module_stream_v1_copy;
+  stream_class->validate = modulemd_module_stream_v1_validate;
 
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",

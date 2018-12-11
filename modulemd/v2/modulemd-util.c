@@ -227,3 +227,101 @@ modulemd_variant_deep_copy (GVariant *variant)
   return g_variant_ref_sink (
     g_variant_new_from_data (data_type, data, data_size, TRUE, NULL, NULL));
 }
+
+
+gboolean
+modulemd_validate_nevra (const gchar *nevra)
+{
+  g_autofree gchar *tmp = g_strdup (nevra);
+  gsize len = strlen (nevra);
+  gchar *i;
+  gchar *endptr;
+
+  /* Since the "name" portion of a NEVRA can have an infinite number of
+   * hyphens, we need to parse from the end backwards.
+   */
+  i = &tmp[len - 1];
+
+  /* Everything after the last '.' must be the architecture */
+  while (i >= tmp)
+    {
+      if (*i == '.')
+        {
+          break;
+        }
+      i--;
+    }
+
+  if (i < tmp)
+    {
+      /* We hit the start of the string without hitting '.' */
+      return FALSE;
+    }
+
+  /*
+   * TODO: Compare the architecture suffix with a list of known-valid ones
+   * This needs to come from an external source that's kept up to date or
+   * this will regularly break.
+   */
+
+  /* Process the "release" tag */
+  while (i >= tmp)
+    {
+      if (*i == '-')
+        {
+          break;
+        }
+      i--;
+    }
+
+  if (i < tmp)
+    {
+      /* We hit the start of the string without hitting '-' */
+      return FALSE;
+    }
+
+  /* No need to validate Release; it's fairly arbitrary */
+
+  /* Process the version */
+  while (i >= tmp)
+    {
+      if (*i == ':')
+        {
+          break;
+        }
+      i--;
+    }
+  if (i < tmp)
+    {
+      /* We hit the start of the string without hitting ':' */
+      return FALSE;
+    }
+
+  /* Process the epoch */
+  *i = '\0';
+  while (i >= tmp)
+    {
+      if (*i == '-')
+        {
+          break;
+        }
+      i--;
+    }
+  if (i < tmp)
+    {
+      /* We hit the start of the string without hitting '-' */
+      return FALSE;
+    }
+
+  /* Validate that this section is a number */
+  g_ascii_strtoll (i, &endptr, 10);
+  if (endptr == i)
+    {
+      /* String conversion failed */
+      return FALSE;
+    }
+
+  /* No need to specifically parse the name section here */
+
+  return TRUE;
+}

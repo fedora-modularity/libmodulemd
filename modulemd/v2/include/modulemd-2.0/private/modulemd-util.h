@@ -92,6 +92,9 @@ modulemd_variant_deep_copy (GVariant *variant);
 void
 modulemd_hash_table_unref (void *table);
 
+gboolean
+modulemd_validate_nevra (const gchar *nevra);
+
 
 #define MODULEMD_REPLACE_SET(_dest, _set)                                     \
   do                                                                          \

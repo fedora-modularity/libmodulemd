@@ -265,9 +265,18 @@ static gboolean
 dump_defaults (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
 {
   ModulemdDefaults *defaults = modulemd_module_get_defaults (module);
+  g_autoptr (GError) nested_error = NULL;
 
   if (defaults == NULL)
     return TRUE; /* Nothing to dump -> all a success */
+
+  if (!modulemd_defaults_validate (defaults, &nested_error))
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Could not validate defaults to emit: ");
+      return FALSE;
+    }
 
   if (modulemd_defaults_get_mdversion (defaults) == MD_DEFAULTS_VERSION_ONE)
     {
@@ -328,6 +337,7 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
   ModulemdModuleStream *stream = NULL;
   gsize i = 0;
   GPtrArray *streams = modulemd_module_get_all_streams (module);
+  g_autoptr (GError) nested_error = NULL;
 
   /*
    * Make sure we get a stable sorting by sorting just before dumping.
@@ -337,6 +347,14 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
   for (i = 0; i < streams->len; i++)
     {
       stream = (ModulemdModuleStream *)g_ptr_array_index (streams, i);
+
+      if (!modulemd_module_stream_validate (stream, &nested_error))
+        {
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Could not validate stream to emit: ");
+          return FALSE;
+        }
 
       if (modulemd_module_stream_get_mdversion (stream) ==
           MD_MODULESTREAM_VERSION_ONE)

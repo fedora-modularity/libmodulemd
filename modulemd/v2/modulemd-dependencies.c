@@ -199,6 +199,83 @@ modulemd_dependencies_get_runtime_streams_as_strv (ModulemdDependencies *self,
 }
 
 
+static gboolean
+modulemd_dependencies_validate_deps (GHashTable *deps, GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *module_name = NULL;
+  gchar *stream_name = NULL;
+  gssize signedness = 0;
+  g_autoptr (GPtrArray) set = NULL;
+
+  g_hash_table_iter_init (&iter, deps);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (gchar *)key;
+      /* The value is a set of strings. Get it and check them all */
+      set = modulemd_ordered_str_keys (value, modulemd_strcmp_sort);
+
+      /* An empty set is always valid */
+      if (set->len == 0)
+        {
+          g_clear_pointer (&set, g_ptr_array_unref);
+          continue;
+        }
+
+      /* The first element will determine the signedness for the whole
+       * set.
+       */
+      if (((const gchar *)g_ptr_array_index (set, 0))[0] == '-')
+        {
+          signedness = -1;
+        }
+      else
+        {
+          signedness = 1;
+        }
+
+      for (guint i = 1; i < set->len; i++)
+        {
+          stream_name = (gchar *)g_ptr_array_index (set, i);
+          if ((stream_name[0] == '-' && signedness > 0) ||
+              (stream_name[0] != '-' && signedness < 0))
+            {
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_VALIDATE,
+                           "Runtime dependency %s contained a mix of positive "
+                           "and negative entries.",
+                           module_name);
+              return FALSE;
+            }
+        }
+
+      g_clear_pointer (&set, g_ptr_array_unref);
+    }
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_dependencies_validate (ModulemdDependencies *self, GError **error)
+{
+  /* Look through all the runtime dependencies */
+  if (!modulemd_dependencies_validate_deps (self->runtime_deps, error))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_dependencies_validate_deps (self->buildtime_deps, error))
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
 static void
 modulemd_dependencies_get_property (GObject *object,
                                     guint prop_id,

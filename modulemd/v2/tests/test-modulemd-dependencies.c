@@ -19,6 +19,7 @@
 #include "modulemd-dependencies.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-dependencies-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -272,6 +273,37 @@ dependencies_test_parse_yaml (DependenciesFixture *fixture,
   g_clear_pointer (&list, g_strfreev);
 }
 
+
+static void
+dependencies_test_parse_bad_yaml (DependenciesFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdDependencies) d = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_PARSER (parser);
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/mismatched-deps.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (yaml_stream);
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  parser_skip_headers (&parser);
+
+  d = modulemd_dependencies_parse_yaml (&parser, &error);
+  g_assert_nonnull (d);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+  g_assert_false (modulemd_dependencies_validate (d, &error));
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+}
+
+
 static void
 dependencies_test_emit_yaml (DependenciesFixture *fixture,
                              gconstpointer user_data)
@@ -357,6 +389,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               dependencies_test_parse_yaml,
+              NULL);
+
+  g_test_add ("/modulemd/v2/dependencies/yaml/parse/bad",
+              DependenciesFixture,
+              NULL,
+              NULL,
+              dependencies_test_parse_bad_yaml,
               NULL);
 
   g_test_add ("/modulemd/v2/dependencies/yaml/emit",

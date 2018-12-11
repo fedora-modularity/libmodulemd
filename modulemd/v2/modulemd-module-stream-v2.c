@@ -755,6 +755,8 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
   gpointer key, value;
   gchar *nevra = NULL;
   ModulemdModuleStreamV2 *v2_self = NULL;
+  ModulemdDependencies *deps = NULL;
+  g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
   v2_self = MODULEMD_MODULE_STREAM_V2 (self);
@@ -779,6 +781,20 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
                        MODULEMD_ERROR_VALIDATE,
                        "Artifact '%s' was not in valid N-E:V-R.A format.",
                        nevra);
+          return FALSE;
+        }
+    }
+
+  /* Iterate through the Dependencies and validate them */
+  for (guint i = 0; i < v2_self->dependencies->len; i++)
+    {
+      deps =
+        MODULEMD_DEPENDENCIES (g_ptr_array_index (v2_self->dependencies, i));
+      if (!modulemd_dependencies_validate (deps, &nested_error))
+        {
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Dependency failed to validate: ");
           return FALSE;
         }
     }

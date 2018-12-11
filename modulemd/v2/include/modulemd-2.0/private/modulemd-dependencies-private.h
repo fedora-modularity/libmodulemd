@@ -59,3 +59,7 @@ gboolean
 modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
                                  yaml_emitter_t *emitter,
                                  GError **error);
+
+
+gboolean
+modulemd_dependencies_validate (ModulemdDependencies *self, GError **error);

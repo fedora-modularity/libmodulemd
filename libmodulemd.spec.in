@@ -126,7 +126,6 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/modulemd-validator
 %{_libdir}/%{name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib
@@ -152,6 +151,7 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %files -n libmodulemd1
 %license COPYING
 %doc README.md
+%{_bindir}/modulemd-validator
 %{_libdir}/%{name}.so.1*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-1.0.typelib

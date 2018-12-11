@@ -166,8 +166,8 @@ _parse_defaults (yaml_parser_t *parser,
             {
               g_debug ("Unexpected key in root: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in root");
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -303,6 +303,15 @@ _parse_defaults_data (ModulemdDefaults *defaults,
                                "intents"))
             {
               _yaml_parser_defaults_recurse_down (_parse_defaults_intents);
+            }
+
+          /* Other keys */
+          else
+            {
+              g_debug ("Unexpected key in data: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -553,8 +562,10 @@ _parse_intent (yaml_parser_t *parser,
           else
             {
               /* Unexpected key in the map */
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in intent");
+              g_debug ("Unexpected key in intent: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
               break;
             }
 

@@ -229,8 +229,8 @@ _parse_module_stream (yaml_parser_t *parser,
             {
               g_debug ("Unexpected key in root: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in root");
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -530,8 +530,8 @@ _parse_modulemd_data (ModulemdModuleStream *modulestream,
             {
               g_debug ("Unexpected key in data: %s",
                        (const gchar *)event.data.scalar.value);
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in data");
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -585,6 +585,17 @@ _parse_modulemd_licenses (ModulemdModuleStream *modulestream,
 
         case YAML_SCALAR_EVENT:
           /* Each scalar event represents a license type */
+          if (!g_str_equal ((const gchar *)event.data.scalar.value,
+                            "module") &&
+              !g_str_equal ((const gchar *)event.data.scalar.value, "content"))
+            {
+              g_debug ("Unexpected key in licenses: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
+              break;
+            }
+
           if (!_simpleset_from_sequence (parser, &set, error))
             {
               MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
@@ -599,11 +610,6 @@ _parse_modulemd_licenses (ModulemdModuleStream *modulestream,
                                "content"))
             {
               modulemd_modulestream_set_content_licenses (modulestream, set);
-            }
-          else
-            {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown license type");
             }
 
           g_clear_pointer (&set, g_object_unref);
@@ -711,6 +717,18 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
           break;
 
         case YAML_SCALAR_EVENT:
+          if (!g_str_equal ((const gchar *)event.data.scalar.value,
+                            "buildrequires") &&
+              !g_str_equal ((const gchar *)event.data.scalar.value,
+                            "requires"))
+            {
+              g_debug ("Unexpected key in v1 dependencies: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
+              break;
+            }
+
           if (!_hashtable_from_mapping (parser, &reqs, error))
             {
               MMD_YAML_ERROR_EVENT_RETURN_RETHROW (
@@ -726,11 +744,6 @@ _parse_modulemd_deps_v1 (ModulemdModuleStream *modulestream,
                                "requires"))
             {
               modulemd_modulestream_set_requires (modulestream, reqs);
-            }
-          else
-            {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown dependency type");
             }
 
           g_clear_pointer (&reqs, g_hash_table_unref);
@@ -872,10 +885,11 @@ _parse_modulemd_v2_dep (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (error,
-                                           event,
-                                           "Dependency map had key other than "
-                                           "'requires' or 'buildrequires'");
+              g_debug ("Unexpected key in v2 dependencies: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
+              break;
             }
 
           if (!_parse_modulemd_v2_dep_map (
@@ -1070,7 +1084,7 @@ _parse_modulemd_refs (ModulemdModuleStream *modulestream,
   /* Make sure there were no other entries */
   if (g_hash_table_size (refs) > 0)
     {
-      MMD_YAML_ERROR_RETURN (error, "Unexpected key found in references.");
+      g_debug ("Unexpected key found in references.");
     }
 
   result = TRUE;
@@ -1219,8 +1233,10 @@ _parse_modulemd_profile (yaml_parser_t *parser,
           else
             {
               /* Unknown field in profile */
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown key in profile body");
+              g_debug ("Unexpected key in profile: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -1288,7 +1304,10 @@ _parse_modulemd_api (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (error, event, "Unknown API type");
+              g_debug ("Unexpected API type: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -1354,8 +1373,10 @@ _parse_modulemd_filters (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown filter type");
+              g_debug ("Unexpected filter type: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -1422,8 +1443,10 @@ _parse_modulemd_buildopts (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown buildopt type");
+              g_debug ("Unexpected key in buildopts: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -1514,8 +1537,10 @@ _parse_modulemd_rpm_buildopts (ModulemdBuildopts *buildopts,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown RPM buildopt key");
+              g_debug ("Unexpected key in RPM buildopts: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
 
           break;
@@ -1596,8 +1621,10 @@ _parse_modulemd_components (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown component type");
+              g_debug ("Unexpected key in module components: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -1834,8 +1861,10 @@ _parse_modulemd_rpm_component (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in component");
+              g_debug ("Unexpected key in RPM component: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
 
           break;
@@ -2037,8 +2066,10 @@ _parse_modulemd_modulestream_component (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unexpected key in component");
+              g_debug ("Unexpected key in component: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
 
           break;
@@ -2114,8 +2145,10 @@ _parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown artifact type");
+              g_debug ("Unexpected artifacts type: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 
@@ -2260,8 +2293,10 @@ _parse_modulemd_servicelevel (yaml_parser_t *parser,
           else
             {
               /* Unknown field in service level */
-              MMD_YAML_ERROR_EVENT_RETURN (
-                error, event, "Unknown key in service level body");
+              g_debug ("Unexpected key in service level: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                goto error;
             }
           break;
 

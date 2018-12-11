@@ -411,6 +411,9 @@ parse_raw_yaml_sequence (yaml_parser_t *parser,
                          GError **error);
 
 gboolean
+skip_unknown_yaml (yaml_parser_t *parser, GError **error);
+
+gboolean
 emit_yaml_variant (yaml_emitter_t *emitter, GVariant *variant, GError **error);
 
 /* == Common Parsing Functions == */

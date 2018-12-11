@@ -545,6 +545,30 @@ modulemd_yaml_test_index_from_stream (YamlFixture *fixture,
 }
 
 
+static void
+modulemd_yaml_read_unknown_keys (YamlFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdModule) module = NULL;
+  gchar *yaml_path = NULL;
+  g_autoptr (GError) error = NULL;
+  FILE *stream = NULL;
+
+
+  yaml_path = g_strdup_printf ("%s/test_data/good-v2-extra-keys.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  stream = g_fopen (yaml_path, "rb");
+  g_assert_nonnull (stream);
+  g_free (yaml_path);
+
+  module = modulemd_module_new_from_stream (stream, &error);
+  g_assert_true (module);
+  g_assert_null (error);
+  fclose (stream);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -596,6 +620,13 @@ main (int argc, char *argv[])
               modulemd_yaml_set_up,
               modulemd_yaml_test_v2_stream,
               modulemd_yaml_tear_down);
+
+  g_test_add ("/modulemd/yaml/extra_keys",
+              YamlFixture,
+              NULL,
+              NULL,
+              modulemd_yaml_read_unknown_keys,
+              NULL);
 
   g_test_add ("/modulemd/yaml/test_validate_nevra",
               YamlFixture,

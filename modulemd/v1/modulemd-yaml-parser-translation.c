@@ -163,10 +163,10 @@ _parse_translation (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_SET_ERROR (error,
-                                  "Unexpected key in root: %s",
-                                  (const gchar *)event.data.scalar.value);
-              return FALSE;
+              g_debug ("Unexpected key in root: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                return FALSE;
             }
           break;
 
@@ -293,10 +293,10 @@ _parse_translation_data (ModulemdTranslation *translation,
 
           else
             {
-              MMD_YAML_SET_ERROR (error,
-                                  "Unexpected key in root: %s",
-                                  (const gchar *)event.data.scalar.value);
-              return FALSE;
+              g_debug ("Unexpected key in data: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                return FALSE;
             }
 
           break;
@@ -455,7 +455,8 @@ _parse_translation_entry (yaml_parser_t *parser,
               yaml_event_delete (&value_event);
             }
 
-          if (!g_strcmp0 ((const gchar *)event.data.scalar.value, "profiles"))
+          else if (!g_strcmp0 ((const gchar *)event.data.scalar.value,
+                               "profiles"))
             {
               if (!_hashtable_from_mapping (parser, &profiles, error))
                 return NULL;
@@ -467,6 +468,14 @@ _parse_translation_entry (yaml_parser_t *parser,
                     entry, (const gchar *)key, (const gchar *)value);
                 }
               g_clear_pointer (&profiles, g_hash_table_unref);
+            }
+
+          else
+            {
+              g_debug ("Unexpected key in entries: %s",
+                       (const gchar *)event.data.scalar.value);
+              if (!skip_unknown_yaml (parser, error))
+                return NULL;
             }
 
           break;

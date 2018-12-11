@@ -767,6 +767,34 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
       return FALSE;
     }
 
+  /* Make sure that mandatory fields are present */
+  if (!modulemd_module_stream_v2_get_summary (v2_self, "C"))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Summary is missing");
+      return FALSE;
+    }
+
+  if (!modulemd_module_stream_v2_get_description (v2_self, "C"))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Description is missing");
+      return FALSE;
+    }
+
+  if (!g_hash_table_size (v2_self->module_licenses))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   "Module license is missing");
+      return FALSE;
+    }
+
   /* Iterate through the artifacts and validate that they are in the proper
    * NEVRA format
    */
@@ -1333,31 +1361,10 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
     }
 
 
-  /* Make sure that mandatory fields are present */
-  if (!modulemd_module_stream_v2_get_summary (modulestream, "C"))
+  if (!modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (modulestream),
+                                        &nested_error))
     {
-      g_set_error (error,
-                   MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
-                   "Summary is missing");
-      return NULL;
-    }
-
-  if (!modulemd_module_stream_v2_get_description (modulestream, "C"))
-    {
-      g_set_error (error,
-                   MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
-                   "Description is missing");
-      return NULL;
-    }
-
-  if (!g_hash_table_size (modulestream->module_licenses))
-    {
-      g_set_error (error,
-                   MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
-                   "Module license is missing");
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
     }
 

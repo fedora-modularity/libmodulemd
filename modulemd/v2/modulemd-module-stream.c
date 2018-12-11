@@ -531,8 +531,6 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
 
   guint64 mdversion = modulemd_module_stream_get_mdversion (self);
-  ModulemdModuleStreamPrivate *priv =
-    modulemd_module_stream_get_instance_private (self);
 
   if (mdversion == 0)
     {
@@ -548,16 +546,6 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
                            MODULEMD_ERROR,
                            MODULEMD_ERROR_VALIDATE,
                            "Unknown metadata version.");
-      return FALSE;
-    }
-
-  if (!priv->module_name ||
-      g_str_equal (priv->module_name, MODULESTREAM_PLACEHOLDER))
-    {
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
-                           "Module name is unset.");
       return FALSE;
     }
 
@@ -841,7 +829,7 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     "module-name",
     "Module Name",
     "The name of the module providing this stream.",
-    MODULESTREAM_PLACEHOLDER,
+    NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
   properties[PROP_STREAM_NAME] = g_param_spec_string (

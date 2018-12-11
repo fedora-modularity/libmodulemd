@@ -33,9 +33,6 @@ G_BEGIN_DECLS
  */
 
 
-#define MODULESTREAM_PLACEHOLDER "__MODULESTREAM_PLACEHOLDER__"
-
-
 void
 modulemd_module_stream_set_module_name (ModulemdModuleStream *self,
                                         const gchar *module_name);

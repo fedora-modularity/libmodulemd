@@ -13,10 +13,12 @@ Source0:        %{url}/releases/download/%{name}-%{version}/modulemd-%{version}.
 BuildRequires:  meson
 BuildRequires:  pkgconfig
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  pkgconfig(gtk-doc)
+BuildRequires:  python3-devel
 BuildRequires:  python3-gobject-base
 BuildRequires:  valgrind
 

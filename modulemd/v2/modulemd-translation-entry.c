@@ -375,6 +375,7 @@ modulemd_translation_entry_parse_yaml_profiles (yaml_parser_t *parser,
 ModulemdTranslationEntry *
 modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
                                        const gchar *locale,
+                                       gboolean strict,
                                        GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -458,8 +459,10 @@ modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unknown key in translation entry body");
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in translation entry body: %s",
+                            (const gchar *)event.data.scalar.value);
             }
           break;
 

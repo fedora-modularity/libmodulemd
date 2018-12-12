@@ -396,12 +396,13 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
 }
 
 ModulemdDependencies *
-modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
+                                  gboolean strict,
+                                  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  g_autofree gchar *value = NULL;
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (GError) nested_error = NULL;
 
@@ -448,8 +449,11 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error)
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unknown key in dependencies body");
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in dependencies body: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 

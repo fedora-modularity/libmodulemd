@@ -167,6 +167,7 @@ modulemd_subdocument_info_get_mdversion (ModulemdSubdocumentInfo *self)
 gboolean
 modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
                                            yaml_parser_t *parser,
+                                           gboolean strict,
                                            GError **error)
 {
   g_return_val_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self), FALSE);
@@ -219,10 +220,32 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
       switch (event.type)
         {
         case YAML_SCALAR_EVENT:
-          if (depth == 0 && g_str_equal (event.data.scalar.value, "data"))
+          if (depth == 0)
             {
-              /* We have arrived at the "data". Return. */
-              return TRUE;
+              if (g_str_equal (event.data.scalar.value, "data"))
+                {
+                  /* We have arrived at the "data". Return. */
+                  return TRUE;
+                }
+              else if (g_str_equal (event.data.scalar.value, "document") ||
+                       g_str_equal (event.data.scalar.value, "version"))
+                {
+                  /* Always kip over the contents of document and version,
+                   * since it was already parsed when we created this subdoc.
+                   */
+                  if (!skip_unknown_yaml (parser, error))
+                    return FALSE;
+                }
+              else
+                {
+                  /* There shouldn't be any other fields at the root of the
+                   * document. Reject or ignore based on 'strict' setting.
+                   */
+                  SKIP_UNKNOWN (parser,
+                                FALSE,
+                                "Unexpected key in root: %s",
+                                (const gchar *)event.data.scalar.value);
+                }
             }
           break;
 
@@ -240,7 +263,8 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
               g_set_error (error,
                            MODULEMD_YAML_ERROR,
                            MODULEMD_YAML_ERROR_UNPARSEABLE,
-                           "Unexpected event while waiting for data");
+                           "Unexpected event while waiting for data: %s",
+                           mmd_yaml_get_event_name (event.type));
               return FALSE;
             }
           break;

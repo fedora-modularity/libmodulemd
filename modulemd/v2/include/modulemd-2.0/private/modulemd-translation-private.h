@@ -45,6 +45,8 @@ modulemd_translation_get_modified (ModulemdTranslation *self);
  * modulemd_translation_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a translation
  * document
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -56,6 +58,7 @@ modulemd_translation_get_modified (ModulemdTranslation *self);
  */
 ModulemdTranslation *
 modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 gboolean strict,
                                  GError **error);
 
 /**

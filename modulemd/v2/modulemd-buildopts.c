@@ -201,10 +201,13 @@ modulemd_buildopts_init (ModulemdBuildopts *self)
 static gboolean
 modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
                                         ModulemdBuildopts *buildopts,
+                                        gboolean strict,
                                         GError **error);
 
 ModulemdBuildopts *
-modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
+modulemd_buildopts_parse_yaml (yaml_parser_t *parser,
+                               gboolean strict,
+                               GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -238,7 +241,7 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
           if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
             {
               if (!modulemd_buildopts_parse_rpm_buildopts (
-                    parser, buildopts, &nested_error))
+                    parser, buildopts, strict, &nested_error))
                 {
                   g_propagate_error (error, nested_error);
                   return NULL;
@@ -246,11 +249,11 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Unexpected key in buildopts: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in buildopts: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 
@@ -270,6 +273,7 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser, GError **error)
 static gboolean
 modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
                                         ModulemdBuildopts *buildopts,
+                                        gboolean strict,
                                         GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -326,8 +330,10 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error, event, "Unknown key in buildopts body");
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in buildopts body: %s",
+                            (const gchar *)event.data.scalar.value);
             }
           break;
 

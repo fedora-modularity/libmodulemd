@@ -1,0 +1,324 @@
+---
+# Document type identifier
+document: modulemd
+# Module metadata format version
+version: 2
+data:
+
+    # An extra key that should be ignored
+    unknown_key: foo
+    # Another unknown key with contents
+    unknown_map:
+        stuff: [ a, b ]
+        junk: [ b, c ]
+        morestuff:
+            yay: [ d, e ]
+    unknown_sequence:
+        - foo
+        - bar
+
+    name: foo
+    stream: stream-name
+    version: 20160927144203
+    context: c0ffee43
+    arch: x86_64
+    summary: An example module
+    description: >-
+        A module for the demonstration of the metadata format. Also,
+        the obligatory lorem ipsum dolor sit amet goes right here.
+    servicelevels:
+        rawhide:
+            eol: 2077-10-23
+        stable_api:
+            eol: 2077-10-23
+        bug_fixes:
+            eol: 2077-10-23
+        security_fixes:
+            eol: 2077-10-23
+    license:
+        module:
+            - MIT
+        content:
+            - Beerware
+            - GPLv2+
+            - zlib
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
+    xmd:
+        some_key: some_data
+        some_list:
+            - a
+            - b
+        some_dict:
+            a: alpha
+            b: beta
+            some_other_list:
+                - c
+                - d
+            some_other_dict:
+                another_key: more_data
+                yet_another_key:
+                    - this
+                    - is
+                    - getting
+                    - silly
+        empty_dict: {}
+        empty_list: []
+    dependencies:
+        - buildrequires:
+              platform: [-f27, -f28, -epel7]
+          requires:
+              platform: [-f27, -f28, -epel7]
+        - buildrequires:
+              platform: [f27]
+              buildtools: [v1, v2]
+              compatible: [v3]
+          requires:
+              platform: [f27]
+              compatible: [v3, v4]
+        - buildrequires:
+              platform: [f28]
+          requires:
+              platform: [f28]
+              runtime: [a, b]
+        - buildrequires:
+              platform: [epel7]
+              extras: []
+              moreextras: [foo, bar]
+          requires:
+              platform: [epel7]
+              extras: []
+              moreextras: [foo, bar]
+
+          unknown_key: foo
+          unknown_map:
+              stuff: [ a, b ]
+              junk: [ b, c ]
+              morestuff:
+                  yay: [ d, e ]
+          unknown_sequence:
+          - foo
+          - bar
+
+    references:
+        community: http://www.example.com/
+        documentation: http://www.example.com/
+        tracker: http://www.example.com/
+
+        # An extra key that should be ignored
+        unknown_key: foo
+
+    profiles:
+        default:
+            rpms:
+                - bar
+                - bar-extras
+                - baz
+
+            unknown_key: foo
+            unknown_map:
+                stuff: [ a, b ]
+                junk: [ b, c ]
+                morestuff:
+                    yay: [ d, e ]
+            unknown_sequence:
+            - foo
+            - bar
+        container:
+            rpms:
+                - bar
+                - bar-devel
+        minimal:
+            description: Minimal profile installing only the bar package.
+            rpms:
+                - bar
+        buildroot:
+            rpms:
+                - bar-devel
+        srpm-buildroot:
+            rpms:
+                - bar-extras
+        unusual:
+            rpms: []
+        moreunusual: {}
+    api:
+        rpms:
+            - bar
+            - bar-extras
+            - bar-devel
+            - baz
+            - xxx
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
+    filter:
+        rpms:
+            - baz-nonfoo
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
+
+    buildopts:
+        rpms:
+            macros: |
+                %demomacro 1
+                %demomacro2 %{demomacro}23
+
+            unknown_key: foo
+            unknown_map:
+                stuff: [ a, b ]
+                junk: [ b, c ]
+                morestuff:
+                    yay: [ d, e ]
+            unknown_sequence:
+            - foo
+            - bar
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
+
+    components:
+        rpms:
+            bar:
+                rationale: We need this to demonstrate stuff.
+                repository: https://pagure.io/bar.git
+                cache: https://example.com/cache
+                ref: 26ca0c0
+            baz:
+                rationale: This one is here to demonstrate other stuff.
+            xxx:
+                rationale: xxx demonstrates arches and multilib.
+                arches: [ i686, x86_64 ]
+                multilib: [ x86_64 ]
+            xyz:
+                rationale: xyz is a bundled dependency of xxx.
+                buildorder: 10
+
+                unknown_key: foo
+                unknown_map:
+                    stuff: [ a, b ]
+                    junk: [ b, c ]
+                    morestuff:
+                        yay: [ d, e ]
+                unknown_sequence:
+                - foo
+                - bar
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
+
+        modules:
+            includedmodule:
+                rationale: Included in the stack, just because.
+                repository: https://pagure.io/includedmodule.git
+                ref: somecoolbranchname
+                buildorder: 100
+
+                unknown_key: foo
+                unknown_map:
+                    stuff: [ a, b ]
+                    junk: [ b, c ]
+                    morestuff:
+                        yay: [ d, e ]
+                unknown_sequence:
+                - foo
+                - bar
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+            unknown_sequence:
+            - foo
+            - bar
+
+    artifacts:
+        rpms:
+            - bar-0:1.23-1.module_deadbeef.x86_64
+            - bar-devel-0:1.23-1.module_deadbeef.x86_64
+            - bar-extras-0:1.23-1.module_deadbeef.x86_64
+            - baz-0:42-42.module_deadbeef.x86_64
+            - xxx-0:1-1.module_deadbeef.x86_64
+            - xxx-0:1-1.module_deadbeef.i686
+            - xyz-0:1-1.module_deadbeef.x86_64
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+            unknown_sequence:
+            - foo
+            - bar
+...
+---
+document: modulemd-translations
+version: 1
+unknown: foo
+data:
+  module: nodejs
+  stream: 8
+  modified: 1
+  unknown: blah
+...
+---
+document: modulemd-defaults
+version: 1
+unknown:
+  - a
+  - b
+data:
+  module: nodejs
+  unknown:
+    a: b
+    c: d
+  profiles:
+    6: [default]
+    8: [default]
+    9: [default]
+  intents:
+    server:
+      stream: 8
+      unknown: [a, b]
+      profiles:
+        6: [server]
+        8: [server]
+...

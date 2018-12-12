@@ -456,16 +456,19 @@ modulemd_defaults_v1_parse_yaml_profiles (yaml_parser_t *parser,
 static gboolean
 modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
                                     ModulemdDefaultsV1 *defaults,
+                                    gboolean strict,
                                     GError **error);
 
 static gboolean
 modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
+                                   gboolean strict,
                                    gchar **_default_stream,
                                    GHashTable **_profile_set,
                                    GError **error);
 
 ModulemdDefaultsV1 *
 modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 gboolean strict,
                                  GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -480,8 +483,12 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
-    return NULL;
+  if (!modulemd_subdocument_info_get_data_parser (
+        subdoc, &parser, strict, error))
+    {
+      g_debug ("get_data_parser() failed: %s", (*error)->message);
+      return NULL;
+    }
 
   /* Create a module with a placeholder name. We'll verify that this has been
    * changed before we return it. This is because we can't guarantee that we
@@ -583,7 +590,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal (event.data.scalar.value, "intents"))
             {
               if (!modulemd_defaults_v1_parse_intents (
-                    &parser, defaults, &nested_error))
+                    &parser, defaults, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -591,11 +598,11 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Unexpected key in defaults data: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (&parser,
+                            NULL,
+                            "Unexpected key in defaults data: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 
@@ -710,6 +717,7 @@ modulemd_defaults_v1_parse_yaml_profiles (yaml_parser_t *parser,
 static gboolean
 modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
                                     ModulemdDefaultsV1 *defaults,
+                                    gboolean strict,
                                     GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -764,7 +772,7 @@ modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
             }
 
           if (!modulemd_defaults_v1_parse_intent (
-                parser, &default_stream, &profile_set, &nested_error))
+                parser, strict, &default_stream, &profile_set, &nested_error))
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
@@ -796,6 +804,7 @@ modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
 
 static gboolean
 modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
+                                   gboolean strict,
                                    gchar **_default_stream,
                                    GHashTable **_profile_defaults,
                                    GError **error)
@@ -860,11 +869,11 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error,
-                event,
-                "Unexpected key in intent data: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in intent data: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 

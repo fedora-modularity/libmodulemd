@@ -87,6 +87,8 @@ modulemd_module_index_new (void);
  * @self: This #ModulemdModuleIndex object
  * @yaml_file: (in): A YAML file containing the module metadata and other
  * related information such as default streams.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
@@ -102,6 +104,7 @@ modulemd_module_index_new (void);
 gboolean
 modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
                                         const gchar *yaml_file,
+                                        gboolean strict,
                                         GPtrArray **failures,
                                         GError **error);
 
@@ -111,6 +114,8 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
  * @self: This #ModulemdModuleIndex object
  * @yaml_string: (in): A YAML string containing the module metadata and other
  * related information such as default streams.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
@@ -126,6 +131,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
                                           const gchar *yaml_string,
+                                          gboolean strict,
                                           GPtrArray **failures,
                                           GError **error);
 
@@ -135,6 +141,8 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
  * @self: This #ModulemdModuleIndex object
  * @yaml_stream: (in): A YAML stream containing the module metadata and other
  * related information such as default streams.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
@@ -150,6 +158,7 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
                                           FILE *yaml_stream,
+                                          gboolean strict,
                                           GPtrArray **failures,
                                           GError **error);
 

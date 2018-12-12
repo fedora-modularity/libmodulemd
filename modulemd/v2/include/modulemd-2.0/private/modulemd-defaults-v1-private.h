@@ -32,6 +32,8 @@ G_BEGIN_DECLS
  * modulemd_defaults_v1_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a defaults document
  * of metadata version 1.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -43,6 +45,7 @@ G_BEGIN_DECLS
  */
 ModulemdDefaultsV1 *
 modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 gboolean strict,
                                  GError **error);
 
 

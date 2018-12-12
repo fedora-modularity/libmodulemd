@@ -60,7 +60,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
@@ -75,7 +75,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   g_assert_true (modulemd_module_index_update_from_file (
-    index2, yaml_path, &failures, &error));
+    index2, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
 

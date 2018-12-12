@@ -1047,30 +1047,40 @@ modulemd_module_stream_v2_init (ModulemdModuleStreamV2 *self)
 static gboolean
 modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
+                                          gboolean strict,
                                           GError **error);
 
 static gboolean
 modulemd_module_stream_v2_parse_servicelevels (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error);
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error);
 
 static gboolean
 modulemd_module_stream_v2_parse_deps (yaml_parser_t *parser,
                                       ModulemdModuleStreamV2 *modulestream,
+                                      gboolean strict,
                                       GError **error);
 
 static gboolean
 modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
                                       ModulemdModuleStreamV2 *modulestream,
+                                      gboolean strict,
                                       GError **error);
 
 static gboolean
 modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
+                                          gboolean strict,
                                           GError **error);
 
 static gboolean
 modulemd_module_stream_v2_parse_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error);
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error);
 
 static GVariant *
 modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
@@ -1080,6 +1090,7 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
 
 ModulemdModuleStreamV2 *
 modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                      gboolean strict,
                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1093,7 +1104,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   g_autoptr (GVariant) xmd = NULL;
   guint64 version;
 
-  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
+  if (!modulemd_subdocument_info_get_data_parser (
+        subdoc, &parser, strict, error))
     return FALSE;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -1204,7 +1216,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "servicelevels"))
             {
               if (!modulemd_module_stream_v2_parse_servicelevels (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1216,7 +1228,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "license"))
             {
               if (!modulemd_module_stream_v2_parse_licenses (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1242,7 +1254,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "dependencies"))
             {
               if (!modulemd_module_stream_v2_parse_deps (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1254,7 +1266,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "references"))
             {
               if (!modulemd_module_stream_v2_parse_refs (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1266,7 +1278,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "profiles"))
             {
               if (!modulemd_module_stream_v2_parse_profiles (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1277,7 +1289,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "api"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                &parser, "rpms", &nested_error);
+                &parser, "rpms", strict, &nested_error);
               modulemd_module_stream_v2_replace_rpm_api (modulestream, set);
               g_clear_pointer (&set, g_hash_table_unref);
             }
@@ -1287,7 +1299,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "filter"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                &parser, "rpms", &nested_error);
+                &parser, "rpms", strict, &nested_error);
               modulemd_module_stream_v2_replace_rpm_filters (modulestream,
                                                              set);
               g_clear_pointer (&set, g_hash_table_unref);
@@ -1298,7 +1310,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "buildopts"))
             {
               buildopts =
-                modulemd_buildopts_parse_yaml (&parser, &nested_error);
+                modulemd_buildopts_parse_yaml (&parser, strict, &nested_error);
               if (!buildopts)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1315,7 +1327,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "components"))
             {
               if (!modulemd_module_stream_v2_parse_components (
-                    &parser, modulestream, &nested_error))
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1327,7 +1339,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                 "artifacts"))
             {
               set = modulemd_yaml_parse_string_set_from_map (
-                &parser, "rpms", &nested_error);
+                &parser, "rpms", strict, &nested_error);
               if (!set)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1340,11 +1352,11 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Unexpected key in data: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (&parser,
+                            NULL,
+                            "Unexpected key in data: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 
@@ -1376,6 +1388,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 static gboolean
 modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
+                                          gboolean strict,
                                           GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1443,11 +1456,10 @@ modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error,
-                event,
-                "Unexpected key in licenses: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in licenses: %s",
+                            (const gchar *)event.data.scalar.value);
               break;
             }
 
@@ -1470,7 +1482,10 @@ modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
 
 static gboolean
 modulemd_module_stream_v2_parse_servicelevels (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error)
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -1518,7 +1533,8 @@ modulemd_module_stream_v2_parse_servicelevels (
 
           name = (const gchar *)event.data.scalar.value;
 
-          sl = modulemd_service_level_parse_yaml (parser, name, &nested_error);
+          sl = modulemd_service_level_parse_yaml (
+            parser, name, strict, &nested_error);
           if (!sl)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1547,6 +1563,7 @@ modulemd_module_stream_v2_parse_servicelevels (
 static gboolean
 modulemd_module_stream_v2_parse_deps (yaml_parser_t *parser,
                                       ModulemdModuleStreamV2 *modulestream,
+                                      gboolean strict,
                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1578,7 +1595,8 @@ modulemd_module_stream_v2_parse_deps (yaml_parser_t *parser,
         case YAML_SEQUENCE_END_EVENT: done = TRUE; break;
 
         case YAML_MAPPING_START_EVENT:
-          deps = modulemd_dependencies_parse_yaml (parser, &nested_error);
+          deps =
+            modulemd_dependencies_parse_yaml (parser, strict, &nested_error);
           if (!deps)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1607,6 +1625,7 @@ modulemd_module_stream_v2_parse_deps (yaml_parser_t *parser,
 static gboolean
 modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
                                       ModulemdModuleStreamV2 *modulestream,
+                                      gboolean strict,
                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1683,11 +1702,11 @@ modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
 
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error,
-                event,
-                "Unknown key in references: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in references: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 
@@ -1709,6 +1728,7 @@ modulemd_module_stream_v2_parse_refs (yaml_parser_t *parser,
 static gboolean
 modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
+                                          gboolean strict,
                                           GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1741,7 +1761,10 @@ modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           profile = modulemd_profile_parse_yaml (
-            parser, (const gchar *)event.data.scalar.value, &nested_error);
+            parser,
+            (const gchar *)event.data.scalar.value,
+            strict,
+            &nested_error);
           if (!profile)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1769,15 +1792,24 @@ modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
 
 static gboolean
 modulemd_module_stream_v2_parse_rpm_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error);
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error);
 static gboolean
 modulemd_module_stream_v2_parse_module_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error);
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error);
 
 
 static gboolean
 modulemd_module_stream_v2_parse_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error)
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -1810,21 +1842,30 @@ modulemd_module_stream_v2_parse_components (
           if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
             {
               if (!modulemd_module_stream_v2_parse_rpm_components (
-                    parser, modulestream, &nested_error))
+                    parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
                 }
             }
+
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "modules"))
             {
               if (!modulemd_module_stream_v2_parse_module_components (
-                    parser, modulestream, &nested_error))
+                    parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
                 }
+            }
+
+          else
+            {
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in components: %s",
+                            (const gchar *)event.data.scalar.value);
             }
 
           break;
@@ -1847,7 +1888,10 @@ modulemd_module_stream_v2_parse_components (
 
 static gboolean
 modulemd_module_stream_v2_parse_rpm_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error)
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -1878,7 +1922,10 @@ modulemd_module_stream_v2_parse_rpm_components (
 
         case YAML_SCALAR_EVENT:
           component = modulemd_component_rpm_parse_yaml (
-            parser, (const gchar *)event.data.scalar.value, &nested_error);
+            parser,
+            (const gchar *)event.data.scalar.value,
+            strict,
+            &nested_error);
           if (!component)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1906,7 +1953,10 @@ modulemd_module_stream_v2_parse_rpm_components (
 
 static gboolean
 modulemd_module_stream_v2_parse_module_components (
-  yaml_parser_t *parser, ModulemdModuleStreamV2 *modulestream, GError **error)
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -1937,7 +1987,10 @@ modulemd_module_stream_v2_parse_module_components (
 
         case YAML_SCALAR_EVENT:
           component = modulemd_component_module_parse_yaml (
-            parser, (const gchar *)event.data.scalar.value, &nested_error);
+            parser,
+            (const gchar *)event.data.scalar.value,
+            strict,
+            &nested_error);
           if (!component)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));

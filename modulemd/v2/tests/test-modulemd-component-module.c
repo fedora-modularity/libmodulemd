@@ -234,7 +234,8 @@ component_module_test_parse_yaml (ComponentModuleFixture *fixture,
   g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
   yaml_event_delete (&event);
 
-  m = modulemd_component_module_parse_yaml (&parser, "includedmodule", &error);
+  m = modulemd_component_module_parse_yaml (
+    &parser, "includedmodule", TRUE, &error);
   g_assert_nonnull (m);
   g_assert_true (MODULEMD_IS_COMPONENT_MODULE (m));
   g_assert_cmpstr (modulemd_component_get_name (MODULEMD_COMPONENT (m)),

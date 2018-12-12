@@ -143,7 +143,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path =
     g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -151,7 +151,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path =
     g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -161,7 +161,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -171,7 +171,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path = g_strdup_printf ("%s/mod-defaults/spec.v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -182,7 +182,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
     g_strdup_printf ("%s/modulemd/v2/tests/test_data/broken_stream.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_false (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 1);
   subdoc = g_ptr_array_index (failures, 0);
@@ -197,7 +197,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path =
     g_strdup_printf ("%s/nothinghere.yaml", g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_false (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_nonnull (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -205,8 +205,8 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   g_clear_pointer (&error, g_error_free);
 
   /* An empty stream */
-  g_assert_false (
-    modulemd_module_index_update_from_stream (index, NULL, &failures, &error));
+  g_assert_false (modulemd_module_index_update_from_stream (
+    index, NULL, TRUE, &failures, &error));
   g_assert_nonnull (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -214,8 +214,8 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   g_clear_pointer (&error, g_error_free);
 
   /* An empty string */
-  g_assert_false (
-    modulemd_module_index_update_from_string (index, NULL, &failures, &error));
+  g_assert_false (modulemd_module_index_update_from_string (
+    index, NULL, TRUE, &failures, &error));
   g_assert_nonnull (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
@@ -229,7 +229,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   yaml_path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/te.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_false (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 1);
   g_clear_pointer (&yaml_path, g_free);
@@ -257,7 +257,7 @@ module_index_test_read_mixed (ModuleIndexFixture *fixture,
   g_assert_nonnull (yaml_path);
 
   g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, &failures, &error));
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
@@ -265,6 +265,34 @@ module_index_test_read_mixed (ModuleIndexFixture *fixture,
   output = modulemd_module_index_dump_to_string (index, &error);
   g_assert_nonnull (output);
   g_assert_null (error);
+}
+
+
+static void
+module_index_test_read_unknown (ModuleIndexFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+
+  index = modulemd_module_index_new ();
+
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/good-v2-extra-keys.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  g_assert_false (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 3);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, FALSE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&failures, g_ptr_array_unref);
 }
 
 
@@ -589,6 +617,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_index_test_read_mixed,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/index/read/unknown",
+              ModuleIndexFixture,
+              NULL,
+              NULL,
+              module_index_test_read_unknown,
               NULL);
 
   g_test_add ("/modulemd/v2/module/index/upgrade/stream",

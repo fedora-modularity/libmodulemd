@@ -31,6 +31,8 @@
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * Service Level entry in the YAML document.
  * @name: (in): The name of this service level.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -43,6 +45,7 @@
 ModulemdServiceLevel *
 modulemd_service_level_parse_yaml (yaml_parser_t *parser,
                                    const gchar *name,
+                                   gboolean strict,
                                    GError **error);
 
 /**

@@ -345,6 +345,8 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
  * map containing a single key which is a sequence with string scalars.
  * @key: (in): The key in a single-key mapping whose contents should be
  * returned as a string set.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -360,6 +362,7 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
 GHashTable *
 modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
                                          const gchar *key,
+                                         gboolean strict,
                                          GError **error);
 
 
@@ -479,6 +482,40 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
  */
 GVariant *
 mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
+
+
+/**
+ * skip_unknown_yaml:
+ * @parser: (inout): A YAML parser positioned just after an unexpected map key
+ * @error: (out): A #GError that will return the reason for failing to parse.
+ *
+ * This function is used to skip a section of YAML that contains unknown keys.
+ * The intent here is that it will allow libmodulemd to be forward-compatible
+ * with new, backwards-compatible changes in the metadata format. This function
+ * will advance @parser to just before the next key in the map.
+ *
+ * Returns: TRUE if the parser was able to skip the unknown values safely.
+ * FALSE and sets @error appropriately if the document was malformed YAML.
+ */
+gboolean
+skip_unknown_yaml (yaml_parser_t *parser, GError **error);
+
+
+#define SKIP_UNKNOWN(_parser, _returnval, ...)                                \
+  do                                                                          \
+    {                                                                         \
+      g_debug (__VA_ARGS__);                                                  \
+      if (strict)                                                             \
+        {                                                                     \
+          MMD_YAML_ERROR_EVENT_EXIT_FULL (                                    \
+            error, event, _returnval, __VA_ARGS__);                           \
+        }                                                                     \
+                                                                              \
+      if (!skip_unknown_yaml (_parser, error))                                \
+        return _returnval;                                                    \
+      break;                                                                  \
+    }                                                                         \
+  while (0)
 
 
 /* A set of macros for simple emitting of common elements */

@@ -244,7 +244,7 @@ dependencies_test_parse_yaml (DependenciesFixture *fixture,
 
   parser_skip_headers (&parser);
 
-  d = modulemd_dependencies_parse_yaml (&parser, &error);
+  d = modulemd_dependencies_parse_yaml (&parser, TRUE, &error);
   g_assert_nonnull (d);
   g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
 
@@ -295,7 +295,7 @@ dependencies_test_parse_bad_yaml (DependenciesFixture *fixture,
 
   parser_skip_headers (&parser);
 
-  d = modulemd_dependencies_parse_yaml (&parser, &error);
+  d = modulemd_dependencies_parse_yaml (&parser, TRUE, &error);
   g_assert_nonnull (d);
   g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
 

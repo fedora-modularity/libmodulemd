@@ -222,6 +222,7 @@ modulemd_profile_init (ModulemdProfile *self)
 ModulemdProfile *
 modulemd_profile_parse_yaml (yaml_parser_t *parser,
                              const gchar *name,
+                             gboolean strict,
                              GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -281,8 +282,11 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unknown key in profile body");
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in profile body: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 

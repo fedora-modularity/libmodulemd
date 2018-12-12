@@ -44,12 +44,12 @@ class TestModuleIndexMerger(TestBase):
         idx2 = Modulemd.ModuleIndex()
 
         res, failures = idx1.update_from_file(path.join(
-            self.source_root, "modulemd/v2/tests/test_data/long-valid.yaml"))
+            self.source_root, "modulemd/v2/tests/test_data/long-valid.yaml"), True)
         self.assertTrue(res)
         self.assertEqual(len(failures), 0)
 
         res, failures = idx2.update_from_file(path.join(
-            self.source_root, "modulemd/v2/tests/test_data/long-valid.yaml"))
+            self.source_root, "modulemd/v2/tests/test_data/long-valid.yaml"), True)
         self.assertTrue(res)
         self.assertEqual(len(failures), 0)
 
@@ -74,7 +74,7 @@ class TestModuleIndexMerger(TestBase):
         base_index.update_from_file(
             path.join(
                 self.source_root,
-                "modulemd/v2/tests/test_data/merging-base.yaml"))
+                "modulemd/v2/tests/test_data/merging-base.yaml"), True)
 
         # Baseline
         httpd_defaults = base_index.get_module('httpd').get_defaults()
@@ -111,7 +111,7 @@ class TestModuleIndexMerger(TestBase):
         override_index.update_from_file(
             path.join(
                 self.source_root,
-                "modulemd/v2/tests/test_data/overriding.yaml"))
+                "modulemd/v2/tests/test_data/overriding.yaml"), True)
 
         # Test that adding both of these at the same priority level fails
         # with a merge conflict.

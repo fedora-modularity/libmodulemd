@@ -659,7 +659,7 @@ data:
         can_bool: TRUE
 ...
 """
-        stream = Modulemd.ModuleStream.read_string(yaml)
+        stream = Modulemd.ModuleStream.read_string(yaml, True)
 
         assert stream is not None
         assert stream.props.module_name == 'modulename'
@@ -756,12 +756,12 @@ data:
 ...
 """
 
-        stream = Modulemd.ModuleStream.read_string(trivial_yaml)
+        stream = Modulemd.ModuleStream.read_string(trivial_yaml, True)
         assert stream
 
         # Sanity check of spec.v2.yaml
         stream = Modulemd.ModuleStream.read_file(
-            "%s/spec.v2.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+            "%s/spec.v2.yaml" % os.getenv('MESON_SOURCE_ROOT'), True)
         assert stream
 
     def test_v1_yaml(self):
@@ -885,7 +885,7 @@ data:
         can_bool: TRUE
 ...
 """
-            stream = Modulemd.ModuleStream.read_string(yaml)
+            stream = Modulemd.ModuleStream.read_string(yaml, True)
 
             assert stream is not None
             assert stream.props.module_name == 'modulename'
@@ -1000,12 +1000,12 @@ data:
 ...
 """
 
-            stream = Modulemd.ModuleStream.read_string(trivial_yaml)
+            stream = Modulemd.ModuleStream.read_string(trivial_yaml, True)
             assert stream
 
             # Sanity check of spec.v1.yaml
             stream = Modulemd.ModuleStream.read_file(
-                "%s/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'))
+                "%s/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'), True)
             assert stream
 
 

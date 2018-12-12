@@ -42,7 +42,7 @@ class TestModuleIndex(TestBase):
         idx = ModuleIndex.new()
 
         with open(path.join(self.source_root, "spec.v1.yaml"), 'r') as v1:
-            res, failures = idx.update_from_string(v1.read())
+            res, failures = idx.update_from_string(v1.read(), True)
             self.assertTrue(res)
             self.assertListEqual(failures, [])
 
@@ -51,12 +51,12 @@ class TestModuleIndex(TestBase):
                 "translations/spec.v1.yaml",
                 "mod-defaults/spec.v1.yaml"]:
             res, failures = idx.update_from_file(
-                path.join(self.source_root, fname))
+                path.join(self.source_root, fname), True)
             self.assertTrue(res)
             self.assertListEqual(failures, [])
 
         res, failures = idx.update_from_file(path.join(
-            self.source_root, "modulemd/v2/tests/test_data/te.yaml"))
+            self.source_root, "modulemd/v2/tests/test_data/te.yaml"), True)
         self.assertFalse(res)
         self.assertEqual(len(failures), 1)
         self.assertIn(

@@ -75,11 +75,13 @@ static ModulemdModuleStream *
 modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                                   const gchar *module_name,
                                   const gchar *module_stream,
+                                  gboolean strict,
                                   GError **error);
 
 
 ModulemdModuleStream *
 modulemd_module_stream_read_file (const gchar *path,
+                                  gboolean strict,
                                   const gchar *module_name,
                                   const gchar *module_stream,
                                   GError **error)
@@ -108,12 +110,13 @@ modulemd_module_stream_read_file (const gchar *path,
   yaml_parser_set_input_file (&parser, yaml_stream);
 
   return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, error);
+    &parser, module_name, module_stream, strict, error);
 }
 
 
 ModulemdModuleStream *
 modulemd_module_stream_read_string (const gchar *yaml_string,
+                                    gboolean strict,
                                     const gchar *module_name,
                                     const gchar *module_stream,
                                     GError **error)
@@ -127,12 +130,13 @@ modulemd_module_stream_read_string (const gchar *yaml_string,
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
 
   return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, error);
+    &parser, module_name, module_stream, strict, error);
 }
 
 
 ModulemdModuleStream *
 modulemd_module_stream_read_stream (FILE *stream,
+                                    gboolean strict,
                                     const gchar *module_name,
                                     const gchar *module_stream,
                                     GError **error)
@@ -141,7 +145,7 @@ modulemd_module_stream_read_stream (FILE *stream,
   yaml_parser_set_input_file (&parser, stream);
 
   return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, error);
+    &parser, module_name, module_stream, strict, error);
 }
 
 
@@ -149,6 +153,7 @@ static ModulemdModuleStream *
 modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                                   const gchar *module_name,
                                   const gchar *module_stream,
+                                  gboolean strict,
                                   GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
@@ -221,7 +226,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
     case MD_MODULESTREAM_VERSION_ONE:
       stream = MODULEMD_MODULE_STREAM (
-        modulemd_module_stream_v1_parse_yaml (subdoc, &nested_error));
+        modulemd_module_stream_v1_parse_yaml (subdoc, strict, &nested_error));
       if (!stream)
         {
           g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -231,7 +236,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
 
     case MD_MODULESTREAM_VERSION_TWO:
       stream = MODULEMD_MODULE_STREAM (
-        modulemd_module_stream_v2_parse_yaml (subdoc, &nested_error));
+        modulemd_module_stream_v2_parse_yaml (subdoc, strict, &nested_error));
       if (!stream)
         {
           g_propagate_error (error, g_steal_pointer (&nested_error));

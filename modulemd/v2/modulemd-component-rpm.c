@@ -428,6 +428,7 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
 ModulemdComponentRpm *
 modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
                                    const gchar *name,
+                                   gboolean strict,
                                    GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -564,11 +565,11 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Unknown key in rpm component body: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in rpm component body: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
         default:

@@ -259,6 +259,7 @@ modulemd_component_module_emit_yaml (ModulemdComponentModule *self,
 ModulemdComponentModule *
 modulemd_component_module_parse_yaml (yaml_parser_t *parser,
                                       const gchar *name,
+                                      gboolean strict,
                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -352,8 +353,11 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unknown key in module component body");
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in module component body: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
         default:

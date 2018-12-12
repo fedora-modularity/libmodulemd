@@ -179,7 +179,7 @@ module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
   g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 1);
   g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
 
-  stream = modulemd_module_stream_v1_parse_yaml (subdoc, &error);
+  stream = modulemd_module_stream_v1_parse_yaml (subdoc, TRUE, &error);
   g_assert_no_error (error);
   g_assert_nonnull (stream);
 
@@ -279,7 +279,7 @@ module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
   g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 2);
   g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
 
-  stream = modulemd_module_stream_v2_parse_yaml (subdoc, &error);
+  stream = modulemd_module_stream_v2_parse_yaml (subdoc, TRUE, &error);
   g_assert_no_error (error);
   g_assert_nonnull (stream);
 

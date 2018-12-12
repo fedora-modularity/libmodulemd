@@ -388,7 +388,9 @@ modulemd_translation_init (ModulemdTranslation *self)
 /* === YAML Functions === */
 
 static GHashTable *
-modulemd_translation_parse_yaml_entries (yaml_parser_t *parser, GError **error)
+modulemd_translation_parse_yaml_entries (yaml_parser_t *parser,
+                                         gboolean strict,
+                                         GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -424,7 +426,10 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser, GError **error)
             }
 
           te = modulemd_translation_entry_parse_yaml (
-            parser, (const gchar *)event.data.scalar.value, &nested_error);
+            parser,
+            (const gchar *)event.data.scalar.value,
+            strict,
+            &nested_error);
           if (te == NULL)
             MMD_YAML_ERROR_EVENT_EXIT (error,
                                        event,
@@ -454,6 +459,7 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser, GError **error)
 
 ModulemdTranslation *
 modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                 gboolean strict,
                                  GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -468,7 +474,8 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   g_autoptr (GHashTable) entries = NULL;
   guint64 version = modulemd_subdocument_info_get_mdversion (subdoc);
 
-  if (!modulemd_subdocument_info_get_data_parser (subdoc, &parser, error))
+  if (!modulemd_subdocument_info_get_data_parser (
+        subdoc, &parser, strict, error))
     return NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -550,7 +557,7 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal (event.data.scalar.value, "translations"))
             {
               entries = modulemd_translation_parse_yaml_entries (
-                &parser, &nested_error);
+                &parser, strict, &nested_error);
               if (!entries)
                 MMD_YAML_ERROR_EVENT_EXIT (
                   error,
@@ -563,11 +570,11 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             }
           else
             {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Unexpected key in translation data: %s",
-                (const gchar *)event.data.scalar.value);
+              SKIP_UNKNOWN (&parser,
+                            NULL,
+                            "Unexpected key in translation data: %s",
+                            (const gchar *)event.data.scalar.value);
+              break;
             }
           break;
 

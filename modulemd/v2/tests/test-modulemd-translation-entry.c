@@ -503,7 +503,7 @@ translation_entry_test_parse_yaml (TranslationEntryFixture *fixture,
   /* Advance the parser past STREAM_START and DOCUMENT_START */
   parser_skip_document_start (&parser);
 
-  te = modulemd_translation_entry_parse_yaml (&parser, "en_GB", &error);
+  te = modulemd_translation_entry_parse_yaml (&parser, "en_GB", TRUE, &error);
   g_assert_nonnull (te);
   g_assert_true (MODULEMD_IS_TRANSLATION_ENTRY (te));
   g_assert_cmpstr (modulemd_translation_entry_get_locale (te), ==, "en_GB");

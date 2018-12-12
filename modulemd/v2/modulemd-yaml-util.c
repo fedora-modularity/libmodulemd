@@ -478,6 +478,7 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 GHashTable *
 modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
                                          const gchar *key,
+                                         gboolean strict,
                                          GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
@@ -518,8 +519,10 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
           else
             {
               /* Encountered a key other than the expected one. */
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unexpected key in map");
+              SKIP_UNKNOWN (parser,
+                            NULL,
+                            "Unexpected key in map: %s",
+                            (const gchar *)event.data.scalar.value);
             }
           break;
 
@@ -1141,4 +1144,140 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
     }
 
   return result;
+}
+
+
+static gboolean
+skip_unknown_yaml_mapping (yaml_parser_t *parser, GError **error);
+static gboolean
+skip_unknown_yaml_sequence (yaml_parser_t *parser, GError **error);
+
+
+gboolean
+skip_unknown_yaml (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  MODULEMD_INIT_TRACE ();
+
+  /* This function is called when an unknown key appears in a mapping.
+   * Read the next event and then skip to the end of it.
+   */
+
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+  switch (event.type)
+    {
+    case YAML_SCALAR_EVENT:
+      /* If we get a scalar key, we can just return here */
+      break;
+
+    case YAML_MAPPING_START_EVENT:
+      return skip_unknown_yaml_mapping (parser, error);
+
+    case YAML_SEQUENCE_START_EVENT:
+      return skip_unknown_yaml_sequence (parser, error);
+
+    default:
+      /* We received a YAML event we shouldn't expect at this level */
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_PARSE,
+                   "Unexpected YAML event %s in skip_unknown_yaml()",
+                   mmd_yaml_get_event_name (event.type));
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+skip_unknown_yaml_sequence (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  gsize depth = 0;
+  gboolean done = FALSE;
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_SCALAR_EVENT: break;
+
+        case YAML_MAPPING_START_EVENT:
+        case YAML_SEQUENCE_START_EVENT: depth++; break;
+
+        case YAML_MAPPING_END_EVENT: depth--; break;
+
+        case YAML_SEQUENCE_END_EVENT:
+          if (depth == 0)
+            return TRUE;
+
+          depth--;
+          break;
+
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          g_set_error (
+            error,
+            MODULEMD_YAML_ERROR,
+            MODULEMD_YAML_ERROR_PARSE,
+            "Unexpected YAML event %s in skip_unknown_yaml_sequence()",
+            mmd_yaml_get_event_name (event.type));
+          return FALSE;
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+skip_unknown_yaml_mapping (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+  gsize depth = 0;
+  gboolean done = FALSE;
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_SCALAR_EVENT: break;
+
+        case YAML_MAPPING_START_EVENT:
+        case YAML_SEQUENCE_START_EVENT: depth++; break;
+
+        case YAML_SEQUENCE_END_EVENT: depth--; break;
+
+        case YAML_MAPPING_END_EVENT:
+          if (depth == 0)
+            return TRUE;
+
+          depth--;
+          break;
+
+
+        default:
+          /* We received a YAML event we shouldn't expect at this level */
+          g_set_error (
+            error,
+            MODULEMD_YAML_ERROR,
+            MODULEMD_YAML_ERROR_PARSE,
+            "Unexpected YAML event %s in skip_unknown_yaml_sequence()",
+            mmd_yaml_get_event_name (event.type));
+          return FALSE;
+        }
+
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
 }

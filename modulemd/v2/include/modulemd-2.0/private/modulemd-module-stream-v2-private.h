@@ -71,6 +71,8 @@ struct _ModulemdModuleStreamV2
  * modulemd_module_stream_v2_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a stream v2
  * document
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -82,6 +84,7 @@ struct _ModulemdModuleStreamV2
  */
 ModulemdModuleStreamV2 *
 modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
+                                      gboolean strict,
                                       GError **error);
 
 /**

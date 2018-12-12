@@ -103,6 +103,8 @@ modulemd_module_stream_new (guint64 mdversion,
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML file.
@@ -117,6 +119,7 @@ modulemd_module_stream_new (guint64 mdversion,
  */
 ModulemdModuleStream *
 modulemd_module_stream_read_file (const gchar *path,
+                                  gboolean strict,
                                   const gchar *module_name,
                                   const gchar *module_stream,
                                   GError **error);
@@ -132,6 +135,8 @@ modulemd_module_stream_read_file (const gchar *path,
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML string.
@@ -146,6 +151,7 @@ modulemd_module_stream_read_file (const gchar *path,
  */
 ModulemdModuleStream *
 modulemd_module_stream_read_string (const gchar *yaml_string,
+                                    gboolean strict,
                                     const gchar *module_name,
                                     const gchar *module_stream,
                                     GError **error);
@@ -161,6 +167,8 @@ modulemd_module_stream_read_string (const gchar *yaml_string,
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML file.
@@ -175,6 +183,7 @@ modulemd_module_stream_read_string (const gchar *yaml_string,
  */
 ModulemdModuleStream *
 modulemd_module_stream_read_stream (FILE *stream,
+                                    gboolean strict,
                                     const gchar *module_name,
                                     const gchar *module_stream,
                                     GError **error);

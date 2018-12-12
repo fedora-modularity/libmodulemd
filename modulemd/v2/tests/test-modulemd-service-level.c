@@ -172,7 +172,6 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GDate) eol = NULL;
   GDate *returned_eol = NULL;
-  g_autoptr (GDate) copied_eol = NULL;
   g_autofree gchar *eol_string = NULL;
 
 
@@ -270,7 +269,7 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
   g_assert_nonnull (name);
   g_assert_cmpstr (name, ==, "sl_name");
 
-  sl = modulemd_service_level_parse_yaml (&parser, name, &error);
+  sl = modulemd_service_level_parse_yaml (&parser, name, TRUE, &error);
   g_assert_nonnull (sl);
   g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl));
   g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "sl_name");

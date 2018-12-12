@@ -127,10 +127,14 @@ modulemd_subdocument_info_set_gerror (ModulemdSubdocumentInfo *self,
  * modulemd_subdocument_info_get_data_parser:
  * @self: This #ModulemdSubdocumentInfo
  * @parser: (inout): An unconfigured libyaml parser
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
+ * @error: (out): A #GError containing the parser error if this function fails.
  *
  * Since: 2.0
  */
 gboolean
 modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
                                            yaml_parser_t *parser,
+                                           gboolean strict,
                                            GError **error);

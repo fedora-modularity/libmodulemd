@@ -271,7 +271,7 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (name);
   g_assert_cmpstr (name, ==, "default");
 
-  p = modulemd_profile_parse_yaml (&parser, name, &error);
+  p = modulemd_profile_parse_yaml (&parser, name, TRUE, &error);
   g_assert_nonnull (p);
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "default");

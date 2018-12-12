@@ -330,7 +330,7 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
     "    stream: x.y\n      profiles:\n        'x.y': []\n");
 
   /* Parse the data section and validate the content */
-  defaults = modulemd_defaults_v1_parse_yaml (subdoc, &error);
+  defaults = modulemd_defaults_v1_parse_yaml (subdoc, TRUE, &error);
   g_assert_nonnull (defaults);
   g_assert_null (error);
 

@@ -120,6 +120,7 @@ get_or_create_module (ModulemdModuleIndex *self, const gchar *module_name)
 static gboolean
 add_subdoc (ModulemdModuleIndex *self,
             ModulemdSubdocumentInfo *subdoc,
+            gboolean strict,
             GError **error)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -133,7 +134,7 @@ add_subdoc (ModulemdModuleIndex *self,
         {
         case MD_MODULESTREAM_VERSION_ONE:
           stream = MODULEMD_MODULE_STREAM (
-            modulemd_module_stream_v1_parse_yaml (subdoc, error));
+            modulemd_module_stream_v1_parse_yaml (subdoc, strict, error));
           if (stream == NULL)
             return FALSE;
           if (!modulemd_module_index_add_module_stream (self, stream, error))
@@ -143,7 +144,7 @@ add_subdoc (ModulemdModuleIndex *self,
         case MD_MODULESTREAM_VERSION_TWO:
           stream =
             (ModulemdModuleStream *)modulemd_module_stream_v2_parse_yaml (
-              subdoc, error);
+              subdoc, strict, error);
           if (stream == NULL)
             return FALSE;
           if (!modulemd_module_index_add_module_stream (self, stream, error))
@@ -164,7 +165,7 @@ add_subdoc (ModulemdModuleIndex *self,
         {
         case MD_DEFAULTS_VERSION_ONE:
           defaults = (ModulemdDefaults *)modulemd_defaults_v1_parse_yaml (
-            subdoc, error);
+            subdoc, strict, error);
           if (defaults == NULL)
             return FALSE;
           if (!modulemd_module_index_add_defaults (self, defaults, error))
@@ -181,7 +182,7 @@ add_subdoc (ModulemdModuleIndex *self,
       break;
 
     case MODULEMD_YAML_DOC_TRANSLATIONS:
-      translation = modulemd_translation_parse_yaml (subdoc, error);
+      translation = modulemd_translation_parse_yaml (subdoc, strict, error);
       if (translation == NULL)
         return FALSE;
       if (!modulemd_module_index_add_translation (self, translation, error))
@@ -203,6 +204,7 @@ add_subdoc (ModulemdModuleIndex *self,
 static gboolean
 modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
                                           yaml_parser_t *parser,
+                                          gboolean strict,
                                           GPtrArray **failures,
                                           GError **error)
 {
@@ -234,7 +236,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
           else
             {
               /* Initial parsing worked, parse further */
-              if (!add_subdoc (self, subdoc, error))
+              if (!add_subdoc (self, subdoc, strict, error))
                 {
                   modulemd_subdocument_info_set_gerror (subdoc, *error);
                   g_clear_pointer (error, g_error_free);
@@ -422,6 +424,7 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
                                         const gchar *yaml_file,
+                                        gboolean strict,
                                         GPtrArray **failures,
                                         GError **error)
 {
@@ -447,13 +450,14 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
     }
 
   return modulemd_module_index_update_from_stream (
-    self, yaml_stream, failures, error);
+    self, yaml_stream, strict, failures, error);
 }
 
 
 gboolean
 modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
                                           const gchar *yaml_string,
+                                          gboolean strict,
                                           GPtrArray **failures,
                                           GError **error)
 {
@@ -475,13 +479,14 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
 
   return modulemd_module_index_update_from_parser (
-    self, &parser, failures, error);
+    self, &parser, strict, failures, error);
 }
 
 
 gboolean
 modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
                                           FILE *yaml_stream,
+                                          gboolean strict,
                                           GPtrArray **failures,
                                           GError **error)
 {
@@ -502,7 +507,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
   yaml_parser_set_input_file (&parser, yaml_stream);
 
   return modulemd_module_index_update_from_parser (
-    self, &parser, failures, error);
+    self, &parser, strict, failures, error);
 }
 
 

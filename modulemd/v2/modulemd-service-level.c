@@ -255,6 +255,7 @@ modulemd_service_level_init (ModulemdServiceLevel *self)
 ModulemdServiceLevel *
 modulemd_service_level_parse_yaml (yaml_parser_t *parser,
                                    const gchar *name,
+                                   gboolean strict,
                                    GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -323,8 +324,10 @@ modulemd_service_level_parse_yaml (yaml_parser_t *parser,
           else
             {
               /* Unknown field in service level */
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Unknown key in service level body");
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in service level body: %s",
+                            (const gchar *)event.data.scalar.value);
             }
           break;
 

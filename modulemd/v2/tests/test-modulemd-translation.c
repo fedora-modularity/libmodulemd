@@ -281,7 +281,7 @@ translation_test_parse_yaml (TranslationFixture *fixture,
   g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 1);
   g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
 
-  t = modulemd_translation_parse_yaml (subdoc, &error);
+  t = modulemd_translation_parse_yaml (subdoc, TRUE, &error);
   g_assert_no_error (error);
   g_assert_null (error);
   g_assert_nonnull (t);

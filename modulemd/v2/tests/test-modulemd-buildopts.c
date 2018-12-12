@@ -218,7 +218,7 @@ buildopts_test_parse_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
 
   parser_skip_document_start (&parser);
 
-  b = modulemd_buildopts_parse_yaml (&parser, &error);
+  b = modulemd_buildopts_parse_yaml (&parser, TRUE, &error);
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_cmpstr (modulemd_buildopts_get_rpm_macros (b),

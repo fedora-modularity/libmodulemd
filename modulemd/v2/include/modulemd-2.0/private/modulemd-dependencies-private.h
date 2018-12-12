@@ -30,6 +30,8 @@
  * modulemd_dependencies_parse_yaml:
  * @parser: (inout): A libyaml parser object positioned at a sequence entry for
  * a Dependencies object.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -40,7 +42,9 @@
  * Since: 2.0
  */
 ModulemdDependencies *
-modulemd_dependencies_parse_yaml (yaml_parser_t *parser, GError **error);
+modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
+                                  gboolean strict,
+                                  GError **error);
 
 /**
  * modulemd_dependenciesemitter_yaml:

@@ -129,6 +129,8 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %{_libdir}/%{name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib
+%{python3_sitearch}/gi/overrides/
+
 
 %files devel
 %{_libdir}/%{name}.so
@@ -142,7 +144,6 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 
 
 %files -n python3-%{name}
-%{python3_sitearch}/gi/overrides/
 
 
 %files -n python3-libmodulemd1

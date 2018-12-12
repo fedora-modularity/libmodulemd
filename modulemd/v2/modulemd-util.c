@@ -158,7 +158,7 @@ modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b)
        * lists are not identical.
        */
       if (!g_str_equal (g_ptr_array_index (set_a, i),
-                        g_ptr_array_index (set_a, i)))
+                        g_ptr_array_index (set_b, i)))
         {
           /* No match, so this simpleset is not equal */
           return FALSE;

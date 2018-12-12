@@ -66,10 +66,10 @@ Compatibility library for libmodulemd 1.x
 %package -n libmodulemd1-devel
 Summary: Compatibility development package for libmodulemd 1.x
 Version: %{libmodulemd_v1_version}
-Requires: libmodulemd1%{?_isa} = %{version}-%{release}
+Requires: libmodulemd1%{?_isa} = %{libmodulemd_v1_version}-%{release}
 Conflicts: %{name}-devel
 Obsoletes: libmodulemd-devel < 2
-Provides: libmodulemd-devel = %{version}-%{release}
+Provides: libmodulemd-devel = %{libmodulemd_v1_version}-%{release}
 RemovePathPostfixes: .compat
 
 
@@ -81,7 +81,7 @@ Development files for libmodulemd 1.x
 Summary: Python 3 bindings for %{name}
 Version: %{libmodulemd_v1_version}
 BuildArch: noarch
-Requires: libmodulemd1 = %{version}-%{release}
+Requires: libmodulemd1 = %{libmodulemd_v1_version}-%{release}
 Requires: python3-gobject-base
 
 %description -n python3-libmodulemd1

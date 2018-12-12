@@ -842,7 +842,7 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
       g_debug ("Prioritizer: merging defaults for %s", module_name);
       defaults = modulemd_module_get_defaults (module);
       into_defaults = modulemd_module_get_defaults (into_module);
-      if (override)
+      if (override && defaults)
         {
           /* If we've been told to override (we're at a higher priority level),
            * then just replace the current defaults with the new one
@@ -853,6 +853,10 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
               g_propagate_error (error, g_steal_pointer (&nested_error));
               return FALSE;
             }
+        }
+      else if (!defaults)
+        {
+          /* No defaults to merge in right now, just continue */
         }
       else if (defaults && !into_defaults)
         {

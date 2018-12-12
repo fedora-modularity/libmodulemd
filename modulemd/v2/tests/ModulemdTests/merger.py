@@ -175,6 +175,26 @@ class TestModuleIndexMerger(TestBase):
         self.assertEqual(
             len(httpd_defaults.get_default_profiles_for_stream('2.8', 'workstation')), 4)
 
+    def test_merger_with_real_world_data(self):
+        fedora_index = Modulemd.ModuleIndex()
+        fedora_index.update_from_file(
+            path.join(
+                self.source_root,
+                "modulemd/v2/tests/test_data/f29.yaml"), True)
+
+        updates_index = Modulemd.ModuleIndex()
+        updates_index.update_from_file(
+            path.join(
+                self.source_root,
+                "modulemd/v2/tests/test_data/f29-updates.yaml"), True)
+
+        merger = Modulemd.ModuleIndexMerger()
+        merger.associate_index(fedora_index, 0)
+        merger.associate_index(updates_index, 0)
+        merged_index = merger.resolve()
+
+        self.assertIsNotNone(merged_index)
+
     def test_merger_with_modified(self):
         pass
 

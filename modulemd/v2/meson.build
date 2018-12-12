@@ -66,6 +66,18 @@ else
     )
 endif
 
+modulemd_v2_validator = executable(
+    'modulemd-validator',
+    sources : modulemd_v2_validator_srcs,
+    include_directories : v2_include_dirs,
+    dependencies : [
+        gobject,
+        yaml,
+        modulemd_v2_dep
+    ],
+    install : true
+)
+
 v2_header_path = 'modulemd-2.0'
 
 install_headers(

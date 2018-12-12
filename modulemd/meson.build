@@ -140,6 +140,10 @@ modulemd_v2_srcs = files(
     'v2/modulemd-yaml-util.c',
 )
 
+modulemd_v2_validator_srcs = files (
+    'v2/modulemd-validator.c',
+)
+
 modulemd_v2_hdrs = files(
     'v2/include/modulemd-2.0/modulemd.h',
     'v2/include/modulemd-2.0/modulemd-buildopts.h',
@@ -239,6 +243,7 @@ test('clang_format', clang_format,
             modulemd_v2_srcs +
             modulemd_v2_hdrs +
             modulemd_v2_priv_hdrs +
+            modulemd_v2_validator_srcs +
             test_v2_srcs +
             test_v2_priv_hdrs)
 

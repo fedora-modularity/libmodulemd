@@ -23,6 +23,7 @@
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-module-index-private.h"
+#include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-translation-private.h"
@@ -121,11 +122,13 @@ static gboolean
 add_subdoc (ModulemdModuleIndex *self,
             ModulemdSubdocumentInfo *subdoc,
             gboolean strict,
+            gboolean autogen_module_name,
             GError **error)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
+  g_autofree gchar *name = NULL;
 
   switch (modulemd_subdocument_info_get_doctype (subdoc))
     {
@@ -135,20 +138,12 @@ add_subdoc (ModulemdModuleIndex *self,
         case MD_MODULESTREAM_VERSION_ONE:
           stream = MODULEMD_MODULE_STREAM (
             modulemd_module_stream_v1_parse_yaml (subdoc, strict, error));
-          if (stream == NULL)
-            return FALSE;
-          if (!modulemd_module_index_add_module_stream (self, stream, error))
-            return FALSE;
           break;
 
         case MD_MODULESTREAM_VERSION_TWO:
           stream =
             (ModulemdModuleStream *)modulemd_module_stream_v2_parse_yaml (
               subdoc, strict, error);
-          if (stream == NULL)
-            return FALSE;
-          if (!modulemd_module_index_add_module_stream (self, stream, error))
-            return FALSE;
           break;
 
         default:
@@ -158,6 +153,32 @@ add_subdoc (ModulemdModuleIndex *self,
                        "Invalid mdversion for a stream object");
           return FALSE;
         }
+
+      if (stream == NULL)
+        return FALSE;
+
+      if (autogen_module_name &&
+          !modulemd_module_stream_get_module_name (stream))
+        {
+          name = g_strdup_printf ("__unnamed_module_%d",
+                                  g_hash_table_size (self->modules) + 1);
+          modulemd_module_stream_set_module_name (stream, name);
+          g_clear_pointer (&name, g_free);
+        }
+
+      if (autogen_module_name &&
+          !modulemd_module_stream_get_stream_name (stream))
+        {
+          name = g_strdup_printf ("__unnamed_stream_%d",
+                                  g_hash_table_size (self->modules) + 1);
+          modulemd_module_stream_set_stream_name (stream, name);
+          g_clear_pointer (&name, g_free);
+        }
+
+
+      if (!modulemd_module_index_add_module_stream (self, stream, error))
+        return FALSE;
+
       break;
 
     case MODULEMD_YAML_DOC_DEFAULTS:
@@ -201,10 +222,11 @@ add_subdoc (ModulemdModuleIndex *self,
 }
 
 
-static gboolean
+gboolean
 modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
                                           yaml_parser_t *parser,
                                           gboolean strict,
+                                          gboolean autogen_module_name,
                                           GPtrArray **failures,
                                           GError **error)
 {
@@ -212,6 +234,9 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
   gboolean all_passed = TRUE;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
   MMD_INIT_YAML_EVENT (event);
+
+  if (*failures == NULL)
+    *failures = g_ptr_array_new_with_free_func (g_object_unref);
 
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
   if (event.type != YAML_STREAM_START_EVENT)
@@ -236,7 +261,8 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
           else
             {
               /* Initial parsing worked, parse further */
-              if (!add_subdoc (self, subdoc, strict, error))
+              if (!add_subdoc (
+                    self, subdoc, strict, autogen_module_name, error))
                 {
                   modulemd_subdocument_info_set_gerror (subdoc, *error);
                   g_clear_pointer (error, g_error_free);
@@ -244,8 +270,8 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
                   g_ptr_array_add (*failures, g_steal_pointer (&subdoc));
                   all_passed = FALSE;
                 }
-              g_clear_pointer (&subdoc, g_object_unref);
             }
+          g_clear_pointer (&subdoc, g_object_unref);
           break;
 
         case YAML_STREAM_END_EVENT: done = TRUE; break;
@@ -479,7 +505,7 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
 
   return modulemd_module_index_update_from_parser (
-    self, &parser, strict, failures, error);
+    self, &parser, strict, FALSE, failures, error);
 }
 
 
@@ -507,7 +533,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
   yaml_parser_set_input_file (&parser, yaml_stream);
 
   return modulemd_module_index_update_from_parser (
-    self, &parser, strict, failures, error);
+    self, &parser, strict, FALSE, failures, error);
 }
 
 

@@ -55,8 +55,8 @@ else
 endif
 
 
-modulemd_validator = executable(
-    'modulemd-validator',
+modulemd_validator_v1 = executable(
+    'modulemd-validator-v1',
     'modulemd-validator.c',
     dependencies : [
         modulemd_v1_dep,

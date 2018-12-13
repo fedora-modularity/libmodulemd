@@ -492,10 +492,9 @@ modulemd_yaml_test_index_from_string (YamlFixture *fixture,
   ModulemdImprovedModule *module = NULL;
 
   yaml_string =
-    "document: modulemd\nversion: 2\ndata:\n    name: Foo\n    summary: Foo\n "
-    "   "
-    "description: >\n        Bar\n    license:\n        module:\n        - "
-    "MIT";
+    "document: modulemd\nversion: 2\ndata:\n    name: Foo\n    stream: Foo\n  "
+    "  summary: Foo\n    description: >\n        Bar\n    license:\n        "
+    "module:\n        - zMIT";
 
   module_index =
     parse_module_index_from_string (yaml_string, &failures, &error);

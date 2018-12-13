@@ -25,7 +25,8 @@ modulemd_error_quark (void);
 
 enum ModulemdError
 {
-  MODULEMD_ERROR_PROGRAMMING
+  MODULEMD_ERROR_PROGRAMMING,
+  MODULEMD_ERROR_MISSING_CONTENT
 };
 
 GHashTable *

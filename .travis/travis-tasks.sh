@@ -6,6 +6,8 @@ set -e
 set -x
 
 JOB_NAME=${TRAVIS_JOB_NAME:-Fedora rawhide}
+PULL_REQUEST=${TRAVIS_PULL_REQUEST:-false}
+BRANCH_POINT=${TRAVIS_BRANCH:-HEAD}
 
 arr=($JOB_NAME)
 os_name=${arr[0]:-Fedora}
@@ -33,9 +35,13 @@ if [ $os_name = "CentOS" ]; then
     $EPEL_HACK ./travis/build.ninja
 fi
 
-$NINJA -C travis test
-if [ $? != 0 ]; then
-    cat /builddir/travis/meson-logs/testlog.txt
+# Test every commit in this branch, if this is a PR
+if [ x$PULL_REQUEST = xfalse ]; then
+    $NINJA -C travis test
+else
+    echo "Testing each commit in this PR"
+    git branch -a
+    git rebase remotes/origin/$BRANCH_POINT -x "$NINJA -C travis test"
 fi
 
 meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=true $COMMON_MESON_ARGS coverity

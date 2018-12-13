@@ -39,7 +39,13 @@ if [ $release != "rawhide" ]; then
   unset COVERITY_SCAN_TOKEN
 fi
 
-docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
+docker run --rm \
+    -e COVERITY_SCAN_TOKEN="$COVERITY_SCAN_TOKEN" \
+    -e TRAVIS="$TRAVIS" \
+    -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" \
+    -e TRAVIS_BRANCH="$TRAVIS_BRANCH" \
+    -e TRAVIS_PULL_REQUEST="$TRAVIS_PULL_REQUEST" \
+    fedora-modularity/libmodulemd:$release
 
 rm -f $TARBALL .travis/Dockerfile.deps.$release .travis/Dockerfile-$release
 

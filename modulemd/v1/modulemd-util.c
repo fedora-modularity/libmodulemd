@@ -370,6 +370,7 @@ module_index_from_data (GPtrArray *data, GError **error)
   gsize i = 0;
   gsize j = 0;
   g_autofree gchar *module_name = NULL;
+  g_autofree gchar *stream_name = NULL;
   g_autoptr (ModulemdImprovedModule) module = NULL;
   ModulemdImprovedModule *stored_module = NULL;
   ModulemdModuleStream *stream = NULL;
@@ -404,6 +405,18 @@ module_index_from_data (GPtrArray *data, GError **error)
         {
           stream = MODULEMD_MODULESTREAM (item);
           module_name = modulemd_modulestream_get_name (stream);
+          stream_name = modulemd_modulestream_get_stream (stream);
+
+          if (!module_name || !stream_name)
+            {
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_MISSING_CONTENT,
+                           "Module streams without a module name or stream "
+                           "name may not be read into an index.");
+              return NULL;
+            }
+
           module = get_or_create_module_from_index (module_index, module_name);
 
           /* Add the stream to this module. Note: if the same stream name
@@ -441,6 +454,7 @@ module_index_from_data (GPtrArray *data, GError **error)
 
       g_clear_pointer (&module, g_object_unref);
       g_clear_pointer (&module_name, g_free);
+      g_clear_pointer (&stream_name, g_free);
     }
 
   /* Iterate through the translations and associate them to the appropriate

@@ -1213,7 +1213,10 @@ skip_unknown_yaml_sequence (yaml_parser_t *parser, GError **error)
 
         case YAML_SEQUENCE_END_EVENT:
           if (depth == 0)
-            return TRUE;
+            {
+              done = TRUE;
+              break;
+            }
 
           depth--;
           break;
@@ -1259,7 +1262,10 @@ skip_unknown_yaml_mapping (yaml_parser_t *parser, GError **error)
 
         case YAML_MAPPING_END_EVENT:
           if (depth == 0)
-            return TRUE;
+            {
+              done = TRUE;
+              break;
+            }
 
           depth--;
           break;

@@ -1269,7 +1269,7 @@ _parse_modulemd_api (ModulemdModuleStream *modulestream,
   gboolean result = FALSE;
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  ModulemdSimpleSet *set = NULL;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -1324,8 +1324,6 @@ _parse_modulemd_api (ModulemdModuleStream *modulestream,
   result = TRUE;
 
 error:
-  g_object_unref (set);
-
   g_debug ("TRACE: exiting _parse_modulemd_api");
   return result;
 }
@@ -2102,7 +2100,7 @@ _parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
   gboolean result = FALSE;
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  ModulemdSimpleSet *set = NULL;
+  g_autoptr (ModulemdSimpleSet) set = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -2165,8 +2163,6 @@ _parse_modulemd_artifacts (ModulemdModuleStream *modulestream,
   result = TRUE;
 
 error:
-  g_object_unref (set);
-
   g_debug ("TRACE: exiting _parse_modulemd_artifacts");
   return result;
 }

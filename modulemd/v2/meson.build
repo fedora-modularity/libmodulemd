@@ -12,6 +12,7 @@
 # -- Library -- #
 
 test_installed_lib = get_option('test_installed_lib')
+skip_introspection = get_option('skip_introspection')
 
 if test_installed_lib
     # If we're just running the tests on a library that's already installed,
@@ -495,18 +496,21 @@ test ('defaultsv1_python_release', python3,
 
 # --- GOBject Introspection -- #
 
-gnome.generate_gir(
-    modulemd_v2_lib,
-    sources : modulemd_v2_srcs + modulemd_v2_hdrs + ['include/modulemd-2.0/private/gi-binding-renames.h'],
-    nsversion : '2.0',
-    namespace : 'Modulemd',
-    symbol_prefix : 'modulemd_',
-    identifier_prefix : 'Modulemd',
-    includes : [
-        'GObject-2.0',
-    ],
-    install : true,
-)
+if skip_introspection
+else
+    gnome.generate_gir(
+        modulemd_v2_lib,
+        sources : modulemd_v2_srcs + modulemd_v2_hdrs + ['include/modulemd-2.0/private/gi-binding-renames.h'],
+        nsversion : '2.0',
+        namespace : 'Modulemd',
+        symbol_prefix : 'modulemd_',
+        identifier_prefix : 'Modulemd',
+        includes : [
+            'GObject-2.0',
+        ],
+        install : true,
+    )
+endif
 
 pkg.generate(
     libraries : modulemd_v2_lib,

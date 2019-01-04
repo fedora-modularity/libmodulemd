@@ -10,6 +10,7 @@
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 test_installed_lib = get_option('test_installed_lib')
+skip_introspection = get_option('skip_introspection')
 
 if test_installed_lib
     # If we're just running the tests on a library that's already installed,
@@ -300,18 +301,21 @@ test ('test_v1_release_modulemd_python', python3,
       env : py_test_release_env,
       args : modulemd_python_scripts)
 
-gnome.generate_gir(
-    modulemd_v1_lib,
-    sources : modulemd_v1_srcs + modulemd_v1_hdrs,
-    nsversion : '1.0',
-    namespace : 'Modulemd',
-    symbol_prefix : 'modulemd_',
-    identifier_prefix : 'Modulemd',
-    includes : [
-        'GObject-2.0',
-    ],
-    install : true,
-    )
+if skip_introspection
+else
+    gnome.generate_gir(
+        modulemd_v1_lib,
+        sources : modulemd_v1_srcs + modulemd_v1_hdrs,
+        nsversion : '1.0',
+        namespace : 'Modulemd',
+        symbol_prefix : 'modulemd_',
+        identifier_prefix : 'Modulemd',
+        includes : [
+            'GObject-2.0',
+        ],
+        install : true,
+        )
+endif
 
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_v1_version)
@@ -329,7 +333,6 @@ pkg.generate(
     description : 'Module metadata manipulation library',
     requires: [ 'glib-2.0', 'gobject-2.0' ],
 )
-
 xcdata = configuration_data()
 xcdata.set('VERSION', meson.project_version())
 configure_file(

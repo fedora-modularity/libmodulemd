@@ -48,10 +48,12 @@ for test in unfiltered_tests:
 
 with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
     for test in tests:
+        # TODO: auto-detect the location of the suppression file
         valgrind_command = "/usr/bin/valgrind " \
                            "--leak-check=full " \
+                           "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp " \
                            "--xml=yes " \
-                           "--xml-file=%s/%s.xml" % (tmpdirname, test)
+                           "--xml-file=%s/%s.xml " % (tmpdirname, test)
         proc_result = subprocess.run(
             [
                 'meson',

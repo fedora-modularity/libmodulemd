@@ -298,7 +298,7 @@ modulemd_module_stream_default_copy (ModulemdModuleStream *self,
                                      const gchar *module_name,
                                      const gchar *module_stream)
 {
-  g_autoptr (ModulemdModuleStream) copy;
+  g_autoptr (ModulemdModuleStream) copy = NULL;
   const gchar *module = NULL;
   const gchar *stream = NULL;
 

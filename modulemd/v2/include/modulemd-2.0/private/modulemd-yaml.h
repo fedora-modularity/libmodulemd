@@ -657,16 +657,8 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
                        key);                                                  \
           return FALSE;                                                       \
         }                                                                     \
-      EMIT_SCALAR (emitter, error, key);                                      \
-      EMIT_SEQUENCE_START (emitter, error);                                   \
-      gsize i;                                                                \
-      g_autoptr (GPtrArray) keys =                                            \
-        modulemd_ordered_str_keys (table, modulemd_strcmp_sort);              \
-      for (i = 0; i < keys->len; i++)                                         \
-        {                                                                     \
-          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));          \
-        }                                                                     \
-      EMIT_SEQUENCE_END (emitter, error);                                     \
+      EMIT_STRING_SET_FULL (                                                  \
+        emitter, error, key, table, YAML_BLOCK_SEQUENCE_STYLE);               \
     }                                                                         \
   while (0)
 
@@ -677,6 +669,22 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         {                                                                     \
           EMIT_STRING_SET (emitter, error, key, table);                       \
         }                                                                     \
+    }                                                                         \
+  while (0)
+
+#define EMIT_STRING_SET_FULL(emitter, error, key, table, sequence_style)      \
+  do                                                                          \
+    {                                                                         \
+      EMIT_SCALAR (emitter, error, key);                                      \
+      EMIT_SEQUENCE_START_WITH_STYLE (emitter, error, sequence_style);        \
+      gsize i;                                                                \
+      g_autoptr (GPtrArray) keys =                                            \
+        modulemd_ordered_str_keys (table, modulemd_strcmp_sort);              \
+      for (i = 0; i < keys->len; i++)                                         \
+        {                                                                     \
+          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));          \
+        }                                                                     \
+      EMIT_SEQUENCE_END (emitter, error);                                     \
     }                                                                         \
   while (0)
 

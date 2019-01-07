@@ -8,8 +8,10 @@ ARG TARBALL
 
 RUN @PKGMGR@ -y --setopt=install_weak_deps=False install \
 	clang \
+	clang-analyzer \
 	createrepo_c \
 	curl \
+	elinks \
 	gcc \
 	git-core \
 	glib2-devel \
@@ -28,6 +30,7 @@ RUN @PKGMGR@ -y --setopt=install_weak_deps=False install \
 	python3-rpm-macros \
 	redhat-rpm-config \
 	rpm-build \
+	rpmdevtools \
 	ruby \
 	"rubygem(json)" \
 	rubygems \
@@ -35,4 +38,3 @@ RUN @PKGMGR@ -y --setopt=install_weak_deps=False install \
 	valgrind \
 	wget \
     && @PKGMGR@ -y clean all
-

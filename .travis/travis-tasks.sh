@@ -27,6 +27,7 @@ fi
 
 pushd /builddir/
 
+# Build the v1 and v2 code under GCC and run standard tests
 meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=true $COMMON_MESON_ARGS travis
 
 if [ $os_name = "CentOS" ]; then
@@ -35,7 +36,35 @@ fi
 
 $NINJA -C travis test
 if [ $? != 0 ]; then
-    cat /builddir/travis/meson-logs/testlog.txt
+    cat travis_v1/meson-logs/testlog.txt
+fi
+
+# Test the v2 code with clang-analyzer
+# This requires meson 0.49.0 or later
+set +e
+rpmdev-vercmp `meson --version` 0.49.0
+if [ $? -eq 12 ]; then
+    # Meson was older than 0.49.0, skip this step
+    echo "Meson is too old to run scan-build"
+else
+    set -e
+    meson --buildtype=debug \
+          -Dbuild_api_v1=false \
+          -Dbuild_api_v2=true \
+          -Dskip_introspection=true \
+          $COMMON_MESON_ARGS \
+          travis_scanbuild
+
+    if [ $os_name = "CentOS" ]; then
+        $EPEL_HACK ./travis/build.ninja
+    fi
+
+    pushd travis_scanbuild
+    /builddir/.travis/scanbuild.sh
+    if [ $? != 0]; then
+      exit 1
+    fi
+    popd #travis_scanbuild
 fi
 
 meson --buildtype=debug -Dbuild_api_v1=true -Dbuild_api_v2=true $COMMON_MESON_ARGS coverity

@@ -523,16 +523,19 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 
 #define NON_EMPTY_ARRAY(array) (array->len != 0)
 
-#define EMIT_SCALAR(emitter, error, value)                                    \
+
+#define EMIT_SCALAR_FULL(emitter, error, value, style)                        \
   do                                                                          \
     {                                                                         \
-      if (!mmd_emitter_scalar (                                               \
-            emitter, value, YAML_PLAIN_SCALAR_STYLE, error))                  \
+      if (!mmd_emitter_scalar (emitter, value, style, error))                 \
         return FALSE;                                                         \
     }                                                                         \
   while (0)
 
-#define EMIT_KEY_VALUE(emitter, error, key, value)                            \
+#define EMIT_SCALAR(emitter, error, value)                                    \
+  EMIT_SCALAR_FULL (emitter, error, value, YAML_PLAIN_SCALAR_STYLE)
+
+#define EMIT_KEY_VALUE_FULL(emitter, error, key, value, style)                \
   do                                                                          \
     {                                                                         \
       if (value == NULL)                                                      \
@@ -545,9 +548,12 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
           return FALSE;                                                       \
         }                                                                     \
       EMIT_SCALAR (emitter, error, key);                                      \
-      EMIT_SCALAR (emitter, error, value);                                    \
+      EMIT_SCALAR_FULL (emitter, error, value, style);                        \
     }                                                                         \
   while (0)
+
+#define EMIT_KEY_VALUE(emitter, error, key, value)                            \
+  EMIT_KEY_VALUE_FULL (emitter, error, key, value, YAML_PLAIN_SCALAR_STYLE)
 
 
 #define EMIT_KEY_VALUE_IF_SET(emitter, error, key, value)                     \

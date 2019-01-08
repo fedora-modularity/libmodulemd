@@ -508,7 +508,8 @@ data:
   name: SuperModule
   stream: latest
   summary: Summary
-  description: Description
+  description: >-
+    Description
   license:
     module:
     - BSD
@@ -534,7 +535,8 @@ data:
   context: c0ffe3
   arch: x86_64
   summary: Module Summary
-  description: Module Description
+  description: >-
+    Module Description
   api:
     rpms:
       - rpm_a
@@ -750,7 +752,8 @@ document: modulemd
 version: 2
 data:
     summary: Trivial Summary
-    description: Trivial Description
+    description: >-
+      Trivial Description
     license:
         module: MIT
 ...
@@ -777,7 +780,8 @@ data:
   context: c0ffe3
   arch: x86_64
   summary: Module Summary
-  description: Module Description
+  description: >-
+    Module Description
   api:
     rpms:
       - rpm_a
@@ -994,7 +998,8 @@ document: modulemd
 version: 1
 data:
   summary: Trivial Summary
-  description: Trivial Description
+  description: >-
+    Trivial Description
   license:
     module: MIT
 ...

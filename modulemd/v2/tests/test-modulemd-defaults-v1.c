@@ -320,14 +320,28 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
                    ==,
                    MD_DEFAULTS_VERSION_ONE);
   g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
-  g_assert_cmpstr (
-    modulemd_subdocument_info_get_yaml (subdoc),
-    ==,
-    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  module: foo\n  "
-    "modified: 201812071200\n  stream: x.y\n  profiles:\n    'x.y': []\n    "
-    "bar: [baz, snafu]\n  intents:\n    desktop:\n      stream: y.z\n      "
-    "profiles:\n        'y.z': [blah]\n        'x.y': [other]\n    server:\n  "
-    "    stream: x.y\n      profiles:\n        'x.y': []\n");
+  g_assert_cmpstr (modulemd_subdocument_info_get_yaml (subdoc),
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  modified: 201812071200\n"
+                   "  stream: x.y\n"
+                   "  profiles:\n"
+                   "    'x.y': []\n"
+                   "    bar: [baz, snafu]\n"
+                   "  intents:\n"
+                   "    desktop:\n"
+                   "      stream: y.z\n"
+                   "      profiles:\n"
+                   "        'y.z': [blah]\n"
+                   "        'x.y': [other]\n"
+                   "    server:\n"
+                   "      stream: x.y\n"
+                   "      profiles:\n"
+                   "        'x.y': []\n");
 
   /* Parse the data section and validate the content */
   defaults = modulemd_defaults_v1_parse_yaml (subdoc, TRUE, &error);
@@ -393,8 +407,12 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_string->str);
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-                   "module: foo\n...\n");
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "...\n");
 
 
   /* Add a default stream and emit again */
@@ -407,8 +425,13 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_string->str);
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-                   "module: foo\n  stream: latest\n...\n");
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "...\n");
 
   /* Add an empty profile default and emit again */
   modulemd_defaults_v1_set_empty_default_profiles_for_stream (
@@ -419,11 +442,17 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_true (modulemd_defaults_v1_emit_yaml (defaults, &emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_nonnull (yaml_string->str);
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-    "module: foo\n  stream: latest\n  profiles:\n    libonly: []\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "  profiles:\n"
+                   "    libonly: []\n"
+                   "...\n");
 
   /* Add a real profile default and emit again */
   modulemd_defaults_v1_add_default_profile_for_stream (
@@ -436,10 +465,16 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_string->str);
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-                   "module: foo\n  stream: latest\n  profiles:\n    latest: "
-                   "[bar]\n    libonly: "
-                   "[]\n...\n");
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "  profiles:\n"
+                   "    latest: [bar]\n"
+                   "    libonly: []\n"
+                   "...\n");
 
   /* Add another real profile default to the same stream and emit again */
   modulemd_defaults_v1_add_default_profile_for_stream (
@@ -452,10 +487,16 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_string->str);
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-                   "module: foo\n  stream: latest\n  profiles:\n    latest: "
-                   "[bar, baz]\n    libonly: "
-                   "[]\n...\n");
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "  profiles:\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
+                   "...\n");
 
 
   /* Add an intent-specific default stream and emit again */
@@ -466,13 +507,21 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_true (modulemd_defaults_v1_emit_yaml (defaults, &emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_nonnull (yaml_string->str);
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-    "module: foo\n  stream: latest\n  profiles:\n    latest: "
-    "[bar, baz]\n    libonly: "
-    "[]\n  intents:\n    intense:\n      stream: earliest\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "  profiles:\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
+                   "  intents:\n"
+                   "    intense:\n"
+                   "      stream: earliest\n"
+                   "...\n");
 
   /* Add an intent-specific profile default and emit again */
   modulemd_defaults_v1_add_default_profile_for_stream (
@@ -485,11 +534,21 @@ defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
   g_assert_nonnull (yaml_string->str);
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  "
-                   "module: foo\n  stream: latest\n  profiles:\n    latest: "
-                   "[bar, baz]\n    libonly: "
-                   "[]\n  intents:\n    intense:\n      stream: earliest\n    "
-                   "  profiles:\n        earliest: [client]\n...\n");
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: foo\n"
+                   "  stream: latest\n"
+                   "  profiles:\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
+                   "  intents:\n"
+                   "    intense:\n"
+                   "      stream: earliest\n"
+                   "      profiles:\n"
+                   "        earliest: [client]\n"
+                   "...\n");
 }
 
 

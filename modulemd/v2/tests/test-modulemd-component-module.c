@@ -178,7 +178,11 @@ component_module_test_emit_yaml (ComponentModuleFixture *fixture,
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (yaml_string->str, ==, "---\ntestcomponent: {}\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "testcomponent: {}\n"
+                   "...\n");
 
   g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
   yaml_emitter_delete (&emitter);
@@ -199,11 +203,15 @@ component_module_test_emit_yaml (ComponentModuleFixture *fixture,
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\ntestcomponent:\n  rationale: testrationale\n  repository: "
-    "testrepository\n  ref: testref\n  buildorder: 42\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "testcomponent:\n"
+                   "  rationale: testrationale\n"
+                   "  repository: testrepository\n"
+                   "  ref: testref\n"
+                   "  buildorder: 42\n"
+                   "...\n");
 }
 
 

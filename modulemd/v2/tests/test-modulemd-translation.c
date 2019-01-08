@@ -311,11 +311,16 @@ translation_test_emit_yaml (TranslationFixture *fixture,
   g_assert_true (modulemd_translation_emit_yaml (t, &emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_nonnull (yaml_string->str);
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\ndocument: modulemd-translations\nversion: 1\ndata:\n  module: "
-    "testmodule\n  stream: teststream\n  modified: 42\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-translations\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: testmodule\n"
+                   "  stream: teststream\n"
+                   "  modified: 42\n"
+                   "...\n");
 
 
   te = modulemd_translation_entry_new ("en_US");
@@ -331,13 +336,22 @@ translation_test_emit_yaml (TranslationFixture *fixture,
   g_assert_true (modulemd_translation_emit_yaml (t, &emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_nonnull (yaml_string->str);
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\ndocument: modulemd-translations\nversion: 1\ndata:\n  module: "
-    "testmodule\n  stream: teststream\n  modified: 42\n  translations:\n  - "
-    "en_US\n  - summary: Some summary\n    description: Test description\n    "
-    "profiles:\n      testprofile: Test Profile Description\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-translations\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: testmodule\n"
+                   "  stream: teststream\n"
+                   "  modified: 42\n"
+                   "  translations:\n"
+                   "  - en_US\n"
+                   "  - summary: Some summary\n"
+                   "    description: Test description\n"
+                   "    profiles:\n"
+                   "      testprofile: Test Profile Description\n"
+                   "...\n");
 }
 
 int

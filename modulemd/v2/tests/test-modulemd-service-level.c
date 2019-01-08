@@ -331,8 +331,12 @@ service_level_test_emit_yaml (ServiceLevelFixture *fixture,
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
 
-  g_assert_cmpstr (
-    yaml_string->str, ==, "---\nfoo:\n  eol: 2018-11-13\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "foo:\n"
+                   "  eol: 2018-11-13\n"
+                   "...\n");
 }
 
 

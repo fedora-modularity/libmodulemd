@@ -223,7 +223,8 @@ buildopts_test_parse_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_cmpstr (modulemd_buildopts_get_rpm_macros (b),
                    ==,
-                   "%demomacro 1\n%demomacro2 %{demomacro}23\n");
+                   "%demomacro 1\n"
+                   "%demomacro2 %{demomacro}23\n");
   whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
   g_assert_cmpint (g_strv_length (whitelist), ==, 4);
   g_assert_cmpstr (whitelist[0], ==, "fooscl-1-bar");
@@ -250,7 +251,11 @@ buildopts_test_emit_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (yaml_string->str, ==, "---\nrpms: {}\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "rpms: {}\n"
+                   "...\n");
 
   g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
   yaml_emitter_delete (&emitter);
@@ -270,11 +275,19 @@ buildopts_test_emit_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\nrpms:\n  macros: >-\n    %testmacro 1\n\n    %anothermacro 2\n  "
-    "whitelist:\n  - test1\n  - test2\n  - test3\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "rpms:\n"
+                   "  macros: >-\n"
+                   "    %testmacro 1\n"
+                   "\n"
+                   "    %anothermacro 2\n"
+                   "  whitelist:\n"
+                   "  - test1\n"
+                   "  - test2\n"
+                   "  - test3\n"
+                   "...\n");
 }
 
 

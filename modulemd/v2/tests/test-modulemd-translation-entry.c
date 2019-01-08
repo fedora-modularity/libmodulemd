@@ -539,7 +539,11 @@ translation_entry_test_emit_yaml (TranslationEntryFixture *fixture,
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (yaml_string->str, ==, "---\nen_GB: {}\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "en_GB: {}\n"
+                   "...\n");
 
   g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
   yaml_emitter_delete (&emitter);
@@ -559,11 +563,15 @@ translation_entry_test_emit_yaml (TranslationEntryFixture *fixture,
   g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (
-    yaml_string->str,
-    ==,
-    "---\nen_GB:\n  summary: An example module\n  description: An example "
-    "module.\n  profiles:\n    profile_a: An example profile\n...\n");
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "en_GB:\n"
+                   "  summary: An example module\n"
+                   "  description: An example module.\n"
+                   "  profiles:\n"
+                   "    profile_a: An example profile\n"
+                   "...\n");
 }
 
 

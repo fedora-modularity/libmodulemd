@@ -107,23 +107,55 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
   /* Verify that all streams and defaults have been upgraded to the highest
    * version added
    */
-  g_assert_cmpstr (
-    string,
-    ==,
-    "---\ndocument: modulemd-defaults\nversion: 1\ndata:\n  module: "
-    "testmodule1\n...\n---\ndocument: modulemd-translations\nversion: "
-    "1\ndata:\n  module: testmodule1\n  stream: teststream1\n  modified: 42\n "
-    " translations:\n  - nl_NL\n  - summary: Een test omschrijving\n  - "
-    "ro_TA\n  - summary: Testsummary in ro_TA\n...\n---\ndocument: "
-    "modulemd\nversion: 2\ndata:\n  name: testmodule1\n  stream: "
-    "teststream1\n  version: 1\n  context: deadbeef\n  summary: A test "
-    "stream\n  description: A test stream's "
-    "description\n  license:\n    module:\n    - "
-    "Beerware\n...\n---\ndocument: modulemd\nversion: 2\ndata:\n  name: "
-    "testmodule1\n  stream: teststream2\n  version: 2\n  context: c0ff33\n  "
-    "summary: A second stream\n  "
-    "description: A second stream's description\n  license:\n    module:\n    "
-    "- Beerware\n...\n");
+  g_assert_cmpstr (string,
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: testmodule1\n"
+                   "...\n"
+                   "---\n"
+                   "document: modulemd-translations\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: testmodule1\n"
+                   "  stream: teststream1\n"
+                   "  modified: 42\n"
+                   "  translations:\n"
+                   "  - nl_NL\n"
+                   "  - summary: Een test omschrijving\n"
+                   "  - ro_TA\n"
+                   "  - summary: Testsummary in ro_TA\n"
+                   "...\n"
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data:\n"
+                   "  name: testmodule1\n"
+                   "  stream: teststream1\n"
+                   "  version: 1\n"
+                   "  context: deadbeef\n"
+                   "  summary: A test stream\n"
+                   "  description: A test stream's description\n"
+                   "  license:\n"
+                   "    module:\n"
+                   "    - Beerware\n"
+                   "...\n"
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data:\n"
+                   "  name: testmodule1\n"
+                   "  stream: teststream2\n"
+                   "  version: 2\n"
+                   "  context: c0ff33\n"
+                   "  summary: A second stream\n"
+                   "  description: A second stream's description\n"
+                   "  license:\n"
+                   "    module:\n"
+                   "    - Beerware\n"
+                   "...\n");
 }
 
 
@@ -188,7 +220,11 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
   subdoc = g_ptr_array_index (failures, 0);
   g_assert_cmpstr (modulemd_subdocument_info_get_yaml (subdoc),
                    ==,
-                   "---\ndocument: modulemd\nversion: 2\ndata: foobar\n...\n");
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data: foobar\n"
+                   "...\n");
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
   g_clear_pointer (&error, g_error_free);

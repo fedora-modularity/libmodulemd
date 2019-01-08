@@ -325,8 +325,14 @@ profile_test_emit_yaml (ProfileFixture *fixture, gconstpointer user_data)
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
   g_assert_cmpstr (yaml_string->str,
                    ==,
-                   "---\ntestprofile:\n  description: A test profile\n  "
-                   "rpms:\n  - test1\n  - test2\n  - test3\n...\n");
+                   "---\n"
+                   "testprofile:\n"
+                   "  description: A test profile\n"
+                   "  rpms:\n"
+                   "  - test1\n"
+                   "  - test2\n"
+                   "  - test3\n"
+                   "...\n");
 }
 
 

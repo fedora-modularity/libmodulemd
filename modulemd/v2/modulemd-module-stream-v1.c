@@ -2239,7 +2239,11 @@ modulemd_module_stream_v1_emit_yaml (ModulemdModuleStreamV1 *self,
   EMIT_KEY_VALUE_IF_SET (
     emitter, error, "arch", modulemd_module_stream_v1_get_arch (self));
   EMIT_KEY_VALUE (emitter, error, "summary", self->summary);
-  EMIT_KEY_VALUE (emitter, error, "description", self->description);
+  EMIT_KEY_VALUE_FULL (emitter,
+                       error,
+                       "description",
+                       self->description,
+                       YAML_FOLDED_SCALAR_STYLE);
 
   EMIT_HASHTABLE_VALUES_IF_NON_EMPTY (emitter,
                                       error,

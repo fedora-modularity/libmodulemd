@@ -21,6 +21,7 @@
 #include "modulemd-translation-entry.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-translation-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/test-utils.h"
@@ -189,8 +190,24 @@ translation_test_validate (TranslationFixture *fixture,
                            gconstpointer user_data)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
+  g_autoptr (GError) error = NULL;
 
+  /* Valid, but empty translation */
   t = modulemd_translation_new (1, "testmodule", "teststream", 5);
+  g_assert_nonnull (t);
+
+  g_assert_true (modulemd_translation_validate (t, &error));
+  g_assert_null (error);
+  g_clear_object (&t);
+
+  /* No modified value set */
+  t = modulemd_translation_new (1, "testmodule", "teststream", 0);
+  g_assert_nonnull (t);
+
+  g_assert_false (modulemd_translation_validate (t, &error));
+  g_assert_nonnull (error);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_clear_object (&t);
 }
 
 static void

@@ -451,6 +451,17 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser,
       yaml_event_delete (&event);
     }
 
+  /* Work around false-positive in clang static analysis which thinks it's
+   * possible for this function to return NULL and not set error.
+   */
+  if (G_UNLIKELY (translation_entries == NULL))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EMIT,
+                   "Somehow got a NULL hash table here.");
+    }
+
   return g_steal_pointer (&translation_entries);
 }
 
@@ -464,7 +475,6 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   MMD_INIT_YAML_PARSER (parser);
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  gboolean in_map = FALSE;
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (GError) nested_error = NULL;
   g_autofree gchar *value = NULL;
@@ -482,26 +492,22 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   t = modulemd_translation_new (
     version, T_PLACEHOLDER_STRING, T_PLACEHOLDER_STRING, 0);
 
+  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Missing mapping in translation data entry");
+    }
+
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
 
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error, event, "Missing mapping in translation data entry");
-            }
-
           if (g_str_equal (event.data.scalar.value, "module"))
             {
               if (!g_str_equal (modulemd_translation_get_module_name (t),

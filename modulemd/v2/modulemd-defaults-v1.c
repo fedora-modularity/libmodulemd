@@ -477,7 +477,6 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   g_autoptr (GError) nested_error = FALSE;
   ModulemdDefaultsV1 *defaults = NULL;
   gboolean done = FALSE;
-  gboolean in_map = FALSE;
   g_autofree gchar *scalar = NULL;
   guint64 modified;
 
@@ -498,22 +497,21 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
    */
   defaults = modulemd_defaults_v1_new (DEFAULT_PLACEHOLDER);
 
+  YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (
+        error, event, "Missing mapping in defaults data entry");
+    }
+
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT (&parser, &event, error);
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in defaults data entry");
           if (g_str_equal (event.data.scalar.value, "module"))
             {
               if (!g_str_equal (modulemd_defaults_get_module_name (
@@ -639,35 +637,28 @@ modulemd_defaults_v1_parse_yaml_profiles (yaml_parser_t *parser,
   g_autoptr (GError) nested_error = NULL;
   g_autofree gchar *stream_name = NULL;
   g_autoptr (GHashTable) profile_set = NULL;
-  gboolean in_map = FALSE;
   gboolean done = FALSE;
+
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Missing mapping in defaults data entry");
+    }
 
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error, event, "Missing mapping in defaults data entry");
-            }
 
           stream_name = g_strdup ((const gchar *)event.data.scalar.value);
           if (!stream_name)
             MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-              error,
-              event,
-              "Failed to parse stream name in profile defaults: %s",
-              nested_error->message);
+              error, event, "Failed to parse stream name in profile defaults");
 
           /* Check to see if we've encountered this stream name previously */
           if (g_hash_table_contains (profile_defaults, stream_name))
@@ -726,36 +717,28 @@ modulemd_defaults_v1_parse_intents (yaml_parser_t *parser,
   g_autofree gchar *intent_name = NULL;
   g_autofree gchar *default_stream = NULL;
   g_autoptr (GHashTable) profile_set = NULL;
-  gboolean in_map = FALSE;
   gboolean done = FALSE;
+
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Missing mapping in intents");
+    }
 
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            {
-              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error, event, "Missing mapping in intents");
-            }
-
           intent_name = g_strdup ((const gchar *)event.data.scalar.value);
           if (!intent_name)
             {
               MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                error,
-                event,
-                "Failed to parse intent name in defaults: %s",
-                nested_error->message);
+                error, event, "Failed to parse intent name in defaults");
             }
 
           /* Check to see if we've encountered this intent name previously */

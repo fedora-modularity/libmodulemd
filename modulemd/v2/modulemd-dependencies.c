@@ -331,7 +331,6 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  gboolean in_map = FALSE;
   g_autofree gchar *key = NULL;
   g_autoptr (GHashTable) value = NULL;
   g_autoptr (GHashTable) t = NULL;
@@ -342,23 +341,25 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
   t = g_hash_table_new_full (
     g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
 
+  /* The first event must be a MAPPING_START */
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (
+              error, event, "Missing mapping in dependencies table entry");
+    }
+
   while (!done)
     {
       YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
 
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
         case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
           done = TRUE;
           break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in dependencies table entry");
           key = g_strdup ((const gchar *)event.data.scalar.value);
           if (g_hash_table_contains (t,
                                      (const gchar *)event.data.scalar.value))

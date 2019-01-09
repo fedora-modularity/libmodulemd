@@ -346,7 +346,7 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
   if (event.type != YAML_MAPPING_START_EVENT)
     {
       MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in dependencies table entry");
+        error, event, "Missing mapping in dependencies table entry");
     }
 
   while (!done)
@@ -355,9 +355,7 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
 
       switch (event.type)
         {
-        case YAML_MAPPING_END_EVENT:
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
           key = g_strdup ((const gchar *)event.data.scalar.value);
@@ -399,7 +397,9 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
    */
   if (G_UNLIKELY (t == NULL))
     {
-      g_set_error (error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT,
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_YAML_ERROR_EMIT,
                    "Somehow got a NULL hash table here.");
     }
 

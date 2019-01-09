@@ -62,16 +62,14 @@ modulemd_translation_new (guint64 version,
                           const gchar *module_stream,
                           guint64 modified)
 {
+  // clang-format off
   return g_object_new (MODULEMD_TYPE_TRANSLATION,
-                       "version",
-                       version,
-                       "module_name",
-                       module_name,
-                       "module_stream",
-                       module_stream,
-                       "modified",
-                       modified,
+                       "version", version,
+                       "module_name", module_name,
+                       "module_stream", module_stream,
+                       "modified", modified,
                        NULL);
+  // clang-format on
 }
 
 

@@ -336,7 +336,7 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
   g_autoptr (GHashTable) t = NULL;
   g_autoptr (GError) nested_error = NULL;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   t = g_hash_table_new_full (
     g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
@@ -393,6 +393,16 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
         }
       yaml_event_delete (&event);
     }
+
+  /* Work around false-positive in clang static analysis which thinks it's
+   * possible for this function to return NULL and not set error.
+   */
+  if (G_UNLIKELY (t == NULL))
+    {
+      g_set_error (error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_EMIT,
+                   "Somehow got a NULL hash table here.");
+    }
+
   return g_steal_pointer (&t);
 }
 

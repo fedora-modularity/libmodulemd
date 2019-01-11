@@ -93,10 +93,14 @@ modulemd_defaults_copy (ModulemdDefaults *self)
 static ModulemdDefaults *
 modulemd_defaults_default_copy (ModulemdDefaults *self)
 {
+  g_autoptr (ModulemdDefaults) copy = NULL;
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self), NULL);
 
-  return modulemd_defaults_new (modulemd_defaults_get_mdversion (self),
+  copy = modulemd_defaults_new (modulemd_defaults_get_mdversion (self),
                                 modulemd_defaults_get_module_name (self));
+  modulemd_defaults_set_modified (copy, modulemd_defaults_get_modified (self));
+
+  return g_steal_pointer (&copy);
 }
 
 
@@ -216,7 +220,6 @@ modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified)
 
   ModulemdDefaultsPrivate *priv =
     modulemd_defaults_get_instance_private (self);
-
   priv->modified = modified;
 }
 

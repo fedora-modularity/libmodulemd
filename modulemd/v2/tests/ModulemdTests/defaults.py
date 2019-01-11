@@ -12,7 +12,9 @@
 # For more information on free software, see
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
+import os
 import sys
+
 try:
     import unittest
     import gi
@@ -93,6 +95,29 @@ class TestDefaults(TestBase):
         # Ensure we cannot set the module_name
         with self.expect_signal():
             defs.props.module_name = None
+
+    def test_modified(self):
+        defs = Modulemd.Defaults.new(
+            Modulemd.DefaultsVersionEnum.LATEST, 'foo')
+        self.assertIsNotNone(defs)
+
+        self.assertEqual(defs.get_modified(), 0)
+
+        defs.set_modified(201901110830)
+
+        self.assertEqual(defs.get_modified(), 201901110830)
+
+        # Load a defaults object into an Index
+        index = Modulemd.ModuleIndex.new()
+        index.update_from_file("%s/mod-defaults/spec.v1.yaml" % (
+            os.getenv('MESON_SOURCE_ROOT')), True)
+        module_names = index.get_module_names()
+        self.assertEqual(len(module_names), 1)
+
+        defs = index.get_module(index.get_module_names()[0]).get_defaults()
+        self.assertIsNotNone(defs)
+
+        self.assertEqual(defs.get_modified(), 201812071200)
 
     def test_validate(self):
         defs = Modulemd.Defaults.new(

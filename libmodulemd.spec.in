@@ -24,6 +24,8 @@ BuildRequires:  valgrind
 
 Obsoletes:      python2-modulemd < 1.3.4
 
+# Make sure we upgrade libmodulemd1 to match
+Conflicts:      libmodulemd1 < %{libmodulemd_v1_version}-%{release}
 
 # Patches
 

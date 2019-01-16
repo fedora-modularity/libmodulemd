@@ -71,8 +71,8 @@ G_BEGIN_DECLS
  *     it.
  *   - If either repository specifies a default stream for the module and the
  *     other does not, use the one specified.
- *   - If both repositories specify different streams, this is an unresolvable
- *     merge conflict and the merge resolution will fail and report an error.
+ *   - If both repositories specify different default streams, the merge will
+ *     unset the default stream and proceed with the merge.
  *   - If both repositories specify a set of default profiles for a stream and
  *     the sets are equivalent, use that set.
  *   - If one repository specifies a set of default profiles for a stream and

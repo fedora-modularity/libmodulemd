@@ -604,6 +604,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
   g_autofree gchar *yaml_override_path = NULL;
   g_autoptr (GPtrArray) base_objects = NULL;
   g_autoptr (GPtrArray) override_objects = NULL;
+  g_autoptr (GPtrArray) override_nodejs_objects = NULL;
   g_autoptr (GPtrArray) merged_objects = NULL;
   g_autoptr (ModulemdPrioritizer) prioritizer = NULL;
   g_autoptr (GError) error = NULL;
@@ -619,6 +620,18 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
   base_objects = modulemd_objects_from_file (yaml_base_path, &error);
   g_assert_nonnull (base_objects);
   g_assert_cmpint (base_objects->len, ==, 7);
+
+
+  yaml_override_path =
+    g_strdup_printf ("%s/test_data/defaults/overriding-nodejs.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_override_path);
+
+  override_nodejs_objects =
+    modulemd_objects_from_file (yaml_override_path, &error);
+  g_clear_pointer (&yaml_override_path, g_free);
+  g_assert_nonnull (override_nodejs_objects);
+  g_assert_cmpint (override_nodejs_objects->len, ==, 1);
 
   yaml_override_path = g_strdup_printf (
     "%s/test_data/defaults/overriding.yaml", g_getenv ("MESON_SOURCE_ROOT"));
@@ -662,6 +675,48 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
 
 
   /*
+   * Test that importing the nodejs overrides at the same priority level fails.
+   *
+   * This YAML has a conflicting default stream which should be ignored and set
+   * to "no default stream".
+   */
+
+  result = modulemd_prioritizer_add (
+    prioritizer, override_nodejs_objects, prio, &error);
+  g_assert_true (result);
+
+  merged_objects = modulemd_prioritizer_resolve (prioritizer, &error);
+  g_assert_nonnull (merged_objects);
+  g_assert_cmpint (merged_objects->len, ==, 3);
+
+  for (gint i = 0; i < merged_objects->len; i++)
+    {
+      if (MODULEMD_IS_DEFAULTS (g_ptr_array_index (merged_objects, i)))
+        {
+          defaults = g_ptr_array_index (merged_objects, i);
+          if (!g_strcmp0 (modulemd_defaults_peek_module_name (defaults),
+                          "nodejs"))
+            {
+              g_assert_null (modulemd_defaults_peek_default_stream (defaults));
+            }
+        }
+    }
+
+  g_clear_pointer (&merged_objects, g_ptr_array_unref);
+
+
+  /* Start over and test profile conflicts */
+  g_clear_pointer (&prioritizer, g_object_unref);
+  prioritizer = modulemd_prioritizer_new ();
+  result = modulemd_prioritizer_add (prioritizer, base_objects, prio, &error);
+  if (!result)
+    {
+      fprintf (stderr, "Merge error: %s", error->message);
+    }
+  g_assert_true (result);
+
+
+  /*
    * Test that importing the overrides at the same priority level fails.
    *
    * These objects have several conflicts with the base objects that cannot be
@@ -673,7 +728,7 @@ modulemd_defaults_test_prioritizer (DefaultsFixture *fixture,
   g_assert_cmpstr (
     g_quark_to_string (error->domain), ==, "modulemd-defaults-error-quark");
   g_assert_cmpint (
-    error->code, ==, MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS);
+    error->code, ==, MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES);
   g_clear_pointer (&error, g_error_free);
 
   /* The object's internal state is undefined after an error, so delete it */
@@ -989,7 +1044,7 @@ modulemd_defaults_test_index_prioritizer (DefaultsFixture *fixture,
   g_assert_cmpstr (
     g_quark_to_string (error->domain), ==, "modulemd-defaults-error-quark");
   g_assert_cmpint (
-    error->code, ==, MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS);
+    error->code, ==, MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES);
   g_clear_pointer (&error, g_error_free);
 
   /* The object's internal state is undefined after an error, so delete it */
@@ -1140,6 +1195,11 @@ modulemd_regressions_issue44 (DefaultsFixture *fixture,
 
   /* Add another almost-identical document, except with a conflicting default
    * stream set.
+   *
+   * NOTE: when this was written (for issue 44 on GitHub), this was meant to be
+   * a hard error. As of 1.8.1 we expect this to just result in having no
+   * default stream for this module. This test has been slightly modified so
+   * that the expected result is now a pass.
    */
   yaml_conflicting_path = g_strdup_printf (
     "%s/test_data/defaults/issue44-2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
@@ -1151,7 +1211,7 @@ modulemd_regressions_issue44 (DefaultsFixture *fixture,
 
   result =
     modulemd_prioritizer_add (prioritizer, conflicting_objects, 0, &error);
-  g_assert_false (result);
+  g_assert_true (result);
 }
 
 

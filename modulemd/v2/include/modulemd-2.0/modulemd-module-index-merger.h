@@ -53,14 +53,22 @@ G_BEGIN_DECLS
  *
  * Merging #ModulemdDefaults entries behaves as follows:
  *
+ * - Within a ModuleIndex, if two or more default entries reference the same
+ *   module, the one with the highest modified field will be used and the
+ *   others discarded.
+ * - When merging ModuleIndexes, if two or more indexes contain Defaults for
+ *   the same module, but different modified values, the one with the highest
+ *   modified value will be used and the others discarded.
  * - Any module default that is provided by a single repository is
  *   authoritative.
  * - If the repos have different priorities (not common), then the default for
  *   this module and stream name coming from the repo of higher priority will
- *   be used and the default from the lower-priority repo will not be included.
+ *   be used and the default from the lower-priority repo will not be included
+ *   even if it has a higher modified value.
  * - If the repos have the same priority (such as "fedora" and "updates" in the
- *   Fedora Project), the entries will be merged as follows:
- *   - If both repositories specify a default stream for the module, use it.
+ *   Fedora Project) and modified value, the entries will be merged as follows:
+ *   - If both repositories specify the same default stream for the module, use
+ *     it.
  *   - If either repository specifies a default stream for the module and the
  *     other does not, use the one specified.
  *   - If both repositories specify different streams, this is an unresolvable

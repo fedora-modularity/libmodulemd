@@ -258,8 +258,8 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_PARSE,
-                           "YAML contained more than a single subdocument");
+                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           "Parser error");
       return NULL;
     }
 
@@ -267,8 +267,8 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_UNPARSEABLE,
-                           "Parser error");
+                           MODULEMD_YAML_ERROR_PARSE,
+                           "YAML contained more than a single subdocument");
       return NULL;
     }
   yaml_event_delete (&event);

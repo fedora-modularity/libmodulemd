@@ -616,3 +616,72 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
     }
   return TRUE;
 }
+
+
+static gboolean
+requires_module_and_stream (GHashTable *modules,
+                            const gchar *module_name,
+                            const gchar *stream_name)
+{
+  GHashTable *streams = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  g_autofree gchar *negated = NULL;
+
+  streams = g_hash_table_lookup (modules, module_name);
+  /* If the module doesn't appear at all, return false */
+  if (!streams)
+    {
+      return FALSE;
+    }
+
+  /* Check whether this module is the empty set (which means "all streams") */
+  if (g_hash_table_size (streams) == 0)
+    {
+      return TRUE;
+    }
+
+  /* Check whether it includes the stream name explicitly */
+  if (g_hash_table_contains (streams, stream_name))
+    {
+      return TRUE;
+    }
+
+
+  /* Get the first item from the table and check if it's a negation */
+  negated = g_strdup_printf ("-%s", stream_name);
+
+  g_hash_table_iter_init (&iter, streams);
+  g_hash_table_iter_next (&iter, &key, &value);
+
+  /* If we have a negative value for any entry, they all must be negative.
+   * Check whether we're explicitly excluding the requested stream */
+  if (((const gchar *)key)[0] == '-' &&
+      (!g_hash_table_contains (streams, negated)))
+    {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+
+gboolean
+modulemd_dependencies_requires_module_and_stream (ModulemdDependencies *self,
+                                                  const gchar *module_name,
+                                                  const gchar *stream_name)
+{
+  return requires_module_and_stream (
+    self->runtime_deps, module_name, stream_name);
+}
+
+
+gboolean
+modulemd_dependencies_buildrequires_module_and_stream (
+  ModulemdDependencies *self,
+  const gchar *module_name,
+  const gchar *stream_name)
+{
+  return requires_module_and_stream (
+    self->buildtime_deps, module_name, stream_name);
+}

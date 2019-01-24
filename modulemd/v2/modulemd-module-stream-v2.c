@@ -952,6 +952,62 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }
 
+
+static gboolean
+depends_on_stream (ModulemdModuleStreamV2 *self,
+                   const gchar *module_name,
+                   const gchar *stream_name,
+                   gboolean is_builddep)
+{
+  ModulemdDependencies *dep = NULL;
+
+  /* Iterate through all of the dependency objects */
+  for (gint i = 0; i < self->dependencies->len; i++)
+    {
+      dep = g_ptr_array_index (self->dependencies, i);
+      if (is_builddep)
+        {
+          if (modulemd_dependencies_buildrequires_module_and_stream (
+                dep, module_name, stream_name))
+            return TRUE;
+        }
+      else
+        {
+          if (modulemd_dependencies_requires_module_and_stream (
+                dep, module_name, stream_name))
+            return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
+static gboolean
+modulemd_module_stream_v2_depends_on_stream (ModulemdModuleStream *self,
+                                             const gchar *module_name,
+                                             const gchar *stream_name)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
+  g_return_val_if_fail (module_name && stream_name, FALSE);
+
+  return depends_on_stream (
+    MODULEMD_MODULE_STREAM_V2 (self), module_name, stream_name, FALSE);
+}
+
+
+static gboolean
+modulemd_module_stream_v2_build_depends_on_stream (ModulemdModuleStream *self,
+                                                   const gchar *module_name,
+                                                   const gchar *stream_name)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
+  g_return_val_if_fail (module_name && stream_name, FALSE);
+
+  return depends_on_stream (
+    MODULEMD_MODULE_STREAM_V2 (self), module_name, stream_name, TRUE);
+}
+
+
 static void
 modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
 {
@@ -966,6 +1022,11 @@ modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
   stream_class->get_mdversion = modulemd_module_stream_v2_get_mdversion;
   stream_class->copy = modulemd_module_stream_v2_copy;
   stream_class->validate = modulemd_module_stream_v2_validate;
+  stream_class->depends_on_stream =
+    modulemd_module_stream_v2_depends_on_stream;
+  stream_class->build_depends_on_stream =
+    modulemd_module_stream_v2_build_depends_on_stream;
+
 
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",

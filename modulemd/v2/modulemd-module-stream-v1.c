@@ -1065,6 +1065,52 @@ modulemd_module_stream_v1_copy (ModulemdModuleStream *self,
 }
 
 
+static gboolean
+modulemd_module_stream_v1_depends_on_stream (ModulemdModuleStream *self,
+                                             const gchar *module_name,
+                                             const gchar *stream_name)
+{
+  const gchar *stream = NULL;
+  ModulemdModuleStreamV1 *v1_self = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), FALSE);
+  g_return_val_if_fail (module_name && stream_name, FALSE);
+
+  v1_self = MODULEMD_MODULE_STREAM_V1 (self);
+
+  stream = g_hash_table_lookup (v1_self->runtime_deps, module_name);
+  if (!stream)
+    {
+      return FALSE;
+    }
+
+  return g_str_equal (stream, stream_name);
+}
+
+
+static gboolean
+modulemd_module_stream_v1_build_depends_on_stream (ModulemdModuleStream *self,
+                                                   const gchar *module_name,
+                                                   const gchar *stream_name)
+{
+  const gchar *stream = NULL;
+  ModulemdModuleStreamV1 *v1_self = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), FALSE);
+  g_return_val_if_fail (module_name && stream_name, FALSE);
+
+  v1_self = MODULEMD_MODULE_STREAM_V1 (self);
+
+  stream = g_hash_table_lookup (v1_self->buildtime_deps, module_name);
+  if (!stream)
+    {
+      return FALSE;
+    }
+
+  return g_str_equal (stream, stream_name);
+}
+
+
 static void
 modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
 {
@@ -1079,6 +1125,10 @@ modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
   stream_class->get_mdversion = modulemd_module_stream_v1_get_mdversion;
   stream_class->copy = modulemd_module_stream_v1_copy;
   stream_class->validate = modulemd_module_stream_v1_validate;
+  stream_class->depends_on_stream =
+    modulemd_module_stream_v1_depends_on_stream;
+  stream_class->build_depends_on_stream =
+    modulemd_module_stream_v1_build_depends_on_stream;
 
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",

@@ -67,3 +67,14 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
 
 gboolean
 modulemd_dependencies_validate (ModulemdDependencies *self, GError **error);
+
+
+gboolean
+modulemd_dependencies_requires_module_and_stream (ModulemdDependencies *self,
+                                                  const gchar *module_name,
+                                                  const gchar *stream_name);
+gboolean
+modulemd_dependencies_buildrequires_module_and_stream (
+  ModulemdDependencies *self,
+  const gchar *module_name,
+  const gchar *stream_name);

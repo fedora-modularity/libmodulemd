@@ -1013,6 +1013,31 @@ data:
                 "%s/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'), True)
             assert stream
 
+    def test_depends_on_stream(self):
+
+        for version in modulestream_versions:
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/modulemd/v2/tests/test_data/dependson_v%d.yaml" % (
+                    os.getenv('MESON_SOURCE_ROOT'),
+                    version),
+                True)
+            self.assertIsNotNone(stream)
+
+            self.assertEqual(stream.depends_on_stream('platform', 'f30'), True)
+            self.assertEqual(
+                stream.build_depends_on_stream(
+                    'platform', 'f30'), True)
+
+            self.assertEqual(
+                stream.depends_on_stream(
+                    'platform', 'f28'), False)
+            self.assertEqual(
+                stream.build_depends_on_stream(
+                    'platform', 'f28'), False)
+
+            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
+            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
+
 
 if __name__ == '__main__':
     unittest.main()

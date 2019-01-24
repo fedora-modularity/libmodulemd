@@ -958,3 +958,35 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
   /* The rest of the fields will be emitted by the version-specific emitters */
   return TRUE;
 }
+
+
+gboolean
+modulemd_module_stream_depends_on_stream (ModulemdModuleStream *self,
+                                          const gchar *module_name,
+                                          const gchar *stream_name)
+{
+  ModulemdModuleStreamClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
+
+  klass = MODULEMD_MODULE_STREAM_GET_CLASS (self);
+  g_return_val_if_fail (klass->depends_on_stream, FALSE);
+
+  return klass->depends_on_stream (self, module_name, stream_name);
+}
+
+
+gboolean
+modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
+                                                const gchar *module_name,
+                                                const gchar *stream_name)
+{
+  ModulemdModuleStreamClass *klass;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
+
+  klass = MODULEMD_MODULE_STREAM_GET_CLASS (self);
+  g_return_val_if_fail (klass->build_depends_on_stream, FALSE);
+
+  return klass->build_depends_on_stream (self, module_name, stream_name);
+}

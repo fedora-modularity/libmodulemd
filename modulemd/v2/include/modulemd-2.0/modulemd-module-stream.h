@@ -70,9 +70,17 @@ struct _ModulemdModuleStreamClass
 
   guint64 (*get_mdversion) (ModulemdModuleStream *self);
 
-  /* Padding to allow adding up to 10 new virtual functions without
+  gboolean (*depends_on_stream) (ModulemdModuleStream *self,
+                                 const gchar *module_name,
+                                 const gchar *stream_name);
+
+  gboolean (*build_depends_on_stream) (ModulemdModuleStream *self,
+                                       const gchar *module_name,
+                                       const gchar *stream_name);
+
+  /* Padding to allow adding up to 8 new virtual functions without
    * breaking ABI. */
-  gpointer padding[10];
+  gpointer padding[8];
 };
 
 
@@ -349,4 +357,34 @@ gchar *
 modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
 
 
+/**
+ * modulemd_module_stream_depends_on_stream:
+ * @self: (not nullable): This #ModulemdModuleStream.
+ * @module_name: (not nullable): A module name
+ * @stream_name: (not nullable): The stream of the module
+ *
+ * Since: 2.1
+ *
+ * Stability: unstable
+ */
+gboolean
+modulemd_module_stream_depends_on_stream (ModulemdModuleStream *self,
+                                          const gchar *module_name,
+                                          const gchar *stream_name);
+
+
+/**
+ * modulemd_module_stream_build_depends_on_stream:
+ * @self: (not nullable): This #ModulemdModuleStream.
+ * @module_name: (not nullable): A module name
+ * @stream_name: (not nullable): The stream of the module
+ *
+ * Since: 2.1
+ *
+ * Stability: unstable
+ */
+gboolean
+modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
+                                                const gchar *module_name,
+                                                const gchar *stream_name);
 G_END_DECLS

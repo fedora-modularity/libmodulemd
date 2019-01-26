@@ -363,6 +363,10 @@ modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
  * @module_name: (not nullable): A module name
  * @stream_name: (not nullable): The stream of the module
  *
+ * Returns: TRUE if any of the #ModulemdDependencies objects associated with
+ * this module applies to the provided module name and stream in the runtime
+ * dependencies.
+ *
  * Since: 2.1
  *
  * Stability: unstable
@@ -378,6 +382,10 @@ modulemd_module_stream_depends_on_stream (ModulemdModuleStream *self,
  * @self: (not nullable): This #ModulemdModuleStream.
  * @module_name: (not nullable): A module name
  * @stream_name: (not nullable): The stream of the module
+ *
+ * Returns: TRUE if any of the #ModulemdDependencies objects associated with
+ * this module applies to the provided module name and stream in the build-time
+ * dependencies.
  *
  * Since: 2.1
  *

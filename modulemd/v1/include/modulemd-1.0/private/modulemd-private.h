@@ -26,6 +26,8 @@ enum
 
 #define MD_VERSION_LATEST MD_VERSION_2
 
+#define DEFAULT_MERGE_CONFLICT "__merge_conflict__"
+
 ModulemdModule *
 modulemd_module_new_from_modulestream (ModulemdModuleStream *stream);
 

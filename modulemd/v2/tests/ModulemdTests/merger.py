@@ -106,21 +106,36 @@ class TestModuleIndexMerger(TestBase):
         self.assertEqual(
             len(httpd_defaults.get_default_profiles_for_stream('2.6', 'workstation')), 3)
 
+        # Get another set of objects that will override the default stream for
+        # nodejs
+        override_nodejs_index = Modulemd.ModuleIndex()
+        override_nodejs_index.update_from_file(
+            path.join(
+                self.source_root,
+                "modulemd/v2/tests/test_data/overriding-nodejs.yaml"), True)
+
+        # Test that adding both of these at the same priority level results in
+        # the no default stream
+        merger = Modulemd.ModuleIndexMerger()
+        merger.associate_index(base_index, 0)
+        merger.associate_index(override_nodejs_index, 0)
+
+        merged_index = merger.resolve()
+        self.assertIsNotNone(merged_index)
+
+        nodejs = merged_index.get_module('nodejs')
+        self.assertIsNotNone(nodejs)
+
+        nodejs_defaults = nodejs.get_defaults()
+        self.assertIsNotNone(nodejs_defaults)
+        self.assertIsNone(nodejs_defaults.get_default_stream())
+
         # Get another set of objects that will override the above
         override_index = Modulemd.ModuleIndex()
         override_index.update_from_file(
             path.join(
                 self.source_root,
                 "modulemd/v2/tests/test_data/overriding.yaml"), True)
-
-        # Test that adding both of these at the same priority level fails
-        # with a merge conflict.
-        merger = Modulemd.ModuleIndexMerger()
-        merger.associate_index(base_index, 0)
-        merger.associate_index(override_index, 0)
-
-        with self.assertRaisesRegex(GLib.GError, 'Module stream mismatch in merge'):
-            merged_index = merger.resolve()
 
         # Test that override_index at a higher priority level succeeds
         # Test that adding both of these at the same priority level fails

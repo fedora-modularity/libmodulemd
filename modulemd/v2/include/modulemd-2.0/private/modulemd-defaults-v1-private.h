@@ -28,6 +28,8 @@ G_BEGIN_DECLS
  * internal consumers.
  */
 
+#define DEFAULT_MERGE_CONFLICT "__merge_conflict__"
+
 /**
  * modulemd_defaults_v1_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a defaults document

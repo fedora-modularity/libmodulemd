@@ -14,6 +14,7 @@
 #include "modulemd.h"
 #include "modulemd-defaults.h"
 #include "modulemd-simpleset.h"
+#include "private/modulemd-private.h"
 #include "private/modulemd-yaml.h"
 
 
@@ -148,6 +149,15 @@ modulemd_defaults_peek_default_stream (ModulemdDefaults *self)
 {
   g_return_val_if_fail (self, NULL);
 
+  if (self->default_stream &&
+      g_str_equal (self->default_stream, DEFAULT_MERGE_CONFLICT))
+    {
+      /* During an index merge, we determined that this was in conflict
+       * with another set of ModulemdDefaults for the same module. If we
+       * see this, treat it as no default stream when querying for it.
+       */
+      return NULL;
+    }
   return self->default_stream;
 }
 
@@ -156,6 +166,16 @@ gchar *
 modulemd_defaults_dup_default_stream (ModulemdDefaults *self)
 {
   g_return_val_if_fail (self, NULL);
+
+  if (self->default_stream &&
+      g_str_equal (self->default_stream, DEFAULT_MERGE_CONFLICT))
+    {
+      /* During an index merge, we determined that this was in conflict
+       * with another set of ModulemdDefaults for the same module. If we
+       * see this, treat it as no default stream when querying for it.
+       */
+      return NULL;
+    }
 
   return g_strdup (self->default_stream);
 }
@@ -755,23 +775,20 @@ modulemd_defaults_merge (ModulemdDefaults *first,
    * Merge them as best we can.
    */
 
+  defaults = modulemd_defaults_copy (first);
+
   /* First check for incompatibilities with the streams */
-  if (g_strcmp0 (modulemd_defaults_peek_default_stream (first),
-                 modulemd_defaults_peek_default_stream (second)))
+  if (g_strcmp0 (first->default_stream, second->default_stream))
     {
       /* Default streams don't match and override is not set.
        * Return an error
        */
-      g_set_error (
-        error,
-        MODULEMD_DEFAULTS_ERROR,
-        MODULEMD_DEFAULTS_ERROR_CONFLICTING_STREAMS,
-        "Conflicting default streams when merging defaults for module %s",
-        modulemd_defaults_peek_module_name (first));
-      return NULL;
+      /* They have conflicting default streams */
+      g_info ("Module stream mismatch in merge: %s != %s",
+              first->default_stream,
+              second->default_stream);
+      modulemd_defaults_set_default_stream (defaults, DEFAULT_MERGE_CONFLICT);
     }
-
-  defaults = modulemd_defaults_copy (first);
 
   /* Merge the profile defaults */
   profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);

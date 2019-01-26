@@ -181,7 +181,18 @@ modulemd_defaults_v1_get_default_stream (ModulemdDefaultsV1 *self,
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS_V1 (self), NULL);
 
   if (!intent)
-    return self->default_stream;
+    {
+      if (self->default_stream &&
+          g_str_equal (self->default_stream, DEFAULT_MERGE_CONFLICT))
+        {
+          /* During an index merge, we determined that this was in conflict
+           * with another set of ModulemdDefaults for the same module. If we
+           * see this, treat it as no default stream when querying for it.
+           */
+          return NULL;
+        }
+      return self->default_stream;
+    }
 
   default_stream = g_hash_table_lookup (self->intent_default_streams, intent);
   if (default_stream)
@@ -1144,8 +1155,6 @@ modulemd_defaults_v1_merge (const gchar *module_name,
                             ModulemdDefaultsV1 *into,
                             GError **error)
 {
-  const gchar *into_default_stream;
-  const gchar *from_default_stream;
   g_autoptr (ModulemdDefaultsV1) merged = NULL;
   GHashTableIter iter;
   gpointer key, value;
@@ -1160,33 +1169,41 @@ modulemd_defaults_v1_merge (const gchar *module_name,
   merged = modulemd_defaults_v1_new (module_name);
 
   /* Merge the default streams */
-  into_default_stream = modulemd_defaults_v1_get_default_stream (into, NULL);
-  from_default_stream = modulemd_defaults_v1_get_default_stream (from, NULL);
-
-  if (into_default_stream && !from_default_stream)
+  if (into->default_stream && !from->default_stream)
     {
       modulemd_defaults_v1_set_default_stream (
-        merged, into_default_stream, NULL);
+        merged, into->default_stream, NULL);
     }
-  else if (from_default_stream && !into_default_stream)
+  else if (from->default_stream && !into->default_stream)
     {
       modulemd_defaults_v1_set_default_stream (
-        merged, from_default_stream, NULL);
+        merged, from->default_stream, NULL);
     }
-  else if (into_default_stream && from_default_stream)
+  else if (into->default_stream && from->default_stream)
     {
-      if (!g_str_equal (into_default_stream, from_default_stream))
+      if (g_str_equal (into->default_stream, DEFAULT_MERGE_CONFLICT))
         {
-          g_set_error (error,
-                       MODULEMD_ERROR,
-                       MODULEMD_ERROR_VALIDATE,
-                       "Module stream mismatch in merge: %s != %s",
-                       into_default_stream,
-                       from_default_stream);
-          return NULL;
+          /* A previous pass over this same module encountered a merge
+           * conflict, so we need to propagate that.
+           */
+          modulemd_defaults_v1_set_default_stream (
+            merged, DEFAULT_MERGE_CONFLICT, NULL);
         }
-      modulemd_defaults_v1_set_default_stream (
-        merged, into_default_stream, NULL);
+      else if (!g_str_equal (into->default_stream, from->default_stream))
+        {
+          /* They have conflicting default streams */
+          g_info ("Module stream mismatch in merge: %s != %s",
+                  into->default_stream,
+                  from->default_stream);
+          modulemd_defaults_v1_set_default_stream (
+            merged, DEFAULT_MERGE_CONFLICT, NULL);
+        }
+      else
+        {
+          /* They're the same, so store that */
+          modulemd_defaults_v1_set_default_stream (
+            merged, into->default_stream, NULL);
+        }
     }
   else
     {

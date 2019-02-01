@@ -41,6 +41,7 @@ for test in unfiltered_tests:
         'v1_release' in test or
         test == 'autopep8' or
         test == 'clang_format' or
+        test == 'pycodestyle' or
         test == 'test_dirty_repo' or
             test == 'valgrind'):
         continue

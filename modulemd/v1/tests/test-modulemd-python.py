@@ -32,7 +32,8 @@ class TestStandard(unittest.TestCase):
     def test_version(self):
         # Make sure that we are linking against the correct version
         expected_version = os.getenv('MODULEMD_VERSION')
-        assert expected_version is None or expected_version == Modulemd.get_version()
+        assert expected_version is None \
+            or expected_version == Modulemd.get_version()
 
     def test_failures(self):
         (objects, failures) = Modulemd.objects_from_file_ext(
@@ -48,23 +49,26 @@ class TestStandard(unittest.TestCase):
         for failure in failures:
             assert failure.props.gerror.code == 3
 
-        assert failures[
-            0].props.gerror.message.startswith(
-                'Document type is not recognized [')
-        assert failures[
-            1].props.gerror.message == 'Document type was specified more than once'
-        assert failures[
-            2].props.gerror.message == 'Document version was specified more than once'
-        assert failures[
-            3].props.gerror.message == 'Document type was not a scalar value'
-        assert failures[
-            4].props.gerror.message.startswith(
-                'Document type is not recognized [')
-        assert failures[
-            5].props.gerror.message.startswith(
-                'Document type is not recognized [')
-        assert failures[
-            6].props.gerror.message == 'Unknown modulemd defaults version'
+        assert failures[0].props.gerror.message.startswith(
+            'Document type is not recognized [')
+
+        assert failures[1].props.gerror.message == \
+            'Document type was specified more than once'
+
+        assert failures[2].props.gerror.message == \
+            'Document version was specified more than once'
+
+        assert failures[3].props.gerror.message == \
+            'Document type was not a scalar value'
+
+        assert failures[4].props.gerror.message.startswith(
+            'Document type is not recognized [')
+
+        assert failures[5].props.gerror.message.startswith(
+            'Document type is not recognized [')
+
+        assert failures[6].props.gerror.message == \
+            'Unknown modulemd defaults version'
 
         # Read in a file that's definitely not YAML
         try:
@@ -229,7 +233,9 @@ document: modulemd
 version: 1
 data:
     summary: A test module in all its beautiful beauty.
-    description: This module demonstrates how to write simple modulemd files And can be used for testing the build and release pipeline.
+    description: >-
+        This module demonstrates how to write simple modulemd files And
+        can be used for testing the build and release pipeline.
     license:
         module: [ MIT ]
     dependencies:

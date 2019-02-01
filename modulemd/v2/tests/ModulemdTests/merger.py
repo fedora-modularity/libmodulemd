@@ -213,5 +213,6 @@ class TestModuleIndexMerger(TestBase):
     def test_merger_with_modified(self):
         pass
 
+
 if __name__ == '__main__':
     unittest.main()

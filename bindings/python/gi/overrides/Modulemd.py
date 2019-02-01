@@ -31,12 +31,12 @@ import gi
 from ..module import get_introspection_module
 from ..overrides import override
 
-Modulemd = get_introspection_module('Modulemd')
-
 from six import text_type
 from gi.repository import GLib
 
 import datetime
+
+Modulemd = get_introspection_module('Modulemd')
 
 
 __all__ = []
@@ -112,6 +112,7 @@ class ModulemdUtil():
 
         else:
             raise TypeError('Cannot convert unknown type')
+
 
 if float(Modulemd._version) >= 2:
 

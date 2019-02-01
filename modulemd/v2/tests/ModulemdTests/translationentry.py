@@ -169,7 +169,7 @@ class TestTranslationEntry(TestBase):
         assert te.props.locale == 'en_US'
         assert te.get_locale() == 'en_US'
         assert te.props.summary is None
-        assert te.get_summary() == None
+        assert te.get_summary() is None
 
         te.set_summary("foobar")
         assert te.props.summary == "foobar"
@@ -181,7 +181,7 @@ class TestTranslationEntry(TestBase):
 
         te.props.summary = None
         assert te.props.summary is None
-        assert te.get_summary() == None
+        assert te.get_summary() is None
 
     def test_get_set_description(self):
         te = Modulemd.TranslationEntry(locale="en_US")
@@ -189,7 +189,7 @@ class TestTranslationEntry(TestBase):
         assert te.props.locale == 'en_US'
         assert te.get_locale() == 'en_US'
         assert te.props.description is None
-        assert te.get_description() == None
+        assert te.get_description() is None
 
         te.set_description("foobar")
         assert te.props.description == "foobar"
@@ -201,7 +201,7 @@ class TestTranslationEntry(TestBase):
 
         te.props.description = None
         assert te.props.description is None
-        assert te.get_description() == None
+        assert te.get_description() is None
 
     def test_profile_descriptions(self):
         te = Modulemd.TranslationEntry(locale="en_US")

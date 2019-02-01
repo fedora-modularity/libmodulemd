@@ -19,6 +19,12 @@ if not clang_format.found()
     clang_format = disabler()
 endif
 
+pycodestyle = find_program('pycodestyle-3', 'pycodestyle',
+                           required : developer_build)
+if not pycodestyle.found()
+    pycodestyle = disabler()
+endif
+
 autopep8 = find_program('python3-autopep8', 'autopep8',
                         required : developer_build)
 if not autopep8.found()
@@ -247,8 +253,9 @@ test('clang_format', clang_format,
             test_v2_srcs +
             test_v2_priv_hdrs)
 
+
 # Fake test to ensure that the python tests are formatted according to PEP8
-autopep8_args = [ '--in-place', '-a', '-a' ]
+autopep8_args = [ '--in-place', '-a', '-a', '--global-config', '../tox.ini' ]
 autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
                            'common/tests/test-dirty.py',
                            'common/tests/test-valgrind.py',
@@ -256,6 +263,16 @@ autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
                      test_v2_python_scripts ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
+
+
+# Test all python files for compliance with pycodestyle
+# Ignore line-length as there are a number of places where this is unavoidable
+pycodestyle_args = [
+    '--show-pep8',
+    '--ignore=E121,E123,E126,E226,E24,E501,E704,W503,W504'
+]
+test('pycodestyle', pycodestyle,
+     args: pycodestyle_args + autopep8_scripts)
 
 
 # Fake test to ensure that the autoformatters didn't end up making changes

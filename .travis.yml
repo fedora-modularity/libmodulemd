@@ -27,3 +27,5 @@ jobs:
       script: ./.travis/travis-fedora.sh
     - name: "Fedora rawhide"
       script: ./.travis/travis-fedora.sh
+    - name: "CentOS 7"
+      script: ./.travis/travis-centos.sh

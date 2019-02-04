@@ -26,7 +26,7 @@ meson --buildtype=debug \
 set +e
 ninja -C travis test
 if [ $? != 0 ]; then
-    cat travis_v1/meson-logs/testlog.txt
+    cat travis/meson-logs/testlog.txt
 fi
 set -e
 

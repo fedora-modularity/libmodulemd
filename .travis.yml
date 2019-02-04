@@ -21,7 +21,8 @@ env:
 
 jobs:
   include:
-    - name: "Fedora 28"
+    - stage: "Build Containers"
+      name: "Fedora 28"
       script: ./.travis/travis-fedora.sh
     - name: "Fedora 29"
       script: ./.travis/travis-fedora.sh
@@ -29,3 +30,13 @@ jobs:
       script: ./.travis/travis-fedora.sh
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
+
+    - stage: "Build Tests"
+      name: "Fedora 28"
+      script: docker run --rm -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" fedora-modularity/libmodulemd:fedora-28 /builddir/.travis/fedora/basic-tests.sh
+    - name: "Fedora 29"
+      script: docker run --rm -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" fedora-modularity/libmodulemd:fedora-29 /builddir/.travis/fedora/basic-tests.sh
+    - name: "Fedora Rawhide"
+      script: docker run --rm -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" fedora-modularity/libmodulemd:fedora-rawhide /builddir/.travis/fedora/basic-tests.sh
+    - name: "CentOS 7"
+      script: docker run --rm -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" fedora-modularity/libmodulemd:fedora-7 /bin/false

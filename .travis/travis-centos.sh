@@ -28,7 +28,7 @@ sed -e "s/@IMAGE@/$repository\/$os:$release/" \
 sed -e "s/@RELEASE@/$release/" $SCRIPT_DIR/centos/Dockerfile.tmpl > $SCRIPT_DIR/centos/Dockerfile-$release
 
 sudo docker build -f $SCRIPT_DIR/centos/Dockerfile.deps.$release -t fedora-modularity/libmodulemd-deps-$release .
-sudo docker build -f $SCRIPT_DIR/centos/Dockerfile-$release -t fedora-modularity/libmodulemd:$release --build-arg TARBALL=$TARBALL .
+sudo docker build -f $SCRIPT_DIR/centos/Dockerfile-$release -t fedora-modularity/libmodulemd:centos-$release --build-arg TARBALL=$TARBALL .
 
 if [ $release != "rawhide" ]; then
   # Only run Coverity scan on Rawhide since we have a limited number of scans per week.
@@ -36,8 +36,6 @@ if [ $release != "rawhide" ]; then
 fi
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/centos/Dockerfile.deps.$release $SCRIPT_DIR/centos/Dockerfile-$release
-
-docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
 
 popd
 exit 0

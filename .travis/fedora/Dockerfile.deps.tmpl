@@ -4,15 +4,14 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 ARG TARBALL
 
-@EXTRA_PRE_STEP@
-
-RUN @PKGMGR@ -y --setopt=install_weak_deps=False install \
+RUN dnf -y --setopt=install_weak_deps=False install \
 	clang \
 	clang-analyzer \
 	createrepo_c \
 	curl \
 	elinks \
 	gcc \
+	gcc-c++ \
 	git-core \
 	glib2-devel \
 	gobject-introspection-devel \
@@ -38,4 +37,4 @@ RUN @PKGMGR@ -y --setopt=install_weak_deps=False install \
 	sudo \
 	valgrind \
 	wget \
-    && @PKGMGR@ -y clean all
+    && dnf -y clean all

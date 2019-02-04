@@ -22,8 +22,8 @@ env:
 jobs:
   include:
     - name: "Fedora 28"
-      script: ./.travis/travis-docker.sh
+      script: ./.travis/travis-fedora.sh
     - name: "Fedora 29"
-      script: ./.travis/travis-docker.sh
+      script: ./.travis/travis-fedora.sh
     - name: "Fedora rawhide"
-      script: ./.travis/travis-docker.sh
+      script: ./.travis/travis-fedora.sh

@@ -11,6 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include <string.h>
+
 #include "private/modulemd-util.h"
 
 

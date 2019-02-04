@@ -18,7 +18,7 @@ project('modulemd', 'c',
           'b_asneeded=true',
         ],
         license : 'MIT',
-        meson_version : '>=0.44.0')
+        meson_version : '>=0.46.0')
 
 libmodulemd_v1_version = '1.8.3'
 libmodulemd_v2_version = meson.project_version()
@@ -47,7 +47,7 @@ foreach cflag: test_cflags
   endif
 endforeach
 
-pymod = import('python3')
+pymod = import('python')
 gnome = import('gnome')
 pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
@@ -56,6 +56,16 @@ gtkdoc = dependency('gtk-doc')
 
 sh = find_program('sh')
 sed = find_program('sed')
+
+python_name = get_option('python_name')
+
+if python_name != ''
+    # If we've been instructed to use a specific python version
+    python3 = pymod.find_installation(python_name)
+else
+    # Use the python installation that is running meson
+    python3 = pymod.find_installation()
+endif
 
 spec_tmpl = find_program('spec_tmpl.sh')
 

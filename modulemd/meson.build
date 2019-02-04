@@ -12,8 +12,6 @@
 developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
 
-python3 = pymod.find_python()
-
 clang_format = find_program('clang-format', required: developer_build)
 if not clang_format.found()
     clang_format = disabler()

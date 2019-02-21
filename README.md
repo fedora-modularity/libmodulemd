@@ -111,6 +111,57 @@ v2_stream.validate()
 ```
 In the example above, we upgraded the stream to v2, in case we were reading from v1 metadata. This will allow us to avoid having to manage multiple code-paths and support only the latest we understand. After that, it calls validate() to ensure that the content that was read in was valid both syntactically and referentially.
 
+# Getting started with developing
+## Prerequisites
+* A Fedora development environment (physical or virtual)
+
+To install all of the dependencies needed to build libmodulemd, the following command will work on Fedora 28+ (run as root or with sudo):
+```
+dnf -y install git-core "dnf-command(builddep)" && dnf -y builddep libmodulemd
+```
+
+To install the tools needed to run the docker-based tests, you will also need:
+```
+dnf -y install docker
+```
+and to make sure that your user has privilege to run `sudo docker` (see the documentation for the `/etc/sudoers` file to figure this out).
+
+## Forking and cloning the sources
+The libmodulemd project follows the [Github Fork-and-Pull](https://reflectoring.io/github-fork-and-pull/) model of development. To get started, create a fork of the upstream libmodulemd sources, clone those locally and create branches on your fork to make changes. When they are ready for review or feedback, create a pull-request.
+
+## Building the sources
+First, decide if you are planning to build the sources for the 1.0 API or the 2.0 API. (Note that the 1.0 API is deprecated and will be removed soon). This guideline will describe the procedure for working with the 2.0 API.
+
+Projects built with the meson build-system require a separate build directory from the source path. The `meson` command will generate this directory for you.
+```
+meson --buildtype=debug -Db_coverage=true -Dbuild_api_v1=false -Dbuild_api_v2=true  api2
+```
+The above command (run from the root of the source checkout) will create a new subdirectory - `api2` - configured to compile with debug symbols and `gcov` symbols to measure test coverage. It enables building the 2.0 API and skips the deprecated 1.0 API.
+
+To build the sources, `chdir()` into the `api2` directory and run
+```
+ninja
+```
+
+To build and run the in-tree tests, use
+```
+ninja test
+```
+
+To generate HTML documentation, you can run
+```
+ninja modulemd-2.0-doc
+```
+(Be aware that the GLib documentation module in meson has some strange quirks and won't recognize newly-added pages without deleting and re-creating the build directory first.)
+
+
+To run the docker-based tests, you can run (from the source root and with `sudo` privilege to run `docker`):
+```
+./.travis/travis-fedora.sh
+```
+(Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`, `Fedora 29`, etc. to switch to building against those releases rather than Fedora Rawhide).
+
+
 # Authors:
 * Stephen Gallagher <sgallagh@redhat.com>
 * Igor Gnatenko <ignatenkobrain@fedoraproject.org>

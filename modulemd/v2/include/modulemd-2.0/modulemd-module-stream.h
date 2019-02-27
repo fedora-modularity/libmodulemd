@@ -78,6 +78,8 @@ struct _ModulemdModuleStreamClass
                                        const gchar *module_name,
                                        const gchar *stream_name);
 
+  gboolean (*equals) (ModulemdModuleStream *self, ModulemdModuleStream *other);
+
   /* Padding to allow adding up to 8 new virtual functions without
    * breaking ABI. */
   gpointer padding[8];
@@ -240,8 +242,6 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
 
 /**
- * modulemd_module_stream_validate:
- * @self: (in): This #ModulemdModuleStream.
  * @error: (out): A #GError that will return the reason for a validation error.
  *
  * Verifies that all stored values are internally consistent and that the
@@ -395,4 +395,16 @@ gboolean
 modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
                                                 const gchar *module_name,
                                                 const gchar *stream_name);
+
+/**
+ *modulemd_module_stream_equals:
+ *@self: (not nullable): This #ModulemdModuleStream.
+ *
+ *Returns: TRUE if all of the objects and varibles composing the two 
+ *ModulemdModuleStreams are equal. FALSE, otherwise.
+ *
+ *Since: 2.1
+ */
+gboolean
+modulemd_module_stream_equals (ModulemdModuleStream *self);
 G_END_DECLS

@@ -995,10 +995,12 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
 static gboolean
 modulemd_module_stream_default_equals (ModulemdModuleStream *self, ModulemdModuleStream *other)
 {
-  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
+  if (self == NULL || other == NULL) return FALSE;
 
   guint64 mdversion_self = modulemd_module_stream_get_module_name (self);
   guint64 mdversion_other = modulemd_module_stream_get_module_name (other);
-  g_return_val_if_fail ((mdversion_self == mdversion_other), FALSE);
+
+  if (mdversion_self != mdversion_other) return FALSE;
+
   return TRUE;
 }

@@ -682,7 +682,6 @@ data:
 
         assert 'rawhide' in stream.get_servicelevel_names()
         assert 'production' in stream.get_servicelevel_names()
-
         sl = stream.get_servicelevel('rawhide')
         assert sl is not None
         assert sl.props.name == 'rawhide'
@@ -1035,8 +1034,16 @@ data:
                 stream.build_depends_on_stream(
                     'platform', 'f28'), False)
 
-            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
-            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
+            self.assertEqual(
+                stream.depends_on_stream(
+                    'base', ''), False)
+            self.assertEqual(
+                stream.build_depends_on_stream(
+                    'base', ''), False)
+
+            ret = stream.build_depends_on_stream(
+                'platform', '')
+            assert (ret is True or ret is False)
 
 
 if __name__ == '__main__':

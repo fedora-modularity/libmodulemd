@@ -140,6 +140,152 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 }
 
 static void
+module_stream_v1_test_depends_on_stream (ModuleStreamFixture *fixture,
+                                         gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *module_name = NULL;
+  g_autofree gchar *module_stream = NULL;
+  gboolean ret;
+
+  path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/dependson_v1.yaml",
+                          g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_true (
+    modulemd_module_stream_depends_on_stream (stream, "platform", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_true (modulemd_module_stream_build_depends_on_stream (
+    stream, "platform", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_depends_on_stream (stream, "platform", "f28"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (modulemd_module_stream_build_depends_on_stream (
+    stream, "platform", "f28"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_depends_on_stream (stream, "base", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_build_depends_on_stream (stream, "base", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  ret = modulemd_module_stream_depends_on_stream (stream, "platform", "");
+  g_assert (ret == 0 || ret == 1);
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  ret =
+    modulemd_module_stream_build_depends_on_stream (stream, "platform", "");
+  g_assert (ret == 0 || ret == 1);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_depends_on_stream (ModuleStreamFixture *fixture,
+                                         gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *module_name = NULL;
+  g_autofree gchar *module_stream = NULL;
+  gboolean ret;
+
+
+  path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/dependson_v2.yaml",
+                          g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_true (
+    modulemd_module_stream_depends_on_stream (stream, "platform", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_true (modulemd_module_stream_build_depends_on_stream (
+    stream, "platform", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_depends_on_stream (stream, "platform", "f28"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (modulemd_module_stream_build_depends_on_stream (
+    stream, "platform", "f28"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_depends_on_stream (stream, "base", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  g_assert_false (
+    modulemd_module_stream_build_depends_on_stream (stream, "base", "f30"));
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  ret = modulemd_module_stream_depends_on_stream (stream, "platform", "");
+  g_assert (ret == 0 || ret == 1);
+  g_clear_object (&stream);
+
+  stream = modulemd_module_stream_read_file (
+    path, TRUE, module_name, module_stream, &error);
+  g_assert_nonnull (stream);
+  ret =
+    modulemd_module_stream_build_depends_on_stream (stream, "platform", "");
+  g_assert (ret == 0 || ret == 1);
+  g_clear_object (&stream);
+}
+
+
+static void
 module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
                                   gconstpointer user_data)
 {
@@ -525,6 +671,19 @@ main (int argc, char *argv[])
               NULL,
               module_stream_test_copy,
               NULL);
+  g_test_add ("/modulemd/v2/modulestream/v1/depends_on_stream",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_depends_on_stream,
+              NULL);
+  g_test_add ("/modulemd/v2/modulestream/v2/depends_on_stream",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_depends_on_stream,
+              NULL);
+
 
   g_test_add ("/modulemd/v2/modulestream/v1/parse_dump",
               ModuleStreamFixture,

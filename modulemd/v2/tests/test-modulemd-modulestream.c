@@ -66,6 +66,24 @@ module_stream_test_construct (ModuleStreamFixture *fixture,
       g_assert_null (modulemd_module_stream_get_stream_name (stream));
 
       g_clear_object (&stream);
+    
+    
+      /*Test that the new() function works with no module or stream*/
+    
+      stream = modulemd_module_stream_new (version, "foo", "latest");
+      g_assert_nonnull (stream);
+      g_assert_true (MODULEMD_IS_MODULE_STREAM (stream));
+    
+      g_assert_cmpint (
+        modulemd_module_stream_get_mdversion (stream), ==, version);
+      g_assert_cmpstr (
+        modulemd_module_stream_get_module_name (stream), ==, "foo");
+      g_assert_null (modulemd_module_stream_get_module_name (stream));
+      g_assert_null (modulemd_module_stream_get_stream_name (stream));
+
+      g_clear_object (&stream);
+    
+      
     }
 
   /* Test with a zero mdversion */

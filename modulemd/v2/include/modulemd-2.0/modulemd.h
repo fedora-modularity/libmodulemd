@@ -172,9 +172,64 @@ G_BEGIN_DECLS
  * code-paths and support only the latest we understand. After that, it calls
  * validate() to ensure that the content that was read in was valid both
  * syntactically and referentially.
- */
-
-
+ *
+ *
+ * # Working with Libmodulemd API 2.0
+ * Steps to list the RPM API for a provided module NSVC in Python
+ * In the example below we assume we are dealing with metadata from only
+ * one repository ie fedora.
+ * We assume that the content of the YAML module metadata from the 
+ * repository is loaded into string variable "fedora_yaml"
+ *
+ * The first step is to import the libmodulemd 2.0 API into a Python script.
+ * This is done as follows
+ *
+ * |[<!-- language="Python" -->
+ * import gi
+ * gi.require_version('Modulemd', '2.0')
+ * from gi.repository import Modulemd
+ * ]|
+ *
+ * The second step is to read repodata YAML from a file into an index.
+ * We load the metadata from the repository into the ModulemdModuleIndex object
+ * This is done as follows
+ *
+ * |[<!-- language="Python" -->
+ * fedora_index = Modulemd.ModuleIndex.new()
+ * ret, failures = fedora_index.update_from_string(fedora_yaml)
+ * ]|
+ *
+ * The failures are a list of subdocuments in the YAML that failed parsing, 
+ * along with the reason they failed. Hence checking the return value of
+ * failures we will know if the YAML parsing was successful or not.
+ *
+ * The third step is to query the Modulemd.ModuleIndex for the module with a 
+ * given name.
+ * This is done as follows
+ *
+ * |[<!-- language="Python" -->
+ * module = fedora_index.get_module ('modulename')
+ * ]|
+ *
+ * The fourth step is to query the Modulemd.Module for the 
+ * Modulemd.ModuleStream associated with the provided 
+ * NSVC (name-stream-version-context identifier)
+ * This is done as follows
+ *
+ * |[<!-- language="Python" -->
+ * stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ * ]|
+ *
+ * The last step is to read the RPM API from the Modulemd.ModuleStream
+ * This is done as follows
+ *
+ * |[<!-- language="Python" -->
+ * api_list = stream.get_rpm_api()
+ * ]|
+ *
+ * Here api_list is a python list of strings containing package names.
+ */        
+          
 /**
  * modulemd_get_version:
  *

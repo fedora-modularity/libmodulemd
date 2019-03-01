@@ -1,0 +1,9 @@
+ 0x000000000000000e (SONAME)             Library soname: [libmodulemd_tests.so]
+__gcov_error_file B
+__gcov_master D
+__gcov_sort_n_vals T
+__gcov_var B
+modulemd_test_signal B
+modulemd_test_signal_handler T
+parser_skip_document_start T
+parser_skip_headers T

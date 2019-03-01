@@ -1,0 +1,401 @@
+Build started at 2019-02-27T15:48:31.064598
+Main binary: /usr/bin/python3
+Python system: Linux
+The Meson build system
+Version: 0.49.2
+Source dir: /home/indigoomega021/git_space/libmodulemd
+Build dir: /home/indigoomega021/git_space/libmodulemd/api2
+Build type: native build
+Project name: modulemd
+Project version: 2.1.1
+Sanity testing C compiler: cc
+Is cross compiler: False.
+Sanity check compiler command line: cc /home/indigoomega021/git_space/libmodulemd/api2/meson-private/sanitycheckc.c -o /home/indigoomega021/git_space/libmodulemd/api2/meson-private/sanitycheckc.exe
+Sanity check compile stdout:
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: /home/indigoomega021/git_space/libmodulemd/api2/meson-private/sanitycheckc.exe
+Native C compiler: cc (gcc 8.2.1 "cc (GCC) 8.2.1 20180801 (Red Hat 8.2.1-2)")
+Build machine cpu family: x86_64
+Build machine cpu: x86_64
+Running compile:
+Working directory:  /tmp/tmp29jur4d8
+Command line:  cc /tmp/tmp29jur4d8/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmp29jur4d8/output.obj -O0 -Wpointer-arith 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Wpointer-arith: YES
+Running compile:
+Working directory:  /tmp/tmpzwt27jmx
+Command line:  cc /tmp/tmpzwt27jmx/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpzwt27jmx/output.obj -O0 -Werror=missing-declarations 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=missing-declarations: YES
+Running compile:
+Working directory:  /tmp/tmpmkt8ospl
+Command line:  cc /tmp/tmpmkt8ospl/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpmkt8ospl/output.obj -O0 -Wmissing-prototypes 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Wmissing-prototypes: YES
+Running compile:
+Working directory:  /tmp/tmpp_j6538d
+Command line:  cc /tmp/tmpp_j6538d/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpp_j6538d/output.obj -O0 -Wstrict-prototypes 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Wstrict-prototypes: YES
+Running compile:
+Working directory:  /tmp/tmptierz3yf
+Command line:  cc /tmp/tmptierz3yf/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmptierz3yf/output.obj -O0 -Wuninitialized 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Wuninitialized: YES
+Running compile:
+Working directory:  /tmp/tmpr421s3bs
+Command line:  cc /tmp/tmpr421s3bs/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpr421s3bs/output.obj -O0 -Werror=format-security -Werror=format=2 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=format-security -Werror=format=2: YES
+Running compile:
+Working directory:  /tmp/tmpar2o1umy
+Command line:  cc /tmp/tmpar2o1umy/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpar2o1umy/output.obj -O0 -Werror=implicit 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=implicit: YES
+Running compile:
+Working directory:  /tmp/tmpx_71j778
+Command line:  cc /tmp/tmpx_71j778/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpx_71j778/output.obj -O0 -Werror=init-self 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=init-self: YES
+Running compile:
+Working directory:  /tmp/tmpgcjnpbbt
+Command line:  cc /tmp/tmpgcjnpbbt/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpgcjnpbbt/output.obj -O0 -Werror=main 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=main: YES
+Running compile:
+Working directory:  /tmp/tmp6hgq1dm5
+Command line:  cc /tmp/tmp6hgq1dm5/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmp6hgq1dm5/output.obj -O0 -Werror=missing-braces 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=missing-braces: YES
+Running compile:
+Working directory:  /tmp/tmpxq3ffmgk
+Command line:  cc /tmp/tmpxq3ffmgk/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpxq3ffmgk/output.obj -O0 -Werror=return-type 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=return-type: YES
+Running compile:
+Working directory:  /tmp/tmpkyql5ofc
+Command line:  cc /tmp/tmpkyql5ofc/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpkyql5ofc/output.obj -O0 -Werror=array-bounds 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=array-bounds: YES
+Running compile:
+Working directory:  /tmp/tmpaey8tt34
+Command line:  cc /tmp/tmpaey8tt34/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmpaey8tt34/output.obj -O0 -Werror=write-strings 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -Werror=write-strings: YES
+Running compile:
+Working directory:  /tmp/tmp70jmnmeq
+Command line:  cc /tmp/tmp70jmnmeq/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmp70jmnmeq/output.obj -O0 -DG_LOG_USE_STRUCTURED 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -DG_LOG_USE_STRUCTURED: YES
+Running compile:
+Working directory:  /tmp/tmp7npx9lyd
+Command line:  cc /tmp/tmp7npx9lyd/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmp7npx9lyd/output.obj -O0 -DG_LOG_DOMAIN="libmodulemd" 
+
+Code:
+ int i;
+
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Compiler for C supports arguments -DG_LOG_DOMAIN="libmodulemd": YES
+Found pkg-config: /usr/bin/pkg-config (1.5.3)
+Determining dependency 'gobject-2.0' with pkg-config executable '/usr/bin/pkg-config'
+Called `/usr/bin/pkg-config --modversion gobject-2.0` -> 0
+2.58.3
+Called `/usr/bin/pkg-config --cflags gobject-2.0` -> 0
+-I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include
+Called `/usr/bin/pkg-config gobject-2.0 --libs` -> 0
+-L/usr/lib64 -lgobject-2.0 -lglib-2.0
+Called `/usr/bin/pkg-config gobject-2.0 --libs` -> 0
+-lgobject-2.0 -lglib-2.0
+Running compile:
+Working directory:  /tmp/tmp3pub90s_
+Command line:  cc /tmp/tmp3pub90s_/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -o /tmp/tmp3pub90s_/output.exe -O0 
+
+Code:
+ #include<stdio.h>
+        
+        int main(int argc, char **argv) {
+            printf("%ld\n", (long)(sizeof(void *)));
+            return 0;
+        };
+Compiler stdout:
+ 
+Compiler stderr:
+ 
+Program stdout:
+
+8
+
+Program stderr:
+
+
+Running compile:
+Working directory:  /tmp/tmp_6c13kl2
+Command line:  cc /tmp/tmp_6c13kl2/testfile.c -pipe -D_FILE_OFFSET_BITS=64 -c -o /tmp/tmp_6c13kl2/output.obj -O0 --print-search-dirs 
+
+Code:
+ 
+Compiler stdout:
+ install: /usr/lib/gcc/x86_64-redhat-linux/8/
+programs: =/usr/libexec/gcc/x86_64-redhat-linux/8/:/usr/libexec/gcc/x86_64-redhat-linux/8/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/8/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../x86_64-redhat-linux/bin/x86_64-redhat-linux/8/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../x86_64-redhat-linux/bin/
+libraries: =/usr/lib/gcc/x86_64-redhat-linux/8/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../x86_64-redhat-linux/lib/x86_64-redhat-linux/8/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../x86_64-redhat-linux/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../x86_64-redhat-linux/8/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../lib64/:/lib/x86_64-redhat-linux/8/:/lib/../lib64/:/usr/lib/x86_64-redhat-linux/8/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../../x86_64-redhat-linux/lib/:/usr/lib/gcc/x86_64-redhat-linux/8/../../../:/lib/:/usr/lib/
+
+Compiler stderr:
+ 
+Dependency gobject-2.0 found: YES 2.58.3
+Determining dependency 'yaml-0.1' with pkg-config executable '/usr/bin/pkg-config'
+Called `/usr/bin/pkg-config --modversion yaml-0.1` -> 0
+0.2.1
+Called `/usr/bin/pkg-config --cflags yaml-0.1` -> 0
+
+Called `/usr/bin/pkg-config yaml-0.1 --libs` -> 0
+-L/usr/lib64 -lyaml
+Called `/usr/bin/pkg-config yaml-0.1 --libs` -> 0
+-lyaml
+Dependency yaml-0.1 found: YES 0.2.1
+Determining dependency 'gtk-doc' with pkg-config executable '/usr/bin/pkg-config'
+Called `/usr/bin/pkg-config --modversion gtk-doc` -> 0
+1.29
+Called `/usr/bin/pkg-config --cflags gtk-doc` -> 0
+
+Called `/usr/bin/pkg-config gtk-doc --libs` -> 0
+
+Called `/usr/bin/pkg-config gtk-doc --libs` -> 0
+
+Dependency gtk-doc found: YES 1.29
+Program sh found: YES (/usr/bin/sh)
+Program sed found: YES (/usr/bin/sed)
+Using meson's python ['/usr/bin/python3']
+Program spec_tmpl.sh found: YES (/home/indigoomega021/git_space/libmodulemd/spec_tmpl.sh)
+Program mkdir found: YES (/usr/bin/mkdir)
+DEPRECATION: build_always is deprecated. Combine build_by_default and build_always_stale instead.
+Configuring make_srpm.sh using configuration
+Configuring make_rpms.sh using configuration
+Program clang-format found: YES (/usr/bin/clang-format)
+Program pycodestyle-3 found: YES (/usr/bin/pycodestyle-3)
+Program python3-autopep8 found: YES (/usr/bin/python3-autopep8)
+Program valgrind found: YES (/usr/bin/valgrind)
+Adding test "clang_format"
+Adding test "autopep8"
+Adding test "pycodestyle"
+Configuring config.h using configuration
+Adding test "buildopts_v2_debug"
+Adding test "buildopts_v2_release"
+Adding test "component_module_v2_debug"
+Adding test "component_module_v2_release"
+Adding test "componentrpm_python_debug"
+Adding test "componentrpm_python_release"
+Adding test "component_rpm_v2_debug"
+Adding test "component_rpm_v2_release"
+Adding test "dependencies_v2_debug"
+Adding test "dependencies_v2_release"
+Adding test "module_v2_debug"
+Adding test "module_v2_release"
+Adding test "module_index_v2_debug"
+Adding test "module_index_v2_release"
+Adding test "module_index_merger_v2_debug"
+Adding test "module_index_merger_v2_release"
+Adding test "modulestream_v2_debug"
+Adding test "modulestream_v2_release"
+Adding test "profile_v2_debug"
+Adding test "profile_v2_release"
+Adding test "service_level_v2_debug"
+Adding test "service_level_v2_release"
+Adding test "translation_v2_debug"
+Adding test "translation_v2_release"
+Adding test "translation_entry_v2_debug"
+Adding test "translation_entry_v2_release"
+Adding test "buildopts_python_debug"
+Adding test "buildopts_python_release"
+Adding test "dependencies_python_debug"
+Adding test "dependencies_python_release"
+Adding test "moduleindex_python_debug"
+Adding test "moduleindex_python_release"
+Adding test "modulestream_python_debug"
+Adding test "modulestream_python_release"
+Adding test "merger_python_debug"
+Adding test "merger_python_release"
+Adding test "profile_python_debug"
+Adding test "profile_python_release"
+Adding test "service_level_python_debug"
+Adding test "service_level_python_release"
+Adding test "translation__python_debug"
+Adding test "translation__python_release"
+Adding test "translation_entry_python_debug"
+Adding test "translation_entry_python_release"
+Adding test "defaults_v2_debug"
+Adding test "defaults_v2_release"
+Adding test "defaults_python_debug"
+Adding test "defaults_python_release"
+Adding test "defaultsv1_v2_debug"
+Adding test "defaultsv1_v2_release"
+Adding test "defaultsv1_python_debug"
+Adding test "defaultsv1_python_release"
+Determining dependency 'gobject-introspection-1.0' with pkg-config executable '/usr/bin/pkg-config'
+Called `/usr/bin/pkg-config --modversion gobject-introspection-1.0` -> 0
+1.58.3
+Called `/usr/bin/pkg-config --cflags gobject-introspection-1.0` -> 0
+-I/usr/include/gobject-introspection-1.0 -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -pthread
+Called `/usr/bin/pkg-config gobject-introspection-1.0 --libs` -> 0
+-L/usr/lib64 -lgirepository-1.0 -lgobject-2.0 -lglib-2.0
+Called `/usr/bin/pkg-config gobject-introspection-1.0 --libs` -> 0
+-lgirepository-1.0 -lgobject-2.0 -lglib-2.0
+Called `/usr/bin/pkg-config --variable=girdir gobject-2.0` -> 0
+
+Called `/usr/bin/pkg-config --print-variables gobject-2.0` -> 0
+includedir
+libdir
+exec_prefix
+prefix
+pcfiledir
+Got pkgconfig variable girdir : 
+Called `/usr/bin/pkg-config --variable=girdir yaml-0.1` -> 0
+
+Called `/usr/bin/pkg-config --print-variables yaml-0.1` -> 0
+libdir
+includedir
+exec_prefix
+prefix
+pcfiledir
+Got pkgconfig variable girdir : 
+Got pkgconfig variable girdir : 
+Got pkgconfig variable girdir : 
+Configuring version.xml using configuration
+Program common/tests/test-import-headers.sh found: YES (/home/indigoomega021/git_space/libmodulemd/modulemd/common/tests/test-import-headers.sh)
+Adding test "test_v2_import_headers"
+Adding test "valgrind"
+Running command: /usr/bin/python3 -c 
+import os
+import sysconfig
+
+libdir = sysconfig.get_config_var('SCRIPTDIR')
+
+if not libdir:
+  libdir = '/usr/lib'
+
+try:
+  import gi
+  overridedir = gi._overridesdir
+except ImportError:
+  purelibdir = sysconfig.get_path('purelib')
+  overridedir = os.path.join(purelibdir, 'gi', 'overrides')
+
+if overridedir.startswith(libdir): # Should always be True..
+  overridedir = overridedir[len(libdir) + 1:]
+
+print(overridedir)
+
+--- stdout ---
+python3.7/site-packages/gi/overrides
+
+--- stderr ---
+
+
+Build targets in project: 24
+Option buildtype is: debug [default: debugoptimized]
+Option b_asneeded is: True [default: true]
+Found ninja-1.8.2 at /usr/bin/ninja

@@ -995,7 +995,8 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
 static gboolean
 modulemd_module_stream_default_equals (ModulemdModuleStream *self, ModulemdModuleStream *other)
 {
-  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);  
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (other), FALSE);
   if (self == other) return TRUE;
 
   guint64 mdversion_self = modulemd_module_stream_get_mdversion (self);

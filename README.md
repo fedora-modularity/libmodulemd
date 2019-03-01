@@ -117,7 +117,7 @@ In the example above, we upgraded the stream to v2, in case we were reading from
 
 To install all of the dependencies needed to build libmodulemd, the following command will work on Fedora 28+ (run as root or with sudo):
 ```
-dnf -y install git-core "dnf-command(builddep)" && dnf -y builddep libmodulemd
+dnf -y install clang git-core python3-pycodestyle python3-autopep8 "dnf-command(builddep)" && dnf -y builddep libmodulemd
 ```
 
 To install the tools needed to run the docker-based tests, you will also need:

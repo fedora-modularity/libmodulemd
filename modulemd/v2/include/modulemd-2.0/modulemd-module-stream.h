@@ -403,7 +403,7 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
  * modulemd_module_stream_equals:
  * @self: (not nullable): This #ModulemdModuleStream.
  *
- * Returns: TRUE if all of the objects and varibles composing the two 
+ * Returns: TRUE if all of the objects and variables composing the two 
  * ModulemdModuleStreams are equal. FALSE, otherwise.
  *
  * Since: 2.1

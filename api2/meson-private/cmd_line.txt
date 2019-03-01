@@ -1,8 +1,0 @@
-[options]
-b_coverage = true
-build_api_v1 = false
-build_api_v2 = true
-buildtype = debug
-
-[properties]
-

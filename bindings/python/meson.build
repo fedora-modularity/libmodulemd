@@ -27,6 +27,5 @@ if ret.returncode() != 0
 else
   pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
 endif
-
 install_data('gi/overrides/Modulemd.py', install_dir: pygobject_override_dir)
 

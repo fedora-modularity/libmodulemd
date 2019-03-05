@@ -87,6 +87,38 @@ example if the repodata has a mix of v1 and v2 ModuleStream objects, the
 index will contain only v2 objects (with the v1 objects automatically
 upgraded internally).
 
+Now, we can start operating on the retrieved data. This guide will
+give only a brief overview of the most common operations. See the API
+specification for a full list of information that can be retrieved.
+
+## Discover the default stream for a particular module.
+## Python
+```python
+ module = merged_index.get_module ('modulename')
+ defaults = module.get_defaults()
+ print ('Default stream for modulename is %s' % (
+       defaults.get_default_stream())
+  ```
+ 
+ ## Get the list of RPMs defining the public API for a particular module NSVC
+ ## Python
+```python
+ module = merged_index.get_module ('modulename')
+ stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ api_list = stream.get_rpm_api()
+```
+
+ ## Retrieve the modular runtime dependencies for a particular module NSVC
+## Python
+```python
+ module = merged_index.get_module ('modulename')
+ stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ deps_list = stream.get_dependencies()
+ for dep in deps_list:
+    depstream_list = dep.get_runtime_streams('depstreamname')
+    <do_stuff>
+```
+
 # Working with a single module stream (Packager/MBS use-case)
 
 One limitation of the ModulemdModuleIndex format is that it requires that

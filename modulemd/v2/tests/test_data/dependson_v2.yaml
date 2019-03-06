@@ -14,8 +14,10 @@ data:
   dependencies:
   - buildrequires:
       platform: [ f30 ]
+      streamname: [ ] 
     requires:
       platform: [ -f28 ]
+      streamname: [ ]     
   references:
     community: http://nodejs.org
     documentation: http://nodejs.org/en/docs

@@ -1085,7 +1085,17 @@ data:
                     'platform', 'f28'), False)
 
             self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
-            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
+            self.assertEqual(
+                stream.build_depends_on_stream(
+                    'base', 'f30'), False)
+
+            if version >= Modulemd.ModuleStreamVersionEnum.TWO:
+                self.assertEqual(
+                    stream.depends_on_stream(
+                        'streamname', 'f30'), True)
+                self.assertEqual(
+                    stream.build_depends_on_stream(
+                        'streamname', 'f30'), True)
 
 
 if __name__ == '__main__':

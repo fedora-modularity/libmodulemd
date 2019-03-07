@@ -446,3 +446,21 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
     }
   return TRUE;
 }
+
+
+gboolean
+modulemd_buildopts_equals (ModulemdBuildopts *self, ModulemdBuildopts *other)
+{
+  if (self == other) return TRUE;
+
+  const gchar *rpm_macros_self = modulemd_buildopts_get_rpm_macros (self);
+  const gchar *rpm_macros_other = modulemd_buildopts_get_rpm_macros (other);
+
+  if (g_strcmp0 (rpm_macros_self, rpm_macros_other) != 0) return FALSE;
+
+  gchar **rpm_whitelist_as_strv_self = modulemd_buildopts_get_rpm_whitelist_as_strv (self);
+  gchar **rpm_whitelist_as_strv_other = modulemd_buildopts_get_rpm_whitelist_as_strv (other);
+
+
+  return TRUE;
+}

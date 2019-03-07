@@ -113,4 +113,15 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
 gchar **
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self);
 
+
+/**
+ * modulemd_buildopts_equals:
+ * @self: This #ModulemdBuildopts 
+ * @other: The other #ModulemdBuildopts being compared
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_buildopts_equals (ModulemdBuildopts *self, ModulemdBuildopts *other);
+
 G_END_DECLS

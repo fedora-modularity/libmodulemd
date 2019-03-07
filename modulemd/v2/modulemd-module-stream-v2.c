@@ -1008,6 +1008,16 @@ modulemd_module_stream_v2_build_depends_on_stream (ModulemdModuleStream *self,
 }
 
 
+gboolean
+modulemd_module_stream_v2_equals (ModulemdModuleStream *self, ModulemdModuleStream *other)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (other), FALSE);
+
+  return NULL;
+}
+
+
 static void
 modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
 {

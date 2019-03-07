@@ -1013,10 +1013,27 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self, ModulemdModuleStre
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (other), FALSE);
+  ModulemdModuleStreamV2 *v2_self = MODULEMD_MODULE_STREAM_V2 (self);
+  ModulemdModuleStreamV2 *v2_other = MODULEMD_MODULE_STREAM_V2 (other);
 
-  return NULL;
+  if (!MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v2_parent_class)
+      ->equals (self, other))    
+  {
+    return FALSE;
+  }
+  
+  const gchar *arch_self = modulemd_module_stream_v2_get_arch (v2_self);
+  const gchar *arch_other = modulemd_module_stream_v2_get_arch (v2_other);
+
+  if (g_strcmp0 (arch_self, arch_other) != 0) return FALSE;
+
+  ModulemdBuildopts *buildopts_self = modulemd_module_stream_v2_get_buildopts 
+      (v2_self);
+  ModulemdBuildopts *buildopts_other = modulemd_module_stream_v2_get_buildopts 
+      (v2_other);
+ 
+  return TRUE;
 }
-
 
 static void
 modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)

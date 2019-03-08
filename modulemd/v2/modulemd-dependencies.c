@@ -652,7 +652,12 @@ requires_module_and_stream (GHashTable *modules,
   negated = g_strdup_printf ("-%s", stream_name);
 
   g_hash_table_iter_init (&iter, streams);
-  g_hash_table_iter_next (&iter, &key, &value);
+
+  /* We already checked that this hash table is not empty, so if iterating it
+   * fails, something has gone horribly wrong. Wrap this in a
+   * g_return_val_if_fail() to make static analysis happy.
+   */
+  g_return_val_if_fail (g_hash_table_iter_next (&iter, &key, &value), FALSE);
 
   /* If we have a negative value for any entry, they all must be negative.
    * Check whether we're explicitly excluding the requested stream */

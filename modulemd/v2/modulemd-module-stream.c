@@ -221,7 +221,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       return NULL;
     }
 
-  /* TODO: Read mdversion and parse 'data' with the appropriate subclass */
+  /* Read mdversion and parse 'data' with the appropriate subclass */
   switch (modulemd_subdocument_info_get_mdversion (subdoc))
     {
     case MD_MODULESTREAM_VERSION_ONE:

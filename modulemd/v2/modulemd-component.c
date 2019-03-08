@@ -226,6 +226,45 @@ modulemd_component_set_property (GObject *object,
 }
 
 
+static gboolean
+modulemd_component_defualt_equals (ModulemdComponent *self, ModulemdComponent *other) 
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (other), FALSE);
+
+  if (self == other) return TRUE;
+
+  gint64 buildorder_self = modulemd_component_get_buildorder (self);
+  gint64 buildorder_other = modulemd_component_get_buildorder (other);
+
+  if (buildorder_self != buildorder_other) return FALSE;
+
+  const gchar *name_self = modulemd_component_get_name (self);
+  const gchar *name_other = modulemd_component_get_name (other);
+  
+  if (g_strcmp0 (name_self, name_other) != 0) return FALSE;
+
+  const gchar *rationale_self = modulemd_component_get_rationale (self);
+  const gchar *rationale_other = modulemd_component_get_rationale (other);
+  
+  if (g_strcmp0 (rationale_self, rationale_other) != 0) return FALSE;
+    
+  return TRUE;
+}
+
+
+gboolean modulemd_component_equals (ModulemdComponent *self, ModulemdComponent *other) 
+{
+  ModulemdComponentClass *klass;
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (other), FALSE);
+
+  return klass->equals (self, other);
+}
+
+
 static void
 modulemd_component_class_init (ModulemdComponentClass *klass)
 {
@@ -236,6 +275,7 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->set_property = modulemd_component_set_property;
 
   klass->copy = modulemd_component_copy_component;
+  klass->equals = modulemd_component_equals;
 
   properties[PROP_BUILDORDER] = g_param_spec_int64 (
     "buildorder",

@@ -34,9 +34,11 @@ struct _ModulemdComponentClass
 
   ModulemdComponent *(*copy) (ModulemdComponent *self, const gchar *name);
 
-  /* Padding to allow adding up to 10 new virtual functions without
+  gboolean (*equals) (ModulemdComponent *self, ModulemdComponent *other);
+
+  /* Padding to allow adding up to 9 new virtual functions without
    * breaking ABI. */
-  gpointer padding[10];
+  gpointer padding[9];
 };
 
 /**
@@ -109,5 +111,19 @@ modulemd_component_set_rationale (ModulemdComponent *self,
  */
 const gchar *
 modulemd_component_get_rationale (ModulemdComponent *self);
+
+
+/**
+ * modulemd_component_equals:
+ * @self: (not nullable); This #ModulemdComponent.
+ * @other: (not nullable): The other #ModulemdComponent being compared.
+ *
+ * Returns: TRUE if all of the objects and varibales composing the two
+ * ModulemdComponents are equal. False, otherwise. 
+ *
+ * Since: 2.1
+ */
+gboolean
+modulemd_component_equals (ModulemdComponent *self, ModulemdComponent *other);
 
 G_END_DECLS

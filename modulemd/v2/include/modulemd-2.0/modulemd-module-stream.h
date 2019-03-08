@@ -345,6 +345,32 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self);
 
 
 /**
+ * modulemd_module_stream_set_arch:
+ * @self: (in): This #ModulemdModuleStream.
+ * @arch: (in) (nullable): Module architecture.
+ * Indicates to which processor architecture this ModulemdModuleStream applies.
+ *
+ * Since: 2.2
+ */
+void
+modulemd_module_stream_set_arch (ModulemdModuleStream *self,
+                                 const gchar *arch);
+
+
+/**
+ * modulemd_module_stream_get_arch:
+ * @self: (in): This #ModulemdModuleStream.
+ *
+ * Returns: (transfer none): Module architecture.
+ * Indicates to which processor architecture this ModulemdModuleStream applies.
+ *
+ * Since: 2.2
+ */
+const gchar *
+modulemd_module_stream_get_arch (ModulemdModuleStream *self);
+
+
+/**
  * modulemd_module_stream_get_nsvc_as_string: (rename-to modulemd_module_stream_get_nsvc)
  * @self: (in): This #ModulemdModuleStream.
  *

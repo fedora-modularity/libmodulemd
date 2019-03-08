@@ -69,7 +69,6 @@ modulemd_module_stream_v2_finalize (GObject *object)
   ModulemdModuleStreamV2 *self = MODULEMD_MODULE_STREAM_V2 (object);
 
   /* Properties */
-  g_clear_pointer (&self->arch, g_free);
   g_clear_object (&self->buildopts);
   g_clear_pointer (&self->community, g_free);
   g_clear_pointer (&self->description, g_free);
@@ -115,8 +114,7 @@ modulemd_module_stream_v2_set_arch (ModulemdModuleStreamV2 *self,
 {
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
-  g_clear_pointer (&self->arch, g_free);
-  self->arch = g_strdup (arch);
+  modulemd_module_stream_set_arch (MODULEMD_MODULE_STREAM (self), arch);
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCH]);
 }
@@ -127,7 +125,7 @@ modulemd_module_stream_v2_get_arch (ModulemdModuleStreamV2 *self)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
 
-  return self->arch;
+  return modulemd_module_stream_get_arch (MODULEMD_MODULE_STREAM (self));
 }
 
 

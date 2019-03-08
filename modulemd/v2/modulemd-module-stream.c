@@ -29,6 +29,7 @@ typedef struct
   gchar *stream_name;
   guint64 version;
   gchar *context;
+  gchar *arch;
   ModulemdTranslation *translation;
 } ModulemdModuleStreamPrivate;
 
@@ -44,6 +45,7 @@ enum
   PROP_STREAM_NAME,
   PROP_VERSION,
   PROP_CONTEXT,
+  PROP_ARCH,
   N_PROPS
 };
 
@@ -287,6 +289,7 @@ modulemd_module_stream_finalize (GObject *object)
   g_clear_pointer (&priv->module_name, g_free);
   g_clear_pointer (&priv->stream_name, g_free);
   g_clear_pointer (&priv->context, g_free);
+  g_clear_pointer (&priv->arch, g_free);
   g_clear_pointer (&priv->translation, g_object_unref);
 
   G_OBJECT_CLASS (modulemd_module_stream_parent_class)->finalize (object);
@@ -701,6 +704,32 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self)
 }
 
 
+void
+modulemd_module_stream_set_arch (ModulemdModuleStream *self, const gchar *arch)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM (self));
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  g_clear_pointer (&priv->arch, g_free);
+  priv->arch = g_strdup (arch);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONTEXT]);
+}
+
+
+const gchar *
+modulemd_module_stream_get_arch (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), 0);
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  return priv->arch;
+}
+
+
 gchar *
 modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self)
 {
@@ -767,6 +796,10 @@ modulemd_module_stream_get_property (GObject *object,
       g_value_set_string (value, modulemd_module_stream_get_context (self));
       break;
 
+    case PROP_ARCH:
+      g_value_set_string (value, modulemd_module_stream_get_arch (self));
+      break;
+
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -798,6 +831,10 @@ modulemd_module_stream_set_property (GObject *object,
 
     case PROP_CONTEXT:
       modulemd_module_stream_set_context (self, g_value_get_string (value));
+      break;
+
+    case PROP_ARCH:
+      modulemd_module_stream_set_arch (self, g_value_get_string (value));
       break;
 
     case PROP_MDVERSION:
@@ -859,6 +896,13 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     "The context of this module stream. Distinguishes between streams with "
     "the same version but different dependencies due to module stream "
     "expansion.",
+    NULL,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
+
+  properties[PROP_ARCH] = g_param_spec_string (
+    "arch",
+    "Module Stream Architetcture",
+    "The processor architecture of this module stream.",
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 

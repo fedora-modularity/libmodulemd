@@ -17,6 +17,8 @@
 #include <glib-object.h>
 #include <glib/gstdio.h>
 
+#include "modulemd-deprecated.h"
+
 G_BEGIN_DECLS
 
 /**
@@ -378,9 +380,26 @@ modulemd_module_stream_get_arch (ModulemdModuleStream *self);
  * module stream. NULL if module name or stream stream is unknown.
  *
  * Since: 2.0
+ * Deprecated: 2.2
  */
+MMD_DEPRECATED_FOR (modulemd_module_stream_get_NSVCA_as_string)
 gchar *
 modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
+
+
+/**
+ * modulemd_module_stream_get_NSVCA_as_string: (rename-to modulemd_module_stream_get_NSVCA)
+ * @self: (in): This #ModulemdModuleStream.
+ *
+ * Returns: (transfer full): The NSVCA of this module stream. The returned
+ * format is described
+ * [here](https://docs.fedoraproject.org/en-US/modularity/architecture/consuming/naming-policy/#_forms).
+ * NULL if module name or stream stream is unknown.
+ *
+ * Since: 2.2
+ */
+gchar *
+modulemd_module_stream_get_NSVCA_as_string (ModulemdModuleStream *self);
 
 
 /**

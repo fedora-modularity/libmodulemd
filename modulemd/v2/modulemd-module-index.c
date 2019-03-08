@@ -349,13 +349,13 @@ dump_translations (ModulemdModule *module,
 
 
 static gint
-compare_stream_SVC (gconstpointer a, gconstpointer b)
+compare_stream_SVCA (gconstpointer a, gconstpointer b)
 {
   ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
   ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
-  g_autofree gchar *a_nsvc = modulemd_module_stream_get_nsvc_as_string (a_);
-  g_autofree gchar *b_nsvc = modulemd_module_stream_get_nsvc_as_string (b_);
-  return g_strcmp0 (a_nsvc, b_nsvc);
+  g_autofree gchar *a_nsvca = modulemd_module_stream_get_NSVCA_as_string (a_);
+  g_autofree gchar *b_nsvca = modulemd_module_stream_get_NSVCA_as_string (b_);
+  return g_strcmp0 (a_nsvca, b_nsvca);
 }
 
 
@@ -370,7 +370,7 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
   /*
    * Make sure we get a stable sorting by sorting just before dumping.
    */
-  g_ptr_array_sort (streams, compare_stream_SVC);
+  g_ptr_array_sort (streams, compare_stream_SVCA);
 
   for (i = 0; i < streams->len; i++)
     {

@@ -764,6 +764,72 @@ modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self)
 }
 
 
+gchar *
+modulemd_module_stream_get_NSVCA_as_string (ModulemdModuleStream *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), 0);
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+  gchar *nsvca = NULL;
+  gchar *endptr = NULL;
+
+  g_autofree gchar *stream = NULL;
+  g_autofree gchar *version = NULL;
+  g_autofree gchar *context = NULL;
+  g_autofree gchar *arch = NULL;
+
+  if (!priv->module_name)
+    {
+      /* Mandatory field is missing */
+      return NULL;
+    }
+
+  if (priv->stream_name)
+    {
+      stream = g_strdup (priv->stream_name);
+    }
+  else
+    {
+      stream = g_strdup ("");
+    }
+
+  version = g_strdup_printf ("%" PRIu64 "", priv->version);
+
+  if (priv->context)
+    {
+      context = g_strdup (priv->context);
+    }
+  else
+    {
+      context = g_strdup ("");
+    }
+
+  if (priv->arch)
+    {
+      arch = g_strdup (priv->arch);
+    }
+  else
+    {
+      arch = g_strdup ("");
+    }
+
+
+  nsvca =
+    g_strjoin (":", priv->module_name, stream, version, context, arch, NULL);
+
+  /* Remove any trailing colons */
+  endptr = nsvca + strlen (nsvca) - 1;
+  while (*endptr == ':' && endptr > nsvca)
+    {
+      *endptr = '\0';
+      endptr--;
+    }
+
+  return nsvca;
+}
+
+
 static void
 modulemd_module_stream_get_property (GObject *object,
                                      guint prop_id,

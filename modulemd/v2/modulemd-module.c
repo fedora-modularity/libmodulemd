@@ -499,7 +499,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
   ModulemdModuleStreamVersionEnum current_mdversion;
   g_autoptr (ModulemdModuleStream) modulestream = NULL;
   g_autoptr (ModulemdModuleStream) upgraded_stream = NULL;
-  g_autofree gchar *nsvc = NULL;
+  g_autofree gchar *nsvca = NULL;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
@@ -511,7 +511,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
       modulestream = g_object_ref (
         MODULEMD_MODULE_STREAM (g_ptr_array_index (self->streams, i)));
       current_mdversion = modulemd_module_stream_get_mdversion (modulestream);
-      nsvc = modulemd_module_stream_get_nsvc_as_string (modulestream);
+      nsvca = modulemd_module_stream_get_NSVCA_as_string (modulestream);
 
       if (current_mdversion <= MD_MODULESTREAM_VERSION_UNSET)
         {
@@ -519,7 +519,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
                        MODULEMD_ERROR,
                        MODULEMD_ERROR_VALIDATE,
                        "ModuleStream %s had invalid mdversion %i",
-                       nsvc,
+                       nsvca,
                        current_mdversion);
           return FALSE;
         }
@@ -537,13 +537,13 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
               g_propagate_prefixed_error (error,
                                           g_steal_pointer (&nested_error),
                                           "Error upgrading module stream %s",
-                                          nsvc);
+                                          nsvca);
               return FALSE;
             }
           g_ptr_array_add (new_streams, g_steal_pointer (&upgraded_stream));
         }
 
-      g_clear_pointer (&nsvc, g_free);
+      g_clear_pointer (&nsvca, g_free);
       g_clear_object (&modulestream);
     }
 

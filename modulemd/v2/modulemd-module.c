@@ -315,17 +315,38 @@ modulemd_module_add_stream (ModulemdModule *self,
       return MD_MODULESTREAM_VERSION_ERROR;
     }
 
-  old = modulemd_module_get_stream_by_NSVC (
+  old = modulemd_module_get_stream_by_NSVCA (
     self,
     modulemd_module_stream_get_stream_name (stream),
     modulemd_module_stream_get_version (stream),
-    modulemd_module_stream_get_context (stream));
+    modulemd_module_stream_get_context (stream),
+    modulemd_module_stream_get_arch (stream),
+    &nested_error);
+
   if (old != NULL)
     {
+      /* We're probably deduplicating content here, so remove the old one in
+       * favor of the new one.
+       */
+
+      /* TODO: Do a full equality check on the two ModuleStreams once
+       * https://github.com/fedora-modularity/libmodulemd/issues/186 is
+       * fixed.
+       */
+
       /* First, drop the existing stream */
       g_ptr_array_remove (self->streams, old);
       old = NULL;
     }
+  else if (old == NULL && g_error_matches (nested_error,
+                                           MODULEMD_ERROR,
+                                           MODULEMD_ERROR_TOO_MANY_MATCHES))
+    {
+      /* It should be impossible to get more than one error back here */
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
+  g_clear_error (&nested_error);
 
   if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
     {

@@ -310,7 +310,7 @@ modulemd_module_add_stream (ModulemdModule *self,
                    MODULEMD_ERROR,
                    MODULEMD_ERROR_VALIDATE,
                    "Attempted to add stream for module '%s' to module '%s'",
-                   stream_name,
+                   module_name,
                    modulemd_module_get_module_name (self));
       return MD_MODULESTREAM_VERSION_ERROR;
     }

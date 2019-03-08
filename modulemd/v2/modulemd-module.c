@@ -415,32 +415,81 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
                                     const guint64 version,
                                     const gchar *context)
 {
+  return modulemd_module_get_stream_by_NSVCA (
+    self, stream_name, version, context, NULL, NULL);
+}
+
+
+ModulemdModuleStream *
+modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
+                                     const gchar *stream_name,
+                                     const guint64 version,
+                                     const gchar *context,
+                                     const gchar *arch,
+                                     GError **error)
+{
   gsize i = 0;
+  g_autoptr (GPtrArray) matching_streams = NULL;
   ModulemdModuleStream *under_consideration = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  /* Assume the worst-case scenario that all streams match to spare us extra
+   * mallocs. This memory is short-lived.
+   */
+  matching_streams = g_ptr_array_sized_new (self->streams->len);
 
   for (i = 0; i < self->streams->len; i++)
     {
       under_consideration =
         (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
 
+      /* Skip this one unless the stream name matches */
       if (g_strcmp0 (
             modulemd_module_stream_get_stream_name (under_consideration),
             stream_name) != 0)
         continue;
 
-      if (modulemd_module_stream_get_version (under_consideration) != version)
+      /* Skip this one unless the stream version matches OR the version is zero
+       * which indicates that it shouldn't prevent the other cases from
+       * matching.
+       */
+      if (version &&
+          modulemd_module_stream_get_version (under_consideration) != version)
         continue;
 
-      if (g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
+      if (context &&
+          g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
                      context) != 0)
         continue;
 
-      return under_consideration;
+      if (arch &&
+          g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
+                     context) != 0)
+        continue;
+
+      g_ptr_array_add (matching_streams, under_consideration);
     }
 
-  return NULL;
+  if (matching_streams->len == 0)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_NO_MATCHES,
+                   "No streams matched");
+      return NULL;
+    }
+  else if (matching_streams->len > 1)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_TOO_MANY_MATCHES,
+                   "Multiple ModulemdModuleStreams matched");
+      return NULL;
+    }
+
+  /* Exactly one result, so return it */
+  return g_ptr_array_index (matching_streams, 0);
 }
 
 

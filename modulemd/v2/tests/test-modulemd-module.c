@@ -23,6 +23,7 @@
 #include "private/glib-extensions.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -50,7 +51,10 @@ module_test_construct (ModuleFixture *fixture, gconstpointer user_data)
   list = modulemd_module_get_streams_by_stream_name_as_list (m, "teststream");
   g_assert_cmpint (list->len, ==, 0);
   g_clear_pointer (&list, g_ptr_array_unref);
-  g_assert_null (modulemd_module_get_stream_by_NSVC (m, "test", 42, "test"));
+  g_assert_null (
+    modulemd_module_get_stream_by_NSVCA (m, "test", 42, "test", NULL, &error));
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_clear_error (&error);
   g_clear_object (&m);
 
   /* Test that object instantiation works wiht a name */
@@ -134,6 +138,7 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   g_autoptr (ModulemdModule) m = modulemd_module_new ("testmodule");
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (ModulemdTranslationEntry) te = NULL;
+  g_autoptr (GError) error = NULL;
   ModulemdModuleStream *stream = NULL;
   GPtrArray *list = NULL;
 
@@ -208,6 +213,7 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (list);
   g_assert_cmpint (list->len, ==, 0);
   g_clear_pointer (&list, g_ptr_array_unref);
+
   list = modulemd_module_get_streams_by_stream_name_as_list (m, "stream2");
   g_assert_nonnull (list);
   g_assert_cmpint (list->len, ==, 1);
@@ -232,10 +238,33 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
   g_clear_pointer (&list, g_ptr_array_unref);
 
   /* Get streams by NSVC */
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_get_stream_by_NSVC (m, "nosuch", 3, "nosuchctx");
   g_assert_null (stream);
+  g_clear_error (&error);
+
   stream = modulemd_module_get_stream_by_NSVC (m, "stream1", 1, "context1");
   g_assert_nonnull (stream);
+  G_GNUC_END_IGNORE_DEPRECATIONS
+
+  /* Get streams by NSVCA */
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "nosuch", 3, "nosuchctx", NULL, &error);
+  g_assert_null (stream);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_clear_error (&error);
+
+  stream =
+    modulemd_module_get_stream_by_NSVCA (m, "stream1", 1, NULL, NULL, &error);
+  g_assert_null (stream);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_TOO_MANY_MATCHES);
+  g_clear_error (&error);
+
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "stream1", 1, "context1", NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+
   g_assert_cmpstr (
     modulemd_module_stream_get_stream_name (stream), ==, "stream1");
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 1);
@@ -249,24 +278,40 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
                      MODULEMD_MODULE_STREAM_V2 (stream), "nl_NL"),
                    ==,
                    "Een test omschrijving");
-  stream = modulemd_module_get_stream_by_NSVC (m, "stream1", 1, "context2");
+
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "stream1", 1, "context2", NULL, &error);
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
+
   g_assert_cmpstr (
     modulemd_module_stream_get_stream_name (stream), ==, "stream1");
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 1);
   g_assert_cmpstr (
     modulemd_module_stream_get_context (stream), ==, "context2");
-  stream = modulemd_module_get_stream_by_NSVC (m, "stream1", 3, "context1");
+
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "stream1", 3, "context1", NULL, &error);
   g_assert_null (stream);
-  stream = modulemd_module_get_stream_by_NSVC (m, "stream1", 3, "context2");
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_clear_error (&error);
+
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "stream1", 3, "context2", NULL, &error);
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
+
   g_assert_cmpstr (
     modulemd_module_stream_get_stream_name (stream), ==, "stream1");
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 3);
   g_assert_cmpstr (
     modulemd_module_stream_get_context (stream), ==, "context2");
-  stream = modulemd_module_get_stream_by_NSVC (m, "stream2", 42, "context42");
+
+  stream = modulemd_module_get_stream_by_NSVCA (
+    m, "stream2", 42, "context42", NULL, &error);
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
+
   g_assert_cmpstr (
     modulemd_module_stream_get_stream_name (stream), ==, "stream2");
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 42);

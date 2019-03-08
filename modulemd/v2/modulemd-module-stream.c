@@ -794,7 +794,14 @@ modulemd_module_stream_get_NSVCA_as_string (ModulemdModuleStream *self)
       stream = g_strdup ("");
     }
 
-  version = g_strdup_printf ("%" PRIu64 "", priv->version);
+  if (priv->version)
+    {
+      version = g_strdup_printf ("%" PRIu64 "", priv->version);
+    }
+  else
+    {
+      version = g_strdup ("");
+    }
 
   if (priv->context)
     {

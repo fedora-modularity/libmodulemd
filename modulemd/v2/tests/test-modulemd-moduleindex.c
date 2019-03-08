@@ -364,12 +364,15 @@ module_index_test_stream_upgrade (ModuleIndexFixture *fixture,
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV1 object */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
     1,
-    "deadbeef"));
+    "deadbeef",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_ONE);
@@ -393,24 +396,30 @@ module_index_test_stream_upgrade (ModuleIndexFixture *fixture,
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV2 object */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream2",
     2,
-    "c0ff33"));
+    "c0ff33",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
   /* Verify that the first object was upgraded to StreamV2 */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
     1,
-    "deadbeef"));
+    "deadbeef",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
@@ -433,12 +442,15 @@ module_index_test_stream_upgrade (ModuleIndexFixture *fixture,
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV2 object */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
     3,
-    "badfeed"));
+    "badfeed",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
@@ -477,12 +489,15 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV1 object */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
     1,
-    "deadbeef"));
+    "deadbeef",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_ONE);
@@ -506,12 +521,15 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV1 object */
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
     3,
-    "badfeed"));
+    "badfeed",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_ONE);
@@ -537,23 +555,29 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
   g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
     1,
-    "deadbeef"));
+    "deadbeef",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
     3,
-    "badfeed"));
+    "badfeed",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
@@ -566,23 +590,29 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
   g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
     1,
-    "deadbeef"));
+    "deadbeef",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
-  stream = g_object_ref (modulemd_module_get_stream_by_NSVC (
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
     3,
-    "badfeed"));
+    "badfeed",
+    NULL,
+    &error));
   g_assert_nonnull (stream);
+  g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
                    MD_MODULESTREAM_VERSION_TWO);

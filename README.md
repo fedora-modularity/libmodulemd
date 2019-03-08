@@ -32,14 +32,14 @@ ModulemdModuleIndex objects. This is done as follows:
 
 ## C
 ```C
-fedora_index = modulemd_module_index_new();
-ret = modulemd_module_index_update_from_string(fedora_index,
+ModulemdModuleIndex * fedora_index = modulemd_module_index_new();
+gboolean ret = modulemd_module_index_update_from_string(fedora_index,
                                                fedora_yaml,
                                                &failures,
                                                &error);
 
-updates_index = modulemd_module_index_new();
-ret = modulemd_module_index_update_from_string(updates_index,
+ModulemdModuleIndex * updates_index = modulemd_module_index_new();
+gboolean ret = modulemd_module_index_update_from_string(updates_index,
                                                updates_yaml,
                                                &failures,
                                                &error);
@@ -60,12 +60,12 @@ indexes into a combined one:
 
 ## C
 ```C
-merger = modulemd_module_index_merger_new()
+ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new();
 
 modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
 modulemd_module_index_merger_associate_index (merger, updates_index, 0);
 
-merged_index = modulemd_module_index_merger_resolve (merger, &error);
+ModulemdModuleIndex * merged_index = modulemd_module_index_merger_resolve (merger, &error);
 ```
 
 ## Python
@@ -92,6 +92,14 @@ give only a brief overview of the most common operations. See the API
 specification for a full list of information that can be retrieved.
 
 ## Discover the default stream for a particular module.
+## C
+```C
+ ModulemdModule * module =  modulemd_module_index_get_module(merged_index, "modulename");
+ ModulemdDefaults * defaults = modulemd_module_get_defaults (module);
+ printf ("Default stream for modulename is %s\n", 
+       modulemd_defaults_get_module_name (defaults));
+  ```
+
 ## Python
 ```python
  module = merged_index.get_module ('modulename')
@@ -100,15 +108,34 @@ specification for a full list of information that can be retrieved.
        defaults.get_default_stream())
   ```
  
- ## Get the list of RPMs defining the public API for a particular module NSVC
- ## Python
+## Get the list of RPMs defining the public API for a particular module NSVC
+## C
+```C
+ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVC (module, "modulestream", 1, "deadbeef");
+GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv(stream); 
+```
+
+## Python
 ```python
  module = merged_index.get_module ('modulename')
  stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
  api_list = stream.get_rpm_api()
 ```
 
- ## Retrieve the modular runtime dependencies for a particular module NSVC
+## Retrieve the modular runtime dependencies for a particular module NSVC
+## C
+```C
+ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVC (module, "modulestream", 1, "deadbeef");
+GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (stream);
+
+for (gint i = 0; i < deps_list->len; i++)
+  {
+    stuff with g_ptr_array_index(deps_list, i);
+  }
+```
+
 ## Python
 ```python
  module = merged_index.get_module ('modulename')

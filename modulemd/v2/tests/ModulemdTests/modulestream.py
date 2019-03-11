@@ -178,6 +178,55 @@ class TestModuleStream(TestBase):
             stream.props.context = 'deadbeef'
             assert stream.get_nsvc() == 'modulename:streamname:42:deadbeef'
 
+    def test_nsvca(self):
+        for version in modulestream_versions:
+            # First test that NSVCA is None for a module with no name
+            stream = Modulemd.ModuleStream.new(version)
+            self.assertIsNone(stream.get_NSVCA())
+
+            # Next, test for no stream name
+            stream = Modulemd.ModuleStream.new(version, 'modulename')
+            self.assertEqual(stream.get_NSVCA(), "modulename")
+
+            # Now with valid module and stream names
+            stream = Modulemd.ModuleStream.new(
+                version, 'modulename', 'streamname')
+            self.assertEqual(stream.get_NSVCA(), 'modulename:streamname')
+
+            # Add a version number
+            stream.props.version = 42
+            self.assertEqual(stream.get_NSVCA(), 'modulename:streamname:42')
+
+            # Add a context
+            stream.props.context = 'deadbeef'
+            self.assertEqual(
+                stream.get_NSVCA(),
+                'modulename:streamname:42:deadbeef')
+
+            # Add an architecture
+            stream.props.arch = 'x86_64'
+            self.assertEqual(stream.get_NSVCA(),
+                             'modulename:streamname:42:deadbeef:x86_64')
+
+            # Now try removing some of the bits in the middle
+            stream.props.context = None
+            self.assertEqual(stream.get_NSVCA(),
+                             'modulename:streamname:42::x86_64')
+
+            stream = Modulemd.ModuleStream.new(version, 'modulename')
+            stream.props.arch = 'x86_64'
+            self.assertEqual(stream.get_NSVCA(),
+                             'modulename::::x86_64')
+
+            stream.props.version = 2019
+            self.assertEqual(stream.get_NSVCA(),
+                             'modulename::2019::x86_64')
+            # Add a context
+            stream.props.context = 'feedfeed'
+            self.assertEqual(
+                stream.get_NSVCA(),
+                'modulename::2019:feedfeed:x86_64')
+
     def test_arch(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)

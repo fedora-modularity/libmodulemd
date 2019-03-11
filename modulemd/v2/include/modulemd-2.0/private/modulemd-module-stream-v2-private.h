@@ -36,7 +36,6 @@ struct _ModulemdModuleStreamV2
   GObject parent_instance;
 
   /* Properties */
-  gchar *arch;
   ModulemdBuildopts *buildopts;
   gchar *community;
   gchar *description;

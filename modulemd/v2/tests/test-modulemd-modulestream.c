@@ -81,6 +81,50 @@ module_stream_test_construct (ModuleStreamFixture *fixture,
   g_clear_object (&stream);
 }
 
+
+static void
+module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  guint64 version;
+  g_autofree gchar *arch = NULL;
+
+  for (version = MD_MODULESTREAM_VERSION_ONE;
+       version <= MD_MODULESTREAM_VERSION_LATEST;
+       version++)
+    {
+      /* Test the parent class set_arch() and get_arch() */
+      stream = modulemd_module_stream_new (version, "foo", "latest");
+      g_assert_nonnull (stream);
+
+      g_assert_null (modulemd_module_stream_get_arch (stream));
+
+      // clang-format off
+      g_object_get (stream,
+                    "arch", &arch,
+                    NULL);
+      // clang-format on
+      g_assert_null (arch);
+
+      modulemd_module_stream_set_arch (stream, "x86_64");
+      g_assert_cmpstr (modulemd_module_stream_get_arch (stream), ==, "x86_64");
+
+      // clang-format off
+      g_object_set (stream,
+                    "arch", "aarch64",
+                    NULL);
+      g_object_get (stream,
+                    "arch", &arch,
+                    NULL);
+      // clang-format on
+      g_assert_cmpstr (arch, ==, "aarch64");
+      g_clear_pointer (&arch, g_free);
+
+      g_clear_object (&stream);
+    }
+}
+
+
 static void
 module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 {
@@ -517,6 +561,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/arch",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_arch,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/copy",

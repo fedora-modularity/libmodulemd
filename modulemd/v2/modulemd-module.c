@@ -310,22 +310,43 @@ modulemd_module_add_stream (ModulemdModule *self,
                    MODULEMD_ERROR,
                    MODULEMD_ERROR_VALIDATE,
                    "Attempted to add stream for module '%s' to module '%s'",
-                   stream_name,
+                   module_name,
                    modulemd_module_get_module_name (self));
       return MD_MODULESTREAM_VERSION_ERROR;
     }
 
-  old = modulemd_module_get_stream_by_NSVC (
+  old = modulemd_module_get_stream_by_NSVCA (
     self,
     modulemd_module_stream_get_stream_name (stream),
     modulemd_module_stream_get_version (stream),
-    modulemd_module_stream_get_context (stream));
+    modulemd_module_stream_get_context (stream),
+    modulemd_module_stream_get_arch (stream),
+    &nested_error);
+
   if (old != NULL)
     {
+      /* We're probably deduplicating content here, so remove the old one in
+       * favor of the new one.
+       */
+
+      /* TODO: Do a full equality check on the two ModuleStreams once
+       * https://github.com/fedora-modularity/libmodulemd/issues/186 is
+       * fixed.
+       */
+
       /* First, drop the existing stream */
       g_ptr_array_remove (self->streams, old);
       old = NULL;
     }
+  else if (old == NULL && g_error_matches (nested_error,
+                                           MODULEMD_ERROR,
+                                           MODULEMD_ERROR_TOO_MANY_MATCHES))
+    {
+      /* It should be impossible to get more than one error back here */
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
+  g_clear_error (&nested_error);
 
   if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
     {
@@ -415,32 +436,81 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
                                     const guint64 version,
                                     const gchar *context)
 {
+  return modulemd_module_get_stream_by_NSVCA (
+    self, stream_name, version, context, NULL, NULL);
+}
+
+
+ModulemdModuleStream *
+modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
+                                     const gchar *stream_name,
+                                     const guint64 version,
+                                     const gchar *context,
+                                     const gchar *arch,
+                                     GError **error)
+{
   gsize i = 0;
+  g_autoptr (GPtrArray) matching_streams = NULL;
   ModulemdModuleStream *under_consideration = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  /* Assume the worst-case scenario that all streams match to spare us extra
+   * mallocs. This memory is short-lived.
+   */
+  matching_streams = g_ptr_array_sized_new (self->streams->len);
 
   for (i = 0; i < self->streams->len; i++)
     {
       under_consideration =
         (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
 
+      /* Skip this one unless the stream name matches */
       if (g_strcmp0 (
             modulemd_module_stream_get_stream_name (under_consideration),
             stream_name) != 0)
         continue;
 
-      if (modulemd_module_stream_get_version (under_consideration) != version)
+      /* Skip this one unless the stream version matches OR the version is zero
+       * which indicates that it shouldn't prevent the other cases from
+       * matching.
+       */
+      if (version &&
+          modulemd_module_stream_get_version (under_consideration) != version)
         continue;
 
-      if (g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
+      if (context &&
+          g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
                      context) != 0)
         continue;
 
-      return under_consideration;
+      if (arch &&
+          g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
+                     context) != 0)
+        continue;
+
+      g_ptr_array_add (matching_streams, under_consideration);
     }
 
-  return NULL;
+  if (matching_streams->len == 0)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_NO_MATCHES,
+                   "No streams matched");
+      return NULL;
+    }
+  else if (matching_streams->len > 1)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_TOO_MANY_MATCHES,
+                   "Multiple ModulemdModuleStreams matched");
+      return NULL;
+    }
+
+  /* Exactly one result, so return it */
+  return g_ptr_array_index (matching_streams, 0);
 }
 
 
@@ -499,7 +569,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
   ModulemdModuleStreamVersionEnum current_mdversion;
   g_autoptr (ModulemdModuleStream) modulestream = NULL;
   g_autoptr (ModulemdModuleStream) upgraded_stream = NULL;
-  g_autofree gchar *nsvc = NULL;
+  g_autofree gchar *nsvca = NULL;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), FALSE);
@@ -511,7 +581,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
       modulestream = g_object_ref (
         MODULEMD_MODULE_STREAM (g_ptr_array_index (self->streams, i)));
       current_mdversion = modulemd_module_stream_get_mdversion (modulestream);
-      nsvc = modulemd_module_stream_get_nsvc_as_string (modulestream);
+      nsvca = modulemd_module_stream_get_NSVCA_as_string (modulestream);
 
       if (current_mdversion <= MD_MODULESTREAM_VERSION_UNSET)
         {
@@ -519,7 +589,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
                        MODULEMD_ERROR,
                        MODULEMD_ERROR_VALIDATE,
                        "ModuleStream %s had invalid mdversion %i",
-                       nsvc,
+                       nsvca,
                        current_mdversion);
           return FALSE;
         }
@@ -537,13 +607,13 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
               g_propagate_prefixed_error (error,
                                           g_steal_pointer (&nested_error),
                                           "Error upgrading module stream %s",
-                                          nsvc);
+                                          nsvca);
               return FALSE;
             }
           g_ptr_array_add (new_streams, g_steal_pointer (&upgraded_stream));
         }
 
-      g_clear_pointer (&nsvc, g_free);
+      g_clear_pointer (&nsvca, g_free);
       g_clear_object (&modulestream);
     }
 

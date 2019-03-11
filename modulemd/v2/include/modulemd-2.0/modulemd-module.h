@@ -15,6 +15,7 @@
 
 #include <glib-object.h>
 #include "modulemd-defaults.h"
+#include "modulemd-deprecated.h"
 #include "modulemd-module-stream.h"
 
 G_BEGIN_DECLS
@@ -109,12 +110,42 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
  * Returns: (transfer none): The requested stream object or NULL if no match was found.
  *
  * Since: 2.0
+ * Deprecated: 2.2
  */
+MMD_DEPRECATED_FOR (modulemd_module_get_stream_by_NSVCA)
 ModulemdModuleStream *
 modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
                                     const gchar *stream_name,
                                     const guint64 version,
                                     const gchar *context);
+
+
+/**
+ * modulemd_module_get_stream_by_NSVCA:
+ * @self: This #ModulemdModule object
+ * @stream_name: The name of the stream to retrieve
+ * @version: The version of the stream to retrieve. If set to zero, the version
+ * is not included in the search.
+ * @context: (nullable): The context of the stream to retrieve. If NULL, the
+ * context is not included in the search.
+ * @arch: (nullable): The processor architecture of the stream to retrieve. If
+ * NULL, the architecture is not included in the search.
+ * @error: (out): A #GError indicating the reason this function failed to
+ * retrieve exactly one #ModulemdModuleStream.
+ *
+ * Returns: (transfer none): The requested stream object. NULL and sets @error
+ * appropriately if the provided information is not sufficient to return
+ * exactly one #ModulemdModuleStream result.
+ *
+ * Since: 2.2
+ */
+ModulemdModuleStream *
+modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
+                                     const gchar *stream_name,
+                                     const guint64 version,
+                                     const gchar *context,
+                                     const gchar *arch,
+                                     GError **error);
 
 
 /**

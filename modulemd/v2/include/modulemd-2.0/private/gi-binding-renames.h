@@ -95,6 +95,13 @@ modulemd_module_get_streams_by_stream_name (ModulemdModule *self,
 gchar *
 modulemd_module_stream_get_nsvc (ModulemdModuleStream *self);
 
+
+/**
+ * modulemd_module_stream_get_NSVCA: (skip)
+ */
+gchar *
+modulemd_module_stream_get_NSVCA (ModulemdModuleStream *self);
+
 /**
  * modulemd_module_stream_v1_get_module_component_names: (skip)
  */

@@ -291,6 +291,80 @@ modulemd_component_rpm_set_property (GObject *object,
 }
 
 
+gboolean
+modulemd_component_rpm_equals (ModulemdComponentRpm *self,
+                               ModulemdComponentRpm *other)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (other), FALSE);
+
+
+  if (self == other)
+    return FALSE;
+
+
+  GStrv arches_as_strv_self = modulemd_component_rpm_get_arches_as_strv (self);
+  GStrv arches_as_strv_other =
+    modulemd_component_rpm_get_arches_as_strv (other);
+
+  // check number of keys
+  if (g_strv_length (arches_as_strv_self) !=
+      g_strv_length (arches_as_strv_other))
+    return FALSE;
+
+
+  // check each element of strv
+  int i = 0;
+  while (i < g_strv_length (arches_as_strv_self))
+    {
+      if (g_strcmp0 (*(arches_as_strv_self + i), *(arches_as_strv_other + i)))
+        return FALSE;
+      i++;
+    }
+
+  GStrv multilib_arches_as_strv_self =
+    modulemd_component_rpm_get_multilib_arches_as_strv (self);
+  GStrv multilib_arches_as_strv_other =
+    modulemd_component_rpm_get_multilib_arches_as_strv (other);
+
+  // check number of keys
+  if (g_strv_length (multilib_arches_as_strv_self) !=
+      g_strv_length (multilib_arches_as_strv_other))
+    return FALSE;
+
+  // check each element of strv
+  i = 0;
+  while (i < g_strv_length (multilib_arches_as_strv_self))
+    {
+      if (g_strcmp0 (*(multilib_arches_as_strv_self + i),
+                     *(multilib_arches_as_strv_other + i)))
+        return FALSE;
+      i++;
+    }
+
+  const gchar *cache_self = modulemd_component_rpm_get_cache (self);
+  const gchar *cache_other = modulemd_component_rpm_get_cache (other);
+
+  if (g_strcmp0 (cache_self, cache_other) != 0)
+    return FALSE;
+
+  const gchar *ref_self = modulemd_component_rpm_get_ref (self);
+  const gchar *ref_other = modulemd_component_rpm_get_ref (other);
+
+  if (g_strcmp0 (ref_self, ref_other) != 0)
+    return FALSE;
+
+  const gchar *repository_self = modulemd_component_rpm_get_repository (self);
+  const gchar *repository_other =
+    modulemd_component_rpm_get_repository (other);
+
+  if (g_strcmp0 (repository_self, repository_other) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static void
 modulemd_component_rpm_class_init (ModulemdComponentRpmClass *klass)
 {

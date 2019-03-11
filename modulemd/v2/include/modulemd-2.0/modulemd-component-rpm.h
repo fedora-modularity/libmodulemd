@@ -192,4 +192,18 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self);
 
+
+/**
+ * modulemd_component_rpm_equals:
+ * @self: This #ModulemdComponentRpm object
+ * @other: The other @ModuleComponentRpm object being compared
+ *
+ * Returns: TRUE if all of the objects and variables composing the two
+ * ModulemdComponentRpms are equal. FALSE, otherwise. 
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_component_rpm_equals (ModulemdComponentRpm *self,
+                               ModulemdComponentRpm *other);
 G_END_DECLS

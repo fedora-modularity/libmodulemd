@@ -409,5 +409,6 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
  * Since: 2.1
  */
 gboolean
-modulemd_module_stream_equals (ModulemdModuleStream *self, ModulemdModuleStream *other);
+modulemd_module_stream_equals (ModulemdModuleStream *self,
+                               ModulemdModuleStream *other);
 G_END_DECLS

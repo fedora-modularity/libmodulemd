@@ -805,55 +805,71 @@ modulemd_module_stream_set_property (GObject *object,
     }
 }
 
- 
+
 static gboolean
-modulemd_module_stream_default_equals (ModulemdModuleStream *self, ModulemdModuleStream *other)
+modulemd_module_stream_default_equals (ModulemdModuleStream *self,
+                                       ModulemdModuleStream *other)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (other), FALSE);
-  
-  if (self == other) return TRUE;
+
+  if (self == other)
+    return TRUE;
 
   guint64 mdversion_self = modulemd_module_stream_get_mdversion (self);
   guint64 mdversion_other = modulemd_module_stream_get_mdversion (other);
 
-  if (mdversion_self != mdversion_other) return FALSE;
+  if (mdversion_self != mdversion_other)
+    return FALSE;
 
-  const gchar *module_name_self = modulemd_module_stream_get_module_name (self); 
-  const gchar *module_name_other = modulemd_module_stream_get_module_name (other); 
+  const gchar *module_name_self =
+    modulemd_module_stream_get_module_name (self);
+  const gchar *module_name_other =
+    modulemd_module_stream_get_module_name (other);
 
-  if (g_strcmp0 (module_name_self, module_name_other) != 0) return FALSE;
+  if (g_strcmp0 (module_name_self, module_name_other) != 0)
+    return FALSE;
 
-  const gchar *stream_name_self = modulemd_module_stream_get_stream_name (self);
-  const gchar *stream_name_other = modulemd_module_stream_get_stream_name (other);
+  const gchar *stream_name_self =
+    modulemd_module_stream_get_stream_name (self);
+  const gchar *stream_name_other =
+    modulemd_module_stream_get_stream_name (other);
 
-  if (g_strcmp0 (stream_name_self, stream_name_other) != 0) return FALSE;
+  if (g_strcmp0 (stream_name_self, stream_name_other) != 0)
+    return FALSE;
 
   guint64 version_self = modulemd_module_stream_get_version (self);
   guint64 version_other = modulemd_module_stream_get_version (other);
 
-  if (version_self != version_other) return FALSE;
+  if (version_self != version_other)
+    return FALSE;
 
   const gchar *context_self = modulemd_module_stream_get_context (self);
   const gchar *context_other = modulemd_module_stream_get_context (other);
 
-  if (g_strcmp0 (context_self, context_other) != 0) return FALSE;
+  if (g_strcmp0 (context_self, context_other) != 0)
+    return FALSE;
 
-  gchar *nsvc_as_string_self = modulemd_module_stream_get_nsvc_as_string(self);
-  gchar *nsvc_as_string_other = modulemd_module_stream_get_nsvc_as_string(other);
+  gchar *nsvc_as_string_self =
+    modulemd_module_stream_get_nsvc_as_string (self);
+  gchar *nsvc_as_string_other =
+    modulemd_module_stream_get_nsvc_as_string (other);
 
-  if (g_strcmp0 (nsvc_as_string_self, nsvc_as_string_other) != 0) return FALSE;
+  if (g_strcmp0 (nsvc_as_string_self, nsvc_as_string_other) != 0)
+    return FALSE;
 
   return TRUE;
 }
 
 
 gboolean
-modulemd_module_stream_equals (ModulemdModuleStream *self, ModulemdModuleStream *other) 
+modulemd_module_stream_equals (ModulemdModuleStream *self,
+                               ModulemdModuleStream *other)
 {
   ModulemdModuleStreamClass *klass;
 
-  if (!self) return FALSE;
+  if (!self)
+    return FALSE;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (other), FALSE);
@@ -1050,4 +1066,3 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
 
   return klass->build_depends_on_stream (self, module_name, stream_name);
 }
-

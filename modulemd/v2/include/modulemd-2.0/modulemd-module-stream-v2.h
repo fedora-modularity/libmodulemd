@@ -720,5 +720,17 @@ modulemd_module_stream_v2_set_xmd (ModulemdModuleStreamV2 *self,
 GVariant *
 modulemd_module_stream_v2_get_xmd (ModulemdModuleStreamV2 *self);
 
-
+/**
+ * moduelmd_module_stream_v2_equals:
+ * @self: This #ModulemdModuleStreamV2 object
+ * @other: The other #ModulemdModuleStreamV2 object being compared
+ *
+ * Returns: TRUE if all of the objects and variables composing the two
+ * ModulemdModuleStreamV2s are equal. FALSE, otherwise.
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_module_stream_v2_equals (ModulemdModuleStream *self,
+                                  ModulemdModuleStream *other);
 G_END_DECLS

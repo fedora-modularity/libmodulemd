@@ -25,7 +25,6 @@ struct _ModulemdDefaultsV1
   GObject parent_instance;
 
   gchar *default_stream;
-  gchar *intent;
 
   /* @key: stream name @value: GHashTable set of profile names
    */
@@ -64,7 +63,6 @@ modulemd_defaults_v1_finalize (GObject *object)
   ModulemdDefaultsV1 *self = (ModulemdDefaultsV1 *)object;
 
   g_clear_pointer (&self->default_stream, g_free);
-  g_clear_pointer (&self->intent, g_free);
   g_clear_pointer (&self->profile_defaults, g_hash_table_unref);
   g_clear_pointer (&self->intent_default_streams, g_hash_table_unref);
   g_clear_pointer (&self->intent_default_profiles, g_hash_table_unref);

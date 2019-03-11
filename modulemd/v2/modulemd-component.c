@@ -227,7 +227,7 @@ modulemd_component_set_property (GObject *object,
 
 
 static gboolean
-modulemd_component_defualt_equals (ModulemdComponent *self, ModulemdComponent *other) 
+modulemd_component_default_equals (ModulemdComponent *self, ModulemdComponent *other) 
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (other), FALSE);

@@ -92,4 +92,18 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
 const gchar *
 modulemd_component_module_get_repository (ModulemdComponentModule *self);
 
+
+/**
+ * modulemd_component_module_equals:
+ * @self: This #ModuleComponentModule object
+ * @other: The other #ModulemdComponentModule object being compared
+ *
+ * Returns: TRUE if all of the objects and variables composing the two
+ * ModulemdComponentModules are equal. FALSE, otherwise. 
+ *
+ * Since: 2.0
+ */
+gboolean
+modulemd_component_module_equals (ModulemdComponentModule *self,
+                                  ModulemdComponentModule *other);
 G_END_DECLS

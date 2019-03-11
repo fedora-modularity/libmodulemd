@@ -115,8 +115,8 @@ modulemd_component_get_rationale (ModulemdComponent *self);
 
 /**
  * modulemd_component_equals:
- * @self: (not nullable); This #ModulemdComponent.
- * @other: (not nullable): The other #ModulemdComponent being compared.
+ * @self: This #ModulemdComponent.
+ * @other: The other #ModulemdComponent being compared.
  *
  * Returns: TRUE if all of the objects and varibales composing the two
  * ModulemdComponents are equal. False, otherwise. 

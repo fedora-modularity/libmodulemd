@@ -172,6 +172,34 @@ modulemd_component_module_set_property (GObject *object,
 }
 
 
+gboolean
+modulemd_component_module_equals (ModulemdComponentModule *self,
+                                  ModulemdComponentModule *other)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (other), FALSE);
+
+  if (self == other)
+    return TRUE;
+
+  const gchar *ref_self = modulemd_component_module_get_ref (self);
+  const gchar *ref_other = modulemd_component_module_get_ref (other);
+
+  if (g_strcmp0 (ref_self, ref_other) != 0)
+    return FALSE;
+
+  const gchar *repository_self =
+    modulemd_component_module_get_repository (self);
+  const gchar *repository_other =
+    modulemd_component_module_get_repository (other);
+
+  if (g_strcmp0 (repository_self, repository_other) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static void
 modulemd_component_module_class_init (ModulemdComponentModuleClass *klass)
 {

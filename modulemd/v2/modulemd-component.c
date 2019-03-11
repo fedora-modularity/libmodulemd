@@ -236,10 +236,8 @@ modulemd_component_default_equals (ModulemdComponent *self,
   if (self == other)
     return TRUE;
 
-  gint64 buildorder_self = modulemd_component_get_buildorder (self);
-  gint64 buildorder_other = modulemd_component_get_buildorder (other);
-
-  if (buildorder_self != buildorder_other)
+  if (modulemd_component_get_buildorder (self) !=
+      modulemd_component_get_buildorder (other))
     return FALSE;
 
   const gchar *name_self = modulemd_component_get_name (self);

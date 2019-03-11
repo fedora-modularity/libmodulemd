@@ -275,7 +275,7 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->set_property = modulemd_component_set_property;
 
   klass->copy = modulemd_component_copy_component;
-  klass->equals = modulemd_component_equals;
+  klass->equals = modulemd_component_default_equals;
 
   properties[PROP_BUILDORDER] = g_param_spec_int64 (
     "buildorder",

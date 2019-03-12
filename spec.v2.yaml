@@ -248,6 +248,11 @@ data:
         # additional information.
         rpms:
             bar:
+                # The real name of the package, if it differs from the key in
+                # this dictionary. Used when bootstrapping to build a
+                # bootstrapping ref before building the package for real.
+                # Optional
+                name: bar-real
                 # Why is this component present.
                 # A simple, free-form string.
                 # Required.

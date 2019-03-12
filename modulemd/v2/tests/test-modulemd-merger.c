@@ -28,11 +28,13 @@ merger_test_constructors (CommonMmdTestFixture *fixture,
   /* Test standard object instantiation */
   merger = g_object_new (MODULEMD_TYPE_MODULE_INDEX_MERGER, NULL);
   g_assert_nonnull (merger);
+  g_assert_null (error);
   g_clear_object (&merger);
 
   /* Test new() */
   merger = modulemd_module_index_merger_new ();
   g_assert_nonnull (merger);
+  g_assert_null (error);
   g_clear_object (&merger);
 }
 
@@ -58,6 +60,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   index = modulemd_module_index_new ();
 
   g_assert_nonnull (yaml_path);
+  g_assert_null (error);
 
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));

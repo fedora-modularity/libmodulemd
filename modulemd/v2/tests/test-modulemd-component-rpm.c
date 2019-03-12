@@ -283,6 +283,44 @@ component_rpm_test_parse_yaml (ComponentRpmFixture *fixture,
   g_clear_pointer (&list, g_strfreev);
 }
 
+static void
+component_rpm_test_override_name (ComponentRpmFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+
+  r = modulemd_component_rpm_new ("a_key");
+
+
+  /* Right after construction, the key and name must have the same value */
+  g_assert_cmpstr (
+    modulemd_component_get_key (MODULEMD_COMPONENT (r)), ==, "a_key");
+
+  g_assert_cmpstr (modulemd_component_get_key (MODULEMD_COMPONENT (r)),
+                   ==,
+                   modulemd_component_get_name (MODULEMD_COMPONENT (r)));
+
+  modulemd_component_set_name (MODULEMD_COMPONENT (r), "a_name");
+
+  /* The key must remain the same */
+  g_assert_cmpstr (
+    modulemd_component_get_key (MODULEMD_COMPONENT (r)), ==, "a_key");
+
+  /* The name will now be "a_name" */
+  g_assert_cmpstr (
+    modulemd_component_get_name (MODULEMD_COMPONENT (r)), ==, "a_name");
+
+  /* Unset the name and make sure it's back to returning the original value */
+  modulemd_component_set_name (MODULEMD_COMPONENT (r), NULL);
+
+  g_assert_cmpstr (
+    modulemd_component_get_key (MODULEMD_COMPONENT (r)), ==, "a_key");
+
+  g_assert_cmpstr (modulemd_component_get_key (MODULEMD_COMPONENT (r)),
+                   ==,
+                   modulemd_component_get_name (MODULEMD_COMPONENT (r)));
+}
+
 
 int
 main (int argc, char *argv[])
@@ -293,32 +331,39 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/component/module/construct",
+  g_test_add ("/modulemd/v2/component/rpm/construct",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/module/copy",
+  g_test_add ("/modulemd/v2/component/rpm/copy",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/module/yaml/emit",
+  g_test_add ("/modulemd/v2/component/rpm/yaml/emit",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_emit_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/module/yaml/parse",
+  g_test_add ("/modulemd/v2/component/rpm/yaml/parse",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_parse_yaml,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/rpm/override_name",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_override_name,
               NULL);
 
   return g_test_run ();

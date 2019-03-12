@@ -305,7 +305,7 @@ modulemd_module_stream_v2_add_component (ModulemdModuleStreamV2 *self,
    * with the same name
    */
   g_hash_table_replace (table,
-                        g_strdup (modulemd_component_get_name (component)),
+                        g_strdup (modulemd_component_get_key (component)),
                         modulemd_component_copy (component, NULL));
 }
 

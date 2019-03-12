@@ -76,9 +76,11 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *name)
 static ModulemdComponent *
 modulemd_component_copy_component (ModulemdComponent *self, const gchar *name)
 {
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
   g_autoptr (ModulemdComponent) m = NULL;
   if (name == NULL)
-    name = modulemd_component_get_name (self);
+    name = priv->name;
 
   m = g_object_new (G_OBJECT_TYPE (self), "name", name, NULL);
 
@@ -118,7 +120,7 @@ modulemd_component_get_buildorder (ModulemdComponent *self)
 
 
 static void
-modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
+modulemd_component_set_key (ModulemdComponent *self, const gchar *name)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT (self));
   g_return_if_fail (name);
@@ -132,9 +134,22 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_NAME]);
 }
 
+void
+modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
+{
+  ModulemdComponentClass *klass;
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+
+  /* Do nothing if the child class has not implemented this */
+  if (!klass->set_name)
+    return;
+
+  klass->set_name (self, name);
+}
 
 const gchar *
-modulemd_component_get_name (ModulemdComponent *self)
+modulemd_component_get_key (ModulemdComponent *self)
 {
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
 
@@ -142,6 +157,18 @@ modulemd_component_get_name (ModulemdComponent *self)
     modulemd_component_get_instance_private (self);
 
   return priv->name;
+}
+
+
+const gchar *
+modulemd_component_get_name (ModulemdComponent *self)
+{
+  ModulemdComponentClass *klass;
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->get_name, NULL);
+
+  return klass->get_name (self);
 }
 
 
@@ -214,7 +241,7 @@ modulemd_component_set_property (GObject *object,
       break;
 
     case PROP_NAME:
-      modulemd_component_set_name (self, g_value_get_string (value));
+      modulemd_component_set_key (self, g_value_get_string (value));
       break;
 
     case PROP_RATIONALE:
@@ -236,6 +263,8 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->set_property = modulemd_component_set_property;
 
   klass->copy = modulemd_component_copy_component;
+  klass->set_name = NULL;
+  klass->get_name = modulemd_component_get_key;
 
   properties[PROP_BUILDORDER] = g_param_spec_int64 (
     "buildorder",
@@ -274,12 +303,13 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
                                     yaml_emitter_t *emitter,
                                     GError **error)
 {
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
   MODULEMD_INIT_TRACE ();
 
-  if (!mmd_emitter_scalar (emitter,
-                           modulemd_component_get_name (self),
-                           YAML_PLAIN_SCALAR_STYLE,
-                           error))
+  if (!mmd_emitter_scalar (
+        emitter, priv->name, YAML_PLAIN_SCALAR_STYLE, error))
     return FALSE;
 
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))

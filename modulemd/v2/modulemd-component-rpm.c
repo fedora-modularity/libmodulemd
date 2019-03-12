@@ -23,6 +23,7 @@ struct _ModulemdComponentRpm
 {
   GObject parent_instance;
 
+  gchar *override_name;
   gchar *ref;
   gchar *repository;
   gchar *cache;
@@ -61,6 +62,7 @@ modulemd_component_rpm_finalize (GObject *object)
 {
   ModulemdComponentRpm *self = (ModulemdComponentRpm *)object;
 
+  g_clear_pointer (&self->override_name, g_free);
   g_clear_pointer (&self->ref, g_free);
   g_clear_pointer (&self->repository, g_free);
   g_clear_pointer (&self->cache, g_free);
@@ -92,6 +94,11 @@ hash_table_str_set_copy (GHashTable *orig)
 }
 
 
+static void
+modulemd_component_rpm_set_name (ModulemdComponent *self, const gchar *name);
+static const gchar *
+modulemd_component_rpm_get_name (ModulemdComponent *self);
+
 static ModulemdComponent *
 modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *name)
 {
@@ -106,6 +113,8 @@ modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *name)
 
   modulemd_component_rpm_set_ref (copy,
                                   modulemd_component_rpm_get_ref (rpm_self));
+  modulemd_component_rpm_set_name (MODULEMD_COMPONENT (copy),
+                                   rpm_self->override_name);
   modulemd_component_rpm_set_repository (
     copy, modulemd_component_rpm_get_repository (rpm_self));
   modulemd_component_rpm_set_cache (
@@ -117,6 +126,56 @@ modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *name)
   copy->multilib = hash_table_str_set_copy (rpm_self->multilib);
 
   return MODULEMD_COMPONENT (g_steal_pointer (&copy));
+}
+
+
+static void
+modulemd_component_rpm_set_name (ModulemdComponent *self, const gchar *name)
+{
+  const gchar *key = NULL;
+  ModulemdComponentRpm *rpm_self = NULL;
+
+  g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
+  rpm_self = MODULEMD_COMPONENT_RPM (self);
+
+  if (g_strcmp0 (rpm_self->override_name, name) == 0)
+    {
+      /* No change, so just return.
+       */
+      return;
+    }
+
+  /* We're changing the value, so clear the existing version */
+  g_clear_pointer (&rpm_self->override_name, g_free);
+
+  key = MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
+          ->get_name (self);
+
+  /* If we were passed non-NULL and the passed name differs from the hash table
+   * key, save it. Otherwise, just leave it set NULL.
+   */
+  if (name && g_strcmp0 (key, name) != 0)
+    {
+      rpm_self->override_name = g_strdup (name);
+    }
+}
+
+
+static const gchar *
+modulemd_component_rpm_get_name (ModulemdComponent *self)
+{
+  ModulemdComponentRpm *rpm_self = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), NULL);
+  rpm_self = MODULEMD_COMPONENT_RPM (self);
+
+  /* If an override name was set, return it */
+  if (rpm_self->override_name)
+    return rpm_self->override_name;
+
+  /* Otherwise, return the hash table key as the name */
+  return MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
+    ->get_name (self);
 }
 
 
@@ -303,6 +362,8 @@ modulemd_component_rpm_class_init (ModulemdComponentRpmClass *klass)
   object_class->set_property = modulemd_component_rpm_set_property;
 
   component_class->copy = modulemd_component_rpm_copy;
+  component_class->set_name = modulemd_component_rpm_set_name;
+  component_class->get_name = modulemd_component_rpm_get_name;
 
   properties[PROP_CACHE] =
     g_param_spec_string ("cache",
@@ -348,43 +409,13 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
         MODULEMD_COMPONENT (self), emitter, error))
     return FALSE;
 
-  if (modulemd_component_rpm_get_repository (self) != NULL)
-    {
-      if (!mmd_emitter_scalar (
-            emitter, "repository", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "name", self->override_name);
 
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_rpm_get_repository (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
-        return FALSE;
-    }
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "repository", self->repository);
 
-  if (modulemd_component_rpm_get_cache (self) != NULL)
-    {
-      if (!mmd_emitter_scalar (
-            emitter, "cache", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "cache", self->cache);
 
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_rpm_get_cache (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
-        return FALSE;
-    }
-
-  if (modulemd_component_rpm_get_ref (self) != NULL)
-    {
-      if (!mmd_emitter_scalar (emitter, "ref", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
-
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_rpm_get_ref (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
-        return FALSE;
-    }
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "ref", self->ref);
 
   if (!modulemd_component_emit_yaml_buildorder (
         MODULEMD_COMPONENT (self), emitter, error))
@@ -480,6 +511,21 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
               modulemd_component_set_rationale (MODULEMD_COMPONENT (r), value);
               g_clear_pointer (&value, g_free);
             }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "name"))
+            {
+              value = modulemd_yaml_parse_string (parser, &nested_error);
+              if (!value)
+                MMD_YAML_ERROR_EVENT_EXIT (
+                  error,
+                  event,
+                  "Failed to parse override name in component: %s",
+                  nested_error->message);
+
+              modulemd_component_set_name (MODULEMD_COMPONENT (r), value);
+              g_clear_pointer (&value, g_free);
+            }
+
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "repository"))
             {

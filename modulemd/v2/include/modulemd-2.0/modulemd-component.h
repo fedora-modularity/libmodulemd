@@ -33,10 +33,12 @@ struct _ModulemdComponentClass
   GObjectClass parent_class;
 
   ModulemdComponent *(*copy) (ModulemdComponent *self, const gchar *name);
+  void (*set_name) (ModulemdComponent *self, const gchar *name);
+  const gchar *(*get_name) (ModulemdComponent *self);
 
-  /* Padding to allow adding up to 10 new virtual functions without
+  /* Padding to allow adding up to 8 new virtual functions without
    * breaking ABI. */
-  gpointer padding[10];
+  gpointer padding[8];
 };
 
 /**
@@ -76,15 +78,48 @@ modulemd_component_get_buildorder (ModulemdComponent *self);
 
 
 /**
+ * modulemd_component_set_name:
+ * @self: This #ModulemdComponent object.
+ * @name: (nullable): The name of this component. Note that this is different
+ * from the key used to save this component to a #ModulemdModuleStream. If this
+ * value is set, it adds a "name:" attribute to this component. This is used in
+ * bootstrapping cases where the key is a different name used to differentiate
+ * multiple ordered builds of the same component name. This function is
+ * currently only implemented for #ModulemdComponentRpm and has no effect on
+ * other #ModulemdComponent types.
+ *
+ * Since: 2.2
+ */
+void
+modulemd_component_set_name (ModulemdComponent *self, const gchar *name);
+
+
+/**
  * modulemd_component_get_name:
  * @self: This #ModulemdComponent object
  *
- * Returns: (transfer none): The name of the component.
+ * Returns: (transfer none): The name of the component. Note that this may be
+ * different from the key used to save this component to a
+ * #ModulemdModuleStream. If you specifically need the key, use
+ * modulemd_component_get_key() instead.
  *
  * Since: 2.0
  */
 const gchar *
 modulemd_component_get_name (ModulemdComponent *self);
+
+
+/**
+ * modulemd_component_get_key:
+ * @self: This #ModulemdComponent object
+ *
+ * Returns: (transfer none): The name of the key used to attach this component
+ * to a #ModulemdModuleStream.
+ *
+ * Since: 2.2
+ */
+const gchar *
+modulemd_component_get_key (ModulemdComponent *self);
 
 
 /**

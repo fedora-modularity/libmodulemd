@@ -82,6 +82,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   /* Create a ModuleIndexMerger and add both copies to it */
   merger = modulemd_module_index_merger_new ();
   g_assert_nonnull (merger);
+  g_assert_null (error);
 
   modulemd_module_index_merger_associate_index (merger, index, 0);
   modulemd_module_index_merger_associate_index (merger, index2, 0);

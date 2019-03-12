@@ -58,6 +58,8 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   index = modulemd_module_index_new ();
 
   g_assert_nonnull (yaml_path);
+  g_assert_nonnull (index);
+  g_assert_null (error);
 
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));

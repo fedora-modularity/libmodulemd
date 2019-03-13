@@ -119,7 +119,7 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_autofree gchar *newline = NULL;
   
   yaml_path =
-    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
   
   
@@ -138,6 +138,10 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_assert_null (error);
 
 
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  
   updates_index = modulemd_module_index_new ();
   
   g_assert_nonnull (yaml_path);

@@ -115,21 +115,40 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
+  g_autofree gchar *baseline = NULL;
+  g_autofree gchar *newline = NULL;
   
   yaml_path =
-    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
   
   
   fedora_index = modulemd_module_index_new ();
   
-  yaml_path =
-    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
-                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    fedora_index, yaml_path, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+  
+  /* Save the baseline output for later comparison */
+  baseline = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_nonnull (baseline);
+  g_assert_null (error);
+
 
   updates_index = modulemd_module_index_new ();
   
   g_assert_nonnull (yaml_path);
+  
+  g_assert_true (modulemd_module_index_update_from_file (
+    updates_index, yaml_path, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_assert_nonnull (updates_index);
+  g_assert_null (error);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+  
   
   merger = modulemd_module_index_merger_new ();
   g_assert_nonnull (merger);
@@ -140,6 +159,13 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   merged_index = modulemd_module_index_merger_resolve (merger, &error);
   g_assert_nonnull (merged_index);
   g_assert_null (error);
+  
+  newline = modulemd_module_index_dump_to_string (merged_index, &error);
+  g_assert_nonnull (newline);
+  g_assert_null (error);
+  
+  g_assert_cmpstr (baseline, ==, newline);
+  
   g_clear_object(&merged_index);
   
 }

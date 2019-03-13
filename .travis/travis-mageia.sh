@@ -20,7 +20,7 @@ pushd $SCRIPT_DIR/..
 git ls-files |xargs tar cfj $TARBALL_PATH .git
 popd
 
-repository=""
+repository="registry.docker.com"
 os="mageia"
 
 

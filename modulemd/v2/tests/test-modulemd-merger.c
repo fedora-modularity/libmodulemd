@@ -62,6 +62,8 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
+  g_assert_nonnull (index);
+  g_assert_null (error);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
   /* Save the baseline output for later comparison */
@@ -85,6 +87,8 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   merger = modulemd_module_index_merger_new ();
   g_assert_nonnull (merger);
 
+  
+  /*Add same index twice*/ 
   modulemd_module_index_merger_associate_index (merger, index, 0);
   modulemd_module_index_merger_associate_index (merger, index2, 0);
 
@@ -99,6 +103,47 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
 
   g_assert_cmpstr (baseline, ==, deduplicated);
 }
+
+static void
+merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
+                         gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) fedora_index = NULL;
+  g_autoptr (ModulemdModuleIndex) updates_index = NULL;
+  g_autoptr (ModulemdModuleIndex) merged_index = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  
+  
+  fedora_index = modulemd_module_index_new ();
+  
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+
+  updates_index = modulemd_module_index_new ();
+  
+  g_assert_nonnull (yaml_path);
+  
+  merger = modulemd_module_index_merger_new ();
+  g_assert_nonnull (merger);
+  
+  modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
+  modulemd_module_index_merger_associate_index (merger, updates_index, 0);
+  
+  merged_index = modulemd_module_index_merger_resolve (merger, &error);
+  g_assert_nonnull (merged_index);
+  g_assert_null (error);
+  g_clear_object(&merged_index);
+  
+}
+
 
 
 int
@@ -119,6 +164,13 @@ main (int argc, char *argv[])
               NULL);
 
   g_test_add ("/modulemd/v2/module/index/merger/deduplicate",
+              CommonMmdTestFixture,
+              NULL,
+              NULL,
+              merger_test_deduplicate,
+              NULL);
+  
+  g_test_add ("/modulemd/v2/module/index/merger/real/world/data",
               CommonMmdTestFixture,
               NULL,
               NULL,

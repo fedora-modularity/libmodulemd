@@ -45,9 +45,9 @@ static GParamSpec *properties[N_PROPS];
 
 
 ModulemdComponentModule *
-modulemd_component_module_new (const gchar *name)
+modulemd_component_module_new (const gchar *key)
 {
-  return g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, "name", name, NULL);
+  return g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, "name", key, NULL);
 }
 
 
@@ -64,7 +64,7 @@ modulemd_component_module_finalize (GObject *object)
 
 
 static ModulemdComponent *
-modulemd_component_module_copy (ModulemdComponent *self, const gchar *name)
+modulemd_component_module_copy (ModulemdComponent *self, const gchar *key)
 {
   ModulemdComponentModule *module_self = NULL;
   g_autoptr (ModulemdComponentModule) copy = NULL;
@@ -73,7 +73,7 @@ modulemd_component_module_copy (ModulemdComponent *self, const gchar *name)
 
   copy = MODULEMD_COMPONENT_MODULE (
     MODULEMD_COMPONENT_CLASS (modulemd_component_module_parent_class)
-      ->copy (self, name));
+      ->copy (self, key));
 
   modulemd_component_module_set_ref (
     copy, modulemd_component_module_get_ref (module_self));

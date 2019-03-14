@@ -35,14 +35,15 @@ G_DECLARE_FINAL_TYPE (ModulemdComponentRpm,
 
 /**
  * modulemd_component_rpm_new:
- * @name: (not nullable): The name of this module component.
+ * @key: (not nullable): The key of this module component. Used when looking up
+ * components from a #ModulemdModuleStream.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdComponentRpm object.
  *
  * Since: 2.0
  */
 ModulemdComponentRpm *
-modulemd_component_rpm_new (const gchar *name);
+modulemd_component_rpm_new (const gchar *key);
 
 
 /**

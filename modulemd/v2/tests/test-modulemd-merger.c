@@ -113,17 +113,19 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_autoptr (ModulemdModuleIndex) merged_index = NULL;
   g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
   g_autofree gchar *yaml_path = NULL;
+  g_autofree gchar *yaml_path2 = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autofree gchar *baseline = NULL;
+  g_autofree gchar *baseline_2 = NULL;
   g_autofree gchar *newline = NULL;
+  
+  fedora_index = modulemd_module_index_new ();
   
   yaml_path =
     g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
   
-  
-  fedora_index = modulemd_module_index_new ();
   
   g_assert_nonnull (yaml_path);
 
@@ -132,26 +134,31 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
   
-  /* Save the baseline output for later comparison */
-  baseline = modulemd_module_index_dump_to_string (index, &error);
+/* Save the baseline output for later comparison */
+  baseline = modulemd_module_index_dump_to_string (fedora_index, &error);
   g_assert_nonnull (baseline);
   g_assert_null (error);
+  
+  updates_index = modulemd_module_index_new ();
 
-
-  yaml_path =
+  yaml_path2 =
     g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
   
-  updates_index = modulemd_module_index_new ();
   
-  g_assert_nonnull (yaml_path);
+  g_assert_nonnull (yaml_path2);
   
   g_assert_true (modulemd_module_index_update_from_file (
-    updates_index, yaml_path, TRUE, &failures, &error));
+    updates_index, yaml_path2, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_assert_nonnull (updates_index);
   g_assert_null (error);
   g_clear_pointer (&failures, g_ptr_array_unref);
+  
+  /* Save the baseline_2 output for later comparison */
+  baseline_2 = modulemd_module_index_dump_to_string (updates_index, &error);
+  g_assert_nonnull (baseline_2);
+  g_assert_null (error);
   
   
   merger = modulemd_module_index_merger_new ();
@@ -169,6 +176,7 @@ merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
   g_assert_null (error);
   
   g_assert_cmpstr (baseline, ==, newline);
+  g_assert_cmpstr (baseline_2, ==, newline);
   
   g_clear_object(&merged_index);
   

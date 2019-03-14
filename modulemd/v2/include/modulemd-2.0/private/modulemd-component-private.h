@@ -43,6 +43,31 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
                                      yaml_parser_t *parser,
                                      GError **error);
 
+/**
+ * modulemd_component_has_buildafter:
+ * @self: This #ModulemdComponent
+ *
+ * Returns: Whether one or more buildafter entries have been added to this
+ * component.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_component_has_buildafter (ModulemdComponent *self);
+
+
+/**
+ * modulemd_component_get_buildafter_internal:
+ * @self: This #ModulemdComponentModule
+ *
+ * Returns: The internal hash table representing the set of buildafter
+ * dependencies.
+ *
+ * Since: 2.2
+ */
+GHashTable *
+modulemd_component_get_buildafter_internal (ModulemdComponent *self);
+
 
 /**
  * modulemd_component_emit_yaml_start:

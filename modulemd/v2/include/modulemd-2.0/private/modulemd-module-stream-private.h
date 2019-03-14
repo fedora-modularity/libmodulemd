@@ -76,6 +76,10 @@ void
 modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
                                                 GPtrArray *array);
 
+gboolean
+modulemd_module_stream_validate_components (GHashTable *components,
+                                            GError **error);
+
 
 /* Some macros used for copy operations */
 #define STREAM_COPY_IF_SET(version, dest, src, property)                      \

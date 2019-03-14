@@ -1097,6 +1097,38 @@ data:
                     stream.build_depends_on_stream(
                         'streamname', 'f30'), True)
 
+    def test_validate_buildafter(self):
+        # buildafter is supported only on v2
+
+        # Test a valid module stream with buildafter set
+        stream = Modulemd.ModuleStream.read_file(
+            "%s/modulemd/v2/tests/test_data/buildafter/good_buildafter.yaml" %
+            (os.getenv('MESON_SOURCE_ROOT')), True)
+
+        self.assertIsNotNone(stream)
+        self.assertTrue(stream.validate())
+
+        # Should fail validation if both buildorder and buildafter are set for
+        # the same component.
+        with self.assertRaisesRegex(gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"):
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/modulemd/v2/tests/test_data/buildafter/both_same_component.yaml" %
+                (os.getenv('MESON_SOURCE_ROOT')), True)
+
+        # Should fail validation if both buildorder and buildafter are set in
+        # different components of the same stream.
+        with self.assertRaisesRegex(gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"):
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/modulemd/v2/tests/test_data/buildafter/mixed_buildorder.yaml" %
+                (os.getenv('MESON_SOURCE_ROOT')), True)
+
+        # Should fail if a key specified in a buildafter set does not exist
+        # for this module stream.
+        with self.assertRaisesRegex(gi.repository.GLib.GError, "not found in components list"):
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/modulemd/v2/tests/test_data/buildafter/invalid_key.yaml" %
+                (os.getenv('MESON_SOURCE_ROOT')), True)
+
 
 if __name__ == '__main__':
     unittest.main()

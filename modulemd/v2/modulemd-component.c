@@ -170,6 +170,30 @@ modulemd_component_get_buildafter_as_strv (ModulemdComponent *self)
 }
 
 
+GHashTable *
+modulemd_component_get_buildafter_internal (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return priv->buildafter;
+}
+
+
+gboolean
+modulemd_component_has_buildafter (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return !!g_hash_table_size (priv->buildafter);
+}
+
+
 void
 modulemd_component_set_buildorder (ModulemdComponent *self, gint64 buildorder)
 {

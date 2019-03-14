@@ -22,6 +22,7 @@
 #include "modulemd-service-level.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-buildopts-private.h"
+#include "private/modulemd-component-private.h"
 #include "private/modulemd-component-rpm-private.h"
 #include "private/modulemd-component-module-private.h"
 #include "private/modulemd-dependencies-private.h"
@@ -879,6 +880,7 @@ modulemd_module_stream_v1_validate (ModulemdModuleStream *self, GError **error)
   gpointer key, value;
   gchar *nevra = NULL;
   ModulemdModuleStreamV1 *v1_self = NULL;
+  g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self), FALSE);
   v1_self = MODULEMD_MODULE_STREAM_V1 (self);
@@ -914,6 +916,16 @@ modulemd_module_stream_v1_validate (ModulemdModuleStream *self, GError **error)
                    MODULEMD_YAML_ERROR,
                    MODULEMD_YAML_ERROR_MISSING_REQUIRED,
                    "Module license is missing");
+      return FALSE;
+    }
+
+  /* Verify that the components are consistent with regards to buildorder and
+   * buildafter values.
+   */
+  if (!modulemd_module_stream_validate_components (v1_self->rpm_components,
+                                                   &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return FALSE;
     }
 

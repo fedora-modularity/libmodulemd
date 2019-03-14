@@ -75,6 +75,51 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *key)
 }
 
 
+static gboolean
+modulemd_component_default_validate (ModulemdComponent *self, GError **error)
+{
+  if (!self)
+    return FALSE;
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+
+  if (priv->buildorder && modulemd_component_has_buildafter (self))
+    {
+      /* It is invalid to have both buildorder and buildafter set on a
+       * component
+       */
+      g_set_error (
+        error,
+        MODULEMD_ERROR,
+        MODULEMD_ERROR_VALIDATE,
+        "Cannot mix buildorder and buildafter in the same component");
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_component_validate (ModulemdComponent *self, GError **error)
+{
+  ModulemdComponentClass *klass;
+
+  if (!self)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self);
+  g_return_val_if_fail (klass->validate, FALSE);
+
+  return klass->validate (self, error);
+}
+
+
 static ModulemdComponent *
 modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
 {
@@ -301,6 +346,7 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   klass->copy = modulemd_component_copy_component;
   klass->set_name = NULL;
   klass->get_name = modulemd_component_get_key;
+  klass->validate = modulemd_component_default_validate;
 
   properties[PROP_BUILDORDER] = g_param_spec_int64 (
     "buildorder",
@@ -375,7 +421,17 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
 
+  g_autoptr (GError) nested_error = NULL;
+
   MODULEMD_INIT_TRACE ();
+
+  if (!modulemd_component_validate (self, &nested_error))
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Component failed to validate: ");
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, priv->name, YAML_PLAIN_SCALAR_STYLE, error))

@@ -57,14 +57,14 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *key);
 
 
 /**
- * modulemd_component_set_builderder:
+ * modulemd_component_set_buildorder:
  * @self: This #ModulemdComponent object
  * @buildorder: The order this component should be built relative to others.
  *
  * Since: 2.0
  */
 void
-modulemd_component_set_buildorder (ModulemdComponent *self, gint64 builderder);
+modulemd_component_set_buildorder (ModulemdComponent *self, gint64 buildorder);
 
 
 /**

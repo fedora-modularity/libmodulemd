@@ -106,7 +106,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
 
 static void
 merger_test_merger_with_real_world_data (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+                                         gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleIndex) fedora_index = NULL;
   g_autoptr (ModulemdModuleIndex) updates_index = NULL;

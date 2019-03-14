@@ -51,9 +51,9 @@ static GParamSpec *properties[N_PROPS];
 
 
 ModulemdComponentRpm *
-modulemd_component_rpm_new (const gchar *name)
+modulemd_component_rpm_new (const gchar *key)
 {
-  return g_object_new (MODULEMD_TYPE_COMPONENT_RPM, "name", name, NULL);
+  return g_object_new (MODULEMD_TYPE_COMPONENT_RPM, "name", key, NULL);
 }
 
 
@@ -100,7 +100,7 @@ static const gchar *
 modulemd_component_rpm_get_name (ModulemdComponent *self);
 
 static ModulemdComponent *
-modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *name)
+modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *key)
 {
   ModulemdComponentRpm *rpm_self = NULL;
   g_autoptr (ModulemdComponentRpm) copy = NULL;
@@ -109,7 +109,7 @@ modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *name)
 
   copy = MODULEMD_COMPONENT_RPM (
     MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
-      ->copy (self, name));
+      ->copy (self, key));
 
   modulemd_component_rpm_set_ref (copy,
                                   modulemd_component_rpm_get_ref (rpm_self));

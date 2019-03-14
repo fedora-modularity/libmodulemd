@@ -35,14 +35,15 @@ G_DECLARE_FINAL_TYPE (ModulemdComponentModule,
 
 /**
  * modulemd_component_module_new:
- * @name: (not nullable): The name of this module component.
+ * @key: (not nullable): The key of this module component. Used when looking up
+ * components from a #ModulemdModuleStream.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdComponentModule object.
  *
  * Since: 2.0
  */
 ModulemdComponentModule *
-modulemd_component_module_new (const gchar *name);
+modulemd_component_module_new (const gchar *key);
 
 
 /**

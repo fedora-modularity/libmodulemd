@@ -60,7 +60,7 @@ modulemd_component_finalize (GObject *object)
 
 
 ModulemdComponent *
-modulemd_component_copy (ModulemdComponent *self, const gchar *name)
+modulemd_component_copy (ModulemdComponent *self, const gchar *key)
 {
   g_return_val_if_fail (self, NULL);
 
@@ -69,20 +69,20 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *name)
   klass = MODULEMD_COMPONENT_GET_CLASS (self);
   g_return_val_if_fail (klass->copy, NULL);
 
-  return klass->copy (self, name);
+  return klass->copy (self, key);
 }
 
 
 static ModulemdComponent *
-modulemd_component_copy_component (ModulemdComponent *self, const gchar *name)
+modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
 {
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
   g_autoptr (ModulemdComponent) m = NULL;
-  if (name == NULL)
-    name = priv->name;
+  if (key == NULL)
+    key = priv->name;
 
-  m = g_object_new (G_OBJECT_TYPE (self), "name", name, NULL);
+  m = g_object_new (G_OBJECT_TYPE (self), "name", key, NULL);
 
   modulemd_component_set_buildorder (m,
                                      modulemd_component_get_buildorder (self));
@@ -214,6 +214,9 @@ modulemd_component_get_property (GObject *object,
       break;
 
     case PROP_NAME:
+      /* On lookups, return the real name value, not the key. This differs from
+       * the set function, which always assigns the key.
+       */
       g_value_set_string (value, modulemd_component_get_name (self));
       break;
 
@@ -241,6 +244,7 @@ modulemd_component_set_property (GObject *object,
       break;
 
     case PROP_NAME:
+      /* On object creation, we set the key. */
       modulemd_component_set_key (self, g_value_get_string (value));
       break;
 
@@ -277,7 +281,9 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   properties[PROP_NAME] = g_param_spec_string (
     "name",
     "Name",
-    "The name of the component.",
+    "The name of the component. This is the real name of the component and "
+    "may differ from the key used to associate this component with the "
+    "ModuleStream.",
     C_DEFAULT_STRING,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
   properties[PROP_RATIONALE] =

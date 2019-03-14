@@ -32,7 +32,7 @@ struct _ModulemdComponentClass
 {
   GObjectClass parent_class;
 
-  ModulemdComponent *(*copy) (ModulemdComponent *self, const gchar *name);
+  ModulemdComponent *(*copy) (ModulemdComponent *self, const gchar *key);
   void (*set_name) (ModulemdComponent *self, const gchar *name);
   const gchar *(*get_name) (ModulemdComponent *self);
 
@@ -44,14 +44,16 @@ struct _ModulemdComponentClass
 /**
  * modulemd_component_copy:
  * @self: This #ModulemdComponent object
- * @name: (in) (nullable): An optional new name for the copied component
+ * @key: (in) (nullable): An optional new key for the copied component which is
+ * used as the lookup key when this component is attached to a
+ * #ModulemdModuleStream.
  *
  * Returns: (transfer full): A newly-allocated copy of @self
  *
  * Since: 2.0
  */
 ModulemdComponent *
-modulemd_component_copy (ModulemdComponent *self, const gchar *name);
+modulemd_component_copy (ModulemdComponent *self, const gchar *key);
 
 
 /**

@@ -35,6 +35,7 @@ struct _ModulemdComponentClass
   ModulemdComponent *(*copy) (ModulemdComponent *self, const gchar *key);
   void (*set_name) (ModulemdComponent *self, const gchar *name);
   const gchar *(*get_name) (ModulemdComponent *self);
+  gboolean (*validate) (ModulemdComponent *self, GError **error);
 
   /* Padding to allow adding up to 8 new virtual functions without
    * breaking ABI. */
@@ -54,6 +55,24 @@ struct _ModulemdComponentClass
  */
 ModulemdComponent *
 modulemd_component_copy (ModulemdComponent *self, const gchar *key);
+
+
+/**
+ * modulemd_component_validate:
+ * @self: (in): This #ModulemdComponent.
+ * @error: (out): A #GError that will return the reason for a validation error.
+ *
+ * Verifies that all stored values are internally consistent and that the
+ * component is sufficiently-complete for emitting. This function is called
+ * implicitly before attempting to emit the contents.
+ *
+ * Returns: TRUE if the #ModulemdComponent passed validation. FALSE and sets
+ * @error appropriately if validation fails.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_component_validate (ModulemdComponent *self, GError **error);
 
 
 /**

@@ -100,6 +100,13 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   g_assert_cmpstr (baseline, ==, deduplicated);
 }
 
+static void
+merger_test_merger_with_modified (CommonMmdTestFixture *fixture,
+                         gconstpointer user_data)
+{
+  //empty C function same as Pass statement in Python
+}
+
 
 int
 main (int argc, char *argv[])

@@ -9,6 +9,7 @@
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -616,6 +617,65 @@ module_stream_v2_test_depends_on_stream (ModuleStreamFixture *fixture,
   g_clear_object (&stream);
 }
 
+static void
+module_stream_v2_test_validate_buildafter (ModuleStreamFixture *fixture,
+                                           gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Test a valid module stream with buildafter set */
+  path = g_strdup_printf (
+    "%s/modulemd/v2/tests/test_data/buildafter/good_buildafter.yaml",
+    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_null (error);
+  g_clear_pointer (&path, g_free);
+  g_clear_object (&stream);
+
+  /* Should fail validation if both buildorder and buildafter are set for the
+   * same component.
+   */
+  path = g_strdup_printf (
+    "%s/modulemd/v2/tests/test_data/buildafter/both_same_component.yaml",
+    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_null (stream);
+  g_clear_error (&error);
+  g_clear_pointer (&path, g_free);
+
+  /* Should fail validation if both buildorder and buildafter are set in
+   * different components of the same stream.
+   */
+  path = g_strdup_printf (
+    "%s/modulemd/v2/tests/test_data/buildafter/mixed_buildorder.yaml",
+    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_null (stream);
+  g_clear_error (&error);
+  g_clear_pointer (&path, g_free);
+
+  /* Should fail if a key specified in a buildafter set does not exist for this
+   * module stream.
+   */
+  path = g_strdup_printf (
+    "%s/modulemd/v2/tests/test_data/buildafter/invalid_key.yaml",
+    g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_null (stream);
+  g_clear_error (&error);
+  g_clear_pointer (&path, g_free);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -671,6 +731,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_depends_on_stream,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildafter",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_validate_buildafter,
               NULL);
 
 

@@ -21,6 +21,7 @@
 #include "modulemd-profile.h"
 #include "modulemd-service-level.h"
 #include "private/modulemd-buildopts-private.h"
+#include "private/modulemd-component-private.h"
 #include "private/modulemd-component-rpm-private.h"
 #include "private/modulemd-component-module-private.h"
 #include "private/modulemd-dependencies-private.h"
@@ -792,6 +793,17 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
                    "Module license is missing");
       return FALSE;
     }
+
+  /* Verify that the components are consistent with regards to buildorder and
+   * buildafter values.
+   */
+  if (!modulemd_module_stream_validate_components (v2_self->rpm_components,
+                                                   &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
 
   /* Iterate through the artifacts and validate that they are in the proper
    * NEVRA format

@@ -16,6 +16,7 @@
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "private/modulemd-component-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
@@ -559,6 +560,88 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
 
   return TRUE;
 }
+
+
+gboolean
+modulemd_module_stream_validate_components (GHashTable *components,
+                                            GError **error)
+{
+  GHashTableIter iter, buildafter_iter;
+  gpointer key, value;
+  gpointer ba_key, ba_value;
+  gboolean has_buildorder = FALSE;
+  gboolean has_buildafter = FALSE;
+
+  /* Iterate through components and verify that they don't mix buildorder and
+   * buildafter
+   */
+  g_hash_table_iter_init (&iter, components);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      /* First, ensure that the component validates in general */
+      if (!modulemd_component_validate (MODULEMD_COMPONENT (value), error))
+        {
+          return FALSE;
+        }
+
+      /* Record whether we've seen buildorder at least once */
+      if (modulemd_component_get_buildorder (MODULEMD_COMPONENT (value)))
+        {
+          has_buildorder = TRUE;
+        }
+
+      /* Record whether we've seen buildafter at least once */
+      if (modulemd_component_has_buildafter (MODULEMD_COMPONENT (value)))
+        {
+          has_buildafter = TRUE;
+
+          /* Verify the all the items listed in buildafter actually appear
+           * in this stream
+           */
+          if (!has_buildorder)
+            {
+              g_hash_table_iter_init (
+                &buildafter_iter,
+                modulemd_component_get_buildafter_internal (
+                  MODULEMD_COMPONENT (value)));
+
+              while (
+                g_hash_table_iter_next (&buildafter_iter, &ba_key, &ba_value))
+                {
+                  /* Check each entry in the list and confirm that it appears
+                   * in the table of components
+                   */
+                  if (!g_hash_table_contains (components, ba_key))
+                    {
+                      g_set_error (
+                        error,
+                        MODULEMD_ERROR,
+                        MODULEMD_ERROR_VALIDATE,
+                        "Buildafter '%s' not found in components list",
+                        (const gchar *)ba_key);
+                      return FALSE;
+                    }
+                }
+            }
+        }
+
+      /* If both buildorder and buildafter have been seen in this stream, it
+       * is invalid.
+       */
+      if (has_buildafter && has_buildorder)
+        {
+          g_set_error (
+            error,
+            MODULEMD_ERROR,
+            MODULEMD_ERROR_VALIDATE,
+            "Cannot mix buildorder and buildafter in the same stream");
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
 
 gboolean
 modulemd_module_stream_validate (ModulemdModuleStream *self, GError **error)

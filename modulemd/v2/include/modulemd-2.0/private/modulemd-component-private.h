@@ -28,6 +28,23 @@
 
 
 /**
+ * modulemd_component_parse_buildafter:
+ * @self: This #ModulemdComponent
+ * @emitter: (inout): A libyaml emitter object positioned just after the
+ * "buildafter" key in a #ModulemdComponent section of a YAML document.
+ * @error: (out): A #GError that will return the reason for a parse failure.
+ *
+ * Returns: TRUE if the buildafter list could be parsed successfully.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_component_parse_buildafter (ModulemdComponent *self,
+                                     yaml_parser_t *parser,
+                                     GError **error);
+
+
+/**
  * modulemd_component_emit_yaml_start:
  * @self: This #ModulemdComponent
  * @emitter: (inout): A libyaml emitter object positioned where Component start

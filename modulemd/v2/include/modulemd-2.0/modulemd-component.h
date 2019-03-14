@@ -57,6 +57,33 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *key);
 
 
 /**
+ * modulemd_component_add_buildafter:
+ * @self: This #ModulemdComponent object
+ * @key: (in): A key representing another component in the
+ * #ModulemdModuleStream components map.
+ *
+ * Add a build dependency of this component.
+ *
+ * Since: 2.2
+ */
+void
+modulemd_component_add_buildafter (ModulemdComponent *self, const gchar *key);
+
+
+/**
+ * modulemd_component_get_buildafter_as_strv: (rename-to modulemd_component_get_buildafter)
+ * @self: This #ModulemdComponent object
+ *
+ * Returns: (transfer full): The set of component keys that this component
+ * depends upon.
+ *
+ * Since: 2.2
+ */
+GStrv
+modulemd_component_get_buildafter_as_strv (ModulemdComponent *self);
+
+
+/**
  * modulemd_component_set_buildorder:
  * @self: This #ModulemdComponent object
  * @buildorder: The order this component should be built relative to others.

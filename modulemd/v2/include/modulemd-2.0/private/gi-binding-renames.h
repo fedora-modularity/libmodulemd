@@ -30,6 +30,12 @@ gchar **
 modulemd_buildopts_get_rpm_whitelist (ModulemdBuildopts *self);
 
 /**
+ * modulemd_component_get_buildafter: (skip)
+ */
+GStrv
+modulemd_component_get_buildafter (ModulemdComponent *self);
+
+/**
  * modulemd_component_rpm_get_arches: (skip)
  */
 GStrv

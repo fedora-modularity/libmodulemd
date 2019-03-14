@@ -596,6 +596,19 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
               r->multilib = g_steal_pointer (&list);
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "buildafter"))
+            {
+              if (!modulemd_component_parse_buildafter (
+                    MODULEMD_COMPONENT (r), parser, &nested_error))
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse buildafter in component: %s",
+                    nested_error->message);
+                }
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "buildorder"))
             {
               buildorder = modulemd_yaml_parse_int64 (parser, &nested_error);

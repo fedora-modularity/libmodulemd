@@ -271,6 +271,14 @@ data:
                 # is assumed.
                 # Optional.
                 ref: 26ca0c0
+                # Use the "buildafter" value to specify that this component
+                # must be be ordered later than some other entries in this map.
+                # The values of this array come from the keys of this map and
+                # not the real component name to enable bootstrapping.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
+                # buildafter:
+                #    - baz
             # baz has no extra options
             baz:
                 rationale: This one is here to demonstrate other stuff.
@@ -301,6 +309,8 @@ data:
                 # In this example, bar, baz and xxx are built first in
                 # no particular order, then tagged into the buildroot,
                 # then, finally, xyz is built.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
                 buildorder: 10
         # Module content of this module
         # Included modules are built in the shared buildroot, together with

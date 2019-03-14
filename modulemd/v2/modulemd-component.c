@@ -23,6 +23,7 @@
 typedef struct
 {
   gint64 buildorder;
+  GHashTable *buildafter;
   gchar *name;
   gchar *rationale;
 } ModulemdComponentPrivate;
@@ -54,6 +55,7 @@ modulemd_component_finalize (GObject *object)
 
   g_clear_pointer (&priv->name, g_free);
   g_clear_pointer (&priv->rationale, g_free);
+  g_clear_pointer (&priv->buildafter, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_component_parent_class)->finalize (object);
 }
@@ -78,6 +80,7 @@ modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
 {
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
+  ModulemdComponentPrivate *m_priv = NULL;
   g_autoptr (ModulemdComponent) m = NULL;
   if (key == NULL)
     key = priv->name;
@@ -89,7 +92,36 @@ modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
   modulemd_component_set_rationale (m,
                                     modulemd_component_get_rationale (self));
 
+
+  m_priv = modulemd_component_get_instance_private (m);
+  g_clear_pointer (&m_priv->buildafter, g_hash_table_unref);
+  m_priv->buildafter = modulemd_hash_table_deep_set_copy (priv->buildafter);
+
   return g_steal_pointer (&m);
+}
+
+
+void
+modulemd_component_add_buildafter (ModulemdComponent *self, const gchar *key)
+{
+  g_return_if_fail (MODULEMD_IS_COMPONENT (self));
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  g_hash_table_add (priv->buildafter, g_strdup (key));
+}
+
+
+GStrv
+modulemd_component_get_buildafter_as_strv (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), NULL);
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return modulemd_ordered_str_keys_as_strv (priv->buildafter);
 }
 
 
@@ -300,7 +332,38 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
 static void
 modulemd_component_init (ModulemdComponent *self)
 {
-  /* Nothing to init */
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  priv->buildafter =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+}
+
+
+gboolean
+modulemd_component_parse_buildafter (ModulemdComponent *self,
+                                     yaml_parser_t *parser,
+                                     GError **error)
+{
+  g_autoptr (GHashTable) buildafter = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  MODULEMD_INIT_TRACE ();
+
+  buildafter = modulemd_yaml_parse_string_set (parser, &nested_error);
+  if (!buildafter)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
+  g_clear_pointer (&priv->buildafter, g_hash_table_unref);
+  priv->buildafter = g_steal_pointer (&buildafter);
+
+  return TRUE;
 }
 
 
@@ -345,7 +408,13 @@ modulemd_component_emit_yaml_buildorder (ModulemdComponent *self,
                                          yaml_emitter_t *emitter,
                                          GError **error)
 {
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
   g_autofree gchar *buildorder = NULL;
+  g_autoptr (GPtrArray) buildafter = NULL;
+
+  MODULEMD_INIT_TRACE ();
 
   if (modulemd_component_get_buildorder (self) != 0)
     {
@@ -359,6 +428,23 @@ modulemd_component_emit_yaml_buildorder (ModulemdComponent *self,
       if (!mmd_emitter_scalar (
             emitter, buildorder, YAML_PLAIN_SCALAR_STYLE, error))
         return FALSE;
+    }
+
+  else if (g_hash_table_size (priv->buildafter))
+    {
+      buildafter =
+        modulemd_ordered_str_keys (priv->buildafter, modulemd_strcmp_sort);
+
+      EMIT_SCALAR (emitter, error, "buildafter");
+
+      EMIT_SEQUENCE_START (emitter, error);
+
+      for (gint i = 0; i < buildafter->len; i++)
+        {
+          EMIT_SCALAR (emitter, error, g_ptr_array_index (buildafter, i));
+        }
+
+      EMIT_SEQUENCE_END (emitter, error);
     }
 
   return TRUE;

@@ -31,3 +31,5 @@ jobs:
       script: ./.travis/travis-fedora.sh
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
+    - name: "Mageia 7"
+      script: ./.travis/travis-mageia.sh

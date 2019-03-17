@@ -121,7 +121,7 @@ modulemd_component_get_rationale (ModulemdComponent *self);
  * Returns: TRUE if all of the objects and variables composing the two
  * ModulemdComponents are equal. False, otherwise. 
  *
- * Since: 2.1
+ * Since: 2.2
  */
 gboolean
 modulemd_component_equals (ModulemdComponent *self, ModulemdComponent *other);

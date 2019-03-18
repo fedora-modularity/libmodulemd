@@ -171,6 +171,54 @@ modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b)
   return TRUE;
 }
 
+/* Processes the set of keys first, then calls a unique compare function to handle any kind of value*/
+gboolean
+modulemd_hash_table_equals (GHashTable *a,
+                            GHashTable *b,
+                            GEqualFunc compare_func)
+{
+  g_autoptr (GPtrArray) set_a = NULL;
+  g_autoptr (GPtrArray) set_b = NULL;
+  int i = 0;
+  gchar *key = NULL;
+  gchar *value_a = NULL;
+  gchar *value_b = NULL;
+
+  /*Check size*/
+  if (g_hash_table_size (a) != g_hash_table_size (b))
+    {
+      return FALSE;
+    }
+
+  /*Equality check on keys of hashtable*/
+  set_a = modulemd_ordered_str_keys (a, modulemd_strcmp_sort);
+  set_b = modulemd_ordered_str_keys (b, modulemd_strcmp_sort);
+
+  for (i = 0; i < set_a->len; i++)
+    {
+      if (!g_str_equal (g_ptr_array_index (set_a, i),
+                        g_ptr_array_index (set_b, i)))
+        {
+          return FALSE;
+        }
+    }
+
+  /*Equality check for each value of all keys of hashtable*/
+  for (i = 0; i < set_a->len; i++)
+    {
+      key = g_ptr_array_index (set_a, i);
+      value_a = g_hash_table_lookup (a, key);
+      value_b = g_hash_table_lookup (b, key);
+
+      if (!compare_func (value_a, value_b))
+        {
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
 
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b)

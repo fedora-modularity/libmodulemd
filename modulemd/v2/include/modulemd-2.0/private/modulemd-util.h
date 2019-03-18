@@ -79,6 +79,11 @@ modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig);
 gboolean
 modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b);
 
+gboolean
+modulemd_hash_table_equals (GHashTable *a,
+                            GHashTable *b,
+                            GEqualFunc compare_func);
+
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
 

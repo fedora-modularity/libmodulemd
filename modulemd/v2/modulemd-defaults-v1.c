@@ -26,7 +26,8 @@ struct _ModulemdDefaultsV1
 
   gchar *default_stream;
 
-  /* @key: stream name @value: GHashTable set of profile names
+  /* @key: stream name
+   * @value: GHashTable set of profile names
    */
   GHashTable *profile_defaults;
 
@@ -44,6 +45,57 @@ struct _ModulemdDefaultsV1
 G_DEFINE_TYPE (ModulemdDefaultsV1,
                modulemd_defaults_v1,
                MODULEMD_TYPE_DEFAULTS)
+
+
+static gboolean
+modulemd_defaults_v1_equals (ModulemdDefaults *self_1,
+                             ModulemdDefaults *self_2)
+{
+  ModulemdDefaultsV1 *v1_self_1 = NULL;
+  ModulemdDefaultsV1 *v1_self_2 = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS_V1 (self_1), FALSE);
+  v1_self_1 = MODULEMD_DEFAULTS_V1 (self_1);
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS_V1 (self_2), FALSE);
+  v1_self_2 = MODULEMD_DEFAULTS_V1 (self_2);
+
+  if (!MODULEMD_DEFAULTS_CLASS (modulemd_defaults_v1_parent_class)
+         ->equals (self_1, self_2))
+    {
+      return FALSE;
+    }
+
+  if (g_strcmp0 (v1_self_1->default_stream, v1_self_2->default_stream) != 0)
+    {
+      return FALSE;
+    }
+
+  /*Check profile_defaults: size, keys, values*/
+  if (!modulemd_hash_table_equals (v1_self_1->profile_defaults,
+                                   v1_self_2->profile_defaults,
+                                   modulemd_hash_table_sets_are_equal))
+    {
+      return FALSE;
+    }
+
+  /*Check intent_default_streams: size, keys, values*/
+  if (!modulemd_hash_table_equals (v1_self_1->intent_default_streams,
+                                   v1_self_2->intent_default_streams,
+                                   g_str_equal))
+    {
+      return FALSE;
+    }
+
+  /*Check intent_default_profiles: size, keys, values*/
+  if (!modulemd_hash_table_equals (v1_self_1->intent_default_profiles,
+                                   v1_self_2->intent_default_profiles,
+                                   modulemd_hash_table_sets_are_equal))
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
 
 
 ModulemdDefaultsV1 *
@@ -440,6 +492,7 @@ modulemd_defaults_v1_class_init (ModulemdDefaultsV1Class *klass)
   defaults_class->copy = modulemd_defaults_v1_copy;
   defaults_class->get_mdversion = modulemd_defaults_v1_get_mdversion;
   defaults_class->validate = modulemd_defaults_v1_validate;
+  defaults_class->equals = modulemd_defaults_v1_equals;
 }
 
 

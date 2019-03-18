@@ -24,6 +24,7 @@
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
+
 static void
 defaults_test_construct (CommonMmdTestFixture *fixture,
                          gconstpointer user_data)
@@ -163,6 +164,190 @@ defaults_test_get_set_default_stream (CommonMmdTestFixture *fixture,
   /* TODO: Remove the default stream */
 
   /* TODO: Get, set and remove default streams for an intent */
+}
+
+
+static void
+defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdDefaultsV1) defaults_1 = NULL;
+  g_autoptr (ModulemdDefaultsV1) defaults_2 = NULL;
+  g_auto (GStrv) profiles_1 = NULL;
+  g_auto (GStrv) profiles_2 = NULL;
+
+  /*Two defaults objects containing only a matched module name*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+
+  defaults_2 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+
+  g_assert_true (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                           MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Two defaults objects containing different module names*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+
+  defaults_2 = modulemd_defaults_v1_new ("bar");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+
+  g_assert_false (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                            MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Two defaults objects that contain a matching module name and a matching module stream*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+  modulemd_defaults_v1_set_default_stream (defaults_1, "latest", NULL);
+
+  defaults_2 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+  modulemd_defaults_v1_set_default_stream (defaults_2, "latest", NULL);
+
+  g_assert_true (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                           MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Two defaults objects that contain a different module name and a matching module stream*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+  modulemd_defaults_v1_set_default_stream (defaults_1, "latest", NULL);
+
+  defaults_2 = modulemd_defaults_v1_new ("bar");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+  modulemd_defaults_v1_set_default_stream (defaults_2, "latest", NULL);
+
+  g_assert_false (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                            MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Two defaults objects that contain a matching module name and a different module stream*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+  modulemd_defaults_v1_set_default_stream (defaults_1, "latest", NULL);
+
+  defaults_2 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+  modulemd_defaults_v1_set_default_stream (defaults_2, "super_old", NULL);
+
+  g_assert_false (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                            MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /* Add matched profile defaults to objects with matched module and stream names. */
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+  modulemd_defaults_v1_set_default_stream (defaults_1, "latest", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_1, "latest", "server", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_1, "latest", "client", NULL);
+
+  defaults_2 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+  modulemd_defaults_v1_set_default_stream (defaults_2, "latest", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_2, "latest", "server", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_2, "latest", "client", NULL);
+
+  /* The profiles must be in lexical order */
+  profiles_1 = modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+    defaults_1, "latest", NULL);
+  profiles_2 = modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+    defaults_2, "latest", NULL);
+  g_assert_cmpstr (profiles_1[0], ==, "client");
+  g_assert_cmpstr (profiles_1[0], ==, profiles_2[0]);
+  g_assert_cmpstr (profiles_1[1], ==, "server");
+  g_assert_cmpstr (profiles_1[1], ==, profiles_2[1]);
+  g_assert_null (profiles_1[2]);
+  g_assert_null (profiles_2[2]);
+  g_clear_pointer (&profiles_1, g_strfreev);
+  g_clear_pointer (&profiles_2, g_strfreev);
+
+  g_assert_true (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                           MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Add mismatched profile defaults to objects with matched module and stream names.*/
+  defaults_1 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_1);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_1));
+  modulemd_defaults_v1_set_default_stream (defaults_1, "latest", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_1, "latest", "selena", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_1, "latest", "client", NULL);
+
+  defaults_2 = modulemd_defaults_v1_new ("foo");
+  g_assert_nonnull (defaults_2);
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+  g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults_2));
+  modulemd_defaults_v1_set_default_stream (defaults_2, "latest", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_2, "latest", "niharika", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults_2, "latest", "client", NULL);
+
+
+  /* The profiles must be in lexical order */
+  profiles_1 = modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+    defaults_1, "latest", NULL);
+  profiles_2 = modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+    defaults_2, "latest", NULL);
+  g_assert_cmpstr (profiles_1[0], ==, "client");
+  g_assert_cmpstr (profiles_1[0], ==, profiles_2[0]);
+  g_assert_cmpstr (profiles_1[1], ==, "selena");
+  g_assert_cmpstr (profiles_1[1], !=, profiles_2[1]);
+  g_assert_null (profiles_1[2]);
+  g_assert_null (profiles_2[2]);
+  g_clear_pointer (&profiles_1, g_strfreev);
+  g_clear_pointer (&profiles_2, g_strfreev);
+
+  g_assert_false (modulemd_defaults_equals (MODULEMD_DEFAULTS (defaults_1),
+                                            MODULEMD_DEFAULTS (defaults_2)));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
 }
 
 
@@ -561,6 +746,13 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
+  g_test_add ("/modulemd/v2/defaults/v1/equals",
+              CommonMmdTestFixture,
+              NULL,
+              NULL,
+              defaults_test_equals,
+              NULL);
+
   g_test_add ("/modulemd/v2/defaults/v1/construct",
               CommonMmdTestFixture,
               NULL,

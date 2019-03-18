@@ -138,5 +138,18 @@ modulemd_service_level_get_eol (ModulemdServiceLevel *self);
 gchar *
 modulemd_service_level_get_eol_as_string (ModulemdServiceLevel *self);
 
+/**
+ * modulemd_service_level_equals:
+ * @self_1: A #ModulemdServiceLevel
+ * @self_2: A #ModulemdServiceLevel
+ *
+ * Returns: TRUE if both the dates are either NULL or valid, FALSE otherwise.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_service_level_equals (ModulemdServiceLevel *self_1,
+                               ModulemdServiceLevel *self_2);
+
 
 G_END_DECLS

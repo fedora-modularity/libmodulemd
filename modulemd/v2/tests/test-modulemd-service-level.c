@@ -92,6 +92,110 @@ service_level_test_construct (ServiceLevelFixture *fixture,
 
 
 static void
+service_level_test_equals (ServiceLevelFixture *fixture,
+                           gconstpointer user_data)
+{
+  g_autoptr (ModulemdServiceLevel) sl_1 = NULL;
+  g_autoptr (ModulemdServiceLevel) sl_2 = NULL;
+  g_autofree gchar *eol_string = NULL;
+
+  /* Test 2 service levels with same name*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+
+  sl_2 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+
+  g_assert_true (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+
+  /* Test 2 service levels with different names*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+
+  sl_2 = modulemd_service_level_new ("bar");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+
+  g_assert_false (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+
+  /* Test 2 service levels with same name and same eol*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+  modulemd_service_level_set_eol_ymd (sl_1, 2018, 11, 13);
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_1));
+
+  sl_2 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+  modulemd_service_level_set_eol_ymd (sl_2, 2018, 11, 13);
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_2));
+
+  g_assert_true (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+
+  /* Test 2 service levels with same name and different eol*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+  modulemd_service_level_set_eol_ymd (sl_1, 2018, 11, 13);
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_1));
+
+  sl_2 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+  modulemd_service_level_set_eol_ymd (sl_2, 1998, 05, 25);
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_2));
+
+  g_assert_false (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+
+  /* Test 2 service levels with same name and 1 invalid eol*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+  modulemd_service_level_set_eol_ymd (sl_1, 9999, 99, 99);
+  g_assert_null (modulemd_service_level_get_eol (sl_1));
+
+  sl_2 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+  modulemd_service_level_set_eol_ymd (sl_2, 1998, 05, 25);
+  g_assert_nonnull (modulemd_service_level_get_eol (sl_2));
+
+  g_assert_false (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+
+  /* Test 2 service levels with same name and both invalid eol*/
+  sl_1 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_1);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_1));
+  modulemd_service_level_set_eol_ymd (sl_1, 9999, 99, 99);
+  g_assert_null (modulemd_service_level_get_eol (sl_1));
+
+  sl_2 = modulemd_service_level_new ("foo");
+  g_assert_nonnull (sl_2);
+  g_assert_true (MODULEMD_IS_SERVICE_LEVEL (sl_2));
+  modulemd_service_level_set_eol_ymd (sl_2, 9999, 99, 98);
+  g_assert_null (modulemd_service_level_get_eol (sl_2));
+
+  g_assert_true (modulemd_service_level_equals (sl_1, sl_2));
+  g_clear_object (&sl_1);
+  g_clear_object (&sl_2);
+}
+
+
+static void
 service_level_test_copy (ServiceLevelFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
@@ -362,6 +466,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               service_level_test_get_name,
+              NULL);
+
+  g_test_add ("/modulemd/v2/servicelevel/equals",
+              ServiceLevelFixture,
+              NULL,
+              NULL,
+              service_level_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/servicelevel/copy",

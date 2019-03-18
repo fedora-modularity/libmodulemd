@@ -55,6 +55,37 @@ modulemd_service_level_new (const gchar *name)
 }
 
 
+gboolean
+modulemd_service_level_equals (ModulemdServiceLevel *self_1,
+                               ModulemdServiceLevel *self_2)
+{
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (self_2), FALSE);
+
+  if (g_strcmp0 (modulemd_service_level_get_name (self_1),
+                 modulemd_service_level_get_name (self_2)) != 0)
+    return FALSE;
+
+  /*if both eols are invalid, its equivalent*/
+  if (!g_date_valid (self_1->eol) && !g_date_valid (self_2->eol))
+    return TRUE;
+
+  if (!g_date_valid (self_1->eol) || !g_date_valid (self_2->eol))
+    return FALSE;
+
+  if (g_date_compare (self_1->eol, self_2->eol) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 ModulemdServiceLevel *
 modulemd_service_level_copy (ModulemdServiceLevel *self)
 {

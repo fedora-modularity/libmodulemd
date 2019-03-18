@@ -134,6 +134,36 @@ defaults_test_validate (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
+defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdDefaults) defaults_1 = NULL;
+  g_autoptr (ModulemdDefaults) defaults_2 = NULL;
+
+  /*Check equality for 2 default objects with same module name and mdversion*/
+  defaults_1 = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "foo");
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  defaults_2 = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "foo");
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+
+  g_assert_true (modulemd_defaults_equals (defaults_1, defaults_2));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+
+  /*Check equality for 2 default objects with different module name and same mdversion*/
+  defaults_1 = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "foo");
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_1));
+  defaults_2 = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "bar");
+  g_assert_true (MODULEMD_IS_DEFAULTS (defaults_2));
+
+  g_assert_false (modulemd_defaults_equals (defaults_1, defaults_2));
+
+  g_clear_object (&defaults_1);
+  g_clear_object (&defaults_2);
+}
+
+
+static void
 defaults_test_upgrade (CommonMmdTestFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
@@ -209,6 +239,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               defaults_test_validate,
+              NULL);
+
+  g_test_add ("/modulemd/v2/defaults/equals",
+              CommonMmdTestFixture,
+              NULL,
+              NULL,
+              defaults_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/defaults/upgrade",

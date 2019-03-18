@@ -63,6 +63,8 @@ struct _ModulemdDefaultsClass
 
   guint64 (*get_mdversion) (ModulemdDefaults *self);
 
+  gboolean (*equals) (ModulemdDefaults *self_1, ModulemdDefaults *self_2);
+
   /* Padding to allow adding up to 10 new virtual functions without
    * breaking ABI. */
   gpointer padding[10];
@@ -109,6 +111,19 @@ modulemd_defaults_copy (ModulemdDefaults *self);
  */
 gboolean
 modulemd_defaults_validate (ModulemdDefaults *self, GError **error);
+
+
+/**
+ * modulemd_defaults_equals:
+ * @self_1: (in): A #ModulemdDefaults object
+ * @self_2: (in): A #ModulemdDefaults object
+ *
+ * Returns: TRUE if both self_1 and self_2 contain equal values, FALSE if they differed.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_defaults_equals (ModulemdDefaults *self_1, ModulemdDefaults *self_2);
 
 
 /**

@@ -44,6 +44,47 @@ enum
 static GParamSpec *properties[N_PROPS];
 
 
+gboolean
+modulemd_defaults_equals (ModulemdDefaults *self_1, ModulemdDefaults *self_2)
+{
+  ModulemdDefaultsClass *klass;
+
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self_2), FALSE);
+
+  klass = MODULEMD_DEFAULTS_GET_CLASS (self_1);
+  g_return_val_if_fail (klass->equals, FALSE);
+
+  return klass->equals (self_1, self_2);
+}
+
+
+static gboolean
+modulemd_defaults_default_equals (ModulemdDefaults *self_1,
+                                  ModulemdDefaults *self_2)
+{
+  if (g_strcmp0 (modulemd_defaults_get_module_name (self_1),
+                 modulemd_defaults_get_module_name (self_2)) != 0)
+    return FALSE;
+
+  if (modulemd_defaults_get_modified (self_1) !=
+      modulemd_defaults_get_modified (self_2))
+    return FALSE;
+
+  if (modulemd_defaults_get_mdversion (self_1) !=
+      modulemd_defaults_get_mdversion (self_2))
+    return FALSE;
+
+  return TRUE;
+}
+
+
 ModulemdDefaults *
 modulemd_defaults_new (guint64 mdversion, const gchar *module_name)
 {
@@ -320,6 +361,7 @@ modulemd_defaults_class_init (ModulemdDefaultsClass *klass)
 
   klass->copy = modulemd_defaults_default_copy;
   klass->validate = modulemd_defaults_default_validate;
+  klass->equals = modulemd_defaults_default_equals;
 
   properties[PROP_MDVERSION] = g_param_spec_uint64 (
     "mdversion",

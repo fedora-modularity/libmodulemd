@@ -45,6 +45,30 @@ enum
 static GParamSpec *properties[N_PROPS];
 
 
+gboolean
+modulemd_buildopts_equals (ModulemdBuildopts *self_1,
+                           ModulemdBuildopts *self_2)
+{
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_2), FALSE);
+
+  if (!modulemd_hash_table_sets_are_equal (self_1->whitelist,
+                                           self_2->whitelist))
+    return FALSE;
+
+  if (g_strcmp0 (self_1->rpm_macros, self_2->rpm_macros) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 ModulemdBuildopts *
 modulemd_buildopts_new (void)
 {

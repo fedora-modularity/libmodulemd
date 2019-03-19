@@ -81,6 +81,151 @@ profile_test_construct (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
+profile_test_equals (ProfileFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdProfile) p_1 = NULL;
+  g_autoptr (ModulemdProfile) p_2 = NULL;
+
+  /*Test 2 objects with same name*/
+  p_1 = modulemd_profile_new ("testprofile");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_true (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /*Test 2 objects with different name*/
+  p_1 = modulemd_profile_new ("testing");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_false (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /* Test 2 profile objects with same name and description */
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "a test");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_true (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /* Test 2 profile objects with same name and different description */
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "b test");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_false (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /* Test 2 profile objects with same name, description, and rpms */
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  modulemd_profile_add_rpm (p_1, "testrpm");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "a test");
+  modulemd_profile_add_rpm (p_2, "testrpm");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_true (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /* Test 2 profile objects with same name, description, and different rpms */
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  modulemd_profile_add_rpm (p_1, "testrpm");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "a test");
+  modulemd_profile_add_rpm (p_2, "testingrpm");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_false (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /*Compare two RPM sets where the first sorted value matches and the second does not.*/
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  modulemd_profile_add_rpm (p_1, "a");
+  modulemd_profile_add_rpm (p_1, "b");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "a test");
+  modulemd_profile_add_rpm (p_1, "a");
+  modulemd_profile_add_rpm (p_1, "c");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_false (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+
+  /*Compare two RPM sets where the first sorted value matches, but one has more entries than the other.*/
+  p_1 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_1, "a test");
+  modulemd_profile_add_rpm (p_1, "a");
+  modulemd_profile_add_rpm (p_1, "b");
+  g_assert_nonnull (p_1);
+  g_assert_true (MODULEMD_IS_PROFILE (p_1));
+
+  p_2 = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_description (p_2, "a test");
+  modulemd_profile_add_rpm (p_1, "a");
+  modulemd_profile_add_rpm (p_1, "b");
+  modulemd_profile_add_rpm (p_1, "c");
+  g_assert_nonnull (p_2);
+  g_assert_true (MODULEMD_IS_PROFILE (p_2));
+
+  g_assert_false (modulemd_profile_equals (p_1, p_2));
+
+  g_clear_object (&p_1);
+  g_clear_object (&p_2);
+}
+
+
+static void
 profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdProfile) p = NULL;
@@ -351,6 +496,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               profile_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/profile/equals",
+              ProfileFixture,
+              NULL,
+              NULL,
+              profile_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/profile/copy",

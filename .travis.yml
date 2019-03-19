@@ -34,4 +34,4 @@ jobs:
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
     - name: "Documentation Update"
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./travis/travis-docs.sh; fi'
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-docs.sh; fi'

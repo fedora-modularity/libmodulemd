@@ -628,7 +628,6 @@ module_stream_test_community (ModuleStreamFixture *fixture,
        version <= MD_MODULESTREAM_VERSION_LATEST;
        version++)
   {
-    
     stream = modulemd_module_stream_new (version, "foo", "latest");
     g_assert_nonnull (stream);
     
@@ -642,28 +641,27 @@ module_stream_test_community (ModuleStreamFixture *fixture,
     // clang-format on
     g_assert_null(community);
     
-    modulemd_module_stream_set_community (stream, "https://example.com");
-    g_assert_cmpstr (modulemd_module_stream_get_community (stream), ==, "https://example.com");
+    modulemd_module_stream_set_community (stream, "http://example.com");
+    g_assert_cmpstr (modulemd_module_stream_get_community (stream), ==, "http://example.com");
     
     
     // clang-format off
     g_object_set (stream,
-                    "community", "https://redhat.com",
+                    "community", "http://redhat.com",
                     NULL);
     g_object_get (stream,
                     "community", &community,
                     NULL);
     
     // clang-format on
-    g_assert_cmpstr (community, ==, "https://redhat.com");
+    g_assert_cmpstr (community, ==, "http://redhat.com");
     g_clear_pointer (&community, g_free);
     
     
     
     g_clear_object (&stream);
     
-   }
-  
+  }
 }    
   
 int

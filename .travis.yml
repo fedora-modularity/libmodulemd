@@ -19,6 +19,8 @@ env:
     #   via the "travis encrypt" command using the project repo's public key
     - secure: "mMcLLwYU0rAQkJDQEw3NlX5l1e1DCuUfCHDhhvku4YMgLbMV3ADvrTvwfnZoimgRhVw5hWXLDGSdJ2jkwAraeNHLjyfDXn/NrPNvo8xAgbtlsWaCO76p3yecfdIzawbW2iKpkyIjw8fCgi2xRccvp2ZTinDspiN96aqqZuhwy/5WzavQG+ECTxkFW6tDcly/NUyy/CH6FH6fqp6tswd+VsqKgZLqybhrwW1/OPBr5e+QvVyfn3KAlWWiyUCj33WU1mxL+LhsS2cNXK5S5V1NOO624oXPCy6oJImONWh0feXuPu20LqoWE/uOVXOcNpSB+3EUA5mfj22ST0FPMrvwS9k2oZGLiIVfDyGmI+Hl/kI4tlh/7zolpaeQB/c8GCGRBuEr+k0J0pqVp7ptOSIw3n6l4R113Sp+EBqSOcNxNVgOoW6pMZSKM73Z9tlr1yHVKw0cfge8YUgplGf0cENgExyjW97W535h2VEMKlgdH9PCQgfTXYANBVp2My+u6CytUetjdJXLwjmjuXBiAtIsrSTUtZ3hx/D1RXygAq0l7YI4iHQOmumSy81rgO2xDs484z/Efs6EXg/zdxluPSND6o/A0OXx80FUa6dwDmP6AmBZsHggVUYK7Gduu0Dry/1lcc2avZqdyOSrLs02vnQaRxb84CKFbhUd93gnVlPki3M="
 
+    # This is the DOC_TOKEN
+    - secure: gOGYwbzAQ4fVZ53AdppercJ0w4rA2XzuZK964c7v46qxD64VFqMSra4O/Bk+0A7hHw5jw1aSvKU/eqoJpOOXPfgT/yth8hJ7XmC7powQiw/Atj2/dcWsmCMxX03uefur8LHGQgNWN4W6lbWMdTyLKzmN0snx5A3zbwbfKYpF+d1gYaKrHO1ykeJHuOoIHDGop5Ur9Inl4S3o2U063Wg/YroTuIWvbEjL0Laz7knWuNpSN0g5G2cnF4y0DTDYxZWxFtnfB0npTDggUQqUTHNYrL+a9CPQc+/47FpmXXx0VxwqZ2l3BVO+a+ef5Q6g2VNxU/WJWdnFyRHAjWRKsyKua8zlOsmj+IVmM4nZDtyD0qlS8/nfdI+ZJS16IvKqyA2n9ScHe5YRsNPItd8c6y22nSKnRKlF2h+gWvD56pHUUHFMPlba0dJ7KMiIQZxmY6dKgzerkOylQziBgBMVulvxGz8KILj9+DxTANDlI+8LHt01bIXa4RbsNvOAcjFhNdNgemGv2uXcFyaVsg5w08PVSKb2pQimmB/EOBRSMMhavxOSaAgu/Jjs8xLPj+hMD/yZlav2dlx4Oix3x1humSUsegoa/Az6qulxK+rQdJJA3BuHk389s7e/i+z30KJsbpuIWxH1c/5ETtUFeIflQBYywr++5GqLG7T8WfVxH3ie3aw=
 jobs:
   include:
     - name: "Fedora 28"
@@ -31,3 +33,5 @@ jobs:
       script: ./.travis/travis-fedora.sh
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
+    - name: "Documentation Update"
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./travis/travis-docs.sh; fi'

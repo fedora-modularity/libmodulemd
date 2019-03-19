@@ -41,6 +41,22 @@ modulemd_buildopts_new (void);
 
 
 /**
+ * modulemd_buildopts_equals:
+ * @self_1: A #ModulemdBuildopts
+ * @self_2: A #ModulemdBuildopts
+ *
+ * Check for equality for 2 ModulemdBuildopts objects.
+ *
+ * Returns: TRUE if both objects are equal, FALSE otherwise.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_buildopts_equals (ModulemdBuildopts *self_1,
+                           ModulemdBuildopts *self_2);
+
+
+/**
  * modulemd_buildopts_copy:
  * @self: This #ModulemdBuildopts
  *

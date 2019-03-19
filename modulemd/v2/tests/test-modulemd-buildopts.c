@@ -56,6 +56,111 @@ buildopts_test_construct (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
+buildopts_test_equals (BuildoptsFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdBuildopts) b_1 = NULL;
+  g_autoptr (ModulemdBuildopts) b_2 = NULL;
+
+  /*Test 2 objects with no rpm_macros*/
+  b_1 = modulemd_buildopts_new ();
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_true (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+
+  /*Test 2 objects with matching rpm_macros*/
+  b_1 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_1, "a test");
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_2, "a test");
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_true (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+
+  /*Test 2 objects with different rpm_macros*/
+  b_1 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_1, "a test");
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_2, "b test");
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_false (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+
+  /*Test 2 objects with matching rpm_macros and whitelist*/
+  b_1 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_1, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_1, "testrpm");
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_2, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_2, "testrpm");
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_true (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+
+  /*Test 2 objects with matching rpm_macros and different whitelist*/
+  b_1 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_1, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_1, "testrpm");
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_2, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_2, "testing");
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_false (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+
+  /*Test 2 objects with matching rpm_macros and subsets of matching whitelist*/
+  b_1 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_1, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_1, "a");
+  modulemd_buildopts_add_rpm_to_whitelist (b_1, "b");
+  g_assert_nonnull (b_1);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_1));
+
+  b_2 = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b_2, "a test");
+  modulemd_buildopts_add_rpm_to_whitelist (b_2, "a");
+  modulemd_buildopts_add_rpm_to_whitelist (b_2, "b");
+  modulemd_buildopts_add_rpm_to_whitelist (b_2, "c");
+  g_assert_nonnull (b_2);
+  g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
+
+  g_assert_false (modulemd_buildopts_equals (b_1, b_2));
+  g_clear_object (&b_1);
+  g_clear_object (&b_2);
+}
+
+
+static void
 buildopts_test_copy (BuildoptsFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
@@ -306,6 +411,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               buildopts_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/buildopts/equals",
+              BuildoptsFixture,
+              NULL,
+              NULL,
+              buildopts_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/buildopts/copy",

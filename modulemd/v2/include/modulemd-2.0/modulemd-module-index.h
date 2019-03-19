@@ -225,6 +225,24 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 
 
 /**
+ * modulemd_module_index_remove_module:
+ * @self: This #ModulemdModuleIndex
+ * @module_name: The name of the module to remove from the index.
+ *
+ * Remove a module, including all of its streams, its defaults and its
+ * translations from a #ModulemdModuleIndex.
+ *
+ * Returns: TRUE if the module name was present in the index. FALSE if it was
+ * not.
+ *
+ * Since: 2.2
+ */
+
+gboolean
+modulemd_module_index_remove_module (ModulemdModuleIndex *self,
+                                     const gchar *module_name);
+
+/**
  * modulemd_module_index_add_module_stream:
  * @self: This #ModulemdModuleIndex
  * @stream: The #ModulemdModuleStream to add to the index. The stream added

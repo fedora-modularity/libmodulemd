@@ -656,6 +656,44 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
 }
 
 
+static void
+module_index_test_remove_module (ModuleIndexFixture *fixture,
+                                 gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+
+  index = modulemd_module_index_new ();
+
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_assert_no_error (error);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* Verify that the 'reviewboard' module exists in the index */
+  g_assert_nonnull (modulemd_module_index_get_module (index, "reviewboard"));
+
+  /* Remove the 'reviewboard' module from the index */
+  g_assert_true (modulemd_module_index_remove_module (index, "reviewboard"));
+
+  /* Verify that the 'reviewboard' module no longer exists in the index */
+  g_assert_null (modulemd_module_index_get_module (index, "reviewboard"));
+
+  /* Remove a nonexistent module from the index */
+  g_assert_null (modulemd_module_index_get_module (index, "nosuchmodule"));
+  g_assert_false (modulemd_module_index_remove_module (index, "nosuchmodule"));
+  g_assert_null (modulemd_module_index_get_module (index, "nosuchmodule"));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -706,6 +744,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_index_test_index_upgrade,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/index/remove_module",
+              ModuleIndexFixture,
+              NULL,
+              NULL,
+              module_index_test_remove_module,
               NULL);
 
   return g_test_run ();

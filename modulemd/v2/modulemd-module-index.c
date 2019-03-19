@@ -587,6 +587,16 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 
 
 gboolean
+modulemd_module_index_remove_module (ModulemdModuleIndex *self,
+                                     const gchar *module_name)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  return g_hash_table_remove (self->modules, module_name);
+}
+
+
+gboolean
 modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
                                          ModulemdModuleStream *stream,
                                          GError **error)

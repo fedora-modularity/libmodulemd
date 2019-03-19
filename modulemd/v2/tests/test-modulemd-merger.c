@@ -208,7 +208,7 @@ main (int argc, char *argv[])
               merger_test_deduplicate,
               NULL);
   
-  g_test_add ("/modulemd/v2/module/index/merger/real/world/data",
+  g_test_add ("/modulemd/v2/module/index/merger/real_world_data",
               CommonMmdTestFixture,
               NULL,
               NULL,

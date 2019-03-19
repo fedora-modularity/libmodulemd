@@ -46,6 +46,28 @@ enum
 static GParamSpec *properties[N_PROPS];
 
 
+gboolean
+modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self_2), FALSE);
+
+  if (g_strcmp0 (modulemd_profile_get_name (self_1),
+                 modulemd_profile_get_name (self_2)) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_profile_get_description (self_1, NULL),
+                 modulemd_profile_get_description (self_2, NULL)))
+    return FALSE;
+
+  //Check rpms: size, set values
+  if (!modulemd_hash_table_sets_are_equal (self_1->rpms, self_2->rpms))
+    return FALSE;
+
+  return TRUE;
+}
+
+
 ModulemdProfile *
 modulemd_profile_new (const gchar *name)
 {

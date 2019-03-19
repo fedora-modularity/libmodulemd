@@ -29,6 +29,20 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (
   ModulemdProfile, modulemd_profile, MODULEMD, PROFILE, GObject)
 
+
+/**
+ * modulemd_profile_equals:
+ * @self_1: A #ModulemdProfile
+ * @self_2: A #ModulemdProfile
+ *
+ * Returns: TRUE if all elements of self_1 and self_2 are equal. FALSE, otherwise. 
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2);
+
+
 /**
  * modulemd_profile_new:
  * @name: (not nullable): The name of this profile.

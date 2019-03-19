@@ -616,6 +616,56 @@ module_stream_v2_test_depends_on_stream (ModuleStreamFixture *fixture,
   g_clear_object (&stream);
 }
 
+static void
+module_stream_test_community (ModuleStreamFixture *fixture,
+                                         gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  guint64 version;
+  g_autofree gchar *community = NULL;
+  
+  for (version = MD_MODULESTREAM_VERSION_ONE;
+       version <= MD_MODULESTREAM_VERSION_LATEST;
+       version++)
+  {
+    
+    stream = modulemd_module_stream_new (version, "foo", "latest");
+    g_assert_nonnull (stream);
+    
+    g_assert_null (modulemd_module_stream_get_community(stream));
+    
+    // clang-format-off
+    g_object_get (stream,
+                    "community", &community,
+                    NULL);
+    
+    // clang-format on
+    g_assert_null(community);
+    
+    modulemd_module_stream_set_community (stream, "https://example.com");
+    g_assert_cmpstr (modulemd_module_stream_get_community (stream), ==, "https://example.com");
+    
+    
+    // clang-format off
+    g_object_set (stream,
+                    "community", "https://redhat.com",
+                    NULL);
+    g_object_get (stream,
+                    "community", &community,
+                    NULL);
+    
+    // clang-format on
+    g_assert_cmpstr (community, ==, "https://redhat.com");
+    g_clear_pointer (&community, g_free);
+    
+    
+    
+    g_clear_object (&stream);
+    
+   }
+  
+}    
+  
 int
 main (int argc, char *argv[])
 {
@@ -671,6 +721,12 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_depends_on_stream,
+              NULL);
+  g_test_add ("/modulemd/v2/modulestream/community",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_arch,
               NULL);
 
 

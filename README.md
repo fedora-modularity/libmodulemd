@@ -5,7 +5,7 @@
 C Library for manipulating module metadata files
 
 Full details can be found in the
-[API Documentation](https://sgallagh.fedorapeople.org/docs/libmodulemd/latest/)
+[API Documentation](https://fedora-modularity.github.io/libmodulemd/latest/)
 
 # Using libmodulemd from Python
 

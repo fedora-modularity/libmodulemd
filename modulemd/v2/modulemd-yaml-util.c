@@ -392,6 +392,35 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error)
 }
 
 
+gboolean
+modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error)
+{
+  MMD_INIT_YAML_EVENT (event);
+
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_SCALAR_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_INT (
+        error, event, "Expected a scalar boolean");
+    }
+
+  if (g_strcmp0 ((const gchar *)event.data.scalar.value, "false"))
+    {
+      return FALSE;
+    }
+  else if (g_strcmp0 ((const gchar *)event.data.scalar.value, "true"))
+    {
+      return TRUE;
+    }
+
+  MMD_YAML_ERROR_EVENT_EXIT_INT (
+    error,
+    event,
+    "Boolean value was neither \"true\" nor \"false\": %s",
+    (const gchar *)event.data.scalar.value);
+}
+
+
 gint64
 modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
 {

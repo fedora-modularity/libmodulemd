@@ -293,6 +293,22 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
 
 
 /**
+ * modulemd_yaml_parse_bool:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * int64 scalar entry.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Returns: A boolean representing the parsed value. Returns FALSE if a parse
+ * error occured and sets @error appropriately.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error);
+
+
+/**
  * modulemd_yaml_parse_int64:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * int64 scalar entry.

@@ -73,7 +73,7 @@ modulemd_defaults_v1_equals (ModulemdDefaults *self_1,
   /*Check profile_defaults: size, keys, values*/
   if (!modulemd_hash_table_equals (v1_self_1->profile_defaults,
                                    v1_self_2->profile_defaults,
-                                   modulemd_hash_table_sets_are_equal))
+                                   modulemd_hash_table_sets_are_equal_wrapper))
     {
       return FALSE;
     }
@@ -89,7 +89,7 @@ modulemd_defaults_v1_equals (ModulemdDefaults *self_1,
   /*Check intent_default_profiles: size, keys, values*/
   if (!modulemd_hash_table_equals (v1_self_1->intent_default_profiles,
                                    v1_self_2->intent_default_profiles,
-                                   modulemd_hash_table_sets_are_equal))
+                                   modulemd_hash_table_sets_are_equal_wrapper))
     {
       return FALSE;
     }

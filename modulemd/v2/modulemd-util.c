@@ -134,6 +134,11 @@ modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig)
   return new;
 }
 
+gboolean
+modulemd_hash_table_sets_are_equal_wrapper (const void *a, const void *b)
+{
+  return modulemd_hash_table_sets_are_equal ((GHashTable *)a, (GHashTable *)b);
+}
 
 gboolean
 modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b)
@@ -218,7 +223,6 @@ modulemd_hash_table_equals (GHashTable *a,
 
   return TRUE;
 }
-
 
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b)

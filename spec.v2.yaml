@@ -279,6 +279,12 @@ data:
                 # prohibited, as they will conflict.
                 # buildafter:
                 #    - baz
+                # Use the "buildonly" value to indicate that all artifacts
+                # produced by this component are intended only for building
+                # this component and should be automatically added to the
+                # data.filter.rpms list after the build is complete.
+                # Optional. Defaults to "false" if not specified.
+                buildonly: false
             # baz has no extra options
             baz:
                 rationale: This one is here to demonstrate other stuff.

@@ -522,6 +522,7 @@ module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
     "        repository: https://pagure.io/bar.git\n"
     "        cache: https://example.com/cache\n"
     "        ref: 26ca0c0\n"
+    "        buildonly: true\n"
     "      baz:\n"
     "        rationale: This one is here to demonstrate other stuff.\n"
     "      xxx:\n"

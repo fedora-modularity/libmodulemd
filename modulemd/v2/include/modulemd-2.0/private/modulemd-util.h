@@ -77,6 +77,9 @@ GHashTable *
 modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig);
 
 gboolean
+modulemd_hash_table_sets_are_equal_wrapper (const void *a, const void *b);
+
+gboolean
 modulemd_hash_table_sets_are_equal (GHashTable *a, GHashTable *b);
 
 gboolean

@@ -44,6 +44,22 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
                                      GError **error);
 
 /**
+ * modulemd_component_parse_buildonly:
+ * @self: This #ModulemdComponent
+ * @emitter: (inout): A libyaml emitter object positioned just after the
+ * "buildonly" key in a #ModulemdComponent section of a YAML document.
+ * @error: (out): A #GError that will return the reason for a parse failure.
+ *
+ * Returns: TRUE if the buildafter list could be parsed successfully.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_component_parse_buildonly (ModulemdComponent *self,
+                                    yaml_parser_t *parser,
+                                    GError **error);
+
+/**
  * modulemd_component_has_buildafter:
  * @self: This #ModulemdComponent
  *
@@ -87,18 +103,19 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
                                     GError **error);
 
 /**
- * modulemd_component_emit_yaml_buildorder:
+ * modulemd_component_emit_yaml_build_common:
  * @self: This #ModulemdComponent
- * @emitter: (inout): A libyaml emitter object positioned where a Component
- * buildorder item should appear in the YAML document.
+ * @emitter: (inout): A libyaml emitter object positioned where a Component's
+ * buildorder, buildafter and/or buildonly item(s) should appear in the YAML
+ * document.
  * @error: (out): A #GError that will return the reason for an emission error.
  *
- * Returns: TRUE if the component buildorder was emitted succesfully. FALSE and sets
- * @error appropriately if the YAML could not be emitted.
+ * Returns: TRUE if the component buildorder was emitted succesfully. FALSE and
+ * sets @error appropriately if the YAML could not be emitted.
  *
- * Since: 2.0
+ * Since: 2.2
  */
 gboolean
-modulemd_component_emit_yaml_buildorder (ModulemdComponent *self,
-                                         yaml_emitter_t *emitter,
-                                         GError **error);
+modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
+                                           yaml_emitter_t *emitter,
+                                           GError **error);

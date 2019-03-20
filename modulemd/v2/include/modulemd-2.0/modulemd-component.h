@@ -103,6 +103,31 @@ modulemd_component_get_buildafter_as_strv (ModulemdComponent *self);
 
 
 /**
+ * modulemd_component_set_buildonly:
+ * @self: This #ModulemdComponent object
+ * @buildonly: Whether this component is used only for building this module. If
+ * set to TRUE, the build system should add any artifacts produced by this
+ * component to the data.filters section of the output modulemd.
+ *
+ * Since: 2.2
+ */
+void
+modulemd_component_set_buildonly (ModulemdComponent *self, gboolean buildonly);
+
+
+/**
+ * modulemd_component_get_buildonly:
+ * @self: This #ModulemdComponent object
+ *
+ * Returns: TRUE if this component is used only for building this module.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_component_get_buildonly (ModulemdComponent *self);
+
+
+/**
  * modulemd_component_set_buildorder:
  * @self: This #ModulemdComponent object
  * @buildorder: The order this component should be built relative to others.

@@ -24,6 +24,7 @@ typedef struct
 {
   gint64 buildorder;
   GHashTable *buildafter;
+  gboolean buildonly;
   gchar *name;
   gchar *rationale;
 } ModulemdComponentPrivate;
@@ -36,6 +37,7 @@ enum
 {
   PROP_0,
 
+  PROP_BUILDONLY,
   PROP_BUILDORDER,
   PROP_NAME,
   PROP_RATIONALE,
@@ -136,6 +138,8 @@ modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
                                      modulemd_component_get_buildorder (self));
   modulemd_component_set_rationale (m,
                                     modulemd_component_get_rationale (self));
+  modulemd_component_set_buildonly (m,
+                                    modulemd_component_get_buildonly (self));
 
 
   m_priv = modulemd_component_get_instance_private (m);
@@ -191,6 +195,32 @@ modulemd_component_has_buildafter (ModulemdComponent *self)
     modulemd_component_get_instance_private (self);
 
   return !!g_hash_table_size (priv->buildafter);
+}
+
+
+void
+modulemd_component_set_buildonly (ModulemdComponent *self, gboolean buildonly)
+{
+  g_return_if_fail (MODULEMD_IS_COMPONENT (self));
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  priv->buildonly = buildonly;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILDONLY]);
+}
+
+
+gboolean
+modulemd_component_get_buildonly (ModulemdComponent *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  return priv->buildonly;
 }
 
 
@@ -310,6 +340,10 @@ modulemd_component_get_property (GObject *object,
 
   switch (prop_id)
     {
+    case PROP_BUILDONLY:
+      g_value_set_boolean (value, modulemd_component_get_buildorder (self));
+      break;
+
     case PROP_BUILDORDER:
       g_value_set_int64 (value, modulemd_component_get_buildorder (self));
       break;
@@ -340,6 +374,10 @@ modulemd_component_set_property (GObject *object,
 
   switch (prop_id)
     {
+    case PROP_BUILDONLY:
+      modulemd_component_set_buildorder (self, g_value_get_boolean (value));
+      break;
+
     case PROP_BUILDORDER:
       modulemd_component_set_buildorder (self, g_value_get_int64 (value));
       break;
@@ -372,6 +410,13 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   klass->get_name = modulemd_component_get_key;
   klass->validate = modulemd_component_default_validate;
 
+  properties[PROP_BUILDONLY] =
+    g_param_spec_boolean ("buildonly",
+                          "Buildonly",
+                          "Whether the artifacts produced by this component "
+                          "are intended only for building this module.",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
   properties[PROP_BUILDORDER] = g_param_spec_int64 (
     "buildorder",
     "Buildorder",
@@ -438,6 +483,27 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
 
 
 gboolean
+modulemd_component_parse_buildonly (ModulemdComponent *self,
+                                    yaml_parser_t *parser,
+                                    GError **error)
+{
+  gboolean buildonly = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
+
+  buildonly = modulemd_yaml_parse_bool (parser, &nested_error);
+  if (nested_error)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+  modulemd_component_set_buildonly (self, buildonly);
+  return TRUE;
+}
+
+
+gboolean
 modulemd_component_emit_yaml_start (ModulemdComponent *self,
                                     yaml_emitter_t *emitter,
                                     GError **error)
@@ -484,9 +550,9 @@ emit_yaml_end to end the mapping. */
 
 
 gboolean
-modulemd_component_emit_yaml_buildorder (ModulemdComponent *self,
-                                         yaml_emitter_t *emitter,
-                                         GError **error)
+modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
+                                           yaml_emitter_t *emitter,
+                                           GError **error)
 {
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
@@ -525,6 +591,13 @@ modulemd_component_emit_yaml_buildorder (ModulemdComponent *self,
         }
 
       EMIT_SEQUENCE_END (emitter, error);
+    }
+
+  /* Only output buildonly if it's TRUE */
+  if (modulemd_component_get_buildonly (self))
+    {
+      EMIT_SCALAR (emitter, error, "buildonly");
+      EMIT_SCALAR (emitter, error, "true");
     }
 
   return TRUE;

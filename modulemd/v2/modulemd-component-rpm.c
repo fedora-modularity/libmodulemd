@@ -417,7 +417,7 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "ref", self->ref);
 
-  if (!modulemd_component_emit_yaml_buildorder (
+  if (!modulemd_component_emit_yaml_build_common (
         MODULEMD_COMPONENT (self), emitter, error))
     return FALSE;
 
@@ -605,6 +605,19 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
                     error,
                     event,
                     "Failed to parse buildafter in component: %s",
+                    nested_error->message);
+                }
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "buildonly"))
+            {
+              if (!modulemd_component_parse_buildonly (
+                    MODULEMD_COMPONENT (r), parser, &nested_error))
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse buildonly in component: %s",
                     nested_error->message);
                 }
             }

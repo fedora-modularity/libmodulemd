@@ -258,4 +258,10 @@ modulemd_translation_get_locales (ModulemdTranslation *self);
 GStrv
 modulemd_module_index_get_module_names (ModulemdModuleIndex *self);
 
+/**
+ * modulemd_rpm_map_entry_get_nevra: (skip)
+ */
+gchar *
+modulemd_rpm_map_entry_get_nevra (ModulemdRpmMapEntry *self);
+
 G_END_DECLS

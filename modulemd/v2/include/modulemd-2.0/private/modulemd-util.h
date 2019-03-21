@@ -120,3 +120,35 @@ modulemd_validate_nevra (const gchar *nevra);
         }                                                                     \
     }                                                                         \
   while (0)
+
+
+#define MODULEMD_SETTER_GETTER_STRING_EXT(                                    \
+  is_static, ObjName, obj_name, OBJ_NAME, attr, ATTR)                         \
+  is_static void modulemd_##obj_name##_set_##attr (ObjName *self,             \
+                                                   const gchar *attr)         \
+  {                                                                           \
+    g_return_if_fail (MODULEMD_IS_##OBJ_NAME (self));                         \
+                                                                              \
+    g_clear_pointer (&self->attr, g_free);                                    \
+    self->attr = g_strdup (attr);                                             \
+                                                                              \
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_##ATTR]);      \
+  }                                                                           \
+                                                                              \
+                                                                              \
+  is_static const gchar *modulemd_##obj_name##_get_##attr (ObjName *self)     \
+  {                                                                           \
+    g_return_val_if_fail (MODULEMD_IS_##OBJ_NAME (self), NULL);               \
+                                                                              \
+    return self->attr;                                                        \
+  }
+
+#define MODULEMD_SETTER_GETTER_STRING(                                        \
+  ObjName, obj_name, OBJ_NAME, attr, ATTR)                                    \
+  MODULEMD_SETTER_GETTER_STRING_EXT (                                         \
+    /**/, ObjName, obj_name, OBJ_NAME, attr, ATTR)
+
+#define MODULEMD_SETTER_GETTER_STRING_STATIC(                                 \
+  ObjName, obj_name, OBJ_NAME, attr, ATTR)                                    \
+  MODULEMD_SETTER_GETTER_STRING_EXT (                                         \
+    static, ObjName, obj_name, OBJ_NAME, attr, ATTR)

@@ -494,6 +494,33 @@ test ('defaultsv1_python_release', python3,
       args : defaultsv1_python_script)
 
 
+# -- Test Modulemd.RpmMapEntry (C) -- #
+test_rpm_map = executable(
+    'rpm_map',
+    'tests/test-modulemd-rpmmap.c',
+    dependencies : [
+        modulemd_v2_dep,
+    ],
+    link_with : [
+        test_utils_lib,
+    ],
+    install : false,
+)
+test ('rpm_map_debug', test_rpm_map,
+      env : test_env)
+test ('rpm_map_release', test_rpm_map,
+      env : test_release_env)
+
+# -- Test Modulemd.RpmMapEntry (Python) -- #
+rpmmap_python_script = files('tests/ModulemdTests/rpmmap.py')
+test ('rpmmap_python_debug', python3,
+      env : py_test_env,
+      args : rpmmap_python_script)
+test ('rpmmap_python_release', python3,
+      env : py_test_release_env,
+      args : rpmmap_python_script)
+
+
 # --- GOBject Introspection -- #
 
 if skip_introspection

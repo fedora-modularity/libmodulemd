@@ -1,0 +1,32 @@
+FROM @IMAGE@
+
+MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
+
+ARG TARBALL
+
+RUN zypper install --no-confirm --no-recommends \
+	clang \
+	clang-checker \
+	createrepo_c \
+	elinks \
+	gcc \
+	gcc-c++ \
+	git-core \
+	glib2-devel \
+	gobject-introspection-devel \
+	gtk-doc \
+	libyaml-devel \
+	meson \
+	ninja \
+	pkgconf \
+	python3-autopep8 \
+	python3-devel \
+	python3-GitPython \
+	python3-gobject \
+	python3-pycodestyle \
+	python-rpm-macros \
+	rpm-build \
+	rpmdevtools \
+	sudo \
+	valgrind \
+&& zypper clean --all

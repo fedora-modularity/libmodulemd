@@ -56,6 +56,9 @@ struct _ModulemdModuleStreamV2
 
   GHashTable *rpm_artifacts; /* string set */
 
+  /*  < string, GHashTable <string, Modulemd.RpmMapEntry> > */
+  GHashTable *rpm_artifact_map;
+
   GHashTable *rpm_filters; /* string set */
 
   GHashTable *servicelevels; /* <string, Modulemd.ServiceLevel */

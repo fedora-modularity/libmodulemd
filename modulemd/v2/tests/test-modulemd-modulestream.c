@@ -547,6 +547,16 @@ module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
     "    - xxx-0:1-1.module_deadbeef.i686\n"
     "    - xxx-0:1-1.module_deadbeef.x86_64\n"
     "    - xyz-0:1-1.module_deadbeef.x86_64\n"
+    "    rpm-map:\n"
+    "      sha256:\n"
+    "        "
+    "ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:\n"
+    "          name: bar\n"
+    "          epoch: 0\n"
+    "          version: 1.23\n"
+    "          release: 1.module_deadbeef\n"
+    "          arch: x86_64\n"
+    "          nevra: bar-0:1.23-1.module_deadbeef.x86_64\n"
     "...\n");
 }
 
@@ -677,6 +687,33 @@ module_stream_v2_test_validate_buildafter (ModuleStreamFixture *fixture,
   g_clear_pointer (&path, g_free);
 }
 
+
+static void
+module_stream_v2_test_rpm_map (ModuleStreamFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdRpmMapEntry) entry = NULL;
+  ModulemdRpmMapEntry *retrieved_entry = NULL;
+
+  stream = modulemd_module_stream_v2_new ("foo", "bar");
+  g_assert_nonnull (stream);
+
+  entry = modulemd_rpm_map_entry_new (
+    "bar", 0, "1.23", "1.module_deadbeef", "x86_64");
+  g_assert_nonnull (entry);
+
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream, entry, "sha256", "baddad");
+
+  retrieved_entry = modulemd_module_stream_v2_get_rpm_artifact_map_entry (
+    stream, "sha256", "baddad");
+  g_assert_nonnull (retrieved_entry);
+
+  g_assert_true (modulemd_rpm_map_entry_equals (entry, retrieved_entry));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -739,6 +776,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_validate_buildafter,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/rpm_map",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_rpm_map,
               NULL);
 
 

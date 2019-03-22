@@ -357,3 +357,24 @@ data:
             - xxx-0:1-1.module_deadbeef.x86_64
             - xxx-0:1-1.module_deadbeef.i686
             - xyz-0:1-1.module_deadbeef.x86_64
+        # The rpm-map exists to link checksums from repomd to specific
+        # artifacts produced by this module. Any item in this list must match
+        # an entry in the data.artifacts.rpms section.
+        # Optional.
+        rpm-map:
+          # The digest-type of this checksum. Required.
+          sha256:
+            # The checksum of the artifact being sought. Required.
+            ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:
+              # The RPM name. Required.
+              name: bar
+              # The RPM epoch. Required.
+              epoch: 0
+              # The RPM version. Required.
+              version: 1.23
+              # The RPM release. Required.
+              release: 1.module_deadbeef
+              # The RPM architecture. Required.
+              arch: x86_64
+              # The complete RPM NEVRA. Required.
+              nevra: bar-0:1.23-1.module_deadbeef.x86_64

@@ -18,6 +18,7 @@
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-translation-entry.h"
+#include "modulemd-rpm-map-entry.h"
 #include "modulemd-profile.h"
 #include "modulemd-service-level.h"
 #include "private/modulemd-buildopts-private.h"
@@ -28,6 +29,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-profile-private.h"
+#include "private/modulemd-rpm-map-entry-private.h"
 #include "private/modulemd-service-level-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
@@ -89,6 +91,8 @@ modulemd_module_stream_v2_finalize (GObject *object)
   g_clear_pointer (&self->rpm_api, g_hash_table_unref);
 
   g_clear_pointer (&self->rpm_artifacts, g_hash_table_unref);
+
+  g_clear_pointer (&self->rpm_artifact_map, g_hash_table_unref);
 
   g_clear_pointer (&self->rpm_filters, g_hash_table_unref);
 
@@ -605,6 +609,58 @@ modulemd_module_stream_v2_get_rpm_artifacts_as_strv (
 }
 
 
+static GHashTable *
+get_or_create_digest_table (ModulemdModuleStreamV2 *self, const gchar *digest)
+{
+  GHashTable *digest_table =
+    g_hash_table_lookup (self->rpm_artifact_map, digest);
+  if (digest_table == NULL)
+    {
+      digest_table = g_hash_table_new_full (
+        g_str_hash, g_str_equal, g_free, g_object_unref);
+      g_hash_table_insert (
+        self->rpm_artifact_map, g_strdup (digest), digest_table);
+    }
+
+  return digest_table;
+}
+
+
+void
+modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+  ModulemdModuleStreamV2 *self,
+  ModulemdRpmMapEntry *entry,
+  const gchar *digest,
+  const gchar *checksum)
+{
+  GHashTable *digest_table = NULL;
+
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+  g_return_if_fail (entry && digest && checksum);
+
+  digest_table = get_or_create_digest_table (self, digest);
+
+  g_hash_table_insert (
+    digest_table, g_strdup (checksum), modulemd_rpm_map_entry_copy (entry));
+}
+
+
+ModulemdRpmMapEntry *
+modulemd_module_stream_v2_get_rpm_artifact_map_entry (
+  ModulemdModuleStreamV2 *self, const gchar *digest, const gchar *checksum)
+{
+  GHashTable *digest_table = NULL;
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
+  g_return_val_if_fail (digest && checksum, NULL);
+
+  digest_table = g_hash_table_lookup (self->rpm_artifact_map, digest);
+  if (!digest_table)
+    return NULL;
+
+  return g_hash_table_lookup (digest_table, checksum);
+}
+
+
 void
 modulemd_module_stream_v2_add_rpm_filter (ModulemdModuleStreamV2 *self,
                                           const gchar *rpm)
@@ -914,6 +970,33 @@ modulemd_module_stream_v2_set_property (GObject *object,
     }
 }
 
+static void
+copy_rpm_artifact_map (ModulemdModuleStreamV2 *from,
+                       ModulemdModuleStreamV2 *to)
+{
+  GHashTableIter outer, inner;
+  gpointer outer_key, outer_value;
+  gpointer inner_key, inner_value;
+  GHashTable *to_digest_table = NULL;
+
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (from));
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (to));
+
+  g_hash_table_iter_init (&outer, from->rpm_artifact_map);
+  while (g_hash_table_iter_next (&outer, &outer_key, &outer_value))
+    {
+      to_digest_table = get_or_create_digest_table (to, outer_key);
+
+      g_hash_table_iter_init (&inner, (GHashTable *)outer_value);
+      while (g_hash_table_iter_next (&inner, &inner_key, &inner_value))
+        {
+          g_hash_table_insert (to_digest_table,
+                               g_strdup (inner_key),
+                               modulemd_rpm_map_entry_copy (inner_value));
+        }
+    }
+}
+
 static ModulemdModuleStream *
 modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
                                 const gchar *module_name,
@@ -955,6 +1038,8 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
     copy, v2_self, servicelevels, modulemd_module_stream_v2_add_servicelevel);
 
   STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, dependencies);
+
+  copy_rpm_artifact_map (v2_self, copy);
 
   if (v2_self->xmd != NULL)
     modulemd_module_stream_v2_set_xmd (copy, g_variant_ref (v2_self->xmd));
@@ -1102,6 +1187,9 @@ modulemd_module_stream_v2_init (ModulemdModuleStreamV2 *self)
   self->rpm_artifacts =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
+  self->rpm_artifact_map = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
+
   self->rpm_filters =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
@@ -1148,6 +1236,13 @@ modulemd_module_stream_v2_parse_profiles (yaml_parser_t *parser,
 
 static gboolean
 modulemd_module_stream_v2_parse_components (
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error);
+
+static gboolean
+modulemd_module_stream_v2_parse_artifacts (
   yaml_parser_t *parser,
   ModulemdModuleStreamV2 *modulestream,
   gboolean strict,
@@ -1409,15 +1504,13 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "artifacts"))
             {
-              set = modulemd_yaml_parse_string_set_from_map (
-                &parser, "rpms", strict, &nested_error);
-              if (!set)
+              if (!modulemd_module_stream_v2_parse_artifacts (
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
-              modulemd_module_stream_v2_replace_rpm_artifacts (modulestream,
-                                                               set);
+
               g_clear_pointer (&set, g_hash_table_unref);
             }
 
@@ -2087,6 +2180,230 @@ modulemd_module_stream_v2_parse_module_components (
 }
 
 
+static gboolean
+modulemd_module_stream_v2_parse_rpm_map (yaml_parser_t *parser,
+                                         ModulemdModuleStreamV2 *modulestream,
+                                         gboolean strict,
+                                         GError **error);
+
+
+static gboolean
+modulemd_module_stream_v2_parse_artifacts (
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GHashTable) set = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in artifacts.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
+            {
+              set = modulemd_yaml_parse_string_set (parser, &nested_error);
+              if (!set)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+
+              modulemd_module_stream_v2_replace_rpm_artifacts (modulestream,
+                                                               set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "rpm-map"))
+            {
+              if (!modulemd_module_stream_v2_parse_rpm_map (
+                    parser, modulestream, strict, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+            }
+
+          else
+            {
+              /* Encountered a key other than the expected ones. */
+              SKIP_UNKNOWN (parser,
+                            FALSE,
+                            "Unexpected key in map: %s",
+                            (const gchar *)event.data.scalar.value);
+            }
+
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error, event, "Unexpected YAML event in map");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v2_parse_rpm_map_digest (
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  const gchar *digest,
+  GError **error);
+
+static gboolean
+modulemd_module_stream_v2_parse_rpm_map (yaml_parser_t *parser,
+                                         ModulemdModuleStreamV2 *modulestream,
+                                         gboolean strict,
+                                         GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in rpm-map.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each entry in the map here represents a digest name */
+          if (!modulemd_module_stream_v2_parse_rpm_map_digest (
+                parser,
+                modulestream,
+                strict,
+                (const gchar *)event.data.scalar.value,
+                &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error, event, "Unexpected YAML event in map");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+modulemd_module_stream_v2_parse_rpm_map_digest (
+  yaml_parser_t *parser,
+  ModulemdModuleStreamV2 *modulestream,
+  gboolean strict,
+  const gchar *digest,
+  GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autoptr (GError) nested_error = NULL;
+  const gchar *checksum = NULL;
+  g_autoptr (ModulemdRpmMapEntry) entry = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  /* We *must* get a MAPPING_START here */
+  YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Got %s instead of MAPPING_START in rpm-map.",
+        mmd_yaml_get_event_name (event.type));
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          /* Each key in this map is a checksum with the value being a
+           * ModulemdRpmMapEntry
+           */
+          checksum = (const gchar *)event.data.scalar.value;
+
+          entry =
+            modulemd_rpm_map_entry_parse_yaml (parser, strict, &nested_error);
+          if (!entry)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+            modulestream, entry, digest, checksum);
+
+          g_clear_object (&entry);
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+            error, event, "Unexpected YAML event in map");
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  return TRUE;
+}
+
+
 static GVariant *
 modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
                                      ModulemdModuleStreamV2 *modulestream,
@@ -2131,11 +2448,17 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
 
 
 gboolean
+modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
+                                        yaml_emitter_t *emitter,
+                                        GError **error);
+
+gboolean
 modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
                                      yaml_emitter_t *emitter,
                                      GError **error)
 {
   MODULEMD_INIT_TRACE ();
+
   if (!modulemd_module_stream_emit_yaml_base (
         MODULEMD_MODULE_STREAM (self), emitter, error))
     return FALSE;
@@ -2241,11 +2564,20 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
       EMIT_MAPPING_END (emitter, error);
     }
 
-  if (NON_EMPTY_TABLE (self->rpm_artifacts))
+  if (NON_EMPTY_TABLE (self->rpm_artifacts) ||
+      NON_EMPTY_TABLE (self->rpm_artifact_map))
     {
       EMIT_SCALAR (emitter, error, "artifacts");
       EMIT_MAPPING_START (emitter, error);
-      EMIT_STRING_SET (emitter, error, "rpms", self->rpm_artifacts);
+
+      /* Emit the rpm artifacts */
+      EMIT_STRING_SET_IF_NON_EMPTY (
+        emitter, error, "rpms", self->rpm_artifacts);
+
+      /* Emit the rpm-map */
+      if (!modulemd_module_stream_v2_emit_rpm_map (self, emitter, error))
+        return FALSE;
+
       EMIT_MAPPING_END (emitter, error);
     }
 
@@ -2255,6 +2587,64 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
   EMIT_MAPPING_END (emitter, error);
   if (!mmd_emitter_end_document (emitter, error))
     return FALSE;
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
+                                        yaml_emitter_t *emitter,
+                                        GError **error)
+{
+  GHashTable *digest_table = NULL;
+  g_autoptr (GPtrArray) digests = NULL;
+  const gchar *digest = NULL;
+  g_autoptr (GPtrArray) checksums = NULL;
+  const gchar *checksum = NULL;
+  ModulemdRpmMapEntry *entry = NULL;
+
+  if (!NON_EMPTY_TABLE (self->rpm_artifact_map))
+    {
+      /* Nothing to output here */
+      return TRUE;
+    }
+
+  digests =
+    modulemd_ordered_str_keys (self->rpm_artifact_map, modulemd_strcmp_sort);
+
+  EMIT_SCALAR (emitter, error, "rpm-map");
+  EMIT_MAPPING_START (emitter, error);
+
+  for (guint i = 0; i < digests->len; i++)
+    {
+      digest = g_ptr_array_index (digests, i);
+      EMIT_SCALAR (emitter, error, digest);
+
+      digest_table = g_hash_table_lookup (self->rpm_artifact_map, digest);
+
+      EMIT_MAPPING_START (emitter, error);
+
+      checksums =
+        modulemd_ordered_str_keys (digest_table, modulemd_strcmp_sort);
+
+      for (guint j = 0; j < digests->len; j++)
+        {
+          checksum = g_ptr_array_index (checksums, j);
+          EMIT_SCALAR (emitter, error, checksum);
+
+          entry = g_hash_table_lookup (digest_table, checksum);
+
+          if (!modulemd_rpm_map_entry_emit_yaml (entry, emitter, error))
+            return FALSE;
+        }
+
+      EMIT_MAPPING_END (emitter, error);
+
+      g_clear_pointer (&checksums, g_ptr_array_unref);
+    }
+
+  EMIT_MAPPING_END (emitter, error);
 
   return TRUE;
 }

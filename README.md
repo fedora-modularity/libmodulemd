@@ -205,6 +205,7 @@ dnf -y builddep libmodulemd
 To install the tools needed to run the docker-based tests, you will also need:
 ```
 dnf -y install docker
+sudo systemctl enable --now docker.service
 ```
 and to make sure that your user has privilege to run `sudo docker` (see the documentation for the `/etc/sudoers` file to figure this out).
 

@@ -24,8 +24,8 @@ with repodata (that is, streams of YAML that contains information on multiple
 streams, default data and translations). The documentation will use two
 repositories, called "fedora" and "updates" for demonstrative purposes. It
 will assume that the content of the YAML module metadata from those two
-repositories have been loaded into string variables "fedora_yaml" and
-"updates_yaml", respectively.
+repositories have been loaded into string variables `"fedora_yaml"` and
+`"updates_yaml"`, respectively.
 
 First step is to load the metadata from these two repositories into
 ModulemdModuleIndex objects. This is done as follows:
@@ -53,6 +53,8 @@ ret, failures = fedora_index.update_from_string(fedora_yaml)
 fedora_index = Modulemd.ModuleIndex.new()
 ret, failures = updates_index.update_from_string(updates_yaml)
 ```
+
+The `failures` are a list of subdocuments in the YAML that failed parsing, along with the reason they failed. Hence, by checking the return value of failures we will know if the YAML parsing was successful or not.
 
 Since it doesn't really make sense to view the contents from separate
 repositories in isolation (in most cases), the next step is to merge the two
@@ -108,26 +110,46 @@ specification for a full list of information that can be retrieved.
        defaults.get_default_stream())
   ```
  
-## Get the list of RPMs defining the public API for a particular module NSVC
+## Get the list of RPMs defining the public API for a particular module NSVCA
+First, query the Modulemd.ModuleIndex for the module with a given name.
 ## C
 ```C
 ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
-ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVC (module, "modulestream", 1, "deadbeef");
-GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv(stream); 
 ```
 
 ## Python
 ```python
  module = merged_index.get_module ('modulename')
- stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+```
+
+Then, query the Modulemd.Module for the Modulemd.ModuleStream associated with the provided NSVCA
+(name-stream-version-context-architechture identifier).
+## C
+```C
+ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA(module, "modulestream", 0, "deadbeef", "coolarch", &error);
+```
+
+## Python
+```python
+ stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+```
+
+Lastly, read the RPM API from the Modulemd.ModuleStream. Here, `api_list` is a list of strings containing package names.
+## C
+```C
+GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv(stream); 
+```
+
+## Python
+```python
  api_list = stream.get_rpm_api()
 ```
 
-## Retrieve the modular runtime dependencies for a particular module NSVC
+## Retrieve the modular runtime dependencies for a particular module NSVCA
 ## C
 ```C
 ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
-ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVC (module, "modulestream", 1, "deadbeef");
+ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
 GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (stream);
 
 for (gint i = 0; i < deps_list->len; i++)
@@ -139,7 +161,7 @@ for (gint i = 0; i < deps_list->len; i++)
 ## Python
 ```python
  module = merged_index.get_module ('modulename')
- stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
  deps_list = stream.get_dependencies()
  for dep in deps_list:
     depstream_list = dep.get_runtime_streams('depstreamname')

@@ -223,9 +223,6 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
       g_assert_cmpstr (modulemd_module_stream_get_module_name (stream),
                        ==,
                        modulemd_module_stream_get_module_name (copied_stream));
-      g_assert_cmpstr (modulemd_module_stream_get_stream_name (stream),
-                       ==,
-                       modulemd_module_stream_get_stream_name (copied_stream));
       g_clear_object (&stream);
       g_clear_object (&copied_stream);
     
@@ -252,9 +249,7 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
       g_assert_cmpstr(modulemd_module_stream_get_module_name(stream),
                       ==,
                       "foo");
-      g_assert_cmpstr(modulemd_module_stream_get_module_name(copied_stream),
-                      ==,
-                      None);
+      g_assert_null(modulemd_module_stream_get_module_name(copied_stream));
       g_clear_object (&stream);
       g_clear_object (&copied_stream);
       
@@ -297,32 +292,28 @@ module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
   {
       /*First test that NSVC is None for a module with no name*/
       stream=modulemd_module_stream_new(version,None,None);
-      g_assert_cmpint(modulemd_module_stream_get_NSVC,
-                      ==,
-                      None);
+      g_assert_null(modulemd_module_stream_get_NSVC(stream));
       g_clear_object (&stream);
     
      /*Next, test for no stream name*/
      stream = modulemd_module_stream_new(version,"modulename",NULL);
-     g_assert_cmpstr(modulemd_module_stream_get_NSVC,
-                     ==,
-                     None);
+     g_assert_null(modulemd_module_stream_get_NSVC(stream));
     
      /*Now with valid module and stream names*/
      stream=modulemd_module_stream_new(version,"modulename","streamname")
-     g_assert_cmpstr(modulemd_module_stream_get_NSVC,
+     g_assert_cmpstr(modulemd_module_stream_get_NSVC(stream),
                      ==,
                      'modulename:streamname:0');
     
      /*Add a version number */
      stream = modulemd_module_stream_new(42,NULL,NULL)
-     g_assert_addint(modulemd_module_stream_get_NSVC,
+     g_assert_addint(modulemd_module_stream_get_NSVC(stream),
                      ==,
                      'modulename:streamname:42');
     
      /* Add a context */
      stream = modulemd_module_stream_new (42,"modulename","streamname")
-     g_assert_addstr(modulemd_module_stream_get_NSCV,
+     g_assert_addstr(modulemd_module_stream_get_NSCV(stream),
                      ==,
                      'modulename:streamname:42:deadbeef')
   } 
@@ -341,32 +332,30 @@ module_stream_test_nsvca (ModuleStreamFixture *fixture, gconstpointer user_data)
   {
       /*First test that NSVCA is None for a module with no name*/
       stream = modulemd_module_stream_new (version,None,None);
-      g_assert_cmpstr(modulemd_module_stream_get_NSVCA,
-                     ==,
-                     None);
+      g_assert_cmpstr (modulemd_module_stream_get_NSVCA(stream));
       g_clear_object (&stream);
     
      /*Next, test for no stream name*/
      stream = modulemd_module_stream_new (version,"modulename",NULL);
-     g_assert_Equal(modulemd_module_stream_get_NSVCA,
+     g_assert_Equal(modulemd_module_stream_get_NSVCA(stream),
                      =,
                      "modulename");
     
      /*Now with valid module and stream names*/
      stream=modulemd_module_stream_new(version,"modulename","streamname")
-     g_assert_Equal(modulemd_module_stream_get_NSVCA,
+     g_assert_Equal(modulemd_module_stream_get_NSVCA(stream),
                      =,
                      'modulename:streamname');
     
      /*Add a version number */
      stream = modulemd_module_stream_new(42,NULL,NULL)
-     g_assert_addint(modulemd_module_stream_get_NSVCA,
+     g_assert_addint(modulemd_module_stream_get_NSVCA(stream),
                      ==,
                      'modulename:streamname:42');
      
      /* Add a context */
      stream = modulemd_module_stream_new (42,"modulename","streamname")
-     g_assert_addstr(modulemd_module_stream_get_NSCV,
+     g_assert_addstr(modulemd_module_stream_get_NSCV(stream),
                      ==,
                      'modulename:streamname:42:deadbeef')
      
@@ -418,21 +407,17 @@ module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_arch(stream),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_arch(stream));
     /*Test property settings*/
-    g_assert_nonnull (modulemd_module_stream_get_arch(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_arch(stream),
                       ==,
                      'x86_64');
     /* Test set_arch */
-    g_assert_nonnull (modulemd_module_stream_set_arch(stream),
+    g_assert_cmpstr (modulemd_module_stream_set_arch(stream),
                       ==,
                      'ppc64le');
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_set_arch(stream),
-                      ==,
-                     None);
+    g_assert_null (modulemd_module_stream_set_arch(stream));
   }
 } 
 static void
@@ -448,9 +433,7 @@ module_stream_test_buildopts(ModuleStreamFixture *fixture, gconstpointer user_da
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_buildopts(stream),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_buildopts(stream));
     buildopts=Modulemd_Buildopts();
     g_assert_nonnull (modulemd_buildopts_get_rpm_macros(buildopts),
                       =,
@@ -459,7 +442,7 @@ module_stream_test_buildopts(ModuleStreamFixture *fixture, gconstpointer user_da
     g_assert_nonnull (modulemd_module_stream_get_buildopts(stream),
                       !=,
                       None);
-    g_assert_nonnull (modulemd_buildopts_get_rpm_macros(buildopts),
+    g_assert_cmpstr (modulemd_buildopts_get_rpm_macros(buildopts),
                       ==,
                       '%demomacro 1');
    } 
@@ -478,21 +461,17 @@ module_stream_test_community(ModuleStreamFixture *fixture, gconstpointer user_da
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_community(stream),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_community(stream));
     /*Test property settings*/
-    g_assert_nonnull (modulemd_module_stream_get_community(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_community(stream),
                       ==,
                      'http://example.com');
     /* Test set_community*/
-    g_assert_nonnull (modulemd_module_stream_set_community(stream),
+    g_assert_cmpstr (modulemd_module_stream_set_community(stream),
                       ==,
                      'http://redhat.com');
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_get_community(stream),
-                      =,
-                     None);
+    g_assert_null (modulemd_module_stream_get_community(stream));
    } 
 }
 
@@ -509,25 +488,19 @@ module_stream_test_description(moduleStreamFixture*fixture,gconstpointer user_da
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_description(stream,locale="C"),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_description(stream,locale="C"));
    
     /* Test set_description*/
     g_assert_nonnull (modulemd_module_stream_set_description(stream),
                       =,
                      'A Different description');
-    g_assert_nonnull(modulemd_module_stream_get_description(stream,locale="C"),
+    g_assert_cmpstr(modulemd_module_stream_get_description(stream,locale="C"),
                      ==,
                      'A Different description');
                      
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_set_description(stream),
-                      =,
-                     None);
-    g_assert_nonnull (modulemd_module_stream_get_description(stream,locale="C"),
-                      =,
-                     None);
+    g_assert_null (modulemd_module_stream_set_description(stream));
+    g_assert_null (modulemd_module_stream_get_description(stream,locale="C"));
    } 
 }
 
@@ -544,28 +517,24 @@ module_stream_test_documentation(ModuleStreamFixture *fixture, gconstpointer use
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_documentation(stream),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_documentation(stream));
     /*Test property settings*/
     g_assert_nonnull (modulemd_module_stream_set_documentation(stream),
                       =,
                      'http://example.com');
-    g_assert_nonnull (modulemd_module_stream_get_documentation(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_documentation(stream),
                       ==,
                       'http://example.com');
     /* Test set_documentation*/
-    g_assert_nonnull (modulemd_module_stream_set_documentation(stream),
+    g_assert_Equal (modulemd_module_stream_set_documentation(stream),
                       =,
                      'http://redhat.com');
     
-    g_assert_nonnull (modulemd_module_stream_get_documentation(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_documentation(stream),
                       ==,
                      'http://redhat.com');
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_get_documentation(stream),
-                      =,
-                     None);
+    g_assert_null (modulemd_module_stream_get_documentation(stream));
    } 
 }
 
@@ -582,25 +551,19 @@ module_stream_test_summary(ModuleStreamFixture *fixture, gconstpointer user_data
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_summary(stream,locale="C")
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_summary(stream,locale="C"));
     
     /* Test set_summary()*/
     g_assert_nonnull (modulemd_module_stream_set_summary(stream),
                       =,
                      'A different summary');
     
-    g_assert_nonnull (modulemd_module_stream_get_summary(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_summary(stream),
                       ==,
                      'A different summary');
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_set_summary(stream),
-                      =,
-                     None);
-    g_assert_nonnull (modulemd_module_stream_get_summary(stream,locale="C"),
-                      =,
-                     None);
+    g_assert_null (modulemd_module_stream_set_summary(stream));
+    g_assert_null (modulemd_module_stream_get_summary(stream,locale="C"));
    } 
 }
 
@@ -617,28 +580,24 @@ module_stream_test_tracker(ModuleStreamFixture *fixture, gconstpointer user_data
     stream=modulemd_module_stream_new (version, "foo", "latest");
     
     /*Check the defaults*/
-    g_assert_nonnull (modulemd_module_stream_get_tracker(stream),
-                      =,
-                      None);
+    g_assert_null (modulemd_module_stream_get_tracker(stream));
     /*Test property settings*/
-    g_assert_nonnull (modulemd_module_stream_set_tracker(stream),
+    g_assert_Equal (modulemd_module_stream_set_tracker(stream),
                       =,
                      'http://example.com');
-    g_assert_nonnull (modulemd_module_stream_get_tracker(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_tracker(stream),
                       ==,
                       'http://example.com');
     /* Test set_tracker*/
-    g_assert_nonnull (modulemd_module_stream_set_tracker(stream),
+    g_assert_Equal (modulemd_module_stream_set_tracker(stream),
                       =,
                      'http://redhat.com');
     
-    g_assert_nonnull (modulemd_module_stream_get_tracker(stream),
+    g_assert_cmpstr (modulemd_module_stream_get_tracker(stream),
                       ==,
                      'http://redhat.com');
     /* Test setting it to None */
-    g_assert_nonnull (modulemd_module_stream_get_tracker(stream),
-                      =,
-                     None);
+    g_assert_null (modulemd_module_stream_get_tracker(stream));
    } 
 }
 
@@ -664,7 +623,7 @@ module_stream_test_components(ModuleStreamFixture *fixture, gconstpointer user_d
     g_assert_cmpstr(modulemd_module_get_module_name(retrieved_comp),
                     ==,
                     'rpmcomponent');
-    /* Add a module component to a stream */
+    /* Add a jmodule component to a stream */
     mod_comp=modulemd_component_rpm_new('modulecomponent');
     stream=modulemd_module_stream_add_component(mod_comp);
     g_assert_nonnull(modulemd_module_get_module_component_name(stream),
@@ -723,7 +682,7 @@ module_stream_test_profiles(ModuleStreamFixture *fixture, gconstpointer user_dat
     profile = modulemd_profile_add_rpm('sssd-client');
 
     stream=modulemd_profile_copy(profile);
-    g_assert_cmp(len(modulemd_get_profile_names(stream)),
+    g_assert_cmpint(len(modulemd_get_profile_names(stream)),
                  ==,
                  1);
     g_assert_cmpstr(modulemd_get_profile_names(stream),
@@ -869,17 +828,17 @@ module_stream_test_v1_dependencies(ModuleStreamFixture *fixture, gconstpointer u
     g_assert_cmpint(len(modulemd_module_stream_v1_get_buildtime_modules(stream)),
                    ==,
                    1);
-    g_assert_nonnull(modulemd_module_stream_v1_get_buildtime_modules(stream),
+    g_assert_cmpstr(modulemd_module_stream_v1_get_buildtime_modules(stream),
                   ==,
                   'testmodule');
-    g_assert_nonnull(modulemd_module_stream_v1_get_buildtime_requirement_stream('testmodule'),
+    g_assert_cmpstr(modulemd_module_stream_v1_get_buildtime_requirement_stream('testmodule'),
                   ==,
                   'stable');
     stream = modulemd_module_stream_v1_add_runtime_requirement('testmodule', 'latest');
     g_assert_cmpint (len(modulemd_module_stream_v1_get_runtime_modules(stream)),
                      == ,
                      1);
-    g_assert_nonnull(modulemd_module_stream_v1_get_runtime_modules(stream),
+    g_assert_cmpstr(modulemd_module_stream_v1_get_runtime_modules(stream),
                      ==,
                      'testmodule');
     g_assert_cmpstr(modulemd_module_stream_v1_get_runtime_requirement_stream('testmodule'),
@@ -899,13 +858,13 @@ module_stream_test_v2_dependencies(ModuleStreamFixture *fixture, gconstpointer u
     g_assert_cmpint(len(modulemd_module_stream_v2_get_dependencies(stream)),
                    ==,
                    1)
-    g_assert_nonnull(modulemd_module_stream_v2_get_dependencies_get_buildtime_modules(stream),
+    g_assert_cmpstr(modulemd_module_stream_v2_get_dependencies_get_buildtime_modules(stream),
                     ==,
                     'foo');
-    g_assert_nonnull(modulemd_module_stream_v2_get_dependencies_get_buildtime_modules('foo'),
+    g_assert_cmpstr(modulemd_module_stream_v2_get_dependencies_get_buildtime_modules('foo'),
                      ==,
                      'stable');
-    g_assert_nonnull(modulemd_module_stream_v2_get_dependencies_get_runtime_modules(stream),
+    g_assert_cmpstr(modulemd_module_stream_v2_get_dependencies_get_runtime_modules(stream),
                      ==,
                      'bar');
 }

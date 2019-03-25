@@ -184,6 +184,202 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
     }
 }
 
+
+static void
+module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *s_nsvc = NULL;
+  guint64 version;
+
+  for (version = MD_MODULESTREAM_VERSION_ONE;
+       version <= MD_MODULESTREAM_VERSION_LATEST;
+       version++)
+    {
+      // First test that nsvc is None for a module with no name
+      stream = modulemd_module_stream_new (version, NULL, NULL);
+      s_nsvc = modulemd_module_stream_get_nsvc_as_string (stream);
+      g_assert_null (s_nsvc);
+      g_clear_pointer (&s_nsvc, g_free);
+      g_clear_object (&stream);
+
+      // Now with valid module and stream names
+      stream = modulemd_module_stream_new (version, "modulename", NULL);
+      s_nsvc = modulemd_module_stream_get_nsvc_as_string (stream);
+      g_assert_null (s_nsvc);
+      g_clear_pointer (&s_nsvc, g_free);
+      g_clear_object (&stream);
+
+      // Now with valid module and stream names
+      stream =
+        modulemd_module_stream_new (version, "modulename", "streamname");
+      s_nsvc = modulemd_module_stream_get_nsvc_as_string (stream);
+      g_assert_cmpstr (s_nsvc, ==, "modulename:streamname:0");
+      g_clear_pointer (&s_nsvc, g_free);
+
+      //# Add a version number
+      modulemd_module_stream_set_version (stream, 42);
+      s_nsvc = modulemd_module_stream_get_nsvc_as_string (stream);
+      g_assert_cmpstr (s_nsvc, ==, "modulename:streamname:42");
+      g_clear_pointer (&s_nsvc, g_free);
+
+      // Add a context
+      modulemd_module_stream_set_context (stream, "deadbeef");
+      s_nsvc = modulemd_module_stream_get_nsvc_as_string (stream);
+      g_assert_cmpstr (s_nsvc, ==, "modulename:streamname:42:deadbeef");
+      g_clear_pointer (&s_nsvc, g_free);
+      g_clear_object (&stream);
+    }
+}
+
+
+static void
+module_stream_test_nsvca (ModuleStreamFixture *fixture,
+                          gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *s_nsvca = NULL;
+  guint64 version;
+
+  for (version = MD_MODULESTREAM_VERSION_ONE;
+       version <= MD_MODULESTREAM_VERSION_LATEST;
+       version++)
+    {
+      // First test that NSVCA is None for a module with no name
+      stream = modulemd_module_stream_new (version, NULL, NULL);
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_null (s_nsvca);
+      g_clear_pointer (&s_nsvca, g_free);
+      g_clear_object (&stream);
+
+      // Now with valid module and stream names
+      stream = modulemd_module_stream_new (version, "modulename", NULL);
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename");
+      g_clear_pointer (&s_nsvca, g_free);
+      g_clear_object (&stream);
+
+      // Now with valid module and stream names
+      stream =
+        modulemd_module_stream_new (version, "modulename", "streamname");
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename:streamname");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      //# Add a version number
+      modulemd_module_stream_set_version (stream, 42);
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename:streamname:42");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      // Add a context
+      modulemd_module_stream_set_context (stream, "deadbeef");
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename:streamname:42:deadbeef");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      // Add an architecture
+      modulemd_module_stream_set_arch (stream, "x86_64");
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (
+        s_nsvca, ==, "modulename:streamname:42:deadbeef:x86_64");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      // Now try removing some of the bits in the middle
+      modulemd_module_stream_set_context (stream, NULL);
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename:streamname:42::x86_64");
+      g_clear_pointer (&s_nsvca, g_free);
+      g_clear_object (&stream);
+
+      stream = modulemd_module_stream_new (version, "modulename", NULL);
+      modulemd_module_stream_set_arch (stream, "x86_64");
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename::::x86_64");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      modulemd_module_stream_set_version (stream, 2019);
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename::2019::x86_64");
+      g_clear_pointer (&s_nsvca, g_free);
+
+      // Add a context
+      modulemd_module_stream_set_context (stream, "feedfeed");
+      s_nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
+      g_assert_cmpstr (s_nsvca, ==, "modulename::2019:feedfeed:x86_64");
+      g_clear_pointer (&s_nsvca, g_free);
+      g_clear_object (&stream);
+    }
+}
+
+
+static void
+module_stream_v1_test_dependencies (ModuleStreamFixture *fixture,
+                                    gconstpointer user_data)
+{
+  g_auto (GStrv) list;
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    stream, "testmodule", "stable");
+  list = modulemd_module_stream_v1_get_buildtime_modules_as_strv (stream);
+  g_assert_cmpint (g_strv_length (list), ==, 1);
+  g_assert_cmpstr (list[0], ==, "testmodule");
+  g_assert_cmpstr (modulemd_module_stream_v1_get_buildtime_requirement_stream (
+                     stream, "testmodule"),
+                   ==,
+                   "stable");
+  g_clear_pointer (&list, g_strfreev);
+
+  modulemd_module_stream_v1_add_runtime_requirement (
+    stream, "testmodule", "latest");
+  list = modulemd_module_stream_v1_get_runtime_modules_as_strv (stream);
+  g_assert_cmpint (g_strv_length (list), ==, 1);
+  g_assert_cmpstr (list[0], ==, "testmodule");
+  g_assert_cmpstr (modulemd_module_stream_v1_get_runtime_requirement_stream (
+                     stream, "testmodule"),
+                   ==,
+                   "latest");
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
+static void
+module_stream_v2_test_dependencies (ModuleStreamFixture *fixture,
+                                    gconstpointer user_data)
+{
+  g_auto (GStrv) list;
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  dep = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (dep, "foo", "stable");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (dep, "bar");
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+  GPtrArray *deps_list = modulemd_module_stream_v2_get_dependencies (stream);
+  g_assert_cmpint (deps_list->len, ==, 1);
+
+  list = modulemd_dependencies_get_buildtime_modules_as_strv (
+    g_ptr_array_index (deps_list, 0));
+  g_assert_cmpstr (list[0], ==, "foo");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_dependencies_get_buildtime_streams_as_strv (
+    g_ptr_array_index (deps_list, 0), "foo");
+  g_assert_cmpstr (list[0], ==, "stable");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_dependencies_get_runtime_modules_as_strv (
+    g_ptr_array_index (deps_list, 0));
+  g_assert_cmpstr (list[0], ==, "bar");
+
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+}
+
+
 static void
 module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
                                   gconstpointer user_data)
@@ -705,6 +901,35 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_copy,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/nsvc",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_nsvc,
+              NULL);
+
+
+  g_test_add ("/modulemd/v2/modulestream/nsvca",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_nsvca,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/dependencies",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_dependencies,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/dependencies",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_dependencies,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/parse_dump",

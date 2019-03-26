@@ -24,7 +24,14 @@ struct _ModulemdDependencies
 {
   GObject parent_instance;
 
+  /* @key: dependent modules.
+   * @value: GHashTable set of compatible streams
+   */
   GHashTable *buildtime_deps;
+
+  /* @key: dependent modules.
+   * @value: GHashTable set of compatible streams
+   */
   GHashTable *runtime_deps;
 };
 
@@ -34,6 +41,33 @@ ModulemdDependencies *
 modulemd_dependencies_new (void)
 {
   return g_object_new (MODULEMD_TYPE_DEPENDENCIES, NULL);
+}
+
+
+gboolean
+modulemd_dependencies_equals (ModulemdDependencies *self_1,
+                              ModulemdDependencies *self_2)
+{
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self_2), FALSE);
+
+  if (!modulemd_hash_table_equals (self_1->buildtime_deps,
+                                   self_2->buildtime_deps,
+                                   modulemd_hash_table_sets_are_equal_wrapper))
+    return FALSE;
+
+  if (!modulemd_hash_table_equals (self_1->runtime_deps,
+                                   self_2->runtime_deps,
+                                   modulemd_hash_table_sets_are_equal_wrapper))
+    return FALSE;
+
+  return TRUE;
 }
 
 

@@ -133,6 +133,174 @@ dependencies_test_dependencies (DependenciesFixture *fixture,
 
 
 static void
+dependencies_test_equals (DependenciesFixture *fixture,
+                          gconstpointer user_data)
+{
+  g_autoptr (ModulemdDependencies) d_1 = NULL;
+  g_autoptr (ModulemdDependencies) d_2 = NULL;
+
+  /*With no hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+
+  g_assert_true (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With same buildtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_1, "builddef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_2, "builddef");
+
+  g_assert_true (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With different buildtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_1, "builddef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream1");
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream3");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_2, "builddef");
+
+  g_assert_false (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With same runtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_1,
+                                                                   "rundef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_2,
+                                                                   "rundef");
+
+  g_assert_true (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With different runtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_1,
+                                                                   "rundef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream4");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream5");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_2,
+                                                                   "rundef");
+
+  g_assert_false (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With same bulidtime_stream and runtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_1, "builddef");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_1,
+                                                                   "rundef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_2, "builddef");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_2,
+                                                                   "rundef");
+
+  g_assert_true (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+
+  /*With different bulidtime_stream and same runtime_stream hashtables*/
+  d_1 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_1);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_1));
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream1");
+  modulemd_dependencies_add_buildtime_stream (d_1, "buildmod1", "stream8");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_1, "builddef");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_1, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_1,
+                                                                   "rundef");
+
+  d_2 = modulemd_dependencies_new ();
+  g_assert_nonnull (d_2);
+  g_assert_true (MODULEMD_IS_DEPENDENCIES (d_2));
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d_2, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d_2, "builddef");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream4");
+  modulemd_dependencies_add_runtime_stream (d_2, "runmod1", "stream5");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d_2,
+                                                                   "rundef");
+
+  g_assert_false (modulemd_dependencies_equals (d_1, d_2));
+  g_clear_object (&d_1);
+  g_clear_object (&d_2);
+}
+
+
+static void
 dependencies_test_copy (DependenciesFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
@@ -380,6 +548,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               dependencies_test_dependencies,
+              NULL);
+
+  g_test_add ("/modulemd/v2/dependencies/equals",
+              DependenciesFixture,
+              NULL,
+              NULL,
+              dependencies_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/dependencies/copy",

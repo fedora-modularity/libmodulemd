@@ -41,6 +41,22 @@ modulemd_dependencies_new (void);
 
 
 /**
+ * modulemd_dependencies_equals:
+ * @self_1: A #ModulemdDependencies
+ * @self_2: A #ModulemdDependencies
+ *
+ * Check if self_1 and self_2 are equal objects
+ *
+ * Returns: TRUE, if the're equal. FALSE, otherwise.
+ *
+ * Since: 2.2
+ */
+gboolean
+modulemd_dependencies_equals (ModulemdDependencies *self_1,
+                              ModulemdDependencies *self_2);
+
+
+/**
  * modulemd_dependencies_copy:
  * @self: This #ModulemdDependencies
  *

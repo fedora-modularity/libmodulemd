@@ -51,7 +51,7 @@ G_DECLARE_FINAL_TYPE (ModulemdRpmMapEntry,
  */
 ModulemdRpmMapEntry *
 modulemd_rpm_map_entry_new (const gchar *name,
-                            guint32 epoch,
+                            guint64 epoch,
                             const gchar *version,
                             const gchar *release,
                             const gchar *arch);

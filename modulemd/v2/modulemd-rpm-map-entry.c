@@ -49,7 +49,7 @@ static GParamSpec *properties[N_PROPS];
 
 ModulemdRpmMapEntry *
 modulemd_rpm_map_entry_new (const gchar *name,
-                            guint32 epoch,
+                            guint64 epoch,
                             const gchar *version,
                             const gchar *release,
                             const gchar *arch)

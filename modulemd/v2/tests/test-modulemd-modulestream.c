@@ -320,7 +320,7 @@ module_stream_v1_test_dependencies (ModuleStreamFixture *fixture,
                                     gconstpointer user_data)
 {
   g_auto (GStrv) list;
-  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   stream = modulemd_module_stream_v1_new (NULL, NULL);
   modulemd_module_stream_v1_add_buildtime_requirement (
     stream, "testmodule", "stable");
@@ -352,7 +352,7 @@ module_stream_v2_test_dependencies (ModuleStreamFixture *fixture,
                                     gconstpointer user_data)
 {
   g_auto (GStrv) list;
-  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autoptr (ModulemdDependencies) dep = NULL;
   stream = modulemd_module_stream_v2_new (NULL, NULL);
   dep = modulemd_dependencies_new ();

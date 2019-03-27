@@ -185,6 +185,7 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 }
 
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
 module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
 {
@@ -231,6 +232,7 @@ module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
       g_clear_object (&stream);
     }
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 static void

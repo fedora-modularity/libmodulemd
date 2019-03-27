@@ -67,6 +67,8 @@ else
     python3 = pymod.find_installation()
 endif
 
+python2 = pymod.find_installation('python2')
+
 spec_tmpl = find_program('spec_tmpl.sh')
 
 specfile_template = files('libmodulemd.spec.in')

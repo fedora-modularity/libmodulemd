@@ -10,7 +10,7 @@ License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        %{url}/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
 
-BuildRequires:  meson
+BuildRequires:  meson >= 0.47
 BuildRequires:  pkgconfig
 BuildRequires:  gcc
 BuildRequires:  gcc-c++

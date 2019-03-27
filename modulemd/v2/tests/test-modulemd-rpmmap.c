@@ -27,6 +27,7 @@ test_basic (CommonMmdTestFixture *fixture, gconstpointer user_data)
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
   g_autofree gchar *nevra = NULL;
+  guint64 epoch = 0;
 
   /* Test that the new() function works */
   entry = modulemd_rpm_map_entry_new (
@@ -67,7 +68,7 @@ test_basic (CommonMmdTestFixture *fixture, gconstpointer user_data)
   // clang-format off
   entry = g_object_new (MODULEMD_TYPE_RPM_MAP_ENTRY,
                        "name", "bar",
-                       "epoch", 0,
+                       "epoch", epoch,
                        "version", "1.23",
                        "release", "1.module_deadbeef",
                        "arch", "x86_64",

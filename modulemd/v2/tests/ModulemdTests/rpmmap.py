@@ -61,32 +61,32 @@ class TestRpmMapEntry(TestBase):
 
         # Remove name
         entry2.props.name = None
-        with self.assertRaisesRegex(gi.repository.GLib.GError,
-                                    "Missing name attribute"):
+        with self.assertRaisesRegexp(gi.repository.GLib.GError,
+                                     "Missing name attribute"):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.name = "bar"
 
         # Remove the version
         entry2.props.version = None
-        with self.assertRaisesRegex(gi.repository.GLib.GError,
-                                    "Missing version attribute"):
+        with self.assertRaisesRegexp(gi.repository.GLib.GError,
+                                     "Missing version attribute"):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.version = "1.23"
 
         # Remove the release
         entry2.props.release = None
-        with self.assertRaisesRegex(gi.repository.GLib.GError,
-                                    "Missing release attribute"):
+        with self.assertRaisesRegexp(gi.repository.GLib.GError,
+                                     "Missing release attribute"):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.release = "1.module_deadbeef"
 
         # Remove the arch
         entry2.props.arch = None
-        with self.assertRaisesRegex(gi.repository.GLib.GError,
-                                    "Missing arch attribute"):
+        with self.assertRaisesRegexp(gi.repository.GLib.GError,
+                                     "Missing arch attribute"):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.arch = "x86_64"

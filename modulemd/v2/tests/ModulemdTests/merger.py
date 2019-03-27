@@ -63,10 +63,7 @@ class TestModuleIndexMerger(TestBase):
         final = deduplicated_idx.dump_to_string()
 
         # Verify that it outputs the same content as the baseline
-        print("Baseline:\n%s" % baseline, file=sys.stderr)
-        print("Resolved:\n%s" % final, file=sys.stderr)
-
-        self.assertEqual(baseline, deduplicated_idx.dump_to_string())
+        self.assertEqual(baseline, final)
 
     def test_merger(self):
         # Get a set of objects in a ModuleIndex

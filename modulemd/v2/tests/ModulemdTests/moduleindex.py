@@ -75,7 +75,7 @@ profiles:
         mod_foo = idx.get_module("foo")
         self.assertTrue(mod_foo.validate())
         self.assertEqual(mod_foo.get_module_name(), "foo")
-        with self.assertRaisesRegex(gi.repository.GLib.GError, "No streams matched"):
+        with self.assertRaisesRegexp(gi.repository.GLib.GError, "No streams matched"):
             mod_foo.get_stream_by_NSVCA("a", 5, "c")
         self.assertEqual(len(mod_foo.get_all_streams()), 2)
         self.assertIsNotNone(mod_foo.get_defaults())

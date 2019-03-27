@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 # This file is part of libmodulemd
 # Copyright (C) 2018 Red Hat, Inc.

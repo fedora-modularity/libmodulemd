@@ -354,88 +354,150 @@ test('translation_entry_v2_release', test_v2_translationentry,
 
 # -- Test Modulemd.Buildopts (Python) -- #
 buildopts_python_script = files('tests/ModulemdTests/buildopts.py')
-test ('buildopts_python_debug', python3,
+test ('buildopts_python3_debug', python3,
       env : py_test_env,
       args : buildopts_python_script)
-test ('buildopts_python_release', python3,
+test ('buildopts_python3_release', python3,
+      env : py_test_release_env,
+      args : buildopts_python_script)
+
+  test ('buildopts_python2_debug', python2,
+      env : py_test_env,
+      args : buildopts_python_script)
+test ('buildopts_python2_release', python2,
       env : py_test_release_env,
       args : buildopts_python_script)
 
 
 # -- Test Modulemd.Dependencies (Python) -- #
 dependencies_python_script = files('tests/ModulemdTests/dependencies.py')
-test ('dependencies_python_debug', python3,
+test ('dependencies_python3_debug', python3,
       env : py_test_env,
       args : dependencies_python_script)
-test ('dependencies_python_release', python3,
+test ('dependencies_python3_release', python3,
+      env : py_test_release_env,
+      args : dependencies_python_script)
+
+test ('dependencies_python2_debug', python2,
+      env : py_test_env,
+      args : dependencies_python_script)
+test ('dependencies_python2_release', python2,
       env : py_test_release_env,
       args : dependencies_python_script)
 
 # -- Test Modulemd.ModuleIndex (Python) -- #
 moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
-test ('moduleindex_python_debug', python3,
+test ('moduleindex_python3_debug', python3,
       env : py_test_env,
       args : moduleindex_python_script)
-test ('moduleindex_python_release', python3,
+test ('moduleindex_python3_release', python3,
+      env : py_test_release_env,
+      args : moduleindex_python_script)
+
+moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
+test ('moduleindex_python2_debug', python2,
+      env : py_test_env,
+      args : moduleindex_python_script)
+test ('moduleindex_python2_release', python2,
       env : py_test_release_env,
       args : moduleindex_python_script)
 
 # -- Test Modulemd.ModuleStream (Python) -- #
 modulestream_python_script = files('tests/ModulemdTests/modulestream.py')
-test ('modulestream_python_debug', python3,
+test ('modulestream_python3_debug', python3,
       env : py_test_env,
       args : modulestream_python_script)
-test ('modulestream_python_release', python3,
+test ('modulestream_python3_release', python3,
+      env : py_test_release_env,
+      args : modulestream_python_script)
+
+test ('modulestream_python2_debug', python2,
+      env : py_test_env,
+      args : modulestream_python_script)
+test ('modulestream_python2_release', python2,
       env : py_test_release_env,
       args : modulestream_python_script)
 
 
 # -- Test Modulemd.ModuleIndexMerger (Python) -- #
 merger_python_script = files('tests/ModulemdTests/merger.py')
-test ('merger_python_debug', python3,
+test ('merger_python3_debug', python3,
       env : py_test_env,
       args : merger_python_script)
-test ('merger_python_release', python3,
+test ('merger_python3_release', python3,
+      env : py_test_release_env,
+      args : merger_python_script)
+
+test ('merger_python2_debug', python2,
+      env : py_test_env,
+      args : merger_python_script)
+test ('merger_python2_release', python2,
       env : py_test_release_env,
       args : merger_python_script)
 
 
 # -- Test Modulemd.Profile (Python) -- #
 profile_python_script = files('tests/ModulemdTests/profile.py')
-test ('profile_python_debug', python3,
+test ('profile_python3_debug', python3,
       env : py_test_env,
       args : profile_python_script)
-test ('profile_python_release', python3,
+test ('profile_python3_release', python3,
       env : py_test_release_env,
       args : profile_python_script)
 
+test ('profile_python2_debug', python2,
+      env : py_test_env,
+      args : profile_python_script)
+test ('profile_python2_release', python2,
+      env : py_test_release_env,
+      args : profile_python_script)
 
 # -- Test Modulemd.ServiceLevel (Python) -- #
 service_level_python_script = files('tests/ModulemdTests/servicelevel.py')
-test ('service_level_python_debug', python3,
+test ('service_level_python3_debug', python3,
       env : py_test_env,
       args : service_level_python_script)
-test ('service_level_python_release', python3,
+test ('service_level_python3_release', python3,
+      env : py_test_release_env,
+      args : service_level_python_script)
+
+test ('service_level_python2_debug', python2,
+      env : py_test_env,
+      args : service_level_python_script)
+test ('service_level_python2_release', python2,
       env : py_test_release_env,
       args : service_level_python_script)
 
 
 # -- Test Modulemd.Translation (Python) -- #
 translation_python_script = files('tests/ModulemdTests/translation.py')
-test ('translation__python_debug', python3,
+test ('translation_python3_debug', python3,
       env : py_test_env,
       args : translation_python_script)
-test ('translation__python_release', python3,
+test ('translation_python3_release', python3,
       env : py_test_release_env,
       args : translation_python_script)
 
+test ('translation_python2_debug', python2,
+      env : py_test_env,
+      args : translation_python_script)
+test ('translation_python2_release', python2,
+      env : py_test_release_env,
+      args : translation_python_script)
 
 # -- Test Modulemd.TranslationEntry (Python) -- #
 translation_entry_python_script = files('tests/ModulemdTests/translationentry.py')
-test ('translation_entry_python_debug', python3,
+test ('translation_entry_python3_debug', python3,
       env : py_test_env,
       args : translation_entry_python_script)
-test ('translation_entry_python_release', python3,
+test ('translation_entry_python3_release', python3,
+      env : py_test_release_env,
+      args : translation_entry_python_script)
+
+test ('translation_entry_python2_debug', python2,
+      env : py_test_env,
+      args : translation_entry_python_script)
+test ('translation_entry_python2_release', python2,
       env : py_test_release_env,
       args : translation_entry_python_script)
 
@@ -459,10 +521,18 @@ test('defaults_v2_release', test_v2_defaults,
 
 # -- Test Modulemd.Defaults (Python) -- #
 defaults_python_script = files('tests/ModulemdTests/defaults.py')
-test ('defaults_python_debug', python3,
+test ('defaults_python3_debug', python3,
       env : py_test_env,
       args : defaults_python_script)
-test ('defaults_python_release', python3,
+test ('defaults_python3_release', python3,
+      env : py_test_release_env,
+      args : defaults_python_script)
+
+defaults_python_script = files('tests/ModulemdTests/defaults.py')
+test ('defaults_python2_debug', python2,
+      env : py_test_env,
+      args : defaults_python_script)
+test ('defaults_python2_release', python2,
       env : py_test_release_env,
       args : defaults_python_script)
 
@@ -486,10 +556,17 @@ test('defaultsv1_v2_release', test_v2_defaultsv1,
 
 # -- Test Modulemd.DefaultsV1 (Python) -- #
 defaultsv1_python_script = files('tests/ModulemdTests/defaultsv1.py')
-test ('defaultsv1_python_debug', python3,
+test ('defaultsv1_python3_debug', python3,
       env : py_test_env,
       args : defaultsv1_python_script)
-test ('defaultsv1_python_release', python3,
+test ('defaultsv1_python3_release', python3,
+      env : py_test_release_env,
+      args : defaultsv1_python_script)
+
+test ('defaultsv1_python2_debug', python2,
+      env : py_test_env,
+      args : defaultsv1_python_script)
+test ('defaultsv1_python2_release', python2,
       env : py_test_release_env,
       args : defaultsv1_python_script)
 
@@ -513,10 +590,17 @@ test ('rpm_map_release', test_rpm_map,
 
 # -- Test Modulemd.RpmMapEntry (Python) -- #
 rpmmap_python_script = files('tests/ModulemdTests/rpmmap.py')
-test ('rpmmap_python_debug', python3,
+test ('rpmmap_python3_debug', python3,
       env : py_test_env,
       args : rpmmap_python_script)
-test ('rpmmap_python_release', python3,
+test ('rpmmap_python3_release', python3,
+      env : py_test_release_env,
+      args : rpmmap_python_script)
+
+test ('rpmmap_python2_debug', python2,
+      env : py_test_env,
+      args : rpmmap_python_script)
+test ('rpmmap_python2_release', python2,
       env : py_test_release_env,
       args : rpmmap_python_script)
 

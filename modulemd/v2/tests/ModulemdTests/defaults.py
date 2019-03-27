@@ -43,22 +43,22 @@ class TestDefaults(TestBase):
         assert defs.get_module_name() == 'foo'
 
         # Test that we cannot instantiate directly
-        with self.assertRaisesRegex(TypeError, 'cannot create instance of abstract'):
+        with self.assertRaisesRegexp(TypeError, 'cannot create instance of abstract'):
             Modulemd.Defaults()
 
         # Test with a zero mdversion
-        with self.assertRaisesRegex(TypeError, 'constructor returned NULL'):
+        with self.assertRaisesRegexp(TypeError, 'constructor returned NULL'):
             with self.expect_signal():
                 defs = Modulemd.Defaults.new(0, 'foo')
 
         # Test with an unknown mdversion
-        with self.assertRaisesRegex(TypeError, 'constructor returned NULL'):
+        with self.assertRaisesRegexp(TypeError, 'constructor returned NULL'):
             with self.expect_signal():
                 defs = Modulemd.Defaults.new(
                     Modulemd.DefaultsVersionEnum.LATEST + 1, 'foo')
 
         # Test with no name
-        with self.assertRaisesRegex(TypeError, 'does not allow None as a value'):
+        with self.assertRaisesRegexp(TypeError, 'does not allow None as a value'):
             defs = Modulemd.Defaults.new(
                 Modulemd.DefaultsVersionEnum.ONE, None)
 
@@ -81,7 +81,7 @@ class TestDefaults(TestBase):
         assert defs.get_mdversion() == Modulemd.DefaultsVersionEnum.ONE
 
         # Ensure we cannot set the mdversion
-        with self.assertRaisesRegex(TypeError, 'is not writable'):
+        with self.assertRaisesRegexp(TypeError, 'is not writable'):
             defs.props.mdversion = 0
 
     def test_module_name(self):

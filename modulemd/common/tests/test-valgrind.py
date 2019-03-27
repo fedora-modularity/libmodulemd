@@ -36,6 +36,8 @@ for test in unfiltered_tests:
     if (not test or
         test.endswith('_python') or
         test.endswith('_python_debug') or
+        test.endswith('_python2_debug') or
+        test.endswith('_python3_debug') or
         test.endswith('_release') or
         test.endswith('_import_headers') or
         'v1_release' in test or

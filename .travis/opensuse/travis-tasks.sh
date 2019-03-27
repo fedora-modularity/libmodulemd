@@ -5,7 +5,7 @@ set -e
 
 set -x
 
-JOB_NAME=${TRAVIS_JOB_NAME:openSUSE tumbleweed}
+JOB_NAME=${TRAVIS_JOB_NAME:-openSUSE tumbleweed}
 
 arr=($JOB_NAME)
 os_name=${arr[0]:-openSUSE}

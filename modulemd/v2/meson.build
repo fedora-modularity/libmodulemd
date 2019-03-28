@@ -172,10 +172,17 @@ test('component_module_v2_release', test_v2_component_module,
 
 # -- Test Modulemd.ComponentRpm (Python) -- #
 componentrpm_python_script = files('tests/ModulemdTests/componentrpm.py')
-test ('componentrpm_python_debug', python3,
+test ('componentrpm_python3_debug', python3,
       env : py_test_env,
       args : componentrpm_python_script)
-test ('componentrpm_python_release', python3,
+test ('componentrpm_python3_release', python3,
+      env : py_test_release_env,
+      args : componentrpm_python_script)
+
+test ('componentrpm_python2_debug', python2,
+      env : py_test_env,
+      args : componentrpm_python_script)
+test ('componentrpm_python2_release', python2,
       env : py_test_release_env,
       args : componentrpm_python_script)
 

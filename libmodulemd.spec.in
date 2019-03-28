@@ -117,7 +117,7 @@ Python 3 bindings for libmodulemd1
 %build
 %meson -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=true
 
-%if 0%{?rhel} <= 7
+%if 0%{?rhel} && 0%{?rhel} <= 7
 # ALERT!!! PURE HACK FOR EPEL!
 # https://bugzilla.redhat.com/show_bug.cgi?id=1546757
 sed -r -i -e "/g-ir-scanner/s/-l(gobject-2.0|glib-2.0|yaml)//g" %{_vpath_builddir}/build.ninja

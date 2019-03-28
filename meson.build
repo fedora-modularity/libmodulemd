@@ -67,7 +67,12 @@ else
     python3 = pymod.find_installation()
 endif
 
-python2 = pymod.find_installation('python2')
+with_py2_overrides = get_option('with_py2_overrides')
+if with_py2_overrides
+    python2 = pymod.find_installation('python2')
+else
+    python2 = disabler()
+endif
 
 spec_tmpl = find_program('spec_tmpl.sh')
 

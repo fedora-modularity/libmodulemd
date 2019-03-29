@@ -1,0 +1,15 @@
+FROM @IMAGE@
+
+MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
+
+ARG TARBALL
+
+RUN pacman -Syu --noconfirm \
+	base-devel \
+	glib2 \
+	gobject-introspection \
+	gtk-doc \
+	libyaml \
+	meson \
+	python-gobject \
+&& pacman -Scc --noconfirm

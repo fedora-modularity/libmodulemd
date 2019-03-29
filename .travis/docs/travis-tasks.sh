@@ -5,8 +5,8 @@ set -e
 
 set -x
 
-os_name=Fedora}
-release=rawhide}
+os_name=Fedora
+release=rawhide
 
 pushd /builddir/
 

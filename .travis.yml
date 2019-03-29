@@ -37,3 +37,5 @@ jobs:
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-docs.sh; fi'
     - name: "openSUSE tumbleweed"
       script: ./.travis/travis-opensuse.sh
+    - name: "Arch Linux"
+      script: ./.travis/travis-archlinux.sh

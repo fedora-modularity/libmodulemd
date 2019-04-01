@@ -618,7 +618,7 @@ if skip_introspection
 else
     gnome.generate_gir(
         modulemd_v2_lib,
-        sources : modulemd_v2_srcs + modulemd_v2_hdrs + ['include/modulemd-2.0/private/gi-binding-renames.h'],
+        sources : modulemd_v2_srcs + modulemd_v2_hdrs + ['include/private/gi-binding-renames.h'],
         nsversion : '2.0',
         namespace : 'Modulemd',
         symbol_prefix : 'modulemd_',

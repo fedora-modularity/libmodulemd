@@ -92,15 +92,18 @@ modulemd_v1_hdrs = files(
 )
 
 modulemd_v1_priv_hdrs = files(
-    'v1/include/modulemd-1.0/private/modulemd-improvedmodule-private.h',
-    'v1/include/modulemd-1.0/private/modulemd-private.h',
-    'v1/include/modulemd-1.0/private/modulemd-profile-private.h',
-    'v1/include/modulemd-1.0/private/modulemd-subdocument-private.h',
-    'v1/include/modulemd-1.0/private/modulemd-util.h',
-    'v1/include/modulemd-1.0/private/modulemd-yaml.h',
+    'v1/include/private/modulemd-improvedmodule-private.h',
+    'v1/include/private/modulemd-private.h',
+    'v1/include/private/modulemd-profile-private.h',
+    'v1/include/private/modulemd-subdocument-private.h',
+    'v1/include/private/modulemd-util.h',
+    'v1/include/private/modulemd-yaml.h',
 )
 
-v1_include_dirs = include_directories ('v1/include/modulemd-1.0')
+v1_include_dirs = include_directories (
+    'v1/include/modulemd-1.0',
+    'v1/include'
+)
 
 test_v1_srcs = files(
     'v1/tests/test-modulemd-buildopts.c',
@@ -174,27 +177,27 @@ modulemd_v2_hdrs = files(
 )
 
 modulemd_v2_priv_hdrs = files(
-    'v2/include/modulemd-2.0/private/glib-extensions.h',
-    'v2/include/modulemd-2.0/private/modulemd-buildopts-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-component-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-component-module-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-component-rpm-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-dependencies-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-profile-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-defaults-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-defaults-v1-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-module-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-module-index-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-module-stream-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-module-stream-v1-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-module-stream-v2-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-service-level-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-subdocument-info-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-translation-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-translation-entry-private.h',
-    'v2/include/modulemd-2.0/private/modulemd-util.h',
-    'v2/include/modulemd-2.0/private/modulemd-yaml.h',
-    'v2/include/modulemd-2.0/private/gi-binding-renames.h',
+    'v2/include/private/glib-extensions.h',
+    'v2/include/private/modulemd-buildopts-private.h',
+    'v2/include/private/modulemd-component-private.h',
+    'v2/include/private/modulemd-component-module-private.h',
+    'v2/include/private/modulemd-component-rpm-private.h',
+    'v2/include/private/modulemd-dependencies-private.h',
+    'v2/include/private/modulemd-profile-private.h',
+    'v2/include/private/modulemd-defaults-private.h',
+    'v2/include/private/modulemd-defaults-v1-private.h',
+    'v2/include/private/modulemd-module-private.h',
+    'v2/include/private/modulemd-module-index-private.h',
+    'v2/include/private/modulemd-module-stream-private.h',
+    'v2/include/private/modulemd-module-stream-v1-private.h',
+    'v2/include/private/modulemd-module-stream-v2-private.h',
+    'v2/include/private/modulemd-service-level-private.h',
+    'v2/include/private/modulemd-subdocument-info-private.h',
+    'v2/include/private/modulemd-translation-private.h',
+    'v2/include/private/modulemd-translation-entry-private.h',
+    'v2/include/private/modulemd-util.h',
+    'v2/include/private/modulemd-yaml.h',
+    'v2/include/private/gi-binding-renames.h',
 )
 
 test_v2_srcs = files(
@@ -217,7 +220,7 @@ test_v2_srcs = files(
 )
 
 test_v2_priv_hdrs = files(
-    'v2/include/modulemd-2.0/private/test-utils.h',
+    'v2/include/private/test-utils.h',
 )
 
 test_v2_python_scripts = files(
@@ -237,7 +240,10 @@ test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/translationentry.py',
 )
 
-v2_include_dirs = include_directories ('v2/include/modulemd-2.0')
+v2_include_dirs = include_directories (
+    'v2/include/modulemd-2.0',
+    'v2/include'
+)
 
 
 # Fake test to ensure that all sources and headers are formatted properly

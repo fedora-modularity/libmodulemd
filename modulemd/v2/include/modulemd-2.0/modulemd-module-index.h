@@ -72,6 +72,35 @@ G_DECLARE_FINAL_TYPE (
 
 
 /**
+ * ModulemdReadHandler:
+ * @data: (inout): A private pointer to the data being read.
+ * @buffer: (out): The buffer to write the data from the source.
+ * @size: (in): The size of the buffer.
+ * @size_read: (out): The actual number of bytes read from the source.
+ *
+ * The prototype of a read handler.
+ *
+ * The read handler is called when the parser needs to read more bytes from the
+ * source. The handler should write not more than @size bytes to the @buffer.
+ * The number of written bytes should be set to the @size_read variable.
+ *
+ * This handler is identical to a
+ * [yaml_read_handler_t](https://github.com/yaml/libyaml/blob/master/include/yaml.h#L988)
+ * but is included here to avoid depending on yaml.h in modulemd headers.
+ *
+ * Returns: On success, the handler must return 1. If the handler failed,
+ * the returned value must be 0.  On EOF, the handler must set the
+ * @size_read to 0 and return 1.
+ *
+ * Since: 2.3
+ */
+typedef gint (*ModulemdReadHandler) (void *data,
+                                     unsigned char *buffer,
+                                     size_t size,
+                                     size_t *size_read);
+
+
+/**
  * modulemd_module_index_new:
  *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object.
@@ -158,6 +187,34 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
                                           FILE *yaml_stream,
+                                          gboolean strict,
+                                          GPtrArray **failures,
+                                          GError **error);
+
+
+/**
+ * modulemd_module_index_update_from_custom: (skip)
+ * @self: This #ModulemdModuleIndex object
+ * @custom_read_fn: (in): A #ModulemdReadHandler
+ * @custom_pvt_data: (inout): The private data needed by the #ModulemdReadHandler
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
+ * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
+ * An array containing any subdocuments from the YAML file that failed to parse.
+ * See #ModulemdSubdocumentInfo for more details.
+ * @error: (out): A GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
+ * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * there was a fatal parse error.
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
+                                          ModulemdReadHandler custom_read_fn,
+                                          void *custom_pvt_data,
                                           gboolean strict,
                                           GPtrArray **failures,
                                           GError **error);

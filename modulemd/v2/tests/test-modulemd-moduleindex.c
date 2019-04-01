@@ -15,6 +15,7 @@
 #include <glib/gstdio.h>
 #include <locale.h>
 #include <signal.h>
+#include <yaml.h>
 
 #include "modulemd-defaults.h"
 #include "modulemd-module.h"
@@ -694,6 +695,151 @@ module_index_test_remove_module (ModuleIndexFixture *fixture,
 }
 
 
+struct custom_string
+{
+  gchar *string;
+  gchar *current;
+};
+
+static int
+custom_string_read_handler (void *data,
+                            unsigned char *buffer,
+                            size_t size,
+                            size_t *size_read)
+{
+  struct custom_string *custom = (struct custom_string *)data;
+  const gchar *end = custom->string + strlen (custom->string);
+
+  if (custom->current == end)
+    {
+      *size_read = 0;
+      return 1;
+    }
+
+  if (size > (size_t) (end - custom->current))
+    {
+      size = end - custom->current;
+    }
+
+  memcpy (buffer, custom->current, size);
+  custom->current += size;
+  *size_read = size;
+  return 1;
+}
+
+
+static void
+module_index_test_custom_read (ModuleIndexFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+
+
+  // clang-format off
+  g_autofree gchar *str = g_strdup(
+"---\n"
+"document: modulemd\n"
+"version: 2\n"
+"data:\n"
+"  name: testmodule\n"
+"  stream: master\n"
+"  version: 20180405123256\n"
+"  context: c2c572ec\n"
+"  arch: x86_64\n"
+"  summary: A test module in all its beautiful beauty\n"
+"  description: >-\n"
+"    This module demonstrates how to write simple modulemd files And can be used for\n"
+"    testing the build and release pipeline.\n"
+"  license:\n"
+"    module:\n"
+"    - MIT\n"
+"    content:\n"
+"    - GPL+ or Artistic\n"
+"    - MIT\n"
+"  xmd:\n"
+"    mbs:\n"
+"      scmurl: https://src.fedoraproject.org/modules/testmodule.git?#0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"
+"      commit: 0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"
+"      buildrequires:\n"
+"        platform:\n"
+"          ref: virtual\n"
+"          stream: f29\n"
+"          filtered_rpms: []\n"
+"          version: 4\n"
+"      rpms:\n"
+"        perl-List-Compare:\n"
+"          ref: c6a689a6ce2683b15b32f83e6cb5d43ffd3816f5\n"
+"        tangerine:\n"
+"          ref: 239ada495d941ceefd8f359e1d8a47877fbba4a9\n"
+"        perl-Tangerine:\n"
+"          ref: 7e96446223f1ad84a26c7cf23d6591cd9f6326c6\n"
+"      requires:\n"
+"        platform:\n"
+"          ref: virtual\n"
+"          stream: f29\n"
+"          filtered_rpms: []\n"
+"          version: 4\n"
+"  dependencies:\n"
+"  - buildrequires:\n"
+"      platform: [f29]\n"
+"    requires:\n"
+"      platform: [f29]\n"
+"  references:\n"
+"    community: https://docs.pagure.org/modularity/\n"
+"    documentation: https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules\n"
+"  profiles:\n"
+"    default:\n"
+"      rpms:\n"
+"      - tangerine\n"
+"  api:\n"
+"    rpms:\n"
+"    - perl-Tangerine\n"
+"    - tangerine\n"
+"  components:\n"
+"    rpms:\n"
+"      perl-List-Compare:\n"
+"        rationale: A dependency of tangerine.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/perl-List-Compare\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-List-Compare\n"
+"        ref: master\n"
+"      perl-Tangerine:\n"
+"        rationale: Provides API for this module and is a dependency of tangerine.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/perl-Tangerine\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-Tangerine\n"
+"        ref: 7e96446\n"
+"      tangerine:\n"
+"        rationale: Provides API for this module.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/tangerine\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/tangerine\n"
+"        ref: master\n"
+"        buildorder: 10\n"
+"  artifacts:\n"
+"    rpms:\n"
+"    - perl-List-Compare-0:0.53-9.module_1588+5eed94c6.noarch\n"
+"    - perl-Tangerine-0:0.22-2.module_1588+5eed94c6.noarch\n"
+"    - tangerine-0:0.22-7.module_1588+5eed94c6.noarch\n"
+"...\n");
+  // clang-format on
+
+  struct custom_string custom;
+  custom.string = str;
+  custom.current = str;
+
+  index = modulemd_module_index_new ();
+
+  g_assert_true (modulemd_module_index_update_from_custom (
+    index, custom_string_read_handler, &custom, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_assert_no_error (error);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* Verify we did indeed get the module we expected */
+  g_assert_nonnull (modulemd_module_index_get_module (index, "testmodule"));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -751,6 +897,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_index_test_remove_module,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/index/custom_read",
+              ModuleIndexFixture,
+              NULL,
+              NULL,
+              module_index_test_custom_read,
               NULL);
 
   return g_test_run ();

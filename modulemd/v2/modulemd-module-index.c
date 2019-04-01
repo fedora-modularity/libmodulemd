@@ -537,6 +537,29 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
 }
 
 
+gboolean
+modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
+                                          ModulemdReadHandler custom_read_fn,
+                                          void *custom_pvt_data,
+                                          gboolean strict,
+                                          GPtrArray **failures,
+                                          GError **error)
+{
+  if (*failures == NULL)
+    *failures = g_ptr_array_new_full (0, g_object_unref);
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+  g_return_val_if_fail (custom_read_fn, FALSE);
+
+  MMD_INIT_YAML_PARSER (parser);
+
+  yaml_parser_set_input (&parser, custom_read_fn, custom_pvt_data);
+
+  return modulemd_module_index_update_from_parser (
+    self, &parser, strict, FALSE, failures, error);
+}
+
+
 gchar *
 modulemd_module_index_dump_to_string (ModulemdModuleIndex *self,
                                       GError **error)

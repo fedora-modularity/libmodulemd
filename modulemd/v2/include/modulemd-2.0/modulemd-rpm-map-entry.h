@@ -15,8 +15,6 @@
 
 #include <glib-object.h>
 
-#include "private/modulemd-util.h"
-
 G_BEGIN_DECLS
 
 /**

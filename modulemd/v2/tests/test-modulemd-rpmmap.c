@@ -18,6 +18,7 @@
 
 #include "modulemd-rpm-map-entry.h"
 #include "private/modulemd-rpm-map-entry-private.h"
+#include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 

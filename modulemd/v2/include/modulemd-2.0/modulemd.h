@@ -28,6 +28,7 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-profile.h"
+#include "modulemd-rpm-map-entry.h"
 #include "modulemd-service-level.h"
 #include "modulemd-subdocument-info.h"
 #include "modulemd-translation.h"

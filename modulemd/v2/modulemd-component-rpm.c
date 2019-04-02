@@ -73,6 +73,46 @@ modulemd_component_rpm_finalize (GObject *object)
 }
 
 
+static gboolean
+modulemd_component_rpm_equals (ModulemdComponent *self_1,
+                               ModulemdComponent *self_2)
+{
+  ModulemdComponentRpm *rpm_self_1 = NULL;
+  ModulemdComponentRpm *rpm_self_2 = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self_1), FALSE);
+  rpm_self_1 = MODULEMD_COMPONENT_RPM (self_1);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self_2), FALSE);
+  rpm_self_2 = MODULEMD_COMPONENT_RPM (self_2);
+
+  if (!MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
+         ->equals (self_1, self_2))
+    return FALSE;
+
+  if (g_strcmp0 (rpm_self_1->override_name, rpm_self_2->override_name) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (rpm_self_1->ref, rpm_self_2->ref) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (rpm_self_1->repository, rpm_self_2->repository) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (rpm_self_1->cache, rpm_self_2->cache) != 0)
+    return FALSE;
+
+  if (!modulemd_hash_table_sets_are_equal (rpm_self_1->arches,
+                                           rpm_self_2->arches))
+    return FALSE;
+
+  if (!modulemd_hash_table_sets_are_equal (rpm_self_1->multilib,
+                                           rpm_self_2->multilib))
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static GHashTable *
 hash_table_str_set_copy (GHashTable *orig)
 {
@@ -362,6 +402,7 @@ modulemd_component_rpm_class_init (ModulemdComponentRpmClass *klass)
   object_class->set_property = modulemd_component_rpm_set_property;
 
   component_class->copy = modulemd_component_rpm_copy;
+  component_class->equals = modulemd_component_rpm_equals;
   component_class->set_name = modulemd_component_rpm_set_name;
   component_class->get_name = modulemd_component_rpm_get_name;
 

@@ -48,6 +48,28 @@ enum
 static GParamSpec *properties[N_PROPS];
 
 
+gboolean
+modulemd_component_equals (ModulemdComponent *self_1,
+                           ModulemdComponent *self_2)
+{
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (self_2), FALSE);
+
+  ModulemdComponentClass *klass;
+
+  klass = MODULEMD_COMPONENT_GET_CLASS (self_1);
+  g_return_val_if_fail (klass->equals, FALSE);
+
+  return klass->equals (self_1, self_2);
+}
+
+
 static void
 modulemd_component_finalize (GObject *object)
 {
@@ -147,6 +169,35 @@ modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
   m_priv->buildafter = modulemd_hash_table_deep_set_copy (priv->buildafter);
 
   return g_steal_pointer (&m);
+}
+
+
+static gboolean
+modulemd_component_default_equals (ModulemdComponent *self_1,
+                                   ModulemdComponent *self_2)
+{
+  if (modulemd_component_get_buildorder (self_1) !=
+      modulemd_component_get_buildorder (self_2))
+    return FALSE;
+
+  if (modulemd_component_get_buildonly (self_1) !=
+      modulemd_component_get_buildonly (self_2))
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_component_get_name (self_1),
+                 modulemd_component_get_name (self_2)) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_component_get_rationale (self_1),
+                 modulemd_component_get_rationale (self_2)) != 0)
+    return FALSE;
+
+  if (!modulemd_hash_table_sets_are_equal (
+        modulemd_component_get_buildafter_internal (self_1),
+        modulemd_component_get_buildafter_internal (self_2)))
+    return FALSE;
+
+  return TRUE;
 }
 
 
@@ -406,6 +457,7 @@ modulemd_component_class_init (ModulemdComponentClass *klass)
   object_class->set_property = modulemd_component_set_property;
 
   klass->copy = modulemd_component_copy_component;
+  klass->equals = modulemd_component_default_equals;
   klass->set_name = NULL;
   klass->get_name = modulemd_component_get_key;
   klass->validate = modulemd_component_default_validate;

@@ -110,6 +110,129 @@ component_module_test_construct (ComponentModuleFixture *fixture,
 
 
 static void
+component_module_test_equals (ComponentModuleFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentModule) m_1 = NULL;
+  g_autoptr (ModulemdComponentModule) m_2 = NULL;
+
+  /*Everything is same*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_1, "someref");
+  modulemd_component_module_set_repository (m_1, "somerepo");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_2, "someref");
+  modulemd_component_module_set_repository (m_2, "somerepo");
+
+  g_assert_true (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                            MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+
+  /*repository is different*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_1, "someref");
+  modulemd_component_module_set_repository (m_1, "repoA");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_2, "someref");
+  modulemd_component_module_set_repository (m_2, "somerepo");
+
+  g_assert_false (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                             MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+
+  /*ref is different*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_1, "someref");
+  modulemd_component_module_set_repository (m_1, "somerepo");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_2, "refA");
+  modulemd_component_module_set_repository (m_2, "somerepo");
+
+  g_assert_false (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                             MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+
+  /*No ref*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_repository (m_1, "somerepo");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_repository (m_2, "somerepo");
+
+  g_assert_true (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                            MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+
+  /*No repository*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_1, "someref");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_2, "someref");
+
+  g_assert_true (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                            MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+
+  /*different ref and no repo*/
+  m_1 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_1),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_1, "someref");
+
+  m_2 = modulemd_component_module_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m_2),
+                                    "Testing all the stuff");
+  modulemd_component_module_set_ref (m_2, "refAA");
+
+  g_assert_false (modulemd_component_equals (MODULEMD_COMPONENT (m_1),
+                                             MODULEMD_COMPONENT (m_2)));
+  g_clear_object (&m_1);
+  g_clear_object (&m_2);
+}
+
+
+static void
 component_module_test_copy (ComponentModuleFixture *fixture,
                             gconstpointer user_data)
 {
@@ -276,6 +399,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               component_module_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/module/equals",
+              ComponentModuleFixture,
+              NULL,
+              NULL,
+              component_module_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/component/module/copy",

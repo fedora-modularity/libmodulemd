@@ -63,6 +63,32 @@ modulemd_component_module_finalize (GObject *object)
 }
 
 
+static gboolean
+modulemd_component_module_equals (ModulemdComponent *self_1,
+                                  ModulemdComponent *self_2)
+{
+  ModulemdComponentModule *module_self_1 = NULL;
+  ModulemdComponentModule *module_self_2 = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self_1), FALSE);
+  module_self_1 = MODULEMD_COMPONENT_MODULE (self_1);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_MODULE (self_2), FALSE);
+  module_self_2 = MODULEMD_COMPONENT_MODULE (self_2);
+
+  if (!MODULEMD_COMPONENT_CLASS (modulemd_component_module_parent_class)
+         ->equals (self_1, self_2))
+    return FALSE;
+
+  if (g_strcmp0 (module_self_1->ref, module_self_2->ref) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (module_self_1->repository, module_self_2->repository) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static ModulemdComponent *
 modulemd_component_module_copy (ModulemdComponent *self, const gchar *key)
 {
@@ -184,6 +210,7 @@ modulemd_component_module_class_init (ModulemdComponentModuleClass *klass)
   object_class->set_property = modulemd_component_module_set_property;
 
   component_class->copy = modulemd_component_module_copy;
+  component_class->equals = modulemd_component_module_equals;
 
   properties[PROP_REF] =
     g_param_spec_string ("ref",

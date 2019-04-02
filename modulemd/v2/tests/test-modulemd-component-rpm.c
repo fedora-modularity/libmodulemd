@@ -84,6 +84,105 @@ component_rpm_test_construct (ComponentRpmFixture *fixture,
 
 
 static void
+component_rpm_test_equals (ComponentRpmFixture *fixture,
+                           gconstpointer user_data)
+{
+  g_autoptr (ModulemdComponentRpm) r_1 = NULL;
+  g_autoptr (ModulemdComponentRpm) r_2 = NULL;
+
+  /*Everything is same*/
+  r_1 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_1),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_1, "someref");
+  modulemd_component_rpm_set_repository (r_1, "somerepo");
+  modulemd_component_rpm_set_cache (r_1, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_1, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_1, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_1, "s390x");
+
+  r_2 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_2),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_2, "someref");
+  modulemd_component_rpm_set_repository (r_2, "somerepo");
+  modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_2, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_2, "s390x");
+
+  g_assert_true (modulemd_component_equals (MODULEMD_COMPONENT (r_1),
+                                            MODULEMD_COMPONENT (r_2)));
+  g_clear_object (&r_1);
+  g_clear_object (&r_2);
+
+  /*Different ref and cache, everything else matching*/
+  r_1 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_1),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_1, "refA");
+  modulemd_component_rpm_set_repository (r_1, "somerepo");
+  modulemd_component_rpm_set_cache (r_1, "cacheA");
+  modulemd_component_rpm_add_restricted_arch (r_1, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_1, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_1, "s390x");
+
+  r_2 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_2),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_2, "someref");
+  modulemd_component_rpm_set_repository (r_2, "somerepo");
+  modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_2, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_2, "s390x");
+
+  g_assert_false (modulemd_component_equals (MODULEMD_COMPONENT (r_1),
+                                             MODULEMD_COMPONENT (r_2)));
+  g_clear_object (&r_1);
+  g_clear_object (&r_2);
+
+  /*Different hashtables,everything else matching*/
+  r_1 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_1), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_1),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_1, "someref");
+  modulemd_component_rpm_set_repository (r_1, "somerepo");
+  modulemd_component_rpm_set_cache (r_1, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_1, "x86_65");
+  modulemd_component_rpm_add_restricted_arch (r_1, "i687");
+  modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_1, "s390x");
+
+  r_2 = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r_2), 42);
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r_2),
+                                    "Testing all the stuff");
+  modulemd_component_rpm_set_ref (r_2, "someref");
+  modulemd_component_rpm_set_repository (r_2, "somerepo");
+  modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r_2, "i686");
+  modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r_2, "s390x");
+
+  g_assert_false (modulemd_component_equals (MODULEMD_COMPONENT (r_1),
+                                             MODULEMD_COMPONENT (r_2)));
+  g_clear_object (&r_1);
+  g_clear_object (&r_2);
+}
+
+
+static void
 component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdComponentRpm) r_orig = NULL;
@@ -336,6 +435,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               component_rpm_test_construct,
+              NULL);
+
+  g_test_add ("/modulemd/v2/component/rpm/equals",
+              ComponentRpmFixture,
+              NULL,
+              NULL,
+              component_rpm_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/component/rpm/copy",

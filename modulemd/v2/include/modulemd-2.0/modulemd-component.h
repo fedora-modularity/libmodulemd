@@ -36,11 +36,26 @@ struct _ModulemdComponentClass
   void (*set_name) (ModulemdComponent *self, const gchar *name);
   const gchar *(*get_name) (ModulemdComponent *self);
   gboolean (*validate) (ModulemdComponent *self, GError **error);
+  gboolean (*equals) (ModulemdComponent *self_1, ModulemdComponent *self_2);
 
   /* Padding to allow adding up to 8 new virtual functions without
    * breaking ABI. */
   gpointer padding[8];
 };
+
+/**
+ * modulemd_component_equals:
+ * @self_1: A #ModulemdComponent object
+ * @self_2: A #ModulemdComponent object
+ *
+ * Returns: TRUE, if both the objects are equal. FALSE, otherwise
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_component_equals (ModulemdComponent *self_1,
+                           ModulemdComponent *self_2);
+
 
 /**
  * modulemd_component_copy:

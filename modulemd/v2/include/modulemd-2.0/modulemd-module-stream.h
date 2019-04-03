@@ -80,9 +80,12 @@ struct _ModulemdModuleStreamClass
                                        const gchar *module_name,
                                        const gchar *stream_name);
 
-  /* Padding to allow adding up to 8 new virtual functions without
+  gboolean (*equals) (ModulemdModuleStream *self_1,
+                      ModulemdModuleStream *self_2);
+
+  /* Padding to allow adding up to 7 new virtual functions without
    * breaking ABI. */
-  gpointer padding[8];
+  gpointer padding[7];
 };
 
 
@@ -197,6 +200,22 @@ modulemd_module_stream_read_stream (FILE *stream,
                                     const gchar *module_name,
                                     const gchar *module_stream,
                                     GError **error);
+
+
+/**
+ * modulemd_module_stream_equals:
+ * @self_1: (in): A #ModulemdModuleStream.
+ * @self_2: (in): A #ModulemdModuleStream.
+ *
+ * Checks if self_1 and self_2 are identical objects.
+ *
+ * Returns: TRUE, If both objects are equal. FALSE, otherwise.
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_module_stream_equals (ModulemdModuleStream *self_1,
+                               ModulemdModuleStream *self_2);
 
 
 /**

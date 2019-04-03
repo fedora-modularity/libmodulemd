@@ -297,6 +297,62 @@ modulemd_module_stream_finalize (GObject *object)
 }
 
 
+static gboolean
+modulemd_module_stream_default_equals (ModulemdModuleStream *self_1,
+                                       ModulemdModuleStream *self_2)
+{
+  if (modulemd_module_stream_get_version (self_1) !=
+      modulemd_module_stream_get_version (self_2))
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_module_stream_get_module_name (self_1),
+                 modulemd_module_stream_get_module_name (self_2)) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_module_stream_get_stream_name (self_1),
+                 modulemd_module_stream_get_stream_name (self_2)) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_module_stream_get_context (self_1),
+                 modulemd_module_stream_get_context (self_2)) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (modulemd_module_stream_get_arch (self_1),
+                 modulemd_module_stream_get_arch (self_2)) != 0)
+    return FALSE;
+
+  /*need a function for this
+  if(!modulemd_translation_equals (modulemd_module_stream_get_translation (self_1), 
+                                   modulemd_module_stream_get_translation (self_2)) != 0)
+    return FALSE;
+  */
+
+  return TRUE;
+}
+
+
+gboolean
+modulemd_module_stream_equals (ModulemdModuleStream *self_1,
+                               ModulemdModuleStream *self_2)
+{
+  ModulemdModuleStreamClass *klass;
+
+  if (!self_1 && !self_2)
+    return TRUE;
+
+  if (!self_1 || !self_2)
+    return FALSE;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self_2), FALSE);
+
+  klass = MODULEMD_MODULE_STREAM_GET_CLASS (self_1);
+  g_return_val_if_fail (klass->equals, FALSE);
+
+  return klass->equals (self_1, self_2);
+}
+
+
 static ModulemdModuleStream *
 modulemd_module_stream_default_copy (ModulemdModuleStream *self,
                                      const gchar *module_name,
@@ -1008,6 +1064,7 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
   object_class->get_property = modulemd_module_stream_get_property;
   object_class->set_property = modulemd_module_stream_set_property;
 
+  klass->equals = modulemd_module_stream_default_equals;
   klass->copy = modulemd_module_stream_default_copy;
   klass->validate = modulemd_module_stream_default_validate;
 

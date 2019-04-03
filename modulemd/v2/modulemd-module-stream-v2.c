@@ -106,6 +106,129 @@ modulemd_module_stream_v2_finalize (GObject *object)
 }
 
 
+static gboolean
+modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
+                                  ModulemdModuleStream *self_2)
+{
+  ModulemdModuleStreamV2 *v2_self_1 = NULL;
+  ModulemdModuleStreamV2 *v2_self_2 = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self_1), FALSE);
+  v2_self_1 = MODULEMD_MODULE_STREAM_V2 (self_1);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self_2), FALSE);
+  v2_self_2 = MODULEMD_MODULE_STREAM_V2 (self_2);
+
+  if (!MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v2_parent_class)
+         ->equals (self_1, self_2))
+    {
+      return FALSE;
+    }
+
+  /*Check property equality*/
+  if (g_strcmp0 (v2_self_1->community, v2_self_2->community) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v2_self_1->description, v2_self_2->description) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v2_self_1->documentation, v2_self_2->documentation) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v2_self_1->summary, v2_self_2->summary) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v2_self_1->tracker, v2_self_2->tracker) != 0)
+    return FALSE;
+
+  if (!modulemd_buildopts_equals (v2_self_1->buildopts, v2_self_2->buildopts))
+    return FALSE;
+
+  if (!modulemd_hash_table_equals (v2_self_1->rpm_components,
+                                   v2_self_2->rpm_components,
+                                   modulemd_component_equals))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (v2_self_1->module_components,
+                                   v2_self_2->module_components,
+                                   modulemd_component_equals))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->module_licenses,
+                                           v2_self_2->module_licenses))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->content_licenses,
+                                           v2_self_2->content_licenses))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (
+        v2_self_1->profiles, v2_self_2->profiles, modulemd_profile_equals))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->rpm_api,
+                                           v2_self_2->rpm_api))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->rpm_artifacts,
+                                           v2_self_2->rpm_artifacts))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->rpm_filters,
+                                           v2_self_2->rpm_filters))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (v2_self_1->servicelevels,
+                                   v2_self_2->servicelevels,
+                                   modulemd_service_level_equals))
+    {
+      return FALSE;
+    }
+
+  /* 
+  //need an equals function for Modulemd.RpmMapEntry
+  // < string, GHashTable <string, Modulemd.RpmMapEntry> >
+  if (!modulemd_hash_table_equals (v2_self_1->rpm_artifact_map,
+                                   v2_self_2->rpm_artifact_map,
+                                   modulemd_hash_table_equals))
+    {
+      return FALSE;
+    }
+  */
+
+  if (v2_self_1->dependencies->len != v2_self_2->dependencies->len)
+    return FALSE;
+
+  for (guint i = 0; i < v2_self_1->dependencies->len; i++)
+    {
+      if (!modulemd_dependencies_equals (
+            g_ptr_array_index (v2_self_1->dependencies, i),
+            g_ptr_array_index (v2_self_2->dependencies, i)))
+        return FALSE;
+    }
+
+  if (g_variant_compare (v2_self_1->xmd, v2_self_2->xmd) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static guint64
 modulemd_module_stream_v2_get_mdversion (ModulemdModuleStream *self)
 {
@@ -1216,6 +1339,7 @@ modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
 
   stream_class->get_mdversion = modulemd_module_stream_v2_get_mdversion;
   stream_class->copy = modulemd_module_stream_v2_copy;
+  stream_class->equals = modulemd_module_stream_v2_equals;
   stream_class->validate = modulemd_module_stream_v2_validate;
   stream_class->depends_on_stream =
     modulemd_module_stream_v2_depends_on_stream;

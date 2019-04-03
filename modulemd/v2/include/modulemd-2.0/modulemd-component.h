@@ -38,9 +38,9 @@ struct _ModulemdComponentClass
   gboolean (*validate) (ModulemdComponent *self, GError **error);
   gboolean (*equals) (ModulemdComponent *self_1, ModulemdComponent *self_2);
 
-  /* Padding to allow adding up to 8 new virtual functions without
+  /* Padding to allow adding up to 7 new virtual functions without
    * breaking ABI. */
-  gpointer padding[8];
+  gpointer padding[7];
 };
 
 /**

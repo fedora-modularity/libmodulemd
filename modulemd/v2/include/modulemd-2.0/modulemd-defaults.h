@@ -65,9 +65,9 @@ struct _ModulemdDefaultsClass
 
   gboolean (*equals) (ModulemdDefaults *self_1, ModulemdDefaults *self_2);
 
-  /* Padding to allow adding up to 10 new virtual functions without
+  /* Padding to allow adding up to 9 new virtual functions without
    * breaking ABI. */
-  gpointer padding[10];
+  gpointer padding[9];
 };
 
 

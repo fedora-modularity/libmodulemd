@@ -101,6 +101,32 @@ typedef gint (*ModulemdReadHandler) (void *data,
 
 
 /**
+ * ModulemdWriteHandler:
+ * @data: (inout): A private pointer that includes the data source.
+ * @buffer: (out): The buffer with bytes to be written.
+ * @size: (in): The size of the buffer.
+ *
+ * The prototype of a write handler.
+ *
+ * The write handler is called when the emitter needs to flush the accumulated
+ * characters to the output.  The handler should write @size bytes of the
+ * @buffer to the output.
+ *
+ * This handler is identical to a
+ * [yaml_write_handler_t](https://github.com/yaml/libyaml/blob/master/include/yaml.h#L1478)
+ * but is included here to avoid depending on yaml.h in modulemd headers.
+ *
+ * Returns: On success, the handler must return 1. If the handler failed,
+ * the returned value must be 0.
+ *
+ * Since: 2.3
+ */
+typedef gint (*ModulemdWriteHandler) (void *data,
+                                      unsigned char *buffer,
+                                      size_t size);
+
+
+/**
  * modulemd_module_index_new:
  *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object.
@@ -251,6 +277,27 @@ modulemd_module_index_dump_to_string (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_dump_to_stream (ModulemdModuleIndex *self,
                                       FILE *yaml_stream,
+                                      GError **error);
+
+
+/**
+ * modulemd_module_index_dump_to_custom: (skip)
+ * @self: This #ModulemdModuleIndex
+ * @custom_write_fn: (in): A #ModulemdWriteHandler
+ * @custom_pvt_data: (inout): The private data needed by the
+ * #ModulemdWriteHandler
+ * @error: (out): A #GError containing the reason the function failed, NULL if
+ * the function succeeded
+ *
+ * Returns: TRUE if written successfully, FALSE and sets error appropriately in
+ * the event of an error.
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_module_index_dump_to_custom (ModulemdModuleIndex *self,
+                                      ModulemdWriteHandler custom_write_fn,
+                                      void *custom_pvt_data,
                                       GError **error);
 
 

@@ -840,6 +840,133 @@ module_index_test_custom_read (ModuleIndexFixture *fixture,
 }
 
 
+static void
+module_index_test_custom_write (ModuleIndexFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *output_string = NULL;
+  g_autoptr (modulemd_yaml_string) yaml_string =
+    g_malloc0_n (1, sizeof (modulemd_yaml_string));
+
+
+  // clang-format off
+  g_autofree gchar *str = g_strdup(
+"---\n"
+"document: modulemd\n"
+"version: 2\n"
+"data:\n"
+"  name: testmodule\n"
+"  stream: master\n"
+"  version: 20180405123256\n"
+"  context: c2c572ec\n"
+"  arch: x86_64\n"
+"  summary: A test module in all its beautiful beauty\n"
+"  description: >-\n"
+"    This module demonstrates how to write simple modulemd files And can be used for\n"
+"    testing the build and release pipeline.\n"
+"  license:\n"
+"    module:\n"
+"    - MIT\n"
+"    content:\n"
+"    - GPL+ or Artistic\n"
+"    - MIT\n"
+"  xmd:\n"
+"    mbs:\n"
+"      scmurl: https://src.fedoraproject.org/modules/testmodule.git?#0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"
+"      commit: 0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"
+"      buildrequires:\n"
+"        platform:\n"
+"          ref: virtual\n"
+"          stream: f29\n"
+"          filtered_rpms: []\n"
+"          version: 4\n"
+"      rpms:\n"
+"        perl-List-Compare:\n"
+"          ref: c6a689a6ce2683b15b32f83e6cb5d43ffd3816f5\n"
+"        tangerine:\n"
+"          ref: 239ada495d941ceefd8f359e1d8a47877fbba4a9\n"
+"        perl-Tangerine:\n"
+"          ref: 7e96446223f1ad84a26c7cf23d6591cd9f6326c6\n"
+"      requires:\n"
+"        platform:\n"
+"          ref: virtual\n"
+"          stream: f29\n"
+"          filtered_rpms: []\n"
+"          version: 4\n"
+"  dependencies:\n"
+"  - buildrequires:\n"
+"      platform: [f29]\n"
+"    requires:\n"
+"      platform: [f29]\n"
+"  references:\n"
+"    community: https://docs.pagure.org/modularity/\n"
+"    documentation: https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules\n"
+"  profiles:\n"
+"    default:\n"
+"      rpms:\n"
+"      - tangerine\n"
+"  api:\n"
+"    rpms:\n"
+"    - perl-Tangerine\n"
+"    - tangerine\n"
+"  components:\n"
+"    rpms:\n"
+"      perl-List-Compare:\n"
+"        rationale: A dependency of tangerine.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/perl-List-Compare\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-List-Compare\n"
+"        ref: master\n"
+"      perl-Tangerine:\n"
+"        rationale: Provides API for this module and is a dependency of tangerine.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/perl-Tangerine\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-Tangerine\n"
+"        ref: 7e96446\n"
+"      tangerine:\n"
+"        rationale: Provides API for this module.\n"
+"        repository: git://pkgs.fedoraproject.org/rpms/tangerine\n"
+"        cache: http://pkgs.fedoraproject.org/repo/pkgs/tangerine\n"
+"        ref: master\n"
+"        buildorder: 10\n"
+"  artifacts:\n"
+"    rpms:\n"
+"    - perl-List-Compare-0:0.53-9.module_1588+5eed94c6.noarch\n"
+"    - perl-Tangerine-0:0.22-2.module_1588+5eed94c6.noarch\n"
+"    - tangerine-0:0.22-7.module_1588+5eed94c6.noarch\n"
+"...\n");
+  // clang-format on
+
+  index = modulemd_module_index_new ();
+
+  g_assert_true (modulemd_module_index_update_from_string (
+    index, str, TRUE, &failures, &error));
+  g_assert_cmpint (failures->len, ==, 0);
+  g_assert_no_error (error);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* Verify we did indeed get the module we expected */
+  g_assert_nonnull (modulemd_module_index_get_module (index, "testmodule"));
+
+
+  /* Write it out to another string
+   * This is mainly to have a baseline to compare against
+   */
+  output_string = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_nonnull (output_string);
+  g_assert_no_error (error);
+
+
+  /* Write it out to a string using a custom emitter */
+  g_assert_true (modulemd_module_index_dump_to_custom (
+    index, write_yaml_string, yaml_string, &error));
+  g_assert_nonnull (yaml_string->str);
+  g_assert_no_error (error);
+  g_assert_cmpstr (yaml_string->str, ==, output_string);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -904,6 +1031,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_index_test_custom_read,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/index/custom_write",
+              ModuleIndexFixture,
+              NULL,
+              NULL,
+              module_index_test_custom_write,
               NULL);
 
   return g_test_run ();

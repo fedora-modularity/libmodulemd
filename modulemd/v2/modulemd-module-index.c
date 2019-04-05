@@ -590,6 +590,21 @@ modulemd_module_index_dump_to_stream (ModulemdModuleIndex *self,
 }
 
 
+gboolean
+modulemd_module_index_dump_to_custom (ModulemdModuleIndex *self,
+                                      ModulemdWriteHandler custom_write_fn,
+                                      void *custom_pvt_data,
+                                      GError **error)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  MMD_INIT_YAML_EMITTER (emitter);
+  yaml_emitter_set_output (&emitter, custom_write_fn, custom_pvt_data);
+
+  return modulemd_module_index_dump_to_emitter (self, &emitter, error);
+}
+
+
 GStrv
 modulemd_module_index_get_module_names_as_strv (ModulemdModuleIndex *self)
 {

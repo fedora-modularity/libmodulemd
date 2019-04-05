@@ -4,7 +4,7 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 ARG TARBALL
 
-RUN pacman -Syu --noconfirm \
+RUN pacman -Syu --needed --noconfirm \
 	base-devel \
 	glib2 \
 	gobject-introspection \

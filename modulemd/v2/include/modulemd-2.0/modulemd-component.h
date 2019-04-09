@@ -44,6 +44,18 @@ struct _ModulemdComponentClass
 };
 
 /**
+ * modulemd_component_equals_wrapper:
+ * @a: A void pointer
+ * @b: A void pointer
+ *
+ * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_component_equals_wrapper (const void *a, const void *b);
+
+/**
  * modulemd_component_equals:
  * @self_1: A #ModulemdComponent object
  * @self_2: A #ModulemdComponent object

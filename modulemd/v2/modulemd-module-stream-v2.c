@@ -145,14 +145,14 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
   if (!modulemd_hash_table_equals (v2_self_1->rpm_components,
                                    v2_self_2->rpm_components,
-                                   modulemd_component_equals))
+                                   modulemd_component_equals_wrapper))
     {
       return FALSE;
     }
 
   if (!modulemd_hash_table_equals (v2_self_1->module_components,
                                    v2_self_2->module_components,
-                                   modulemd_component_equals))
+                                   modulemd_component_equals_wrapper))
     {
       return FALSE;
     }
@@ -169,8 +169,9 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
       return FALSE;
     }
 
-  if (!modulemd_hash_table_equals (
-        v2_self_1->profiles, v2_self_2->profiles, modulemd_profile_equals))
+  if (!modulemd_hash_table_equals (v2_self_1->profiles,
+                                   v2_self_2->profiles,
+                                   modulemd_profile_equals_wrapper))
     {
       return FALSE;
     }
@@ -195,7 +196,7 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
   if (!modulemd_hash_table_equals (v2_self_1->servicelevels,
                                    v2_self_2->servicelevels,
-                                   modulemd_service_level_equals))
+                                   modulemd_service_level_equals_wrapper))
     {
       return FALSE;
     }

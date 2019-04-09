@@ -56,6 +56,14 @@ modulemd_service_level_new (const gchar *name)
 
 
 gboolean
+modulemd_service_level_equals_wrapper (const void *a, const void *b)
+{
+  return modulemd_service_level_equals ((ModulemdServiceLevel *)a,
+                                        (ModulemdServiceLevel *)b);
+}
+
+
+gboolean
 modulemd_service_level_equals (ModulemdServiceLevel *self_1,
                                ModulemdServiceLevel *self_2)
 {

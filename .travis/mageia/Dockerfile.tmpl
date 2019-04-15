@@ -1,0 +1,11 @@
+FROM fedora-modularity/libmodulemd-deps-@RELEASE@
+
+MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
+
+ARG TARBALL
+
+ADD $TARBALL /builddir/
+
+RUN  /builddir/.travis/coverity_prep.sh
+
+ENTRYPOINT /builddir/.travis/mageia/travis-tasks.sh

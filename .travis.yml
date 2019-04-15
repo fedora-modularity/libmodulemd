@@ -39,3 +39,5 @@ jobs:
       script: ./.travis/travis-opensuse.sh
     - name: "Arch Linux"
       script: ./.travis/travis-archlinux.sh
+    - name: "Mageia cauldron"
+      script: ./.travis/travis-mageia.sh

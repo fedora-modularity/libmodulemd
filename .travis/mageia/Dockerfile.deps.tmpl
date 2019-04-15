@@ -1,0 +1,36 @@
+FROM @IMAGE@
+
+MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
+
+ARG TARBALL
+
+RUN sudo dnf -y --setopt=install_weak_deps=False install \
+	clang \
+	clang-analyzer \
+	createrepo_c \
+	curl \
+	elinks \
+	gcc \
+	gcc-c++ \
+	git-core \
+	glib2 \
+	libgirepository-devel \
+	gtk-doc \
+	yaml-devel \
+	meson \
+	ninja \
+	openssl \
+	pkgconf \
+	libpopt-devel \
+	python3-autopep8 \
+	libpython3-devel \
+	python3-GitPython \
+	python3-gobject \
+	python3-pycodestyle \
+	python3-rpm-macros \
+	rpm-build \
+	rpmdevtools \
+	sudo \
+	valgrind \
+	wget \
+    && dnf -y clean all

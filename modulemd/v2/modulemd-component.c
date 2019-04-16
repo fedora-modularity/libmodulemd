@@ -51,8 +51,11 @@ static GParamSpec *properties[N_PROPS];
 gboolean
 modulemd_component_equals_wrapper (const void *a, const void *b)
 {
-  return modulemd_component_equals ((ModulemdComponent *)a,
-                                    (ModulemdComponent *)b);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (a), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT (b), FALSE);
+
+  return modulemd_component_equals (MODULEMD_COMPONENT (a),
+                                    MODULEMD_COMPONENT (b));
 }
 
 

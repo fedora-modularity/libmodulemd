@@ -151,17 +151,5 @@ gboolean
 modulemd_service_level_equals (ModulemdServiceLevel *self_1,
                                ModulemdServiceLevel *self_2);
 
-/**
- * modulemd_service_level_equals_wrapper:
- * @a: A void pointer
- * @b: A void pointer
- *
- * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
- *
- * Since: 2.3
- */
-gboolean
-modulemd_service_level_equals_wrapper (const void *a, const void *b);
-
 
 G_END_DECLS

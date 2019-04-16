@@ -65,3 +65,15 @@ gboolean
 modulemd_profile_emit_yaml (ModulemdProfile *self,
                             yaml_emitter_t *emitter,
                             GError **error);
+
+/**
+ * modulemd_profile_equals_wrapper:
+ * @a: A void pointer
+ * @b: A void pointer
+ *
+ * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
+ *
+ * Since: 2.3
+ */
+gboolean
+modulemd_profile_equals_wrapper (const void *a, const void *b);

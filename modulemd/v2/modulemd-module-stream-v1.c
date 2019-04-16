@@ -1069,7 +1069,7 @@ modulemd_module_stream_v1_equals (ModulemdModuleStream *self_1,
       return FALSE;
     }
 
-  if (g_variant_compare (v1_self_1->xmd, v1_self_2->xmd) != 0)
+  if (g_variant_equal (v1_self_1->xmd, v1_self_2->xmd) != 0)
     return FALSE;
 
   return TRUE;

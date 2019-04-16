@@ -223,7 +223,7 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
         return FALSE;
     }
 
-  if (g_variant_compare (v2_self_1->xmd, v2_self_2->xmd) != 0)
+  if (g_variant_equal (v2_self_1->xmd, v2_self_2->xmd) != 0)
     return FALSE;
 
   return TRUE;

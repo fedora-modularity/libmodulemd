@@ -321,12 +321,6 @@ modulemd_module_stream_default_equals (ModulemdModuleStream *self_1,
                  modulemd_module_stream_get_arch (self_2)) != 0)
     return FALSE;
 
-  /*need a function for this
-  if(!modulemd_translation_equals (modulemd_module_stream_get_translation (self_1), 
-                                   modulemd_module_stream_get_translation (self_2)) != 0)
-    return FALSE;
-  */
-
   return TRUE;
 }
 

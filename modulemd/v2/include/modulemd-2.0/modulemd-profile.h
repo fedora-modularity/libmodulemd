@@ -31,19 +31,6 @@ G_DECLARE_FINAL_TYPE (
 
 
 /**
- * modulemd_profile_equals_wrapper:
- * @a: A void pointer
- * @b: A void pointer
- *
- * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
- *
- * Since: 2.3
- */
-gboolean
-modulemd_profile_equals_wrapper (const void *a, const void *b);
-
-
-/**
  * modulemd_profile_equals:
  * @self_1: A #ModulemdProfile
  * @self_2: A #ModulemdProfile

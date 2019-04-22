@@ -486,7 +486,7 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
       if (arch &&
           g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
-                     context) != 0)
+                     arch) != 0)
         continue;
 
       g_ptr_array_add (matching_streams, under_consideration);

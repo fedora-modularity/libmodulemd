@@ -944,7 +944,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
     {
       EMIT_SEQUENCE_START (emitter, error);
       g_variant_iter_init (&iter, variant);
-      while (g_variant_iter_next (&iter, "v", &value))
+      while ((value = g_variant_iter_next_value (&iter)))
         {
           if (!modulemd_yaml_emit_variant (emitter, value, error))
             return FALSE;

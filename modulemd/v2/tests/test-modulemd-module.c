@@ -18,6 +18,8 @@
 
 #include "modulemd-defaults.h"
 #include "modulemd-module.h"
+#include "modulemd-module-index.h"
+#include "modulemd-module-index-merger.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v2.h"
 #include "private/glib-extensions.h"
@@ -328,6 +330,91 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
 }
 
 
+static void
+modulemd_test_remove_streams (void)
+{
+  g_autoptr (ModulemdModuleIndex) f29 = NULL;
+  g_autoptr (ModulemdModuleIndex) f29_updates = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
+  ModulemdModule *nodejs_module = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autofree gchar *yaml_path = NULL;
+
+  /* Get the f29 and f29-updates indexes. They have multiple streams and
+   * versions for the 'dwm' module
+   */
+  f29 = modulemd_module_index_new ();
+  yaml_path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  f29_updates = modulemd_module_index_new ();
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29_updates, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+
+  /* Merge them so we're operating on a combined index */
+  merger = modulemd_module_index_merger_new ();
+  modulemd_module_index_merger_associate_index (merger, f29, 0);
+  modulemd_module_index_merger_associate_index (merger, f29_updates, 0);
+
+  index = modulemd_module_index_merger_resolve (merger, &error);
+  g_assert_nonnull (index);
+  g_assert_no_error (error);
+
+  /* Now get the 'nodejs' module */
+  nodejs_module = modulemd_module_index_get_module (index, "nodejs");
+  g_assert_nonnull (nodejs_module);
+  g_assert_true (MODULEMD_IS_MODULE (nodejs_module));
+
+  g_assert_cmpuint (
+    modulemd_module_get_all_streams (nodejs_module)->len, ==, 4);
+
+  /* Remove the `nodejs:10:20181101171344:6c81f848:x86_64` item from the
+   * index.
+   */
+  modulemd_module_remove_streams_by_NSVCA (
+    nodejs_module, "10", 20181101171344, "6c81f848", "x86_64");
+
+  /* This should remove exactly one item */
+  g_assert_cmpuint (
+    modulemd_module_get_all_streams (nodejs_module)->len, ==, 3);
+
+
+  /* Try to remove the same stream from the index a second time, which should
+   * do nothing.
+   */
+  modulemd_module_remove_streams_by_NSVCA (
+    nodejs_module, "10", 20181101171344, "6c81f848", "x86_64");
+
+  /* This should remove exactly one item */
+  g_assert_cmpuint (
+    modulemd_module_get_all_streams (nodejs_module)->len, ==, 3);
+
+
+  /* Remove all dwm stream objects for the "11" stream from the index. */
+  modulemd_module_remove_streams_by_name (nodejs_module, "11");
+
+  /* This should remove two items */
+  g_assert_cmpuint (
+    modulemd_module_get_all_streams (nodejs_module)->len, ==, 2);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -358,6 +445,9 @@ main (int argc, char *argv[])
               NULL,
               module_test_streams,
               NULL);
+
+  g_test_add_func ("/modulemd/v2/module/streams/remove",
+                   modulemd_test_remove_streams);
 
   return g_test_run ();
 }

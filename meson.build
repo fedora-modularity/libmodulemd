@@ -10,7 +10,7 @@
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 project('modulemd', 'c',
-        version : '2.3.0',
+        version : '2.3.1',
         default_options : [
           'buildtype=debugoptimized',
           'c_std=c11',
@@ -20,7 +20,7 @@ project('modulemd', 'c',
         license : 'MIT',
         meson_version : '>=0.47.0')
 
-libmodulemd_v1_version = '1.8.7'
+libmodulemd_v1_version = '1.8.8'
 libmodulemd_v2_version = meson.project_version()
 
 cc = meson.get_compiler('c')

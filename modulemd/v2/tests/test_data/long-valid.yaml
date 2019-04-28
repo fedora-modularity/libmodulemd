@@ -219,6 +219,10 @@ data:
           stream: f28
           filtered_rpms: []
           version: 4
+      mbs_options:
+        blocked_pacakges:
+        - blocked1
+        - blocked2
   dependencies:
   - buildrequires:
       platform: [f28]

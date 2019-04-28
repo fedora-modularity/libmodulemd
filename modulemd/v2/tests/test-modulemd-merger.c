@@ -52,7 +52,7 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
   g_autofree gchar *deduplicated = NULL;
 
   yaml_path =
-    g_strdup_printf ("%s/modulemd/v2/tests/test_data/long-valid.yaml",
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
                      g_getenv ("MESON_SOURCE_ROOT"));
 
   index = modulemd_module_index_new ();

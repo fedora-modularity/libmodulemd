@@ -486,7 +486,7 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
       if (arch &&
           g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
-                     context) != 0)
+                     arch) != 0)
         continue;
 
       g_ptr_array_add (matching_streams, under_consideration);
@@ -511,6 +511,91 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
   /* Exactly one result, so return it */
   return g_ptr_array_index (matching_streams, 0);
+}
+
+
+typedef struct _modulemd_nsvca
+{
+  const gchar *stream_name;
+  guint64 version;
+  const gchar *context;
+  const gchar *arch;
+} modulemd_nsvca;
+
+
+static void
+modulemd_nsvca_free (gpointer nsvca)
+{
+  /* All of the fields are just pointers to static data,
+   * so nothing to free here.
+   */
+
+  g_free ((modulemd_nsvca *)nsvca);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (modulemd_nsvca, modulemd_nsvca_free);
+
+
+static gboolean
+match_nsvca (gconstpointer haystraw, gconstpointer needle)
+{
+  ModulemdModuleStream *stream = (ModulemdModuleStream *)haystraw;
+  modulemd_nsvca *nsvca = (modulemd_nsvca *)needle;
+
+  if (!g_str_equal (nsvca->stream_name,
+                    modulemd_module_stream_get_stream_name (stream)))
+    return FALSE;
+
+  if (nsvca->version)
+    {
+      if (nsvca->version != modulemd_module_stream_get_version (stream))
+        return FALSE;
+    }
+
+  if (nsvca->context)
+    {
+      if (!g_str_equal (nsvca->context,
+                        modulemd_module_stream_get_context (stream)))
+        return FALSE;
+    }
+
+  if (nsvca->arch)
+    {
+      if (!g_str_equal (nsvca->arch, modulemd_module_stream_get_arch (stream)))
+        return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+void
+modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
+                                         const gchar *stream_name,
+                                         const guint64 version,
+                                         const gchar *context,
+                                         const gchar *arch)
+{
+  gboolean found = FALSE;
+  guint index;
+  g_autoptr (modulemd_nsvca) nsvca = g_malloc0_n (1, sizeof (modulemd_nsvca));
+
+  nsvca->stream_name = stream_name;
+  nsvca->version = version;
+  nsvca->context = context;
+  nsvca->arch = arch;
+
+  /* Iterate through the streams and remove any that match the requested
+   * parameters
+   */
+  do
+    {
+      found = g_ptr_array_find_with_equal_func (
+        self->streams, nsvca, match_nsvca, &index);
+      if (found)
+        g_ptr_array_remove_index (self->streams, index);
+    }
+  while (found);
 }
 
 

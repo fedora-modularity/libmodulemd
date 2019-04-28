@@ -149,6 +149,44 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
 
 /**
+ * modulemd_module_remove_streams_by_NSVCA:
+ * @self: This #ModulemdModule object
+ * @stream_name: (not nullable): The name of the stream to remove
+ * @version: The version of the stream to remove. If set to zero, matches all
+ * versions.
+ * @context: (nullable): The context of the stream to remove. If NULL, matches
+ * all stream contexts.
+ * @arch: (nullable): The processor architecture of the stream to remove. If
+ * NULL, matches all architectures.
+ *
+ * Remove one or more #ModulemdModuleStream objects from this #ModulemdModule
+ * that match the provided parameters.
+ *
+ * Since: 2.3
+ */
+void
+modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
+                                         const gchar *stream_name,
+                                         const guint64 version,
+                                         const gchar *context,
+                                         const gchar *arch);
+
+
+/**
+ * modulemd_module_remove_streams_by_name:
+ * @self: This #ModulemdModule object
+ * @stream_name: (not nullable): The name of the stream to remove
+ *
+ * Remove one or more #ModulemdModuleStream objects from this #ModulemdModule
+ * that match the provided stream name.
+ *
+ * Since: 2.3
+ */
+#define modulemd_module_remove_streams_by_name(self, stream_name)             \
+  modulemd_module_remove_streams_by_NSVCA (self, stream_name, 0, NULL, NULL)
+
+
+/**
  * modulemd_module_get_defaults:
  * @self: This #ModulemdModule object
  *

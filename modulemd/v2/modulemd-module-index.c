@@ -814,7 +814,11 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
 
       /* Skip any module without defaults */
       if (!defaults)
-        continue;
+        {
+          g_clear_object (&module);
+          continue;
+        }
+
       g_object_ref (defaults);
 
       returned_mdversion = modulemd_module_set_defaults (

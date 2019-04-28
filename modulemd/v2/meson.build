@@ -92,12 +92,12 @@ install_headers(
 # Test env with release values
 test_release_env = environment()
 test_release_env.set('LC_ALL', 'C')
-test_release_env.set('G_MESSAGES_DEBUG', 'all')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
 
 # Test env with fatal warnings and criticals
 test_env = test_release_env
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+test_env.set('G_MESSAGES_DEBUG', 'all')
 
 # Python test env with fatal warnings and criticals
 py_test_env = test_env

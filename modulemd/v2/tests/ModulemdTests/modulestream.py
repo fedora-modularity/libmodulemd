@@ -528,10 +528,10 @@ class TestModuleStream(TestBase):
 
             xmd_copy = stream.get_xmd()
             assert xmd_copy
-            assert 'outer_key' in xmd
-            assert 'scalar' in xmd['outer_key']
-            assert 'inner_key' in xmd['outer_key'][1]
-            assert xmd['outer_key'][1]['inner_key'] == 'another_scalar'
+            assert 'outer_key' in xmd_copy
+            assert 'scalar' in xmd_copy['outer_key']
+            assert 'inner_key' in xmd_copy['outer_key'][1]
+            assert xmd_copy['outer_key'][1]['inner_key'] == 'another_scalar'
 
     def test_upgrade(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
@@ -1137,6 +1137,29 @@ data:
 
         self.assertIsNotNone(stream)
         self.assertTrue(stream.validate())
+
+    def test_xmd_issue_274(self):
+        # Test a valid module stream with unicode in the description
+        stream = Modulemd.ModuleStream.read_file(
+            "%s/modulemd/v2/tests/test_data/stream_unicode.yaml" %
+            (os.getenv('MESON_SOURCE_ROOT')), True, '', '')
+
+        # In this bug, we were getting a traceback attemping to call
+        # get_xmd() more than once on the same stream. There were subtle
+        # memory issues at play here.
+        if '_overrides_module' in dir(Modulemd):
+            # The XMD python tests can only be run against the installed lib
+            # because the overrides that translate between python and GVariant
+            # must be installed in /usr/lib/python*/site-packages/gi/overrides
+            # or they are not included when importing Modulemd
+
+            xmd = stream.get_xmd()
+            mbs_xmd = stream.get_xmd()['mbs']
+            mbs_xmd2 = stream.get_xmd()['mbs']
+
+        else:
+            stream.get_xmd()
+            stream.get_xmd()
 
 
 if __name__ == '__main__':

@@ -929,6 +929,35 @@ module_stream_v2_test_unicode_desc (void)
 }
 
 
+static void
+module_stream_v2_test_xmd_issue_274 (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+  GVariant *xmd1 = NULL;
+  GVariant *xmd2 = NULL;
+
+  path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/stream_unicode.yaml",
+                          g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+
+  xmd1 =
+    modulemd_module_stream_v1_get_xmd (MODULEMD_MODULE_STREAM_V1 (stream));
+  xmd2 =
+    modulemd_module_stream_v1_get_xmd (MODULEMD_MODULE_STREAM_V1 (stream));
+
+  g_assert_true (xmd1 == xmd2);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1032,6 +1061,8 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/modulestream/v2/unicode/description",
                    module_stream_v2_test_unicode_desc);
 
+  g_test_add_func ("/modulemd/v2/modulestream/v2/xmd/issue274",
+                   module_stream_v2_test_xmd_issue_274);
 
   return g_test_run ();
 }

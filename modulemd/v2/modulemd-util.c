@@ -271,15 +271,25 @@ modulemd_hash_table_unref (void *table)
   g_hash_table_unref ((GHashTable *)table);
 }
 
+
+static void
+destroy_variant_data (gpointer data)
+{
+  g_free (data);
+}
+
+
 GVariant *
 modulemd_variant_deep_copy (GVariant *variant)
 {
   const GVariantType *data_type = g_variant_get_type (variant);
   gsize data_size = g_variant_get_size (variant);
-  gconstpointer data = g_variant_get_data (variant);
+  gpointer data = g_malloc0 (data_size);
 
-  return g_variant_ref_sink (
-    g_variant_new_from_data (data_type, data, data_size, TRUE, NULL, NULL));
+  g_variant_store (variant, data);
+
+  return g_variant_ref_sink (g_variant_new_from_data (
+    data_type, data, data_size, FALSE, destroy_variant_data, data));
 }
 
 

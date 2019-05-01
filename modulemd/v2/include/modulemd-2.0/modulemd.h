@@ -162,6 +162,7 @@ G_BEGIN_DECLS
  *
  * |[<!-- language="Python" -->
  * stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',
+ *                                           True,
  *                                           module_name,
  *                                           stream_name)
  * v2_stream = stream.upgrade(Modulemd.ModuleStreamVersion.TWO)

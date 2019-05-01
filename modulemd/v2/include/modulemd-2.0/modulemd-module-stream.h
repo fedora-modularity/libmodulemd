@@ -107,14 +107,14 @@ modulemd_module_stream_new (guint64 mdversion,
  * modulemd_module_stream_read_file:
  * @path: (in): The path to a YAML document containing a module stream
  * definition.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @module_name: (in) (nullable): An optional module name to override the
  * document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
- * @strict: (in): Whether the parser should return failure if it encounters an
- * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML file.
@@ -139,14 +139,14 @@ modulemd_module_stream_read_file (const gchar *path,
  * modulemd_module_stream_read_string:
  * @yaml_string: (in): A YAML document string containing a module stream
  * definition.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @module_name: (in) (nullable): An optional module name to override the
  * document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
- * @strict: (in): Whether the parser should return failure if it encounters an
- * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML string.
@@ -171,14 +171,14 @@ modulemd_module_stream_read_string (const gchar *yaml_string,
  * modulemd_module_stream_read_stream: (skip)
  * @stream: (in): A YAML document as a FILE * containing a module stream
  * definition.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
  * @module_name: (in) (nullable): An optional module name to override the
  * document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
  * @module_stream: (in) (nullable): An optional module stream name to override
  * the document on disk. Mostly useful in cases where the name is being
  * auto-detected from git.
- * @strict: (in): Whether the parser should return failure if it encounters an
- * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a failed read.
  *
  * Create a #ModulemdModuleStream object from a YAML file.

@@ -42,8 +42,9 @@ Modulemd = get_introspection_module('Modulemd')
 __all__ = []
 
 
-class ModulemdUtil():
+class ModulemdUtil(object):
 
+    @staticmethod
     def variant_str(s):
         """ Converts a string to a GLib.Variant
         """
@@ -52,6 +53,7 @@ class ModulemdUtil():
 
         return GLib.Variant('s', s)
 
+    @staticmethod
     def variant_bool(b):
         """ Converts a boolean to a GLib.Varant
         """
@@ -60,6 +62,7 @@ class ModulemdUtil():
 
         return GLib.Variant('b', b)
 
+    @staticmethod
     def variant_list(l):
         """ Converts a list to a GLib.Variant
         """
@@ -71,6 +74,7 @@ class ModulemdUtil():
             l_variant.append(ModulemdUtil.python_to_variant(item))
         return GLib.Variant('av', l_variant)
 
+    @staticmethod
     def variant_dict(d):
         """ Converts a dictionary to a dictionary of GLib.Variant
         """
@@ -80,6 +84,7 @@ class ModulemdUtil():
         d_variant = ModulemdUtil.dict_values(d)
         return GLib.Variant('a{sv}', d_variant)
 
+    @staticmethod
     def dict_values(d):
         """ Converts each dictionary value to a GLib.Variant
         """
@@ -94,6 +99,7 @@ class ModulemdUtil():
             d_variant[k] = ModulemdUtil.python_to_variant(v)
         return d_variant
 
+    @staticmethod
     def python_to_variant(obj):
         if isinstance(obj, str):
             return ModulemdUtil.variant_str(obj)

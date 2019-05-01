@@ -18,6 +18,10 @@ gi.require_version('Modulemd', '2.0')
 from gi.repository import Modulemd
 ```
 
+It's highly recommended that you install `python2-libmodulemd` or
+`python3-libmodulemd`, which will seamlessly translate GLib Variants to native
+Python objects and vice-versa.
+
 # Working with repodata (DNF use-case)
 The libmodulemd API provides a number of convenience tools for interacting
 with repodata (that is, streams of YAML that contains information on multiple

@@ -165,7 +165,7 @@ G_BEGIN_DECLS
  *                                           True,
  *                                           module_name,
  *                                           stream_name)
- * v2_stream = stream.upgrade(Modulemd.ModuleStreamVersion.TWO)
+ * v2_stream = stream.upgrade(2)
  * v2_stream.validate()
  * ]|
  *

@@ -1129,6 +1129,15 @@ data:
                 "%s/modulemd/v2/tests/test_data/buildafter/invalid_key.yaml" %
                 (os.getenv('MESON_SOURCE_ROOT')), True)
 
+    def test_unicode_desc(self):
+        # Test a valid module stream with unicode in the description
+        stream = Modulemd.ModuleStream.read_file(
+            "%s/modulemd/v2/tests/test_data/stream_unicode.yaml" %
+            (os.getenv('MESON_SOURCE_ROOT')), True, '', '')
+
+        self.assertIsNotNone(stream)
+        self.assertTrue(stream.validate())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,26 @@
+document: modulemd
+version: 1
+data:
+  description: Fedora 28 traditional base ’
+  name: platform
+  license:
+    module: [MIT]
+  profiles:
+    buildroot:
+      rpms: [bash, bzip2, coreutils, cpio, diffutils, fedora-release, findutils, gawk,
+        gcc, gcc-c++, grep, gzip, info, make, patch, redhat-rpm-config, rpm-build,
+        sed, shadow-utils, tar, unzip, util-linux, which, xz]
+    srpm-buildroot:
+      rpms: [bash, fedora-release, fedpkg-minimal, gnupg2, redhat-rpm-config, rpm-build,
+        shadow-utils]
+  stream: f28
+  summary: Fedora 28 traditional base
+  version: 3
+  context: 00000000
+  xmd:
+    mbs:
+      buildrequires: {}
+      commit: virtual
+      requires: {}
+      mse: true
+      koji_tag: module-f28-build

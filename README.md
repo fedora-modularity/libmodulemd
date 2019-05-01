@@ -185,6 +185,7 @@ string variables named 'module_name' and 'stream_name', respectively.
 ## Python
 ```python
 stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',
+                                          True,
                                           module_name,
                                           stream_name)
 v2_stream = stream.upgrade(Modulemd.ModuleStreamVersion.TWO)

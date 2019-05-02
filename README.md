@@ -188,7 +188,7 @@ stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',
                                           True,
                                           module_name,
                                           stream_name)
-v2_stream = stream.upgrade(Modulemd.ModuleStreamVersion.TWO)
+v2_stream = stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
 v2_stream.validate()
 ```
 In the example above, we upgraded the stream to v2, in case we were reading from v1 metadata. This will allow us to avoid having to manage multiple code-paths and support only the latest we understand. After that, it calls validate() to ensure that the content that was read in was valid both syntactically and referentially.

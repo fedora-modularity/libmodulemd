@@ -165,7 +165,7 @@ G_BEGIN_DECLS
  *                                           True,
  *                                           module_name,
  *                                           stream_name)
- * v2_stream = stream.upgrade(Modulemd.ModuleStreamVersion.TWO)
+ * v2_stream = stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
  * v2_stream.validate()
  * ]|
  *
@@ -174,6 +174,10 @@ G_BEGIN_DECLS
  * code-paths and support only the latest we understand. After that, it calls
  * validate() to ensure that the content that was read in was valid both
  * syntactically and referentially.
+ *
+ * Also available is `Modulemd.ModuleStreamVersionEnum.LATEST` which will
+ * always represent the highest-supported ModuleStream version. This may change
+ * at any time.
  */
 
 

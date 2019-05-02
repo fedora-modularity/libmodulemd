@@ -49,7 +49,7 @@ modulemd_component_module_new (const gchar *key);
 /**
  * modulemd_component_module_set_ref:
  * @self: This #ModulemdComponentModule object.
- * @ref: The commit ID in the SCM repository.
+ * @ref: (in) (nullable): The commit ID in the SCM repository.
  *
  * Since: 2.0
  */
@@ -73,7 +73,7 @@ modulemd_component_module_get_ref (ModulemdComponentModule *self);
 /**
  * modulemd_component_module_set_repository:
  * @self: This #ModulemdComponentModule object
- * @repository: The URI of the SCM repository.
+ * @repository: (in) (nullable): The URI of the SCM repository.
  *
  * Since: 2.0
  */

@@ -126,7 +126,7 @@ modulemd_component_rpm_get_multilib_arches_as_strv (
 /**
  * modulemd_component_rpm_set_cache:
  * @self: This #ModulemdComponentRpm object.
- * @cache: The lookaside cache URL.
+ * @cache: (in) (nullable): The lookaside cache URL.
  *
  * Since: 2.0
  */
@@ -150,7 +150,7 @@ modulemd_component_rpm_get_cache (ModulemdComponentRpm *self);
 /**
  * modulemd_component_rpm_set_ref:
  * @self: This #ModulemdComponentRpm object.
- * @ref: The commit ID in the SCM repository.
+ * @ref: (in) (nullable): The commit ID in the SCM repository.
  *
  * Since: 2.0
  */
@@ -173,7 +173,7 @@ modulemd_component_rpm_get_ref (ModulemdComponentRpm *self);
 /**
  * modulemd_component_rpm_set_repository:
  * @self: This #ModulemdComponentRpm object
- * @repository: The URI of the SCM repository.
+ * @repository: (in) (nullable): The URI of the SCM repository.
  *
  * Since: 2.0
  */

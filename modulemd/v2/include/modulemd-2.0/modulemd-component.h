@@ -213,7 +213,8 @@ modulemd_component_get_key (ModulemdComponent *self);
 /**
  * modulemd_component_set_rationale:
  * @self: This #ModulemdComponent object
- * @rationale: The reason that this component is part of the stream.
+ * @rationale: (in) (nullable): The reason that this component is part of the
+ * stream.
  *
  * Since: 2.0
  */

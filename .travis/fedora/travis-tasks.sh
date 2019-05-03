@@ -94,6 +94,13 @@ dnf -y install --nogpgcheck \
                libmodulemd1-devel \
                --exclude libmodulemd
 
+# Also install the python2-libmodulemd1 if it was built for this release
+# the ||: at the end instructs bash to consider this a pass either way.
+dnf -y install --nogpgcheck \
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python2-libmodulemd1 \
+               --exclude libmodulemd ||:
+
 popd #build_rpm
 
 meson --buildtype=debug \
@@ -118,6 +125,13 @@ dnf -y install --nogpgcheck \
                --repofrompath libmodulemd-travis,rpmbuild/RPMS \
                python3-libmodulemd \
                "libmodulemd-devel > 2"
+
+# Also install the python2-libmodulemd if it was built for this release
+# the ||: at the end instructs bash to consider this a pass either way.
+dnf -y install --nogpgcheck \
+               --allowerasing \
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python2-libmodulemd ||:
 popd
 
 meson --buildtype=debug \

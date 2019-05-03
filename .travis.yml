@@ -23,8 +23,6 @@ env:
     - secure: gOGYwbzAQ4fVZ53AdppercJ0w4rA2XzuZK964c7v46qxD64VFqMSra4O/Bk+0A7hHw5jw1aSvKU/eqoJpOOXPfgT/yth8hJ7XmC7powQiw/Atj2/dcWsmCMxX03uefur8LHGQgNWN4W6lbWMdTyLKzmN0snx5A3zbwbfKYpF+d1gYaKrHO1ykeJHuOoIHDGop5Ur9Inl4S3o2U063Wg/YroTuIWvbEjL0Laz7knWuNpSN0g5G2cnF4y0DTDYxZWxFtnfB0npTDggUQqUTHNYrL+a9CPQc+/47FpmXXx0VxwqZ2l3BVO+a+ef5Q6g2VNxU/WJWdnFyRHAjWRKsyKua8zlOsmj+IVmM4nZDtyD0qlS8/nfdI+ZJS16IvKqyA2n9ScHe5YRsNPItd8c6y22nSKnRKlF2h+gWvD56pHUUHFMPlba0dJ7KMiIQZxmY6dKgzerkOylQziBgBMVulvxGz8KILj9+DxTANDlI+8LHt01bIXa4RbsNvOAcjFhNdNgemGv2uXcFyaVsg5w08PVSKb2pQimmB/EOBRSMMhavxOSaAgu/Jjs8xLPj+hMD/yZlav2dlx4Oix3x1humSUsegoa/Az6qulxK+rQdJJA3BuHk389s7e/i+z30KJsbpuIWxH1c/5ETtUFeIflQBYywr++5GqLG7T8WfVxH3ie3aw=
 jobs:
   include:
-    - name: "Fedora 28"
-      script: ./.travis/travis-fedora.sh
     - name: "Fedora 29"
       script: ./.travis/travis-fedora.sh
     - name: "Fedora 30"

@@ -52,10 +52,10 @@ gboolean ret = modulemd_module_index_update_from_string(updates_index,
 ## Python
 ```python
 fedora_index = Modulemd.ModuleIndex.new()
-ret, failures = fedora_index.update_from_string(fedora_yaml)
+ret, failures = fedora_index.update_from_string(fedora_yaml, True)
 
 fedora_index = Modulemd.ModuleIndex.new()
-ret, failures = updates_index.update_from_string(updates_yaml)
+ret, failures = updates_index.update_from_string(updates_yaml, True)
 ```
 
 The `failures` are a list of subdocuments in the YAML that failed parsing, along with the reason they failed. Hence, by checking the return value of failures we will know if the YAML parsing was successful or not.

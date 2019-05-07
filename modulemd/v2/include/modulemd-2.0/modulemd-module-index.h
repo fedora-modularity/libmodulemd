@@ -48,7 +48,7 @@ G_BEGIN_DECLS
  *
  * |[<!-- language="Python" -->
  * fedora_repo_index = Modulemd.ModuleIndex.new()
- * fedora_repo_index.update_from_string(fedora_modulemd)
+ * fedora_repo_index.update_from_string(fedora_modulemd, True)
  *
  * # Get the list of all module names in the index
  * module_names = fedora_repo_index.get_module_names()

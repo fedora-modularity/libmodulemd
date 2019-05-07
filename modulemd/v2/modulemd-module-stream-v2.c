@@ -777,6 +777,38 @@ modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
 }
 
 
+void
+modulemd_module_stream_v2_clear_dependencies (ModulemdModuleStreamV2 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_ptr_array_set_size (self->dependencies, 0);
+}
+
+
+static gboolean
+dep_equal_wrapper (gconstpointer a, gconstpointer b)
+{
+  return modulemd_dependencies_equals ((ModulemdDependencies *)a,
+                                       (ModulemdDependencies *)b);
+}
+
+
+void
+modulemd_module_stream_v2_remove_dependencies (ModulemdModuleStreamV2 *self,
+                                               ModulemdDependencies *deps)
+{
+  guint index;
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  while (g_ptr_array_find_with_equal_func (
+    self->dependencies, deps, dep_equal_wrapper, &index))
+    {
+      g_ptr_array_remove_index (self->dependencies, index);
+    }
+}
+
+
 GPtrArray *
 modulemd_module_stream_v2_get_dependencies (ModulemdModuleStreamV2 *self)
 {

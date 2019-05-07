@@ -514,6 +514,17 @@ class TestModuleStream(TestBase):
         assert 'bar' in stream.get_dependencies(
         )[0].get_runtime_modules()
 
+        retrieved_deps = stream.get_dependencies()
+        stream.clear_dependencies()
+        self.assertEquals(len(retrieved_deps), 1)
+        self.assertEquals(len(stream.get_dependencies()), 0)
+
+        stream.add_dependencies(deps)
+        self.assertEquals(len(stream.get_dependencies()), 1)
+
+        stream.remove_dependencies(deps)
+        self.assertEquals(len(stream.get_dependencies()), 0)
+
     def test_xmd(self):
         if '_overrides_module' in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib

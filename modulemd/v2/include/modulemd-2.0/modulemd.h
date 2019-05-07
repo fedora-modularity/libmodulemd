@@ -78,10 +78,10 @@ G_BEGIN_DECLS
  *
  * |[<!-- language="Python" -->
  * fedora_index = Modulemd.ModuleIndex.new()
- * ret, failures = fedora_index.update_from_string(fedora_yaml)
+ * ret, failures = fedora_index.update_from_string(fedora_yaml, True)
  *
  * fedora_index = Modulemd.ModuleIndex.new()
- * ret, failures = updates_index.update_from_string(updates_yaml)
+ * ret, failures = updates_index.update_from_string(updates_yaml, True)
  * ]|
  *
  * Since it doesn't really make sense to view the contents from separate

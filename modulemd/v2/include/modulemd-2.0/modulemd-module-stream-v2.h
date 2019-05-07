@@ -716,6 +716,34 @@ modulemd_module_stream_v2_add_dependencies (ModulemdModuleStreamV2 *self,
 
 
 /**
+ * modulemd_module_stream_v2_clear_dependencies:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Empties the list of dependencies for this #ModulemdModuleStream
+ *
+ * Since: 2.4
+ */
+void
+modulemd_module_stream_v2_clear_dependencies (ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_remove_dependencies:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @deps: (in): A #ModulemdDependencies object to remove from the list for this
+ * module stream.
+ *
+ * Removes all entries matching @deps from the array of #ModulemdDependencies
+ * objects.
+ *
+ * Since: 2.4
+ */
+void
+modulemd_module_stream_v2_remove_dependencies (ModulemdModuleStreamV2 *self,
+                                               ModulemdDependencies *deps);
+
+
+/**
  * modulemd_module_stream_v2_get_dependencies:
  * @self: (in): This #ModulemdModuleStreamV2 object.
  *

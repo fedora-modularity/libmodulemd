@@ -26,8 +26,6 @@
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 
-import gi
-
 from ..module import get_introspection_module
 from ..overrides import override
 

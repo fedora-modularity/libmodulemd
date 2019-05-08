@@ -129,6 +129,8 @@ if float(Modulemd._version) >= 2:
 
         def get_xmd(self):
             variant_xmd = super(ModuleStreamV2, self).get_xmd()
+            if variant_xmd is None:
+                return {}
             return variant_xmd.unpack()
 
     ModuleStreamV2 = override(ModuleStreamV2)
@@ -143,6 +145,8 @@ if float(Modulemd._version) >= 2:
 
         def get_xmd(self):
             variant_xmd = super(ModuleStreamV1, self).get_xmd()
+            if variant_xmd is None:
+                return {}
             return variant_xmd.unpack()
 
     ModuleStreamV1 = override(ModuleStreamV1)

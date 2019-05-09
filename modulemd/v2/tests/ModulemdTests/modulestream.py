@@ -532,6 +532,8 @@ class TestModuleStream(TestBase):
             # must be installed in /usr/lib/python*/site-packages/gi/overrides
             # or they are not included when importing Modulemd
             stream = Modulemd.ModuleStreamV2.new()
+            # An empty dictionary should be returned if no xmd value is set
+            assert stream.get_xmd() == {}
 
             xmd = {'outer_key': ['scalar', {'inner_key': 'another_scalar'}]}
 

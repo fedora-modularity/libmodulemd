@@ -1,12 +1,12 @@
 %global libmodulemd_version @VERSION@
 %global libmodulemd_v1_version @V1_VERSION@
 
-%if ! 0%{?fedora} > 30
+%if ( 0%{?fedora} && 0%{?fedora} <= 30 ) || ( 0%{?rhel} && 0%{?rhel} <= 7)
 %global build_python2 1
-%global meson_python_flags -Dwith_py2_overrides=true
+%global meson_python_flags -Dwith_py3_overrides=true -Dwith_py2_overrides=true
 %else
 %global build_python2 0
-%global meson_python_flags -Dwith_py2_overrides=false
+%global meson_python_flags -Dwith_py3_overrides=true -Dwith_py2_overrides=false
 %endif
 
 Name:           libmodulemd

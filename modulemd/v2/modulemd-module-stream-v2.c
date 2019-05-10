@@ -823,8 +823,12 @@ modulemd_module_stream_v2_set_xmd (ModulemdModuleStreamV2 *self, GVariant *xmd)
 {
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
+  /* Do nothing if we were passed the same pointer */
+  if (self->xmd == xmd)
+    return;
+
   g_clear_pointer (&self->xmd, g_variant_unref);
-  self->xmd = xmd;
+  self->xmd = modulemd_variant_deep_copy (xmd);
 }
 
 GVariant *
@@ -1073,8 +1077,7 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
 
   copy_rpm_artifact_map (v2_self, copy);
 
-  if (v2_self->xmd != NULL)
-    modulemd_module_stream_v2_set_xmd (copy, g_variant_ref (v2_self->xmd));
+  STREAM_COPY_IF_SET (v2, copy, v2_self, xmd);
 
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }
@@ -1443,8 +1446,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
-              modulemd_module_stream_v2_set_xmd (modulestream,
-                                                 g_steal_pointer (&xmd));
+              modulemd_module_stream_v2_set_xmd (modulestream, xmd);
+              g_clear_pointer (&xmd, g_variant_unref);
             }
 
           /* Dependencies */
@@ -2443,7 +2446,7 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
-  g_autoptr (GVariant) variant = NULL;
+  GVariant *variant = NULL;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -2473,9 +2476,7 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
       break;
     }
 
-  g_variant_ref_sink (variant);
-
-  return g_steal_pointer (&variant);
+  return g_variant_ref_sink (variant);
 }
 
 

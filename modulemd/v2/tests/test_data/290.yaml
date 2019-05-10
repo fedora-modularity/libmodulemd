@@ -1,0 +1,72 @@
+document: modulemd
+version: 1
+data:
+  name: testmodule
+  stream: master
+  version: 20180205135154
+  context: 9c690d0e
+  summary: A test module in all its beautiful beauty
+  description: This module demonstrates how to write simple modulemd files And can
+    be used for testing the build and release pipeline. ’
+  license:
+    module:
+    - MIT
+  dependencies:
+    buildrequires:
+      platform: f28
+    requires:
+      platform: f28
+  references:
+    community: https://docs.pagure.org/modularity/
+    documentation: https://fedoraproject.org/wiki/Fedora_Packaging_Guidelines_for_Modules
+  xmd:
+    mbs:
+      buildrequires:
+        platform:
+          filtered_rpms: []
+          ref: virtual
+          stream: f28
+          version: '3'
+          context: '00000000'
+      commit: 65a7721ee4eff44d2a63fb8f3a8da6e944ab7f4d
+      requires:
+        platform:
+          filtered_rpms: []
+          ref: virtual
+          stream: f28
+          version: '3'
+      rpms:
+        perl-List-Compare:
+          ref: ac0f3bccca9dcb8465c434ac4c38974bf6205c28
+        perl-Tangerine:
+          ref: 7e96446223f1ad84a26c7cf23d6591cd9f6326c6
+        tangerine:
+          ref: c0f9a7dbd8cf823a2bdc19eeeed20d22b0aa52bf
+      mse: true
+      scmurl: https://src.fedoraproject.org/modules/testmodule.git?#65a7721ee4eff44d2a63fb8f3a8da6e944ab7f4d
+  profiles:
+    default:
+      rpms:
+      - tangerine
+  api:
+    rpms:
+    - perl-Tangerine
+    - tangerine
+  components:
+    rpms:
+      perl-List-Compare:
+        rationale: A dependency of tangerine.
+        repository: https://src.fedoraproject.org/rpms/perl-List-Compare
+        ref: master
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-List-Compare
+      tangerine:
+        rationale: Provides API for this module.
+        buildorder: 10
+        repository: https://src.fedoraproject.org/rpms/tangerine
+        ref: master
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/tangerine
+      perl-Tangerine:
+        rationale: Provides API for this module and is a dependency of tangerine.
+        repository: https://src.fedoraproject.org/rpms/perl-Tangerine
+        ref: master
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-Tangerine

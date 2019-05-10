@@ -1,3 +1,18 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# This file is part of libmodulemd
+# Copyright (C) 2018 Red Hat, Inc.
+#
+# Fedora-License-Identifier: MIT
+# SPDX-2.0-License-Identifier: MIT
+# SPDX-3.0-License-Identifier: MIT
+#
+# This program is free software.
+# For more information on the license, see COPYING.
+# For more information on free software, see
+# <https://www.gnu.org/philosophy/free-sw.en.html>.
+
 import os
 import sys
 try:
@@ -531,20 +546,35 @@ class TestModuleStream(TestBase):
             # because the overrides that translate between python and GVariant
             # must be installed in /usr/lib/python*/site-packages/gi/overrides
             # or they are not included when importing Modulemd
-            stream = Modulemd.ModuleStreamV2.new()
+            stream = Modulemd.ModuleStreamV2.new("foo", "bar")
             # An empty dictionary should be returned if no xmd value is set
             assert stream.get_xmd() == {}
 
-            xmd = {'outer_key': ['scalar', {'inner_key': 'another_scalar'}]}
+            xmd = {'outer_key': {'inner_key': ['scalar', 'another_scalar']}}
 
             stream.set_xmd(xmd)
 
             xmd_copy = stream.get_xmd()
             assert xmd_copy
             assert 'outer_key' in xmd_copy
-            assert 'scalar' in xmd_copy['outer_key']
-            assert 'inner_key' in xmd_copy['outer_key'][1]
-            assert xmd_copy['outer_key'][1]['inner_key'] == 'another_scalar'
+            assert 'inner_key' in xmd_copy['outer_key']
+            assert 'scalar' in xmd_copy['outer_key']['inner_key']
+            assert 'another_scalar' in xmd_copy['outer_key']['inner_key']
+
+            # Verify that we can add content and save it back
+            xmd["something"] = ["foo", "bar"]
+            stream.set_xmd(xmd)
+
+            stream.set_summary("foo")
+            stream.set_description("bar")
+            stream.add_module_license("MIT")
+
+            # Verify that we can output the XMD successfully
+            index = Modulemd.ModuleIndex()
+            index.add_module_stream(stream)
+            out_yaml = index.dump_to_string()
+
+            self.assertIsNotNone(out_yaml)
 
     def test_upgrade(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
@@ -1173,6 +1203,26 @@ data:
         else:
             stream.get_xmd()
             stream.get_xmd()
+
+    def test_xmd_issue_290(self):
+        if '_overrides_module' in dir(Modulemd):
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/modulemd/v2/tests/test_data/290.yaml" %
+                (os.getenv('MESON_SOURCE_ROOT')), True, '', '')
+
+            self.assertIsNotNone(stream)
+
+            xmd = stream.get_xmd()
+
+            xmd["something"] = ["foo", "bar"]
+            stream.set_xmd(xmd)
+
+            index = Modulemd.ModuleIndex()
+            index.add_module_stream(stream)
+            self.maxDiff = None
+            output_yaml = index.dump_to_string()
+            self.assertIsNotNone(output_yaml)
+        pass
 
 
 if __name__ == '__main__':

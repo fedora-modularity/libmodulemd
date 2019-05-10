@@ -817,7 +817,7 @@ modulemd_module_stream_v1_get_runtime_requirement_stream (
 /**
  * modulemd_module_stream_v1_set_xmd:
  * @self: (in): This #ModulemdModuleStreamV1 object.
- * @xmd: (in) (transfer full): A #GVariant representing arbitrary YAML.
+ * @xmd: (in) (transfer none): A #GVariant representing arbitrary YAML.
  *
  * Sets the eXtensible MetaData (XMD) for this module. XMD is arbitrary YAML
  * data that will be set and returned as-is (with the exception that the

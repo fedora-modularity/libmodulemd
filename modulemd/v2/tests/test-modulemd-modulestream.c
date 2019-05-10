@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <signal.h>
 
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-stream-private.h"
@@ -958,6 +959,101 @@ module_stream_v2_test_xmd_issue_274 (void)
 }
 
 
+static void
+module_stream_v2_test_xmd_issue_290 (void)
+{
+  g_auto (GVariantBuilder) builder;
+  g_autoptr (GVariant) xmd = NULL;
+  GVariant *xmd_array = NULL;
+  g_autoptr (GVariantDict) xmd_dict = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autofree gchar *yaml_str = NULL;
+
+  g_autoptr (ModulemdModuleStreamV2) stream =
+    modulemd_module_stream_v2_new ("foo", "bar");
+
+  modulemd_module_stream_v2_set_summary (stream, "summary");
+  modulemd_module_stream_v2_set_description (stream, "desc");
+  modulemd_module_stream_v2_add_module_license (stream, "MIT");
+
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+
+  g_variant_builder_add_value (&builder, g_variant_new_string ("foo"));
+  g_variant_builder_add_value (&builder, g_variant_new_string ("bar"));
+
+  xmd_array = g_variant_builder_end (&builder);
+
+  xmd_dict = g_variant_dict_new (NULL);
+  g_variant_dict_insert_value (
+    xmd_dict, "something", g_steal_pointer (&xmd_array));
+  xmd = g_variant_ref_sink (g_variant_dict_end (xmd_dict));
+
+
+  modulemd_module_stream_v2_set_xmd (stream, xmd);
+
+  modulemd_module_index_add_module_stream (
+    index, MODULEMD_MODULE_STREAM (stream), &error);
+  g_assert_no_error (error);
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+
+  // clang-format off
+  g_assert_cmpstr (yaml_str, ==,
+"---\n"
+"document: modulemd\n"
+"version: 2\n"
+"data:\n"
+"  name: foo\n"
+"  stream: bar\n"
+"  summary: summary\n"
+"  description: >-\n"
+"    desc\n"
+"  license:\n"
+"    module:\n"
+"    - MIT\n"
+"  xmd:\n"
+"    something:\n"
+"    - foo\n"
+"    - bar\n"
+"...\n");
+  // clang-format on
+
+  g_assert_no_error (error);
+}
+
+
+static void
+module_stream_v2_test_xmd_issue_290_with_example (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autofree gchar *output_yaml = NULL;
+  g_autoptr (GVariant) xmd = NULL;
+
+  path = g_strdup_printf ("%s/modulemd/v2/tests/test_data/290.yaml",
+                          g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+
+  xmd = modulemd_variant_deep_copy (
+    modulemd_module_stream_v1_get_xmd (MODULEMD_MODULE_STREAM_V1 (stream)));
+  modulemd_module_stream_v1_set_xmd (MODULEMD_MODULE_STREAM_V1 (stream), xmd);
+
+  modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_no_error (error);
+
+  output_yaml = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_nonnull (output_yaml);
+  g_assert_no_error (error);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1063,6 +1159,12 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/xmd/issue274",
                    module_stream_v2_test_xmd_issue_274);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/xmd/issue290",
+                   module_stream_v2_test_xmd_issue_290);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/xmd/issue290plus",
+                   module_stream_v2_test_xmd_issue_290_with_example);
 
   return g_test_run ();
 }

@@ -860,6 +860,10 @@ modulemd_module_stream_v1_set_xmd (ModulemdModuleStreamV1 *self, GVariant *xmd)
 {
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
+  /* Do nothing if we were passed the same pointer */
+  if (self->xmd == xmd)
+    return;
+
   g_clear_pointer (&self->xmd, g_variant_unref);
   self->xmd = modulemd_variant_deep_copy (xmd);
 }
@@ -1068,8 +1072,7 @@ modulemd_module_stream_v1_copy (ModulemdModuleStream *self,
   COPY_HASHTABLE_BY_VALUE_ADDER (
     copy, v1_self, servicelevels, modulemd_module_stream_v1_add_servicelevel);
 
-  if (v1_self->xmd != NULL)
-    modulemd_module_stream_v1_set_xmd (copy, v1_self->xmd);
+  STREAM_COPY_IF_SET (v1, copy, v1_self, xmd);
 
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }

@@ -759,7 +759,7 @@ modulemd_module_stream_v2_get_dependencies (ModulemdModuleStreamV2 *self);
 /**
  * modulemd_module_stream_v2_set_xmd:
  * @self: (in): This #ModulemdModuleStreamV2 object.
- * @xmd: (in) (transfer full): A #GVariant representing arbitrary YAML.
+ * @xmd: (in) (transfer none): A #GVariant representing arbitrary YAML.
  *
  * Sets the eXtensible MetaData (XMD) for this module. XMD is arbitrary YAML
  * data that will be set and returned as-is (with the exception that the

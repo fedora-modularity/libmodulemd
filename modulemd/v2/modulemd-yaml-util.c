@@ -957,8 +957,9 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
                    MODULEMD_YAML_ERROR_EMIT,
-                   "Unhandled variant type: \"%s\"",
-                   g_variant_get_type_string (variant));
+                   "Unhandled variant type: \"%s\": %s",
+                   g_variant_get_type_string (variant),
+                   g_variant_print (variant, TRUE));
       return FALSE;
     }
   return TRUE;

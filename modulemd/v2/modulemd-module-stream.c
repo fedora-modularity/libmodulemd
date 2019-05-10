@@ -502,7 +502,7 @@ modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
 
 
   if (v1_stream->xmd != NULL)
-    modulemd_module_stream_v2_set_xmd (copy, g_variant_ref (v1_stream->xmd));
+    modulemd_module_stream_v2_set_xmd (copy, v1_stream->xmd);
 
 
   /* Upgrade the Dependencies */

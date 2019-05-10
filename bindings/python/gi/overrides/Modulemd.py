@@ -25,7 +25,6 @@
 # For more information on free software, see
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
-
 from ..module import get_introspection_module
 from ..overrides import override
 
@@ -49,7 +48,7 @@ class ModulemdUtil(object):
         if not isinstance(s, str):
             raise TypeError('Only strings are supported for scalars')
 
-        return GLib.Variant('s', s)
+        return GLib.Variant.new_string(s)
 
     @staticmethod
     def variant_bool(b):
@@ -58,19 +57,25 @@ class ModulemdUtil(object):
         if not isinstance(b, bool):
             raise TypeError('Only booleans are supported')
 
-        return GLib.Variant('b', b)
+        return GLib.Variant.new_boolean(b)
 
     @staticmethod
     def variant_list(l):
         """ Converts a list to a GLib.Variant
         """
-        l_variant = list()
+
+        # If this is a zero-length array, handle it specially
+        if (len(l) == 0):
+            return GLib.Variant.new_array(GLib.VariantType('v'))
+
+        # Build the array from each entry
+        builder = GLib.VariantBuilder(GLib.VariantType('a*'))
         for item in l:
             if item is None:
                 item = ''
+            builder.add_value(ModulemdUtil.python_to_variant(item))
 
-            l_variant.append(ModulemdUtil.python_to_variant(item))
-        return GLib.Variant('av', l_variant)
+        return builder.end()
 
     @staticmethod
     def variant_dict(d):
@@ -79,26 +84,18 @@ class ModulemdUtil(object):
         if not isinstance(d, dict):
             raise TypeError('Only dictionaries are supported for mappings')
 
-        d_variant = ModulemdUtil.dict_values(d)
-        return GLib.Variant('a{sv}', d_variant)
+        vdict = GLib.VariantDict()
 
-    @staticmethod
-    def dict_values(d):
-        """ Converts each dictionary value to a GLib.Variant
-        """
-        if not isinstance(d, dict):
-            raise TypeError('Only dictionaries are supported for mappings')
-
-        d_variant = dict()
         for k, v in d.items():
             if v is None:
                 v = ''
+            vdict.insert_value(k, ModulemdUtil.python_to_variant(v))
 
-            d_variant[k] = ModulemdUtil.python_to_variant(v)
-        return d_variant
+        return vdict.end()
 
     @staticmethod
     def python_to_variant(obj):
+
         if isinstance(obj, str):
             return ModulemdUtil.variant_str(obj)
 

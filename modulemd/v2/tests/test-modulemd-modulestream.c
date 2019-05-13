@@ -993,8 +993,8 @@ module_stream_v2_test_xmd_issue_290 (void)
 
   modulemd_module_stream_v2_set_xmd (stream, xmd);
 
-  modulemd_module_index_add_module_stream (
-    index, MODULEMD_MODULE_STREAM (stream), &error);
+  g_assert_true (modulemd_module_index_add_module_stream (
+    index, MODULEMD_MODULE_STREAM (stream), &error));
   g_assert_no_error (error);
 
   yaml_str = modulemd_module_index_dump_to_string (index, &error);

@@ -251,6 +251,30 @@ To run the docker-based tests, you can run (from the source root and with `sudo`
 (Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`, `Fedora 29`, etc. to switch to building against those releases rather than Fedora Rawhide).
 
 
+## Tips and tricks
+
+### Running tests in debug mode
+
+The libmodulemd library is built atop
+[GObject](https://developer.gnome.org/gobject/stable/). It provides a debug
+mode that is configurable by an environment variable. In general, it is highly
+recommended that you run all tests with
+`G_DEBUG='fatal-warnings,fatal-criticals'` set in the environment. This will
+cause the application to `abort()` on programming errors that would be logged
+and ignored at runtime.
+
+
+### Skipping the valgrind tests
+
+If you are trying to iterate quickly, you can temporarily skip the valgrind
+memory tests by running the test suite with:
+```
+MMD_SKIP_VALGRIND=True ninja test
+```
+
+The automated CI tests will always run with valgrind on all platforms where it
+is supported.
+
 # Authors:
 * Stephen Gallagher <sgallagh@redhat.com>
 * Igor Gnatenko <ignatenkobrain@fedoraproject.org>

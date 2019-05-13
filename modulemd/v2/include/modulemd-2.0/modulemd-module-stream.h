@@ -376,13 +376,17 @@ modulemd_module_stream_get_arch (ModulemdModuleStream *self);
  * modulemd_module_stream_get_nsvc_as_string: (rename-to modulemd_module_stream_get_nsvc)
  * @self: (in): This #ModulemdModuleStream.
  *
+ * Retrieves a representation of the module name, stream name, version and
+ * context of this #ModuleStream in the form
+ * `module_name:stream_name:version:context`. Note that this excludes the
+ * architecture of the module stream and as such is not guaranteed to be unique
+ * within a repository.
+ *
  * Returns: (transfer full): The NSVC (name:stream:version[:context]) of this
  * module stream. NULL if module name or stream stream is unknown.
  *
  * Since: 2.0
- * Deprecated: 2.2
  */
-MMD_DEPRECATED_FOR (modulemd_module_stream_get_NSVCA_as_string)
 gchar *
 modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
 

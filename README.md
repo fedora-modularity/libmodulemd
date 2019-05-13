@@ -12,15 +12,16 @@ Full details can be found in the
 Using libmodulemd from Python is possible thanks to the gobject-introspection
 project. To use libmodulemd from Python, include the following at the top of
 your sources.
+
+Install the `python2-libmodulemd` or `python3-libmodulemd` package for your
+system depending on the version of python with which you are working.
+These packages provide the appropriate language bindings.
+
 ```python
 import gi
 gi.require_version('Modulemd', '2.0')
 from gi.repository import Modulemd
 ```
-
-It's highly recommended that you install `python2-libmodulemd` or
-`python3-libmodulemd`, which will seamlessly translate GLib Variants to native
-Python objects and vice-versa.
 
 # Working with repodata (DNF use-case)
 The libmodulemd API provides a number of convenience tools for interacting
@@ -249,6 +250,30 @@ To run the docker-based tests, you can run (from the source root and with `sudo`
 ```
 (Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`, `Fedora 29`, etc. to switch to building against those releases rather than Fedora Rawhide).
 
+
+## Tips and tricks
+
+### Running tests in debug mode
+
+The libmodulemd library is built atop
+[GObject](https://developer.gnome.org/gobject/stable/). It provides a debug
+mode that is configurable by an environment variable. In general, it is highly
+recommended that you run all tests with
+`G_DEBUG='fatal-warnings,fatal-criticals'` set in the environment. This will
+cause the application to `abort()` on programming errors that would be logged
+and ignored at runtime.
+
+
+### Skipping the valgrind tests
+
+If you are trying to iterate quickly, you can temporarily skip the valgrind
+memory tests by running the test suite with:
+```
+MMD_SKIP_VALGRIND=True ninja test
+```
+
+The automated CI tests will always run with valgrind on all platforms where it
+is supported.
 
 # Authors:
 * Stephen Gallagher <sgallagh@redhat.com>

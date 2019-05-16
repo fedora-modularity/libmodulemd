@@ -105,6 +105,18 @@ modulemd_component_add_buildafter (ModulemdComponent *self, const gchar *key);
 
 
 /**
+ * modulemd_component_clear_buildafter:
+ * @self: This #ModulemdComponent object
+ *
+ * Remove all buildafter entries for this component.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_component_clear_buildafter (ModulemdComponent *self);
+
+
+/**
  * modulemd_component_get_buildafter_as_strv: (rename-to modulemd_component_get_buildafter)
  * @self: This #ModulemdComponent object
  *

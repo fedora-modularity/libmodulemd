@@ -145,6 +145,13 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
   g_hash_table_remove (self->whitelist, rpm);
 }
 
+void
+modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self)
+{
+  g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
+  g_hash_table_remove_all (self->whitelist);
+}
+
 
 gchar **
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self)

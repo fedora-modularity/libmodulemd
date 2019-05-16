@@ -172,6 +172,14 @@ modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
 }
 
 
+void
+modulemd_dependencies_clear_buildtime_dependencies (ModulemdDependencies *self)
+{
+  g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
+  g_hash_table_remove_all (self->buildtime_deps);
+}
+
+
 GStrv
 modulemd_dependencies_get_buildtime_modules_as_strv (
   ModulemdDependencies *self)
@@ -212,6 +220,14 @@ modulemd_dependencies_set_empty_runtime_dependencies_for_module (
   g_return_if_fail (module_name);
   modulemd_dependencies_nested_table_add (
     self->runtime_deps, module_name, NULL);
+}
+
+
+void
+modulemd_dependencies_clear_runtime_dependencies (ModulemdDependencies *self)
+{
+  g_return_if_fail (MODULEMD_IS_DEPENDENCIES (self));
+  g_hash_table_remove_all (self->runtime_deps);
 }
 
 

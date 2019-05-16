@@ -119,6 +119,18 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
 
 
 /**
+ * modulemd_buildopts_clear_rpm_whitelist:
+ * @self: This #ModulemdBuildopts
+ *
+ * Remove all RPMs from the whitelist.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self);
+
+
+/**
  * modulemd_buildopts_get_rpm_whitelist_as_strv: (rename-to modulemd_buildopts_get_rpm_whitelist)
  * @self: This #ModulemdBuildopts
  *

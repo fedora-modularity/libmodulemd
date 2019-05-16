@@ -394,11 +394,36 @@ modulemd_module_get_all_streams (ModulemdModule *self)
 static gint
 compare_streams (gconstpointer a, gconstpointer b)
 {
+  int cmp = 0;
+  guint64 a_ver, b_ver;
   ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
   ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
 
-  return modulemd_module_stream_get_version (b_) -
-         modulemd_module_stream_get_version (a_);
+  /* Sort alphabetically by stream name */
+  cmp = g_strcmp0 (modulemd_module_stream_get_stream_name (a_),
+                   modulemd_module_stream_get_stream_name (b_));
+  if (cmp != 0)
+    return cmp;
+
+  /* Sort by the version, highest first */
+  a_ver = modulemd_module_stream_get_version (a_);
+  b_ver = modulemd_module_stream_get_version (b_);
+  if (b_ver > a_ver)
+    return 1;
+  if (a_ver > b_ver)
+    return -1;
+
+  /* Sort alphabetically by context */
+  cmp = g_strcmp0 (modulemd_module_stream_get_context (a_),
+                   modulemd_module_stream_get_context (b_));
+  if (cmp != 0)
+    return cmp;
+
+  /* Sort alphabetically by architecture */
+  cmp = g_strcmp0 (modulemd_module_stream_get_arch (a_),
+                   modulemd_module_stream_get_arch (b_));
+
+  return cmp;
 }
 
 

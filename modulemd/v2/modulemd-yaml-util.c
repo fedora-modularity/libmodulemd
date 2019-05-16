@@ -914,6 +914,8 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
   GVariantIter iter;
   g_autofree gchar *key = NULL;
   g_autoptr (GVariant) value = NULL;
+  g_autoptr (GPtrArray) keys = NULL;
+  g_autoptr (GVariantDict) dict = NULL;
 
   if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING))
     {
@@ -929,15 +931,43 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
   else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
     {
       EMIT_MAPPING_START (emitter, error);
+      keys = g_ptr_array_new_with_free_func (g_free);
+
+      dict = g_variant_dict_new (variant);
       g_variant_iter_init (&iter, variant);
+
+      /* Get a list of the keys to sort */
       while (g_variant_iter_next (&iter, "{sv}", &key, &value))
         {
-          EMIT_SCALAR (emitter, error, key);
-          if (!modulemd_yaml_emit_variant (emitter, value, error))
-            return FALSE;
-          g_clear_pointer (&key, g_free);
+          g_ptr_array_add (keys, g_steal_pointer (&key));
           g_clear_pointer (&value, g_variant_unref);
         }
+
+      /* Sort the keys alphabetically */
+      g_ptr_array_sort (keys, modulemd_strcmp_sort);
+
+      /* Write out the keys and recurse into their values */
+      for (guint i = 0; i < keys->len; i++)
+        {
+          value = g_variant_dict_lookup_value (
+            dict, g_ptr_array_index (keys, i), NULL);
+          if (!value)
+            {
+              g_set_error (
+                error,
+                MODULEMD_YAML_ERROR,
+                MODULEMD_YAML_ERROR_EMIT,
+                "Got unexpected type while processing XMD dictionary.");
+              return FALSE;
+            }
+          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));
+          if (!modulemd_yaml_emit_variant (emitter, value, error))
+            return FALSE;
+
+          g_clear_pointer (&value, g_variant_unref);
+        }
+
+      g_clear_pointer (&keys, g_ptr_array_unref);
       EMIT_MAPPING_END (emitter, error);
     }
   else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_ARRAY))

@@ -65,6 +65,27 @@ modulemd_rpm_map_entry_new (const gchar *name,
   // clang-format on
 }
 
+
+gboolean
+modulemd_rpm_map_entry_equals_wrapper (const void *a, const void *b)
+{
+  g_return_val_if_fail (MODULEMD_IS_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)a),
+                        FALSE);
+  g_return_val_if_fail (MODULEMD_IS_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)b),
+                        FALSE);
+
+  return modulemd_rpm_map_entry_equals (
+    MODULEMD_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)a),
+    MODULEMD_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)b));
+}
+
+gboolean
+modulemd_RpmMapEntry_hash_table_equals_wrapper (const void *a, const void *b)
+{
+  return modulemd_hash_table_equals (
+    (GHashTable *)a, (GHashTable *)b, modulemd_rpm_map_entry_equals_wrapper);
+}
+
 static void
 modulemd_rpm_map_entry_finalize (GObject *object)
 {

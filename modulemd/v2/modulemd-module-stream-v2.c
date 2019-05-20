@@ -201,16 +201,16 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
       return FALSE;
     }
 
-  /* 
-  //need an equals function for Modulemd.RpmMapEntry
-  // < string, GHashTable <string, Modulemd.RpmMapEntry> >
-  if (!modulemd_hash_table_equals (v2_self_1->rpm_artifact_map,
-                                   v2_self_2->rpm_artifact_map,
-                                   modulemd_hash_table_equals))
+
+  /* < string, GHashTable <string, Modulemd.RpmMapEntry> > */
+  if (!modulemd_hash_table_equals (
+        v2_self_1->rpm_artifact_map,
+        v2_self_2->rpm_artifact_map,
+        modulemd_RpmMapEntry_hash_table_equals_wrapper))
     {
       return FALSE;
     }
-  */
+
 
   if (v2_self_1->dependencies->len != v2_self_2->dependencies->len)
     return FALSE;

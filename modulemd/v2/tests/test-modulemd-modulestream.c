@@ -186,6 +186,66 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 }
 
 
+static void
+module_stream_test_equals (ModuleStreamFixture *fixture,
+                           gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream_1 = NULL;
+  g_autoptr (ModulemdModuleStream) stream_2 = NULL;
+  guint64 version;
+
+  for (version = MD_MODULESTREAM_VERSION_ONE;
+       version <= MD_MODULESTREAM_VERSION_LATEST;
+       version++)
+    {
+      /* Test equality with same stream and module names */
+      stream_1 = modulemd_module_stream_new (version, "foo", "latest");
+      stream_2 = modulemd_module_stream_new (version, "foo", "latest");
+
+      g_assert_true (modulemd_module_stream_equals (stream_1, stream_2));
+      g_clear_object (&stream_1);
+      g_clear_object (&stream_2);
+
+
+      /* Test equality with different stream names*/
+      stream_1 = modulemd_module_stream_new (version, "foo", NULL);
+      stream_2 = modulemd_module_stream_new (version, "bar", NULL);
+
+      g_assert_false (modulemd_module_stream_equals (stream_1, stream_2));
+      g_clear_object (&stream_1);
+      g_clear_object (&stream_2);
+
+      /* Test equality with different module name */
+      stream_1 = modulemd_module_stream_new (version, "bar", "thor");
+      stream_2 = modulemd_module_stream_new (version, "bar", "loki");
+
+      g_assert_false (modulemd_module_stream_equals (stream_1, stream_2));
+      g_clear_object (&stream_1);
+      g_clear_object (&stream_2);
+
+      /* Test equality with same arch */
+      stream_1 = modulemd_module_stream_new (version, "bar", "thor");
+      modulemd_module_stream_set_arch (stream_1, "x86_64");
+      stream_2 = modulemd_module_stream_new (version, "bar", "thor");
+      modulemd_module_stream_set_arch (stream_2, "x86_64");
+
+      g_assert_true (modulemd_module_stream_equals (stream_1, stream_2));
+      g_clear_object (&stream_1);
+      g_clear_object (&stream_2);
+
+      /* Test equality with different arch */
+      stream_1 = modulemd_module_stream_new (version, "bar", "thor");
+      modulemd_module_stream_set_arch (stream_1, "x86_64");
+      stream_2 = modulemd_module_stream_new (version, "bar", "thor");
+      modulemd_module_stream_set_arch (stream_2, "x86_25");
+
+      g_assert_false (modulemd_module_stream_equals (stream_1, stream_2));
+      g_clear_object (&stream_1);
+      g_clear_object (&stream_2);
+    }
+}
+
+
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
 module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
@@ -1082,6 +1142,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_copy,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/equals",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/nsvc",

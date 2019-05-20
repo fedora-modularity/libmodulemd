@@ -58,11 +58,14 @@ modulemd_service_level_new (const gchar *name)
 gboolean
 modulemd_service_level_equals_wrapper (const void *a, const void *b)
 {
-  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (a), FALSE);
-  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (b), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL ((ModulemdServiceLevel *)a),
+                        FALSE);
+  g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL ((ModulemdServiceLevel *)b),
+                        FALSE);
 
-  return modulemd_service_level_equals (MODULEMD_SERVICE_LEVEL (a),
-                                        MODULEMD_SERVICE_LEVEL (b));
+  return modulemd_service_level_equals (
+    MODULEMD_SERVICE_LEVEL ((ModulemdServiceLevel *)a),
+    MODULEMD_SERVICE_LEVEL ((ModulemdServiceLevel *)b));
 }
 
 

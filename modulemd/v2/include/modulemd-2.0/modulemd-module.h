@@ -121,6 +121,34 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
 
 
 /**
+ * modulemd_module_search_streams:
+ * @self: This #ModulemdModule object
+ * @stream_name: The name of the stream to retrieve
+ * @version: The version of the stream to retrieve. If set to zero,
+ * the version is not included in the search.
+ * @context: (nullable): The context of the stream to retrieve. If NULL, the
+ * context is not included in the search.
+ * @arch: (nullable): The processor architecture of the stream to retrieve. If
+ * NULL, the architecture is not included in the search.
+ *
+ * Returns: (transfer full) (element-type ModulemdModuleStream): The list of
+ * stream objects matching the requested parameters. This function cannot
+ * fail, but it may return a zero-length list if no matches were found. The
+ * returned streams will be in a predictable order, sorted first by stream
+ * name, then by version (highest to lowest), then by context and finally by
+ * architecture.
+ *
+ * Since: 2.5
+ */
+GPtrArray *
+modulemd_module_search_streams (ModulemdModule *self,
+                                const gchar *stream_name,
+                                const guint64 version,
+                                const gchar *context,
+                                const gchar *arch);
+
+
+/**
  * modulemd_module_get_stream_by_NSVCA:
  * @self: This #ModulemdModule object
  * @stream_name: The name of the stream to retrieve

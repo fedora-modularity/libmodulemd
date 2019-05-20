@@ -394,11 +394,36 @@ modulemd_module_get_all_streams (ModulemdModule *self)
 static gint
 compare_streams (gconstpointer a, gconstpointer b)
 {
+  int cmp = 0;
+  guint64 a_ver, b_ver;
   ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
   ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
 
-  return modulemd_module_stream_get_version (b_) -
-         modulemd_module_stream_get_version (a_);
+  /* Sort alphabetically by stream name */
+  cmp = g_strcmp0 (modulemd_module_stream_get_stream_name (a_),
+                   modulemd_module_stream_get_stream_name (b_));
+  if (cmp != 0)
+    return cmp;
+
+  /* Sort by the version, highest first */
+  a_ver = modulemd_module_stream_get_version (a_);
+  b_ver = modulemd_module_stream_get_version (b_);
+  if (b_ver > a_ver)
+    return 1;
+  if (a_ver > b_ver)
+    return -1;
+
+  /* Sort alphabetically by context */
+  cmp = g_strcmp0 (modulemd_module_stream_get_context (a_),
+                   modulemd_module_stream_get_context (b_));
+  if (cmp != 0)
+    return cmp;
+
+  /* Sort alphabetically by architecture */
+  cmp = g_strcmp0 (modulemd_module_stream_get_arch (a_),
+                   modulemd_module_stream_get_arch (b_));
+
+  return cmp;
 }
 
 
@@ -408,25 +433,7 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
-  gsize i = 0;
-  ModulemdModuleStream *stream = NULL;
-  g_autoptr (GPtrArray) streams =
-    g_ptr_array_new_with_free_func (g_object_unref);
-
-  for (i = 0; i < self->streams->len; i++)
-    {
-      stream = (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
-
-      if (!g_str_equal (modulemd_module_stream_get_stream_name (stream),
-                        stream_name))
-        continue;
-
-      g_ptr_array_add (streams, g_object_ref (stream));
-    }
-
-  g_ptr_array_sort (streams, compare_streams);
-
-  return g_steal_pointer (&streams);
+  return modulemd_module_search_streams (self, stream_name, 0, NULL, NULL);
 }
 
 
@@ -441,13 +448,12 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
 }
 
 
-ModulemdModuleStream *
-modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
-                                     const gchar *stream_name,
-                                     const guint64 version,
-                                     const gchar *context,
-                                     const gchar *arch,
-                                     GError **error)
+GPtrArray *
+modulemd_module_search_streams (ModulemdModule *self,
+                                const gchar *stream_name,
+                                const guint64 version,
+                                const gchar *context,
+                                const gchar *arch)
 {
   gsize i = 0;
   g_autoptr (GPtrArray) matching_streams = NULL;
@@ -456,7 +462,7 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   /* Assume the worst-case scenario that all streams match to spare us extra
-   * mallocs. This memory is short-lived.
+   * mallocs.
    */
   matching_streams = g_ptr_array_sized_new (self->streams->len);
 
@@ -491,6 +497,27 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
       g_ptr_array_add (matching_streams, under_consideration);
     }
+
+  g_ptr_array_sort (matching_streams, compare_streams);
+
+  return g_steal_pointer (&matching_streams);
+}
+
+
+ModulemdModuleStream *
+modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
+                                     const gchar *stream_name,
+                                     const guint64 version,
+                                     const gchar *context,
+                                     const gchar *arch,
+                                     GError **error)
+{
+  g_autoptr (GPtrArray) matching_streams = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  matching_streams =
+    modulemd_module_search_streams (self, stream_name, version, context, arch);
 
   if (matching_streams->len == 0)
     {

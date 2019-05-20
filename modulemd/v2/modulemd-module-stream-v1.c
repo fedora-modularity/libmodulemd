@@ -331,6 +331,16 @@ modulemd_module_stream_v1_remove_module_component (
 
 
 void
+modulemd_module_stream_v1_clear_module_components (
+  ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->module_components);
+}
+
+
+void
 modulemd_module_stream_v1_remove_rpm_component (ModulemdModuleStreamV1 *self,
                                                 const gchar *component_name)
 {
@@ -341,6 +351,15 @@ modulemd_module_stream_v1_remove_rpm_component (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_remove (self->rpm_components, component_name);
+}
+
+
+void
+modulemd_module_stream_v1_clear_rpm_components (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->rpm_components);
 }
 
 
@@ -408,6 +427,15 @@ modulemd_module_stream_v1_replace_content_licenses (
 
 
 void
+modulemd_module_stream_v1_clear_content_licenses (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->content_licenses);
+}
+
+
+void
 modulemd_module_stream_v1_add_module_license (ModulemdModuleStreamV1 *self,
                                               const gchar *license)
 {
@@ -427,6 +455,15 @@ modulemd_module_stream_v1_replace_module_licenses (
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   MODULEMD_REPLACE_SET (self->module_licenses, set);
+}
+
+
+void
+modulemd_module_stream_v1_clear_module_licenses (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->module_licenses);
 }
 
 
@@ -555,6 +592,16 @@ modulemd_module_stream_v1_remove_rpm_api (ModulemdModuleStreamV1 *self,
   g_hash_table_remove (self->rpm_api, rpm);
 }
 
+
+void
+modulemd_module_stream_v1_clear_rpm_api (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->rpm_api);
+}
+
+
 GStrv
 modulemd_module_stream_v1_get_rpm_api_as_strv (ModulemdModuleStreamV1 *self)
 {
@@ -597,6 +644,15 @@ modulemd_module_stream_v1_remove_rpm_artifact (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_remove (self->rpm_artifacts, nevr);
+}
+
+
+void
+modulemd_module_stream_v1_clear_rpm_artifacts (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->rpm_artifacts);
 }
 
 
@@ -643,6 +699,15 @@ modulemd_module_stream_v1_remove_rpm_filter (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
 
   g_hash_table_remove (self->rpm_filters, rpm);
+}
+
+
+void
+modulemd_module_stream_v1_clear_rpm_filters (ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->rpm_filters);
 }
 
 
@@ -812,6 +877,26 @@ modulemd_module_stream_v1_remove_runtime_requirement (
   g_return_if_fail (module_name);
 
   g_hash_table_remove (self->runtime_deps, module_name);
+}
+
+
+void
+modulemd_module_stream_v1_clear_buildtime_requirements (
+  ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->buildtime_deps);
+}
+
+
+void
+modulemd_module_stream_v1_clear_runtime_requirements (
+  ModulemdModuleStreamV1 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
+
+  g_hash_table_remove_all (self->runtime_deps);
 }
 
 

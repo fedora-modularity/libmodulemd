@@ -392,7 +392,7 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
 
 
 /**
- * modulemd_index_add_translation:
+ * modulemd_module_index_add_translation:
  * @self: This #ModulemdModuleIndex
  * @translation: The #ModulemdTranslation object to add to the index.
  * @error: (out): A #GError containing the reason the #ModulemdTranslation

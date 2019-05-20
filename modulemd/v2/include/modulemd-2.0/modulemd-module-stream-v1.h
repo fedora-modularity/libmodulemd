@@ -287,6 +287,19 @@ modulemd_module_stream_v1_remove_module_component (
 
 
 /**
+ * modulemd_module_stream_v1_clear_module_components:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all module components from this module stream.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_module_components (
+  ModulemdModuleStreamV1 *self);
+
+
+/**
  * modulemd_module_stream_v1_remove_rpm_component:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  * @component_name: (in): The name of the component to remove from the module
@@ -299,6 +312,18 @@ modulemd_module_stream_v1_remove_module_component (
 void
 modulemd_module_stream_v1_remove_rpm_component (ModulemdModuleStreamV1 *self,
                                                 const gchar *component_name);
+
+
+/**
+ * modulemd_module_stream_v1_clear_rpm_components:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all RPM components from this module stream.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_rpm_components (ModulemdModuleStreamV1 *self);
 
 
 /**
@@ -397,6 +422,19 @@ modulemd_module_stream_v1_remove_content_license (ModulemdModuleStreamV1 *self,
 
 
 /**
+ * modulemd_module_stream_v1_clear_content_licenses:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all content licenses.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_content_licenses (
+  ModulemdModuleStreamV1 *self);
+
+
+/**
  * modulemd_module_stream_v1_remove_module_license:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  * @license: (in): A license to remove from the list. Has no effect if the
@@ -407,6 +445,18 @@ modulemd_module_stream_v1_remove_content_license (ModulemdModuleStreamV1 *self,
 void
 modulemd_module_stream_v1_remove_module_license (ModulemdModuleStreamV1 *self,
                                                  const gchar *license);
+
+
+/**
+ * modulemd_module_stream_v1_clear_module_licenses:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all module licenses.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_module_licenses (ModulemdModuleStreamV1 *self);
 
 
 /**
@@ -518,6 +568,18 @@ modulemd_module_stream_v1_remove_rpm_api (ModulemdModuleStreamV1 *self,
 
 
 /**
+ * modulemd_module_stream_v1_clear_rpm_api:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all RPMs from the list of stable public API.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_rpm_api (ModulemdModuleStreamV1 *self);
+
+
+/**
  * modulemd_module_stream_v1_get_rpm_api_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_api)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
@@ -552,6 +614,18 @@ modulemd_module_stream_v1_add_rpm_artifact (ModulemdModuleStreamV1 *self,
 void
 modulemd_module_stream_v1_remove_rpm_artifact (ModulemdModuleStreamV1 *self,
                                                const gchar *nevr);
+
+
+/**
+ * modulemd_module_stream_v1_clear_rpm_artifacts:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all RPM NEVRs from the list of artifacts
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_rpm_artifacts (ModulemdModuleStreamV1 *self);
 
 
 /**
@@ -590,6 +664,18 @@ modulemd_module_stream_v1_add_rpm_filter (ModulemdModuleStreamV1 *self,
 void
 modulemd_module_stream_v1_remove_rpm_filter (ModulemdModuleStreamV1 *self,
                                              const gchar *rpm);
+
+
+/**
+ * modulemd_module_stream_v1_clear_rpm_filters:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all RPMs from the filter list.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_rpm_filters (ModulemdModuleStreamV1 *self);
 
 
 /**
@@ -754,6 +840,32 @@ modulemd_module_stream_v1_remove_buildtime_requirement (
 void
 modulemd_module_stream_v1_remove_runtime_requirement (
   ModulemdModuleStreamV1 *self, const gchar *module_name);
+
+
+/**
+ * modulemd_module_stream_v1_clear_buildtime_requirements
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all buildtime dependencies for this module.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_buildtime_requirements (
+  ModulemdModuleStreamV1 *self);
+
+
+/**
+ * modulemd_module_stream_v1_clear_runtime_requirements
+ * @self: (in): This #ModulemdModuleStreamV1 object.
+ *
+ * Remove all runtime dependencies for this module.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v1_clear_runtime_requirements (
+  ModulemdModuleStreamV1 *self);
 
 
 /**

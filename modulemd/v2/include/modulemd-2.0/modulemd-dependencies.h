@@ -101,6 +101,19 @@ modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
 
 
 /**
+ * modulemd_dependencies_clear_buildtime_dependencies:
+ * @self: This #ModuleDependencies
+ *
+ * Remove all buildtime dependencies from this @ModulemdDependencies object
+ *
+ * Since 2.5
+ */
+void
+modulemd_dependencies_clear_buildtime_dependencies (
+  ModulemdDependencies *self);
+
+
+/**
  * modulemd_dependencies_get_buildtime_modules_as_strv: (rename-to modulemd_dependencies_get_buildtime_modules)
  * @self: This #ModulemdDependencies
  *
@@ -155,6 +168,18 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
 void
 modulemd_dependencies_set_empty_runtime_dependencies_for_module (
   ModulemdDependencies *self, const gchar *module_name);
+
+
+/**
+ * modulemd_dependencies_clear_runtime_dependencies:
+ * @self: This #ModuleDependencies
+ *
+ * Remove all runtime dependencies from this @ModulemdDependencies object
+ *
+ * Since 2.5
+ */
+void
+modulemd_dependencies_clear_runtime_dependencies (ModulemdDependencies *self);
 
 
 /**

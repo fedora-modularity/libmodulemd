@@ -167,6 +167,14 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm)
 }
 
 
+void
+modulemd_profile_clear_rpms (ModulemdProfile *self)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+  g_hash_table_remove_all (self->rpms);
+}
+
+
 gchar **
 modulemd_profile_get_rpms_as_strv (ModulemdProfile *self)
 {

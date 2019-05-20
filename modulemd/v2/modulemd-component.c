@@ -212,6 +212,17 @@ modulemd_component_add_buildafter (ModulemdComponent *self, const gchar *key)
   g_hash_table_add (priv->buildafter, g_strdup (key));
 }
 
+void
+modulemd_component_clear_buildafter (ModulemdComponent *self)
+{
+  g_return_if_fail (MODULEMD_IS_COMPONENT (self));
+
+  ModulemdComponentPrivate *priv =
+    modulemd_component_get_instance_private (self);
+
+  g_hash_table_remove_all (priv->buildafter);
+}
+
 
 GStrv
 modulemd_component_get_buildafter_as_strv (ModulemdComponent *self)

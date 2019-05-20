@@ -290,6 +290,17 @@ modulemd_module_stream_v2_remove_module_component (
 
 
 /**
+ * modulemd_module_stream_v2_clear_module_components:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all module components from this module stream.
+ */
+void
+modulemd_module_stream_v2_clear_module_components (
+  ModulemdModuleStreamV2 *self);
+
+
+/**
  * modulemd_module_stream_v2_remove_rpm_component:
  * @self: (in): This #ModulemdModuleStreamV2 object.
  * @component_name: (in): The name of the component to remove from the module
@@ -302,6 +313,16 @@ modulemd_module_stream_v2_remove_module_component (
 void
 modulemd_module_stream_v2_remove_rpm_component (ModulemdModuleStreamV2 *self,
                                                 const gchar *component_name);
+
+
+/**
+ * modulemd_module_stream_v2_clear_rpm_components:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all RPM components from this module stream.
+ */
+void
+modulemd_module_stream_v2_clear_rpm_components (ModulemdModuleStreamV2 *self);
 
 
 /**
@@ -413,6 +434,31 @@ modulemd_module_stream_v2_remove_module_license (ModulemdModuleStreamV2 *self,
 
 
 /**
+ * modulemd_module_stream_v2_clear_content_licenses:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all content licenses.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v2_clear_content_licenses (
+  ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_clear_module_licenses:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all module licenses.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v2_clear_module_licenses (ModulemdModuleStreamV2 *self);
+
+
+/**
  * modulemd_module_stream_v2_get_content_licenses_as_strv: (rename-to modulemd_module_stream_v2_get_content_licenses)
  * @self: (in): This #ModulemdModuleStreamV2 object.
  *
@@ -521,6 +567,18 @@ modulemd_module_stream_v2_remove_rpm_api (ModulemdModuleStreamV2 *self,
 
 
 /**
+ * modulemd_module_stream_v2_clear_rpm_api:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all RPMs from the list of stable public API.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v2_clear_rpm_api (ModulemdModuleStreamV2 *self);
+
+
+/**
  * modulemd_module_stream_v2_get_rpm_api_as_strv: (rename-to modulemd_module_stream_v2_get_rpm_api)
  * @self: (in): This #ModulemdModuleStreamV2 object.
  *
@@ -555,6 +613,18 @@ modulemd_module_stream_v2_add_rpm_artifact (ModulemdModuleStreamV2 *self,
 void
 modulemd_module_stream_v2_remove_rpm_artifact (ModulemdModuleStreamV2 *self,
                                                const gchar *nevr);
+
+
+/**
+ * modulemd_module_stream_v2_clear_rpm_artifacts:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all NPM NEVRs from the list of artifacts.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v2_clear_rpm_artifacts (ModulemdModuleStreamV2 *self);
 
 
 /**
@@ -628,6 +698,18 @@ modulemd_module_stream_v2_add_rpm_filter (ModulemdModuleStreamV2 *self,
 void
 modulemd_module_stream_v2_remove_rpm_filter (ModulemdModuleStreamV2 *self,
                                              const gchar *rpm);
+
+
+/**
+ * modulemd_module_stream_v2_clear_rpm_filters:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all RPMs from the filter list.
+ *
+ * Since: 2.5
+ */
+void
+modulemd_module_stream_v2_clear_rpm_filters (ModulemdModuleStreamV2 *self);
 
 
 /**

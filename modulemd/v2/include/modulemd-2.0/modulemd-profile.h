@@ -136,6 +136,18 @@ modulemd_profile_remove_rpm (ModulemdProfile *self, const gchar *rpm);
 
 
 /**
+ * modulemd_profile_clear_rpms:
+ * @self: This #ModulemdProfile
+ *
+ * Remove all RPMs from this profile
+ *
+ * Since: 2.5
+ */
+void
+modulemd_profile_clear_rpms (ModulemdProfile *self);
+
+
+/**
  * modulemd_profile_get_rpms_as_strv: (rename-to modulemd_profile_get_rpms)
  * @self: This #ModulemdProfile
  *

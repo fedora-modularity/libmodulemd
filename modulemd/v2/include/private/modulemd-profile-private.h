@@ -73,7 +73,7 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
  *
  * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
  *
- * Since: 2.3
+ * Since: 2.5
  */
 gboolean
 modulemd_profile_equals_wrapper (const void *a, const void *b);

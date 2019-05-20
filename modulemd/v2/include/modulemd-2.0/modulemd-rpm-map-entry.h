@@ -68,34 +68,6 @@ modulemd_rpm_map_entry_copy (ModulemdRpmMapEntry *self);
 
 
 /**
- * modulemd_rpm_map_entry_equals_wrapper:
- * @a: const void pointer
- * @b: const void pointer
- *
- * Returns: TRUE if the two entries contain equivalent data. FALSE if they
- * differ.
- *
- * Since: 2.5
- */
-gboolean
-modulemd_rpm_map_entry_equals_wrapper (const void *a, const void *b);
-
-
-/**
- * modulemd_RpmMapEntry_hash_table_equals_wrapper:
- * @a: const void pointer
- * @b: const void pointer
- *
- * Returns: TRUE if the two entries contain equivalent data. FALSE if they
- * differ.
- *
- * Since: 2.5
- */
-gboolean
-modulemd_RpmMapEntry_hash_table_equals_wrapper (const void *a, const void *b);
-
-
-/**
  * modulemd_rpm_map_entry_equals:
  * @self: A #ModuleRpmMapEntry
  * @other: Another #ModulemdRpmMapEntry

@@ -217,6 +217,8 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
   for (guint i = 0; i < v2_self_1->dependencies->len; i++)
     {
+      /*Ordering is important for the dependencies, 
+       so that each array index must be the same.*/
       if (!modulemd_dependencies_equals (
             g_ptr_array_index (v2_self_1->dependencies, i),
             g_ptr_array_index (v2_self_2->dependencies, i)))

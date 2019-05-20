@@ -127,7 +127,7 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
  *
  * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
  *
- * Since: 2.3
+ * Since: 2.5
  */
 gboolean
 modulemd_component_equals_wrapper (const void *a, const void *b);

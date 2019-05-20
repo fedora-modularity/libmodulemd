@@ -54,9 +54,8 @@ modulemd_component_equals_wrapper (const void *a, const void *b)
   g_return_val_if_fail (MODULEMD_IS_COMPONENT ((ModulemdComponent *)a), FALSE);
   g_return_val_if_fail (MODULEMD_IS_COMPONENT ((ModulemdComponent *)b), FALSE);
 
-  return modulemd_component_equals (
-    MODULEMD_COMPONENT ((ModulemdComponent *)a),
-    MODULEMD_COMPONENT ((ModulemdComponent *)b));
+  return modulemd_component_equals ((ModulemdComponent *)a,
+                                    (ModulemdComponent *)b);
 }
 
 

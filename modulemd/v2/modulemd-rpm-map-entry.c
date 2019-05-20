@@ -74,9 +74,8 @@ modulemd_rpm_map_entry_equals_wrapper (const void *a, const void *b)
   g_return_val_if_fail (MODULEMD_IS_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)b),
                         FALSE);
 
-  return modulemd_rpm_map_entry_equals (
-    MODULEMD_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)a),
-    MODULEMD_RPM_MAP_ENTRY ((ModulemdRpmMapEntry *)b));
+  return modulemd_rpm_map_entry_equals ((ModulemdRpmMapEntry *)a,
+                                        (ModulemdRpmMapEntry *)b);
 }
 
 gboolean

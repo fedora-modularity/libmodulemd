@@ -377,6 +377,442 @@ module_stream_test_nsvca (ModuleStreamFixture *fixture,
 
 
 static void
+module_stream_v1_test_equals (ModuleStreamFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream_1 = NULL;
+  g_autoptr (ModulemdModuleStreamV1) stream_2 = NULL;
+  g_autoptr (ModulemdProfile) profile_1 = NULL;
+  g_autoptr (ModulemdServiceLevel) servicelevel_1 = NULL;
+  g_autoptr (ModulemdServiceLevel) servicelevel_2 = NULL;
+  g_autoptr (ModulemdComponentModule) component_1 = NULL;
+  g_autoptr (ModulemdComponentRpm) component_2 = NULL;
+
+  /*Test equality of 2 streams with same string constants*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_set_community (stream_1, "community_1");
+  modulemd_module_stream_v1_set_description (stream_1, "description_1");
+  modulemd_module_stream_v1_set_documentation (stream_1, "documentation_1");
+  modulemd_module_stream_v1_set_summary (stream_1, "summary_1");
+  modulemd_module_stream_v1_set_tracker (stream_1, "tracker_1");
+
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_set_community (stream_2, "community_1");
+  modulemd_module_stream_v1_set_description (stream_2, "description_1");
+  modulemd_module_stream_v1_set_documentation (stream_2, "documentation_1");
+  modulemd_module_stream_v1_set_summary (stream_2, "summary_1");
+  modulemd_module_stream_v1_set_tracker (stream_2, "tracker_1");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with certain different string constants*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_set_community (stream_1, "community_1");
+  modulemd_module_stream_v1_set_description (stream_1, "description_1");
+  modulemd_module_stream_v1_set_documentation (stream_1, "documentation_1");
+  modulemd_module_stream_v1_set_summary (stream_1, "summary_1");
+  modulemd_module_stream_v1_set_tracker (stream_1, "tracker_1");
+
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_set_community (stream_2, "community_1");
+  modulemd_module_stream_v1_set_description (stream_2, "description_2");
+  modulemd_module_stream_v1_set_documentation (stream_2, "documentation_1");
+  modulemd_module_stream_v1_set_summary (stream_2, "summary_2");
+  modulemd_module_stream_v1_set_tracker (stream_2, "tracker_2");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with same hashtable sets*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_rpm_api (stream_1, "rpm_1");
+  modulemd_module_stream_v1_add_rpm_api (stream_1, "rpm_2");
+  modulemd_module_stream_v1_add_module_license (stream_1, "module_a");
+  modulemd_module_stream_v1_add_module_license (stream_1, "module_b");
+  modulemd_module_stream_v1_add_content_license (stream_1, "content_a");
+  modulemd_module_stream_v1_add_content_license (stream_1, "content_b");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_1, "artifact_a");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_1, "artifact_b");
+  modulemd_module_stream_v1_add_rpm_filter (stream_1, "filter_a");
+  modulemd_module_stream_v1_add_rpm_filter (stream_1, "filter_b");
+
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_rpm_api (stream_2, "rpm_1");
+  modulemd_module_stream_v1_add_rpm_api (stream_2, "rpm_2");
+  modulemd_module_stream_v1_add_module_license (stream_2, "module_a");
+  modulemd_module_stream_v1_add_module_license (stream_2, "module_b");
+  modulemd_module_stream_v1_add_content_license (stream_2, "content_a");
+  modulemd_module_stream_v1_add_content_license (stream_2, "content_b");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_2, "artifact_a");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_2, "artifact_b");
+  modulemd_module_stream_v1_add_rpm_filter (stream_2, "filter_a");
+  modulemd_module_stream_v1_add_rpm_filter (stream_2, "filter_b");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with different hashtable sets*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_rpm_api (stream_1, "rpm_1");
+  modulemd_module_stream_v1_add_rpm_api (stream_1, "rpm_2");
+  modulemd_module_stream_v1_add_module_license (stream_1, "module_a");
+  modulemd_module_stream_v1_add_module_license (stream_1, "module_b");
+  modulemd_module_stream_v1_add_content_license (stream_1, "content_a");
+  modulemd_module_stream_v1_add_content_license (stream_1, "content_b");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_1, "artifact_a");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_1, "artifact_b");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_1, "artifact_c");
+  modulemd_module_stream_v1_add_rpm_filter (stream_1, "filter_a");
+  modulemd_module_stream_v1_add_rpm_filter (stream_1, "filter_b");
+
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_rpm_api (stream_2, "rpm_1");
+  modulemd_module_stream_v1_add_module_license (stream_2, "module_a");
+  modulemd_module_stream_v1_add_module_license (stream_2, "module_b");
+  modulemd_module_stream_v1_add_content_license (stream_2, "content_a");
+  modulemd_module_stream_v1_add_content_license (stream_2, "content_b");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_2, "artifact_a");
+  modulemd_module_stream_v1_add_rpm_artifact (stream_2, "artifact_b");
+  modulemd_module_stream_v1_add_rpm_filter (stream_2, "filter_a");
+  modulemd_module_stream_v1_add_rpm_filter (stream_2, "filter_b");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with same dependencies*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    stream_1, "testmodule", "stable");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    stream_1, "testmodule", "latest");
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    stream_2, "testmodule", "stable");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    stream_2, "testmodule", "latest");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with different dependencies*/
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    stream_1, "test", "stable");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    stream_1, "testmodule", "latest");
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    stream_2, "testmodule", "stable");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    stream_2, "testmodule", "not_latest");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with same hashtables*/
+  profile_1 = modulemd_profile_new ("testprofile");
+  component_1 = modulemd_component_module_new ("testmodule");
+  servicelevel_1 = modulemd_service_level_new ("foo");
+
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_profile (stream_1, profile_1);
+  modulemd_module_stream_v1_add_component (stream_1,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v1_add_servicelevel (stream_1, servicelevel_1);
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_profile (stream_2, profile_1);
+  modulemd_module_stream_v1_add_component (stream_2,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v1_add_servicelevel (stream_2, servicelevel_1);
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&profile_1);
+  g_clear_object (&component_1);
+  g_clear_object (&servicelevel_1);
+
+  /*Test equality of 2 streams with different hashtables*/
+  profile_1 = modulemd_profile_new ("testprofile");
+  component_1 = modulemd_component_module_new ("testmodule");
+  component_2 = modulemd_component_rpm_new ("something");
+  servicelevel_1 = modulemd_service_level_new ("foo");
+  servicelevel_2 = modulemd_service_level_new ("bar");
+
+  stream_1 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_profile (stream_1, profile_1);
+  modulemd_module_stream_v1_add_component (stream_1,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v1_add_servicelevel (stream_1, servicelevel_1);
+  stream_2 = modulemd_module_stream_v1_new (NULL, NULL);
+  modulemd_module_stream_v1_add_profile (stream_2, profile_1);
+  modulemd_module_stream_v1_add_component (stream_2,
+                                           (ModulemdComponent *)component_2);
+  modulemd_module_stream_v1_add_servicelevel (stream_2, servicelevel_2);
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&profile_1);
+  g_clear_object (&component_1);
+  g_clear_object (&component_2);
+  g_clear_object (&servicelevel_1);
+  g_clear_object (&servicelevel_2);
+}
+
+
+static void
+module_stream_v2_test_equals (ModuleStreamFixture *fixture,
+                              gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream_1 = NULL;
+  g_autoptr (ModulemdModuleStreamV2) stream_2 = NULL;
+  g_autoptr (ModulemdProfile) profile_1 = NULL;
+  g_autoptr (ModulemdServiceLevel) servicelevel_1 = NULL;
+  g_autoptr (ModulemdServiceLevel) servicelevel_2 = NULL;
+  g_autoptr (ModulemdComponentModule) component_1 = NULL;
+  g_autoptr (ModulemdComponentRpm) component_2 = NULL;
+  g_autoptr (ModulemdDependencies) dep_1 = NULL;
+  g_autoptr (ModulemdDependencies) dep_2 = NULL;
+  g_autoptr (ModulemdRpmMapEntry) entry_1 = NULL;
+
+  /*Test equality of 2 streams with same string constants*/
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_community (stream_1, "community_1");
+  modulemd_module_stream_v2_set_description (stream_1, "description_1");
+  modulemd_module_stream_v2_set_documentation (stream_1, "documentation_1");
+  modulemd_module_stream_v2_set_summary (stream_1, "summary_1");
+  modulemd_module_stream_v2_set_tracker (stream_1, "tracker_1");
+
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_community (stream_2, "community_1");
+  modulemd_module_stream_v2_set_description (stream_2, "description_1");
+  modulemd_module_stream_v2_set_documentation (stream_2, "documentation_1");
+  modulemd_module_stream_v2_set_summary (stream_2, "summary_1");
+  modulemd_module_stream_v2_set_tracker (stream_2, "tracker_1");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with certain different string constants*/
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_community (stream_1, "community_1");
+  modulemd_module_stream_v2_set_description (stream_1, "description_1");
+  modulemd_module_stream_v2_set_documentation (stream_1, "documentation_1");
+  modulemd_module_stream_v2_set_summary (stream_1, "summary_1");
+  modulemd_module_stream_v2_set_tracker (stream_1, "tracker_1");
+
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_community (stream_2, "community_1");
+  modulemd_module_stream_v2_set_description (stream_2, "description_2");
+  modulemd_module_stream_v2_set_documentation (stream_2, "documentation_1");
+  modulemd_module_stream_v2_set_summary (stream_2, "summary_2");
+  modulemd_module_stream_v2_set_tracker (stream_2, "tracker_2");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with same hashtable sets*/
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_rpm_api (stream_1, "rpm_1");
+  modulemd_module_stream_v2_add_rpm_api (stream_1, "rpm_2");
+  modulemd_module_stream_v2_add_module_license (stream_1, "module_a");
+  modulemd_module_stream_v2_add_module_license (stream_1, "module_b");
+  modulemd_module_stream_v2_add_content_license (stream_1, "content_a");
+  modulemd_module_stream_v2_add_content_license (stream_1, "content_b");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_a");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_b");
+  modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_a");
+  modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_b");
+
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_rpm_api (stream_2, "rpm_1");
+  modulemd_module_stream_v2_add_rpm_api (stream_2, "rpm_2");
+  modulemd_module_stream_v2_add_module_license (stream_2, "module_a");
+  modulemd_module_stream_v2_add_module_license (stream_2, "module_b");
+  modulemd_module_stream_v2_add_content_license (stream_2, "content_a");
+  modulemd_module_stream_v2_add_content_license (stream_2, "content_b");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_a");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_b");
+  modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_a");
+  modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_b");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with different hashtable sets*/
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_rpm_api (stream_1, "rpm_1");
+  modulemd_module_stream_v2_add_rpm_api (stream_1, "rpm_2");
+  modulemd_module_stream_v2_add_module_license (stream_1, "module_a");
+  modulemd_module_stream_v2_add_module_license (stream_1, "module_b");
+  modulemd_module_stream_v2_add_content_license (stream_1, "content_a");
+  modulemd_module_stream_v2_add_content_license (stream_1, "content_b");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_a");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_b");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_c");
+  modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_a");
+  modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_b");
+
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_rpm_api (stream_2, "rpm_1");
+  modulemd_module_stream_v2_add_module_license (stream_2, "module_a");
+  modulemd_module_stream_v2_add_module_license (stream_2, "module_b");
+  modulemd_module_stream_v2_add_content_license (stream_2, "content_a");
+  modulemd_module_stream_v2_add_content_license (stream_2, "content_b");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_a");
+  modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_b");
+  modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_a");
+  modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_b");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /*Test equality of 2 streams with same hashtables*/
+  profile_1 = modulemd_profile_new ("testprofile");
+  component_1 = modulemd_component_module_new ("testmodule");
+  servicelevel_1 = modulemd_service_level_new ("foo");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_profile (stream_1, profile_1);
+  modulemd_module_stream_v2_add_component (stream_1,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v2_add_servicelevel (stream_1, servicelevel_1);
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_profile (stream_2, profile_1);
+  modulemd_module_stream_v2_add_component (stream_2,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v2_add_servicelevel (stream_2, servicelevel_1);
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&profile_1);
+  g_clear_object (&component_1);
+  g_clear_object (&servicelevel_1);
+
+  /*Test equality of 2 streams with different hashtables*/
+  profile_1 = modulemd_profile_new ("testprofile");
+  component_1 = modulemd_component_module_new ("testmodule");
+  component_2 = modulemd_component_rpm_new ("something");
+  servicelevel_1 = modulemd_service_level_new ("foo");
+  servicelevel_2 = modulemd_service_level_new ("bar");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_profile (stream_1, profile_1);
+  modulemd_module_stream_v2_add_component (stream_1,
+                                           (ModulemdComponent *)component_1);
+  modulemd_module_stream_v2_add_servicelevel (stream_1, servicelevel_1);
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_profile (stream_2, profile_1);
+  modulemd_module_stream_v2_add_component (stream_2,
+                                           (ModulemdComponent *)component_2);
+  modulemd_module_stream_v2_add_servicelevel (stream_2, servicelevel_2);
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&profile_1);
+  g_clear_object (&component_1);
+  g_clear_object (&component_2);
+  g_clear_object (&servicelevel_1);
+  g_clear_object (&servicelevel_2);
+
+  /*Test equality of 2 streams with same dependencies*/
+  dep_1 = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (dep_1, "foo", "stable");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream_1, dep_1);
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream_2, dep_1);
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&dep_1);
+
+  /*Test equality of 2 streams with different dependencies*/
+  dep_1 = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (dep_1, "foo", "stable");
+  dep_2 = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (dep_2, "foo", "latest");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream_1, dep_1);
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream_2, dep_2);
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&dep_1);
+  g_clear_object (&dep_2);
+
+  /*Test equality of 2 streams with same rpm artifact map entry*/
+  entry_1 = modulemd_rpm_map_entry_new (
+    "bar", 0, "1.23", "1.module_deadbeef", "x86_64");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream_1, entry_1, "sha256", "baddad");
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream_2, entry_1, "sha256", "baddad");
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&entry_1);
+
+  /*Test equality of 2 streams with different rpm artifact map entry*/
+  entry_1 = modulemd_rpm_map_entry_new (
+    "bar", 0, "1.23", "1.module_deadbeef", "x86_64");
+
+  stream_1 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream_1, entry_1, "sha256", "baddad");
+  stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream_2, entry_1, "sha256", "badmom");
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+  g_clear_object (&entry_1);
+}
+
+
+static void
 module_stream_v1_test_dependencies (ModuleStreamFixture *fixture,
                                     gconstpointer user_data)
 {
@@ -1164,6 +1600,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_nsvca,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/equals",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_equals,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/equals",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_equals,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/dependencies",

@@ -967,6 +967,47 @@ module_index_test_custom_write (ModuleIndexFixture *fixture,
 }
 
 
+static void
+module_index_test_get_default_streams (void)
+{
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GHashTable) default_streams = NULL;
+
+  yaml_path =
+    g_strdup_printf ("%s/modulemd/v2/tests/test_data/f29-updates.yaml",
+                     g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_nonnull (yaml_path);
+
+  index = modulemd_module_index_new ();
+  g_assert_nonnull (index);
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+
+  default_streams =
+    modulemd_module_index_get_default_streams_as_hash_table (index, NULL);
+  g_assert_nonnull (default_streams);
+
+  g_assert_cmpint (g_hash_table_size (default_streams), ==, 3);
+
+  g_assert_true (g_hash_table_contains (default_streams, "bat"));
+  g_assert_cmpstr (g_hash_table_lookup (default_streams, "bat"), ==, "latest");
+
+  g_assert_true (g_hash_table_contains (default_streams, "dwm"));
+  g_assert_cmpstr (g_hash_table_lookup (default_streams, "dwm"), ==, "6.1");
+
+  g_assert_true (g_hash_table_contains (default_streams, "stratis"));
+  g_assert_cmpstr (g_hash_table_lookup (default_streams, "stratis"), ==, "1");
+
+  g_assert_false (g_hash_table_contains (default_streams, "nodejs"));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1039,6 +1080,9 @@ main (int argc, char *argv[])
               NULL,
               module_index_test_custom_write,
               NULL);
+
+  g_test_add_func ("/modulemd/v2/module/index/get_default_streams",
+                   module_index_test_get_default_streams);
 
   return g_test_run ();
 }

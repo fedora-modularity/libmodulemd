@@ -259,6 +259,14 @@ GStrv
 modulemd_module_index_get_module_names (ModulemdModuleIndex *self);
 
 /**
+ * modulemd_module_index_get_default_streams: (skip)
+ */
+GHashTable *
+modulemd_module_index_get_default_streams (ModulemdModuleIndex *self,
+                                           const gchar *intent);
+
+
+/**
  * modulemd_rpm_map_entry_get_nevra: (skip)
  */
 gchar *

@@ -13,6 +13,7 @@
 
 #include <errno.h>
 #include <glib.h>
+#include <inttypes.h>
 #include <yaml.h>
 
 #include "modulemd-module-index.h"
@@ -770,6 +771,53 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
     }
 
   return TRUE;
+}
+
+
+GHashTable *
+modulemd_module_index_get_default_streams_as_hash_table (
+  ModulemdModuleIndex *self, const gchar *intent)
+{
+  GHashTable *defaults = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+  ModulemdDefaults *defs = NULL;
+  const gchar *def_stream_name = NULL;
+
+  defaults = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  g_hash_table_iter_init (&iter, self->modules);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      defs = modulemd_module_get_defaults (MODULEMD_MODULE (value));
+      if (defs)
+        {
+          switch (modulemd_defaults_get_mdversion (defs))
+            {
+            case MD_DEFAULTS_VERSION_ONE:
+              def_stream_name = modulemd_defaults_v1_get_default_stream (
+                MODULEMD_DEFAULTS_V1 (defs), intent);
+              if (def_stream_name)
+                {
+                  /* This module has a default stream. Add it to the table */
+                  g_hash_table_replace (
+                    defaults, g_strdup (key), g_strdup (def_stream_name));
+                }
+              break;
+
+            default:
+              /* This should be impossible and suggests that we somehow added
+               * a corrupt defaults object. We will ignore it and continue to
+               * return valid entries.
+               */
+              g_warning ("Encountered an unknown defaults mdversion: %" PRIu64,
+                         modulemd_defaults_get_mdversion (defs));
+              break;
+            }
+        }
+    }
+
+  return defaults;
 }
 
 

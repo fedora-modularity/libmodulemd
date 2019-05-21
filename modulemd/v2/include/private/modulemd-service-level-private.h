@@ -65,3 +65,15 @@ gboolean
 modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
                                   yaml_emitter_t *emitter,
                                   GError **error);
+
+/**
+ * modulemd_service_level_equals_wrapper:
+ * @a: A void pointer
+ * @b: A void pointer
+ *
+ * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
+ *
+ * Since: 2.5
+ */
+gboolean
+modulemd_service_level_equals_wrapper (const void *a, const void *b);

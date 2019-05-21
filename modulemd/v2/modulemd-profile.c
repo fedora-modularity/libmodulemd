@@ -47,6 +47,16 @@ static GParamSpec *properties[N_PROPS];
 
 
 gboolean
+modulemd_profile_equals_wrapper (const void *a, const void *b)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE ((ModulemdProfile *)a), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_PROFILE ((ModulemdProfile *)b), FALSE);
+
+  return modulemd_profile_equals ((ModulemdProfile *)a, (ModulemdProfile *)b);
+}
+
+
+gboolean
 modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self_1), FALSE);

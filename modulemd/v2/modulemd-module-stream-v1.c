@@ -963,6 +963,126 @@ modulemd_module_stream_v1_get_xmd (ModulemdModuleStreamV1 *self)
 
 
 static gboolean
+modulemd_module_stream_v1_equals (ModulemdModuleStream *self_1,
+                                  ModulemdModuleStream *self_2)
+{
+  ModulemdModuleStreamV1 *v1_self_1 = NULL;
+  ModulemdModuleStreamV1 *v1_self_2 = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self_1), FALSE);
+  v1_self_1 = MODULEMD_MODULE_STREAM_V1 (self_1);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self_2), FALSE);
+  v1_self_2 = MODULEMD_MODULE_STREAM_V1 (self_2);
+
+  if (!MODULEMD_MODULE_STREAM_CLASS (modulemd_module_stream_v1_parent_class)
+         ->equals (self_1, self_2))
+    {
+      return FALSE;
+    }
+
+  /*Check property equality*/
+  if (g_strcmp0 (v1_self_1->community, v1_self_2->community) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v1_self_1->description, v1_self_2->description) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v1_self_1->documentation, v1_self_2->documentation) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v1_self_1->summary, v1_self_2->summary) != 0)
+    return FALSE;
+
+  if (g_strcmp0 (v1_self_1->tracker, v1_self_2->tracker) != 0)
+    return FALSE;
+
+  if (!modulemd_buildopts_equals (v1_self_1->buildopts, v1_self_2->buildopts))
+    return FALSE;
+
+  if (!modulemd_hash_table_equals (v1_self_1->rpm_components,
+                                   v1_self_2->rpm_components,
+                                   modulemd_component_equals_wrapper))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (v1_self_1->module_components,
+                                   v1_self_2->module_components,
+                                   modulemd_component_equals_wrapper))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v1_self_1->module_licenses,
+                                           v1_self_2->module_licenses))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v1_self_1->content_licenses,
+                                           v1_self_2->content_licenses))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (v1_self_1->profiles,
+                                   v1_self_2->profiles,
+                                   modulemd_profile_equals_wrapper))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v1_self_1->rpm_api,
+                                           v1_self_2->rpm_api))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v1_self_1->rpm_artifacts,
+                                           v1_self_2->rpm_artifacts))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v1_self_1->rpm_filters,
+                                           v1_self_2->rpm_filters))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (v1_self_1->servicelevels,
+                                   v1_self_2->servicelevels,
+                                   modulemd_service_level_equals_wrapper))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (
+        v1_self_1->buildtime_deps, v1_self_2->buildtime_deps, g_str_equal))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (
+        v1_self_1->runtime_deps, v1_self_2->runtime_deps, g_str_equal))
+    {
+      return FALSE;
+    }
+
+  if (v1_self_1->xmd == NULL && v1_self_2->xmd == NULL)
+    return TRUE;
+
+  if (v1_self_1->xmd == NULL || v1_self_2->xmd == NULL)
+    return FALSE;
+
+  if (g_variant_equal (v1_self_1->xmd, v1_self_2->xmd) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+
+static gboolean
 modulemd_module_stream_v1_validate (ModulemdModuleStream *self, GError **error)
 {
   GHashTableIter iter;
@@ -1222,6 +1342,7 @@ modulemd_module_stream_v1_class_init (ModulemdModuleStreamV1Class *klass)
 
   stream_class->get_mdversion = modulemd_module_stream_v1_get_mdversion;
   stream_class->copy = modulemd_module_stream_v1_copy;
+  stream_class->equals = modulemd_module_stream_v1_equals;
   stream_class->validate = modulemd_module_stream_v1_validate;
   stream_class->depends_on_stream =
     modulemd_module_stream_v1_depends_on_stream;

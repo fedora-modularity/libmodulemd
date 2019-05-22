@@ -392,6 +392,29 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
 
 
 /**
+ * modulemd_module_index_get_default_streams_as_hash_table: (rename-to modulemd_module_index_get_default_streams)
+ * @self: (in): This #ModulemdModuleIndex
+ * @intent: (in) (nullable): The name of the system intent whose default stream
+ * will be retrieved. If left NULL or the specified intent has no separate
+ * default, it will return the generic default stream for this module.
+ *
+ * Get a dictionary of all modules in the index that have a default stream.
+ *
+ * This function cannot fail, but may return an empty (non-NULL) GHashTable.
+ *
+ * Returns: (transfer container) (element-type utf8 utf8): A #GHashTable with
+ * the module name as the key and the default stream as the value for all
+ * modules with a default stream in the index. Modules without a default stream
+ * will not appear in this table.
+ *
+ * Since: 2.5
+ */
+GHashTable *
+modulemd_module_index_get_default_streams_as_hash_table (
+  ModulemdModuleIndex *self, const gchar *intent);
+
+
+/**
  * modulemd_module_index_add_translation:
  * @self: This #ModulemdModuleIndex
  * @translation: The #ModulemdTranslation object to add to the index.

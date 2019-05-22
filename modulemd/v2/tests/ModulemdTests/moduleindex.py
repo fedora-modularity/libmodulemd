@@ -99,6 +99,23 @@ profiles:
             "obligatory lorem ipsum dolor sit amet goes right here.")
         self.assertEqual(stream.get_description("en_GB"), "An example module.")
 
+    def test_get_default_streams(self):
+        idx = Modulemd.ModuleIndex.new()
+        idx.update_from_file(path.join(self.source_root,
+                                       "modulemd/v2/tests/test_data/f29.yaml"),
+                             True)
+
+        default_streams = idx.get_default_streams()
+        self.assertIsNotNone(default_streams)
+
+        self.assertIn("dwm", default_streams.keys())
+        self.assertEquals("6.1", default_streams["dwm"])
+
+        self.assertIn("stratis", default_streams.keys())
+        self.assertEquals("1", default_streams["stratis"])
+
+        self.assertNotIn("nodejs", default_streams.keys())
+
 
 if __name__ == '__main__':
     unittest.main()

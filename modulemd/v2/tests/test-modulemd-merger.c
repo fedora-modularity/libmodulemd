@@ -90,8 +90,8 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
 
   /* Resolve the merge, which should deduplicate all entries */
   merged_index = modulemd_module_index_merger_resolve (merger, &error);
+  g_assert_no_error (error);
   g_assert_nonnull (merged_index);
-  g_assert_null (error);
 
   deduplicated = modulemd_module_index_dump_to_string (merged_index, &error);
   g_assert_nonnull (deduplicated);

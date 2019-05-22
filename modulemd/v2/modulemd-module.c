@@ -329,10 +329,17 @@ modulemd_module_add_stream (ModulemdModule *self,
        * favor of the new one.
        */
 
-      /* TODO: Do a full equality check on the two ModuleStreams once
-       * https://github.com/fedora-modularity/libmodulemd/issues/186 is
-       * fixed.
-       */
+      if (!modulemd_module_stream_equals (old, stream))
+        {
+          /* The two streams have matching NSVCA, but differ in content */
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MODULEMD_ERROR_VALIDATE,
+                       "Encountered two streams with matching NSVCA %s but "
+                       "differing content",
+                       modulemd_module_stream_get_NSVCA_as_string (stream));
+          return MD_MODULESTREAM_VERSION_ERROR;
+        }
 
       /* First, drop the existing stream */
       g_ptr_array_remove (self->streams, old);

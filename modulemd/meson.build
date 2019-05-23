@@ -315,5 +315,5 @@ if valgrind.found()
     test ('valgrind', python3,
           env : test_env,
           args : modulemd_valgrind_scripts,
-          timeout : 600)
+          timeout : 1200)
 endif

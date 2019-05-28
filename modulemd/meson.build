@@ -231,6 +231,7 @@ test_v2_python_scripts = files(
     'v2/tests/ModulemdTests/defaultsv1.py',
     'v2/tests/ModulemdTests/dependencies.py',
     'v2/tests/ModulemdTests/merger.py',
+    'v2/tests/ModulemdTests/module.py',
     'v2/tests/ModulemdTests/moduleindex.py',
     'v2/tests/ModulemdTests/modulestream.py',
     'v2/tests/ModulemdTests/profile.py',

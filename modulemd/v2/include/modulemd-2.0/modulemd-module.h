@@ -131,8 +131,8 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
  * @arch: (nullable): The processor architecture of the stream to retrieve. If
  * NULL, the architecture is not included in the search.
  *
- * Returns: (transfer full) (element-type ModulemdModuleStream): The list of
- * stream objects matching the requested parameters. This function cannot
+ * Returns: (transfer container) (element-type ModulemdModuleStream): The list
+ * of stream objects matching the requested parameters. This function cannot
  * fail, but it may return a zero-length list if no matches were found. The
  * returned streams will be in a predictable order, sorted first by stream
  * name, then by version (highest to lowest), then by context and finally by

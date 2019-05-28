@@ -392,6 +392,22 @@ test ('dependencies_python2_release', python2,
       env : py_test_release_env,
       args : dependencies_python_script)
 
+# -- Test Modulemd.Module (Python) -- #
+module_python_script = files('tests/ModulemdTests/module.py')
+test ('module_python3_debug', python3,
+      env : py_test_env,
+      args : module_python_script)
+test ('module_python3_release', python3,
+      env : py_test_release_env,
+      args : module_python_script)
+
+test ('module_python2_debug', python2,
+      env : py_test_env,
+      args : module_python_script)
+test ('module_python2_release', python2,
+      env : py_test_release_env,
+      args : module_python_script)
+
 # -- Test Modulemd.ModuleIndex (Python) -- #
 moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
 test ('moduleindex_python3_debug', python3,
@@ -401,7 +417,6 @@ test ('moduleindex_python3_release', python3,
       env : py_test_release_env,
       args : moduleindex_python_script)
 
-moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
 test ('moduleindex_python2_debug', python2,
       env : py_test_env,
       args : moduleindex_python_script)

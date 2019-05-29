@@ -15,6 +15,7 @@
 import os
 import sys
 import git
+import subprocess
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -29,6 +30,8 @@ repo = git.Repo(script_dir,
 if (repo.is_dirty()):
     print("Autoformatter was not run before submitting. Please run "
           "`ninja test`, amend the commit and resubmit this pull request.")
+    res = subprocess.run(['git', 'diff'], capture_output=True, text=True)
+    print(res.stdout, file=sys.stderr)
     sys.exit(os.EX_USAGE)
 
 sys.exit(os.EX_OK)

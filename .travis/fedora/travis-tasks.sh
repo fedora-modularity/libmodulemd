@@ -11,7 +11,7 @@ arr=($JOB_NAME)
 os_name=${arr[0]:-Fedora}
 release=${arr[1]:-rawhide}
 
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
+DIRTY_REPO_CHECK_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
 
 
 pushd /builddir/
@@ -20,7 +20,7 @@ pushd /builddir/
 meson --buildtype=debug \
       -Dbuild_api_v1=true \
       -Dbuild_api_v2=true \
-      $COMMON_MESON_ARGS \
+      $DIRTY_REPO_CHECK_ARGS \
       travis
 
 set +e
@@ -46,7 +46,6 @@ else
           -Dbuild_api_v1=false \
           -Dbuild_api_v2=true \
           -Dskip_introspection=true \
-          $COMMON_MESON_ARGS \
           travis_scanbuild
 
     pushd travis_scanbuild
@@ -57,7 +56,6 @@ fi
 meson --buildtype=debug \
       -Dbuild_api_v1=true \
       -Dbuild_api_v2=true \
-      $COMMON_MESON_ARGS \
       coverity
 
 pushd coverity
@@ -78,7 +76,7 @@ popd #coverity
 
 meson --buildtype=debug \
       -Dbuild_api_v1=true \
-      $COMMON_MESON_ARGS \
+      -Dbuild_api_v2=true \
       build_rpm
 
 pushd build_rpm
@@ -107,7 +105,6 @@ meson --buildtype=debug \
       -Dbuild_api_v1=true \
       -Dbuild_api_v2=false \
       -Dtest_installed_lib=true \
-      $COMMON_MESON_ARGS \
       installed_lib_tests_v1
 
 pushd installed_lib_tests_v1
@@ -138,7 +135,6 @@ meson --buildtype=debug \
       -Dbuild_api_v1=false \
       -Dbuild_api_v2=true \
       -Dtest_installed_lib=true \
-      $COMMON_MESON_ARGS \
       installed_lib_tests_v2
 
 pushd installed_lib_tests_v2

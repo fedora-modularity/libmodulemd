@@ -310,7 +310,8 @@ if build_api_v2
     import_header_script = find_program('common/tests/test-import-headers.sh')
     test ('test_v2_import_headers', import_header_script,
           env : test_env,
-          args : modulemd_v2_hdrs)
+          args : modulemd_v2_hdrs,
+          timeout : 300)
 endif
 
 if valgrind.found()

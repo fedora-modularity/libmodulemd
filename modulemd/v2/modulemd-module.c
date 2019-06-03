@@ -389,6 +389,28 @@ modulemd_module_add_stream (ModulemdModule *self,
 }
 
 
+GStrv
+modulemd_module_get_stream_names_as_strv (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  if (!self->streams)
+    return NULL;
+
+  g_autoptr (GHashTable) stream_names =
+    g_hash_table_new (g_str_hash, g_str_equal);
+
+  for (guint i = 0; i < self->streams->len; i++)
+    {
+      g_hash_table_add (stream_names,
+                        (void *)modulemd_module_stream_get_stream_name (
+                          g_ptr_array_index (self->streams, i)));
+    }
+
+  return modulemd_ordered_str_keys_as_strv (stream_names);
+}
+
+
 GPtrArray *
 modulemd_module_get_all_streams (ModulemdModule *self)
 {

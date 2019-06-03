@@ -331,6 +331,84 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
 
 
 static void
+module_test_get_stream_names (ModuleFixture *fixture, gconstpointer user_data)
+{
+  g_autoptr (ModulemdModule) m = NULL;
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_auto (GStrv) list = NULL;
+
+  /*Test module with no streams*/
+  m = modulemd_module_new ("testmodule");
+  list = modulemd_module_get_stream_names_as_strv (m);
+  g_assert_nonnull (list);
+  g_assert_cmpint (g_strv_length (list), ==, 0);
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&m);
+
+  /*Test module with all same stream names*/
+  m = modulemd_module_new ("testmodule");
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+
+  list = modulemd_module_get_stream_names_as_strv (m);
+  g_assert_nonnull (list);
+  g_assert_cmpint (g_strv_length (list), ==, 1);
+
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&m);
+
+  /*Test module with all different stream names*/
+  m = modulemd_module_new ("testmodule");
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream2");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream3");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+
+  list = modulemd_module_get_stream_names_as_strv (m);
+  g_assert_nonnull (list);
+  g_assert_cmpint (g_strv_length (list), ==, 3);
+
+  g_assert_cmpstr (list[0], ==, "stream1");
+  g_assert_cmpstr (list[1], ==, "stream2");
+  g_assert_cmpstr (list[2], ==, "stream3");
+
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&m);
+
+  /*Test module with some same/different stream names*/
+  m = modulemd_module_new ("testmodule");
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream2");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+
+  list = modulemd_module_get_stream_names_as_strv (m);
+  g_assert_nonnull (list);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+
+  g_assert_cmpstr (list[0], ==, "stream1");
+  g_assert_cmpstr (list[1], ==, "stream2");
+
+  g_clear_pointer (&list, g_strfreev);
+  g_clear_object (&m);
+}
+
+
+static void
 modulemd_test_remove_streams (void)
 {
   g_autoptr (ModulemdModuleIndex) f29 = NULL;
@@ -437,6 +515,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_test_defaults,
+              NULL);
+
+  g_test_add ("/modulemd/v2/module/stream_names",
+              ModuleFixture,
+              NULL,
+              NULL,
+              module_test_get_stream_names,
               NULL);
 
   g_test_add ("/modulemd/v2/module/streams",

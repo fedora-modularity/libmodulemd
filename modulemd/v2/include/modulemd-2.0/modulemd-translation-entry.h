@@ -130,7 +130,7 @@ modulemd_translation_entry_get_description (ModulemdTranslationEntry *self);
 
 /**
  * modulemd_translation_entry_get_profiles_as_strv: (rename-to modulemd_translation_entry_get_profiles)
- * @self: This #ModuleTranslationEntry
+ * @self: This #ModulemdTranslationEntry
  *
  * Get a list of profiles that have descriptions.
  *
@@ -145,7 +145,7 @@ modulemd_translation_entry_get_profiles_as_strv (
 
 /**
  * modulemd_translation_entry_set_profile_description:
- * @self: This #ModuleTranslationEntry
+ * @self: This #ModulemdTranslationEntry
  * @profile_name: The name of the profile.
  * @profile_description: (nullable): The translated description of the profile.
  *
@@ -162,7 +162,7 @@ modulemd_translation_entry_set_profile_description (
 
 /**
  * module_translation_entry_get_profile_description:
- * @self: This #ModuleTranslationEntry
+ * @self: This #ModulemdTranslationEntry
  * @profile_name: The name of the profile whose description is being translated.
  *
  * Returns: (transfer none): The description for the specified profile.

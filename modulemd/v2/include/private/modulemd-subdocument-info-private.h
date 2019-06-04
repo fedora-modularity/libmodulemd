@@ -23,7 +23,7 @@
  * SECTION: modulemd-subdocument-info-private
  * @title: Modulemd.SubdocumentInfo (Private)
  * @stability: Private
- * @short_description: #Modulemd.SubdocumentInfo methods that should be used only
+ * @short_description: #ModulemdSubdocumentInfo methods that should be used only
  * by internal consumers.
  */
 

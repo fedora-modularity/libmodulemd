@@ -18,7 +18,7 @@
  * SECTION: modulemd-rpm-map-entry-private
  * @title: Modulemd.RpmMapEntry (Private)
  * @stability: Private
- * @short_description: #Modulemd.RpmMapEntry methods that should be used only
+ * @short_description: #ModulemdRpmMapEntry methods that should be used only
  * by internal consumers
  */
 

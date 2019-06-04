@@ -51,9 +51,9 @@ modulemd_component_rpm_new (void);
 
 /**
  * modulemd_component_rpm_set_arches:
- * @arches: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
- * package should be available. An empty set means  the package is available
- * on all supported architectures.
+ * @arches: (nullable): a #ModulemdSimpleSet: A set of architectures on which
+ * this RPM package should be available. An empty set means the package is
+ * available on all supported architectures.
  *
  * Since: 1.0
  */
@@ -163,9 +163,9 @@ modulemd_component_rpm_dup_cache (ModulemdComponentRpm *self);
 
 /**
  * modulemd_component_rpm_set_multilib:
- * @multilib: (nullable): a #ModuleSimpleSet: A set of architectures on which this RPM
- * package should be available as multilib. An empty set means the package is
- * not available as multilib on any architecture.
+ * @multilib: (nullable): a #ModulemdSimpleSet: A set of architectures on which
+ * this RPM package should be available as multilib. An empty set means the
+ * package is not available as multilib on any architecture.
  *
  * Since: 1.0
  */

@@ -22,7 +22,7 @@
  * SECTION: modulemd-component-rpm-private
  * @title: Modulemd.ComponentRpm (Private)
  * @stability: Private
- * @short_description: #Modulemd.ComponentRpm methods that should be used only
+ * @short_description: #ModulemdComponentRpm methods that should be used only
  * by internal consumers
  */
 

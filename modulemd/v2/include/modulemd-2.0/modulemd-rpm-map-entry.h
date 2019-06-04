@@ -69,7 +69,7 @@ modulemd_rpm_map_entry_copy (ModulemdRpmMapEntry *self);
 
 /**
  * modulemd_rpm_map_entry_equals:
- * @self: A #ModuleRpmMapEntry
+ * @self: A #ModulemdRpmMapEntry
  * @other: Another #ModulemdRpmMapEntry
  *
  * Returns: TRUE if the two entries contain equivalent data. FALSE if they

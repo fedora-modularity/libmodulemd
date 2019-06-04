@@ -90,7 +90,7 @@ modulemd_module_stream_v2_get_arch (ModulemdModuleStreamV2 *self);
 /**
  * modulemd_module_stream_v2_set_buildopts:
  * @self: (in): This #ModulemdModuleStreamV2 object.
- * @buildopts: (in) (transfer none): A #ModulemdBuildOpts object describing
+ * @buildopts: (in) (transfer none): A #ModulemdBuildopts object describing
  * build options that apply globally to components in this module.
  *
  * Set build options for this module's components.

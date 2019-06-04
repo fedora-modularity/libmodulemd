@@ -22,7 +22,7 @@
  * SECTION: modulemd-service-level-private
  * @title: Modulemd.ServiceLevel (Private)
  * @stability: Private
- * @short_description: #Modulemd.ServiceLevel methods that should be used only
+ * @short_description: #ModulemdServiceLevel methods that should be used only
  * by internal consumers.
  */
 

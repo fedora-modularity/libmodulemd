@@ -32,7 +32,8 @@ G_DECLARE_FINAL_TYPE (
 /**
  * modulemd_buildopts_new:
  *
- * Returns: (transfer full): A newly-allocated #ModuleBuildopts. This object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdBuildopts. This object
+ * must be freed with g_object_unref().
  *
  * Since: 2.0
  */

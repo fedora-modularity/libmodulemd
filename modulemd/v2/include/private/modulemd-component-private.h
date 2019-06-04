@@ -22,7 +22,7 @@
  * SECTION: modulemd-component-private
  * @title: Modulemd.Component (Private)
  * @stability: Private
- * @short_description: #Modulemd.Component methods that should be used only
+ * @short_description: #ModulemdComponent methods that should be used only
  * by internal consumers
  */
 

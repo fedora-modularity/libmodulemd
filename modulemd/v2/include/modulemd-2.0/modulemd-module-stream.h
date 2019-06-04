@@ -31,12 +31,12 @@ G_BEGIN_DECLS
 
 /**
  * ModulemdModuleStreamVersionEnum:
- * @MD_MODULESTREAM_VERSION_ONE: Represents v1 of the #Modulemd.ModuleStream
+ * @MD_MODULESTREAM_VERSION_ONE: Represents v1 of the #ModulemdModuleStream
  * metadata format.
- * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #Modulemd.ModuleStream
+ * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #ModulemdModuleStream
  * metadata format.
  * @MD_MODULESTREAM_VERSION_LATEST: Represents the highest-supported version of
- * the #Modulemd.ModuleStream metadata format.
+ * the #ModulemdModuleStream metadata format.
  *
  * Since: 2.0
  */
@@ -91,7 +91,7 @@ struct _ModulemdModuleStreamClass
 
 /**
  * modulemd_module_stream_new:
- * @mdversion: (in): The metadata version of ModuleStream to create.
+ * @mdversion: (in): The metadata version of #ModulemdModuleStream to create.
  * @module_name: (in) (nullable): The name of the module.
  * @module_stream: (in) (nullable): The name of this stream. Optional.
  *
@@ -369,7 +369,8 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self);
  * modulemd_module_stream_set_arch:
  * @self: (in): This #ModulemdModuleStream.
  * @arch: (in) (nullable): Module architecture.
- * Indicates to which processor architecture this ModulemdModuleStream applies.
+ * Indicates to which processor architecture this #ModulemdModuleStream
+ * applies.
  *
  * Since: 2.2
  */
@@ -383,7 +384,8 @@ modulemd_module_stream_set_arch (ModulemdModuleStream *self,
  * @self: (in): This #ModulemdModuleStream.
  *
  * Returns: (transfer none): Module architecture.
- * Indicates to which processor architecture this ModulemdModuleStream applies.
+ * Indicates to which processor architecture this #ModulemdModuleStream
+ * applies.
  *
  * Since: 2.2
  */
@@ -396,7 +398,7 @@ modulemd_module_stream_get_arch (ModulemdModuleStream *self);
  * @self: (in): This #ModulemdModuleStream.
  *
  * Retrieves a representation of the module name, stream name, version and
- * context of this #ModuleStream in the form
+ * context of this #ModulemdModuleStream in the form
  * `module_name:stream_name:version:context`. Note that this excludes the
  * architecture of the module stream and as such is not guaranteed to be unique
  * within a repository.

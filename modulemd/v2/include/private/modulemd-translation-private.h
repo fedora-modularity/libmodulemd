@@ -20,10 +20,10 @@
 #include "modulemd-subdocument-info.h"
 
 /**
- * SECTION: modulemd-profile-private
- * @title: Modulemd.Profile (Private)
+ * SECTION: modulemd-translation-private
+ * @title: Modulemd.Translation (Private)
  * @stability: Private
- * @short_description: #Modulemd.Profile methods that should be used only
+ * @short_description: #ModulemdTranslation methods that should be used only
  * by internal consumers.
  */
 

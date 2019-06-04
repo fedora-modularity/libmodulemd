@@ -22,7 +22,7 @@
  * SECTION: modulemd-dependencies-private
  * @title: Modulemd.Dependencies (Private)
  * @stability: Private
- * @short_description: #Modulemd.Dependencies methods that should be used only
+ * @short_description: #ModulemdDependencies methods that should be used only
  * by internal consumers.
  */
 

@@ -71,7 +71,7 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
  * @override: (in): In the event that the contents cannot be merged, this
  * argument specifies whether the contents of @from will supersede those from
  * @into. For specifics of how this works, see the Description section for
- * #ModulemdIndexMerger.
+ * #ModulemdModuleIndexMerger.
  * @error: (out): If the merge fails, this will return a #GError explaining the
  * reason for it.
  *

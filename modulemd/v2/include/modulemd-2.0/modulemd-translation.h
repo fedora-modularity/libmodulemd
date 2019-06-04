@@ -37,7 +37,8 @@ G_DECLARE_FINAL_TYPE (
  * @module_stream: The name of the module stream to which these translations apply.
  * @modified: The last modified time represented as a 64-bit integer (such as 201807011200)
  *
- * Returns: (transfer full): A newly-allocated #ModuleTranslation. This object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdTranslation. This
+ * object must be freed with g_object_unref().
  *
  * Since: 2.0
  */

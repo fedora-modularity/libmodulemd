@@ -24,7 +24,7 @@ G_BEGIN_DECLS
  * SECTION: modulemd-defaults-v1-private
  * @title: Modulemd.DefaultsV1 (Private)
  * @stability: private
- * @short_description: #ModulemdDefault methods that should only be used by
+ * @short_description: #ModulemdDefaults methods that should only be used by
  * internal consumers.
  */
 

@@ -47,8 +47,8 @@ modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2);
  * modulemd_profile_new:
  * @name: (not nullable): The name of this profile.
  *
- * Returns: (transfer full): A newly-allocated #ModuleProfile. This object must
- * be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdProfile. This object
+ * must be freed with g_object_unref().
  *
  * Since: 2.0
  */

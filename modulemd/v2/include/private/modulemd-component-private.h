@@ -30,7 +30,7 @@
 /**
  * modulemd_component_parse_buildafter:
  * @self: This #ModulemdComponent
- * @emitter: (inout): A libyaml emitter object positioned just after the
+ * @parser: (inout): A libyaml parser object positioned just after the
  * "buildafter" key in a #ModulemdComponent section of a YAML document.
  * @error: (out): A #GError that will return the reason for a parse failure.
  *
@@ -46,7 +46,7 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
 /**
  * modulemd_component_parse_buildonly:
  * @self: This #ModulemdComponent
- * @emitter: (inout): A libyaml emitter object positioned just after the
+ * @parser: (inout): A libyaml parser object positioned just after the
  * "buildonly" key in a #ModulemdComponent section of a YAML document.
  * @error: (out): A #GError that will return the reason for a parse failure.
  *

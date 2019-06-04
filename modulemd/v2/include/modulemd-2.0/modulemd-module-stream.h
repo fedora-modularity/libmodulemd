@@ -31,6 +31,9 @@ G_BEGIN_DECLS
 
 /**
  * ModulemdModuleStreamVersionEnum:
+ * @MD_MODULESTREAM_VERSION_ERROR: Represents an error handling module stream
+ * version.
+ * @MD_MODULESTREAM_VERSION_UNSET: Represents an unset module stream version.
  * @MD_MODULESTREAM_VERSION_ONE: Represents v1 of the #ModulemdModuleStream
  * metadata format.
  * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #ModulemdModuleStream

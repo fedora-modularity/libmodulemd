@@ -112,9 +112,9 @@ G_BEGIN_DECLS
  * complete successfully. Additionally, it should be noted that the combined
  * metadata in any #ModulemdModuleIndex will have all of its component parts
  * upgraded to match the highest version of those objects seen. So for example
- * if the repodata has a mix of v1 and v2 #ModuleStream objects, the index will
- * contain only v2 objects (with the v1 objects automatically upgraded
- * internally).
+ * if the repodata has a mix of v1 and v2 #ModulemdModuleStream objects, the
+ * index will contain only v2 objects (with the v1 objects automatically
+ * upgraded internally).
  *
  * At this point, we can start operating on the retrieved data. This guide will
  * give only a brief overview of the most common operations. See the API
@@ -176,8 +176,8 @@ G_BEGIN_DECLS
  * syntactically and referentially.
  *
  * Also available is `Modulemd.ModuleStreamVersionEnum.LATEST` which will
- * always represent the highest-supported ModuleStream version. This may change
- * at any time.
+ * always represent the highest-supported version of the
+ * #ModulemdModuleStream metadata format. This may change at any time.
  */
 
 

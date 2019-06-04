@@ -22,7 +22,7 @@
  * SECTION: modulemd-profile-private
  * @title: Modulemd.Profile (Private)
  * @stability: Private
- * @short_description: #Modulemd.Profile methods that should be used only
+ * @short_description: #ModulemdProfile methods that should be used only
  * by internal consumers.
  */
 

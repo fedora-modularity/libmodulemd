@@ -372,8 +372,8 @@ modulemd_module_dup_community (ModulemdModule *self)
 
 /**
  * modulemd_module_set_content_licenses:
- * @licenses: (nullable): A #ModuleSimpleSet: The licenses under which the components of
- * this module are released.
+ * @licenses: (nullable): A #ModulemdSimpleSet: The licenses under which the
+ * components of this module are released.
  *
  * Sets the content_licenses property.
  *
@@ -1005,8 +1005,8 @@ modulemd_module_dup_module_components (ModulemdModule *self)
 
 /**
  * modulemd_module_set_module_licenses:
- * @licenses: (nullable): A #ModuleSimpleSet: The licenses under which the components of
- * this module are released.
+ * @licenses: (nullable): A #ModulemdSimpleSet: The licenses under which the
+ * components of this module are released.
  *
  * Sets the module_licenses property.
  *
@@ -1344,8 +1344,8 @@ modulemd_module_dup_requires (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_api:
- * @apis: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that form the
- * public API for this module.
+ * @apis: (nullable): A #ModulemdSimpleSet: The set of binary RPM packages that
+ * form the public API for this module.
  *
  * Sets the rpm_api property.
  *
@@ -1420,8 +1420,9 @@ modulemd_module_dup_rpm_api (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_artifacts:
- * @artifacts: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that are
- * contained in this module. Generally populated by the module build service.
+ * @artifacts: (nullable): A #ModulemdSimpleSet: The set of binary RPM packages
+ * that are contained in this module. Generally populated by the module build
+ * service.
  *
  * Sets the rpm_artifacts property.
  *
@@ -1726,8 +1727,8 @@ modulemd_module_dup_rpm_components (ModulemdModule *self)
 
 /**
  * modulemd_module_set_rpm_filter:
- * @filter: (nullable): A #ModuleSimpleSet: The set of binary RPM packages that are
- * explicitly filtered out of this module.
+ * @filter: (nullable): A #ModulemdSimpleSet: The set of binary RPM packages
+ * that are explicitly filtered out of this module.
  *
  * Sets the rpm_artifacts property.
  *

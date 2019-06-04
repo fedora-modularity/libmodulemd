@@ -119,8 +119,8 @@ modulemd_module_index_merger_new (void);
 /**
  * modulemd_module_index_merger_associate_index:
  * @self: (in): This #ModulemdModuleIndexMerger object.
- * @index: (in) (transfer none): A #ModuleIndex, usually constructed by reading
- * the module metadata from a repository with
+ * @index: (in) (transfer none): A #ModulemdModuleIndex, usually constructed by
+ * reading the module metadata from a repository with
  * modulemd_module_index_update_from_file(),
  * modulemd_module_index_update_from_string(), or
  * `modulemd_module_index_update_from_stream()`. This function take a reference

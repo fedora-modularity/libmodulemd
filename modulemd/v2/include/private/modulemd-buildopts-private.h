@@ -22,7 +22,7 @@
  * SECTION: modulemd-buildopts-private
  * @title: Modulemd.Buildopts (Private)
  * @stability: Private
- * @short_description: #Modulemd.Buildopts methods that should be used only
+ * @short_description: #ModulemdBuildopts methods that should be used only
  * by internal consumers.
  */
 

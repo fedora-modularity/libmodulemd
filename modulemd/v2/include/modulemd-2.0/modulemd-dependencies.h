@@ -32,7 +32,8 @@ G_DECLARE_FINAL_TYPE (
 /**
  * modulemd_dependencies_new:
  *
- * Returns: (transfer full): A newly-allocated #ModuleDependencies. This object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdDependencies. This
+ * object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -88,7 +89,7 @@ modulemd_dependencies_add_buildtime_stream (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_empty_buildtime_dependencies_for_module:
- * @self: This #ModuleDependencies
+ * @self: This #ModulemdDependencies
  * @module_name: The name of the module to add dependencies on.
  *
  * Adds a module and inserts an empty list for it as buildtime dependency.
@@ -102,9 +103,9 @@ modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
 
 /**
  * modulemd_dependencies_clear_buildtime_dependencies:
- * @self: This #ModuleDependencies
+ * @self: This #ModulemdDependencies
  *
- * Remove all buildtime dependencies from this @ModulemdDependencies object
+ * Remove all buildtime dependencies from this #ModulemdDependencies object
  *
  * Since 2.5
  */
@@ -158,7 +159,7 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_empty_runtime_dependencies_for_module:
- * @self: This #ModuleDependencies
+ * @self: This #ModulemdDependencies
  * @module_name: The name of the module to add dependencies on.
  *
  * Adds a module and inserts an empty list for it as runtime dependency.
@@ -172,9 +173,9 @@ modulemd_dependencies_set_empty_runtime_dependencies_for_module (
 
 /**
  * modulemd_dependencies_clear_runtime_dependencies:
- * @self: This #ModuleDependencies
+ * @self: This #ModulemdDependencies
  *
- * Remove all runtime dependencies from this @ModulemdDependencies object
+ * Remove all runtime dependencies from this #ModulemdDependencies object
  *
  * Since 2.5
  */

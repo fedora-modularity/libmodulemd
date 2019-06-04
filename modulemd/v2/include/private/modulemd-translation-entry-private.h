@@ -22,7 +22,7 @@
  * SECTION: modulemd-translation-entry-private
  * @title: Modulemd.TranslationEntry (Private)
  * @stability: Private
- * @short_description: #Modulemd.TranslationEntry methods that should be used only
+ * @short_description: #ModulemdTranslationEntry methods that should be used only
  * by internal consumers.
  */
 

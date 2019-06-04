@@ -365,8 +365,8 @@ modulemd_modulestream_peek_community (ModulemdModuleStream *self);
 
 /**
  * modulemd_modulestream_set_content_licenses:
- * @licenses: (nullable) (transfer none): A #ModuleSimpleSet: The licenses under
- * which the components of this module are released.
+ * @licenses: (nullable) (transfer none): A #ModulemdSimpleSet: The licenses
+ * under which the components of this module are released.
  *
  * Sets the content_licenses property.
  *
@@ -744,8 +744,8 @@ modulemd_modulestream_peek_module_components (ModulemdModuleStream *self);
 
 /**
  * modulemd_modulestream_set_module_licenses:
- * @licenses: (transfer none) (nullable): A #ModuleSimpleSet: The licenses under
- * which the components of this module are released.
+ * @licenses: (transfer none) (nullable): A #ModulemdSimpleSet: The licenses
+ * under which the components of this module are released.
  *
  * Sets the module_licenses property.
  *
@@ -940,8 +940,8 @@ modulemd_modulestream_peek_requires (ModulemdModuleStream *self);
 
 /**
  * modulemd_modulestream_set_rpm_api:
- * @apis: (transfer none) (nullable): A #ModuleSimpleSet: The set of binary RPM
- * packages that form the public API for this module.
+ * @apis: (transfer none) (nullable): A #ModulemdSimpleSet: The set of binary
+ * RPM packages that form the public API for this module.
  *
  * Sets the rpm_api property.
  *
@@ -984,9 +984,9 @@ modulemd_modulestream_peek_rpm_api (ModulemdModuleStream *self);
 
 /**
  * modulemd_modulestream_set_rpm_artifacts:
- * @artifacts: (transfer none) (nullable): A #ModuleSimpleSet: The set of binary
- * RPM packages that are contained in this module. Generally populated by the
- * module build service.
+ * @artifacts: (transfer none) (nullable): A #ModulemdSimpleSet: The set of
+ * binary RPM packages that are contained in this module. Generally populated
+ * by the module build service.
  *
  * Sets the rpm_artifacts property.
  *
@@ -1095,7 +1095,7 @@ modulemd_modulestream_peek_rpm_components (ModulemdModuleStream *self);
 
 /**
  * modulemd_modulestream_set_rpm_filter:
- * @filter: (transfer none) (nullable): A #ModuleSimpleSet: The set of binary
+ * @filter: (transfer none) (nullable): A #ModulemdSimpleSet: The set of binary
  * RPM packages that are explicitly filtered out of this module.
  *
  * Sets the rpm_artifacts property.

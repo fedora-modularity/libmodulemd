@@ -175,7 +175,8 @@ modulemd_profile_dup_name (ModulemdProfile *self);
 
 /**
  * modulemd_profile_set_rpms:
- * @rpms: (nullable): A #ModuleSimpleSet: The rpms to be installed by this profile.
+ * @rpms: (nullable): A #ModulemdSimpleSet: The rpms to be installed by this
+ * profile.
  *
  * Assigns the set of RPMs that will be installed when this profile is
  * activated.

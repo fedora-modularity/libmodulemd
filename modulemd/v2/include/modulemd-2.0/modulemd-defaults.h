@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 /**
  * ModulemdDefaultsVersionEnum:
  * @MD_DEFAULTS_VERSION_ERROR: Represents an error handling mdversion.
+ * @MD_DEFAULTS_VERSION_UNSET: Represents an unset mdversion.
  * @MD_DEFAULTS_VERSION_ONE: Represents v1 of the #ModulemdDefaults metadata
  * format.
  * @MD_DEFAULTS_VERSION_LATEST: Represents the highest-supported version of the

@@ -1,0 +1,11 @@
+*.pyc
+*.pyo
+*.pot
+*.po
+*.yaml
+*~
+*.swp
+.idea/*
+/build/*
+/dist/*
+mmdzanata.egg-info/*

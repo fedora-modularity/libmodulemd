@@ -37,17 +37,19 @@ ModulemdModuleIndex objects. This is done as follows:
 
 ## C
 ```C
-ModulemdModuleIndex * fedora_index = modulemd_module_index_new();
-gboolean ret = modulemd_module_index_update_from_string(fedora_index,
-                                               fedora_yaml,
-                                               &failures,
-                                               &error);
+ModulemdModuleIndex * fedora_index = modulemd_module_index_new ();
+gboolean ret = modulemd_module_index_update_from_string (fedora_index,
+                                                         fedora_yaml,
+                                                         TRUE,
+                                                         &failures,
+                                                         &error);
 
-ModulemdModuleIndex * updates_index = modulemd_module_index_new();
-gboolean ret = modulemd_module_index_update_from_string(updates_index,
-                                               updates_yaml,
-                                               &failures,
-                                               &error);
+ModulemdModuleIndex * updates_index = modulemd_module_index_new ();
+gboolean ret2 = modulemd_module_index_update_from_string (updates_index,
+                                                          updates_yaml,
+                                                          TRUE,
+                                                          &failures,
+                                                          &error);
 ```
 
 ## Python
@@ -67,7 +69,7 @@ indexes into a combined one:
 
 ## C
 ```C
-ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new();
+ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new ();
 
 modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
 modulemd_module_index_merger_associate_index (merger, updates_index, 0);
@@ -101,10 +103,10 @@ specification for a full list of information that can be retrieved.
 ## Discover the default stream for a particular module.
 ## C
 ```C
- ModulemdModule * module =  modulemd_module_index_get_module(merged_index, "modulename");
+ ModulemdModule * module =  modulemd_module_index_get_module (merged_index, "modulename");
  ModulemdDefaults * defaults = modulemd_module_get_defaults (module);
- printf ("Default stream for modulename is %s\n", 
-       modulemd_defaults_get_module_name (defaults));
+ printf ("Default stream for modulename is %s\n",
+         modulemd_defaults_v1_get_default_stream (MODULEMD_DEFAULTS_V1 (defaults), NULL));
   ```
 
 ## Python
@@ -114,7 +116,7 @@ specification for a full list of information that can be retrieved.
  print ('Default stream for modulename is %s' % (
        defaults.get_default_stream())
   ```
- 
+
 ## Get the list of RPMs defining the public API for a particular module NSVCA
 First, query the Modulemd.ModuleIndex for the module with a given name.
 ## C
@@ -131,7 +133,7 @@ Then, query the Modulemd.Module for the Modulemd.ModuleStream associated with th
 (name-stream-version-context-architechture identifier).
 ## C
 ```C
-ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA(module, "modulestream", 0, "deadbeef", "coolarch", &error);
+ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
 ```
 
 ## Python
@@ -142,7 +144,7 @@ ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA(module, "mod
 Lastly, read the RPM API from the Modulemd.ModuleStream. Here, `api_list` is a list of strings containing package names.
 ## C
 ```C
-GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv(stream); 
+GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (MODULEMD_MODULE_STREAM_V2 (stream));
 ```
 
 ## Python
@@ -155,7 +157,7 @@ GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv(stream);
 ```C
 ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
 ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
-GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (stream);
+GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (MODULEMD_MODULE_STREAM_V2 (stream));
 
 for (gint i = 0; i < deps_list->len; i++)
   {

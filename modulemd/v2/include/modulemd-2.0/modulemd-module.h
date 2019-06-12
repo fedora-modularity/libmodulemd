@@ -34,7 +34,7 @@ G_DECLARE_FINAL_TYPE (
 
 
 /**
- * modulemd_module_get_stream_names_as_strv
+ * modulemd_module_get_stream_names_as_strv: (rename-to modulemd_module_get_stream_names)
  * @self: This #ModulemdModule
  *
  * Returns: (transfer full): An ordered list of stream names in this module.

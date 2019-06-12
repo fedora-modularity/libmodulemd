@@ -89,6 +89,12 @@ modulemd_dependencies_get_runtime_streams (ModulemdDependencies *self,
                                            const gchar *module);
 
 /**
+ * modulemd_module_get_stream_names: (skip)
+ */
+GStrv
+modulemd_module_get_stream_names (ModulemdModule *self);
+
+/**
  * modulemd_module_get_streams_by_stream_name: (skip)
  */
 GPtrArray *

@@ -707,6 +707,10 @@ gnome.gtkdoc(
     install_dir: 'modulemd-2.0',
     src_dir : './modulemd/v2',
     main_xml : 'modulemd-v2-docs.xml',
+    gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
+    dependencies : [
+        modulemd_v2_dep,
+    ],
     install : true,
 )
 

@@ -14,8 +14,10 @@
 #include <glib.h>
 #include <yaml.h>
 
+#include "modulemd-module-stream.h"
 #include "modulemd-profile.h"
 #include "private/glib-extensions.h"
+#include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-profile-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -30,6 +32,8 @@ struct _ModulemdProfile
   gchar *description;
 
   GHashTable *rpms;
+
+  ModulemdModuleStream *owner;
 };
 
 G_DEFINE_TYPE (ModulemdProfile, modulemd_profile, G_TYPE_OBJECT)
@@ -155,7 +159,22 @@ modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
-  /* TODO: retrieve translated strings */
+  /* Retrieve translated strings, if available */
+  if (self->owner)
+    {
+      ModulemdTranslationEntry *entry =
+        modulemd_module_stream_get_translation_entry (self->owner, locale);
+
+      if (entry != NULL)
+        {
+          const gchar *translation =
+            modulemd_translation_entry_get_profile_description (entry,
+                                                                self->name);
+
+          if (translation != NULL)
+            return translation;
+        }
+    }
 
   return self->description;
 }
@@ -191,6 +210,16 @@ modulemd_profile_get_rpms_as_strv (ModulemdProfile *self)
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);
 
   return modulemd_ordered_str_keys_as_strv (self->rpms);
+}
+
+
+void
+modulemd_profile_set_owner (ModulemdProfile *self, ModulemdModuleStream *owner)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM (owner));
+
+  self->owner = owner;
 }
 
 

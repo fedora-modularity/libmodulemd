@@ -522,9 +522,12 @@ modulemd_module_stream_v1_add_profile (ModulemdModuleStreamV1 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (self));
   g_return_if_fail (MODULEMD_IS_PROFILE (profile));
 
+  ModulemdProfile *copied_profile = modulemd_profile_copy (profile);
+  modulemd_profile_set_owner (copied_profile, MODULEMD_MODULE_STREAM (self));
+
   g_hash_table_replace (self->profiles,
                         g_strdup (modulemd_profile_get_name (profile)),
-                        modulemd_profile_copy (profile));
+                        copied_profile);
 }
 
 

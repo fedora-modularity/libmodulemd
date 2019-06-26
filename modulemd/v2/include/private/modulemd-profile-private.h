@@ -16,6 +16,7 @@
 #include <glib-object.h>
 #include <yaml.h>
 
+#include "modulemd-module-stream.h"
 #include "modulemd-profile.h"
 
 /**
@@ -77,3 +78,16 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
  */
 gboolean
 modulemd_profile_equals_wrapper (const void *a, const void *b);
+
+
+/**
+ * modulemd_profile_set_owner:
+ * @self: This #ModulemdProfile
+ * @owner: A #ModulemdModuleStream that will own this profile. Used to look up
+ * translations internally.
+ *
+ * Since: 2.6
+ */
+void
+modulemd_profile_set_owner (ModulemdProfile *self,
+                            ModulemdModuleStream *owner);

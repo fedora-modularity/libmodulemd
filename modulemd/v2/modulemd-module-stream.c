@@ -1065,11 +1065,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
   /* get_mdversion() must be implemented by the child class */
   klass->get_mdversion = NULL;
 
-  /**
-   * ModulemdModuleStream:mdversion:
-   *
-   * The metadata version of this #ModulemdModuleStream object.
-   */
   properties[PROP_MDVERSION] = g_param_spec_uint64 (
     "mdversion",
     "Metadata Version",
@@ -1079,11 +1074,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     0,
     G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
-  /**
-   * ModulemdModuleStream:module-name:
-   *
-   * The name of the module providing this stream.
-   */
   properties[PROP_MODULE_NAME] = g_param_spec_string (
     "module-name",
     "Module Name",
@@ -1091,11 +1081,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
-  /**
-   * ModulemdModuleStream:stream-name:
-   *
-   * The name of this module stream.
-   */
   properties[PROP_STREAM_NAME] = g_param_spec_string (
     "stream-name",
     "Stream Name",
@@ -1103,11 +1088,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
-  /**
-   * ModulemdModuleStream:version:
-   *
-   * The version of this module stream.
-   */
   properties[PROP_VERSION] = g_param_spec_uint64 (
     "version",
     "Module Stream Version",
@@ -1117,13 +1097,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     0,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 
-  /**
-   * ModulemdModuleStream:context:
-   *
-   * The context of this module stream. Distinguishes between streams with
-   * the same version but different dependencies due to module stream
-   * expansion.
-   */
   properties[PROP_CONTEXT] = g_param_spec_string (
     "context",
     "Module Stream Context",
@@ -1133,11 +1106,6 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 
-  /**
-   * ModulemdModuleStream:arch:
-   *
-   * The processor architecture of this module stream.
-   */
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",
     "Module Stream Architecture",

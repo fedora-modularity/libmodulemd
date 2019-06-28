@@ -1140,7 +1140,7 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
    */
   properties[PROP_ARCH] = g_param_spec_string (
     "arch",
-    "Module Stream Architetcture",
+    "Module Stream Architecture",
     "The processor architecture of this module stream.",
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);

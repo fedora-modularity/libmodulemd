@@ -22,7 +22,7 @@ G_BEGIN_DECLS
  * SECTION: modulemd-component-rpm
  * @title: Modulemd.ComponentRpm
  * @stability: stable
- * @short_description: A rpm component that goes into a module stream.
+ * @short_description: An rpm component that goes into a module stream.
  */
 #define MODULEMD_TYPE_COMPONENT_RPM (modulemd_component_rpm_get_type ())
 
@@ -51,7 +51,10 @@ modulemd_component_rpm_new (const gchar *key);
  * @self: This #ModulemdComponentRpm object.
  * @arch: An architecture on which this package should be available.
  *
- * Restrict the list of architectures on which this RPM will be available. It may be called any number of times to indicate support on additional architectures. Use `reset_arches()` to return to "all architectures".
+ * Restrict the list of architectures on which this RPM will be available. It
+ * may be called any number of times to indicate support on additional
+ * architectures. Use modulemd_component_rpm_reset_arches() to return to "all
+ * architectures".
  *
  * Since: 2.0
  */
@@ -89,7 +92,9 @@ modulemd_component_rpm_get_arches_as_strv (ModulemdComponentRpm *self);
  * @self: This #ModulemdComponentRpm object.
  * @arch: An architecture on which this package should be multilib.
  *
- * Add an architectures on which this RPM will be multilib. It may be called any number of times. Use `reset_multilib_arches()` to return to "no architectures".
+ * Add an architectures on which this RPM will be multilib. It may be called
+ * any number of times. Use modulemd_component_rpm_reset_multilib_arches() to
+ * return to "no architectures".
  *
  * Since: 2.0
  */

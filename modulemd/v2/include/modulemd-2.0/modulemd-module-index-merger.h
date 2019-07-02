@@ -110,7 +110,7 @@ G_DECLARE_FINAL_TYPE (ModulemdModuleIndexMerger,
  * Returns: (transfer full): A newly-allocated Modulemd.ModuleIndexMerger
  * object.
  *
- * Since:2.0
+ * Since: 2.0
  */
 ModulemdModuleIndexMerger *
 modulemd_module_index_merger_new (void);

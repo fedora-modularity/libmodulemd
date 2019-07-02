@@ -70,6 +70,25 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
                                 GError **error);
 
 
+/**
+ * modulemd_defaults_v1_merge:
+ * @module_name: (in): The name of the module for which defaults are being merged.
+ * @from: (in): A #ModulemdDefaultsV1 object to merge from
+ * @into: (in): A #ModulemdDefaultsV1 object being merged into
+ * @error: (out): A #GError containing the reason for an unresolvable merge
+ * conflict
+ *
+ * Performs a merge of two #ModulemdDefaultsV1 objects representing the
+ * defaults for a single module name. See the documentation for
+ * #ModulemdModuleIndexMerger for details on the merge algorithm used.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdDefaultsV1 containing
+ * the merged values of @from and @into. If this function encounters an
+ * unresolvable merge conflict, it will return NULL and set @error
+ * appropriately.
+ *
+ * Since: 2.x
+ */
 ModulemdDefaults *
 modulemd_defaults_v1_merge (const gchar *module_name,
                             ModulemdDefaultsV1 *from,

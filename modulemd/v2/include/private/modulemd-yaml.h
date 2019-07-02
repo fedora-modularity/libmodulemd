@@ -251,7 +251,7 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
  * @list: A list that will be emitted to the YAML emitter.
  * @error: (out): A #GError that will return the reason for an emitting error.
  *
- * Returns: A boolean whether emitting the sequence was succesful.
+ * Returns: A boolean whether emitting the sequence was successful.
  *
  * Since: 2.0
  */
@@ -285,7 +285,7 @@ modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error);
  * @error: (out): A #GError that will return the reason for a parsing or validation error.
  *
  * Returns: (transfer full): A newly-allocated gchar * representing the parsed value.
- * NULL if a parse error occured and sets @error appropriately.
+ * NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -301,7 +301,7 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
  * validation error.
  *
  * Returns: A boolean representing the parsed value. Returns FALSE if a parse
- * error occured and sets @error appropriately.
+ * error occurred and sets @error appropriately.
  *
  * Since: 2.2
  */
@@ -317,7 +317,7 @@ modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error);
  * validation error.
  *
  * Returns: (transfer full): A 64-bit signed integer representing the parsed
- * value. Returns 0 if a parse error occured and sets @error appropriately.
+ * value. Returns 0 if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -333,7 +333,7 @@ modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error);
  * validation error.
  *
  * Returns: (transfer full): A 64-bit unsigned integer representing the parsed
- * value. Returns 0 if a parse error occured and sets @error appropriately.
+ * value. Returns 0 if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -348,7 +348,7 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error);
  *
  * Returns: (transfer full): A newly-allocated GHashtTable * representing the parsed value.
  * All parsed sequence entries are added as keys in the hashtable.
- * NULL if a parse error occured and sets @error appropriately.
+ * NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -372,7 +372,7 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
  *
  * Returns: (transfer full): A newly-allocated GHashtTable * representing the
  * parsed values. All parsed sequence entries are added as keys in the
- * hashtable. NULL if a parse error occured and sets @error appropriately.
+ * hashtable. NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -394,7 +394,7 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
  * data.dependencies in ModuleStreamV1.
  *
  * Returns: (transfer full): A newly-allocated GHashtTable * representing the
- * parsed values. NULL if a parse error occured and sets @error appropriately.
+ * parsed values. NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -449,7 +449,7 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
  * array or dictionary.
  * @error: (out): A #GError that will return the reason for failing to emit.
  *
- * Returns: TRUE if the variant emitted succesfully. FALSE if an error was
+ * Returns: TRUE if the variant emitted successfully. FALSE if an error was
  * encountered and sets @error appropriately.
  *
  * Since: 2.0

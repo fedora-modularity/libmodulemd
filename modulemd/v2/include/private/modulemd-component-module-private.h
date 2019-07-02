@@ -23,7 +23,7 @@
  * @title: Modulemd.ComponentModule (Private)
  * @stability: Private
  * @short_description: #ModulemdComponentModule methods that should be used only
- * by internal consumers
+ * by internal consumers.
  */
 
 /**
@@ -36,7 +36,7 @@
  * @error: (out): A #GError that will return the reason for parsing error.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdComponentModule object
- * read from the YAML. NULL if a parse error occured and sets @error
+ * read from the YAML. NULL if a parse error occurred and sets @error
  * appropriately.
  *
  * Since: 2.0
@@ -55,7 +55,7 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission error.
  *
- * Returns: TRUE if the module component was emitted succesfully. FALSE and sets
+ * Returns: TRUE if the module component was emitted successfully. FALSE and sets
  * @error appropriately if the YAML could not be emitted.
  *
  * Since: 2.0

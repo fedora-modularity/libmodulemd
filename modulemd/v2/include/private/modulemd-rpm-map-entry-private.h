@@ -19,7 +19,7 @@
  * @title: Modulemd.RpmMapEntry (Private)
  * @stability: Private
  * @short_description: #ModulemdRpmMapEntry methods that should be used only
- * by internal consumers
+ * by internal consumers.
  */
 
 /**
@@ -31,7 +31,7 @@
  * @error: (out): A #GError that will return the reason for parsing error.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdComponentRpm object
- * read from the YAML. NULL if a parse error occured and sets @error
+ * read from the YAML. NULL if a parse error occurred and sets @error
  * appropriately.
  * Since: 2.2
  */

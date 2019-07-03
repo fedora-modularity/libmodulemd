@@ -360,7 +360,7 @@ modulemd_module_index_remove_module (ModulemdModuleIndex *self,
  * between streams of the same version. If this upgrade cannot be performed,
  * the function will return @error set appropriately.
  *
- * Returns: TRUE if the #ModulemdModuleStream was added succesfully. If the
+ * Returns: TRUE if the #ModulemdModuleStream was added successfully. If the
  * stream already existed in the index, it will be replaced by the new one. On
  * failure, returns FALSE and sets @error appropriately.
  *
@@ -379,7 +379,7 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
  * @error: (out): A #GError containing the reason the #ModulemdDefaults object
  * could not be added or NULL if the function succeeded.
  *
- * Returns: TRUE if the #ModulemdDefaults was added succesfully. If the defaults
+ * Returns: TRUE if the #ModulemdDefaults was added successfully. If the defaults
  * already existed in the index, it will be replaced by the new one. On failure,
  * returns FALSE and sets error approriately.
  *
@@ -421,7 +421,7 @@ modulemd_module_index_get_default_streams_as_hash_table (
  * @error: (out): A #GError containing the reason the #ModulemdTranslation
  * object could not be added or NULL if the function succeeded.
  *
- * Returns: TRUE if the #ModulemdTranslation was added succesfully. If the
+ * Returns: TRUE if the #ModulemdTranslation was added successfully. If the
  * translation already existed in the index, it will be replaced by the new one.
  * On failure, returns FALSE and sets error appropriately.
  *

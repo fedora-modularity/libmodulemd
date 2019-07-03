@@ -23,7 +23,7 @@
  * @title: Modulemd.Component (Private)
  * @stability: Private
  * @short_description: #ModulemdComponent methods that should be used only
- * by internal consumers
+ * by internal consumers.
  */
 
 
@@ -50,7 +50,7 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
  * "buildonly" key in a #ModulemdComponent section of a YAML document.
  * @error: (out): A #GError that will return the reason for a parse failure.
  *
- * Returns: TRUE if the buildafter list could be parsed successfully.
+ * Returns: TRUE if the buildonly list could be parsed successfully.
  *
  * Since: 2.2
  */
@@ -63,7 +63,7 @@ modulemd_component_parse_buildonly (ModulemdComponent *self,
  * modulemd_component_has_buildafter:
  * @self: This #ModulemdComponent
  *
- * Returns: Whether one or more buildafter entries have been added to this
+ * Returns: TRUE if one or more buildafter entries have been added to this
  * component.
  *
  * Since: 2.2
@@ -92,7 +92,7 @@ modulemd_component_get_buildafter_internal (ModulemdComponent *self);
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission error.
  *
- * Returns: TRUE if the component header was emitted succesfully. FALSE and sets
+ * Returns: TRUE if the component header was emitted successfully. FALSE and sets
  * @error appropriately if the YAML could not be emitted.
  *
  * Since: 2.0
@@ -110,8 +110,9 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
  * document.
  * @error: (out): A #GError that will return the reason for an emission error.
  *
- * Returns: TRUE if the component buildorder was emitted succesfully. FALSE and
- * sets @error appropriately if the YAML could not be emitted.
+ * Returns: TRUE if the component buildorder, buildafter and/or buildonly
+ * item(s) were emitted successfully. FALSE and sets @error appropriately if
+ * the YAML could not be emitted.
  *
  * Since: 2.2
  */
@@ -125,7 +126,7 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
  * @a: A void pointer
  * @b: A void pointer
  *
- * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
+ * Returns: TRUE, if both the pointers are equal. FALSE, otherwise.
  *
  * Since: 2.5
  */

@@ -30,6 +30,13 @@ G_BEGIN_DECLS
 #define DEFAULT_PLACEHOLDER "__DEFAULT_PLACEHOLDER__"
 
 
+/**
+ * modulemd_defaults_set_module_name:
+ * @self: (in): This #ModulemdDefaults object
+ * @module_name: The module name this object represents
+ *
+ * Since: 2.0
+ */
 void
 modulemd_defaults_set_module_name (ModulemdDefaults *self,
                                    const gchar *module_name);
@@ -45,7 +52,9 @@ modulemd_defaults_set_module_name (ModulemdDefaults *self,
  * #ModulemdModuleIndexMerger for details on the merge algorithm used.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdDefaults containing the
- * merged values of @from and @into.
+ * merged values of @from and @into. If this function encounters an
+ * unresolvable merge conflict, it will return NULL and set @error
+ * appropriately.
  *
  * Since: 2.0
  */

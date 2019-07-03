@@ -72,6 +72,9 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
  * argument specifies whether the contents of @from will supersede those from
  * @into. For specifics of how this works, see the Description section for
  * #ModulemdModuleIndexMerger.
+ * @strict_default_streams: (in): When merging #ModulemdDefaults, treat
+ * conflicting stream defaults as an error if this is True. Otherwise, on a
+ * conflict, the default stream will be unset.
  * @error: (out): If the merge fails, this will return a #GError explaining the
  * reason for it.
  *
@@ -84,6 +87,7 @@ gboolean
 modulemd_module_index_merge (ModulemdModuleIndex *from,
                              ModulemdModuleIndex *into,
                              gboolean override,
+                             gboolean strict_default_streams,
                              GError **error);
 
 G_END_DECLS

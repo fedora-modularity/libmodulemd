@@ -38,6 +38,8 @@ modulemd_defaults_set_module_name (ModulemdDefaults *self,
  * modulemd_defaults_merge:
  * @from: (in): A #ModulemdDefaults object to merge from
  * @into: (in): A #ModulemdDefaults object being merged into
+ * @strict_default_streams: (in): Whether a stream conflict should throw an
+ * error or just unset the default stream.
  * @error: (out): A #GError containing the reason for an unresolvable merge
  * conflict
  *
@@ -52,6 +54,7 @@ modulemd_defaults_set_module_name (ModulemdDefaults *self,
 ModulemdDefaults *
 modulemd_defaults_merge (ModulemdDefaults *from,
                          ModulemdDefaults *into,
+                         gboolean strict_default_streams,
                          GError **error);
 
 G_END_DECLS

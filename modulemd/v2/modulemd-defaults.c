@@ -391,6 +391,7 @@ modulemd_defaults_init (ModulemdDefaults *self)
 ModulemdDefaults *
 modulemd_defaults_merge (ModulemdDefaults *from,
                          ModulemdDefaults *into,
+                         gboolean strict_default_streams,
                          GError **error)
 {
   g_autoptr (ModulemdDefaults) merged_defaults = NULL;
@@ -446,6 +447,7 @@ modulemd_defaults_merge (ModulemdDefaults *from,
   merged_defaults = modulemd_defaults_v1_merge (module_name,
                                                 MODULEMD_DEFAULTS_V1 (from),
                                                 MODULEMD_DEFAULTS_V1 (into),
+                                                strict_default_streams,
                                                 &nested_error);
   if (!merged_defaults)
     {

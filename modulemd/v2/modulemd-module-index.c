@@ -908,6 +908,7 @@ gboolean
 modulemd_module_index_merge (ModulemdModuleIndex *from,
                              ModulemdModuleIndex *into,
                              gboolean override,
+                             gboolean strict_default_streams,
                              GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -996,8 +997,8 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
         }
       else
         {
-          merged_defaults =
-            modulemd_defaults_merge (defaults, into_defaults, &nested_error);
+          merged_defaults = modulemd_defaults_merge (
+            defaults, into_defaults, strict_default_streams, &nested_error);
           if (!merged_defaults)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));

@@ -161,6 +161,10 @@ modulemd_module_index_merger_associate_index (ModulemdModuleIndexMerger *self,
  * #ModulemdModuleIndexMerger is undefined. The only valid action on it after
  * that point is g_object_unref().
  *
+ * This function is equivalent to calling
+ * modulemd_module_index_merger_resolve_ext() with
+ * `strict_default_streams=FALSE`.
+ *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing
  * the merged results. If this function encounters an unresolvable merge
  * conflict, it will return NULL and set @error appropriately.
@@ -170,5 +174,34 @@ modulemd_module_index_merger_associate_index (ModulemdModuleIndexMerger *self,
 ModulemdModuleIndex *
 modulemd_module_index_merger_resolve (ModulemdModuleIndexMerger *self,
                                       GError **error);
+
+
+/**
+ * modulemd_module_index_merger_resolve_ext:
+ * @self: (in): This #ModulemdModuleIndexMerger object.
+ * @strict_default_streams: (in): If TRUE, merging two #ModulemdDefaults with
+ * conflicting default streams will raise an error. If FALSE, the module will
+ * have its default stream blocked.
+ * @error: (out): A #GError containing the reason for a failure to resolve the
+ * merges.
+ *
+ * Merges all added #ModulemdModuleIndex objects according to their priority.
+ * The logic of this merge is described in the Description of
+ * #ModulemdModuleIndexMerger.
+ *
+ * Once this function has been called, the internal state of the
+ * #ModulemdModuleIndexMerger is undefined. The only valid action on it after
+ * that point is g_object_unref().
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing
+ * the merged results. If this function encounters an unresolvable merge
+ * conflict, it will return NULL and set @error appropriately.
+ *
+ * Since: 2.6
+ */
+ModulemdModuleIndex *
+modulemd_module_index_merger_resolve_ext (ModulemdModuleIndexMerger *self,
+                                          gboolean strict_default_streams,
+                                          GError **error);
 
 G_END_DECLS

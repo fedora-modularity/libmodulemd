@@ -96,6 +96,7 @@ test('test_v1_modulemd_buildopts', test_v1_modulemd_buildopts,
      env : test_env)
 test('test_v1_release_modulemd_buildopts', test_v1_modulemd_buildopts,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_buildopts'
 
 test_v1_modulemd_component = executable(
     'test_v1_modulemd_component',
@@ -109,6 +110,7 @@ test('test_v1_modulemd_component', test_v1_modulemd_component,
      env : test_env)
 test('test_v1_release_modulemd_component', test_v1_modulemd_component,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_component'
 
 test_v1_modulemd_defaults = executable(
     'test_v1_modulemd_defaults',
@@ -123,6 +125,7 @@ test('test_v1_modulemd_defaults', test_v1_modulemd_defaults,
      env : test_env)
 test('test_v1_release_modulemd_defaults', test_v1_modulemd_defaults,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_defaults'
 
 test_v1_modulemd_dependencies = executable(
     'test_v1_modulemd_dependencies',
@@ -136,6 +139,7 @@ test('test_v1_modulemd_dependencies', test_v1_modulemd_dependencies,
      env : test_env)
 test('test_v1_release_modulemd_dependencies', test_v1_modulemd_dependencies,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_dependencies'
 
 test_v1_modulemd_intent = executable(
     'test_v1_modulemd_intent',
@@ -149,6 +153,7 @@ test('test_v1_modulemd_intent', test_v1_modulemd_intent,
      env : test_env)
 test('test_v1_release_modulemd_intent', test_v1_modulemd_intent,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_intent'
 
 test_v1_modulemd_module = executable(
     'test_v1_modulemd_module',
@@ -162,6 +167,7 @@ test('test_v1_modulemd_module', test_v1_modulemd_module,
      env : test_env)
 test('test_v1_release_modulemd_module', test_v1_modulemd_module,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_module'
 
 test_v1_modulemd_modulestream = executable(
     'test_v1_modulemd_modulestream',
@@ -175,6 +181,7 @@ test('test_v1_modulemd_modulestream', test_v1_modulemd_modulestream,
      env : test_env)
 test('test_v1_release_modulemd_modulestream', test_v1_modulemd_modulestream,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_modulestream'
 
 test_v1_modulemd_regressions = executable(
     'test_v1_modulemd_regressions',
@@ -188,6 +195,7 @@ test('test_v1_modulemd_regressions', test_v1_modulemd_regressions,
     env : test_env)
 test('test_v1_release_modulemd_regressions', test_v1_modulemd_regressions,
     env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_regressions'
 
 test_v1_modulemd_servicelevel = executable(
     'test_v1_modulemd_servicelevel',
@@ -201,6 +209,7 @@ test('test_v1_modulemd_servicelevel', test_v1_modulemd_servicelevel,
      env : test_env)
 test('test_v1_release_modulemd_servicelevel', test_v1_modulemd_servicelevel,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_servicelevel'
 
 test_v1_modulemd_simpleset = executable(
     'test_v1_modulemd_simpleset',
@@ -214,6 +223,7 @@ test('test_v1_modulemd_simpleset', test_v1_modulemd_simpleset,
      env : test_env)
 test('test_v1_release_modulemd_simpleset', test_v1_modulemd_simpleset,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_simpleset'
 
 test_v1_modulemd_subdocument = executable(
     'test_v1_modulemd_subdocument',
@@ -227,6 +237,7 @@ test('test_v1_modulemd_subdocument', test_v1_modulemd_subdocument,
      env : test_env)
 test('test_v1_release_modulemd_subdocument', test_v1_modulemd_subdocument,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_subdocument'
 
 
 test_v1_modulemd_translation = executable(
@@ -243,6 +254,7 @@ test('test_v1_modulemd_translation',
 test('test_v1_release_modulemd_translation',
      test_v1_modulemd_translation,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_translation'
 
 
 test_v1_modulemd_translation_entry = executable(
@@ -259,6 +271,7 @@ test('test_v1_modulemd_translation_entry',
 test('test_v1_release_modulemd_translation_entry',
      test_v1_modulemd_translation_entry,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_translation_entry'
 
 
 test_v1_modulemd_yaml = executable(
@@ -274,6 +287,7 @@ test('test_v1_modulemd_yaml', test_v1_modulemd_yaml,
      env : test_env)
 test('test_v1_release_modulemd_yaml', test_v1_modulemd_yaml,
      env : test_release_env)
+valgrind_tests += 'test_v1_modulemd_yaml'
 
 # Test env with fatal warnings and criticals
 py_test_env = test_env
@@ -300,6 +314,7 @@ test ('test_v1_modulemd_python', python3,
 test ('test_v1_release_modulemd_python', python3,
       env : py_test_release_env,
       args : modulemd_python_scripts)
+
 
 if skip_introspection
 else

@@ -27,30 +27,11 @@ if os.getenv('MMD_SKIP_VALGRIND'):
 failed = False
 
 # Get the list of tests to run
-proc_result = subprocess.run(['meson', 'test', '--list'],
-                             stdout=subprocess.PIPE,
-                             encoding='utf-8')
-if proc_result.returncode != 0:
-    sys.exit(2)
-
-unfiltered_tests = proc_result.stdout.split('\n')
 tests = []
-for test in unfiltered_tests:
-    if (not test or
-        test.endswith('_python') or
-        test.endswith('_python_debug') or
-        test.endswith('_python2_debug') or
-        test.endswith('_python3_debug') or
-        test.endswith('_release') or
-        test.endswith('_import_headers') or
-        'v1_release' in test or
-        test == 'autopep8' or
-        test == 'clang_format' or
-        test == 'pycodestyle' or
-        test == 'test_dirty_repo' or
-            test == 'valgrind'):
-        continue
-    tests.append(test)
+if len(sys.argv) > 1:
+    tests = sys.argv[1:]
+else:
+    sys.exit(77)
 
 
 with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:

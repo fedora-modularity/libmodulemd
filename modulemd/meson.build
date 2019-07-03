@@ -296,6 +296,7 @@ if test_dirty_git
          args: dirty_repo_scripts)
 endif
 
+valgrind_tests = []
 
 if build_api_v1
     subdir('v1')
@@ -318,6 +319,6 @@ if valgrind.found()
     modulemd_valgrind_scripts = files('common/tests/test-valgrind.py')
     test ('valgrind', python3,
           env : test_env,
-          args : modulemd_valgrind_scripts,
+          args : modulemd_valgrind_scripts + valgrind_tests,
           timeout : 1200)
 endif

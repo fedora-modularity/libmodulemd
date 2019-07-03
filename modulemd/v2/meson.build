@@ -170,6 +170,8 @@ foreach name, sources : v2_c_tests
          env : test_env)
     test(name + '_release', exe,
          env : test_release_env)
+
+    valgrind_tests += name + '_debug'
 endforeach
 
 

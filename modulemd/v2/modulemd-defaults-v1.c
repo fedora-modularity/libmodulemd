@@ -1204,6 +1204,7 @@ ModulemdDefaults *
 modulemd_defaults_v1_merge (const gchar *module_name,
                             ModulemdDefaultsV1 *from,
                             ModulemdDefaultsV1 *into,
+                            gboolean strict_default_streams,
                             GError **error)
 {
   g_autoptr (ModulemdDefaultsV1) merged = NULL;
@@ -1246,6 +1247,17 @@ modulemd_defaults_v1_merge (const gchar *module_name,
           g_info ("Module stream mismatch in merge: %s != %s",
                   into->default_stream,
                   from->default_stream);
+          if (strict_default_streams)
+            {
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_VALIDATE,
+                           "Default stream mismatch in module %s: %s != %s",
+                           module_name,
+                           into->default_stream,
+                           from->default_stream);
+              return NULL;
+            }
           modulemd_defaults_v1_set_default_stream (
             merged, DEFAULT_MERGE_CONFLICT, NULL);
         }

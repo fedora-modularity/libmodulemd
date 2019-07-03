@@ -210,6 +210,27 @@ class TestModuleIndexMerger(TestBase):
     def test_merger_with_modified(self):
         pass
 
+    def test_strict_default_streams(self):
+        merger = Modulemd.ModuleIndexMerger.new()
+
+        for stream in ("27", "38"):
+            default = """
+---
+document: modulemd-defaults
+version: 1
+data:
+    module: python
+    stream: %s
+...
+""" % (stream)
+
+            index = Modulemd.ModuleIndex()
+            index.update_from_string(default, strict=True)
+            merger.associate_index(index, 0)
+
+        with self.assertRaisesRegexp(gi.repository.GLib.GError, "Default stream mismatch in module python"):
+            merger.resolve_ext(True)
+
 
 if __name__ == '__main__':
     unittest.main()

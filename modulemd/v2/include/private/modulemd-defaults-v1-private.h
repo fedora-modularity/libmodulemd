@@ -93,6 +93,7 @@ ModulemdDefaults *
 modulemd_defaults_v1_merge (const gchar *module_name,
                             ModulemdDefaultsV1 *from,
                             ModulemdDefaultsV1 *into,
+                            gboolean strict_default_streams,
                             GError **error);
 
 G_END_DECLS

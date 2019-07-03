@@ -171,6 +171,14 @@ ModulemdModuleIndex *
 modulemd_module_index_merger_resolve (ModulemdModuleIndexMerger *self,
                                       GError **error)
 {
+  return modulemd_module_index_merger_resolve_ext (self, FALSE, error);
+}
+
+ModulemdModuleIndex *
+modulemd_module_index_merger_resolve_ext (ModulemdModuleIndexMerger *self,
+                                          gboolean strict_default_streams,
+                                          GError **error)
+{
   MODULEMD_INIT_TRACE ();
   g_autoptr (ModulemdModuleIndex) thislevel = NULL;
   g_autoptr (ModulemdModuleIndex) final = NULL;
@@ -200,6 +208,7 @@ modulemd_module_index_merger_resolve (ModulemdModuleIndexMerger *self,
           if (!modulemd_module_index_merge (g_ptr_array_index (indexes, j),
                                             thislevel,
                                             FALSE,
+                                            strict_default_streams,
                                             &nested_error))
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -209,7 +218,8 @@ modulemd_module_index_merger_resolve (ModulemdModuleIndexMerger *self,
 
 
       /* Merge 'thislevel' into 'final' with override=True */
-      if (!modulemd_module_index_merge (thislevel, final, TRUE, &nested_error))
+      if (!modulemd_module_index_merge (
+            thislevel, final, TRUE, strict_default_streams, &nested_error))
         {
           g_propagate_error (error, g_steal_pointer (&nested_error));
           return NULL;

@@ -136,495 +136,76 @@ test_utils_lib = library(
     install : false,
 )
 
-# -- Test Modulemd.Buildopts (C) -- #
-test_v2_buildopts = executable(
-    'buildopts_v2',
-    'tests/test-modulemd-buildopts.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('buildopts_v2_debug', test_v2_buildopts,
-     env : test_env)
-test('buildopts_v2_release', test_v2_buildopts,
-     env : test_release_env)
+v2_c_tests = {
+'buildopts_v2'           : [ 'tests/test-modulemd-buildopts.c' ],
+'component_module_v2'    : [ 'tests/test-modulemd-component-module.c' ],
+'component_rpm_v2'       : [ 'tests/test-modulemd-component-rpm.c' ],
+'defaults_v2'            : [ 'tests/test-modulemd-defaults.c' ],
+'defaultsv1_v2'          : [ 'tests/test-modulemd-defaults-v1.c' ],
+'dependencies_v2'        : [ 'tests/test-modulemd-dependencies.c' ],
+'module_v2'              : [ 'tests/test-modulemd-module.c' ],
+'module_index_v2'        : [ 'tests/test-modulemd-moduleindex.c' ],
+'module_index_merger_v2' : [ 'tests/test-modulemd-merger.c' ],
+'modulestream_v2'        : [ 'tests/test-modulemd-modulestream.c' ],
+'profile_v2'             : [ 'tests/test-modulemd-profile.c' ],
+'rpm_map'                : [ 'tests/test-modulemd-rpmmap.c' ],
+'service_level_v2'       : [ 'tests/test-modulemd-service-level.c' ],
+'translation_v2'         : [ 'tests/test-modulemd-translation.c' ],
+'translation_entry_v2'   : [ 'tests/test-modulemd-translation-entry.c' ],
+}
 
-# -- Test Modulemd.ComponentModule (C) -- #
-test_v2_component_module = executable(
-    'component_module_v2',
-    'tests/test-modulemd-component-module.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('component_module_v2_debug', test_v2_component_module,
-     env : test_env)
-test('component_module_v2_release', test_v2_component_module,
-     env : test_release_env)
-
-# -- Test Modulemd.ComponentRpm (Python) -- #
-componentrpm_python_script = files('tests/ModulemdTests/componentrpm.py')
-test ('componentrpm_python3_debug', python3,
-      env : py_test_env,
-      args : componentrpm_python_script)
-test ('componentrpm_python3_release', python3,
-      env : py_test_release_env,
-      args : componentrpm_python_script)
-
-test ('componentrpm_python2_debug', python2,
-      env : py_test_env,
-      args : componentrpm_python_script)
-test ('componentrpm_python2_release', python2,
-      env : py_test_release_env,
-      args : componentrpm_python_script)
-
-# -- Test Modulemd.ComponentRpm (C) -- #
-test_v2_component_rpm = executable(
-    'component_rpm_v2',
-    'tests/test-modulemd-component-rpm.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('component_rpm_v2_debug', test_v2_component_rpm,
-     env : test_env)
-test('component_rpm_v2_release', test_v2_component_rpm,
-     env : test_release_env)
-
-# -- Test Modulemd.Dependencies (C) -- #
-test_v2_dependencies = executable(
-    'dependencies_v2',
-    'tests/test-modulemd-dependencies.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('dependencies_v2_debug', test_v2_dependencies,
-     env : test_env)
-test('dependencies_v2_release', test_v2_dependencies,
-     env : test_release_env)
-
-# -- Test Modulemd.Module (C) -- #
-test_v2_module = executable(
-    'module_v2',
-    'tests/test-modulemd-module.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('module_v2_debug', test_v2_module,
-     env : test_env)
-test('module_v2_release', test_v2_module,
-     env : test_release_env)
-
-# -- Test Modulemd.ModuleIndex (C) -- #
-test_v2_module_index = executable(
-    'module_index_v2',
-    'tests/test-modulemd-moduleindex.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('module_index_v2_debug', test_v2_module_index,
-     env : test_env)
-test('module_index_v2_release', test_v2_module_index,
-     env : test_release_env)
+foreach name, sources : v2_c_tests
+    exe = executable(
+        name,
+        sources,
+        dependencies : [
+            modulemd_v2_dep,
+        ],
+        link_with : [
+            test_utils_lib,
+        ],
+        install : false,
+    )
+    test(name + '_debug', exe,
+         env : test_env)
+    test(name + '_release', exe,
+         env : test_release_env)
+endforeach
 
 
-# -- Test Modulemd.ModuleIndexMerger (C) -- #
-test_v2_module_index_merger = executable(
-    'module_index_merger_v2',
-    'tests/test-modulemd-merger.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('module_index_merger_v2_debug', test_v2_module_index_merger,
-     env : test_env)
-test('module_index_merger_v2_release', test_v2_module_index_merger,
-     env : test_release_env)
+v2_python_tests = {
+'buildopts'        : 'tests/ModulemdTests/buildopts.py',
+'componentrpm'     : 'tests/ModulemdTests/componentrpm.py',
+'defaults'         : 'tests/ModulemdTests/defaults.py',
+'defaultsv1'       : 'tests/ModulemdTests/defaultsv1.py',
+'dependencies'     : 'tests/ModulemdTests/dependencies.py',
+'merger'           : 'tests/ModulemdTests/merger.py',
+'module'           : 'tests/ModulemdTests/module.py',
+'moduleindex'      : 'tests/ModulemdTests/moduleindex.py',
+'modulestream'     : 'tests/ModulemdTests/modulestream.py',
+'profile'          : 'tests/ModulemdTests/profile.py',
+'rpmmap'           : 'tests/ModulemdTests/rpmmap.py',
+'servicelevel'     : 'tests/ModulemdTests/servicelevel.py',
+'translation'      : 'tests/ModulemdTests/translation.py',
+'translationentry' : 'tests/ModulemdTests/translationentry.py',
+}
 
+foreach name, script : v2_python_tests
+    test (name + '_python3_debug', python3,
+          env : py_test_env,
+          args : files(script))
+    test (name + '_python3_release', python3,
+          env : py_test_release_env,
+          args : files(script))
 
-# -- Test Modulemd.Modulestream (C) -- #
-test_v2_modulestream = executable(
-    'modulestream_v2',
-    'tests/test-modulemd-modulestream.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('modulestream_v2_debug', test_v2_modulestream,
-     env : test_env)
-test('modulestream_v2_release', test_v2_modulestream,
-     env : test_release_env)
+    test (name + '_python2_debug', python2,
+          env : py_test_env,
+          args : files(script))
+    test (name + '_python2_release', python2,
+          env : py_test_release_env,
+          args : files(script))
+endforeach
 
-# -- Test Modulemd.Profile (C) -- #
-test_v2_profile = executable(
-    'profile_v2',
-    'tests/test-modulemd-profile.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('profile_v2_debug', test_v2_profile,
-     env : test_env)
-test('profile_v2_release', test_v2_profile,
-     env : test_release_env)
-
-# -- Test Modulemd.ServiceLevel (C) -- #
-test_v2_servicelevel = executable(
-    'service_level_v2',
-    'tests/test-modulemd-service-level.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('service_level_v2_debug', test_v2_servicelevel,
-     env : test_env)
-test('service_level_v2_release', test_v2_servicelevel,
-     env : test_release_env)
-
-# -- Test Modulemd.Translation (C) -- #
-test_v2_translation = executable(
-    'translation_v2',
-    'tests/test-modulemd-translation.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('translation_v2_debug', test_v2_translation,
-     env : test_env)
-test('translation_v2_release', test_v2_translation,
-     env : test_release_env)
-
-# -- Test Modulemd.TranslationEntry (C) -- #
-test_v2_translationentry = executable(
-    'translation_entry_v2',
-    'tests/test-modulemd-translation-entry.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('translation_entry_v2_debug', test_v2_translationentry,
-     env : test_env)
-test('translation_entry_v2_release', test_v2_translationentry,
-     env : test_release_env)
-
-
-# -- Test Modulemd.Buildopts (Python) -- #
-buildopts_python_script = files('tests/ModulemdTests/buildopts.py')
-test ('buildopts_python3_debug', python3,
-      env : py_test_env,
-      args : buildopts_python_script)
-test ('buildopts_python3_release', python3,
-      env : py_test_release_env,
-      args : buildopts_python_script)
-
-  test ('buildopts_python2_debug', python2,
-      env : py_test_env,
-      args : buildopts_python_script)
-test ('buildopts_python2_release', python2,
-      env : py_test_release_env,
-      args : buildopts_python_script)
-
-
-# -- Test Modulemd.Dependencies (Python) -- #
-dependencies_python_script = files('tests/ModulemdTests/dependencies.py')
-test ('dependencies_python3_debug', python3,
-      env : py_test_env,
-      args : dependencies_python_script)
-test ('dependencies_python3_release', python3,
-      env : py_test_release_env,
-      args : dependencies_python_script)
-
-test ('dependencies_python2_debug', python2,
-      env : py_test_env,
-      args : dependencies_python_script)
-test ('dependencies_python2_release', python2,
-      env : py_test_release_env,
-      args : dependencies_python_script)
-
-# -- Test Modulemd.Module (Python) -- #
-module_python_script = files('tests/ModulemdTests/module.py')
-test ('module_python3_debug', python3,
-      env : py_test_env,
-      args : module_python_script)
-test ('module_python3_release', python3,
-      env : py_test_release_env,
-      args : module_python_script)
-
-test ('module_python2_debug', python2,
-      env : py_test_env,
-      args : module_python_script)
-test ('module_python2_release', python2,
-      env : py_test_release_env,
-      args : module_python_script)
-
-# -- Test Modulemd.ModuleIndex (Python) -- #
-moduleindex_python_script = files('tests/ModulemdTests/moduleindex.py')
-test ('moduleindex_python3_debug', python3,
-      env : py_test_env,
-      args : moduleindex_python_script)
-test ('moduleindex_python3_release', python3,
-      env : py_test_release_env,
-      args : moduleindex_python_script)
-
-test ('moduleindex_python2_debug', python2,
-      env : py_test_env,
-      args : moduleindex_python_script)
-test ('moduleindex_python2_release', python2,
-      env : py_test_release_env,
-      args : moduleindex_python_script)
-
-# -- Test Modulemd.ModuleStream (Python) -- #
-modulestream_python_script = files('tests/ModulemdTests/modulestream.py')
-test ('modulestream_python3_debug', python3,
-      env : py_test_env,
-      args : modulestream_python_script)
-test ('modulestream_python3_release', python3,
-      env : py_test_release_env,
-      args : modulestream_python_script)
-
-test ('modulestream_python2_debug', python2,
-      env : py_test_env,
-      args : modulestream_python_script)
-test ('modulestream_python2_release', python2,
-      env : py_test_release_env,
-      args : modulestream_python_script)
-
-
-# -- Test Modulemd.ModuleIndexMerger (Python) -- #
-merger_python_script = files('tests/ModulemdTests/merger.py')
-test ('merger_python3_debug', python3,
-      env : py_test_env,
-      args : merger_python_script)
-test ('merger_python3_release', python3,
-      env : py_test_release_env,
-      args : merger_python_script)
-
-test ('merger_python2_debug', python2,
-      env : py_test_env,
-      args : merger_python_script)
-test ('merger_python2_release', python2,
-      env : py_test_release_env,
-      args : merger_python_script)
-
-
-# -- Test Modulemd.Profile (Python) -- #
-profile_python_script = files('tests/ModulemdTests/profile.py')
-test ('profile_python3_debug', python3,
-      env : py_test_env,
-      args : profile_python_script)
-test ('profile_python3_release', python3,
-      env : py_test_release_env,
-      args : profile_python_script)
-
-test ('profile_python2_debug', python2,
-      env : py_test_env,
-      args : profile_python_script)
-test ('profile_python2_release', python2,
-      env : py_test_release_env,
-      args : profile_python_script)
-
-# -- Test Modulemd.ServiceLevel (Python) -- #
-service_level_python_script = files('tests/ModulemdTests/servicelevel.py')
-test ('service_level_python3_debug', python3,
-      env : py_test_env,
-      args : service_level_python_script)
-test ('service_level_python3_release', python3,
-      env : py_test_release_env,
-      args : service_level_python_script)
-
-test ('service_level_python2_debug', python2,
-      env : py_test_env,
-      args : service_level_python_script)
-test ('service_level_python2_release', python2,
-      env : py_test_release_env,
-      args : service_level_python_script)
-
-
-# -- Test Modulemd.Translation (Python) -- #
-translation_python_script = files('tests/ModulemdTests/translation.py')
-test ('translation_python3_debug', python3,
-      env : py_test_env,
-      args : translation_python_script)
-test ('translation_python3_release', python3,
-      env : py_test_release_env,
-      args : translation_python_script)
-
-test ('translation_python2_debug', python2,
-      env : py_test_env,
-      args : translation_python_script)
-test ('translation_python2_release', python2,
-      env : py_test_release_env,
-      args : translation_python_script)
-
-# -- Test Modulemd.TranslationEntry (Python) -- #
-translation_entry_python_script = files('tests/ModulemdTests/translationentry.py')
-test ('translation_entry_python3_debug', python3,
-      env : py_test_env,
-      args : translation_entry_python_script)
-test ('translation_entry_python3_release', python3,
-      env : py_test_release_env,
-      args : translation_entry_python_script)
-
-test ('translation_entry_python2_debug', python2,
-      env : py_test_env,
-      args : translation_entry_python_script)
-test ('translation_entry_python2_release', python2,
-      env : py_test_release_env,
-      args : translation_entry_python_script)
-
-
-# -- Test Modulemd.Defaults (C) -- #
-test_v2_defaults = executable(
-    'defaults_v2',
-    'tests/test-modulemd-defaults.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('defaults_v2_debug', test_v2_defaults,
-     env : test_env)
-test('defaults_v2_release', test_v2_defaults,
-     env : test_release_env)
-
-# -- Test Modulemd.Defaults (Python) -- #
-defaults_python_script = files('tests/ModulemdTests/defaults.py')
-test ('defaults_python3_debug', python3,
-      env : py_test_env,
-      args : defaults_python_script)
-test ('defaults_python3_release', python3,
-      env : py_test_release_env,
-      args : defaults_python_script)
-
-defaults_python_script = files('tests/ModulemdTests/defaults.py')
-test ('defaults_python2_debug', python2,
-      env : py_test_env,
-      args : defaults_python_script)
-test ('defaults_python2_release', python2,
-      env : py_test_release_env,
-      args : defaults_python_script)
-
-
-# -- Test Modulemd.DefaultsV1 (C) -- #
-test_v2_defaultsv1 = executable(
-    'defaultsv1_v2',
-    'tests/test-modulemd-defaults-v1.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test('defaultsv1_v2_debug', test_v2_defaultsv1,
-     env : test_env)
-test('defaultsv1_v2_release', test_v2_defaultsv1,
-     env : test_release_env)
-
-# -- Test Modulemd.DefaultsV1 (Python) -- #
-defaultsv1_python_script = files('tests/ModulemdTests/defaultsv1.py')
-test ('defaultsv1_python3_debug', python3,
-      env : py_test_env,
-      args : defaultsv1_python_script)
-test ('defaultsv1_python3_release', python3,
-      env : py_test_release_env,
-      args : defaultsv1_python_script)
-
-test ('defaultsv1_python2_debug', python2,
-      env : py_test_env,
-      args : defaultsv1_python_script)
-test ('defaultsv1_python2_release', python2,
-      env : py_test_release_env,
-      args : defaultsv1_python_script)
-
-
-# -- Test Modulemd.RpmMapEntry (C) -- #
-test_rpm_map = executable(
-    'rpm_map',
-    'tests/test-modulemd-rpmmap.c',
-    dependencies : [
-        modulemd_v2_dep,
-    ],
-    link_with : [
-        test_utils_lib,
-    ],
-    install : false,
-)
-test ('rpm_map_debug', test_rpm_map,
-      env : test_env)
-test ('rpm_map_release', test_rpm_map,
-      env : test_release_env)
-
-# -- Test Modulemd.RpmMapEntry (Python) -- #
-rpmmap_python_script = files('tests/ModulemdTests/rpmmap.py')
-test ('rpmmap_python3_debug', python3,
-      env : py_test_env,
-      args : rpmmap_python_script)
-test ('rpmmap_python3_release', python3,
-      env : py_test_release_env,
-      args : rpmmap_python_script)
-
-test ('rpmmap_python2_debug', python2,
-      env : py_test_env,
-      args : rpmmap_python_script)
-test ('rpmmap_python2_release', python2,
-      env : py_test_release_env,
-      args : rpmmap_python_script)
 
 # -- Test Modulemd.TranslationHelpers (Python) -- #
 

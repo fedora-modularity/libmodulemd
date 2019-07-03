@@ -35,7 +35,7 @@ G_BEGIN_DECLS
  * @self: (in): This #ModulemdDefaults object
  * @module_name: The module name this object represents
  *
- * Since: 2.x
+ * Since: 2.0
  */
 void
 modulemd_defaults_set_module_name (ModulemdDefaults *self,

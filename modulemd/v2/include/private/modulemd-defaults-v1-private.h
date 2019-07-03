@@ -87,7 +87,7 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
  * unresolvable merge conflict, it will return NULL and set @error
  * appropriately.
  *
- * Since: 2.x
+ * Since: 2.0
  */
 ModulemdDefaults *
 modulemd_defaults_v1_merge (const gchar *module_name,

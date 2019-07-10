@@ -52,30 +52,6 @@ ModulemdTranslationEntry *
 modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
                                               const gchar *locale);
 
-void
-modulemd_module_stream_v2_replace_content_licenses (
-  ModulemdModuleStreamV2 *self, GHashTable *set);
-
-void
-modulemd_module_stream_v2_replace_module_licenses (
-  ModulemdModuleStreamV2 *self, GHashTable *set);
-
-void
-modulemd_module_stream_v2_replace_rpm_api (ModulemdModuleStreamV2 *self,
-                                           GHashTable *set);
-
-void
-modulemd_module_stream_v2_replace_rpm_artifacts (ModulemdModuleStreamV2 *self,
-                                                 GHashTable *set);
-
-void
-modulemd_module_stream_v2_replace_rpm_filters (ModulemdModuleStreamV2 *self,
-                                               GHashTable *set);
-
-void
-modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
-                                                GPtrArray *array);
-
 gboolean
 modulemd_module_stream_validate_components (GHashTable *components,
                                             GError **error);

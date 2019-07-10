@@ -107,5 +107,95 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
                                      yaml_emitter_t *emitter,
                                      GError **error);
 
+/**
+ * modulemd_module_stream_v2_replace_content_licenses:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of licenses under which one or more of the
+ * components of this module stream are distributed.
+ *
+ * Any existing content licenses associated with module stream @self are
+ * removed and replaced by @set.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_content_licenses (
+  ModulemdModuleStreamV2 *self, GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_module_licenses:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of licenses under which this module stream is
+ * distributed.
+ *
+ * Any existing module licenses associated with module stream @self are removed
+ * and replaced by @set.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_module_licenses (
+  ModulemdModuleStreamV2 *self, GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_rpm_api:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of binary RPMs present in this module stream that is
+ * considered stable public API.
+ *
+ * Any existing API RPMs associated with module stream @self are removed and
+ * replaced by @set.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_rpm_api (ModulemdModuleStreamV2 *self,
+                                           GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_rpm_artifacts:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of NEVRs of binary RPMs present in this module
+ * stream.
+ *
+ * Any existing artifact RPMs associated with module stream @self are removed
+ * and replaced by @set.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_rpm_artifacts (ModulemdModuleStreamV2 *self,
+                                                 GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_rpm_filters:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of names of binary RPMs to filter out of this
+ * module stream.
+ *
+ * Any existing filtered binary RPM names associated with module stream @self
+ * are removed and replaced by @set.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_rpm_filters (ModulemdModuleStreamV2 *self,
+                                               GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_dependencies:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @array: (in): A #GPtrArray of #ModulemdDependencies objects for this module
+ * stream.
+ *
+ * Any existing dependencies associated with module stream @self are removed
+ * and replaced by @array.
+ *
+ * Since: 2.0
+ */
+void
+modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
+                                                GPtrArray *array);
+
 
 G_END_DECLS

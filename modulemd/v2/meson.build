@@ -107,6 +107,7 @@ if not test_installed_lib
     # locations for these paths.
     py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd/v2')
     py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd/v2')
+    py_test_env.set ('PYTHONPATH', meson.source_root())
 
     # This test is just to catch whether we are accidentally not testing
     # the built version.
@@ -211,13 +212,13 @@ endforeach
 
 # -- Test Modulemd.TranslationHelpers (Python) -- #
 
-translation_helpers_python_script = files('../../ModulemdTranslationHelpers/Utils.py')
+translation_helpers_python_script = files('tests/ModulemdTests/translation_helpers.py')
 get_babel = '''
 import babel
 '''
 
 # Python 2
-if (get_option('with_py2_overrides'))
+if (get_option('with_py2_overrides') and not test_installed_lib)
   ret2 = run_command([python2, '-c', get_babel])
 
   if ret2.returncode() != 0
@@ -233,7 +234,7 @@ if (get_option('with_py2_overrides'))
 endif
 
 # Python 3
-if (get_option('with_py3_overrides'))
+if (get_option('with_py3_overrides') and not test_installed_lib)
   ret2 = run_command([python3, '-c', get_babel])
 
   if ret2.returncode() != 0

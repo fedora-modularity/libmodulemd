@@ -14,6 +14,9 @@
 
 import os
 import sys
+from ModulemdTranslationHelpers import Utils
+from babel.messages import pofile
+from six import text_type
 
 try:
     import unittest
@@ -33,40 +36,106 @@ class TestTranslationHelpers(TestBase):
     def test_translation_catalog_from_index(self):
         # Create a Modulemd.ModuleIndex object containing the YAML stream
         index = Modulemd.ModuleIndex.new()
-        yaml_path = "../test_data/f29.yaml"
-        ret, failures = index.update_from_file(yaml_path, True)
         self.assertIsNotNone(index)
+        ret, failures = index.update_from_file(
+            "%s/modulemd/v2/tests/test_data/f29.yaml" %
+            (os.getenv('MESON_SOURCE_ROOT')), True)
+        self.assertTrue(ret)
+        self.assertTrue(len(failures) == 0)
 
         # Create a babel catalog for the Modulemd.ModuleIndex object
-        catalog = get_translation_catalog_from_index(index)
+        catalog = Utils.get_translation_catalog_from_index(
+            index, "fedora-modularity-translations")
         self.assertTrue(catalog)
-
         # Check if the catalog is internally consistent
-        _, err = catalog.check()
-        self.assertNone(err)
+        self.assertTrue(catalog.check())
 
         # Check if each translatable string is mapped to its correct location
         for msg in catalog:
             for location in msg.locations:
-                props = location.split(";")
+                (module_name, stream_name, string_type,
+                 profile_name) = Utils.split_location(location)
 
-                module_name = props[0].split(":")[0]
                 module = index.get_module(module_name)
+                self.assertIsNotNone(module)
 
-                stream_name = props[0].split(":")[1]
                 stream = module.search_streams(stream_name, 0)[0]
+                self.assertIsNotNone(stream)
 
-                string_type = props[1]
                 if string_type == "summary":
-                    assert stream.get_summary("C") == msg.id
+                    self.assertEqual(stream.get_summary("C"), msg.id)
                 elif string_type == "description":
-                    assert stream.get_description("C") == msg.id
+                    self.assertEqual(stream.get_description("C"), msg.id)
                 else:
-                    profile = stream.get_profile(stream_type.split(";")[1])
-                    assert profile.get_description("C") == msg.id
+                    self.assertEqual(string_type, "profile")
+                    profile = stream.get_profile(profile_name)
+                    self.assertIsNotNone(profile)
+                    self.assertEqual(profile.get_description("C"), msg.id)
 
-        # There are 34 unique summaries and descriptions in f29.yaml
-        self.assertEquals(len(catalog), 34)
+        # There are 75 unique summaries and descriptions in f29.yaml
+        self.assertEqual(len(catalog), 75)
+
+    def test_translations_from_catalog(self):
+        translation_files = [
+            "%s/modulemd/v2/tests/test_data/nl.po" %
+            (os.getenv('MESON_SOURCE_ROOT'))]
+
+        catalogs = list()
+        for f in translation_files:
+            with open(f, 'r') as infile:
+                catalog = pofile.read_po(infile)
+                self.assertIsNotNone(catalog)
+
+                # Check if the catalog is internally consistent
+                self.assertTrue(catalog.check())
+                catalogs.append(catalog)
+
+        index = Modulemd.ModuleIndex.new()
+        self.assertIsNotNone(index)
+        ret, failures = index.update_from_file(
+            "%s/modulemd/v2/tests/test_data/f29.yaml" %
+            (os.getenv('MESON_SOURCE_ROOT')), True)
+        self.assertTrue(ret)
+        self.assertTrue(len(failures) == 0)
+
+        Utils.get_modulemd_translations_from_catalog(catalogs, index)
+
+        for catalog in catalogs:
+            for msg in catalog:
+                # Handle UTF-8 differences between python 2 and 3
+                if isinstance(msg.string, str):
+                    msg_string = msg.string
+                elif isinstance(msg.string, text_type):
+                    msg_string = msg.string.encode('utf-8')
+                else:
+                    raise IOError("Message was not a str or text_type")
+
+                for location, _ in msg.locations:
+                    (module_name, stream_name, string_type,
+                     profile_name) = Utils.split_location(location)
+
+                    module = index.get_module(module_name)
+                    self.assertIsNotNone(module)
+
+                    streams = module.search_streams(stream_name, 0)
+                    self.assertIsNotNone(streams)
+
+                    for stream in streams:
+                        if string_type == "summary":
+                            self.assertEqual(
+                                stream.get_summary(
+                                    str(catalog.locale)), msg_string)
+                        elif string_type == "description":
+                            self.assertEqual(
+                                stream.get_description(
+                                    str(catalog.locale)), msg_string)
+                        else:
+                            self.assertEqual(string_type, "profile")
+                            profile = stream.get_profile(profile_name)
+                            self.assertIsNotNone(profile)
+                            self.assertEqual(
+                                profile.get_description(
+                                    str(catalog.locale)), msg_string)
 
 
 if __name__ == '__main__':

@@ -32,8 +32,8 @@ G_DECLARE_FINAL_TYPE (
 /**
  * modulemd_buildopts_new:
  *
- * Returns: (transfer full): A newly-allocated #ModulemdBuildopts. This object
- * must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdBuildopts object. This
+ * object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -43,10 +43,10 @@ modulemd_buildopts_new (void);
 
 /**
  * modulemd_buildopts_equals:
- * @self_1: A #ModulemdBuildopts
- * @self_2: A #ModulemdBuildopts
+ * @self_1: A #ModulemdBuildopts object.
+ * @self_2: A #ModulemdBuildopts object.
  *
- * Check for equality for 2 ModulemdBuildopts objects.
+ * Check for equality for two #ModulemdBuildopts objects.
  *
  * Returns: TRUE if both objects are equal, FALSE otherwise.
  *
@@ -59,11 +59,12 @@ modulemd_buildopts_equals (ModulemdBuildopts *self_1,
 
 /**
  * modulemd_buildopts_copy:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  *
  * Create a copy of this #ModulemdBuildopts object.
  *
- * Returns: (transfer full): a copied #ModulemdBuildopts object
+ * Returns: (transfer full): A newly-allocated #ModulemdBuildopts object that
+ * is a copy of @self.
  *
  * Since: 2.0
  */
@@ -73,8 +74,9 @@ modulemd_buildopts_copy (ModulemdBuildopts *self);
 
 /**
  * modulemd_buildopts_set_rpm_macros:
- * @self: This #ModulemdBuildopts
- * @rpm_macros: A string containing RPM build macros in the form that they would appear in an RPM macros file on-disk.
+ * @self: This #ModulemdBuildopts object.
+ * @rpm_macros: A string containing RPM build macros in the form that they
+ * would appear in an RPM macros file on-disk.
  *
  * Since: 2.0
  */
@@ -85,9 +87,10 @@ modulemd_buildopts_set_rpm_macros (ModulemdBuildopts *self,
 
 /**
  * modulemd_buildopts_get_rpm_macros:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  *
- * Returns: (transfer none): A string containing RPM build macros in the form that they would appear in an RPM macros file on-disk.
+ * Returns: (transfer none): A string containing RPM build macros in the form
+ * that they would appear in an RPM macros file on-disk.
  *
  * Since: 2.0
  */
@@ -97,7 +100,7 @@ modulemd_buildopts_get_rpm_macros (ModulemdBuildopts *self);
 
 /**
  * modulemd_buildopts_add_rpm_to_whitelist:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  * @rpm: An RPM name to add to the whitelist.
  *
  * Since: 2.0
@@ -109,7 +112,7 @@ modulemd_buildopts_add_rpm_to_whitelist (ModulemdBuildopts *self,
 
 /**
  * modulemd_buildopts_remove_rpm_from_whitelist:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  * @rpm: An RPM name to remove from the whitelist.
  *
  * Since: 2.0
@@ -121,7 +124,7 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
 
 /**
  * modulemd_buildopts_clear_rpm_whitelist:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  *
  * Remove all RPMs from the whitelist.
  *
@@ -133,7 +136,7 @@ modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self);
 
 /**
  * modulemd_buildopts_get_rpm_whitelist_as_strv: (rename-to modulemd_buildopts_get_rpm_whitelist)
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  *
  * Returns: (transfer full): An ordered #GStrv list of all RPMs in the whitelist.
  *

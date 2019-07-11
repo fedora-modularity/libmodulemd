@@ -33,25 +33,80 @@ G_BEGIN_DECLS
  */
 
 
+/**
+ * modulemd_module_stream_set_module_name:
+ * @self: (in): This #ModulemdModuleStream object.
+ * @module_name: The module name this object represents.
+ *
+ * Since: 2.0
+ */
 void
 modulemd_module_stream_set_module_name (ModulemdModuleStream *self,
                                         const gchar *module_name);
 
+/**
+ * modulemd_module_stream_set_stream_name:
+ * @self: (in): This #ModulemdModuleStream object.
+ * @stream_name: The stream name this object represents.
+ *
+ * Since: 2.0
+ */
 void
 modulemd_module_stream_set_stream_name (ModulemdModuleStream *self,
                                         const gchar *stream_name);
 
+/**
+ * modulemd_module_stream_associate_translation:
+ * @self: (in): This #ModulemdModuleStream object.
+ * @translation: (in): The #ModulemdTranslation information to associate with
+ * this object.
+ *
+ * Since: 2.0
+ */
 void
 modulemd_module_stream_associate_translation (
   ModulemdModuleStream *self, ModulemdTranslation *translation);
 
+/**
+ * modulemd_module_stream_get_translation:
+ * @self: (in): This #ModulemdModuleStream object.
+ *
+ * Returns: The #ModulemdTranslation information to associated with this object.
+ *
+ * Since: 2.0
+ */
 ModulemdTranslation *
 modulemd_module_stream_get_translation (ModulemdModuleStream *self);
 
+/**
+ * modulemd_module_stream_get_translation_entry:
+ * @self: (in): This #ModulemdModuleStream object.
+ * @locale: The locale of the translation to retrieve.
+ *
+ * Returns: (transfer none): The module stream #ModulemdTranslationEntry for
+ * the requested locale, or NULL if the locale was unknown.
+ *
+ * Since: 2.0
+ */
 ModulemdTranslationEntry *
 modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
                                               const gchar *locale);
 
+/**
+ * modulemd_module_stream_validate_components:
+ * @components: (in): A #GHashTable of #ModulemdComponent objects.
+ * @error: (out): A #GError that will return the reason for a validation error.
+ *
+ * Verifies that each of the #ModulemdComponent objects in @components
+ * validates correctly via modulemd_component_validate(), verifies that any
+ * buildafter components are also present in @components, and verifies that
+ * buildorder and buildafter aren't mixed.
+ *
+ * Returns: TRUE if the component objects passed validation. FALSE and sets
+ * @error appropriately if validation fails.
+ *
+ * Since: 2.0
+ */
 gboolean
 modulemd_module_stream_validate_components (GHashTable *components,
                                             GError **error);
@@ -120,6 +175,23 @@ modulemd_module_stream_validate_components (GHashTable *components,
     }                                                                         \
   while (0)
 
+/**
+ * modulemd_module_stream_emit_yaml_base:
+ * @self: This #ModulemdModuleStream object.
+ * @emitter: (inout): A libyaml emitter object positioned where a Module Stream
+ * document belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an emission or
+ * validation error.
+ *
+ * Emit the common non-version specific YAML components for the Module Stream
+ * document.
+ *
+ * Returns: TRUE if the #ModulemdModuleStream components were emitted
+ * successfully. FALSE and sets @error appropriately if the YAML could not be
+ * emitted.
+ *
+ * Since: 2.0
+ */
 gboolean
 modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
                                        yaml_emitter_t *emitter,

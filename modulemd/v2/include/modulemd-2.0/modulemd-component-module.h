@@ -60,7 +60,7 @@ modulemd_component_module_set_ref (ModulemdComponentModule *self,
 
 /**
  * modulemd_component_module_get_ref:
- * @self: This #ModulemdComponentModule object
+ * @self: This #ModulemdComponentModule object.
  *
  * Returns: (transfer none): The commit ID in the SCM repository.
  *
@@ -72,7 +72,7 @@ modulemd_component_module_get_ref (ModulemdComponentModule *self);
 
 /**
  * modulemd_component_module_set_repository:
- * @self: This #ModulemdComponentModule object
+ * @self: This #ModulemdComponentModule object.
  * @repository: (in) (nullable): The URI of the SCM repository.
  *
  * Since: 2.0
@@ -84,7 +84,7 @@ modulemd_component_module_set_repository (ModulemdComponentModule *self,
 
 /**
  * modulemd_component_module_get_repository:
- * @self: This #ModulemdComponentModule object
+ * @self: This #ModulemdComponentModule object.
  *
  * Returns: (transfer none): The URI of the SCM repository.
  *

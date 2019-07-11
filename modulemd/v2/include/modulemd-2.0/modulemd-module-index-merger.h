@@ -107,7 +107,7 @@ G_DECLARE_FINAL_TYPE (ModulemdModuleIndexMerger,
 /**
  * modulemd_module_index_merger_new:
  *
- * Returns: (transfer full): A newly-allocated Modulemd.ModuleIndexMerger
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndexMerger
  * object.
  *
  * Since: 2.0
@@ -165,9 +165,9 @@ modulemd_module_index_merger_associate_index (ModulemdModuleIndexMerger *self,
  * modulemd_module_index_merger_resolve_ext() with
  * `strict_default_streams=FALSE`.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing
- * the merged results. If this function encounters an unresolvable merge
- * conflict, it will return NULL and set @error appropriately.
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
+ * containing the merged results. If this function encounters an unresolvable
+ * merge conflict, it will return NULL and set @error appropriately.
  *
  * Since: 2.0
  */
@@ -193,9 +193,9 @@ modulemd_module_index_merger_resolve (ModulemdModuleIndexMerger *self,
  * #ModulemdModuleIndexMerger is undefined. The only valid action on it after
  * that point is g_object_unref().
  *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing
- * the merged results. If this function encounters an unresolvable merge
- * conflict, it will return NULL and set @error appropriately.
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
+ * containing the merged results. If this function encounters an unresolvable
+ * merge conflict, it will return NULL and set @error appropriately.
  *
  * Since: 2.6
  */

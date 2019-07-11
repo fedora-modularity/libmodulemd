@@ -27,7 +27,7 @@ struct _ModulemdDefaultsV1
   gchar *default_stream;
 
   /* @key: stream name
-   * @value: GHashTable set of profile names
+   * @value: #GHashTable set of profile names
    */
   GHashTable *profile_defaults;
 
@@ -37,7 +37,7 @@ struct _ModulemdDefaultsV1
   GHashTable *intent_default_streams;
 
   /* @key: intent name
-   * @value: GHashTable set of profile names
+   * @value: #GHashTable set of profile names
    */
   GHashTable *intent_default_profiles;
 };

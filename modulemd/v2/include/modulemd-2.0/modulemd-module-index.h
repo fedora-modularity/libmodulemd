@@ -139,7 +139,7 @@ modulemd_module_index_new (void);
 
 /**
  * modulemd_module_index_update_from_file:
- * @self: This #ModulemdModuleIndex object
+ * @self: This #ModulemdModuleIndex object.
  * @yaml_file: (in): A YAML file containing the module metadata and other
  * related information such as default streams.
  * @strict: (in): Whether the parser should return failure if it encounters an
@@ -147,10 +147,10 @@ modulemd_module_index_new (void);
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
- * @error: (out): A GError containing additional information if this function
+ * @error: (out): A #GError containing additional information if this function
  * fails in a way that prevents program continuation.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets failures
+ * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
  * approriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
@@ -166,7 +166,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_update_from_string:
- * @self: This #ModulemdModuleIndex object
+ * @self: This #ModulemdModuleIndex object.
  * @yaml_string: (in): A YAML string containing the module metadata and other
  * related information such as default streams.
  * @strict: (in): Whether the parser should return failure if it encounters an
@@ -174,10 +174,10 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
- * @error: (out): A GError containing additional information if this function
+ * @error: (out): A #GError containing additional information if this function
  * fails in a way that prevents program continuation.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets failures
+ * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
  * approriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
@@ -193,7 +193,7 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_update_from_stream: (skip)
- * @self: This #ModulemdModuleIndex object
+ * @self: This #ModulemdModuleIndex object.
  * @yaml_stream: (in): A YAML stream containing the module metadata and other
  * related information such as default streams.
  * @strict: (in): Whether the parser should return failure if it encounters an
@@ -201,10 +201,10 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
- * @error: (out): A GError containing additional information if this function
+ * @error: (out): A #GError containing additional information if this function
  * fails in a way that prevents program continuation.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets failures
+ * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
  * approriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
@@ -220,7 +220,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_update_from_custom: (skip)
- * @self: This #ModulemdModuleIndex object
+ * @self: This #ModulemdModuleIndex object.
  * @custom_read_fn: (in): A #ModulemdReadHandler
  * @custom_pvt_data: (inout): The private data needed by the #ModulemdReadHandler
  * @strict: (in): Whether the parser should return failure if it encounters an
@@ -228,7 +228,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
  * An array containing any subdocuments from the YAML file that failed to parse.
  * See #ModulemdSubdocumentInfo for more details.
- * @error: (out): A GError containing additional information if this function
+ * @error: (out): A #GError containing additional information if this function
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
@@ -248,12 +248,12 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_dump_to_string:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @error: (out): A #GError containing the reason the function failed, NULL if
  * the function succeeded.
  *
  * Returns: (transfer full): A YAML representation of the index as a string. In
- * the event of an error, sets error appropriately and returns NULL.
+ * the event of an error, sets @error appropriately and returns NULL.
  *
  * Since: 2.0
  */
@@ -263,13 +263,13 @@ modulemd_module_index_dump_to_string (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_dump_to_stream: (skip)
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @yaml_stream: (in): A stream to write the module metadata and other related
  * information to.
  * @error: (out): A #GError containing the reason the function failed, NULL if
  * the function succeeded.
  *
- * Returns: TRUE if written successfully, FALSE and sets error appropriately in
+ * Returns: TRUE if written successfully, FALSE and sets @error appropriately in
  * the event of an error.
  *
  * Since: 2.0
@@ -282,14 +282,14 @@ modulemd_module_index_dump_to_stream (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_dump_to_custom: (skip)
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @custom_write_fn: (in): A #ModulemdWriteHandler
  * @custom_pvt_data: (inout): The private data needed by the
  * #ModulemdWriteHandler
  * @error: (out): A #GError containing the reason the function failed, NULL if
  * the function succeeded
  *
- * Returns: TRUE if written successfully, FALSE and sets error appropriately in
+ * Returns: TRUE if written successfully, FALSE and sets @error appropriately in
  * the event of an error.
  *
  * Since: 2.3
@@ -303,7 +303,7 @@ modulemd_module_index_dump_to_custom (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_get_module_names_as_strv: (rename-to modulemd_module_index_get_module_names)
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  *
  * Returns: (transfer full): An ordered list of string keys in this index.
  *
@@ -315,7 +315,7 @@ modulemd_module_index_get_module_names_as_strv (ModulemdModuleIndex *self);
 
 /**
  * modulemd_module_index_get_module:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @module_name: The module name to look up in the index.
  *
  * Returns: (transfer none): The #ModulemdModule object matching the provided
@@ -330,7 +330,7 @@ modulemd_module_index_get_module (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_remove_module:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @module_name: The name of the module to remove from the index.
  *
  * Remove a module, including all of its streams, its defaults and its
@@ -348,14 +348,14 @@ modulemd_module_index_remove_module (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_add_module_stream:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @stream: The #ModulemdModuleStream to add to the index. The stream added
  * must have a module name and stream name set on it or it will be rejected.
  * @error: (out): A #GError containing the reason the #ModulemdModuleStream
  * object could not be added or NULL if the function succeeded.
  *
  * Add a #ModulemdModuleStream to the #ModulemdModuleIndex. While being added,
- * the #ModulemdModuleStream will be upgraded to MD_MODULESTREAM_VERSION_LATEST
+ * the #ModulemdModuleStream will be upgraded to %MD_MODULESTREAM_VERSION_LATEST
  * to ensure that merges done with #ModulemdModuleIndexMerger will always occur
  * between streams of the same version. If this upgrade cannot be performed,
  * the function will return @error set appropriately.
@@ -374,14 +374,14 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_add_defaults:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @defaults: The #ModulemdDefaults object to add to the index.
  * @error: (out): A #GError containing the reason the #ModulemdDefaults object
  * could not be added or NULL if the function succeeded.
  *
  * Returns: TRUE if the #ModulemdDefaults was added successfully. If the defaults
  * already existed in the index, it will be replaced by the new one. On failure,
- * returns FALSE and sets error approriately.
+ * returns FALSE and sets @error approriately.
  *
  * Since: 2.0
  */
@@ -393,14 +393,14 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_get_default_streams_as_hash_table: (rename-to modulemd_module_index_get_default_streams)
- * @self: (in): This #ModulemdModuleIndex
+ * @self: (in): This #ModulemdModuleIndex object.
  * @intent: (in) (nullable): The name of the system intent whose default stream
  * will be retrieved. If left NULL or the specified intent has no separate
  * default, it will return the generic default stream for this module.
  *
  * Get a dictionary of all modules in the index that have a default stream.
  *
- * This function cannot fail, but may return an empty (non-NULL) GHashTable.
+ * This function cannot fail, but may return an empty (non-NULL) #GHashTable.
  *
  * Returns: (transfer container) (element-type utf8 utf8): A #GHashTable with
  * the module name as the key and the default stream as the value for all
@@ -416,14 +416,14 @@ modulemd_module_index_get_default_streams_as_hash_table (
 
 /**
  * modulemd_module_index_add_translation:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @translation: The #ModulemdTranslation object to add to the index.
  * @error: (out): A #GError containing the reason the #ModulemdTranslation
  * object could not be added or NULL if the function succeeded.
  *
  * Returns: TRUE if the #ModulemdTranslation was added successfully. If the
  * translation already existed in the index, it will be replaced by the new one.
- * On failure, returns FALSE and sets error appropriately.
+ * On failure, returns FALSE and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -434,7 +434,7 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
 
 /**
  * modulemd_module_index_get_defaults_mdversion:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  *
  * Returns: The metadata version of #ModulemdDefaults in use for this index.
  *
@@ -446,7 +446,7 @@ modulemd_module_index_get_defaults_mdversion (ModulemdModuleIndex *self);
 
 /**
  * modulemd_module_index_get_stream_mdversion:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  *
  * Returns: The metadata version of #ModulemdModuleStream in use for this
  * index.
@@ -459,7 +459,7 @@ modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self);
 
 /**
  * modulemd_module_index_upgrade_streams:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @mdversion: The #ModulemdModuleStream metadata version to upgrade to.
  * @error: (out): A #GError that contains information on why the index could
  * not be upgraded in the event of an error.
@@ -478,7 +478,7 @@ modulemd_module_index_upgrade_streams (
 
 /**
  * modulemd_module_index_upgrade_defaults:
- * @self: This #ModulemdModuleIndex
+ * @self: This #ModulemdModuleIndex object.
  * @mdversion: The #ModulemdDefaults metadata version to upgrade to.
  * @error: (out): A #GError that contains information on why the index could
  * not be upgraded in the event of an error.

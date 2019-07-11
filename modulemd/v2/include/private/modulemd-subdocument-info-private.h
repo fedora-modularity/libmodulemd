@@ -31,7 +31,7 @@
 /**
  * modulemd_subdocument_info_new:
  *
- * Returns: (transfer full): A newly-allocated #ModulemdSubdocumentInfo
+ * Returns: (transfer full): A newly-allocated #ModulemdSubdocumentInfo object.
  *
  * Since: 2.0
  */
@@ -41,9 +41,9 @@ modulemd_subdocument_info_new (void);
 
 /**
  * modulemd_subdocument_info_copy:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  *
- * Returns: (transfer full): A deep copy of @self
+ * Returns: (transfer full): A deep copy of @self.
  *
  * Since: 2.0
  */
@@ -53,8 +53,9 @@ modulemd_subdocument_info_copy (ModulemdSubdocumentInfo *self);
 
 /**
  * modulemd_subdocument_info_set_doctype:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  * @doctype: The #ModulemdYamlDocumentTypeEnum represented by this subdocument
+ * object.
  *
  * Since: 2.0
  */
@@ -65,9 +66,9 @@ modulemd_subdocument_info_set_doctype (ModulemdSubdocumentInfo *self,
 
 /**
  * modulemd_subdocument_info_get_doctype:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  *
- * Returns: The type of subdocument represented by this SubdocumentInfo
+ * Returns: The type of subdocument represented by this #ModulemdSubdocumentInfo object.
  *
  * Since: 2.0
  */
@@ -77,8 +78,8 @@ modulemd_subdocument_info_get_doctype (ModulemdSubdocumentInfo *self);
 
 /**
  * modulemd_subdocument_info_set_mdversion:
- * @self: This #ModulemdSubdocumentInfo
- * @mdversion: The metadata version
+ * @self: This #ModulemdSubdocumentInfo object.
+ * @mdversion: The metadata version of this #ModulemdSubdocumentInfo object.
  *
  * Since: 2.0
  */
@@ -89,9 +90,9 @@ modulemd_subdocument_info_set_mdversion (ModulemdSubdocumentInfo *self,
 
 /**
  * modulemd_subdocument_info_get_mdversion:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  *
- * Returns: The metadata version
+ * Returns: The metadata version of this #ModulemdSubdocumentInfo object.
  *
  * Since: 2.0
  */
@@ -101,8 +102,8 @@ modulemd_subdocument_info_get_mdversion (ModulemdSubdocumentInfo *self);
 
 /**
  * modulemd_subdocument_info_set_yaml:
- * @self: This #ModulemdSubdocumentInfo
- * @contents: The contents of the document
+ * @self: This #ModulemdSubdocumentInfo object.
+ * @contents: The contents of the document.
  *
  * Since: 2.0
  */
@@ -113,8 +114,8 @@ modulemd_subdocument_info_set_yaml (ModulemdSubdocumentInfo *self,
 
 /**
  * modulemd_subdocument_info_set_gerror:
- * @self: This #ModulemdSubdocumentInfo
- * @error: The error
+ * @self: This #ModulemdSubdocumentInfo object.
+ * @error: The error.
  *
  * Since: 2.0
  */
@@ -125,8 +126,8 @@ modulemd_subdocument_info_set_gerror (ModulemdSubdocumentInfo *self,
 
 /**
  * modulemd_subdocument_info_get_data_parser:
- * @self: This #ModulemdSubdocumentInfo
- * @parser: (inout): An unconfigured libyaml parser
+ * @self: This #ModulemdSubdocumentInfo object.
+ * @parser: (inout): An unconfigured libyaml parser.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError containing the parser error if this function fails.

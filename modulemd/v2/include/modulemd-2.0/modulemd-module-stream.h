@@ -207,10 +207,10 @@ modulemd_module_stream_read_stream (FILE *stream,
 
 /**
  * modulemd_module_stream_equals:
- * @self_1: (in): A #ModulemdModuleStream.
- * @self_2: (in): A #ModulemdModuleStream.
+ * @self_1: (in): A #ModulemdModuleStream object.
+ * @self_2: (in): A #ModulemdModuleStream object.
  *
- * Checks if self_1 and self_2 are identical objects.
+ * Checks if @self_1 and @self_2 are identical objects.
  *
  * Returns: TRUE, If both objects are equal. FALSE, otherwise.
  *
@@ -223,7 +223,7 @@ modulemd_module_stream_equals (ModulemdModuleStream *self_1,
 
 /**
  * modulemd_module_stream_copy:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  * @module_name: (in) (nullable): An optional new name for the module of the
  * copied stream.
  * @module_stream: (in) (nullable): An optional new name for the copied stream.
@@ -244,7 +244,7 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_upgrade:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  * @mdversion: (in): The metadata version to upgrade to. If zero, upgrades to
  * the highest-supported version.
  * @error: (out): A #GError that will return the reason for an upgrade error.
@@ -265,7 +265,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_validate:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  * @error: (out): A #GError that will return the reason for a validation error.
  *
  * Verifies that all stored values are internally consistent and that the
@@ -283,7 +283,7 @@ modulemd_module_stream_validate (ModulemdModuleStream *self, GError **error);
 
 /**
  * modulemd_module_stream_get_mdversion:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: The metadata version of this #ModulemdModuleStream.
  *
@@ -295,7 +295,7 @@ modulemd_module_stream_get_mdversion (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_get_module_name:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: (transfer none): The name of the module.
  *
@@ -307,7 +307,7 @@ modulemd_module_stream_get_module_name (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_get_stream_name:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: (transfer none): The name of this stream.
  *
@@ -319,8 +319,8 @@ modulemd_module_stream_get_stream_name (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_set_version:
- * @self: (in): This #ModulemdModuleStream.
- * @version: (in): The version of this #ModulemdModuleStream
+ * @self: (in): This #ModulemdModuleStream object.
+ * @version: (in): The version of this #ModulemdModuleStream.
  *
  * Since: 2.0
  */
@@ -331,7 +331,7 @@ modulemd_module_stream_set_version (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_get_version:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: The version of this #ModulemdModuleStream.
  */
@@ -340,7 +340,7 @@ modulemd_module_stream_get_version (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_set_context:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  * @context: (in) (nullable): Module context flag.
  * The context flag serves to distinguish module builds with the same name,
  * stream and version and plays an important role in automatic module stream
@@ -355,7 +355,7 @@ modulemd_module_stream_set_context (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_get_context:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: (transfer none): Module context flag.
  * The context flag serves to distinguish module builds with the same name,
@@ -370,7 +370,7 @@ modulemd_module_stream_get_context (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_set_arch:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  * @arch: (in) (nullable): Module architecture.
  * Indicates to which processor architecture this #ModulemdModuleStream
  * applies.
@@ -384,9 +384,9 @@ modulemd_module_stream_set_arch (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_get_arch:
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
- * Returns: (transfer none): Module architecture.
+ * Returns: (transfer none): Module architecture object.
  * Indicates to which processor architecture this #ModulemdModuleStream
  * applies.
  *
@@ -398,7 +398,7 @@ modulemd_module_stream_get_arch (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_get_nsvc_as_string: (rename-to modulemd_module_stream_get_nsvc)
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Retrieves a representation of the module name, stream name, version and
  * context of this #ModulemdModuleStream in the form
@@ -417,7 +417,7 @@ modulemd_module_stream_get_nsvc_as_string (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_get_NSVCA_as_string: (rename-to modulemd_module_stream_get_NSVCA)
- * @self: (in): This #ModulemdModuleStream.
+ * @self: (in): This #ModulemdModuleStream object.
  *
  * Returns: (transfer full): The NSVCA of this module stream. The returned
  * format is described
@@ -432,9 +432,9 @@ modulemd_module_stream_get_NSVCA_as_string (ModulemdModuleStream *self);
 
 /**
  * modulemd_module_stream_depends_on_stream:
- * @self: (not nullable): This #ModulemdModuleStream.
- * @module_name: (not nullable): A module name
- * @stream_name: (not nullable): The stream of the module
+ * @self: (not nullable): This #ModulemdModuleStream object.
+ * @module_name: (not nullable): A module name.
+ * @stream_name: (not nullable): The stream of the module.
  *
  * Returns: TRUE if any of the #ModulemdDependencies objects associated with
  * this module applies to the provided module name and stream in the runtime
@@ -452,9 +452,9 @@ modulemd_module_stream_depends_on_stream (ModulemdModuleStream *self,
 
 /**
  * modulemd_module_stream_build_depends_on_stream:
- * @self: (not nullable): This #ModulemdModuleStream.
- * @module_name: (not nullable): A module name
- * @stream_name: (not nullable): The stream of the module
+ * @self: (not nullable): This #ModulemdModuleStream object.
+ * @module_name: (not nullable): A module name.
+ * @stream_name: (not nullable): The stream of the module.
  *
  * Returns: TRUE if any of the #ModulemdDependencies objects associated with
  * this module applies to the provided module name and stream in the build-time

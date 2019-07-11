@@ -344,7 +344,7 @@ modulemd_translation_class_init (ModulemdTranslationClass *klass)
   properties[PROP_VERSION] =
     g_param_spec_uint64 ("version",
                          "Version",
-                         "The metadata version of this Modulemd.Translation.",
+                         "The metadata version of this Translation object.",
                          0,
                          G_MAXUINT64,
                          0,

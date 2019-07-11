@@ -88,8 +88,8 @@ modulemd_defaults_v1_get_default_stream (ModulemdDefaultsV1 *self,
  * separate defaults for this module, it will return the generic stream
  * profiles.
  *
- * Returns: (transfer full): A sorted list of unique stream names for which
- * default profiles have been assigned.
+ * Returns: (transfer full): A sorted #GStrv list of unique stream names for
+ * which default profiles have been assigned.
  *
  * Since: 2.0
  */
@@ -124,8 +124,8 @@ modulemd_defaults_v1_add_default_profile_for_stream (ModulemdDefaultsV1 *self,
 /**
  * modulemd_defaults_v1_set_empty_default_profiles_for_stream:
  * @self: (in): This #ModulemdDefaultsV1 object.
- * @stream_name: (in): The name of the module stream to which to add this
- * default profile.
+ * @stream_name: (in): The name of the module stream for which to empty
+ * default profiles.
  * @intent: (in) (nullable): The name of the system intent from which to clear
  * the profile defaults for this stream.
  *
@@ -141,8 +141,8 @@ modulemd_defaults_v1_set_empty_default_profiles_for_stream (
 /**
  * modulemd_defaults_v1_remove_default_profiles_for_stream:
  * @self: (in): This #ModulemdDefaultsV1 object.
- * @stream_name: (in): The name of the module stream to which to add this
- * default profile.
+ * @stream_name: (in): The name of the module stream from which to remove
+ * default profiles.
  * @intent: (in) (nullable): The name of the system intent from which to remove
  * the profile defaults for this stream.
  *
@@ -164,9 +164,9 @@ modulemd_defaults_v1_remove_default_profiles_for_stream (
  * @intent: (in) (nullable): The name of the system intent from which to
  * retrieve the profile defaults for this stream.
  *
- * Returns: (transfer full): A sorted list of unique profiles to be installed
- * by default for this stream. NULL, if this stream_name is not present in the
- * defaults.
+ * Returns: (transfer full): A sorted #GStrv list of unique profiles to be
+ * installed by default for this stream. NULL, if this stream_name is not
+ * present in the defaults.
  *
  * Since: 2.0
  */

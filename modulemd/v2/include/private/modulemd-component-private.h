@@ -29,9 +29,9 @@
 
 /**
  * modulemd_component_parse_buildafter:
- * @self: This #ModulemdComponent
+ * @self: This #ModulemdComponent object.
  * @parser: (inout): A libyaml parser object positioned just after the
- * "buildafter" key in a #ModulemdComponent section of a YAML document.
+ * "buildafter" key in a Component section of a YAML document.
  * @error: (out): A #GError that will return the reason for a parse failure.
  *
  * Returns: TRUE if the buildafter list could be parsed successfully.
@@ -45,9 +45,9 @@ modulemd_component_parse_buildafter (ModulemdComponent *self,
 
 /**
  * modulemd_component_parse_buildonly:
- * @self: This #ModulemdComponent
+ * @self: This #ModulemdComponent object.
  * @parser: (inout): A libyaml parser object positioned just after the
- * "buildonly" key in a #ModulemdComponent section of a YAML document.
+ * "buildonly" key in a Component section of a YAML document.
  * @error: (out): A #GError that will return the reason for a parse failure.
  *
  * Returns: TRUE if the buildonly list could be parsed successfully.
@@ -61,7 +61,7 @@ modulemd_component_parse_buildonly (ModulemdComponent *self,
 
 /**
  * modulemd_component_has_buildafter:
- * @self: This #ModulemdComponent
+ * @self: This #ModulemdComponent object.
  *
  * Returns: TRUE if one or more buildafter entries have been added to this
  * component.
@@ -74,7 +74,7 @@ modulemd_component_has_buildafter (ModulemdComponent *self);
 
 /**
  * modulemd_component_get_buildafter_internal:
- * @self: This #ModulemdComponentModule
+ * @self: This #ModulemdComponent object.
  *
  * Returns: The internal hash table representing the set of buildafter
  * dependencies.
@@ -87,7 +87,7 @@ modulemd_component_get_buildafter_internal (ModulemdComponent *self);
 
 /**
  * modulemd_component_emit_yaml_start:
- * @self: This #ModulemdComponent
+ * @self: This #ModulemdComponent object.
  * @emitter: (inout): A libyaml emitter object positioned where Component start
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission error.
@@ -104,7 +104,7 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
 
 /**
  * modulemd_component_emit_yaml_build_common:
- * @self: This #ModulemdComponent
+ * @self: This #ModulemdComponent object.
  * @emitter: (inout): A libyaml emitter object positioned where a Component's
  * buildorder, buildafter and/or buildonly item(s) should appear in the YAML
  * document.
@@ -126,7 +126,7 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
  * @a: A void pointer
  * @b: A void pointer
  *
- * Returns: TRUE, if both the pointers are equal. FALSE, otherwise.
+ * Returns: TRUE, if both pointers are pointers to #ModulemdComponent objects and both objects are equal. FALSE, otherwise.
  *
  * Since: 2.5
  */

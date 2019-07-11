@@ -48,7 +48,7 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser,
 
 /**
  * modulemd_buildopts_emit_yaml:
- * @self: This #ModulemdBuildopts
+ * @self: This #ModulemdBuildopts object.
  * @emitter: (inout): A libyaml emitter object positioned where a Buildopts
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or

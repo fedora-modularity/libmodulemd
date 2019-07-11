@@ -155,13 +155,15 @@ modulemd_module_stream_v1_set_description (ModulemdModuleStreamV1 *self,
 
 /**
  * modulemd_module_stream_v1_get_description:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
  * @locale: (in) (nullable): The name of the locale to use when translating
  * the string. If NULL, it will determine the locale with a system call to
- * setlocale(LC_MESSAGES, NULL) and return the that. If the caller wants the
- * untranslated string, they should pass "C" for the locale.
+ * `setlocale(LC_MESSAGES, NULL)` and return that. If the caller wants the
+ * untranslated string, they should pass `"C"` for the locale.
  *
  * Returns: (transfer none): The module description, translated to the
- * requested locale if available.
+ * requested locale if available. Translation information is managed by the
+ * #ModulemdTranslation and #ModulemdTranslationEntry objects.
  *
  * Since: 2.0
  */
@@ -212,13 +214,15 @@ modulemd_module_stream_v1_set_summary (ModulemdModuleStreamV1 *self,
 
 /**
  * modulemd_module_stream_v1_get_summary:
+ * @self: (in): This #ModulemdModuleStreamV1 object.
  * @locale: (in) (nullable): The name of the locale to use when translating
  * the string. If NULL, it will determine the locale with a system call to
- * setlocale(LC_MESSAGES, NULL) and return the that. If the caller wants the
- * untranslated string, they should pass "C" for the locale.
+ * `setlocale(LC_MESSAGES, NULL)` and return that. If the caller wants the
+ * untranslated string, they should pass `"C"` for the locale.
  *
  * Returns: (transfer none): The module summary, translated to the requested
- * locale if available.
+ * locale if available. Translation information is managed by the
+ * #ModulemdTranslation and #ModulemdTranslationEntry objects.
  *
  * Since: 2.0
  */
@@ -330,8 +334,8 @@ modulemd_module_stream_v1_clear_rpm_components (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_module_component_names_as_strv: (rename-to modulemd_module_stream_v1_get_module_component_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of module component names included
- * in this stream.
+ * Returns: (transfer full): An ordered #GStrv list of module component names
+ * included in this stream.
  *
  * Since: 2.0
  */
@@ -343,8 +347,8 @@ modulemd_module_stream_v1_get_module_component_names_as_strv (
  * modulemd_module_stream_v1_get_rpm_component_names_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_component_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of RPM component names included
- * in this stream.
+ * Returns: (transfer full): An ordered #GStrv list of RPM component names
+ * included in this stream.
  *
  * Since: 2.0
  */
@@ -358,7 +362,7 @@ modulemd_module_stream_v1_get_rpm_component_names_as_strv (
  * @self: (in): This #ModulemdModuleStreamV1 object.
  * @component_name: (in): The name of the component to retrieve.
  *
- * Returns: (transfer none): The module component matching @component name if
+ * Returns: (transfer none): The module component matching @component_name if
  * it exists, else NULL.
  *
  * Since: 2.0
@@ -373,7 +377,7 @@ modulemd_module_stream_v1_get_module_component (ModulemdModuleStreamV1 *self,
  * @self: (in): This #ModulemdModuleStreamV1 object.
  * @component_name: (in): The name of the component to retrieve.
  *
- * Returns: (transfer none): The RPM component matching @component name if it
+ * Returns: (transfer none): The RPM component matching @component_name if it
  * exists, else NULL.
  *
  * Since: 2.0
@@ -463,8 +467,8 @@ modulemd_module_stream_v1_clear_module_licenses (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_content_licenses_as_strv: (rename-to modulemd_module_stream_v1_get_content_licenses)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of licenses under which one or
- * more components of this module stream are released.
+ * Returns: (transfer full): An ordered #GStrv list of licenses under which one
+ * or more components of this module stream are released.
  *
  * Since: 2.0
  */
@@ -477,8 +481,8 @@ modulemd_module_stream_v1_get_content_licenses_as_strv (
  * modulemd_module_stream_v1_get_module_licenses_as_strv: (rename-to modulemd_module_stream_v1_get_module_licenses)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of licenses under which this
- * module stream is released.
+ * Returns: (transfer full): An ordered #GStrv list of licenses under which
+ * this module stream is released.
  *
  * Since: 2.0
  */
@@ -505,7 +509,7 @@ modulemd_module_stream_v1_add_profile (ModulemdModuleStreamV1 *self,
  * modulemd_module_stream_v1_clear_profiles:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Removes all profiles from this module stream.
+ * Remove all profiles from this module stream.
  *
  * Since: 2.0
  */
@@ -517,8 +521,8 @@ modulemd_module_stream_v1_clear_profiles (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_profile_names_as_strv: (rename-to modulemd_module_stream_v1_get_profile_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of profile names associated with
- * this module stream.
+ * Returns: (transfer full): An ordered #GStrv list of profile names associated
+ * with this module stream.
  *
  * Since: 2.0
  */
@@ -583,8 +587,8 @@ modulemd_module_stream_v1_clear_rpm_api (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_rpm_api_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_api)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of binary RPM names that forms
- * the public API of this module stream.
+ * Returns: (transfer full): An ordered #GStrv list of binary RPM names that
+ * forms the public API of this module stream.
  *
  * Since: 2.0
  */
@@ -620,7 +624,7 @@ modulemd_module_stream_v1_remove_rpm_artifact (ModulemdModuleStreamV1 *self,
  * modulemd_module_stream_v1_clear_rpm_artifacts:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Remove all RPM NEVRs from the list of artifacts
+ * Remove all RPM NEVRs from the list of artifacts.
  *
  * Since: 2.5
  */
@@ -632,8 +636,8 @@ modulemd_module_stream_v1_clear_rpm_artifacts (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_rpm_artifacts_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_artifacts)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of RPM NEVRs are included in this
- * module stream.
+ * Returns: (transfer full): An ordered #GStrv list of RPM NEVRs are included
+ * in this module stream.
  *
  * Since: 2.0
  */
@@ -682,8 +686,8 @@ modulemd_module_stream_v1_clear_rpm_filters (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_rpm_filters_as_strv: (rename-to modulemd_module_stream_v1_get_rpm_filters)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of binary RPM names that are
- * filtered out of this module stream.
+ * Returns: (transfer full): An ordered #GStrv list of binary RPM names that
+ * are filtered out of this module stream.
  *
  * Since: 2.0
  */
@@ -710,7 +714,7 @@ modulemd_module_stream_v1_add_servicelevel (
  * modulemd_module_stream_v1_clear_servicelevels:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Removes all servicelevels from this module stream.
+ * Remove all servicelevels from this module stream.
  *
  * Since: 2.0
  */
@@ -722,8 +726,8 @@ modulemd_module_stream_v1_clear_servicelevels (ModulemdModuleStreamV1 *self);
  * modulemd_module_stream_v1_get_servicelevel_names_as_strv: (rename-to modulemd_module_stream_v1_get_servicelevel_names)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of servicelevel names associated with
- * this module stream.
+ * Returns: (transfer full): An ordered #GStrv list of servicelevel names
+ * associated with this module stream.
  *
  * Since: 2.0
  */
@@ -753,7 +757,7 @@ modulemd_module_stream_v1_get_servicelevel (ModulemdModuleStreamV1 *self,
  * @eol: (in): The end-of-life date for the "rawhide" service level.
  *
  * Comptibility function with early iterations of modulemd v1. This function is
- * a wrapper for Modulemd.ModuleStreamV1.add_servicelevel("rawhide", eol).
+ * a wrapper for `modulemd_module_stream_v1_add_servicelevel("rawhide", eol)`.
  *
  * Since: 2.0
  * Deprecated: 2.0
@@ -768,7 +772,7 @@ modulemd_module_stream_v1_set_eol (ModulemdModuleStreamV1 *self, GDate *eol);
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
  * Compatibility function with early iterations of modulemd v1. This function
- * is a wrapper for Modulemd.ModuleStreamV1.get_servicelevel("rawhide").
+ * is a wrapper for `modulemd_module_stream_v1_get_servicelevel("rawhide")`.
  *
  * Returns: (transfer none): The end-of-life date for the "rawhide" service
  * level.
@@ -872,8 +876,8 @@ modulemd_module_stream_v1_clear_runtime_requirements (
  * modulemd_module_stream_v1_get_buildtime_modules_as_strv: (rename-to modulemd_module_stream_v1_get_buildtime_modules)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of module names that this module
- * depends on at build-time.
+ * Returns: (transfer full): An ordered #GStrv list of module names that this
+ * module depends on at build-time.
  *
  * Since: 2.0
  */
@@ -886,8 +890,8 @@ modulemd_module_stream_v1_get_buildtime_modules_as_strv (
  * modulemd_module_stream_v1_get_runtime_modules_as_strv: (rename-to modulemd_module_stream_v1_get_runtime_modules)
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer full): An ordered list of module names that this module
- * depends on at runtime.
+ * Returns: (transfer full): An ordered #GStrv list of module names that this
+ * module depends on at runtime.
  *
  * Since: 2.0
  */
@@ -949,7 +953,7 @@ modulemd_module_stream_v1_set_xmd (ModulemdModuleStreamV1 *self,
  * modulemd_module_stream_v1_get_xmd:
  * @self: (in): This #ModulemdModuleStreamV1 object.
  *
- * Returns: (transfer none): The extensible metadata block as a GVariant.
+ * Returns: (transfer none): The extensible metadata block as a #GVariant.
  */
 GVariant *
 modulemd_module_stream_v1_get_xmd (ModulemdModuleStreamV1 *self);

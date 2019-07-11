@@ -49,8 +49,8 @@ modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
                                        GError **error);
 
 /**
- * modulemd_translation_entry_emitter_yaml:
- * @self: This #ModulemdTranslationEntry
+ * modulemd_translation_entry_emit_yaml:
+ * @self: This #ModulemdTranslationEntry object.
  * @emitter: (inout): A libyaml emitter object positioned where a Translation Entry
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or

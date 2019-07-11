@@ -25,12 +25,12 @@ struct _ModulemdDependencies
   GObject parent_instance;
 
   /* @key: dependent modules.
-   * @value: GHashTable set of compatible streams
+   * @value: #GHashTable set of compatible streams
    */
   GHashTable *buildtime_deps;
 
   /* @key: dependent modules.
-   * @value: GHashTable set of compatible streams
+   * @value: #GHashTable set of compatible streams
    */
   GHashTable *runtime_deps;
 };

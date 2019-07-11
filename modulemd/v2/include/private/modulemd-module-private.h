@@ -33,9 +33,9 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_module_new:
- * @module_name: (in) (not nullable): The name of the module
+ * @module_name: (in) (not nullable): The name of the module.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdModule
+ * Returns: (transfer full): A newly-allocated #ModulemdModule object.
  *
  * Since: 2.0
  */
@@ -45,7 +45,7 @@ modulemd_module_new (const gchar *module_name);
 
 /**
  * modulemd_module_set_defaults:
- * @self: (in): This #ModulemdModule object
+ * @self: (in): This #ModulemdModule object.
  * @defaults: (in): A #ModulemdDefaults object to associate with this
  * #ModulemdModule. If the module_name in the #ModulemdDefaults object does not
  * match this module, it will be rejected.
@@ -62,9 +62,9 @@ modulemd_module_new (const gchar *module_name);
  * error.
  *
  * Returns: The mdversion of the defaults that were added. Returns
- * MD_DEFAULTS_VERSION_ERROR and sets @error if the default name didn't match
+ * %MD_DEFAULTS_VERSION_ERROR and sets @error if the default name didn't match
  * or the Defaults object couldn't be upgraded successfully to
- * the @index_mdversion. Returns MD_DEFAULTS_VERSION_UNSET if @defaults was
+ * the @index_mdversion. Returns %MD_DEFAULTS_VERSION_UNSET if @defaults was
  * NULL.
  *
  * Since: 2.0
@@ -77,8 +77,8 @@ modulemd_module_set_defaults (ModulemdModule *self,
 
 
 /**
- * modulemd_module_associate_translation:
- * @self: This #ModulemdModule object
+ * modulemd_module_add_translation:
+ * @self: This #ModulemdModule object.
  * @translation: (in): A #ModulemdTranslation object which is copied into the
  * #ModulemdModule object.
  *
@@ -91,7 +91,7 @@ modulemd_module_add_translation (ModulemdModule *self,
 
 /**
  * modulemd_module_get_translated_streams:
- * @self: This #ModulemdModule object
+ * @self: This #ModulemdModule object.
  *
  * Returns: (transfer container): A list of streams for which translations have
  * been added, sorted by stream name.
@@ -103,8 +103,8 @@ modulemd_module_get_translated_streams (ModulemdModule *self);
 
 
 /**
- * modulemd_module_get_translations:
- * @self: This #ModulemdModule object
+ * modulemd_module_get_translation:
+ * @self: This #ModulemdModule object.
  * @stream: The stream to look up translations for.
  *
  * Returns: (transfer none): The set of translations attached to streams.
@@ -117,7 +117,7 @@ modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
 
 /**
  * modulemd_module_add_stream:
- * @self: This #ModulemdModule object
+ * @self: This #ModulemdModule object.
  * @stream: A #ModulemdModuleStream object to associate with this
  * #ModulemdModule. A stream added to a #ModulemdModule must have a module
  * name and stream name set on it or it will be rejected. If the module name
@@ -135,10 +135,10 @@ modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
  * appropriate error.
  *
  * Returns: The mdversion of the stream that was added. Returns
- * MD_MODULE_STREAM_VERSION_ERROR and sets @error if the module name didn't
+ * %MD_MODULE_STREAM_VERSION_ERROR and sets @error if the module name didn't
  * match, the module and stream names were unset or the stream object couldn't
  * be upgraded successfully to the @index_mdversion. Returns
- * MD_MODULE_STREAM_VERSION_UNSET if @stream was NULL.
+ * %MD_MODULE_STREAM_VERSION_UNSET if @stream was NULL.
  *
  * Since: 2.0
  */
@@ -151,8 +151,8 @@ modulemd_module_add_stream (ModulemdModule *self,
 
 /**
  * modulemd_module_upgrade_streams:
- * @self: This #ModulemdModule object
- * @mdversion: The metadata version to upgrade to
+ * @self: This #ModulemdModule object.
+ * @mdversion: The metadata version to upgrade to.
  * @error: (out): A #GError containing the reason a stream failed to upgrade.
  *
  * Returns: TRUE if all upgrades completed successfully. FALSE and sets @error

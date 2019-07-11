@@ -28,15 +28,48 @@
  */
 
 
+/**
+ * modulemd_translation_get_version:
+ * @self: (in): This #ModulemdTranslation object.
+ *
+ * Returns: The metadata version of this #ModulemdTranslation object.
+ *
+ * Since: 2.0
+ */
 guint64
 modulemd_translation_get_version (ModulemdTranslation *self);
 
+/**
+ * modulemd_translation_get_module_name:
+ * @self: (in): This #ModulemdTranslation object.
+ *
+ * Returns: The module name to which this #ModulemdTranslation object applies.
+ *
+ * Since: 2.0
+ */
 const gchar *
 modulemd_translation_get_module_name (ModulemdTranslation *self);
 
+/**
+ * modulemd_translation_get_module_stream:
+ * @self: (in): This #ModulemdTranslation object.
+ *
+ * Returns: The stream name to which this #ModulemdTranslation object applies.
+ *
+ * Since: 2.0
+ */
 const gchar *
 modulemd_translation_get_module_stream (ModulemdTranslation *self);
 
+/**
+ * modulemd_translation_get_modified:
+ * @self: (in): This #ModulemdTranslation object.
+ *
+ * Returns: The last modified time of this #ModulemdTranslation object
+ * represented as a 64-bit integer (such as 201807011200).
+ *
+ * Since: 2.0
+ */
 guint64
 modulemd_translation_get_modified (ModulemdTranslation *self);
 
@@ -63,7 +96,7 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
 /**
  * modulemd_translation_emit_yaml:
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  * @emitter: (inout): A libyaml emitter object positioned where Translation data
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or

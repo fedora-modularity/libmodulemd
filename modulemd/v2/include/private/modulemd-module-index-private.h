@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_module_index_update_from_parser:
- * @self: (in): This #ModulemdModuleIndex object
+ * @self: (in): This #ModulemdModuleIndex object.
  * @parser: (inout): An initialized YAML parser that has not yet processed any
  * events.
  * @strict: (in): Whether the parser should return failure if it encounters an
@@ -44,7 +44,7 @@ G_BEGIN_DECLS
  * See #ModulemdSubdocumentInfo for more details. If the array is NULL, it will
  * be allocated by this function. If it is non-NULL, this function will append
  * to it.
- * @error: (out): A GError containing additional information if this function
+ * @error: (out): A #GError containing additional information if this function
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets failures

@@ -38,8 +38,8 @@ G_DECLARE_FINAL_TYPE (ModulemdTranslationEntry,
  * @locale: (not nullable): The locale for this translation entry.
  * It must correspond to the format specified by libc locale names.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdTranslationEntry. This
- * object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdTranslationEntry
+ * object. This object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -49,11 +49,11 @@ modulemd_translation_entry_new (const gchar *locale);
 
 /**
  * modulemd_translation_entry_copy:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  *
  * Create a copy of this #ModulemdTranslationEntry object.
  *
- * Returns: (transfer full): a copied #ModulemdTranslationEntry object
+ * Returns: (transfer full): The copied #ModulemdTranslationEntry object.
  *
  * Since: 2.0
  */
@@ -63,7 +63,7 @@ modulemd_translation_entry_copy (ModulemdTranslationEntry *self);
 
 /**
  * modulemd_translation_entry_get_locale:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  *
  * Get the locale of this translation entry.
  *
@@ -78,8 +78,9 @@ modulemd_translation_entry_get_locale (ModulemdTranslationEntry *self);
 
 /**
  * modulemd_translation_entry_set_summary:
- * @self: This #ModulemdTranslationEntry
- * @summary: (nullable): The summary of this module translated appropriately for this locale.
+ * @self: This #ModulemdTranslationEntry object.
+ * @summary: (nullable): The summary of this module translated appropriately
+ * for this locale.
  *
  * Since: 2.0
  */
@@ -90,11 +91,12 @@ modulemd_translation_entry_set_summary (ModulemdTranslationEntry *self,
 
 /**
  * modulemd_translation_entry_get_summary:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  *
  * Get the summary of this translation entry.
  *
- * Returns: (transfer none): The summary of this module stream translated into the language specified by locale.
+ * Returns: (transfer none): The summary of this module stream translated into
+ * the language specified by locale.
  *
  * Since: 2.0
  */
@@ -104,8 +106,9 @@ modulemd_translation_entry_get_summary (ModulemdTranslationEntry *self);
 
 /**
  * modulemd_translation_entry_set_description:
- * @self: This #ModulemdTranslationEntry
- * @description: (nullable): The description of this module stream translated into the language specified by locale.
+ * @self: This #ModulemdTranslationEntry object.
+ * @description: (nullable): The description of this module stream translated
+ * into the language specified by locale.
  *
  * Since: 2.0
  */
@@ -116,11 +119,12 @@ modulemd_translation_entry_set_description (ModulemdTranslationEntry *self,
 
 /**
  * modulemd_translation_entry_get_description:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  *
  * Get the description of this translation entry.
  *
- * Returns: (transfer none): The description of this module stream translated into the language specified by locale.
+ * Returns: (transfer none): The description of this module stream translated
+ * into the language specified by locale.
  *
  * Since: 2.0
  */
@@ -130,7 +134,7 @@ modulemd_translation_entry_get_description (ModulemdTranslationEntry *self);
 
 /**
  * modulemd_translation_entry_get_profiles_as_strv: (rename-to modulemd_translation_entry_get_profiles)
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  *
  * Get a list of profiles that have descriptions.
  *
@@ -146,11 +150,11 @@ modulemd_translation_entry_get_profiles_as_strv (
 
 /**
  * modulemd_translation_entry_set_profile_description:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  * @profile_name: The name of the profile.
  * @profile_description: (nullable): The translated description of the profile.
  *
- * Adds a profile name translation
+ * Adds a profile name translation.
  *
  * Since: 2.0
  */
@@ -163,7 +167,7 @@ modulemd_translation_entry_set_profile_description (
 
 /**
  * module_translation_entry_get_profile_description:
- * @self: This #ModulemdTranslationEntry
+ * @self: This #ModulemdTranslationEntry object.
  * @profile_name: The name of the profile whose description is being translated.
  *
  * Returns: (transfer none): The description for the specified profile.

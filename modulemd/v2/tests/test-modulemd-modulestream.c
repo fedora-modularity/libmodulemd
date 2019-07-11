@@ -866,12 +866,16 @@ module_stream_v2_test_dependencies (ModuleStreamFixture *fixture,
 
   list = modulemd_dependencies_get_buildtime_streams_as_strv (
     g_ptr_array_index (deps_list, 0), "foo");
+  g_assert_nonnull (list);
   g_assert_cmpstr (list[0], ==, "stable");
+  g_assert_null (list[1]);
   g_clear_pointer (&list, g_strfreev);
 
   list = modulemd_dependencies_get_runtime_modules_as_strv (
     g_ptr_array_index (deps_list, 0));
+  g_assert_nonnull (list);
   g_assert_cmpstr (list[0], ==, "bar");
+  g_assert_null (list[1]);
 
   g_clear_pointer (&list, g_strfreev);
   g_clear_object (&dep);

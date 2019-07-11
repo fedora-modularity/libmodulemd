@@ -32,8 +32,8 @@ G_BEGIN_DECLS
 
 /**
  * modulemd_defaults_set_module_name:
- * @self: (in): This #ModulemdDefaults object
- * @module_name: The module name this object represents
+ * @self: (in): This #ModulemdDefaults object.
+ * @module_name: The module name this object represents.
  *
  * Since: 2.0
  */
@@ -43,19 +43,19 @@ modulemd_defaults_set_module_name (ModulemdDefaults *self,
 
 /**
  * modulemd_defaults_merge:
- * @from: (in): A #ModulemdDefaults object to merge from
- * @into: (in): A #ModulemdDefaults object being merged into
+ * @from: (in): A #ModulemdDefaults object to merge from.
+ * @into: (in): A #ModulemdDefaults object being merged into.
  * @strict_default_streams: (in): Whether a stream conflict should throw an
  * error or just unset the default stream.
  * @error: (out): A #GError containing the reason for an unresolvable merge
- * conflict
+ * conflict.
  *
  * Performs a merge of two #ModulemdDefaults objects. See the documentation for
  * #ModulemdModuleIndexMerger for details on the merge algorithm used.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdDefaults containing the
- * merged values of @from and @into. If this function encounters an
- * unresolvable merge conflict, it will return NULL and set @error
+ * Returns: (transfer full): A newly-allocated #ModulemdDefaults object
+ * containing the merged values of @from and @into. If this function encounters
+ * an unresolvable merge conflict, it will return NULL and set @error
  * appropriately.
  *
  * Since: 2.0

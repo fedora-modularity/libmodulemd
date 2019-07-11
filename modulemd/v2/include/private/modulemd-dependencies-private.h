@@ -46,9 +46,10 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
                                   gboolean strict,
                                   GError **error);
 
+
 /**
- * modulemd_dependenciesemitter_yaml:
- * @self: This #ModulemdDependencies
+ * modulemd_dependencies_emit_yaml:
+ * @self: This #ModulemdDependencies object.
  * @emitter: (inout): A libyaml emitter object positioned where a dependencies instance
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or
@@ -65,14 +66,55 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
                                  GError **error);
 
 
+/**
+ * modulemd_dependencies_validate:
+ * @self: This #ModulemdDependencies object.
+ * @error: (out): A #GError containing the reason the object failed validation.
+ * NULL if the validation passed.
+ *
+ * Returns: TRUE if validation passed. FALSE and sets @error if failed.
+ *
+ * This method runs a sanity check that the runtime (requires) and buildtime
+ * (buildrequires) dependencies are internally consistent.
+ *
+ * Since: 2.0
+ */
 gboolean
 modulemd_dependencies_validate (ModulemdDependencies *self, GError **error);
 
 
+/**
+ * modulemd_dependencies_requires_module_and_stream:
+ * @self: This #ModulemdDependencies object.
+ * @module_name: (in): The name of the module to be checked.
+ * @stream_name: (in): The name of the stream to be checked.
+ *
+ * Returns: TRUE if the specified runtime dependency is present. FALSE if not.
+ *
+ * This method checks if the runtime dependencies for this object include the
+ * specified module stream.
+ *
+ * Since: 2.2
+ */
 gboolean
 modulemd_dependencies_requires_module_and_stream (ModulemdDependencies *self,
                                                   const gchar *module_name,
                                                   const gchar *stream_name);
+
+
+/**
+ * modulemd_dependencies_buildrequires_module_and_stream:
+ * @self: This #ModulemdDependencies object.
+ * @module_name: (in): The name of the module to be checked.
+ * @stream_name: (in): The name of the stream to be checked.
+ *
+ * Returns: TRUE if the specified buildtime dependency is present. FALSE if not.
+ *
+ * This method checks if the buildtime dependencies for this object include the
+ * specified module stream.
+ *
+ * Since: 2.2
+ */
 gboolean
 modulemd_dependencies_buildrequires_module_and_stream (
   ModulemdDependencies *self,

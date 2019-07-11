@@ -380,7 +380,7 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error);
  * @parser: (inout): A libyaml parser object positioned at the beginning of a sequence with string scalars.
  * @error: (out): A #GError that will return the reason for a parsing or validation error.
  *
- * Returns: (transfer full): A newly-allocated GHashtTable * representing the parsed value.
+ * Returns: (transfer full): A newly-allocated #GHashTable * representing the parsed value.
  * All parsed sequence entries are added as keys in the hashtable.
  * NULL if a parse error occurred and sets @error appropriately.
  *
@@ -404,7 +404,7 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error);
  * Function for retrieving a string set from a single-key map such as
  * data.artifacts, data.api or data.filter from a module stream document.
  *
- * Returns: (transfer full): A newly-allocated GHashtTable * representing the
+ * Returns: (transfer full): A newly-allocated #GHashTable * representing the
  * parsed values. All parsed sequence entries are added as keys in the
  * hashtable. NULL if a parse error occurred and sets @error appropriately.
  *
@@ -427,7 +427,7 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
  * Function for retrieving a hash table from a str/str map such as
  * data.dependencies in ModuleStreamV1.
  *
- * Returns: (transfer full): A newly-allocated GHashtTable * representing the
+ * Returns: (transfer full): A newly-allocated #GHashTable * representing the
  * parsed values. NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0

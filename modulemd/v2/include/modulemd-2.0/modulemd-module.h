@@ -35,9 +35,10 @@ G_DECLARE_FINAL_TYPE (
 
 /**
  * modulemd_module_get_stream_names_as_strv: (rename-to modulemd_module_get_stream_names)
- * @self: This #ModulemdModule
+ * @self: This #ModulemdModule object.
  *
- * Returns: (transfer full): An ordered list of stream names in this module.
+ * Returns: (transfer full): An ordered #GStrv list of stream names in this
+ * module.
  *
  * Since: 2.6
  */
@@ -47,9 +48,9 @@ modulemd_module_get_stream_names_as_strv (ModulemdModule *self);
 
 /**
  * modulemd_module_copy:
- * @self: (in): This #ModulemdModule object
+ * @self: (in): This #ModulemdModule object.
  *
- * Returns: (transfer full): A deep copy of this #ModulemdModule object
+ * Returns: (transfer full): A deep copy of this #ModulemdModule object.
  *
  * Since: 2.0
  */
@@ -59,8 +60,9 @@ modulemd_module_copy (ModulemdModule *self);
 
 /**
  * modulemd_module_validate:
- * @self: (in): This #ModulemdModule object
- * @error: (out): A GError containign the reason the object failed validation. NULL if the validation passed.
+ * @self: (in): This #ModulemdModule object.
+ * @error: (out): A #GError containing the reason the object failed validation.
+ * NULL if the validation passed.
  *
  * Returns: TRUE if validation passed, FALSE and sets @error if failed.
  *
@@ -72,9 +74,9 @@ modulemd_module_validate (ModulemdModule *self, GError **error);
 
 /**
  * modulemd_module_get_module_name:
- * @self: This #ModulemdModule object
+ * @self: This #ModulemdModule object.
  *
- * Returns: (transfer none): The module name
+ * Returns: (transfer none): The module name.
  *
  * Since: 2.0
  */
@@ -84,7 +86,7 @@ modulemd_module_get_module_name (ModulemdModule *self);
 
 /**
  * modulemd_module_get_all_streams:
- * @self: This #ModulemdModule object
+ * @self: This #ModulemdModule object.
  *
  * Returns: (transfer none) (element-type ModulemdModuleStream): A list of all available stream objects associated with
  * this module. There may be multiple streams with the same name and different version and
@@ -98,8 +100,8 @@ modulemd_module_get_all_streams (ModulemdModule *self);
 
 /**
  * modulemd_module_get_streams_by_stream_name_as_list: (rename-to modulemd_module_get_streams_by_stream_name)
- * @self: This #ModulemdModule object
- * @stream_name: The name of the stream to retrieve
+ * @self: This #ModulemdModule object.
+ * @stream_name: The name of the stream to retrieve.
  *
  * Returns: (transfer container) (element-type ModulemdModuleStream): A list of all available stream objects associated with a
  * particular stream name, sorted highest to lowest by the version. The same version may have
@@ -114,10 +116,10 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
 
 /**
  * modulemd_module_get_stream_by_NSVC:
- * @self: This #ModulemdModule object
- * @stream_name: The name of the stream to retrieve
- * @version: The version of the stream to retrieve
- * @context: The context of the stream to retrieve
+ * @self: This #ModulemdModule object.
+ * @stream_name: The name of the stream to retrieve.
+ * @version: The version of the stream to retrieve.
+ * @context: The context of the stream to retrieve.
  *
  * Returns: (transfer none): The requested stream object or NULL if no match was found.
  *
@@ -134,8 +136,8 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
 
 /**
  * modulemd_module_search_streams:
- * @self: This #ModulemdModule object
- * @stream_name: The name of the stream to retrieve
+ * @self: This #ModulemdModule object.
+ * @stream_name: The name of the stream to retrieve.
  * @version: The version of the stream to retrieve. If set to zero,
  * the version is not included in the search.
  * @context: (nullable): The context of the stream to retrieve. If NULL, the
@@ -162,8 +164,8 @@ modulemd_module_search_streams (ModulemdModule *self,
 
 /**
  * modulemd_module_get_stream_by_NSVCA:
- * @self: This #ModulemdModule object
- * @stream_name: The name of the stream to retrieve
+ * @self: This #ModulemdModule object.
+ * @stream_name: The name of the stream to retrieve.
  * @version: The version of the stream to retrieve. If set to zero, the version
  * is not included in the search.
  * @context: (nullable): The context of the stream to retrieve. If NULL, the
@@ -190,8 +192,8 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
 /**
  * modulemd_module_remove_streams_by_NSVCA:
- * @self: This #ModulemdModule object
- * @stream_name: (not nullable): The name of the stream to remove
+ * @self: This #ModulemdModule object.
+ * @stream_name: (not nullable): The name of the stream to remove.
  * @version: The version of the stream to remove. If set to zero, matches all
  * versions.
  * @context: (nullable): The context of the stream to remove. If NULL, matches
@@ -214,8 +216,8 @@ modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
 
 /**
  * modulemd_module_remove_streams_by_name:
- * @self: This #ModulemdModule object
- * @stream_name: (not nullable): The name of the stream to remove
+ * @self: This #ModulemdModule object.
+ * @stream_name: (not nullable): The name of the stream to remove.
  *
  * Remove one or more #ModulemdModuleStream objects from this #ModulemdModule
  * that match the provided stream name.
@@ -228,7 +230,7 @@ modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
 
 /**
  * modulemd_module_get_defaults:
- * @self: This #ModulemdModule object
+ * @self: This #ModulemdModule object.
  *
  * Returns: (transfer none): The defaults of this module.
  *

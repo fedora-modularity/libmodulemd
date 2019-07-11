@@ -43,7 +43,7 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
 
 /**
  * modulemd_rpm_map_entry_emit_yaml:
- * @self: This #ModulemdRpmMapEntry
+ * @self: This #ModulemdRpmMapEntry object.
  * @emitter: (inout): A libyaml emitter object positioned where a
  * #ModulemdRpmMapEntry belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or
@@ -62,11 +62,11 @@ modulemd_rpm_map_entry_emit_yaml (ModulemdRpmMapEntry *self,
 
 /**
  * modulemd_rpm_map_entry_equals_wrapper:
- * @a: const void pointer
- * @b: const void pointer
+ * @a: A const void pointer.
+ * @b: A const void pointer.
  *
- * Returns: TRUE if the two entries contain equivalent data. FALSE if they
- * differ.
+ * Returns: TRUE if the two entries are both pointers to #ModulemdRpmMapEntry
+ * objects containing equivalent data. FALSE if they differ.
  *
  * Since: 2.5
  */
@@ -76,11 +76,12 @@ modulemd_rpm_map_entry_equals_wrapper (const void *a, const void *b);
 
 /**
  * modulemd_RpmMapEntry_hash_table_equals_wrapper:
- * @a: const void pointer
- * @b: const void pointer
+ * @a: A const void pointer.
+ * @b: A const void pointer.
  *
- * Returns: TRUE if the two entries contain equivalent data. FALSE if they
- * differ.
+ * Returns: TRUE if the two entries are equivalent #GHashTable<!-- -->s of
+ * pointers to #ModulemdRpmMapEntry objects containing equivalent data. FALSE
+ * if they differ.
  *
  * Since: 2.5
  */

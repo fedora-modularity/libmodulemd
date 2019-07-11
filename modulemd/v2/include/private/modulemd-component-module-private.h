@@ -50,7 +50,7 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
 
 /**
  * modulemd_component_module_emit_yaml:
- * @self: This #ModulemdComponentModule
+ * @self: This #ModulemdComponentModule object.
  * @emitter: (inout): A libyaml emitter object positioned where Module Component
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission error.

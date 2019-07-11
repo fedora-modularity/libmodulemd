@@ -32,8 +32,8 @@ G_DECLARE_FINAL_TYPE (
 /**
  * modulemd_dependencies_new:
  *
- * Returns: (transfer full): A newly-allocated #ModulemdDependencies. This
- * object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdDependencies object.
+ * This object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -43,10 +43,10 @@ modulemd_dependencies_new (void);
 
 /**
  * modulemd_dependencies_equals:
- * @self_1: A #ModulemdDependencies
- * @self_2: A #ModulemdDependencies
+ * @self_1: A #ModulemdDependencies object.
+ * @self_2: A #ModulemdDependencies object.
  *
- * Check if self_1 and self_2 are equal objects
+ * Check if @self_1 and @self_2 are equal objects.
  *
  * Returns: TRUE, if the're equal. FALSE, otherwise.
  *
@@ -59,11 +59,11 @@ modulemd_dependencies_equals (ModulemdDependencies *self_1,
 
 /**
  * modulemd_dependencies_copy:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  *
  * Create a copy of this #ModulemdDependencies object.
  *
- * Returns: (transfer full): a copied #ModulemdDependencies object
+ * Returns: (transfer full): The copied #ModulemdDependencies object.
  *
  * Since: 2.0
  */
@@ -73,11 +73,14 @@ modulemd_dependencies_copy (ModulemdDependencies *self);
 
 /**
  * modulemd_dependencies_add_buildtime_stream:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module_name: The name of the module to depend on.
  * @module_stream: The name of the module stream to depend on.
  *
- * Add a single stream of a module that is required to build another dependent module. The matrix of streams and module names will be calculated by the build-system. If the provided module name is already present, the streams will be added (with deduplication).
+ * Add a single stream of a module that is required to build another dependent
+ * module. The matrix of streams and module names will be calculated by the
+ * build-system. If the provided module name is already present, the streams
+ * will be added (with deduplication).
  *
  * Since: 2.0
  */
@@ -89,7 +92,7 @@ modulemd_dependencies_add_buildtime_stream (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_empty_buildtime_dependencies_for_module:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module_name: The name of the module to add dependencies on.
  *
  * Adds a module and inserts an empty list for it as buildtime dependency.
@@ -103,11 +106,11 @@ modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
 
 /**
  * modulemd_dependencies_clear_buildtime_dependencies:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  *
- * Remove all buildtime dependencies from this #ModulemdDependencies object
+ * Remove all buildtime dependencies from this #ModulemdDependencies object.
  *
- * Since 2.5
+ * Since: 2.5
  */
 void
 modulemd_dependencies_clear_buildtime_dependencies (
@@ -116,9 +119,10 @@ modulemd_dependencies_clear_buildtime_dependencies (
 
 /**
  * modulemd_dependencies_get_buildtime_modules_as_strv: (rename-to modulemd_dependencies_get_buildtime_modules)
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  *
- * Returns: (transfer full): An ordered list of module names of build-time dependencies.
+ * Returns: (transfer full): An ordered #GStrv list of module names of
+ * build-time dependencies.
  *
  * Since: 2.0
  */
@@ -129,10 +133,12 @@ modulemd_dependencies_get_buildtime_modules_as_strv (
 
 /**
  * modulemd_dependencies_get_buildtime_streams_as_strv: (rename-to modulemd_dependencies_get_buildtime_streams)
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module: The name of the module.
  *
- * Returns: (transfer full) (nullable): An ordered list of module streams associated with the specified module that are required at build-time.
+ * Returns: (transfer full) (nullable): An ordered #GStrv list of module
+ * streams associated with the specified module that are required at
+ * build-time.
  *
  * Since: 2.0
  */
@@ -143,11 +149,14 @@ modulemd_dependencies_get_buildtime_streams_as_strv (
 
 /**
  * modulemd_dependencies_add_runtime_stream:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module_name: The name of the module to depend on.
  * @module_stream: The name of the module stream to depend on.
  *
- * Adds a module and its stream that is required at runtime by a dependent module. The matrix of streams and module names will be calculated by the build-system. If the listed provided module name is already present, the streams will be added (with deduplication).
+ * Adds a module and its stream that is required at runtime by a dependent
+ * module. The matrix of streams and module names will be calculated by the
+ * build-system. If the listed provided module name is already present, the
+ * streams will be added (with deduplication).
  *
  * Since: 2.0
  */
@@ -159,7 +168,7 @@ modulemd_dependencies_add_runtime_stream (ModulemdDependencies *self,
 
 /**
  * modulemd_dependencies_set_empty_runtime_dependencies_for_module:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module_name: The name of the module to add dependencies on.
  *
  * Adds a module and inserts an empty list for it as runtime dependency.
@@ -173,11 +182,11 @@ modulemd_dependencies_set_empty_runtime_dependencies_for_module (
 
 /**
  * modulemd_dependencies_clear_runtime_dependencies:
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  *
- * Remove all runtime dependencies from this #ModulemdDependencies object
+ * Remove all runtime dependencies from this #ModulemdDependencies object.
  *
- * Since 2.5
+ * Since: 2.5
  */
 void
 modulemd_dependencies_clear_runtime_dependencies (ModulemdDependencies *self);
@@ -185,9 +194,10 @@ modulemd_dependencies_clear_runtime_dependencies (ModulemdDependencies *self);
 
 /**
  * modulemd_dependencies_get_runtime_modules_as_strv: (rename-to modulemd_dependencies_get_runtime_modules)
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  *
- * Returns: (transfer full): An ordered list of module names of run-time dependencies.
+ * Returns: (transfer full): An ordered #GStrv list of module names of run-time
+ * dependencies.
  *
  * Since: 2.0
  */
@@ -197,10 +207,11 @@ modulemd_dependencies_get_runtime_modules_as_strv (ModulemdDependencies *self);
 
 /**
  * modulemd_dependencies_get_runtime_streams_as_strv: (rename-to modulemd_dependencies_get_runtime_streams)
- * @self: This #ModulemdDependencies
+ * @self: This #ModulemdDependencies object.
  * @module: The name of the module.
  *
- * Returns: (transfer full) (nullable): An ordered list of module streams associated with the specified module that are required at run-time.
+ * Returns: (transfer full) (nullable): An ordered #GStrv list of module streams
+ * associated with the specified module that are required at run-time.
  *
  * Since: 2.0
  */

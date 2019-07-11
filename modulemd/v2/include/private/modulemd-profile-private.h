@@ -50,8 +50,8 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
                              GError **error);
 
 /**
- * modulemd_profile_emitter_yaml:
- * @self: This #ModulemdProfile
+ * modulemd_profile_emit_yaml:
+ * @self: This #ModulemdProfile object.
  * @emitter: (inout): A libyaml emitter object positioned where a Profile
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or
@@ -69,10 +69,11 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
 
 /**
  * modulemd_profile_equals_wrapper:
- * @a: A void pointer
- * @b: A void pointer
+ * @a: A const void pointer.
+ * @b: A const void pointer.
  *
- * Returns: TRUE, if both the pointers are equal. FALSE, otherwise
+ * Returns: TRUE, if both arguments are pointers to #ModulemdProfile objects
+ * and all elements of both objects are equal. FALSE, otherwise.
  *
  * Since: 2.5
  */
@@ -82,7 +83,7 @@ modulemd_profile_equals_wrapper (const void *a, const void *b);
 
 /**
  * modulemd_profile_set_owner:
- * @self: This #ModulemdProfile
+ * @self: This #ModulemdProfile object.
  * @owner: A #ModulemdModuleStream that will own this profile. Used to look up
  * translations internally.
  *

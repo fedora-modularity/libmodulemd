@@ -74,12 +74,12 @@ struct _ModulemdDefaultsClass
 
 /**
  * modulemd_defaults_new:
- * @version: The version of the defaults metadata to create
- * @module_name: The name of the module to which these defaults apply
+ * @version: The version of the defaults metadata to create.
+ * @module_name: The name of the module to which these defaults apply.
  *
  * Create a new #ModulemdDefaults.
  *
- * Returns: (transfer full): a newly created #ModulemdDefaults subtype of the
+ * Returns: (transfer full): A newly created #ModulemdDefaults subtype of the
  * requested version.
  *
  * Since: 2.0
@@ -90,9 +90,9 @@ modulemd_defaults_new (guint64 version, const gchar *module_name);
 
 /**
  * modulemd_defaults_copy:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  *
- * Returns: (transfer full): A newly-allocated copy of @self
+ * Returns: (transfer full): A newly-allocated copy of @self.
  *
  * Since: 2.0
  */
@@ -102,7 +102,7 @@ modulemd_defaults_copy (ModulemdDefaults *self);
 
 /**
  * modulemd_defaults_validate:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  * @error: (out):  A #GError that will return the reason for a validation error.
  *
  * Returns: TRUE if validation passed, FALSE and sets @error appropriately if
@@ -119,7 +119,7 @@ modulemd_defaults_validate (ModulemdDefaults *self, GError **error);
  * @self_1: (in): A #ModulemdDefaults object
  * @self_2: (in): A #ModulemdDefaults object
  *
- * Returns: TRUE if both self_1 and self_2 contain equal values, FALSE if they differed.
+ * Returns: TRUE if both @self_1 and @self_2 contain equal values, FALSE if they differed.
  *
  * Since: 2.2
  */
@@ -129,7 +129,7 @@ modulemd_defaults_equals (ModulemdDefaults *self_1, ModulemdDefaults *self_2);
 
 /**
  * modulemd_defaults_upgrade:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  * @mdversion: (in): The version to upgrade to.
  * @error: (out):  A #GError that will return the reason for an upgrade error.
  *
@@ -147,7 +147,7 @@ modulemd_defaults_upgrade (ModulemdDefaults *self,
 
 /**
  * modulemd_defaults_get_module_name:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  *
  * Returns: (transfer none): The name of the module to which these defaults
  * apply.
@@ -160,7 +160,7 @@ modulemd_defaults_get_module_name (ModulemdDefaults *self);
 
 /**
  * modulemd_defaults_get_mdversion:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  *
  * Returns: The metadata version of this defaults object.
  *
@@ -172,7 +172,7 @@ modulemd_defaults_get_mdversion (ModulemdDefaults *self);
 
 /**
  * modulemd_defaults_set_modified:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  * @modified: (in): The last modified time represented as a 64-bit integer
  * (such as 201807011200)
  *
@@ -184,7 +184,7 @@ modulemd_defaults_set_modified (ModulemdDefaults *self, guint64 modified);
 
 /**
  * modulemd_defaults_get_modified:
- * @self: (in): This #ModulemdDefaults object
+ * @self: (in): This #ModulemdDefaults object.
  *
  * Returns: The last modified time represented as a 64-bit integer
  * (such as 201807011200)

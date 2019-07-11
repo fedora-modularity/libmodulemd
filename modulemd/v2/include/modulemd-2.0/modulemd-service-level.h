@@ -36,8 +36,8 @@ G_DECLARE_FINAL_TYPE (ModulemdServiceLevel,
  * modulemd_service_level_new:
  * @name: (not nullable): The name of the service level.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdServiceLevel. This
- * object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdServiceLevel object.
+ * This object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -47,11 +47,11 @@ modulemd_service_level_new (const gchar *name);
 
 /**
  * modulemd_service_level_copy:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  *
  * Create a copy of this #ModulemdServiceLevel object.
  *
- * Returns: (transfer full): a copied #ModulemdServiceLevel object
+ * Returns: (transfer full): The copied #ModulemdServiceLevel object.
  *
  * Since: 2.0
  */
@@ -61,7 +61,7 @@ modulemd_service_level_copy (ModulemdServiceLevel *self);
 
 /**
  * modulemd_service_level_get_name:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  *
  * Get the name of this service level.
  *
@@ -76,7 +76,7 @@ modulemd_service_level_get_name (ModulemdServiceLevel *self);
 
 /**
  * modulemd_service_level_set_eol:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  * @date: (nullable): The date this service level ends.
  *
  * Sets the end date of the service level. If the #GDate passed in is invalid
@@ -90,7 +90,7 @@ modulemd_service_level_set_eol (ModulemdServiceLevel *self, GDate *date);
 
 /**
  * modulemd_service_level_set_eol_ymd:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  * @year: The year this service level ends.
  * @month: The month this service level ends.
  * @day: The day of the month this service level ends.
@@ -106,9 +106,9 @@ modulemd_service_level_set_eol_ymd (ModulemdServiceLevel *self,
 
 /**
  * modulemd_service_level_remove_eol:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  *
- * Remove the EOL from this Service Level
+ * Remove the EOL from this Service Level.
  *
  * Since: 2.0
  */
@@ -117,7 +117,7 @@ modulemd_service_level_remove_eol (ModulemdServiceLevel *self);
 
 /**
  * modulemd_service_level_get_eol:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  *
  * Returns: (transfer none): The end date of the service level as a #GDate.
  *
@@ -128,7 +128,7 @@ modulemd_service_level_get_eol (ModulemdServiceLevel *self);
 
 /**
  * modulemd_service_level_get_eol_as_string:
- * @self: This #ModulemdServiceLevel
+ * @self: This #ModulemdServiceLevel object.
  *
  * Returns: (transfer full) (nullable): The end date of the service level as a
  * string of the form "YYYY-MM-DD" or NULL if the date is unset or invalid.
@@ -140,8 +140,8 @@ modulemd_service_level_get_eol_as_string (ModulemdServiceLevel *self);
 
 /**
  * modulemd_service_level_equals:
- * @self_1: A #ModulemdServiceLevel
- * @self_2: A #ModulemdServiceLevel
+ * @self_1: A #ModulemdServiceLevel object.
+ * @self_2: A #ModulemdServiceLevel object.
  *
  * Returns: TRUE if both the dates are either NULL or valid, FALSE otherwise.
  *

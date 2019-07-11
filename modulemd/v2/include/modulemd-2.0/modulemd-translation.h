@@ -35,10 +35,11 @@ G_DECLARE_FINAL_TYPE (
  * @version: The metadata version of this #ModulemdTranslation.
  * @module_name: The name of the module to which these translations apply.
  * @module_stream: The name of the module stream to which these translations apply.
- * @modified: The last modified time represented as a 64-bit integer (such as 201807011200)
+ * @modified: The last modified time represented as a 64-bit integer (such as
+ * 201807011200).
  *
- * Returns: (transfer full): A newly-allocated #ModulemdTranslation. This
- * object must be freed with g_object_unref().
+ * Returns: (transfer full): A newly-allocated #ModulemdTranslation object.
+ * This object must be freed with g_object_unref().
  *
  * Since: 2.0
  */
@@ -51,11 +52,11 @@ modulemd_translation_new (guint64 version,
 
 /**
  * modulemd_translation_copy:
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  *
  * Create a copy of this #ModulemdTranslation object.
  *
- * Returns: (transfer full): a copied #ModulemdTranslation object
+ * Returns: (transfer full): The copied #ModulemdTranslation object.
  *
  * Since: 2.0
  */
@@ -65,10 +66,13 @@ modulemd_translation_copy (ModulemdTranslation *self);
 
 /**
  * modulemd_translation_validate:
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  * @error: (out): If the object is not valid, it will return the reason.
  *
- * This method ensures that the translation is internally consistent for usage or dumping to YAML. It will be run implicitly prior to emitting YAML. This is not a complete linter, merely a sanity check that the values are not impossible.
+ * This method ensures that the translation is internally consistent for usage
+ * or dumping to YAML. It will be run implicitly prior to emitting YAML. This
+ * is not a complete linter, merely a sanity check that the values are not
+ * impossible.
  *
  * Since: 2.0
  */
@@ -78,8 +82,9 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error);
 
 /**
  * modulemd_translation_set_modified:
- * @self: This #ModulemdTranslation
- * @modified: The last modified time represented as a 64-bit integer (such as 201807011200)
+ * @self: This #ModulemdTranslation object.
+ * @modified: The last modified time represented as a 64-bit integer (such as
+ * 201807011200).
  *
  * Since: 2.0
  */
@@ -90,9 +95,10 @@ modulemd_translation_set_modified (ModulemdTranslation *self,
 
 /**
  * modulemd_translation_get_locales_as_strv: (rename-to modulemd_translation_get_locales)
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  *
- * Returns: (transfer full): An ordered list of locales known to this Modulemd.Translation.
+ * Returns: (transfer full): An ordered #GStrv list of locales known to this
+ * #ModulemdTranslation.
  *
  * Since: 2.0
  */
@@ -102,7 +108,7 @@ modulemd_translation_get_locales_as_strv (ModulemdTranslation *self);
 
 /**
  * modulemd_translation_set_translation_entry:
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  * @translation_entry: A set of translations of this module stream for a particular locale.
  *
  * Since: 2.0
@@ -114,7 +120,7 @@ modulemd_translation_set_translation_entry (
 
 /**
  * modulemd_translation_get_translation_entry:
- * @self: This #ModulemdTranslation
+ * @self: This #ModulemdTranslation object.
  * @locale: The locale of the translation to retrieve.
  *
  * Returns: (transfer none): The translation entry for the requested locale, or NULL if the locale was unknown.

@@ -79,7 +79,8 @@ modulemd_component_rpm_reset_arches (ModulemdComponentRpm *self);
  * modulemd_component_rpm_get_arches_as_strv: (rename-to modulemd_component_rpm_get_arches)
  * @self: This #ModulemdComponentRpm object.
  *
- * Returns: (transfer full): A list of architectures on which this RPM should be available.
+ * Returns: (transfer full): A #GStrv list of architectures on which this RPM
+ * should be available.
  *
  * Since: 2.0
  */
@@ -92,7 +93,7 @@ modulemd_component_rpm_get_arches_as_strv (ModulemdComponentRpm *self);
  * @self: This #ModulemdComponentRpm object.
  * @arch: An architecture on which this package should be multilib.
  *
- * Add an architectures on which this RPM will be multilib. It may be called
+ * Add an architecture on which this RPM will be multilib. It may be called
  * any number of times. Use modulemd_component_rpm_reset_multilib_arches() to
  * return to "no architectures".
  *
@@ -119,7 +120,8 @@ modulemd_component_rpm_reset_multilib_arches (ModulemdComponentRpm *self);
  * modulemd_component_rpm_get_multilib_arches_as_strv: (rename-to modulemd_component_rpm_get_multilib_arches)
  * @self: This #ModulemdComponentRpm object.
  *
- * Returns: (transfer full): A list of architectures on which multilib should be available.
+ * Returns: (transfer full): A #GStrv list of architectures on which multilib
+ * should be available.
  *
  * Since: 2.0
  */
@@ -165,7 +167,7 @@ modulemd_component_rpm_set_ref (ModulemdComponentRpm *self, const gchar *ref);
 
 /**
  * modulemd_component_rpm_get_ref:
- * @self: This #ModulemdComponentRpm object
+ * @self: This #ModulemdComponentRpm object.
  *
  * Returns: (transfer none): The commit ID in the SCM repository.
  *
@@ -177,7 +179,7 @@ modulemd_component_rpm_get_ref (ModulemdComponentRpm *self);
 
 /**
  * modulemd_component_rpm_set_repository:
- * @self: This #ModulemdComponentRpm object
+ * @self: This #ModulemdComponentRpm object.
  * @repository: (in) (nullable): The URI of the SCM repository.
  *
  * Since: 2.0
@@ -189,7 +191,7 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
 
 /**
  * modulemd_component_rpm_get_repository:
- * @self: This #ModulemdComponentRpm object
+ * @self: This #ModulemdComponentRpm object.
  *
  * Returns: (transfer none): The URI of the SCM repository.
  *

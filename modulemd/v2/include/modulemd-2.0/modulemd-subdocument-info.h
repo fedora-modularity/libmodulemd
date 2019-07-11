@@ -35,9 +35,9 @@ G_DECLARE_FINAL_TYPE (ModulemdSubdocumentInfo,
 
 /**
  * modulemd_subdocument_info_get_yaml:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  *
- * Returns: (transfer none): The associated YAML subdocument
+ * Returns: (transfer none): The associated YAML subdocument.
  *
  * Since: 2.0
  */
@@ -47,9 +47,10 @@ modulemd_subdocument_info_get_yaml (ModulemdSubdocumentInfo *self);
 
 /**
  * modulemd_subdocument_info_get_gerror:
- * @self: This #ModulemdSubdocumentInfo
+ * @self: This #ModulemdSubdocumentInfo object.
  *
- * Returns: (transfer none): A GError containing an error code and message about why this subdocument failed parsing.
+ * Returns: (transfer none): A #GError containing an error code and message
+ * about why this subdocument failed parsing.
  *
  * Since: 2.0
  */

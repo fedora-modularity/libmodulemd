@@ -50,7 +50,7 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
 
 /**
  * modulemd_component_rpm_emit_yaml:
- * @self: This #ModulemdComponentRpm
+ * @self: This #ModulemdComponentRpm object.
  * @emitter: (inout): A libyaml emitter object positioned where Rpm Component
  * belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission error.

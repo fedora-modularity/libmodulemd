@@ -45,10 +45,10 @@ struct _ModulemdComponentClass
 
 /**
  * modulemd_component_equals:
- * @self_1: A #ModulemdComponent object
- * @self_2: A #ModulemdComponent object
+ * @self_1: A #ModulemdComponent object.
+ * @self_2: A #ModulemdComponent object.
  *
- * Returns: TRUE, if both the objects are equal. FALSE, otherwise
+ * Returns: TRUE, if both the objects are equal. FALSE, otherwise.
  *
  * Since: 2.3
  */
@@ -59,12 +59,12 @@ modulemd_component_equals (ModulemdComponent *self_1,
 
 /**
  * modulemd_component_copy:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  * @key: (in) (nullable): An optional new key for the copied component which is
  * used as the lookup key when this component is attached to a
  * #ModulemdModuleStream.
  *
- * Returns: (transfer full): A newly-allocated copy of @self
+ * Returns: (transfer full): A newly-allocated copy of @self.
  *
  * Since: 2.0
  */
@@ -74,7 +74,7 @@ modulemd_component_copy (ModulemdComponent *self, const gchar *key);
 
 /**
  * modulemd_component_validate:
- * @self: (in): This #ModulemdComponent.
+ * @self: (in): This #ModulemdComponent object.
  * @error: (out): A #GError that will return the reason for a validation error.
  *
  * Verifies that all stored values are internally consistent and that the
@@ -92,7 +92,7 @@ modulemd_component_validate (ModulemdComponent *self, GError **error);
 
 /**
  * modulemd_component_add_buildafter:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  * @key: (in): A key representing another component in the
  * #ModulemdModuleStream components map.
  *
@@ -106,7 +106,7 @@ modulemd_component_add_buildafter (ModulemdComponent *self, const gchar *key);
 
 /**
  * modulemd_component_clear_buildafter:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Remove all buildafter entries for this component.
  *
@@ -118,7 +118,7 @@ modulemd_component_clear_buildafter (ModulemdComponent *self);
 
 /**
  * modulemd_component_get_buildafter_as_strv: (rename-to modulemd_component_get_buildafter)
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Returns: (transfer full): The set of component keys that this component
  * depends upon.
@@ -131,7 +131,7 @@ modulemd_component_get_buildafter_as_strv (ModulemdComponent *self);
 
 /**
  * modulemd_component_set_buildonly:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  * @buildonly: Whether this component is used only for building this module. If
  * set to TRUE, the build system should add any artifacts produced by this
  * component to the data.filters section of the output modulemd.
@@ -144,7 +144,7 @@ modulemd_component_set_buildonly (ModulemdComponent *self, gboolean buildonly);
 
 /**
  * modulemd_component_get_buildonly:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Returns: TRUE if this component is used only for building this module.
  *
@@ -156,7 +156,7 @@ modulemd_component_get_buildonly (ModulemdComponent *self);
 
 /**
  * modulemd_component_set_buildorder:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  * @buildorder: The order this component should be built relative to others.
  *
  * Since: 2.0
@@ -167,9 +167,9 @@ modulemd_component_set_buildorder (ModulemdComponent *self, gint64 buildorder);
 
 /**
  * modulemd_component_get_buildorder:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
- * Returns: The value of the buildorder
+ * Returns: The value of the buildorder.
  *
  * Since: 2.0
  */
@@ -196,7 +196,7 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name);
 
 /**
  * modulemd_component_get_name:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Returns: (transfer none): The name of the component. Note that this may be
  * different from the key used to save this component to a
@@ -211,7 +211,7 @@ modulemd_component_get_name (ModulemdComponent *self);
 
 /**
  * modulemd_component_get_key:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Returns: (transfer none): The name of the key used to attach this component
  * to a #ModulemdModuleStream.
@@ -224,7 +224,7 @@ modulemd_component_get_key (ModulemdComponent *self);
 
 /**
  * modulemd_component_set_rationale:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  * @rationale: (in) (nullable): The reason that this component is part of the
  * stream.
  *
@@ -237,7 +237,7 @@ modulemd_component_set_rationale (ModulemdComponent *self,
 
 /**
  * modulemd_component_get_rationale:
- * @self: This #ModulemdComponent object
+ * @self: This #ModulemdComponent object.
  *
  * Returns: (transfer none): The rationale.
  *

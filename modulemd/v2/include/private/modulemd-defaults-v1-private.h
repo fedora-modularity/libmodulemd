@@ -53,7 +53,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
 /**
  * modulemd_defaults_v1_emit_yaml:
- * @self: This #ModulemdDefaultsV1
+ * @self: This #ModulemdDefaultsV1 object.
  * @emitter: (inout): A libyaml emitter object positioned where a Defaults (v1)
  * data section belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or
@@ -73,18 +73,20 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
 /**
  * modulemd_defaults_v1_merge:
  * @module_name: (in): The name of the module for which defaults are being merged.
- * @from: (in): A #ModulemdDefaultsV1 object to merge from
- * @into: (in): A #ModulemdDefaultsV1 object being merged into
+ * @from: (in): A #ModulemdDefaultsV1 object to merge from.
+ * @into: (in): A #ModulemdDefaultsV1 object being merged into.
+ * @strict_default_streams: (in): Whether a stream conflict should throw an
+ * error or just unset the default stream.
  * @error: (out): A #GError containing the reason for an unresolvable merge
- * conflict
+ * conflict.
  *
  * Performs a merge of two #ModulemdDefaultsV1 objects representing the
  * defaults for a single module name. See the documentation for
  * #ModulemdModuleIndexMerger for details on the merge algorithm used.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdDefaultsV1 containing
- * the merged values of @from and @into. If this function encounters an
- * unresolvable merge conflict, it will return NULL and set @error
+ * Returns: (transfer full): A newly-allocated #ModulemdDefaultsV1 object
+ * containing the merged values of @from and @into. If this function encounters
+ * an unresolvable merge conflict, it will return NULL and set @error
  * appropriately.
  *
  * Since: 2.0

@@ -72,7 +72,7 @@ struct _ModulemdModuleStreamV2
 /**
  * modulemd_module_stream_v2_parse_yaml:
  * @subdoc: (in): A #ModulemdSubdocumentInfo representing a stream v2
- * document
+ * document.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or
@@ -91,7 +91,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
 /**
  * modulemd_module_stream_v2_emit_yaml:
- * @self: This #ModulemdModuleStreamV2 object
+ * @self: This #ModulemdModuleStreamV2 object.
  * @emitter: (inout): A libyaml emitter object positioned where the data
  * section of a #ModulemdModuleStreamV2 belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or

@@ -32,6 +32,6 @@ sudo docker build -f $SCRIPT_DIR/opensuse/Dockerfile-$release -t fedora-modulari
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/opensuse/Dockerfile.deps.$release $SCRIPT_DIR/opensuse/Dockerfile-$release
 
-docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
+docker run -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
 popd
 exit 0

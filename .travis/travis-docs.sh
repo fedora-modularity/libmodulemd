@@ -33,7 +33,6 @@ rm -f $TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$release $SCRIPT_DIR/fedo
 
 # Override the standard tasks with the doc-generation
 docker run \
-    -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN \
     -e TRAVIS=$TRAVIS \
     -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" \
     -e TRAVIS_COMMIT="$TRAVIS_COMMIT" \

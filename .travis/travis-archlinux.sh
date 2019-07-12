@@ -31,6 +31,6 @@ sudo docker build -f $SCRIPT_DIR/archlinux/Dockerfile-$release -t fedora-modular
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/archlinux/Dockerfile.deps.$release $SCRIPT_DIR/archlinux/Dockerfile-$release
 
-docker run -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
+docker run -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
 popd
 exit 0

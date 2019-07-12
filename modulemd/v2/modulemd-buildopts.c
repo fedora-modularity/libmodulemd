@@ -153,7 +153,7 @@ modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self)
 }
 
 
-gchar **
+GStrv
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self)
 {
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);

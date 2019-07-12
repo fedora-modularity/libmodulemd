@@ -249,14 +249,14 @@ modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func)
   return keys;
 }
 
-gchar **
+GStrv
 modulemd_ordered_str_keys_as_strv (GHashTable *htable)
 {
   GPtrArray *keys = modulemd_ordered_str_keys (htable, modulemd_strcmp_sort);
   // Add the NULL sentinel
   g_ptr_array_add (keys, NULL);
   // Store the pdata for returning after we free the container
-  gchar **result = (gchar **)keys->pdata;
+  GStrv result = (GStrv)keys->pdata;
   g_ptr_array_free (keys, FALSE);
   return result;
 }

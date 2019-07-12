@@ -26,7 +26,7 @@ G_BEGIN_DECLS
 /**
  * modulemd_buildopts_get_rpm_whitelist: (skip)
  */
-gchar **
+GStrv
 modulemd_buildopts_get_rpm_whitelist (ModulemdBuildopts *self);
 
 /**
@@ -243,13 +243,13 @@ modulemd_module_stream_v2_get_servicelevel_names (
 /**
  * modulemd_profile_get_rpms: (skip)
  */
-gchar **
+GStrv
 modulemd_profile_get_rpms (ModulemdProfile *self);
 
 /**
  * modulemd_translation_entry_get_profiles: (skip)
  */
-gchar **
+GStrv
 modulemd_translation_entry_get_profiles (ModulemdTranslationEntry *self);
 
 /**

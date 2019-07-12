@@ -295,6 +295,10 @@ gnome.gtkdoc(
     dependencies : [
         modulemd_v2_dep,
     ],
+    fixxref_args: [
+                 '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
+                 '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
+               ],
     install : true,
 )
 

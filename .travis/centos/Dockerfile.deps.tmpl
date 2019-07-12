@@ -5,7 +5,7 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 ARG TARBALL
 
 RUN yum -y install epel-release \
-    && yum -y install \
+    && yum -y --setopt=tsflags='' install \
         clang \
 	createrepo_c \
 	elinks \
@@ -13,6 +13,7 @@ RUN yum -y install epel-release \
 	gcc-c++ \
 	git-core \
 	glib2-devel \
+	glib2-doc \
 	gobject-introspection-devel \
 	gtk-doc \
 	libyaml-devel \

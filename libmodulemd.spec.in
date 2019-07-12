@@ -35,6 +35,7 @@ BuildRequires:  python3-gobject-base
 BuildRequires:  python3-babel
 BuildRequires:  python2-babel
 BuildRequires:  valgrind
+BuildRequires:  glib2-doc
 
 # Make sure we upgrade libmodulemd1 to match
 Conflicts:      libmodulemd1 < %{libmodulemd_v1_version}-%{release}

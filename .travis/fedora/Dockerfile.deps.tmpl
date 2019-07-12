@@ -4,7 +4,7 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 ARG TARBALL
 
-RUN dnf -y --setopt=install_weak_deps=False install \
+RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	clang \
 	clang-analyzer \
 	createrepo_c \
@@ -15,6 +15,7 @@ RUN dnf -y --setopt=install_weak_deps=False install \
 	gcc-c++ \
 	git-core \
 	glib2-devel \
+	glib2-doc \
 	gobject-introspection-devel \
 	gtk-doc \
 	libyaml-devel \

@@ -54,8 +54,22 @@ gobject = dependency('gobject-2.0')
 yaml = dependency('yaml-0.1')
 gtkdoc = dependency('gtk-doc')
 
+glib_prefix = dependency('glib-2.0').get_pkgconfig_variable('prefix')
+glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
+
 sh = find_program('sh')
 sed = find_program('sed')
+test = find_program('test')
+
+ret = run_command ([test, '-e', join_paths(glib_docpath, 'glib/index.html')])
+if ret.returncode() != 0
+  error('Missing documentation for GLib.')
+endif
+
+ret = run_command ([test, '-e', join_paths(glib_docpath, 'gobject/index.html')])
+if ret.returncode() != 0
+  error('Missing documentation for GObject.')
+endif
 
 python_name = get_option('python_name')
 

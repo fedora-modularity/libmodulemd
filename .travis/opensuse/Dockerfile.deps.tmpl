@@ -4,6 +4,9 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 ARG TARBALL
 
+RUN sed -i /etc/zypp/zypp.conf \
+        -e "s/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/"
+
 RUN zypper install --no-confirm --no-recommends \
 	clang \
 	clang-checker \

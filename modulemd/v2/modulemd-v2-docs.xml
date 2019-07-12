@@ -84,4 +84,52 @@
         <xi:include href="xml/test-utils.xml"/>
     </chapter>
   </reference>
+  <reference id="modulemd-2.0-resources">
+    <title>resources</title>
+    <partintro>
+      <para>
+        Additional resources for libmodulemd
+      </para>
+    </partintro>
+    <chapter>
+      <title>Annotations</title>
+      <xi:include href="xml/annotation-glossary.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.0 API Index</title>
+      <xi:include href="xml/api-index-2.0.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.1 API Index</title>
+      <xi:include href="xml/api-index-2.1.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.2 API Index</title>
+      <xi:include href="xml/api-index-2.2.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.3 API Index</title>
+      <xi:include href="xml/api-index-2.3.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.4 API Index</title>
+      <xi:include href="xml/api-index-2.4.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.5 API Index</title>
+      <xi:include href="xml/api-index-2.5.xml"/>
+    </chapter>
+    <chapter>
+      <title>2.6 API Index</title>
+      <xi:include href="xml/api-index-2.6.xml"/>
+    </chapter>
+    <chapter>
+      <title>Deprecated API Index</title>
+      <xi:include href="xml/api-index-deprecated.xml"/>
+    </chapter>
+    <chapter>
+      <title>Full API Index</title>
+      <xi:include href="xml/api-index-full.xml"/>
+    </chapter>
+  </reference>
 </book>

@@ -8,9 +8,9 @@ set -x
 
 JOB_NAME=${TRAVIS_JOB_NAME:-Fedora rawhide}
 
-arr=($JOB_NAME)
-os_name=${arr[0]:-Fedora}
-release=${arr[1]:-rawhide}
+# Always run the Coverity scan on Fedora Rawhide
+os_name=Fedora
+release=rawhide
 
 # Create an archive of the current checkout
 TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`
@@ -25,14 +25,19 @@ os="fedora"
 
 sed -e "s/@IMAGE@/$repository\/$os:$release/" \
     $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$release
-sed -e "s/@RELEASE@/$release/" $SCRIPT_DIR/fedora/Dockerfile.tmpl > $SCRIPT_DIR/fedora/Dockerfile-$release
 
 sudo docker build -f $SCRIPT_DIR/fedora/Dockerfile.deps.$release -t fedora-modularity/libmodulemd-deps-$release .
-sudo docker build -f $SCRIPT_DIR/fedora/Dockerfile-$release -t fedora-modularity/libmodulemd:$release --build-arg TARBALL=$TARBALL .
+sudo docker build -f $SCRIPT_DIR/coverity/Dockerfile -t fedora-modularity/libmodulemd-coverity --build-arg TARBALL=$TARBALL .
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$release $SCRIPT_DIR/fedora/Dockerfile-$release
 
-docker run -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
+# Override the standard tasks with the Coverity scan
+docker run \
+    -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN \
+    -e TRAVIS=$TRAVIS \
+    -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" \
+    -e TRAVIS_COMMIT="$TRAVIS_COMMIT" \
+    --rm fedora-modularity/libmodulemd-coverity
 
 popd
 exit 0

@@ -170,7 +170,7 @@ modulemd_translation_entry_get_locale (ModulemdTranslationEntry *self)
 }
 
 
-gchar **
+GStrv
 modulemd_translation_entry_get_profiles_as_strv (
   ModulemdTranslationEntry *self)
 {

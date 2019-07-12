@@ -135,11 +135,11 @@ modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self);
  * modulemd_buildopts_get_rpm_whitelist_as_strv: (rename-to modulemd_buildopts_get_rpm_whitelist)
  * @self: This #ModulemdBuildopts
  *
- * Returns: (transfer full): An ordered list of all RPMs in the whitelist.
+ * Returns: (transfer full): An ordered #GStrv list of all RPMs in the whitelist.
  *
  * Since: 2.0
  */
-gchar **
+GStrv
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self);
 
 G_END_DECLS

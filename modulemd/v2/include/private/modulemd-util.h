@@ -93,7 +93,7 @@ modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
 GPtrArray *
 modulemd_ordered_str_keys (GHashTable *htable, GCompareFunc compare_func);
 
-gchar **
+GStrv
 modulemd_ordered_str_keys_as_strv (GHashTable *htable);
 
 GVariant *

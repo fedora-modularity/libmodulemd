@@ -625,7 +625,7 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error)
 static gboolean
 modulemd_yaml_parse_document_type_internal (
   yaml_parser_t *parser,
-  enum ModulemdYamlDocumentType *_doctype,
+  ModulemdYamlDocumentTypeEnum *_doctype,
   guint64 *_mdversion,
   yaml_emitter_t *emitter,
   GError **error)
@@ -634,7 +634,7 @@ modulemd_yaml_parse_document_type_internal (
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean had_data = FALSE;
-  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
+  ModulemdYamlDocumentTypeEnum doctype = MODULEMD_YAML_DOC_UNKNOWN;
   guint64 mdversion = 0;
   g_autofree gchar *doctype_scalar = NULL;
   g_autofree gchar *mdversion_string = NULL;
@@ -834,7 +834,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
   MMD_INIT_YAML_EMITTER (emitter);
   MMD_INIT_YAML_STRING (&emitter, yaml_string);
   g_autoptr (ModulemdSubdocumentInfo) s = modulemd_subdocument_info_new ();
-  enum ModulemdYamlDocumentType doctype = MODULEMD_YAML_DOC_UNKNOWN;
+  ModulemdYamlDocumentTypeEnum doctype = MODULEMD_YAML_DOC_UNKNOWN;
   guint64 mdversion = 0;
   g_autoptr (GError) error = NULL;
 
@@ -853,7 +853,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
 
 
 static const gchar *
-modulemd_yaml_get_doctype_string (enum ModulemdYamlDocumentType doctype)
+modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype)
 {
   switch (doctype)
     {
@@ -870,7 +870,7 @@ modulemd_yaml_get_doctype_string (enum ModulemdYamlDocumentType doctype)
 
 gboolean
 modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
-                                     enum ModulemdYamlDocumentType doctype,
+                                     ModulemdYamlDocumentTypeEnum doctype,
                                      guint64 mdversion,
                                      GError **error)
 {

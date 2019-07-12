@@ -151,12 +151,12 @@ modulemd_profile_clear_rpms (ModulemdProfile *self);
  * modulemd_profile_get_rpms_as_strv: (rename-to modulemd_profile_get_rpms)
  * @self: This #ModulemdProfile
  *
- * Returns: (transfer full): An ordered list of binary RPMS that would be
+ * Returns: (transfer full): An ordered #GStrv list of binary RPMS that would be
  * installed when this profile is selected for installation.
  *
  * Since: 2.0
  */
-gchar **
+GStrv
 modulemd_profile_get_rpms_as_strv (ModulemdProfile *self);
 
 G_END_DECLS

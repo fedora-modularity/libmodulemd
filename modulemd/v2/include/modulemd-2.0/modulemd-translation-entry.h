@@ -134,11 +134,12 @@ modulemd_translation_entry_get_description (ModulemdTranslationEntry *self);
  *
  * Get a list of profiles that have descriptions.
  *
- * Returns: (transfer full): An ordered list of profiles for which descriptions have been translated for this locale.
+ * Returns: (transfer full): An ordered #GStrv list of profiles for which
+ * descriptions have been translated for this locale.
  *
  * Since: 2.0
  */
-gchar **
+GStrv
 modulemd_translation_entry_get_profiles_as_strv (
   ModulemdTranslationEntry *self);
 

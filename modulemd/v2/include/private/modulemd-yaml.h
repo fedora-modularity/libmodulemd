@@ -34,15 +34,49 @@ G_BEGIN_DECLS
 GQuark
 modulemd_yaml_error_quark (void);
 
-enum ModulemdYamlDocumentType
+/**
+ * ModulemdYamlDocumentTypeEnum:
+ * @MODULEMD_YAML_DOC_UNKNOWN: Represents an unknown YAML document type.
+ * @MODULEMD_YAML_DOC_MODULESTREAM: Represents a `modulemd` (see
+ * #ModulemdModuleStream) YAML document type.
+ * @MODULEMD_YAML_DOC_DEFAULTS: Represents a `modulemd-defaults` (see
+ * #ModulemdDefaultsV1) YAML document type.
+ * @MODULEMD_YAML_DOC_TRANSLATIONS: Represents a `modulemd-translations` (see
+ * #ModulemdTranslation) YAML document type.
+ *
+ * Since: 2.0
+ */
+typedef enum
 {
   MODULEMD_YAML_DOC_UNKNOWN = 0,
   MODULEMD_YAML_DOC_MODULESTREAM,
   MODULEMD_YAML_DOC_DEFAULTS,
   MODULEMD_YAML_DOC_TRANSLATIONS
-};
+} ModulemdYamlDocumentTypeEnum;
 
-enum ModulemdYamlError
+/**
+ * ModulemdYamlErrorEnum:
+ * @MODULEMD_YAML_ERROR_OPEN: Represents an error encountered while opening a
+ * YAML file.
+ * @MODULEMD_YAML_ERROR_PROGRAMMING: Represents an internal programming error
+ * encountered while parsing a YAML document.
+ * @MODULEMD_YAML_ERROR_UNPARSEABLE: Represents an error indicating that
+ * unexpected data or some other parsing error was encountered while parsing a
+ * YAML document.
+ * @MODULEMD_YAML_ERROR_PARSE: Represents an error indicating invalid data was
+ * encountered while parsing a YAML document.
+ * @MODULEMD_YAML_ERROR_EMIT: Represents an error encountered while writing a
+ * YAML file.
+ * @MODULEMD_YAML_ERROR_MISSING_REQUIRED: Represents an error indicating that
+ * required elements are missing encountered while parsing a YAML document.
+ * @MODULEMD_YAML_ERROR_EVENT_INIT: Represents an error indicating that a YAML
+ * output event could not be initialized.
+ * @MODULEMD_YAML_ERROR_INCONSISTENT: Represents a data inconsistency error
+ * encountered while parsing a YAML document.
+ *
+ * Since: 2.0
+ */
+typedef enum
 {
   MODULEMD_YAML_ERROR_OPEN,
   MODULEMD_YAML_ERROR_PROGRAMMING,
@@ -52,7 +86,7 @@ enum ModulemdYamlError
   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
   MODULEMD_YAML_ERROR_EVENT_INIT,
   MODULEMD_YAML_ERROR_INCONSISTENT
-};
+} ModulemdYamlErrorEnum;
 
 typedef struct _modulemd_yaml_string
 {
@@ -423,7 +457,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser);
  * @emitter: (inout): A libyaml emitter object that is positioned where the
  * YAML_DOCUMENT_START_EVENT should occur (so this must be after either a
  * YAML_STREAM_START_EVENT or YAML_DOCUMENT_END_EVENT).
- * @doctype: (in): The document type (see #ModulemdYamlDocumentType)
+ * @doctype: (in): The document type (see #ModulemdYamlDocumentTypeEnum)
  * @mdversion: (in): The metadata version for this document
  * @error: (out): A #GError that will return the reason for failing to emit.
  *
@@ -437,7 +471,7 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser);
  */
 gboolean
 modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
-                                     enum ModulemdYamlDocumentType doctype,
+                                     ModulemdYamlDocumentTypeEnum doctype,
                                      guint64 mdversion,
                                      GError **error);
 

@@ -204,7 +204,7 @@ modulemd_profile_clear_rpms (ModulemdProfile *self)
 }
 
 
-gchar **
+GStrv
 modulemd_profile_get_rpms_as_strv (ModulemdProfile *self)
 {
   g_return_val_if_fail (MODULEMD_IS_PROFILE (self), NULL);

@@ -54,13 +54,13 @@ modulemd_subdocument_info_copy (ModulemdSubdocumentInfo *self);
 /**
  * modulemd_subdocument_info_set_doctype:
  * @self: This #ModulemdSubdocumentInfo
- * @doctype: The #ModulemdYamlDocumentType represented by this subdocument
+ * @doctype: The #ModulemdYamlDocumentTypeEnum represented by this subdocument
  *
  * Since: 2.0
  */
 void
 modulemd_subdocument_info_set_doctype (ModulemdSubdocumentInfo *self,
-                                       enum ModulemdYamlDocumentType doctype);
+                                       ModulemdYamlDocumentTypeEnum doctype);
 
 
 /**
@@ -71,7 +71,7 @@ modulemd_subdocument_info_set_doctype (ModulemdSubdocumentInfo *self,
  *
  * Since: 2.0
  */
-enum ModulemdYamlDocumentType
+ModulemdYamlDocumentTypeEnum
 modulemd_subdocument_info_get_doctype (ModulemdSubdocumentInfo *self);
 
 

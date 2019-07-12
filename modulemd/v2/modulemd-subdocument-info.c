@@ -26,7 +26,7 @@ struct _ModulemdSubdocumentInfo
 {
   GObject parent_instance;
 
-  enum ModulemdYamlDocumentType doctype;
+  ModulemdYamlDocumentTypeEnum doctype;
   guint64 mdversion;
   GError *error;
   gchar *contents;
@@ -127,7 +127,7 @@ modulemd_subdocument_info_get_gerror (ModulemdSubdocumentInfo *self)
 
 void
 modulemd_subdocument_info_set_doctype (ModulemdSubdocumentInfo *self,
-                                       enum ModulemdYamlDocumentType doctype)
+                                       ModulemdYamlDocumentTypeEnum doctype)
 {
   g_return_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self));
 
@@ -135,7 +135,7 @@ modulemd_subdocument_info_set_doctype (ModulemdSubdocumentInfo *self,
 }
 
 
-enum ModulemdYamlDocumentType
+ModulemdYamlDocumentTypeEnum
 modulemd_subdocument_info_get_doctype (ModulemdSubdocumentInfo *self)
 {
   g_return_val_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self),

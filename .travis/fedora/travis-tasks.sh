@@ -16,10 +16,8 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
 
 pushd /builddir/
 
-# Build the v1 and v2 code under GCC and run standard tests
+# Build the code under GCC and run standard tests
 meson --buildtype=debug \
-      -Dbuild_api_v1=true \
-      -Dbuild_api_v2=true \
       $COMMON_MESON_ARGS \
       travis
 
@@ -32,7 +30,7 @@ if [ $ret != 0 ]; then
 fi
 set -e
 
-# Test the v2 code with clang-analyzer
+# Test the code with clang-analyzer
 # This requires meson 0.49.0 or later
 set +e
 rpmdev-vercmp `meson --version` 0.49.0
@@ -43,8 +41,6 @@ if [ $? -eq 12 ]; then
 else
     set -e
     meson --buildtype=debug \
-          -Dbuild_api_v1=false \
-          -Dbuild_api_v2=true \
           -Dskip_introspection=true \
           $COMMON_MESON_ARGS \
           travis_scanbuild
@@ -59,7 +55,6 @@ fi
 # testing environment above.
 
 meson --buildtype=debug \
-      -Dbuild_api_v1=true \
       $COMMON_MESON_ARGS \
       build_rpm
 
@@ -69,38 +64,6 @@ ninja
 ./make_rpms.sh
 
 createrepo_c rpmbuild/RPMS/
-
-dnf -y install --nogpgcheck \
-               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
-               python3-libmodulemd1 \
-               libmodulemd1-devel \
-               --exclude libmodulemd
-
-# Also install the python2-libmodulemd1 if it was built for this release
-# the ||: at the end instructs bash to consider this a pass either way.
-dnf -y install --nogpgcheck \
-               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
-               python2-libmodulemd1 \
-               --exclude libmodulemd ||:
-
-popd #build_rpm
-
-meson --buildtype=debug \
-      -Dbuild_api_v1=true \
-      -Dbuild_api_v2=false \
-      -Dtest_installed_lib=true \
-      $COMMON_MESON_ARGS \
-      installed_lib_tests_v1
-
-pushd installed_lib_tests_v1
-
-# Run the tests against the installed RPMs
-ninja test
-
-popd #installed_lib_tests_v1
-
-
-pushd build_rpm
 
 dnf -y install --nogpgcheck \
                --allowerasing \
@@ -114,19 +77,17 @@ dnf -y install --nogpgcheck \
                --allowerasing \
                --repofrompath libmodulemd-travis,rpmbuild/RPMS \
                python2-libmodulemd ||:
-popd
+popd #build_rpm
 
 meson --buildtype=debug \
-      -Dbuild_api_v1=false \
-      -Dbuild_api_v2=true \
       -Dtest_installed_lib=true \
       $COMMON_MESON_ARGS \
-      installed_lib_tests_v2
+      installed_lib_tests
 
-pushd installed_lib_tests_v2
+pushd installed_lib_tests
 # Run the tests against the installed RPMs
 ninja test
 
-popd #installed_lib_tests_v2
+popd #installed_lib_tests
 
 popd #builddir

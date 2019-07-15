@@ -29,12 +29,21 @@ sed -e "s/@IMAGE@/$repository\/$os:$release/" \
     $SCRIPT_DIR/mageia/Dockerfile.deps.tmpl > $SCRIPT_DIR/mageia/Dockerfile.deps.$release
 sed -e "s/@RELEASE@/$release/" $SCRIPT_DIR/mageia/Dockerfile.tmpl > $SCRIPT_DIR/mageia/Dockerfile-$release
 
-sudo docker build -f $SCRIPT_DIR/mageia/Dockerfile.deps.$release -t fedora-modularity/libmodulemd-deps-$release .
-sudo docker build -f $SCRIPT_DIR/mageia/Dockerfile-$release -t fedora-modularity/libmodulemd:$release --build-arg TARBALL=$TARBALL .
+sudo docker build \
+    -f $SCRIPT_DIR/mageia/Dockerfile.deps.$release \
+    -t fedora-modularity/libmodulemd-deps-$release .
+
+sudo docker build \
+    -f $SCRIPT_DIR/mageia/Dockerfile-$release \
+    -t fedora-modularity/libmodulemd:$release \
+    --build-arg TARBALL=$TARBALL .
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/mageia/Dockerfile.deps.$release $SCRIPT_DIR/mageia/Dockerfile-$release
 
-docker run -e TRAVIS=$TRAVIS -eTRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" --rm fedora-modularity/libmodulemd:$release
+docker run \
+    -e TRAVIS=$TRAVIS \
+    -e TRAVIS_JOB_NAME="$TRAVIS_JOB_NAME" \
+    --rm fedora-modularity/libmodulemd:$release
 
 popd
 exit 0

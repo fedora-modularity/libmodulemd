@@ -26,8 +26,14 @@ os="fedora"
 sed -e "s/@IMAGE@/$repository\/$os:$release/" \
     $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$release
 
-sudo docker build -f $SCRIPT_DIR/fedora/Dockerfile.deps.$release -t fedora-modularity/libmodulemd-deps-$release .
-sudo docker build -f $SCRIPT_DIR/docs/Dockerfile -t fedora-modularity/libmodulemd-docs --build-arg TARBALL=$TARBALL .
+sudo docker build \
+    -f $SCRIPT_DIR/fedora/Dockerfile.deps.$release \
+    -t fedora-modularity/libmodulemd-deps-$release .
+
+sudo docker build \
+    -f $SCRIPT_DIR/docs/Dockerfile \
+    -t fedora-modularity/libmodulemd-docs \
+    --build-arg TARBALL=$TARBALL .
 
 rm -f $TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$release $SCRIPT_DIR/fedora/Dockerfile-$release
 

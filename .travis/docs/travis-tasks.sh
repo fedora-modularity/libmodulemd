@@ -10,10 +10,8 @@ release=rawhide
 
 pushd /builddir/
 
-# Build the v1 and v2 code under GCC and run standard tests
+# Build the code under GCC and run documentation generation
 meson --buildtype=debug \
-      -Dbuild_api_v1=false \
-      -Dbuild_api_v2=true \
       $COMMON_MESON_ARGS \
       doc-generation
 
@@ -27,12 +25,12 @@ fi
 set -e
 
 # Fix external references for publishing on the web
-pushd doc-generation/modulemd/v2/html
+pushd doc-generation/modulemd/html
 /builddir/contrib/doc-tools/fix-xref.sh
 popd
 
 git clone https://sgallagher:$DOC_TOKEN@github.com/fedora-modularity/fedora-modularity.github.io
-rsync -avh --delete-before --no-perms --omit-dir-times /builddir/doc-generation/modulemd/v2/html/* fedora-modularity.github.io/libmodulemd/latest
+rsync -avh --delete-before --no-perms --omit-dir-times /builddir/doc-generation/modulemd/html/* fedora-modularity.github.io/libmodulemd/latest
 
 pushd fedora-modularity.github.io
 

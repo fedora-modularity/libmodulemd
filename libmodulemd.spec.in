@@ -1,5 +1,4 @@
 %global libmodulemd_version @VERSION@
-%global libmodulemd_v1_version @V1_VERSION@
 
 %if ( 0%{?fedora} && 0%{?fedora} <= 30 ) || ( 0%{?rhel} && 0%{?rhel} <= 7)
 %global build_python2 1
@@ -36,9 +35,6 @@ BuildRequires:  python3-babel
 BuildRequires:  python2-babel
 BuildRequires:  valgrind
 BuildRequires:  glib2-doc
-
-# Make sure we upgrade libmodulemd1 to match
-Conflicts:      libmodulemd1 < %{libmodulemd_v1_version}-%{release}
 
 # Patches
 
@@ -82,58 +78,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Development files for libmodulemd.
 
 
-%package -n libmodulemd1
-Summary: Compatibility package for libmodulemd 1.x
-Version: %{libmodulemd_v1_version}
-Obsoletes: libmodulemd < 2
-Provides: libmodulemd = %{libmodulemd_v1_version}-%{release}
-Provides: libmodulemd%{?_isa} = %{libmodulemd_v1_version}-%{release}
-
-%description -n libmodulemd1
-Compatibility library for libmodulemd 1.x
-
-
-%package -n libmodulemd1-devel
-Summary: Compatibility development package for libmodulemd 1.x
-Version: %{libmodulemd_v1_version}
-Requires: libmodulemd1%{?_isa} = %{libmodulemd_v1_version}-%{release}
-Conflicts: %{name}-devel
-Obsoletes: libmodulemd-devel < 2
-Provides: libmodulemd-devel = %{libmodulemd_v1_version}-%{release}
-RemovePathPostfixes: .compat
-
-%description -n libmodulemd1-devel
-Development files for libmodulemd 1.x
-
-
-%if %{build_python2}
-%package -n python2-libmodulemd1
-Summary: Python 2 bindings for %{name}1
-Version: %{libmodulemd_v1_version}
-Requires: libmodulemd1 = %{libmodulemd_v1_version}-%{release}
-Requires: python-gobject-base
-
-%description -n python2-libmodulemd1
-Python 2 bindings for libmodulemd1
-%endif
-
-
-%package -n python3-libmodulemd1
-Summary: Python 3 bindings for %{name}1
-Version: %{libmodulemd_v1_version}
-Requires: libmodulemd1 = %{libmodulemd_v1_version}-%{release}
-Requires: python3-gobject-base
-
-%description -n python3-libmodulemd1
-Python 3 bindings for libmodulemd1
-
-
 %prep
 %autosetup -p1 -n modulemd-%{libmodulemd_version}
 
 
 %build
-%meson -Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=true %{meson_python_flags}
+%meson -Ddeveloper_build=false %{meson_python_flags}
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 # ALERT!!! PURE HACK FOR EPEL!
@@ -158,9 +108,6 @@ export MMD_SKIP_VALGRIND=1
 
 %install
 %meson_install
-
-ln -s libmodulemd.so.%{libmodulemd_v1_version} \
-      %{buildroot}%{_libdir}/%{name}.so.compat
 
 
 %files
@@ -191,33 +138,6 @@ ln -s libmodulemd.so.%{libmodulemd_v1_version} \
 %files -n python3-%{name}
 %{python3_sitearch}/gi/overrides/
 
-
-%files -n python3-libmodulemd1
-
-
-%if %{build_python2}
-%files -n python2-libmodulemd1
-%endif
-
-
-%files -n libmodulemd1
-%license COPYING
-%doc README.md
-%{_bindir}/modulemd-validator-v1
-%{_libdir}/%{name}.so.1*
-%dir %{_libdir}/girepository-1.0
-%{_libdir}/girepository-1.0/Modulemd-1.0.typelib
-
-
-%files -n libmodulemd1-devel
-%{_libdir}/%{name}.so.compat
-%{_libdir}/pkgconfig/modulemd.pc
-%{_includedir}/modulemd/
-%dir %{_datadir}/gir-1.0
-%{_datadir}/gir-1.0/Modulemd-1.0.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/modulemd-1.0/
 
 
 %changelog

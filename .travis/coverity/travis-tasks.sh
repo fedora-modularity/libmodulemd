@@ -11,8 +11,6 @@ release=rawhide
 pushd /builddir/
 
 meson --buildtype=debug \
-      -Dbuild_api_v1=true \
-      -Dbuild_api_v2=true \
       $COMMON_MESON_ARGS \
       coverity
 

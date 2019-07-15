@@ -20,8 +20,7 @@ project('modulemd', 'c',
         license : 'MIT',
         meson_version : '>=0.47.0')
 
-libmodulemd_v1_version = '1.8.14'
-libmodulemd_v2_version = meson.project_version()
+libmodulemd_version = meson.project_version()
 
 cc = meson.get_compiler('c')
 test_cflags = [
@@ -111,7 +110,6 @@ spec_target = custom_target(
     build_always: true,
     command: [sh, spec_tmpl,
               meson.project_version(),
-              libmodulemd_v1_version,
               '@INPUT@'],
     input: specfile_template,
     output: 'libmodulemd.spec',
@@ -120,12 +118,10 @@ spec_target = custom_target(
 
 rpm_cdata = configuration_data()
 rpm_cdata.set('VERSION', meson.project_version())
-rpm_cdata.set('V1_VERSION', libmodulemd_v1_version)
 rpm_cdata.set('BUILDFLAG', '-bb')
 
 srpm_cdata = configuration_data()
 srpm_cdata.set('VERSION', meson.project_version())
-srpm_cdata.set('V1_VERSION', libmodulemd_v1_version)
 srpm_cdata.set('BUILDFLAG', '-bs')
 
 configure_file(

@@ -221,15 +221,13 @@ and to make sure that your user has privilege to run `sudo docker` (see the docu
 The libmodulemd project follows the [Github Fork-and-Pull](https://reflectoring.io/github-fork-and-pull/) model of development. To get started, create a fork of the upstream libmodulemd sources, clone those locally and create branches on your fork to make changes. When they are ready for review or feedback, create a pull-request.
 
 ## Building the sources
-First, decide if you are planning to build the sources for the 1.0 API or the 2.0 API. (Note that the 1.0 API is deprecated and will be removed soon). This guideline will describe the procedure for working with the 2.0 API.
-
 Projects built with the meson build-system require a separate build directory from the source path. The `meson` command will generate this directory for you.
 ```
-meson --buildtype=debug -Db_coverage=true -Dbuild_api_v1=false -Dbuild_api_v2=true  api2
+meson --buildtype=debug -Db_coverage=true  debugbuild
 ```
-The above command (run from the root of the source checkout) will create a new subdirectory - `api2` - configured to compile with debug symbols and `gcov` symbols to measure test coverage. It enables building the 2.0 API and skips the deprecated 1.0 API.
+The above command (run from the root of the source checkout) will create a new subdirectory - `debugbuild` - configured to compile with debug symbols and `gcov` symbols to measure test coverage.
 
-To build the sources, `chdir()` into the `api2` directory and run
+To build the sources, `chdir()` into the `debugbuild` directory and run
 ```
 ninja
 ```

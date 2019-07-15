@@ -28,7 +28,7 @@ set -e
 
 # Fix external references for publishing on the web
 pushd doc-generation/modulemd/v2/html
-/builddir/modulemd/contrib/doc-tools/fix-xref.sh
+/builddir/contrib/doc-tools/fix-xref.sh
 popd
 
 git clone https://sgallagher:$DOC_TOKEN@github.com/fedora-modularity/fedora-modularity.github.io

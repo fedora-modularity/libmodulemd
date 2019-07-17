@@ -1,9 +1,0 @@
----
-name: bar
-epoch: 0
-version: 1.23
-release: 1.module_deadbeef
-arch: x86_64
-nevra: foo-0:1.23-1.module_deadbeef.x86_64
-...
-

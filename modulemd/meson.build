@@ -9,6 +9,8 @@
 # For more information on the license, see COPYING.
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
+test_installed_lib = get_option('test_installed_lib')
+skip_introspection = get_option('skip_introspection')
 developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
 
@@ -34,244 +36,413 @@ valgrind = find_program('valgrind', required: developer_build)
 if not valgrind.found()
     valgrind = disabler()
 endif
+valgrind_tests = []
 
-build_api_v1 = get_option('build_api_v1')
-build_api_v2 = get_option('build_api_v2')
+if test_installed_lib
+    # If we're just running the tests on a library that's already installed,
+    # don't bother building it again.
+    build_lib = disabler()
+else
+    build_lib = declare_dependency()
+endif
 
-modulemd_v1_srcs = files(
-    'v1/modulemd-buildopts.c',
-    'v1/modulemd-common.c',
-    'v1/modulemd-component.c',
-    'v1/modulemd-component-module.c',
-    'v1/modulemd-component-rpm.c',
-    'v1/modulemd-defaults.c',
-    'v1/modulemd-dependencies.c',
-    'v1/modulemd-improvedmodule.c',
-    'v1/modulemd-intent.c',
-    'v1/modulemd-module.c',
-    'v1/modulemd-modulestream.c',
-    'v1/modulemd-prioritizer.c',
-    'v1/modulemd-profile.c',
-    'v1/modulemd-simpleset.c',
-    'v1/modulemd-servicelevel.c',
-    'v1/modulemd-subdocument.c',
-    'v1/modulemd-translation.c',
-    'v1/modulemd-translation-entry.c',
-    'v1/modulemd-util.c',
-    'v1/modulemd-yaml-emitter.c',
-    'v1/modulemd-yaml-emitter-defaults.c',
-    'v1/modulemd-yaml-emitter-modulemd.c',
-    'v1/modulemd-yaml-emitter-translation.c',
-    'v1/modulemd-yaml-parser.c',
-    'v1/modulemd-yaml-parser-defaults.c',
-    'v1/modulemd-yaml-parser-modulemd.c',
-    'v1/modulemd-yaml-parser-translation.c',
-    'v1/modulemd-yaml-utils.c'
+
+modulemd_srcs = files(
+    'modulemd-buildopts.c',
+    'modulemd-common.c',
+    'modulemd-component.c',
+    'modulemd-component-module.c',
+    'modulemd-component-rpm.c',
+    'modulemd-defaults.c',
+    'modulemd-dependencies.c',
+    'modulemd-improvedmodule.c',
+    'modulemd-intent.c',
+    'modulemd-module.c',
+    'modulemd-modulestream.c',
+    'modulemd-prioritizer.c',
+    'modulemd-profile.c',
+    'modulemd-simpleset.c',
+    'modulemd-servicelevel.c',
+    'modulemd-subdocument.c',
+    'modulemd-translation.c',
+    'modulemd-translation-entry.c',
+    'modulemd-util.c',
+    'modulemd-yaml-emitter.c',
+    'modulemd-yaml-emitter-defaults.c',
+    'modulemd-yaml-emitter-modulemd.c',
+    'modulemd-yaml-emitter-translation.c',
+    'modulemd-yaml-parser.c',
+    'modulemd-yaml-parser-defaults.c',
+    'modulemd-yaml-parser-modulemd.c',
+    'modulemd-yaml-parser-translation.c',
+    'modulemd-yaml-utils.c'
 )
 
-modulemd_v1_hdrs = files(
-    'v1/include/modulemd-1.0/modulemd.h',
-    'v1/include/modulemd-1.0/modulemd-buildopts.h',
-    'v1/include/modulemd-1.0/modulemd-component.h',
-    'v1/include/modulemd-1.0/modulemd-component-module.h',
-    'v1/include/modulemd-1.0/modulemd-component-rpm.h',
-    'v1/include/modulemd-1.0/modulemd-defaults.h',
-    'v1/include/modulemd-1.0/modulemd-dependencies.h',
-    'v1/include/modulemd-1.0/modulemd-deprecated.h',
-    'v1/include/modulemd-1.0/modulemd-improvedmodule.h',
-    'v1/include/modulemd-1.0/modulemd-intent.h',
-    'v1/include/modulemd-1.0/modulemd-module.h',
-    'v1/include/modulemd-1.0/modulemd-modulestream.h',
-    'v1/include/modulemd-1.0/modulemd-prioritizer.h',
-    'v1/include/modulemd-1.0/modulemd-profile.h',
-    'v1/include/modulemd-1.0/modulemd-simpleset.h',
-    'v1/include/modulemd-1.0/modulemd-servicelevel.h',
-    'v1/include/modulemd-1.0/modulemd-subdocument.h',
-    'v1/include/modulemd-1.0/modulemd-translation.h',
-    'v1/include/modulemd-1.0/modulemd-translation-entry.h',
+modulemd_hdrs = files(
+    'include/modulemd-1.0/modulemd.h',
+    'include/modulemd-1.0/modulemd-buildopts.h',
+    'include/modulemd-1.0/modulemd-component.h',
+    'include/modulemd-1.0/modulemd-component-module.h',
+    'include/modulemd-1.0/modulemd-component-rpm.h',
+    'include/modulemd-1.0/modulemd-defaults.h',
+    'include/modulemd-1.0/modulemd-dependencies.h',
+    'include/modulemd-1.0/modulemd-deprecated.h',
+    'include/modulemd-1.0/modulemd-improvedmodule.h',
+    'include/modulemd-1.0/modulemd-intent.h',
+    'include/modulemd-1.0/modulemd-module.h',
+    'include/modulemd-1.0/modulemd-modulestream.h',
+    'include/modulemd-1.0/modulemd-prioritizer.h',
+    'include/modulemd-1.0/modulemd-profile.h',
+    'include/modulemd-1.0/modulemd-simpleset.h',
+    'include/modulemd-1.0/modulemd-servicelevel.h',
+    'include/modulemd-1.0/modulemd-subdocument.h',
+    'include/modulemd-1.0/modulemd-translation.h',
+    'include/modulemd-1.0/modulemd-translation-entry.h',
 )
 
-modulemd_v1_priv_hdrs = files(
-    'v1/include/private/modulemd-improvedmodule-private.h',
-    'v1/include/private/modulemd-private.h',
-    'v1/include/private/modulemd-profile-private.h',
-    'v1/include/private/modulemd-subdocument-private.h',
-    'v1/include/private/modulemd-util.h',
-    'v1/include/private/modulemd-yaml.h',
+modulemd_priv_hdrs = files(
+    'include/private/modulemd-improvedmodule-private.h',
+    'include/private/modulemd-private.h',
+    'include/private/modulemd-profile-private.h',
+    'include/private/modulemd-subdocument-private.h',
+    'include/private/modulemd-util.h',
+    'include/private/modulemd-yaml.h',
 )
 
-v1_include_dirs = include_directories (
-    'v1/include/modulemd-1.0',
-    'v1/include'
+include_dirs = include_directories (
+    'include/modulemd-1.0',
+    'include'
 )
 
-test_v1_srcs = files(
-    'v1/tests/test-modulemd-buildopts.c',
-    'v1/tests/test-modulemd-component.c',
-    'v1/tests/test-modulemd-defaults.c',
-    'v1/tests/test-modulemd-dependencies.c',
-    'v1/tests/test-modulemd-intent.c',
-    'v1/tests/test-modulemd-module.c',
-    'v1/tests/test-modulemd-modulestream.c',
-    'v1/tests/test-modulemd-regressions.c',
-    'v1/tests/test-modulemd-servicelevel.c',
-    'v1/tests/test-modulemd-simpleset.c',
-    'v1/tests/test-modulemd-subdocument.c',
-    'v1/tests/test-modulemd-translation.c',
-    'v1/tests/test-modulemd-translation-entry.c',
-    'v1/tests/test-modulemd-yaml.c',
+test_srcs = files(
+    'tests/test-modulemd-buildopts.c',
+    'tests/test-modulemd-component.c',
+    'tests/test-modulemd-defaults.c',
+    'tests/test-modulemd-dependencies.c',
+    'tests/test-modulemd-intent.c',
+    'tests/test-modulemd-module.c',
+    'tests/test-modulemd-modulestream.c',
+    'tests/test-modulemd-regressions.c',
+    'tests/test-modulemd-servicelevel.c',
+    'tests/test-modulemd-simpleset.c',
+    'tests/test-modulemd-subdocument.c',
+    'tests/test-modulemd-translation.c',
+    'tests/test-modulemd-translation-entry.c',
+    'tests/test-modulemd-yaml.c',
 )
 
 
-modulemd_v2_srcs = files(
-    'v2/modulemd.c',
-    'v2/modulemd-buildopts.c',
-    'v2/modulemd-component.c',
-    'v2/modulemd-component-module.c',
-    'v2/modulemd-component-rpm.c',
-    'v2/modulemd-defaults.c',
-    'v2/modulemd-defaults-v1.c',
-    'v2/modulemd-dependencies.c',
-    'v2/modulemd-module.c',
-    'v2/modulemd-module-index.c',
-    'v2/modulemd-module-index-merger.c',
-    'v2/modulemd-module-stream.c',
-    'v2/modulemd-module-stream-v1.c',
-    'v2/modulemd-module-stream-v2.c',
-    'v2/modulemd-profile.c',
-    'v2/modulemd-rpm-map-entry.c',
-    'v2/modulemd-service-level.c',
-    'v2/modulemd-subdocument-info.c',
-    'v2/modulemd-translation.c',
-    'v2/modulemd-translation-entry.c',
-    'v2/modulemd-util.c',
-    'v2/modulemd-yaml-util.c',
+modulemd_lib = library(
+    'modulemd',
+    sources : modulemd_srcs,
+    include_directories : include_dirs,
+    dependencies : [
+        gobject,
+        yaml,
+        build_lib,
+    ],
+    install : true,
+    version: libmodulemd_version,
 )
 
-modulemd_v2_validator_srcs = files (
-    'v2/modulemd-validator.c',
+if test_installed_lib
+    # Run tests against an installed library instead of in-tree
+    modulemd_dep = declare_dependency(
+        include_directories : include_dirs,
+        dependencies : [
+            gobject,
+            dependency(
+                'modulemd',
+                version: ['>= 1.0.0', '< 2.0.0']
+            ),
+        ]
+    )
+else
+    modulemd_dep = declare_dependency(
+        include_directories : include_dirs,
+        link_with : modulemd_lib,
+        dependencies : [
+            gobject,
+        ]
+    )
+endif
+
+
+modulemd_validator_v1 = executable(
+    'modulemd-validator-v1',
+    'modulemd-validator.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : true,
 )
 
-modulemd_v2_hdrs = files(
-    'v2/include/modulemd-2.0/modulemd.h',
-    'v2/include/modulemd-2.0/modulemd-buildopts.h',
-    'v2/include/modulemd-2.0/modulemd-component.h',
-    'v2/include/modulemd-2.0/modulemd-component-module.h',
-    'v2/include/modulemd-2.0/modulemd-component-rpm.h',
-    'v2/include/modulemd-2.0/modulemd-defaults.h',
-    'v2/include/modulemd-2.0/modulemd-defaults-v1.h',
-    'v2/include/modulemd-2.0/modulemd-dependencies.h',
-    'v2/include/modulemd-2.0/modulemd-deprecated.h',
-    'v2/include/modulemd-2.0/modulemd-module.h',
-    'v2/include/modulemd-2.0/modulemd-module-index.h',
-    'v2/include/modulemd-2.0/modulemd-module-index-merger.h',
-    'v2/include/modulemd-2.0/modulemd-module-stream.h',
-    'v2/include/modulemd-2.0/modulemd-module-stream-v1.h',
-    'v2/include/modulemd-2.0/modulemd-module-stream-v2.h',
-    'v2/include/modulemd-2.0/modulemd-profile.h',
-    'v2/include/modulemd-2.0/modulemd-rpm-map-entry.h',
-    'v2/include/modulemd-2.0/modulemd-service-level.h',
-    'v2/include/modulemd-2.0/modulemd-subdocument-info.h',
-    'v2/include/modulemd-2.0/modulemd-translation.h',
-    'v2/include/modulemd-2.0/modulemd-translation-entry.h',
+header_path = 'modulemd'
+
+install_headers(
+  modulemd_hdrs,
+  subdir : header_path,
 )
 
-modulemd_v2_priv_hdrs = files(
-    'v2/include/private/glib-extensions.h',
-    'v2/include/private/modulemd-buildopts-private.h',
-    'v2/include/private/modulemd-component-private.h',
-    'v2/include/private/modulemd-component-module-private.h',
-    'v2/include/private/modulemd-component-rpm-private.h',
-    'v2/include/private/modulemd-dependencies-private.h',
-    'v2/include/private/modulemd-profile-private.h',
-    'v2/include/private/modulemd-defaults-private.h',
-    'v2/include/private/modulemd-defaults-v1-private.h',
-    'v2/include/private/modulemd-module-private.h',
-    'v2/include/private/modulemd-module-index-private.h',
-    'v2/include/private/modulemd-module-stream-private.h',
-    'v2/include/private/modulemd-module-stream-v1-private.h',
-    'v2/include/private/modulemd-module-stream-v2-private.h',
-    'v2/include/private/modulemd-service-level-private.h',
-    'v2/include/private/modulemd-subdocument-info-private.h',
-    'v2/include/private/modulemd-translation-private.h',
-    'v2/include/private/modulemd-translation-entry-private.h',
-    'v2/include/private/modulemd-util.h',
-    'v2/include/private/modulemd-yaml.h',
-    'v2/include/private/gi-binding-renames.h',
+
+# Test env with release values
+test_release_env = environment()
+test_release_env.set('G_MESSAGES_DEBUG', 'all')
+test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+
+
+# Test env with fatal warnings and criticals
+test_env = test_release_env
+test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+
+test_modulemd_buildopts = executable(
+    'test_modulemd_buildopts',
+    'tests/test-modulemd-buildopts.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
 )
 
-test_v2_srcs = files(
-    'v2/tests/test-modulemd-buildopts.c',
-    'v2/tests/test-modulemd-component-module.c',
-    'v2/tests/test-modulemd-component-rpm.c',
-    'v2/tests/test-modulemd-defaults.c',
-    'v2/tests/test-modulemd-defaults-v1.c',
-    'v2/tests/test-modulemd-dependencies.c',
-    'v2/tests/test-modulemd-merger.c',
-    'v2/tests/test-modulemd-module.c',
-    'v2/tests/test-modulemd-moduleindex.c',
-    'v2/tests/test-modulemd-modulestream.c',
-    'v2/tests/test-modulemd-profile.c',
-    'v2/tests/test-modulemd-rpmmap.c',
-    'v2/tests/test-modulemd-service-level.c',
-    'v2/tests/test-modulemd-translation.c',
-    'v2/tests/test-modulemd-translation-entry.c',
-    'v2/tests/test-utils.c',
-)
+test('test_modulemd_buildopts', test_modulemd_buildopts,
+     env : test_env)
+test('test_release_modulemd_buildopts', test_modulemd_buildopts,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_buildopts'
 
-test_v2_priv_hdrs = files(
-    'v2/include/private/test-utils.h',
+test_modulemd_component = executable(
+    'test_modulemd_component',
+    'tests/test-modulemd-component.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
 )
+test('test_modulemd_component', test_modulemd_component,
+     env : test_env)
+test('test_release_modulemd_component', test_modulemd_component,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_component'
 
-test_v2_python_scripts = files(
-    'v2/tests/ModulemdTests/base.py',
-    'v2/tests/ModulemdTests/buildopts.py',
-    'v2/tests/ModulemdTests/componentrpm.py',
-    'v2/tests/ModulemdTests/defaults.py',
-    'v2/tests/ModulemdTests/defaultsv1.py',
-    'v2/tests/ModulemdTests/dependencies.py',
-    'v2/tests/ModulemdTests/merger.py',
-    'v2/tests/ModulemdTests/module.py',
-    'v2/tests/ModulemdTests/moduleindex.py',
-    'v2/tests/ModulemdTests/modulestream.py',
-    'v2/tests/ModulemdTests/profile.py',
-    'v2/tests/ModulemdTests/rpmmap.py',
-    'v2/tests/ModulemdTests/servicelevel.py',
-    'v2/tests/ModulemdTests/translation.py',
-    'v2/tests/ModulemdTests/translationentry.py',
+test_modulemd_defaults = executable(
+    'test_modulemd_defaults',
+    'tests/test-modulemd-defaults.c',
+    dependencies : [
+        modulemd_dep,
+        yaml
+    ],
+    install : false,
 )
+test('test_modulemd_defaults', test_modulemd_defaults,
+     env : test_env)
+test('test_release_modulemd_defaults', test_modulemd_defaults,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_defaults'
 
-v2_include_dirs = include_directories (
-    'v2/include/modulemd-2.0',
-    'v2/include'
+test_modulemd_dependencies = executable(
+    'test_modulemd_dependencies',
+    'tests/test-modulemd-dependencies.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
 )
+test('test_modulemd_dependencies', test_modulemd_dependencies,
+     env : test_env)
+test('test_release_modulemd_dependencies', test_modulemd_dependencies,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_dependencies'
+
+test_modulemd_intent = executable(
+    'test_modulemd_intent',
+    'tests/test-modulemd-intent.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_intent', test_modulemd_intent,
+     env : test_env)
+test('test_release_modulemd_intent', test_modulemd_intent,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_intent'
+
+test_modulemd_module = executable(
+    'test_modulemd_module',
+    'tests/test-modulemd-module.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_module', test_modulemd_module,
+     env : test_env)
+test('test_release_modulemd_module', test_modulemd_module,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_module'
+
+test_modulemd_modulestream = executable(
+    'test_modulemd_modulestream',
+    'tests/test-modulemd-modulestream.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_modulestream', test_modulemd_modulestream,
+     env : test_env)
+test('test_release_modulemd_modulestream', test_modulemd_modulestream,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_modulestream'
+
+test_modulemd_regressions = executable(
+    'test_modulemd_regressions',
+    'tests/test-modulemd-regressions.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_regressions', test_modulemd_regressions,
+    env : test_env)
+test('test_release_modulemd_regressions', test_modulemd_regressions,
+    env : test_release_env)
+valgrind_tests += 'test_modulemd_regressions'
+
+test_modulemd_servicelevel = executable(
+    'test_modulemd_servicelevel',
+    'tests/test-modulemd-servicelevel.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_servicelevel', test_modulemd_servicelevel,
+     env : test_env)
+test('test_release_modulemd_servicelevel', test_modulemd_servicelevel,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_servicelevel'
+
+test_modulemd_simpleset = executable(
+    'test_modulemd_simpleset',
+    'tests/test-modulemd-simpleset.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_simpleset', test_modulemd_simpleset,
+     env : test_env)
+test('test_release_modulemd_simpleset', test_modulemd_simpleset,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_simpleset'
+
+test_modulemd_subdocument = executable(
+    'test_modulemd_subdocument',
+    'tests/test-modulemd-subdocument.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_subdocument', test_modulemd_subdocument,
+     env : test_env)
+test('test_release_modulemd_subdocument', test_modulemd_subdocument,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_subdocument'
+
+
+test_modulemd_translation = executable(
+    'test_modulemd_translation',
+    'tests/test-modulemd-translation.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_translation',
+     test_modulemd_translation,
+     env : test_env)
+test('test_release_modulemd_translation',
+     test_modulemd_translation,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_translation'
+
+
+test_modulemd_translation_entry = executable(
+    'test_modulemd_translation_entry',
+    'tests/test-modulemd-translation-entry.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_translation_entry',
+     test_modulemd_translation_entry,
+     env : test_env)
+test('test_release_modulemd_translation_entry',
+     test_modulemd_translation_entry,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_translation_entry'
+
+
+test_modulemd_yaml = executable(
+    'test_modulemd_yaml',
+    'tests/test-modulemd-yaml.c',
+    dependencies : [
+        modulemd_dep,
+        yaml
+    ],
+    install : false,
+)
+test('test_modulemd_yaml', test_modulemd_yaml,
+     env : test_env)
+test('test_release_modulemd_yaml', test_modulemd_yaml,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_yaml'
+
+# Test env with fatal warnings and criticals
+py_test_env = test_env
+
+if not test_installed_lib
+    # If we're testing an installed version, we want to use the default
+    # locations for these paths.
+    py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
+    py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
+
+    # This test is just to catch whether we are accidentally not testing
+    # the built version.
+    py_test_env.set ('MODULEMD_VERSION', libmodulemd_version)
+endif
+
+# Test env with release values
+py_test_release_env = py_test_env
+py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
+
+modulemd_python_scripts = files('tests/test-modulemd-python.py')
+test ('test_modulemd_python', python3,
+      env : py_test_env,
+      args : modulemd_python_scripts)
+test ('test_release_modulemd_python', python3,
+      env : py_test_release_env,
+      args : modulemd_python_scripts)
 
 
 # Fake test to ensure that all sources and headers are formatted properly
 clang_args = [ '-i' ]
 test('clang_format', clang_format,
      args : clang_args +
-            modulemd_v1_srcs +
-            modulemd_v1_hdrs +
-            modulemd_v1_priv_hdrs +
-            test_v1_srcs +
-            modulemd_v2_srcs +
-            modulemd_v2_hdrs +
-            modulemd_v2_priv_hdrs +
-            modulemd_v2_validator_srcs +
-            test_v2_srcs +
-            test_v2_priv_hdrs)
+            modulemd_srcs +
+            modulemd_hdrs +
+            modulemd_priv_hdrs +
+            test_srcs)
 
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 autopep8_args = [ '--in-place', '-a', '-a', '--global-config', '../tox.ini' ]
-autopep8_scripts = [ files('v1/tests/test-modulemd-python.py',
-                           'common/tests/test-dirty.py',
-                           'common/tests/test-valgrind.py',
-                           '../bindings/python/gi/overrides/Modulemd.py',
-                           '../ModulemdTranslationHelpers/Utils.py',
-                           'v2/tests/ModulemdTests/translation_helpers.py') +
-                     test_v2_python_scripts ]
+autopep8_scripts = [ files('tests/test-modulemd-python.py',
+                           'tests/test-dirty.py',
+                           'tests/test-valgrind.py',) ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)
 
@@ -291,34 +462,72 @@ test('pycodestyle', pycodestyle,
 # meson was configured with `-Dtest_dirty_git=true`
 
 if test_dirty_git
-    dirty_repo_scripts = [ files('common/tests/test-dirty.py') ]
+    dirty_repo_scripts = [ files('tests/test-dirty.py') ]
     test('test_dirty_repo', python3,
          args: dirty_repo_scripts)
 endif
 
-valgrind_tests = []
 
-if build_api_v1
-    subdir('v1')
-    import_header_script = find_program('common/tests/test-import-headers.sh')
-    test ('test_v1_import_headers', import_header_script,
-          env : test_env,
-          args : modulemd_v1_hdrs)
-endif
+import_header_script = find_program('tests/test-import-headers.sh')
+test ('test_import_headers', import_header_script,
+      env : test_env,
+      args : modulemd_hdrs)
 
-if build_api_v2
-    subdir('v2')
-    import_header_script = find_program('common/tests/test-import-headers.sh')
-    test ('test_v2_import_headers', import_header_script,
-          env : test_env,
-          args : modulemd_v2_hdrs,
-          timeout : 300)
-endif
 
 if valgrind.found()
-    modulemd_valgrind_scripts = files('common/tests/test-valgrind.py')
+    modulemd_valgrind_scripts = files('tests/test-valgrind.py')
     test ('valgrind', python3,
           env : test_env,
           args : modulemd_valgrind_scripts + valgrind_tests,
           timeout : 1200)
 endif
+
+
+if skip_introspection
+else
+    gnome.generate_gir(
+        modulemd_lib,
+        sources : modulemd_srcs + modulemd_hdrs,
+        nsversion : '1.0',
+        namespace : 'Modulemd',
+        symbol_prefix : 'modulemd_',
+        identifier_prefix : 'Modulemd',
+        includes : [
+            'GObject-2.0',
+        ],
+        install : true,
+        )
+endif
+
+cdata = configuration_data()
+cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
+configure_file(
+  output : 'config.h',
+  configuration : cdata
+)
+
+pkg.generate(
+    libraries : modulemd_lib,
+    subdirs : header_path,
+    version : libmodulemd_version,
+    name : 'modulemd',
+    filebase : 'modulemd',
+    description : 'Module metadata manipulation library',
+    requires: [ 'glib-2.0', 'gobject-2.0' ],
+)
+xcdata = configuration_data()
+xcdata.set('VERSION', libmodulemd_version)
+configure_file(
+  input : 'version.xml.in',
+  output : 'version.xml',
+  configuration : xcdata
+)
+
+gnome.gtkdoc(
+    'modulemd-1.0',
+    install_dir: 'modulemd-1.0',
+    src_dir : './modulemd',
+    main_xml : 'modulemd-docs.xml',
+    install : true,
+)
+

@@ -10,7 +10,7 @@
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 project('modulemd', 'c',
-        version : '2.6.1',
+        version : '1.8.15',
         default_options : [
           'buildtype=debugoptimized',
           'c_std=c11',
@@ -20,8 +20,7 @@ project('modulemd', 'c',
         license : 'MIT',
         meson_version : '>=0.47.0')
 
-libmodulemd_v1_version = '1.8.14'
-libmodulemd_v2_version = meson.project_version()
+libmodulemd_version = meson.project_version()
 
 cc = meson.get_compiler('c')
 test_cflags = [
@@ -81,13 +80,6 @@ else
     python3 = pymod.find_installation()
 endif
 
-with_py2_overrides = get_option('with_py2_overrides')
-if with_py2_overrides
-    python2 = pymod.find_installation('python2')
-else
-    python2 = disabler()
-endif
-
 spec_tmpl = find_program('spec_tmpl.sh')
 
 specfile_template = files('libmodulemd.spec.in')
@@ -110,8 +102,7 @@ spec_target = custom_target(
     capture: true,
     build_always: true,
     command: [sh, spec_tmpl,
-              meson.project_version(),
-              libmodulemd_v1_version,
+              libmodulemd_version,
               '@INPUT@'],
     input: specfile_template,
     output: 'libmodulemd.spec',
@@ -119,13 +110,11 @@ spec_target = custom_target(
 )
 
 rpm_cdata = configuration_data()
-rpm_cdata.set('VERSION', meson.project_version())
-rpm_cdata.set('V1_VERSION', libmodulemd_v1_version)
+rpm_cdata.set('VERSION', libmodulemd_version)
 rpm_cdata.set('BUILDFLAG', '-bb')
 
 srpm_cdata = configuration_data()
-srpm_cdata.set('VERSION', meson.project_version())
-srpm_cdata.set('V1_VERSION', libmodulemd_v1_version)
+srpm_cdata.set('VERSION', libmodulemd_version)
 srpm_cdata.set('BUILDFLAG', '-bs')
 
 configure_file(
@@ -141,4 +130,3 @@ configure_file(
 )
 
 subdir('modulemd')
-subdir('bindings/python')

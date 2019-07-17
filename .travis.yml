@@ -35,10 +35,6 @@ jobs:
       script: ./.travis/travis-fedora.sh
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
-    - name: "Documentation Update"
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-docs.sh; fi'
-    - name: "Coverity Scan"
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-coverity.sh; fi'
     - name: "openSUSE tumbleweed"
       script: ./.travis/travis-opensuse.sh
     - name: "Arch Linux"

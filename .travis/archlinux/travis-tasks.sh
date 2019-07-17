@@ -15,10 +15,8 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=
 
 pushd /builddir/
 
-# Build the v1 and v2 code under GCC and run standard tests
+# Build the code under GCC and run standard tests
 meson --buildtype=debug \
-      -Dbuild_api_v1=true \
-      -Dbuild_api_v2=true \
       $COMMON_MESON_ARGS \
       travis
 

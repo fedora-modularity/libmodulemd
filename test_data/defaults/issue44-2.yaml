@@ -1,7 +1,0 @@
-document: modulemd-defaults
-version: 1
-data:
-  module: testmodule
-  stream: master
-  profiles:
-    master: [default]

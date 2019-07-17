@@ -78,7 +78,12 @@ class TestTranslationHelpers(TestBase):
     def test_translations_from_catalog(self):
         translation_files = [
             "%s/modulemd/v2/tests/test_data/nl.po" %
-            (os.getenv('MESON_SOURCE_ROOT'))]
+            (os.getenv('MESON_SOURCE_ROOT')),
+            "%s/modulemd/v2/tests/test_data/fr.po" %
+            (os.getenv('MESON_SOURCE_ROOT')),
+            "%s/modulemd/v2/tests/test_data/sv.po" %
+            (os.getenv('MESON_SOURCE_ROOT'))
+        ]
 
         catalogs = list()
         for f in translation_files:

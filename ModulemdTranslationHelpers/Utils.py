@@ -1,17 +1,18 @@
 import sys
+import logging
+import gi
 from babel.messages import Catalog, pofile
 from datetime import datetime
 from collections import defaultdict
 
 try:
-    import gi
     gi.require_version('Modulemd', '2.0')
     from gi.repository import Modulemd
 except ImportError:
     sys.exit(77)
 
 
-def get_latest_modules_in_tag(session, tag, debug=False):
+def get_latest_modules_in_tag(session, tag):
     """
     Get the most-recently built versions of each (module,stream) pair from
     a Koji tag
@@ -26,10 +27,9 @@ def get_latest_modules_in_tag(session, tag, debug=False):
         try:
             tagged = session.listTagged(tag)
         except requests.exceptions.ConnectionError:
-            if debug:
-                print("Connection lost while retrieving builds for tag %s, "
-                      "retrying..." % tag,
-                      file=sys.stderr)
+            logger.debug(
+                "Connection lost while retrieving builds for tag %s, "
+                "retrying..." % tag)
         else:
             # Succeeded this time, so break out of the loop
             break
@@ -55,25 +55,25 @@ def get_latest_modules_in_tag(session, tag, debug=False):
     return latest
 
 
-def get_index_from_tags(session, tags, debug=False):
+def get_index_from_tags(session, tags):
     """
     Construct a ModuleIndex object from the contents of the provided tags.
     :param session: A Koji session
     :param tags: A set of Koji tags from which module metadata should be pulled
-    :param debug: Whether to print debugging information to the console
     :return: A ModuleIndex object. Raises an exception if any of the
     retrieved modulemd is invalid.
     """
 
     tagged_builds = []
     for tag in tags:
-        tagged_builds.extend(get_latest_modules_in_tag(session, tag, debug))
+        tagged_builds.extend(get_latest_modules_in_tag(session, tag))
 
     # Make the list unique since some modules may have multiple tags
     unique_builds = {}
     for build in tagged_builds:
         unique_builds[build['id']] = build
 
+    index = Modulemd.ModuleIndex.new()
     for build_id in unique_builds.keys():
         # Koji sometimes disconnects for no apparent reason. Retry up to 5
         # times before failing.
@@ -81,27 +81,17 @@ def get_index_from_tags(session, tags, debug=False):
             try:
                 build = session.getBuild(build_id)
             except requests.exceptions.ConnectionError:
-                if debug:
-                    print("Connection lost while processing buildId %s, "
-                          "retrying..." % build_id,
-                          file=sys.stderr)
+                logger.debug(
+                    "Connection lost while processing buildId %s, "
+                    "retrying..." % build_id)
             else:
                 # Succeeded this time, so break out of the loop
                 break
-        if debug:
-            print("Processing %s:%s" % (build['package_name'], build['nvr']))
 
-        modulemds = Modulemd.objects_from_string(
-            build['extra']['typeinfo']['module']['modulemd_str'])
+        logger.info("Processing %s:%s" % (build['package_name'], build['nvr']))
+        ret, failures = index.update_from_string(
+            build['extra']['typeinfo']['module']['modulemd_str'], True)
 
-        # We should only get a single modulemd document from Koji
-        if len(modulemds) != 1:
-            raise ValueError("Koji build %s returned multiple modulemd YAML "
-                             "documents." % build['nvr'])
-
-        index = Modulemd.ModuleIndex.new()
-        ret, failures = index.update_from_string(modulemds, True)
-        
     return index
 
 
@@ -209,7 +199,7 @@ def get_modulemd_translations_from_catalog(catalogs, index):
         try:
             ret = index.add_translation(mmd_translation)
         except GLib.Error:
-            print(
+            logger.debug(
                 "The translation for this %s:%s could not be added",
                 module_name,
                 stream_name)

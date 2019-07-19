@@ -232,7 +232,7 @@ translation_test_translations (TranslationFixture *fixture,
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   ModulemdTranslationEntry *te = NULL;
-  g_auto (GStrv) locales;
+  g_auto (GStrv) locales = NULL;
 
   t = modulemd_translation_new (1, "testmodule", "teststream", 5);
   te = modulemd_translation_entry_new ("en_US");

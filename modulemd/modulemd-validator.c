@@ -140,7 +140,7 @@ int
 main (int argc, char *argv[])
 {
   const char *filename;
-  g_autoptr (GOptionContext) context;
+  g_autoptr (GOptionContext) context = NULL;
   g_autoptr (GError) error = NULL;
   gsize num_invalid = 0;
   gboolean ret;

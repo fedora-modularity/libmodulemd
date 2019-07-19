@@ -115,6 +115,13 @@ profiles:
 
         self.assertNotIn("nodejs", default_streams.keys())
 
+    def test_dump_empty_index(self):
+        idx = Modulemd.ModuleIndex.new()
+
+        with self.assertRaisesRegexp(gi.repository.GLib.GError, "Index contains no modules."):
+            yaml = idx.dump_to_string()
+            self.assertIsNone(yaml)
+
 
 if __name__ == '__main__':
     unittest.main()

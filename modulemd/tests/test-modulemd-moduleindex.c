@@ -1002,6 +1002,22 @@ module_index_test_get_default_streams (void)
 }
 
 
+static void
+module_index_test_dump_empty_index (void)
+{
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml = NULL;
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+
+  g_assert_nonnull (index);
+  g_assert_true (MODULEMD_IS_MODULE_INDEX (index));
+
+  yaml = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_null (yaml);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1077,6 +1093,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/get_default_streams",
                    module_index_test_get_default_streams);
+
+  g_test_add_func ("/modulemd/v2/module/index/empty",
+                   module_index_test_dump_empty_index);
 
   return g_test_run ();
 }

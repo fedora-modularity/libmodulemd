@@ -45,36 +45,34 @@ G_BEGIN_DECLS
  *
  * # Working with repodata (DNF use-case) #
  * The libmodulemd API provides a number of convenience tools for interacting
- * with repodata (that is, streams of YAML that contains information on
- * multiple streams, default data and translations). The documentation will use
- * two repositories, called "fedora" and "updates" for demonstrative purposes.
- * It will assume that the content of the YAML module metadata from those two
- * repositories have been loaded into string variables "fedora_yaml" and
- * "updates_yaml", respectively.
+ * with repodata (that is, streams of YAML that contains information on multiple
+ * streams, default data and translations). The documentation will use two
+ * repositories, called "fedora" and "updates" for demonstrative purposes. It
+ * will assume that the content of the YAML module metadata from those two
+ * repositories have been loaded into string variables `fedora_yaml` and
+ * `updates_yaml`, respectively.
  *
  * First step is to load the metadata from these two repositories into
  * #ModulemdModuleIndex objects. This is done as follows:
  *
  * In C:
  * |[<!-- language="C" -->
- * fedora_index = modulemd_module_index_new();
- * ret = modulemd_module_index_update_from_string(fedora_index,
- *                                                fedora_yaml,
- *                                                &failures,
- *                                                &error);
+ * ModulemdModuleIndex * fedora_index = modulemd_module_index_new ();
+ * gboolean ret = modulemd_module_index_update_from_string (fedora_index,
+ *                                                          fedora_yaml,
+ *                                                          TRUE,
+ *                                                          &failures,
+ *                                                          &error);
  *
- * updates_index = modulemd_module_index_new();
- * ret = modulemd_module_index_update_from_string(updates_index,
- *                                                updates_yaml,
- *                                                &failures,
- *                                                &error);
+ * ModulemdModuleIndex * updates_index = modulemd_module_index_new ();
+ * gboolean ret2 = modulemd_module_index_update_from_string (updates_index,
+ *                                                           updates_yaml,
+ *                                                           TRUE,
+ *                                                           &failures,
+ *                                                           &error);
  * ]|
  *
- * The @failures argument will return any subdocuments in the YAML stream
- * that could not be parsed or validated successfully. In the event that the
- * stream as a whole could not be parsed, @error will be set accordingly.
- *
- * In python:
+ * In Python:
  *
  * |[<!-- language="Python" -->
  * fedora_index = Modulemd.ModuleIndex.new()
@@ -84,17 +82,22 @@ G_BEGIN_DECLS
  * ret, failures = updates_index.update_from_string(updates_yaml, True)
  * ]|
  *
+ * The @failures are a list of subdocuments in the YAML that failed parsing,
+ * along with the reason they failed. Hence, by checking the return value of
+ * @failures we will know if the YAML parsing was successful or not.
+ *
  * Since it doesn't really make sense to view the contents from separate
- * repositories in isolation (in most cases), the next step is to merge the
- * two indexes into a combined one:
+ * repositories in isolation (in most cases), the next step is to merge the two
+ * indexes into a combined one:
  *
  * In C:
  * |[<!-- language="C" -->
- * merger = modulemd_module_index_merger_new()
+ * ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new ();
+ *
  * modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
  * modulemd_module_index_merger_associate_index (merger, updates_index, 0);
  *
- * merged_index = modulemd_module_index_merger_resolve (merger, &error);
+ * ModulemdModuleIndex * merged_index = modulemd_module_index_merger_resolve (merger, &error);
  * ]|
  *
  * In Python:
@@ -116,11 +119,20 @@ G_BEGIN_DECLS
  * index will contain only v2 objects (with the v1 objects automatically
  * upgraded internally).
  *
- * At this point, we can start operating on the retrieved data. This guide will
+ * Now, we can start operating on the retrieved data. This guide will
  * give only a brief overview of the most common operations. See the API
  * specification for a full list of information that can be retrieved.
  *
  * ## Discover the default stream for a particular module.
+ * In C:
+ * |[<!-- language="C" -->
+ * ModulemdModule * module =  modulemd_module_index_get_module (merged_index, "modulename");
+ * ModulemdDefaults * defaults = modulemd_module_get_defaults (module);
+ * printf ("Default stream for modulename is %s\n",
+ *         modulemd_defaults_v1_get_default_stream (MODULEMD_DEFAULTS_V1 (defaults), NULL));
+ * ]|
+ *
+ * In Python:
  * |[<!-- language="Python" -->
  * module = merged_index.get_module ('modulename')
  * defaults = module.get_defaults()
@@ -128,17 +140,69 @@ G_BEGIN_DECLS
  *        defaults.get_default_stream())
  * ]|
  *
- * ## Get the list of RPMs defining the public API for a particular module NSVC
+ *
+ * ## Get the list of RPMs defining the public API for a particular module NSVCA
+ * First, query the #ModulemdModuleIndex for the module with a given name.
+ *
+ * In C:
+ * |[<!-- language="C" -->
+ * ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ * ]|
+ *
+ * In Python:
  * |[<!-- language="Python" -->
  * module = merged_index.get_module ('modulename')
- * stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ * ]|
+ *
+ * Then, query the #ModulemdModule for the #ModulemdModuleStream associated with the
+ * provided NSVCA (name-stream-version-context-architecture identifier).
+ *
+ * In C:
+ * |[<!-- language="C" -->
+ * ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module,
+ *                                                                      "modulestream",
+ *                                                                      0,
+ *                                                                      "deadbeef",
+ *                                                                      "coolarch",
+ *                                                                      &error);
+ * ]|
+ *
+ * In Python:
+ * |[<!-- language="Python" -->
+ * stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+ * ]|
+ *
+ * Lastly, read the RPM API from the #ModulemdModuleStream. Here, `api_list` is
+ * a list of strings containing package names.
+ *
+ * In C:
+ * |[<!-- language="C" -->
+ * GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (MODULEMD_MODULE_STREAM_V2 (stream));
+ * ]|
+ *
+ * In Python:
+ * |[<!-- language="Python" -->
  * api_list = stream.get_rpm_api()
  * ]|
  *
- * ## Retrieve the modular runtime dependencies for a particular module NSVC
+ *
+ * ## Retrieve the modular runtime dependencies for a particular module NSVCA
+ * In C:
+ * |[<!-- language="C" -->
+ * ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ * ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
+ * GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (MODULEMD_MODULE_STREAM_V2 (stream));
+ *
+ * for (gint i = 0; i < deps_list->len; i++)
+ *   {
+ *     stuff with g_ptr_array_index(deps_list, i);
+ *   }
+ * ]|
+ *
+ * In Python:
  * |[<!-- language="Python" -->
  * module = merged_index.get_module ('modulename')
- * stream = module.get_stream_by_NSVC('modulestream', 1, 'deadbeef')
+ * stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
  * deps_list = stream.get_dependencies()
  *
  * for dep in deps_list:
@@ -149,16 +213,16 @@ G_BEGIN_DECLS
  *
  * # Working with a single module stream (Packager/MBS use-case)
  * One limitation of the #ModulemdModuleIndex format is that it requires that
- * all module streams loaded into it have both a name and a stream name. This
- * however is not possible when dealing with streams such as a packager would
- * be using (since the build-system auto-generates the module name and stream
- * name from the git repository information. In this case, we need to work
- * with a single module stream document at a time. For this, we will use the
- * #ModulemdModuleStream interface.
+ * all module streams loaded into it have both a name and a stream name.
+ * This however is not possible when dealing with streams such as a packager
+ * would be using (since the build-system auto-generates the module name and
+ * stream name from the git repository information. In this case, we need to
+ * work with a single module stream document at a time. For this, we will
+ * use the #ModulemdModuleStream interface.
  *
- * This example will assume that the module name and stream name have already
- * been determined from the repodata and that they are stored in string
- * variables named 'module_name' and 'stream_name', respectively.
+ * This example will assume that the module name and stream name have
+ * already been determined from the repodata and that they are stored in
+ * string variables named `module_name` and `stream_name`, respectively.
  *
  * |[<!-- language="Python" -->
  * stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',

@@ -230,7 +230,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (ModulemdProfile) p_copy = NULL;
-  g_auto (GStrv) rpms;
+  g_auto (GStrv) rpms = NULL;
 
   p = modulemd_profile_new ("testprofile");
   g_assert_nonnull (p);
@@ -356,7 +356,7 @@ static void
 profile_test_rpms (ProfileFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdProfile) p = NULL;
-  g_auto (GStrv) rpms;
+  g_auto (GStrv) rpms = NULL;
 
   p = modulemd_profile_new ("testprofile");
   g_assert_nonnull (p);

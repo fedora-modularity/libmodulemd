@@ -30,7 +30,7 @@ static void
 buildopts_test_construct (BuildoptsFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
-  g_auto (GStrv) whitelist;
+  g_auto (GStrv) whitelist = NULL;
 
   /* Test that the new() function works */
   b = modulemd_buildopts_new ();
@@ -165,7 +165,7 @@ buildopts_test_copy (BuildoptsFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autoptr (ModulemdBuildopts) b_copy = NULL;
-  g_auto (GStrv) whitelist;
+  g_auto (GStrv) whitelist = NULL;
 
   b = modulemd_buildopts_new ();
   g_assert_nonnull (b);
@@ -269,7 +269,7 @@ static void
 buildopts_test_whitelist (BuildoptsFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
-  g_auto (GStrv) whitelist;
+  g_auto (GStrv) whitelist = NULL;
 
   b = modulemd_buildopts_new ();
   g_assert_nonnull (b);

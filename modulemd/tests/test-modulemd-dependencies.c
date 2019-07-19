@@ -40,7 +40,7 @@ dependencies_test_construct (DependenciesFixture *fixture,
                              gconstpointer user_data)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
-  g_auto (GStrv) list;
+  g_auto (GStrv) list = NULL;
 
   /* Test that the new() function works */
   d = modulemd_dependencies_new ();
@@ -65,7 +65,7 @@ dependencies_test_dependencies (DependenciesFixture *fixture,
                                 gconstpointer user_data)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
-  g_auto (GStrv) list;
+  g_auto (GStrv) list = NULL;
 
   d = modulemd_dependencies_new ();
   g_assert_nonnull (d);
@@ -305,7 +305,7 @@ dependencies_test_copy (DependenciesFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (ModulemdDependencies) d_copy = NULL;
-  g_auto (GStrv) list;
+  g_auto (GStrv) list = NULL;
 
   d = modulemd_dependencies_new ();
   g_assert_nonnull (d);

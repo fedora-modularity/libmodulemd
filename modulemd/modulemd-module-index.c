@@ -423,6 +423,15 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
   g_autoptr (GPtrArray) modules =
     modulemd_ordered_str_keys (self->modules, modulemd_strcmp_sort);
 
+  if (modules->len == 0)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_VALIDATE,
+                           "Index contains no modules.");
+      return FALSE;
+    }
+
   if (!mmd_emitter_start_stream (emitter, error))
     return FALSE;
 

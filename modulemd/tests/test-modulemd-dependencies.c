@@ -488,7 +488,7 @@ dependencies_test_emit_yaml (DependenciesFixture *fixture,
   g_assert_true (mmd_emitter_end_sequence (&emitter, &error));
   g_assert_true (mmd_emitter_end_document (&emitter, &error));
   g_assert_true (mmd_emitter_end_stream (&emitter, &error));
-  g_assert_cmpstr (yaml_string->str, ==, "--- []\n...\n");
+  g_assert_cmpstr (yaml_string->str, ==, "---\n- {}\n...\n");
 
   g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
   yaml_emitter_delete (&emitter);

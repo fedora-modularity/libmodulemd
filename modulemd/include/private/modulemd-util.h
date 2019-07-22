@@ -45,31 +45,6 @@ GQuark
 modulemd_error_quark (void);
 
 /**
- * ModulemdErrorEnum:
- * @MODULEMD_ERROR_UPGRADE: Represents an error encountered while upgrading the
- * metadata version of a module stream or module defaults.
- * @MODULEMD_ERROR_VALIDATE: Represents an error encountered while validating
- * module metadata.
- * @MODULEMD_ERROR_FILE_ACCESS: Represents an error encountered when attempting
- * to access a file.
- * @MODULEMD_ERROR_NO_MATCHES: Represents an error indicating that no streams
- * matched when searching for a specific module stream. Since: 2.2
- * @MODULEMD_ERROR_TOO_MANY_MATCHES: Represents an error indicating that
- * multiple streams matched when searching for a specific module stream.
- * Since: 2.2
- *
- * Since: 2.0
- */
-typedef enum
-{
-  MODULEMD_ERROR_UPGRADE,
-  MODULEMD_ERROR_VALIDATE,
-  MODULEMD_ERROR_FILE_ACCESS,
-  MODULEMD_ERROR_NO_MATCHES,
-  MODULEMD_ERROR_TOO_MANY_MATCHES
-} ModulemdErrorEnum;
-
-/**
  * modulemd_tracer:
  * @function_name: The name of the function to be tracked by this
  * #modulemd_tracer.

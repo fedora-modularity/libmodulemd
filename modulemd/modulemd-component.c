@@ -14,6 +14,7 @@
 #include <inttypes.h>
 
 #include "modulemd-component.h"
+#include "modulemd-errors.h"
 #include "private/modulemd-component-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"

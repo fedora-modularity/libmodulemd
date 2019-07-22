@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <yaml.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-module.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"

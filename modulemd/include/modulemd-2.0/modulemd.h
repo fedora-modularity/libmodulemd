@@ -21,6 +21,7 @@
 #include "modulemd-defaults-v1.h"
 #include "modulemd-dependencies.h"
 #include "modulemd-deprecated.h"
+#include "modulemd-errors.h"
 #include "modulemd-module.h"
 #include "modulemd-module-index.h"
 #include "modulemd-module-index-merger.h"

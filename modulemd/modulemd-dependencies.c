@@ -15,6 +15,7 @@
 #include <yaml.h>
 
 #include "modulemd-dependencies.h"
+#include "modulemd-errors.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-dependencies-private.h"
 #include "private/modulemd-util.h"

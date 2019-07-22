@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <yaml.h>
 #include <inttypes.h>
+#include "modulemd-errors.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"

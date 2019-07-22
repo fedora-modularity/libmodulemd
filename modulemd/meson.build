@@ -90,6 +90,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-defaults-v1.h',
     'include/modulemd-2.0/modulemd-dependencies.h',
     'include/modulemd-2.0/modulemd-deprecated.h',
+    'include/modulemd-2.0/modulemd-errors.h',
     'include/modulemd-2.0/modulemd-module.h',
     'include/modulemd-2.0/modulemd-module-index.h',
     'include/modulemd-2.0/modulemd-module-index-merger.h',

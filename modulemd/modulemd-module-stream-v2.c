@@ -15,6 +15,7 @@
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-errors.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-translation-entry.h"

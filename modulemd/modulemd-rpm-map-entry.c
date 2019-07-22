@@ -14,6 +14,7 @@
 #include <inttypes.h>
 #include "yaml.h"
 
+#include "modulemd-errors.h"
 #include "modulemd-rpm-map-entry.h"
 #include "private/modulemd-rpm-map-entry-private.h"
 #include "private/modulemd-util.h"

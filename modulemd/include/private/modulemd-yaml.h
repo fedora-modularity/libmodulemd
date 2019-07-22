@@ -16,8 +16,10 @@
 #include <glib.h>
 #include <yaml.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-service-level.h"
 #include "modulemd-subdocument-info.h"
+#include "private/modulemd-util.h"
 
 G_BEGIN_DECLS
 
@@ -53,40 +55,6 @@ typedef enum
   MODULEMD_YAML_DOC_DEFAULTS,
   MODULEMD_YAML_DOC_TRANSLATIONS
 } ModulemdYamlDocumentTypeEnum;
-
-/**
- * ModulemdYamlErrorEnum:
- * @MODULEMD_YAML_ERROR_OPEN: Represents an error encountered while opening a
- * YAML file.
- * @MODULEMD_YAML_ERROR_PROGRAMMING: Represents an internal programming error
- * encountered while parsing a YAML document.
- * @MODULEMD_YAML_ERROR_UNPARSEABLE: Represents an error indicating that
- * unexpected data or some other parsing error was encountered while parsing a
- * YAML document.
- * @MODULEMD_YAML_ERROR_PARSE: Represents an error indicating invalid data was
- * encountered while parsing a YAML document.
- * @MODULEMD_YAML_ERROR_EMIT: Represents an error encountered while writing a
- * YAML file.
- * @MODULEMD_YAML_ERROR_MISSING_REQUIRED: Represents an error indicating that
- * required elements are missing encountered while parsing a YAML document.
- * @MODULEMD_YAML_ERROR_EVENT_INIT: Represents an error indicating that a YAML
- * output event could not be initialized.
- * @MODULEMD_YAML_ERROR_INCONSISTENT: Represents a data inconsistency error
- * encountered while parsing a YAML document.
- *
- * Since: 2.0
- */
-typedef enum
-{
-  MODULEMD_YAML_ERROR_OPEN,
-  MODULEMD_YAML_ERROR_PROGRAMMING,
-  MODULEMD_YAML_ERROR_UNPARSEABLE,
-  MODULEMD_YAML_ERROR_PARSE,
-  MODULEMD_YAML_ERROR_EMIT,
-  MODULEMD_YAML_ERROR_MISSING_REQUIRED,
-  MODULEMD_YAML_ERROR_EVENT_INIT,
-  MODULEMD_YAML_ERROR_INCONSISTENT
-} ModulemdYamlErrorEnum;
 
 typedef struct _modulemd_yaml_string
 {

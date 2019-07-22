@@ -13,6 +13,7 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include "modulemd-errors.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"

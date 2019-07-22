@@ -43,6 +43,7 @@
         <xi:include href="xml/modulemd-defaults.xml"/>
         <xi:include href="xml/modulemd-defaults-v1.xml"/>
         <xi:include href="xml/modulemd-dependencies.xml"/>
+        <xi:include href="xml/modulemd-errors.xml"/>
         <xi:include href="xml/modulemd-module.xml"/>
         <xi:include href="xml/modulemd-module-index.xml"/>
         <xi:include href="xml/modulemd-module-index-merger.xml"/>

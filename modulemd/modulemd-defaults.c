@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
+#include "modulemd-errors.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-util.h"

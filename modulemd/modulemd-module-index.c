@@ -16,6 +16,7 @@
 #include <inttypes.h>
 #include <yaml.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-module-index.h"
 #include "modulemd-subdocument-info.h"
 #include "private/glib-extensions.h"

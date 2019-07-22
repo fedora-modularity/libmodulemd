@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <yaml.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-translation-entry.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-translation-entry-private.h"

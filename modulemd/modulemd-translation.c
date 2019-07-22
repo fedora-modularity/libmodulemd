@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include <yaml.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
 #include "private/glib-extensions.h"

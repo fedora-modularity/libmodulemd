@@ -589,12 +589,6 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
   int ret;
   g_autoptr (GError) nested_error = NULL;
   MMD_INIT_YAML_EVENT (event);
-  if ((g_hash_table_size (self->runtime_deps) == 0) &&
-      g_hash_table_size (self->buildtime_deps) == 0)
-    {
-      // Nothing to emit...
-      return TRUE;
-    }
 
   ret = mmd_emitter_start_mapping (
     emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);

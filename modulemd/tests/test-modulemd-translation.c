@@ -363,11 +363,11 @@ translation_test_emit_yaml (TranslationFixture *fixture,
                    "  stream: teststream\n"
                    "  modified: 42\n"
                    "  translations:\n"
-                   "  - en_US\n"
-                   "  - summary: Some summary\n"
-                   "    description: Test description\n"
-                   "    profiles:\n"
-                   "      testprofile: Test Profile Description\n"
+                   "    en_US:\n"
+                   "      summary: Some summary\n"
+                   "      description: Test description\n"
+                   "      profiles:\n"
+                   "        testprofile: Test Profile Description\n"
                    "...\n");
 }
 

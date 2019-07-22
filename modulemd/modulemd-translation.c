@@ -612,7 +612,7 @@ modulemd_translation_emit_yaml_entries (ModulemdTranslation *self,
   g_autoptr (GError) nested_error = NULL;
   gpointer key, value;
 
-  if (!mmd_emitter_start_sequence (emitter, YAML_BLOCK_SEQUENCE_STYLE, error))
+  if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
     return FALSE;
 
   g_hash_table_iter_init (&iter, self->translation_entries);
@@ -628,7 +628,7 @@ modulemd_translation_emit_yaml_entries (ModulemdTranslation *self,
         }
     }
 
-  if (!mmd_emitter_end_sequence (emitter, error))
+  if (!mmd_emitter_end_mapping (emitter, error))
     return FALSE;
 
   return TRUE;

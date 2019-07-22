@@ -522,6 +522,70 @@ dependencies_test_emit_yaml (DependenciesFixture *fixture,
                    "    rundef: []\n"
                    "    runmod1: [stream3, stream4]\n"
                    "...\n");
+
+
+  /* Test with only adding a buildrequires */
+
+  g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
+  yaml_emitter_delete (&emitter);
+  yaml_emitter_initialize (&emitter);
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
+  yaml_emitter_set_output (&emitter, write_yaml_string, (void *)yaml_string);
+
+  g_clear_object (&d);
+  d = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream2");
+  modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    d, "builddef");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_sequence (&emitter, YAML_BLOCK_SEQUENCE_STYLE, &error));
+  g_assert_true (modulemd_dependencies_emit_yaml (d, &emitter, &error));
+  g_assert_true (mmd_emitter_end_sequence (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "- buildrequires:\n"
+                   "    builddef: []\n"
+                   "    buildmod1: [stream1, stream2]\n"
+                   "...\n");
+
+  /* Test with only adding a runtime requires */
+
+  g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
+  yaml_emitter_delete (&emitter);
+  yaml_emitter_initialize (&emitter);
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));
+  yaml_emitter_set_output (&emitter, write_yaml_string, (void *)yaml_string);
+
+  g_clear_object (&d);
+  d = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream3");
+  modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d,
+                                                                   "rundef");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_sequence (&emitter, YAML_BLOCK_SEQUENCE_STYLE, &error));
+  g_assert_true (modulemd_dependencies_emit_yaml (d, &emitter, &error));
+  g_assert_true (mmd_emitter_end_sequence (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "- requires:\n"
+                   "    rundef: []\n"
+                   "    runmod1: [stream3, stream4]\n"
+                   "...\n");
 }
 
 int

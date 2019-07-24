@@ -54,7 +54,7 @@ Requires: python-six
 Obsoletes: python2-modulemd < 1.3.4
 
 %description -n python2-%{name}
-Python 3 bindings for %{name}
+Python 2 bindings for %{name}
 %endif
 
 

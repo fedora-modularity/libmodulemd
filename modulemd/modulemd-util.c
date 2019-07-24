@@ -389,3 +389,18 @@ modulemd_validate_nevra (const gchar *nevra)
 
   return TRUE;
 }
+
+
+gboolean
+modulemd_boolean_equals (gboolean a, gboolean b)
+{
+  /*
+   * There is no validation when assigning to a gboolean variable and so it
+   * could contain any value represented by a gint. Thus, each value needs to
+   * be canonicalized before comparing for equality.
+   */
+  if (!!a == !!b)
+    return TRUE;
+
+  return FALSE;
+}

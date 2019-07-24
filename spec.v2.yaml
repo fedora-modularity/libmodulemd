@@ -285,6 +285,19 @@ data:
                 # data.filter.rpms list after the build is complete.
                 # Optional. Defaults to "false" if not specified.
                 buildonly: false
+                # If buildroot is set to True, the packages listed in this
+                # module's buildroot profile will be installed into the
+                # buildroot of any component built in subsequent
+                # buildorder/buildafter batches, even if that module does not
+                # explicitly include these packages in its BuildRequires.
+                # Optional. Defaults to "false" if not specified.
+                buildroot: false
+                # If srpm-buildroot is set to True, the packages listed in this
+                # module's srpm-buildroot profile will be installed into the
+                # buildroot when performing the buildSRPMfromSCM step in
+                # subsequent buildorder/buildafter batches.
+                # Optional. Defaults to "false" if not specified.
+                srpm-buildroot: false
             # baz has no extra options
             baz:
                 rationale: This one is here to demonstrate other stuff.

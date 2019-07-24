@@ -27,6 +27,8 @@ struct _ModulemdComponentRpm
   gchar *ref;
   gchar *repository;
   gchar *cache;
+  gboolean buildroot;
+  gboolean srpm_buildroot;
 
   GHashTable *arches;
   GHashTable *multilib;
@@ -43,6 +45,8 @@ enum
   PROP_REF,
   PROP_REPOSITORY,
   PROP_CACHE,
+  PROP_BUILDROOT,
+  PROP_SRPM_BUILDROOT,
 
   N_PROPS
 };
@@ -99,6 +103,13 @@ modulemd_component_rpm_equals (ModulemdComponent *self_1,
     return FALSE;
 
   if (g_strcmp0 (rpm_self_1->cache, rpm_self_2->cache) != 0)
+    return FALSE;
+
+  if (!modulemd_boolean_equals (rpm_self_1->buildroot, rpm_self_2->buildroot))
+    return FALSE;
+
+  if (!modulemd_boolean_equals (rpm_self_1->srpm_buildroot,
+                                rpm_self_2->srpm_buildroot))
     return FALSE;
 
   if (!modulemd_hash_table_sets_are_equal (rpm_self_1->arches,
@@ -159,6 +170,8 @@ modulemd_component_rpm_copy (ModulemdComponent *self, const gchar *key)
     copy, modulemd_component_rpm_get_repository (rpm_self));
   modulemd_component_rpm_set_cache (
     copy, modulemd_component_rpm_get_cache (rpm_self));
+  modulemd_component_rpm_set_buildroot (copy, rpm_self->buildroot);
+  modulemd_component_rpm_set_srpm_buildroot (copy, rpm_self->srpm_buildroot);
 
   g_clear_pointer (&copy->arches, g_hash_table_unref);
   copy->arches = hash_table_str_set_copy (rpm_self->arches);
@@ -285,6 +298,48 @@ modulemd_component_rpm_get_repository (ModulemdComponentRpm *self)
 
 
 void
+modulemd_component_rpm_set_buildroot (ModulemdComponentRpm *self,
+                                      gboolean buildroot)
+{
+  g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
+
+  self->buildroot = buildroot;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILDROOT]);
+}
+
+
+gboolean
+modulemd_component_rpm_get_buildroot (ModulemdComponentRpm *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), FALSE);
+
+  return self->buildroot;
+}
+
+
+void
+modulemd_component_rpm_set_srpm_buildroot (ModulemdComponentRpm *self,
+                                           gboolean srpm_buildroot)
+{
+  g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
+
+  self->srpm_buildroot = srpm_buildroot;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SRPM_BUILDROOT]);
+}
+
+
+gboolean
+modulemd_component_rpm_get_srpm_buildroot (ModulemdComponentRpm *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_COMPONENT_RPM (self), FALSE);
+
+  return self->srpm_buildroot;
+}
+
+
+void
 modulemd_component_rpm_add_restricted_arch (ModulemdComponentRpm *self,
                                             const gchar *arch)
 {
@@ -361,6 +416,13 @@ modulemd_component_rpm_get_property (GObject *object,
     case PROP_CACHE:
       g_value_set_string (value, modulemd_component_rpm_get_cache (self));
       break;
+    case PROP_BUILDROOT:
+      g_value_set_boolean (value, modulemd_component_rpm_get_buildroot (self));
+      break;
+    case PROP_SRPM_BUILDROOT:
+      g_value_set_boolean (value,
+                           modulemd_component_rpm_get_srpm_buildroot (self));
+      break;
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -385,6 +447,13 @@ modulemd_component_rpm_set_property (GObject *object,
     case PROP_CACHE:
       modulemd_component_rpm_set_cache (self, g_value_get_string (value));
       break;
+    case PROP_BUILDROOT:
+      modulemd_component_rpm_set_buildroot (self, g_value_get_boolean (value));
+      break;
+    case PROP_SRPM_BUILDROOT:
+      modulemd_component_rpm_set_srpm_buildroot (self,
+                                                 g_value_get_boolean (value));
+      break;
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -406,24 +475,42 @@ modulemd_component_rpm_class_init (ModulemdComponentRpmClass *klass)
   component_class->set_name = modulemd_component_rpm_set_name;
   component_class->get_name = modulemd_component_rpm_get_name;
 
-  properties[PROP_CACHE] =
-    g_param_spec_string ("cache",
-                         "Cache",
-                         "The lookaside cache URL.",
-                         CR_DEFAULT_STRING,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-  properties[PROP_REF] =
-    g_param_spec_string ("ref",
-                         "Ref",
-                         "The commit ID in the SCM repository.",
-                         CR_DEFAULT_STRING,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-  properties[PROP_REPOSITORY] =
-    g_param_spec_string ("repository",
-                         "Repository",
-                         "The URI of the SCM repository.",
-                         CR_DEFAULT_STRING,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  // clang-format off
+  properties[PROP_CACHE] = g_param_spec_string (
+    "cache",
+    "Cache",
+    "The lookaside cache URL.",
+    CR_DEFAULT_STRING,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  properties[PROP_REF] = g_param_spec_string (
+    "ref",
+    "Ref",
+    "The commit ID in the SCM repository.",
+    CR_DEFAULT_STRING,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  properties[PROP_REPOSITORY] = g_param_spec_string (
+    "repository",
+    "Repository",
+    "The URI of the SCM repository.",
+    CR_DEFAULT_STRING,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  properties[PROP_BUILDROOT] = g_param_spec_boolean (
+    "buildroot",
+    "Buildroot",
+    "Whether the packages listed in this module's buildroot profile will be "
+    "installed into the buildroot of any component built in subsequent "
+    "buildorder/buildafter batches.",
+    FALSE,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  properties[PROP_SRPM_BUILDROOT] = g_param_spec_boolean (
+    "srpm-buildroot",
+    "SrpmBuildroot",
+    "Whether the packages listed in this module's srpm-buildroot profile will "
+    "be installed into the buildroot when performing the buildSRPMfromSCM "
+    "step in subsequent buildorder/buildafter batches.",
+    FALSE,
+    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+  // clang-format on
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -457,6 +544,14 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
   EMIT_KEY_VALUE_IF_SET (emitter, error, "cache", self->cache);
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "ref", self->ref);
+
+  /* Only output buildroot if it's TRUE */
+  if (modulemd_component_rpm_get_buildroot (self))
+    EMIT_KEY_VALUE (emitter, error, "buildroot", "true");
+
+  /* Only output srpm-buildroot if it's TRUE */
+  if (modulemd_component_rpm_get_srpm_buildroot (self))
+    EMIT_KEY_VALUE (emitter, error, "srpm-buildroot", "true");
 
   if (!modulemd_component_emit_yaml_build_common (
         MODULEMD_COMPONENT (self), emitter, error))
@@ -507,6 +602,7 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean in_map = FALSE;
+  gboolean truth_value;
   g_autofree gchar *value = NULL;
   g_autoptr (GHashTable) list = NULL;
   gint buildorder = 0;
@@ -635,6 +731,36 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
 
               g_clear_pointer (&r->multilib, g_hash_table_unref);
               r->multilib = g_steal_pointer (&list);
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "buildroot"))
+            {
+              truth_value = modulemd_yaml_parse_bool (parser, &nested_error);
+              if (nested_error)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse buildroot in component: %s",
+                    nested_error->message);
+                }
+
+              modulemd_component_rpm_set_buildroot (r, truth_value);
+            }
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "srpm-buildroot"))
+            {
+              truth_value = modulemd_yaml_parse_bool (parser, &nested_error);
+              if (nested_error)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse srpm-buildroot in component: %s",
+                    nested_error->message);
+                }
+
+              modulemd_component_rpm_set_srpm_buildroot (r, truth_value);
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "buildafter"))

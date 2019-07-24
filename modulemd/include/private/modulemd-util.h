@@ -295,6 +295,20 @@ modulemd_hash_table_unref (void *table);
 gboolean
 modulemd_validate_nevra (const gchar *nevra);
 
+/**
+ * modulemd_boolean_equals:
+ * @a: A #gboolean value.
+ * @b: A #gboolean value.
+ *
+ * Since a #gboolean could contain any value represented by a #gint, @a and @b
+ * are compared for logical equivalence.
+ *
+ * Returns: TRUE if @a and @b are logically equal, FALSE otherwise.
+ *
+ * Since: 2.7
+ */
+gboolean
+modulemd_boolean_equals (gboolean a, gboolean b);
 
 /**
  * MODULEMD_REPLACE_SET:

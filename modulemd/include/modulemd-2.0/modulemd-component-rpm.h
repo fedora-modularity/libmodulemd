@@ -200,4 +200,53 @@ modulemd_component_rpm_set_repository (ModulemdComponentRpm *self,
 const gchar *
 modulemd_component_rpm_get_repository (ModulemdComponentRpm *self);
 
+
+/**
+ * modulemd_component_rpm_set_buildroot:
+ * @self: This #ModulemdComponentRpm object.
+ * @buildroot: (in): The #ModulemdComponentRpm:buildroot flag to set for @self.
+ *
+ * Since: 2.7
+ */
+void
+modulemd_component_rpm_set_buildroot (ModulemdComponentRpm *self,
+                                      gboolean buildroot);
+
+
+/**
+ * modulemd_component_rpm_get_buildroot:
+ * @self: This #ModulemdComponentRpm object.
+ *
+ * Returns: The #ModulemdComponentRpm:buildroot flag.
+ *
+ * Since: 2.7
+ */
+gboolean
+modulemd_component_rpm_get_buildroot (ModulemdComponentRpm *self);
+
+
+/**
+ * modulemd_component_rpm_set_srpm_buildroot:
+ * @self: This #ModulemdComponentRpm object.
+ * @srpm_buildroot: (in): The #ModulemdComponentRpm:srpm_buildroot flag to set
+ * for @self.
+ *
+ * Since: 2.7
+ */
+void
+modulemd_component_rpm_set_srpm_buildroot (ModulemdComponentRpm *self,
+                                           gboolean srpm_buildroot);
+
+
+/**
+ * modulemd_component_rpm_get_srpm_buildroot:
+ * @self: This #ModulemdComponentRpm object.
+ *
+ * Returns: The #ModulemdComponentRpm:srpm_buildroot flag.
+ *
+ * Since: 2.7
+ */
+gboolean
+modulemd_component_rpm_get_srpm_buildroot (ModulemdComponentRpm *self);
+
 G_END_DECLS

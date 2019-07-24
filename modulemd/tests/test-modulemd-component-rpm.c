@@ -98,6 +98,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_1, "someref");
   modulemd_component_rpm_set_repository (r_1, "somerepo");
   modulemd_component_rpm_set_cache (r_1, "somecache");
+  modulemd_component_rpm_set_buildroot (r_1, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_1, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_1, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_1, "i686");
   modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
@@ -110,6 +112,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_2, "someref");
   modulemd_component_rpm_set_repository (r_2, "somerepo");
   modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_set_buildroot (r_2, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_2, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_2, "i686");
   modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
@@ -128,6 +132,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_1, "refA");
   modulemd_component_rpm_set_repository (r_1, "somerepo");
   modulemd_component_rpm_set_cache (r_1, "cacheA");
+  modulemd_component_rpm_set_buildroot (r_1, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_1, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_1, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_1, "i686");
   modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
@@ -140,6 +146,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_2, "someref");
   modulemd_component_rpm_set_repository (r_2, "somerepo");
   modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_set_buildroot (r_2, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_2, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_2, "i686");
   modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
@@ -158,6 +166,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_1, "someref");
   modulemd_component_rpm_set_repository (r_1, "somerepo");
   modulemd_component_rpm_set_cache (r_1, "somecache");
+  modulemd_component_rpm_set_buildroot (r_1, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_1, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_1, "x86_65");
   modulemd_component_rpm_add_restricted_arch (r_1, "i687");
   modulemd_component_rpm_add_multilib_arch (r_1, "ppc64le");
@@ -170,6 +180,8 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_ref (r_2, "someref");
   modulemd_component_rpm_set_repository (r_2, "somerepo");
   modulemd_component_rpm_set_cache (r_2, "somecache");
+  modulemd_component_rpm_set_buildroot (r_2, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_2, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_2, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_2, "i686");
   modulemd_component_rpm_add_multilib_arch (r_2, "ppc64le");
@@ -197,6 +209,8 @@ component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
   modulemd_component_rpm_set_ref (r_orig, "someref");
   modulemd_component_rpm_set_repository (r_orig, "somerepo");
   modulemd_component_rpm_set_cache (r_orig, "somecache");
+  modulemd_component_rpm_set_buildroot (r_orig, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r_orig, TRUE);
   modulemd_component_rpm_add_restricted_arch (r_orig, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r_orig, "i686");
   modulemd_component_rpm_add_multilib_arch (r_orig, "ppc64le");
@@ -216,6 +230,8 @@ component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
   g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "someref");
   g_assert_cmpstr (modulemd_component_rpm_get_repository (r), ==, "somerepo");
   g_assert_cmpstr (modulemd_component_rpm_get_cache (r), ==, "somecache");
+  g_assert_true (modulemd_component_rpm_get_buildroot (r));
+  g_assert_true (modulemd_component_rpm_get_srpm_buildroot (r));
 
   list = modulemd_component_rpm_get_arches_as_strv (r);
   g_assert_cmpint (g_strv_length (list), ==, 2);
@@ -244,6 +260,8 @@ component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
   g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "someref");
   g_assert_cmpstr (modulemd_component_rpm_get_repository (r), ==, "somerepo");
   g_assert_cmpstr (modulemd_component_rpm_get_cache (r), ==, "somecache");
+  g_assert_true (modulemd_component_rpm_get_buildroot (r));
+  g_assert_true (modulemd_component_rpm_get_srpm_buildroot (r));
 
   list = modulemd_component_rpm_get_arches_as_strv (r);
   g_assert_cmpint (g_strv_length (list), ==, 2);
@@ -298,6 +316,8 @@ component_rpm_test_emit_yaml (ComponentRpmFixture *fixture,
   modulemd_component_rpm_set_repository (r, "testrepository");
   modulemd_component_rpm_set_ref (r, "testref");
   modulemd_component_rpm_set_cache (r, "testcache");
+  modulemd_component_rpm_set_buildroot (r, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r, TRUE);
   modulemd_component_rpm_add_restricted_arch (r, "x86_64");
   modulemd_component_rpm_add_restricted_arch (r, "i686");
   modulemd_component_rpm_add_multilib_arch (r, "ppc64le");
@@ -319,6 +339,8 @@ component_rpm_test_emit_yaml (ComponentRpmFixture *fixture,
                    "  repository: testrepository\n"
                    "  cache: testcache\n"
                    "  ref: testref\n"
+                   "  buildroot: true\n"
+                   "  srpm-buildroot: true\n"
                    "  buildorder: 42\n"
                    "  arches: [i686, x86_64]\n"
                    "  multilib: [ppc64le, s390x]\n"
@@ -368,6 +390,8 @@ component_rpm_test_parse_yaml (ComponentRpmFixture *fixture,
   g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "26ca0c0");
   g_assert_cmpstr (
     modulemd_component_rpm_get_cache (r), ==, "https://example.com/cache");
+  g_assert_true (modulemd_component_rpm_get_buildroot (r));
+  g_assert_true (modulemd_component_rpm_get_srpm_buildroot (r));
 
   list = modulemd_component_rpm_get_arches_as_strv (r);
   g_assert_cmpint (g_strv_length (list), ==, 2);

@@ -34,6 +34,8 @@ class TestComponentRpm(TestBase):
         assert rpm
         assert rpm.props.buildorder == 0
         assert rpm.get_buildorder() == 0
+        assert rpm.props.buildonly is False
+        assert rpm.get_buildonly() is False
         assert rpm.props.name == "testrpm"
         assert rpm.get_name() == "testrpm"
         assert rpm.props.rationale is None
@@ -50,6 +52,7 @@ class TestComponentRpm(TestBase):
         # Test that object instantiation works
         rpm = ComponentRpm(
             buildorder=42,
+            buildonly=True,
             name='testrpm',
             rationale='Testing all the things',
             ref='someref',
@@ -58,6 +61,8 @@ class TestComponentRpm(TestBase):
         assert rpm
         assert rpm.props.buildorder == 42
         assert rpm.get_buildorder() == 42
+        assert rpm.props.buildonly is True
+        assert rpm.get_buildonly() is True
         assert rpm.props.name == 'testrpm'
         assert rpm.get_name() == 'testrpm'
         assert rpm.props.rationale == 'Testing all the things'
@@ -74,6 +79,7 @@ class TestComponentRpm(TestBase):
     def test_copy(self):
         rpm_orig = ComponentRpm(
             buildorder=42,
+            buildonly=True,
             name='testrpm',
             rationale='Testing all the things',
             ref='someref',
@@ -88,6 +94,8 @@ class TestComponentRpm(TestBase):
         assert rpm
         assert rpm.props.buildorder == 42
         assert rpm.get_buildorder() == 42
+        assert rpm.props.buildonly is True
+        assert rpm.get_buildonly() is True
         assert rpm.props.name == 'testrpm'
         assert rpm.get_name() == 'testrpm'
         assert rpm.props.rationale == 'Testing all the things'

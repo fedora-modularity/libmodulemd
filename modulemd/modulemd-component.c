@@ -415,7 +415,7 @@ modulemd_component_get_property (GObject *object,
   switch (prop_id)
     {
     case PROP_BUILDONLY:
-      g_value_set_boolean (value, modulemd_component_get_buildorder (self));
+      g_value_set_boolean (value, modulemd_component_get_buildonly (self));
       break;
 
     case PROP_BUILDORDER:
@@ -449,7 +449,7 @@ modulemd_component_set_property (GObject *object,
   switch (prop_id)
     {
     case PROP_BUILDONLY:
-      modulemd_component_set_buildorder (self, g_value_get_boolean (value));
+      modulemd_component_set_buildonly (self, g_value_get_boolean (value));
       break;
 
     case PROP_BUILDORDER:

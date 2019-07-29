@@ -78,7 +78,12 @@ class TestTranslationHelpers(TestBase):
     def test_translations_from_catalog(self):
         translation_files = [
             "%s/nl.po" %
-            (os.getenv('TEST_DATA_PATH'))]
+            (os.getenv('TEST_DATA_PATH')),
+            "%s/fr.po" %
+            (os.getenv('TEST_DATA_PATH')),
+            "%s/sv.po" %
+            (os.getenv('TEST_DATA_PATH'))
+        ]
 
         catalogs = list()
         for f in translation_files:

@@ -1,0 +1,758 @@
+# Jean-Baptiste Holcroft <jean-baptiste@holcroft.fr>, 2018. #zanata
+# Thierry Carrere <dijitaldea@elebi.xyz>, 2018. #zanata
+# elmerys <contact@zle.fr>, 2018. #zanata
+# Jean-Baptiste Holcroft <jean-baptiste@holcroft.fr>, 2019. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: fedora-modularity-translations VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-10-16 20:32+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2019-01-28 09:27+0000\n"
+"Last-Translator: Jean-Baptiste Holcroft <jean-baptiste@holcroft.fr>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"X-Generator: Zanata 4.6.2\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: ant;1.10;description:2
+msgid ""
+"Apache Ant is a Java library and command-line tool whose mission is to drive "
+"processes described in build files as targets and extension points dependent "
+"upon each other. The main known usage of Ant is the build of Java "
+"applications. Ant supplies a number of built-in tasks allowing to compile, "
+"assemble, test and run Java applications. Ant can also be used effectively "
+"to build non Java applications, for instance C or C++ applications. More "
+"generally, Ant can be used to pilot any type of process which can be "
+"described in terms of targets and tasks."
+msgstr ""
+"Apache Ant est une librairie Java et un utilitaire de commande dont la "
+"mission est de piloter les processus décrit comme des cibles et des points "
+"d'extensions dépendant les uns des autres dans les fichiers de création. "
+"L'usage le plus courant de Ant est de construire des applications Java. Ant "
+"fournit de nombreuses fonctions pré-intégrées permettant de compiler, "
+"d'assembler, de tester et d'exécuter des applications Java. Ant peut aussi "
+"être utilisé pour créer des applications autre que Java par example en C ou "
+"C++. Plus généralement Ant peut être utilisé pour coordonner n'importe quel "
+"processus qui peut être décrit en terme de cibles et de taches."
+
+#: ant;1.10;summary:1
+msgid "Java build tool"
+msgstr "Outil de création Java"
+
+#: avocado;latest;description:2 avocado;stable;description:2
+msgid ""
+"Avocado is a set of tools and libraries (what people call these days a "
+"framework) to perform automated testing."
+msgstr ""
+"Avocado est un ensemble d'outils et de librairies (que l'on nomme aussi "
+"environnement de développement) pour effectuer des tests automatisés."
+
+#: avocado;latest;profile;default:3
+msgid "Default profile installing the most commonly used avocado packages."
+msgstr ""
+"Le profil par défaut installe les paquets d'Avocado les plus courants."
+
+#: avocado;latest;profile;minimal:3
+msgid "Minimal profile installing only the main avocado package."
+msgstr ""
+"Le profil minimal installe seulement les paquets principaux d'Avocado."
+
+#: avocado;latest;summary:1 avocado;stable;summary:1
+msgid "Framework with tools and libraries for Automated Testing"
+msgstr ""
+"Environnement de développement incluant les outils et les librairies pour "
+"les tests automatiques."
+
+#: container-tools;2017.0;description:2 container-tools;2018.0;description:2
+msgid ""
+"Contains SELinux policies, binaries and other dependencies for use with "
+"container runtimes"
+msgstr ""
+"Contient les politiques SELinux, les binaires et autres dépendances pour une "
+"utilisation avec les Runtimes containérisés."
+
+#: container-tools;2017.0;summary:1 container-tools;2018.0;summary:1
+msgid "Common tools and dependencies for container runtimes"
+msgstr "Outils usuels et dépendences pour les Runtimes containérisés."
+
+#: cri-o;1.11;description:2 cri-o;2017.0;description:2
+#: cri-o;2018.0;description:2
+msgid ""
+"CRI-O is the Kubernetes Container Runtime Interface for OCI-based containers."
+""
+msgstr ""
+"CRI-O est l'interface Kubernetes Container Runtime pour les conteneurs OCI."
+
+#: cri-o;1.11;summary:1 cri-o;2017.0;summary:1 cri-o;2018.0;summary:1
+msgid "Kubernetes Container Runtime Interface for OCI-based containers"
+msgstr "Interface Kubernetes Container Runtime pour les conteneurs OCI"
+
+#: django;1.6;description:2
+msgid ""
+"Django is a high-level Python Web framework that encourages rapid "
+"development and a clean, pragmatic design. It focuses on automating as much "
+"as possible and adhering to the DRY (Don't Repeat Yourself) principle."
+msgstr ""
+"Django est un framework Web Python de haut niveau qui encourage un "
+"développement rapide et une conception claire et pragmatique. Il se "
+"concentre sur l'automatisation autant que possible et sur le respect du "
+"principe DRY (Don't Repeat Yourself)."
+
+#: django;1.6;summary:1
+msgid "A high-level Python Web framework"
+msgstr "Un cadriciel Web de haut niveau en Python"
+
+#: docker;2017.0;description:2
+msgid ""
+"Docker is an open-source engine that automates the deployment of any "
+"application as a lightweight, portable, self-sufficient container that will "
+"run virtually anywhere."
+msgstr ""
+"Docker est un moteur open-source qui automatise le déploiement de n'importe "
+"quelle application en tant que conteneur léger, portable et autosuffisant "
+"qui fonctionne pratiquement partout."
+
+#: docker;2017.0;summary:1
+msgid "Module for docker runtime and docker-distribution"
+msgstr "Module pour l'environnement d’exécution docker et docker-distribution"
+
+#: dwm;6.0;description:2 dwm;6.1;description:2 dwm;latest;description:2
+msgid ""
+"dwm is a dynamic window manager for X.  It manages windows in tiled, "
+"monocle, and floating layouts.  All of the layouts can be applied "
+"dynamically, optimizing the environment for the application in use and the "
+"task performed."
+msgstr ""
+"dwm est un gestionnaire de fenêtres dynamique pour X. Il gère les fenêtres "
+"en mosaïque, en monocle et en disposition flottante.  Toutes les mises en "
+"page peuvent être appliquées dynamiquement, optimisant ainsi l'environnement "
+"pour l'application utilisée et la tâche effectuée."
+
+#: dwm;6.0;profile;default:3 dwm;6.1;profile;default:3
+#: dwm;latest;profile;default:3
+msgid "The minimal, distribution-compiled dwm binary."
+msgstr "Le binaire dwm minimal, compilé pour la diffusion."
+
+#: dwm;6.0;profile;user:3 dwm;6.1;profile;user:3 dwm;latest;profile;user:3
+msgid ""
+"Includes distribution-compiled dwm as well as a helper script to apply user "
+"patches and configuration, dwm-user."
+msgstr ""
+"Inclut dwm compilé pour la distribution ainsi qu'un script d'aide pour "
+"appliquer les correctifs utilisateur et la configuration, dwm-user."
+
+#: dwm;6.0;summary:1 dwm;6.1;summary:1 dwm;latest;summary:1
+msgid "Dynamic window manager for X"
+msgstr "Gestionnaire dynamique de fenêtres pour X."
+
+#: eog;master;description:2
+msgid ""
+"The Eye of GNOME image viewer (eog) is the official image viewer for the "
+"GNOME desktop. It can view single image files in a variety of formats, as "
+"well as large image collections.\n"
+msgstr ""
+"Le visionneur d'images \"Eye of GNOME\" (eog) est le logiciel officiel pour "
+"l'environnement de bureau GNOME. Il peut afficher aussi bien un simple "
+"fichier image dans une multitude de formats qu'une importante galerie "
+"d'images.\n"
+
+#: eog;master;summary:1
+msgid "Eye of GNOME Application Module"
+msgstr "Module d'application \"Eye of GNOME\"."
+
+#: feedreader;master;description:2
+msgid ""
+"FeedReader is a modern desktop application designed to complement existing "
+"web-based RSS accounts. It combines all the advantages of web based services "
+"like synchronization across all your devices with everything you expect from "
+"a modern desktop application."
+msgstr ""
+"FeedReader est une application de bureau moderne conçue pour compléter les "
+"comptes RSS en ligne existants.  Il combine tous les avantages d'un service "
+"en ligne comme la synchronisation de tous vos périphériques avec tout ce que "
+"l'on peut attendre d'une application moderne de bureau."
+
+#: feedreader;master;summary:1
+msgid "RSS desktop client"
+msgstr "Client RSS de bureau"
+
+#: flatpak-common;f29;description:2
+msgid ""
+"This module is used to build packages relocated into /app for bundling into "
+"Flatpaks."
+msgstr ""
+"Ce module est utilisé pour construire des paquets transférés dans /app pour "
+"regroupement dans des paquets Flatpak."
+
+#: flatpak-common;f29;summary:1
+msgid "Common builds to include in Flatpak containers"
+msgstr "Structures courantes, à inclure dans les conteneurs Flatpak."
+
+#: flatpak-runtime;f29;description:2
+msgid ""
+"This module defines two runtimes for Flatpaks, the 'runtime' profile that "
+"most Flatpaks in Fedora use, and a smaller 'runtime-base' profile that is "
+"intended to be more minimal and (slightly) more API stable. There are also "
+"corresponding sdk and sdk-base profiles that are used to build SDKs that "
+"applications can be built against with flatpak-builder."
+msgstr ""
+"Ce module définit deux environnements d'exécution pour Flatpaks : le profil "
+"basique convenant à la plupart des utilisateurs de Fedora ainsi qu'un profil "
+"de développement plus petit pensé pour être plus minimal et plus stable avec "
+"les APIs.\n"
+" There are also corresponding sdk and sdk-base profiles that are used to "
+"build SDKs that applications can be built against with flatpak-builder."
+
+#: flatpak-runtime;f29;summary:1
+msgid "Flatpak Runtime"
+msgstr "L'environnement d'exécution Flatpak"
+
+#: gcsf;master;description:2
+msgid ""
+"GCSF is a virtual filesystem that allows users to mount their\n"
+"Google Drive account locally and interact with it as a\n"
+"regular disk partition.\n"
+msgstr ""
+"GCSF est un système de fichiers virtuels qui permet aux utilisateurs de "
+"monter leurs \n"
+"comptes Google Drive en local et interagir avec eux comme si c'était une "
+"partition\n"
+"normale.\n"
+
+#: gcsf;master;summary:1
+msgid "FUSE file system based on Google Drive"
+msgstr "Système de fichiers FUSE basé sur Google Drive"
+
+#: ghc;8.4;description:2
+msgid "This module provides the Glasgow Haskell Compiler version 8.4.3."
+msgstr "Ce module fournit la version 8.4.3 du compilateur Glasgow Haskell."
+
+#: ghc;8.4;profile;default:3
+msgid "standard installation"
+msgstr "Installation standard"
+
+#: ghc;8.4;profile;minimal:3
+msgid "just compiler and base"
+msgstr "juste le compilateur et la base"
+
+#: ghc;8.4;profile;small:3
+msgid "compiler with main core libs"
+msgstr "Compilateur avec les bibliothéques du noyau prncipal"
+
+#: ghc;8.4;summary:1
+msgid "Haskell GHC 8.4"
+msgstr "Haskell GHC 8.4"
+
+#: gimp;2.10;description:2
+msgid "A module containing GIMP, the GNU Image Manipulation Program."
+msgstr ""
+"Un module qui contient GIMP, le logiciel de manipulation d'images de GNU."
+
+#: gimp;2.10;summary:1
+msgid "GIMP"
+msgstr "GIMP"
+
+#: gnome-clocks;master;description:2 gnome-clocks;master;summary:1
+msgid "Clock application designed for GNOME 3"
+msgstr "Application \"Horloge\" conçue pour GNOME 3"
+
+#: gnome-tetravex;master;description:2
+msgid ""
+"A puzzle game where you have to match a grid of tiles together. The skill "
+"level ranges from the simple two by two up to the seriously mind-bending six "
+"by six grid."
+msgstr ""
+"Un jeu de puzzle où vous devez faire correspondre des grilles de tuiles. Le "
+"niveau de difficulté va du simple deux par deux jusqu'à l'infernal \"tord-"
+"méninges\" de la grille six par six."
+
+#: gnome-tetravex;master;summary:1
+msgid "GNOME Tetravex game"
+msgstr "Jeu GNOME Tetravex "
+
+#: golang-ecosystem;2017.0;description:2 golang-ecosystem;2018.0;description:2
+msgid ""
+"This module contains golang based tools used as dependencies for other "
+"packages, for instance, go-md2man, a manpage converter written in Go, along "
+"with rpm macros for building Go based tools."
+msgstr ""
+"Ce module contient des outils spécifiques à golang utilisés comme "
+"dépendances pour d'autres paquets. Par exemple \"go-md2man\", un "
+"convertisseur de page de \"man\" écrit en Go sera couplé avec des macros rpm "
+"pour construire des outils pour Go."
+
+#: golang-ecosystem;2017.0;summary:1 golang-ecosystem;2018.0;summary:1
+msgid "The ecosystem of packages for the Go programming language"
+msgstr "L'écosystème de paquets pour le langage de programmation Go"
+
+#: golang;1.10;description:2
+msgid ""
+"This module provides the Go compiler and associated tools and documentation."
+msgstr ""
+"Ce module fournit le compilateur Go, sa documentation et les outils associés."
+""
+
+#: golang;1.10;summary:1
+msgid "The Go Programming Language"
+msgstr "Le langage de programmation Go."
+
+#: hub;pre-release;description:2
+msgid ""
+"hub is a command line tool that wraps `git` in order to extend it with extra "
+"features and commands that make working with GitHub easier.\n"
+"\n"
+"    $ hub clone rtomayko/tilt\n"
+"\n"
+"    # expands to:\n"
+"    $ git clone git://github.com/rtomayko/tilt.git"
+msgstr ""
+"hub est un outil en ligne de commande qui enrobe `git`dans le but de "
+"l'enrichir avec des fonctionnalités additionnelles et des commandes "
+"facilitant le travail avec GitHub.\n"
+"\n"
+"    $ hub clone rtomayko/tilt\n"
+"\n"
+"    # s'étendra en :\n"
+"    $ git clone git://github.com/rtomayko/tilt.git"
+
+#: hub;pre-release;summary:1
+msgid "A command-line wrapper for git with github shortcuts"
+msgstr ""
+"Une surcouche à git en ligne de commande avec des raccourcis liés à Github"
+
+#: kubernetes;1.10;description:2
+msgid ""
+"Kubernetes is an open source system for managing containerized applications "
+"across multiple hosts; providing basic mechanisms for deployment, "
+"maintenance, and scaling of applications. Kubernetes builds upon a decade "
+"and a half of experience at Google running production workloads at scale "
+"using a system called Borg, combined with best-of-breed ideas and practices "
+"from the community."
+msgstr ""
+"Kubernetes s'appuie sur une quinzaine d'années d'expérience chez Google dans "
+"l'exécution de volumes de travail en production à l'échelle utilisant un "
+"système appelé Borg, combiné avec les meilleures idées et pratiques de la "
+"communauté."
+
+#: kubernetes;1.10;summary:1
+msgid "Container cluster management"
+msgstr "Gestion des grappes de conteneurs"
+
+#: kubernetes;openshift-3.10;description:2
+msgid ""
+"OpenShift Origin is a distribution of Kubernetes optimized for application "
+"development and deployment. OpenShift Origin adds developer and operational "
+"centric tools on top of Kubernetes to enable rapid application development, "
+"easy deployment and scaling, and long-term lifecycle maintenance for small "
+"and large teams and applications. It provides a secure and multi-tenant "
+"configuration for Kubernetes allowing you to safely host many different "
+"applications and workloads."
+msgstr ""
+"OpenShift Origin est une distribution de Kubernetes optimisée pour le "
+"développement d’applications et le déploiement. OpenShift Origin apporte des "
+"outils focalisés pour les développeurs et les opérations s’appuyant sur "
+"Kubernetes pour permettre le développement d'applications rapides, faciles à "
+"déployer et à faire monter en charge, et une maintenance à long terme du "
+"cycle de vie pour les petites et grandes équipes et applications. Cet outil "
+"fourni une configuration sécurisé et multi-tenant pour Kubernetes vous "
+"permettant d'héberger de façon sécurisé différentes applications et charges "
+"de travail."
+
+#: kubernetes;openshift-3.10;summary:1
+msgid "OpenShift Container Management"
+msgstr "Gestionnaire de conteneurs OpenShift"
+
+#: libgit2;0.26;description:2 libgit2;0.27;description:2
+msgid "The Git linkable library."
+msgstr "La bibliothèque Git linkable"
+
+#: libgit2;0.26;summary:1 libgit2;0.27;summary:1
+msgid "Library implementation of Git"
+msgstr "Implémentation de la bibliothèque de Git"
+
+#: lizardfs;devel;description:2
+msgid ""
+"LizardFS is an Open Source, easy to deploy and maintain, distributed, fault "
+"tolerant file system for POSIX compliant OSes. LizardFS is a fork of MooseFS."
+" For more information please visit http://lizardfs.com"
+msgstr ""
+"LizardFS est un système de fichier Open-Source, facile à déployer et "
+"maintenir, distribué et tolérant aux pannes pour les systèmes "
+"d'exploitations compatibles POSIX. C'est un fork de MooseFS. Pour plus "
+"d'informations, veuillez visiter http://lizardfs.com"
+
+#: lizardfs;devel;summary:1
+msgid "Distributed, fault tolerant file system"
+msgstr "Système de fichier distribué, tolérant aux pannes"
+
+#: mariadb;10.1;description:2
+msgid ""
+"MariaDB is a community developed branch of MySQL. MariaDB is a multi-user, "
+"multi-threaded SQL database server. It is a client/server implementation "
+"consisting of a server daemon (mysqld) and many different client programs "
+"and libraries. The base package contains the standard MariaDB/MySQL client "
+"programs and generic MySQL files."
+msgstr ""
+"MariaDB est une branche de MySQL développée par la communauté. MariaDB est "
+"un serveur de base de données SQL multi-utilisateurs et multi-threads. C'est "
+"une implémentation client/serveur constituée d'un démon serveur (mysqld) et "
+"de nombreux programmes clientes et bibliothèques. Le paquet de base contient "
+"les programmes clients MariaDB/MySQL et les fichiers MySQL génériques."
+
+#: mariadb;10.1;summary:1
+msgid "MariaDB Module"
+msgstr "Module MariaDB"
+
+#: maven;3.5;description:2
+msgid ""
+"Maven is a software project management and comprehension tool. Based on the "
+"concept of a project object model (POM), Maven can manage a project's build, "
+"reporting and documentation from a central piece of information."
+msgstr ""
+"Maven est un outil de gestion et de conception projets logiciels. Basé sur "
+"le concept du modèle objet projet (POM), Maven peut gérer la compilation du "
+"projet, son reporting et sa documentation depuis un seul ensemble "
+"d'informations."
+
+#: maven;3.5;summary:1
+msgid "Java project management and project comprehension tool"
+msgstr "Outil de conception de projets et de gestion de projets Java"
+
+#: meson;master;description:2
+msgid ""
+"Meson is an open source build system meant to be both extremely fast, and, "
+"even more importantly, as user friendly as possible.\n"
+"The main design point of Meson is that every moment a developer spends "
+"writing or debugging build definitions is a second wasted. So is every "
+"second spent waiting for the build system to actually start compiling code."
+msgstr ""
+"Meson est un système de compilation open-source visant à être extrêmement "
+"rapide, et plus important encore, aussi facile à utiliser que possible.\n"
+"Le point central de conception de Meson est que chaque instant que le "
+"développeur passe à écrire ou déboguer les définitions de compilations est "
+"une seconde de perdue. Idem pour chaque seconde passé à attendre que le "
+"système de compilation démarre effectivement à compiler le code."
+
+#: meson;master;summary:1
+msgid "The Meson Build system"
+msgstr "Le système de compilation Meson"
+
+#: mongodb;3.4;description:2 mongodb;3.6;description:2
+msgid ""
+"Mongo from humongous is a high-performance, open source, schema-free "
+"document-oriented database. MongoDB is written in C++ and offers the "
+"following features. Collection oriented storage, easy storage of object/JSON-"
+"style data. Dynamic queries. Full index support, including on inner objects "
+"and embedded arrays. Query profiling. Replication and fail-over support. "
+"Efficient storage of binary data including large objects (e.g. photos and "
+"videos). Auto-sharding for cloud-level scalability (currently in early "
+"alpha). Commercial Support Available. A key goal of MongoDB is to bridge the "
+"gap between key/value stores (which are fast and highly scalable) and "
+"traditional RDBMS systems (which are deep in functionality)."
+msgstr ""
+"Mongo de humongous est une base de données de haute performance, open "
+"source, sans schémas, orientée documents. MongoDB est écrite en C+++ et "
+"offre les fonctionnalités suivantes. Stockage orienté collection, stockage "
+"facile des données de type objet/JSON. Requêtes dynamiques. Prise en charge "
+"complète de l'index, y compris sur les objets internes et les tableaux "
+"intégrés. Profilage des requêtes. Prise en charge de la réplication et du "
+"basculement. Stockage efficace des données binaires, y compris des objets de "
+"grande taille (par ex. photos et vidéos). Auto-sharding pour l'évolutivité "
+"au niveau du nuage (actuellement en pré-alpha). Support commercial "
+"disponible. L'un des principaux objectifs de MongoDB est de combler le fossé "
+"entre les stockages clés/de valeur (qui sont rapides et hautement "
+"évolutives) et les systèmes de SGBDR traditionnels (dont les fonctionnalités "
+"sont très développées)."
+
+#: mongodb;3.4;summary:1 mongodb;3.6;summary:1
+msgid "MongoDB Module"
+msgstr "Module MongoDB"
+
+#: mysql;5.7;description:2
+msgid ""
+"MySQL is a multi-user, multi-threaded SQL database server. MySQL is a client/"
+"server implementation consisting of a server daemon (mysqld) and many "
+"different client programs and libraries. The base package contains the "
+"standard MySQL client programs and generic MySQL files."
+msgstr ""
+"MySQL est un serveur de base de données SQL multi-utilisateurs et multi-"
+"threads. C'est une implémentation client/serveur constituée d'un démon "
+"serveur (mysqld) et de nombreux programmes clientes et bibliothèques. Le "
+"paquet de base contient les programmes clients MySQL et les fichiers MySQL "
+"génériques."
+
+#: mysql;5.7;summary:1
+msgid "MySQL Module"
+msgstr "Module MySQL"
+
+#: ninja;master;description:2
+msgid ""
+"This module includes Ninja build system. Ninja is a small build system with "
+"a focus on speed. It differs from other build systems in two major respects: "
+"it is designed to have its input files generated by a higher-level build "
+"system, and it is designed to run builds as fast as possible."
+msgstr ""
+"Ce module inclus le système de compilation Ninja. C'est un petit système de "
+"compilation axé sur la vitesse. Il se différencie des autres systèmes de "
+"compilation à deux égards majeurs : il est conçu pour avoir ses fichiers "
+"d'entrée générés par un système de compilation de plus haut niveau, et pour "
+"exécuter les compilations aussi vite que possible."
+
+#: ninja;master;summary:1
+msgid "Small build system with a focus on speed"
+msgstr "Petit système de compilation axé sur la vitesse"
+
+#: nodejs;10;description:2 nodejs;8;description:2
+msgid ""
+"Node.js is a platform built on Chrome''s JavaScript runtime for easily "
+"building fast, scalable network applications. Node.js uses an event-driven, "
+"non-blocking I/O model that makes it lightweight and efficient, perfect for "
+"data-intensive real-time applications that run across distributed devices."
+msgstr ""
+"Note.js est une plateforme construite à partir de l'interpréteur JavaScript "
+"de Chrome pour facilement construire des applications réseaux rapides et "
+"pouvant monter en charge. Node.js utilise un modèle évènementiel et d'I/O "
+"non bloquantes le faisant léger et efficient, parfait pour les applications "
+"temps réelles et gourmandes en données exécutée sur des périphériques "
+"distribués."
+
+#: nodejs;10;summary:1 nodejs;8;summary:1
+msgid "Javascript runtime"
+msgstr "L'exécutable Javascript"
+
+#: perl-bootstrap;5.24;description:2 perl-bootstrap;5.26;description:2
+msgid ""
+"This is the Perl interpreter and a set of modules written in Perl language "
+"intended for bootstrapping the perl module. This module disables some "
+"optional tests to limit amount of components. This module is not intended "
+"for public use. It's an intermediate step for building perl module.\n"
+msgstr ""
+"Il s'agit de l'interpréteur Perl et d'un ensemble de modules écrits en "
+"langage Perl destinés à amorcer le module Perl. Ce module désactive certains "
+"tests optionnels pour limiter le nombre de composants. Ce module n'est pas "
+"destiné à un usage public. C'est une étape intermédiaire pour construire un "
+"module Perl.\n"
+
+#: perl-bootstrap;5.24;summary:1 perl-bootstrap;5.26;summary:1
+msgid "Perl bootstrap module for bootrapping Perl module"
+msgstr "Module d'amorçage Perl pour l'amorçage du module Perl"
+
+#: perl;5.24;description:2 perl;5.26;description:2
+msgid ""
+"Perl is a high-level programming language with roots in C, sed, awk and "
+"shell scripting. Perl is good at handling processes and files, and is "
+"especially good at handling text. Perl's hallmarks are practicality and "
+"efficiency. While it is used to do a lot of different things, Perl's most "
+"common applications are system administration utilities and web programming."
+"\n"
+msgstr ""
+"Perl est un langage de programmation de haut niveau avec des racines en C, "
+"sed, awk et des scripts shell. Perl est bon dans la gestion des processus et "
+"des fichiers, et est particulièrement bon dans la gestion du texte. Les "
+"caractéristiques de Perl sont la praticité et l'efficacité. Bien qu'il soit "
+"utilisé pour faire beaucoup de choses différentes, les applications Perl les "
+"plus courantes sont les utilitaires d'administration système et la "
+"programmation Web.\n"
+
+#: perl;5.26;profile;default:3
+msgid "Interpreter and all Perl modules bundled within upstream Perl."
+msgstr ""
+"Regroupement de l'interpréteur et de tous les modules inclus dans l'upstream "
+"de Perl"
+
+#: perl;5.26;profile;minimal:3
+msgid "Only the interpreter as a standalone executable."
+msgstr "Seulement l'interpréteur en tant qu'exécutable autonome."
+
+#: perl;5.24;summary:1 perl;5.26;summary:1
+msgid "Practical Extraction and Report Language"
+msgstr "Langage pratique d'extraction et de rapports"
+
+#: pki;10.6;description:2
+msgid "A module for Dogtag PKI."
+msgstr "Un module pour Dogtag PKI."
+
+#: pki;10.6;summary:1
+msgid "Dogtag PKI"
+msgstr "Dogtag PKI"
+
+#: postgresql;9.6;description:2
+msgid ""
+"PostgreSQL is an advanced Object-Relational database management system "
+"(DBMS). The PostgreSQL server can be found in the postgresql-server sub-"
+"package."
+msgstr ""
+"PostgreSQL est un système avancé de gestion de base de données Object-"
+"Relational (SGBD). Le serveur PostgreSQL se trouve dans le sous-paquet "
+"postgresql-server."
+
+#: postgresql;9.6;summary:1
+msgid "PostgreSQL module"
+msgstr "Module PostgreSQL"
+
+#: rawtherapee;devel;description:2
+msgid ""
+"Rawtherapee is a RAW image processing software. It gives full control over "
+"many parameters to enhance the raw picture before finally exporting it to "
+"some common image format."
+msgstr ""
+"Rawtherapee est un logiciel de traitement d'images RAW. Il donne un contrôle "
+"total sur de nombreux paramètres pour améliorer l'image brute avant de "
+"l'exporter dans un format d'image commun."
+
+#: rawtherapee;devel;summary:1
+msgid "Raw image processing software"
+msgstr "Logiciel de traitement d’images RAW"
+
+#: reviewboard;2.5;description:2 reviewboard;3.0;description:2
+msgid ""
+"Review Board is a powerful web-based code review tool that offers developers "
+"an easy way to handle code reviews. It scales well from small projects to "
+"large companies and offers a variety of tools to take much of the stress and "
+"time out of the code review process."
+msgstr ""
+"Review Board est un puissant outil web qui offre aux développeurs un moyen "
+"facile de traiter les revues de code. Il s'adapte aussi bien aux petits "
+"projets qu'aux grandes entreprises et offre une variété d'outils pour "
+"réduire le stress et le temps du processus."
+
+#: reviewboard;2.5;summary:1 reviewboard;3.0;summary:1
+msgid "A web-based code review tool"
+msgstr "Un outil web de revues de code"
+
+#: ripgrep;latest;description:2 ripgrep;master;description:2
+msgid ""
+"Line oriented search tool using Rust's regex library. Combines\n"
+"the raw performance of grep with the usability of the silver searcher.\n"
+msgstr ""
+"Outil de recherche orienté ligne utilisant la bibliothèque regex de Rust. "
+"Combine la performance brute du grep avec la facilité d'utilisation du "
+"chercheur d'argent.\n"
+
+#: ripgrep;latest;summary:1 ripgrep;master;summary:1
+msgid "Line oriented search tool using Rust's regex library"
+msgstr ""
+"Outil de recherche orienté ligne utilisant la bibliothèque regex de Rust"
+
+#: ruby;master;description:2 ruby;private-jaruga-master;description:2
+msgid ""
+"Ruby is the interpreted scripting language for quick and easy object-"
+"oriented programming.  It has many features to process text files and to do "
+"system management tasks (as in Perl).  It is simple, straight-forward, and "
+"extensible."
+msgstr ""
+"Ruby est le langage de script interprété pour une programmation orientée "
+"objet rapide et facile. Il dispose de nombreuses fonctionnalités pour "
+"traiter les fichiers texte et pour effectuer des tâches de gestion du "
+"système (comme dans Perl).  Il est simple, direct et extensible."
+
+#: ruby;master;summary:1 ruby;private-jaruga-master;summary:1
+msgid "An interpreter of object-oriented scripting language"
+msgstr "Un interpréteur de langage de script orienté objet"
+
+#: scala;2.10;description:2
+msgid ""
+"Scala is a general purpose programming language designed to express common "
+"programming patterns in a concise, elegant, and type-safe way. It smoothly "
+"integrates features of object-oriented and functional languages. It is also "
+"fully interoperable with Java."
+msgstr ""
+"Scala est un langage de programmation généraliste conçu pour exprimer les "
+"cas de programmation communs d'une façon concise, élégante et à typage sûre. "
+"Il intègre délicatement les fonctionnalités des langages orientés objets et "
+"fonctionnels. Il est également complètement interopérable avec Java."
+
+#: scala;2.10;summary:1
+msgid "A hybrid functional/object-oriented language for the JVM"
+msgstr "Un langage hybride fonctionnel/orienté-objet pour la JVM"
+
+#: setools;4.2.0;description:2
+msgid ""
+"SETools is a collection of graphical tools, command-line tools, and Python "
+"modules designed to facilitate SELinux policy analysis."
+msgstr ""
+"SETools est une collection d'outils graphiques, d'outils en ligne de "
+"commande et de modules Python conçus pour faciliter l'analyse des politiques "
+"SELinux."
+
+#: setools;4.2.0;profile;default:3
+msgid "Standard installation"
+msgstr "Installation standard"
+
+#: setools;4.2.0;summary:1
+msgid "Policy analysis tools for SELinux"
+msgstr "Outils d'analyse de politiques SELinux"
+
+#: skychart;devel;description:2
+msgid ""
+"This program enables you to draw sky charts, making use of the data in 16 "
+"catalogs of stars and nebulae. In addition the position of planets, "
+"asteroids and comets are shown.\n"
+"The purpose of this program is to prepare different sky maps for a "
+"particular observation. A large number of parameters help you to choose "
+"specifically or automatically which catalogs to use, the colour and the "
+"dimension of stars and nebulae, the representation of planets, the display "
+"of labels and coordinate grids, the superposition of pictures, the condition "
+"of visibility and more. All these features make this celestial atlas more "
+"complete than a conventional planetarium."
+msgstr ""
+"Ce programme vous permet de dessiner des cartes du ciel, en utilisant les "
+"données de 16 catalogues d'étoiles et de nébuleuses. De plus, la position "
+"des planètes, des astéroïdes et des comètes est indiquée.\n"
+"Le but de ce programme est de préparer différentes cartes du ciel pour une "
+"observation particulière. Un grand nombre de paramètres vous aident à "
+"choisir spécifiquement ou automatiquement les catalogues à utiliser, la "
+"couleur et la dimension des étoiles et des nébuleuses, la représentation des "
+"planètes, l'affichage des étiquettes et des grilles de coordonnées, la "
+"superposition des images, la condition de visibilité et plus encore. Toutes "
+"ces caractéristiques rendent cet atlas céleste plus complet qu'un "
+"planétarium conventionnel."
+
+#: skychart;devel;profile;additional-dso:3
+msgid "Core program, documentation and additional Deep Sky catalogs."
+msgstr ""
+"Programme de base, documentation et catalogues Deep Sky supplémentaires."
+
+#: skychart;devel;profile;additional-stars:3
+msgid "Core program, documentation and additional star catalogs."
+msgstr ""
+"Programme de base, documentation et catalogues d'étoiles supplémentaires."
+
+#: skychart;devel;profile;default:3
+msgid "Minimal installation with default catalogs and documentation."
+msgstr "Installation minimale avec catalogues et documentation par défaut."
+
+#: skychart;devel;profile;full:3
+msgid "Core program, documentation and all available additional catalogs."
+msgstr ""
+"Programme de base, documentation et tous les catalogues supplémentaires "
+"disponibles."
+
+#: skychart;devel;summary:1
+msgid "Planetarium software for the advanced amateur astronomer"
+msgstr "Logiciel de planétarium pour l'astronome amateur avancé"
+
+#: stratis;1;description:2 stratis;master;description:2
+msgid "Easy to use local storage management."
+msgstr "Gestion du stockage local facile à utiliser."
+
+#: stratis;1;summary:1 stratis;master;summary:1
+msgid "Stratis Storage"
+msgstr "Stockage Stratis"
+
+#: testmodule;master;description:2
+msgid ""
+"This module demonstrates how to write simple modulemd files And can be used "
+"for testing the build and release pipeline."
+msgstr ""
+"Ce module démontre la facilité d'écriture de fichiers modulemd, et peut être "
+"utilisé pour tester la chaîne de construction et de sorties de nouvelles "
+"versions."
+
+#: testmodule;master;summary:1
+msgid "A test module in all its beautiful beauty"
+msgstr "Un mode de test dans toute sa splendeur"
+

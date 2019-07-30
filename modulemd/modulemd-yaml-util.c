@@ -405,11 +405,11 @@ modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error)
         error, event, "Expected a scalar boolean");
     }
 
-  if (g_strcmp0 ((const gchar *)event.data.scalar.value, "false"))
+  if (g_str_equal ((const gchar *)event.data.scalar.value, "false"))
     {
       return FALSE;
     }
-  else if (g_strcmp0 ((const gchar *)event.data.scalar.value, "true"))
+  else if (g_str_equal ((const gchar *)event.data.scalar.value, "true"))
     {
       return TRUE;
     }

@@ -107,7 +107,8 @@ rpmsetup_target = custom_target(
 spec_target = custom_target(
     'specfile',
     capture: true,
-    build_always: true,
+    build_by_default: true,
+    build_always_stale: true,
     command: [sh, spec_tmpl,
               meson.project_version(),
               '@INPUT@'],

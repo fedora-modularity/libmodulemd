@@ -22,15 +22,7 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-set +e
 ninja -C travis test
-if [ $? != 0 ]; then
-    if [ "x$TRAVIS_JOB_NAME" != "x" ]; then
-        cat travis/meson-logs/testlog.txt
-    fi
-    exit $ret
-fi
-set -e
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later

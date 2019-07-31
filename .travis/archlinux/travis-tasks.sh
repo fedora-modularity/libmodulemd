@@ -20,13 +20,6 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-set +e
 ninja -C travis test
-ret=$?
-if [ $ret != 0 ]; then
-    cat travis/meson-logs/testlog.txt
-    exit $ret
-fi
-set -e
 
 popd #builddir

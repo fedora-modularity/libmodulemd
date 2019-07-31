@@ -21,14 +21,7 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-set +e
 ninja -C travis test
-ret=$?
-if [ $ret != 0 ]; then
-    cat travis/meson-logs/testlog.txt
-    exit $ret
-fi
-set -e
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later

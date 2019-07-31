@@ -32,7 +32,22 @@ G_BEGIN_DECLS
  */
 
 
+/**
+ * MODULEMD_YAML_ERROR:
+ *
+ * A convenience macro for identifying an error in the modulemd yaml domain.
+ *
+ * Since: 2.0
+ */
 #define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
+
+/**
+ * modulemd_yaml_error_quark:
+ *
+ * Returns: A #GQuark used to identify an error in the modulemd yaml domain.
+ *
+ * Since: 2.0
+ */
 GQuark
 modulemd_yaml_error_quark (void);
 
@@ -56,15 +71,41 @@ typedef enum
   MODULEMD_YAML_DOC_TRANSLATIONS
 } ModulemdYamlDocumentTypeEnum;
 
+/**
+ * modulemd_yaml_string:
+ * @str: A pointer to a block of memory containing YAML.
+ * @len: The number of bytes currently in use in @str.
+ *
+ * #modulemd_yaml_string is an internal representation of an arbitrary length
+ * YAML string.
+ *
+ * Since: 2.0
+ */
 typedef struct _modulemd_yaml_string
 {
   char *str;
   size_t len;
 } modulemd_yaml_string;
 
+/**
+ * write_yaml_string:
+ * @data: A void pointer to a #modulemd_yaml_string object.
+ * @buffer: YAML text to append to @data.
+ * @size: The number of bytes from @buffer to append to @data.
+ *
+ * Additionally memory for @data is automatically allocated if necessary.
+ *
+ * Since: 2.0
+ */
 int
 write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
+/**
+ * modulemd_yaml_string_free:
+ * @yaml_string: A pointer to a #modulemd_yaml_string to be freed.
+ *
+ * Since: 2.0
+ */
 void
 modulemd_yaml_string_free (modulemd_yaml_string *yaml_string);
 
@@ -79,26 +120,83 @@ G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_parser_t, yaml_parser_delete);
 
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_emitter_t, yaml_emitter_delete);
 
+/**
+ * mmd_yaml_get_event_name:
+ * @type: A libyaml event.
+ *
+ * Returns the string representation for @type.
+ *
+ * Since: 2.0
+ */
 const gchar *
 mmd_yaml_get_event_name (yaml_event_type_t type);
 
+/**
+ * MMD_INIT_YAML_PARSER:
+ * @_parser: A variable name to use for the new parser object.
+ *
+ * This convenience macro allocates and initializes a new libyaml parser object
+ * named @_parser.
+ *
+ * Since: 2.0
+ */
 #define MMD_INIT_YAML_PARSER(_parser)                                         \
   g_auto (yaml_parser_t) _parser;                                             \
   yaml_parser_initialize (&_parser)
 
+/**
+ * MMD_INIT_YAML_EMITTER:
+ * @_emitter: A variable name to use for the new emitter object.
+ *
+ * This convenience macro allocates and initializes a new libyaml emitter
+ * object named @_emitter.
+ *
+ * Since: 2.0
+ */
 #define MMD_INIT_YAML_EMITTER(_emitter)                                       \
   g_auto (yaml_emitter_t) _emitter;                                           \
   yaml_emitter_initialize (&_emitter)
 
+/**
+ * MMD_INIT_YAML_EVENT:
+ * @_event: A variable name to use for the new event object.
+ *
+ * This convenience macro allocates and initializes a new libyaml event object
+ * named @_event.
+ *
+ * Since: 2.0
+ */
 #define MMD_INIT_YAML_EVENT(_event)                                           \
   g_auto (yaml_event_t) _event;                                               \
   memset (&(_event), 0, sizeof (yaml_event_t))
 
+/**
+ * MMD_INIT_YAML_STRING:
+ * @_emitter: A libyaml emitter object.
+ * @_string: A variable name to use for the new yaml string object.
+ *
+ * This convenience macro allocates and initializes a new yaml string object
+ * named @_string and associates it as the output target for the libyaml
+ * emitter object @_emitter.
+ *
+ * Since: 2.0
+ */
 #define MMD_INIT_YAML_STRING(_emitter, _string)                               \
   g_autoptr (modulemd_yaml_string) yaml_string =                              \
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
   yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
+/**
+ * MMD_REINIT_YAML_STRING:
+ * @_emitter: A libyaml emitter object to reinitialize.
+ * @_string: A variable name to reinitialize with a new yaml string object.
+ *
+ * This convenience macro deletes then initializes a new libyaml emitter named
+ * @_emitter, then deletes, reallocates, and initializes a new yaml string
+ * object named @_string and associates it as the output target for @_emitter.
+ *
+ * Since: 2.0
+ */
 #define MMD_REINIT_YAML_STRING(_emitter, _string)                             \
   yaml_emitter_delete (_emitter);                                             \
   yaml_emitter_initialize (_emitter);                                         \
@@ -106,6 +204,24 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));               \
   yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
+/**
+ * YAML_PARSER_PARSE_WITH_EXIT_FULL:
+ * @_parser: A libyaml parser object positioned at the beginning of an event.
+ * @_returnval: The value to return in case of of a parsing error.
+ * @_event: Returns the type of libyaml event that was parsed.
+ * @_error: A #GError that will return the reason for a parsing or validation
+ * error.
+ *
+ * DIRECT USE OF THIS MACRO SHOULD BE AVOIDED. This is the internal
+ * implementation for %YAML_PARSER_PARSE_WITH_EXIT_BOOL,
+ * %YAML_PARSER_PARSE_WITH_EXIT_INT, and %YAML_PARSER_PARSE_WITH_EXIT which
+ * should be used instead.
+ *
+ * Returns: Continues on if parsing of the event was successful. Returns
+ * @_returnval if a parse error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define YAML_PARSER_PARSE_WITH_EXIT_FULL(_parser, _returnval, _event, _error) \
   do                                                                          \
     {                                                                         \
@@ -130,10 +246,48 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
+/**
+ * YAML_PARSER_PARSE_WITH_EXIT_BOOL:
+ * @_parser: A libyaml parser object positioned at the beginning of an event.
+ * @_event: Returns the type of libyaml event that was parsed.
+ * @_error: A #GError that will return the reason for a parsing or validation
+ * error.
+ *
+ * Returns: Continues on if parsing of the event was successful. Returns
+ * FALSE if a parse error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define YAML_PARSER_PARSE_WITH_EXIT_BOOL(_parser, _event, _error)             \
   YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, FALSE, _event, _error)
+
+/**
+ * YAML_PARSER_PARSE_WITH_EXIT_INT:
+ * @_parser: A libyaml parser object positioned at the beginning of an event.
+ * @_event: Returns the type of libyaml event that was parsed.
+ * @_error: A #GError that will return the reason for a parsing or validation
+ * error.
+ *
+ * Returns: Continues on if parsing of the event was successful. Returns
+ * 0 if a parse error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define YAML_PARSER_PARSE_WITH_EXIT_INT(_parser, _event, _error)              \
   YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, 0, _event, _error)
+
+/**
+ * YAML_PARSER_PARSE_WITH_EXIT:
+ * @_parser: A libyaml parser object positioned at the beginning of an event.
+ * @_event: Returns the type of libyaml event that was parsed.
+ * @_error: A #GError that will return the reason for a parsing or validation
+ * error.
+ *
+ * Returns: Continues on if parsing of the event was successful. Returns
+ * NULL if a parse error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define YAML_PARSER_PARSE_WITH_EXIT(_parser, _event, _error)                  \
   YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, NULL, _event, _error)
 

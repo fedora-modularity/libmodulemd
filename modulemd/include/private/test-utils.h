@@ -19,6 +19,21 @@
 
 G_BEGIN_DECLS
 
+/**
+ * SECTION: test-utils
+ * @title: Internal Unit Test Utilities
+ * @stability: private
+ * @short_description: Utility functions for use with unit tests.
+ */
+
+
+/**
+ * CommonMmdTestFixture:
+ *
+ * A common data type for use as a libmodulemd GLib test fixture.
+ *
+ * Since: 2.0
+ */
 typedef struct _CommonMmdTestFixture
 {
 } CommonMmdTestFixture;
@@ -28,24 +43,15 @@ extern int modulemd_test_signal;
 
 /**
  * modulemd_test_signal_handler:
- * @sig_num: The signal received
+ * @sig_num: The signal received.
  *
- * Sets the global variable modulemd_test_signal with the value of the signal
+ * Sets the global variable #modulemd_test_signal with the value of the signal
  * that was received.
  *
  * Since: 2.0
  */
 void
 modulemd_test_signal_handler (int sig_num);
-
-
-/**
- * SECTION: test-utils
- * @title: Internal Unit Test Utilities
- * @stability: private
- * @short_description: Utility functions for use with unit tests.
- */
-
 
 /**
  * parser_skip_headers:

@@ -27,6 +27,9 @@ sed -e "s/@IMAGE@/$repository\/$os:$release/" \
     $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$release
 sed -e "s/@RELEASE@/$release/" $SCRIPT_DIR/fedora/Dockerfile.tmpl > $SCRIPT_DIR/fedora/Dockerfile-$release
 
+# Load the emulation layer for non-x86_64 architectures
+sudo docker run --rm --privileged npmccallum/qemu-register
+
 sudo docker build \
     -f $SCRIPT_DIR/fedora/Dockerfile.deps.$release \
     -t fedora-modularity/libmodulemd-deps-$release .

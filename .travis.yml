@@ -27,11 +27,11 @@ notifications:
 
 jobs:
   include:
+    - name: "Fedora rawhide"
+      script: ./.travis/travis-fedora.sh
     - name: "Fedora 29"
       script: ./.travis/travis-fedora.sh
     - name: "Fedora 30"
-      script: ./.travis/travis-fedora.sh
-    - name: "Fedora rawhide"
       script: ./.travis/travis-fedora.sh
     - name: "CentOS 7"
       script: ./.travis/travis-centos.sh
@@ -45,3 +45,11 @@ jobs:
       script: ./.travis/travis-archlinux.sh
     - name: "Mageia 7"
       script: ./.travis/travis-mageia.sh
+    - name: "Fedora 30-armhfp"
+      script: ./.travis/travis-fedora.sh
+    - name: "Fedora 30-aarch64"
+      script: ./.travis/travis-fedora.sh
+    - name: "Fedora 30-ppc64le"
+      script: ./.travis/travis-fedora.sh
+    - name: "Fedora 30-s390x"
+      script: ./.travis/travis-fedora.sh

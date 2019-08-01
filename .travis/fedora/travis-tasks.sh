@@ -21,7 +21,7 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-ninja -C travis test
+meson test -C travis -t 10 --print-errorlogs
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later
@@ -77,10 +77,8 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       installed_lib_tests
 
-pushd installed_lib_tests
 # Run the tests against the installed RPMs
-ninja test
+meson test -C installed_lib_tests -t 10 --print-errorlogs
 
-popd #installed_lib_tests
 
 popd #builddir

@@ -1,14 +1,99 @@
 import sys
+import logging
+import gi
+import requests
+import koji
 from babel.messages import Catalog, pofile
 from datetime import datetime
 from collections import defaultdict
 
-try:
-    import gi
-    gi.require_version('Modulemd', '2.0')
-    from gi.repository import Modulemd
-except ImportError:
-    sys.exit(77)
+gi.require_version('Modulemd', '2.0')  # noqa
+from gi.repository import Modulemd
+
+
+def get_latest_modules_in_tag(session, tag):
+    """
+    Get the most-recently built versions of each (module,stream) pair from
+    a Koji tag
+    :param session: A Koji session
+    :param tag: A koji tag
+    :return: A list of the most recent build of all modules in the tag.
+    """
+
+    # Koji sometimes disconnects for no apparent reason. Retry up to 5
+    # times before failing.
+    for attempt in range(5):
+        try:
+            tagged = session.listTagged(tag)
+        except requests.exceptions.ConnectionError:
+            logging.warning(
+                "Connection lost while retrieving builds for tag %s, "
+                "retrying..." % tag)
+        else:
+            # Succeeded this time, so break out of the loop
+            break
+
+    # Find the latest, in module terms.  Pungi does this.
+    # Collect all contexts that share the same NSV.
+    NSVs = {}
+    for entry in tagged:
+        name, stream = entry['name'], entry['version']
+        version = entry['release'].rsplit('.', 1)[0]
+
+        NSVs[name] = NSVs.get(name, {})
+        NSVs[name][stream] = NSVs[name].get(stream, {})
+        NSVs[name][stream][version] = NSVs[name][stream].get(version, [])
+        NSVs[name][stream][version].append(entry)
+
+    latest = []
+    for name in NSVs:
+        for stream in NSVs[name]:
+            version = sorted(list(NSVs[name][stream].keys()))[-1]
+            latest.extend(NSVs[name][stream][version])
+
+    return latest
+
+
+def get_index_from_tags(session, tags):
+    """
+    Construct a ModuleIndex object from the contents of the provided tags.
+    :param session: A Koji session
+    :param tags: A set of Koji tags from which module metadata should be pulled
+    :return: A ModuleIndex object. Raises an exception if any of the
+    retrieved modulemd is invalid.
+    """
+
+    tagged_builds = []
+    for tag in tags:
+        tagged_builds.extend(get_latest_modules_in_tag(session, tag))
+
+    # Make the list unique since some modules may have multiple tags
+    unique_builds = {}
+    for build in tagged_builds:
+        unique_builds[build['id']] = build
+
+    index = Modulemd.ModuleIndex.new()
+    for build_id in unique_builds.keys():
+        # Koji sometimes disconnects for no apparent reason. Retry up to 5
+        # times before failing.
+        for attempt in range(5):
+            try:
+                build = session.getBuild(build_id)
+            except requests.exceptions.ConnectionError:
+                logging.warning(
+                    "Connection lost while processing buildId %s, "
+                    "retrying..." % build_id)
+            else:
+                # Succeeded this time, so break out of the loop
+                break
+
+        logging.debug(
+            "Processing %s:%s" %
+            (build['package_name'], build['nvr']))
+        ret, failures = index.update_from_string(
+            build['extra']['typeinfo']['module']['modulemd_str'], True)
+
+    return index
 
 
 def get_translation_catalog_from_index(index, project_name):
@@ -115,7 +200,7 @@ def get_modulemd_translations_from_catalog(catalogs, index):
         try:
             ret = index.add_translation(mmd_translation)
         except GLib.Error:
-            print(
+            logging.warning(
                 "The translation for this %s:%s could not be added",
                 module_name,
                 stream_name)

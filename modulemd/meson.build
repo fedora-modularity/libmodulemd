@@ -374,22 +374,6 @@ get_babel = '''
 import babel
 '''
 
-# Python 2
-if (get_option('with_py2_overrides') and not test_installed_lib)
-  ret2 = run_command([python2, '-c', get_babel])
-
-  if ret2.returncode() != 0
-    warning('No Babel on Python 2: skipping TranslationHelper tests')
-  else
-    test ('translation_helpers_python2_debug', python2,
-          env : py_test_env,
-          args : translation_helpers_python_script)
-    test ('translation_helpers_python2_release', python2,
-          env : py_test_release_env,
-          args : translation_helpers_python_script)
-  endif
-endif
-
 # Python 3
 if (get_option('with_py3_overrides') and not test_installed_lib)
   ret2 = run_command([python3, '-c', get_babel])

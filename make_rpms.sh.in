@@ -7,7 +7,14 @@ set -e
 
 echo "Creating tarball. This may take a while."
 
-MMD_SKIP_VALGRIND=True ninja dist > /dev/null
+set +e
+MMD_SKIP_VALGRIND=True ninja dist > ./ninjadist.log
+retcode=$?
+if [ $retcode != 0 ]; then
+    cat ./ninjadist.log
+    exit $retcode
+fi
+set -e
 
 ln -sf ../meson-dist/ ./rpmbuild/SOURCES
 

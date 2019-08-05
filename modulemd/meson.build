@@ -367,30 +367,6 @@ foreach name, script : python_tests
 endforeach
 
 
-# -- Test Modulemd.TranslationHelpers (Python) -- #
-
-translation_helpers_python_script = files('tests/ModulemdTests/translation_helpers.py')
-get_babel = '''
-import babel
-'''
-
-# Python 3
-if (get_option('with_py3_overrides') and not test_installed_lib)
-  ret2 = run_command([python3, '-c', get_babel])
-
-  if ret2.returncode() != 0
-    warning('No Babel on Python 3: skipping TranslationHelper tests')
-  else
-    test ('translation_helpers_python3_debug', python3,
-          env : py_test_env,
-          args : translation_helpers_python_script)
-    test ('translation_helpers_python3_release', python3,
-          env : py_test_release_env,
-          args : translation_helpers_python_script)
-  endif
-endif
-
-
 # --- Formatting Helpers -- #
 # Run these after the functional tests so we get those results more quickly
 
@@ -411,9 +387,7 @@ test('clang_format', clang_format,
 autopep8_args = [ '--in-place', '-a', '-a', '--global-config', '../tox.ini' ]
 autopep8_scripts = [ files('tests/test-dirty.py',
                            'tests/test-valgrind.py',
-                           '../bindings/python/gi/overrides/Modulemd.py',
-                           '../ModulemdTranslationHelpers/Utils.py',
-                           'tests/ModulemdTests/translation_helpers.py') +
+                           '../bindings/python/gi/overrides/Modulemd.py') +
                      test_python_scripts ]
 test('autopep8', autopep8,
      args: autopep8_args + autopep8_scripts)

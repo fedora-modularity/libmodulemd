@@ -31,8 +31,6 @@ BuildRequires:  python-gobject-base
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-gobject-base
-BuildRequires:  python3-babel
-BuildRequires:  python2-babel
 BuildRequires:  valgrind
 BuildRequires:  glib2-doc
 

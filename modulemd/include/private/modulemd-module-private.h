@@ -103,19 +103,6 @@ modulemd_module_get_translated_streams (ModulemdModule *self);
 
 
 /**
- * modulemd_module_get_translation:
- * @self: This #ModulemdModule object.
- * @stream: The stream to look up translations for.
- *
- * Returns: (transfer none): The set of translations attached to streams.
- *
- * Since: 2.0
- */
-ModulemdTranslation *
-modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
-
-
-/**
  * modulemd_module_add_stream:
  * @self: This #ModulemdModule object.
  * @stream: A #ModulemdModuleStream object to associate with this

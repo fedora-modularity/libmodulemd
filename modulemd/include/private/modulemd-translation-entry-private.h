@@ -30,7 +30,7 @@
  * modulemd_translation_entry_parse_yaml:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * Translation Entry's mapping entry in the YAML document.
- * @locale: (int): A string with the locale for the current translation entry.
+ * @locale: (in): A string with the locale for the current translation entry.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @error: (out): A #GError that will return the reason for a parsing or

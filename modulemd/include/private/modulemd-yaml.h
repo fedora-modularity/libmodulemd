@@ -89,9 +89,9 @@ typedef struct _modulemd_yaml_string
 
 /**
  * write_yaml_string:
- * @data: A void pointer to a #modulemd_yaml_string object.
- * @buffer: YAML text to append to @data.
- * @size: The number of bytes from @buffer to append to @data.
+ * @data: (inout): A void pointer to a #modulemd_yaml_string object.
+ * @buffer: (in): YAML text to append to @data.
+ * @size: (in): The number of bytes from @buffer to append to @data.
  *
  * Additionally memory for @data is automatically allocated if necessary.
  *
@@ -102,7 +102,7 @@ write_yaml_string (void *data, unsigned char *buffer, size_t size);
 
 /**
  * modulemd_yaml_string_free:
- * @yaml_string: A pointer to a #modulemd_yaml_string to be freed.
+ * @yaml_string: (inout): A pointer to a #modulemd_yaml_string to be freed.
  *
  * Since: 2.0
  */
@@ -122,9 +122,9 @@ G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_emitter_t, yaml_emitter_delete);
 
 /**
  * mmd_yaml_get_event_name:
- * @type: A libyaml event.
+ * @type: (in): A libyaml event type.
  *
- * Returns the string representation for @type.
+ * Returns: The string representation for @type.
  *
  * Since: 2.0
  */
@@ -133,7 +133,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * MMD_INIT_YAML_PARSER:
- * @_parser: A variable name to use for the new parser object.
+ * @_parser: (out): A variable name to use for the new parser object.
  *
  * This convenience macro allocates and initializes a new libyaml parser object
  * named @_parser.
@@ -146,7 +146,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * MMD_INIT_YAML_EMITTER:
- * @_emitter: A variable name to use for the new emitter object.
+ * @_emitter: (out): A variable name to use for the new emitter object.
  *
  * This convenience macro allocates and initializes a new libyaml emitter
  * object named @_emitter.
@@ -159,7 +159,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * MMD_INIT_YAML_EVENT:
- * @_event: A variable name to use for the new event object.
+ * @_event: (out): A variable name to use for the new event object.
  *
  * This convenience macro allocates and initializes a new libyaml event object
  * named @_event.
@@ -172,8 +172,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * MMD_INIT_YAML_STRING:
- * @_emitter: A libyaml emitter object.
- * @_string: A variable name to use for the new yaml string object.
+ * @_emitter: (inout): A libyaml emitter object.
+ * @_string: (out): A variable name to use for the new yaml string object.
  *
  * This convenience macro allocates and initializes a new yaml string object
  * named @_string and associates it as the output target for the libyaml
@@ -188,8 +188,9 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * MMD_REINIT_YAML_STRING:
- * @_emitter: A libyaml emitter object to reinitialize.
- * @_string: A variable name to reinitialize with a new yaml string object.
+ * @_emitter: (inout): A libyaml emitter object to reinitialize.
+ * @_string: (inout): A variable name to reinitialize with a new yaml string
+ * object.
  *
  * This convenience macro deletes then initializes a new libyaml emitter named
  * @_emitter, then deletes, reallocates, and initializes a new yaml string
@@ -206,11 +207,12 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT_FULL:
- * @_parser: A libyaml parser object positioned at the beginning of an event.
- * @_returnval: The value to return in case of of a parsing error.
- * @_event: Returns the type of libyaml event that was parsed.
- * @_error: A #GError that will return the reason for a parsing or validation
- * error.
+ * @_parser: (inout): A libyaml parser object positioned at the beginning of an
+ * event.
+ * @_returnval: (in): The value to return in case of a parsing error.
+ * @_event: (out): Returns the libyaml event that was parsed.
+ * @_error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
  * DIRECT USE OF THIS MACRO SHOULD BE AVOIDED. This is the internal
  * implementation for %YAML_PARSER_PARSE_WITH_EXIT_BOOL,
@@ -248,10 +250,11 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT_BOOL:
- * @_parser: A libyaml parser object positioned at the beginning of an event.
- * @_event: Returns the type of libyaml event that was parsed.
- * @_error: A #GError that will return the reason for a parsing or validation
- * error.
+ * @_parser: (inout): A libyaml parser object positioned at the beginning of an
+ * event.
+ * @_event: (out): Returns the libyaml event that was parsed.
+ * @_error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
  * Returns: Continues on if parsing of the event was successful. Returns
  * FALSE if a parse error occurred and sets @_error appropriately.
@@ -263,10 +266,11 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT_INT:
- * @_parser: A libyaml parser object positioned at the beginning of an event.
- * @_event: Returns the type of libyaml event that was parsed.
- * @_error: A #GError that will return the reason for a parsing or validation
- * error.
+ * @_parser: (inout): A libyaml parser object positioned at the beginning of an
+ * event.
+ * @_event: (out): Returns the libyaml event that was parsed.
+ * @_error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
  * Returns: Continues on if parsing of the event was successful. Returns
  * 0 if a parse error occurred and sets @_error appropriately.
@@ -278,10 +282,11 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT:
- * @_parser: A libyaml parser object positioned at the beginning of an event.
- * @_event: Returns the type of libyaml event that was parsed.
- * @_error: A #GError that will return the reason for a parsing or validation
- * error.
+ * @_parser: (inout): A libyaml parser object positioned at the beginning of an
+ * event.
+ * @_event: (out): Returns the libyaml event that was parsed.
+ * @_error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
  * Returns: Continues on if parsing of the event was successful. Returns
  * NULL if a parse error occurred and sets @_error appropriately.
@@ -292,6 +297,25 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   YAML_PARSER_PARSE_WITH_EXIT_FULL (_parser, NULL, _event, _error)
 
 
+/**
+ * MMD_EMIT_WITH_EXIT_FULL:
+ * @_emitter: (inout): A libyaml emitter object positioned where @_event
+ * belongs in the YAML document.
+ * @_returnval: (in): The value to return in case of an output error.
+ * @_event: (in): The libyaml event to be emitted.
+ * @_error: (out): A #GError that will return the reason for an output error.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error in case of failure.
+ *
+ * DIRECT USE OF THIS MACRO SHOULD BE AVOIDED. This is the internal
+ * implementation for %MMD_EMIT_WITH_EXIT and %MMD_EMIT_WITH_EXIT_PTR which
+ * should be used instead.
+ *
+ * Returns: Continues on if emitting of the event was successful. Returns
+ * @_returnval if an output error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_EMIT_WITH_EXIT_FULL(_emitter, _returnval, _event, _error, ...)    \
   do                                                                          \
     {                                                                         \
@@ -312,11 +336,57 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
+/**
+ * MMD_EMIT_WITH_EXIT:
+ * @_emitter: (inout): A libyaml emitter object positioned where @_event
+ * belongs in the YAML document.
+ * @_event: (in): The libyaml event to be emitted.
+ * @_error: (out): A #GError that will return the reason for an output error.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error in case of failure.
+ *
+ * Returns: Continues on if emitting of the event was successful. Returns
+ * FALSE if an output error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_EMIT_WITH_EXIT(_emitter, _event, _error, ...)                     \
   MMD_EMIT_WITH_EXIT_FULL (_emitter, FALSE, _event, _error, __VA_ARGS__)
+
+/**
+ * MMD_EMIT_WITH_EXIT_PTR:
+ * @_emitter: (inout): A libyaml emitter object positioned where @_event
+ * belongs in the YAML document.
+ * @_event: (in): The libyaml event to be emitted.
+ * @_error: (out): A #GError that will return the reason for an output error.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error in case of failure.
+ *
+ * Returns: Continues on if emitting of the event was successful. Returns
+ * NULL if an output error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_EMIT_WITH_EXIT_PTR(_emitter, _event, _error, ...)                 \
   MMD_EMIT_WITH_EXIT_FULL (_emitter, NULL, _event, _error, __VA_ARGS__)
 
+/**
+ * MMD_YAML_ERROR_EVENT_EXIT_FULL:
+ * @_error: (out): A #GError that will return the reason for the error.
+ * @_event: (in): The libyaml event for which an error is to be reported.
+ * @_returnval: (in): The error value to return.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error.
+ *
+ * DIRECT USE OF THIS MACRO SHOULD BE AVOIDED. This is the internal
+ * implementation for %MMD_YAML_ERROR_EVENT_EXIT,
+ * %MMD_YAML_ERROR_EVENT_EXIT_BOOL, and %MMD_YAML_ERROR_EVENT_EXIT_INT which
+ * should be used instead.
+ *
+ * Returns: Returns @_returnval and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_YAML_ERROR_EVENT_EXIT_FULL(_error, _event, _returnval, ...)       \
   do                                                                          \
     {                                                                         \
@@ -336,15 +406,68 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
+/**
+ * MMD_YAML_ERROR_EVENT_EXIT:
+ * @_error: (out): A #GError that will return the reason for the error.
+ * @_event: (in): The libyaml event for which an error is to be reported.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error.
+ *
+ * Returns: Returns NULL and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_YAML_ERROR_EVENT_EXIT(_error, _event, ...)                        \
   MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, NULL, __VA_ARGS__)
 
+/**
+ * MMD_YAML_ERROR_EVENT_EXIT_BOOL:
+ * @_error: (out): A #GError that will return the reason for the error.
+ * @_event: (in): The libyaml event for which an error is to be reported.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error.
+ *
+ * Returns: Returns FALSE and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_YAML_ERROR_EVENT_EXIT_BOOL(_error, _event, ...)                   \
   MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, FALSE, __VA_ARGS__)
 
+/**
+ * MMD_YAML_ERROR_EVENT_EXIT_INT:
+ * @_error: (out): A #GError that will return the reason for the error.
+ * @_event: (in): The libyaml event for which an error is to be reported.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * @_error.
+ *
+ * Returns: Returns 0 and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_YAML_ERROR_EVENT_EXIT_INT(_error, _event, ...)                    \
   MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, 0, __VA_ARGS__)
 
+/**
+ * MMD_SET_PARSED_YAML_STRING:
+ * @_parser: (inout): A libyaml parser object positioned at the beginning of an
+ * expected string event.
+ * @_error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ * @_fn: (in): A setter method for a property of object @_obj to be called with
+ * the successfully parsed string.
+ * @_obj: (inout): The object that is to store the parsed string via its @_fn
+ * setter method.
+ *
+ * This convenience macro can be used when a YAML string (scalar) event is
+ * expected, and that string is to be stored in a property of libmodulemd
+ * object @_obj via setter method @_fn.
+ *
+ * Returns: Continues on if parsing of the event was successful. Returns
+ * NULL if a parse error occurred and sets @_error appropriately.
+ *
+ * Since: 2.0
+ */
 #define MMD_SET_PARSED_YAML_STRING(_parser, _error, _fn, _obj)                \
   do                                                                          \
     {                                                                         \
@@ -361,38 +484,145 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
     }                                                                         \
   while (0)
 
+/**
+ * mmd_emitter_start_stream:
+ * @emitter: (inout): A libyaml emitter object that will be positioned at the
+ * beginning of a new YAML output stream.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML stream was started successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error);
 
+/**
+ * mmd_emitter_end_stream:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the end of
+ * a YAML output stream to be closed.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML stream was closed successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_end_stream (yaml_emitter_t *emitter, GError **error);
 
 
+/**
+ * mmd_emitter_start_document:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new YAML document will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Emits a YAML document start header line.
+ *
+ * Returns: TRUE if the YAML document was started successfully. Returns FALSE
+ * if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_start_document (yaml_emitter_t *emitter, GError **error);
 
+/**
+ * mmd_emitter_end_document:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a YAML document terminator will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Emits a YAML document termination line.
+ *
+ * Returns: TRUE if the YAML document was terminated successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_end_document (yaml_emitter_t *emitter, GError **error);
 
 
+/**
+ * mmd_emitter_start_mapping:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new mapping will be written.
+ * @style: (in): The YAML mapping style for the output.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML mapping was started successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_start_mapping (yaml_emitter_t *emitter,
                            yaml_mapping_style_t style,
                            GError **error);
 
+/**
+ * mmd_emitter_end_mapping:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a mapping ending will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML mapping was ended successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_end_mapping (yaml_emitter_t *emitter, GError **error);
 
 
+/**
+ * mmd_emitter_start_sequence:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @style: (in): The YAML sequence style for the output.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML sequence was started successfully. Returns FALSE
+ * if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_start_sequence (yaml_emitter_t *emitter,
                             yaml_sequence_style_t style,
                             GError **error);
 
+/**
+ * mmd_emitter_end_sequence:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a sequence ending will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML sequence was ended successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_end_sequence (yaml_emitter_t *emitter, GError **error);
 
 
+/**
+ * mmd_emitter_scalar:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a scalar will be written.
+ * @scalar: (in): The scalar (string) to be written.
+ * @style: (in): The YAML scalar style for the output.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML scalar was written successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 gboolean
 mmd_emitter_scalar (yaml_emitter_t *emitter,
                     const gchar *scalar,
@@ -402,12 +632,14 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 
 /**
  * mmd_emitter_strv:
- * @emitter: (intout): A yaml emitter object positioned at the beginning of a value place to emit a sequence.
+ * @emitter: (inout): A libyaml emitter object positioned at the start of where
+ * a string sequence will be written.
  * @seq_style: (in): The YAML sequence style for the output.
- * @list: A list that will be emitted to the YAML emitter.
+ * @list: (in): A list that will be emitted to the YAML emitter.
  * @error: (out): A #GError that will return the reason for an emitting error.
  *
- * Returns: A boolean whether emitting the sequence was successful.
+ * Returns: TRUE if the sequence emitted successfully. FALSE if an error was
+ * encountered and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -437,11 +669,13 @@ modulemd_yaml_parse_date (yaml_parser_t *parser, GError **error);
 
 /**
  * modulemd_yaml_parse_string:
- * @parser: (inout): A libyaml parser object positioned at the beginning of a string scalar entry.
- * @error: (out): A #GError that will return the reason for a parsing or validation error.
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * string scalar entry.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
- * Returns: (transfer full): A newly-allocated gchar * representing the parsed value.
- * NULL if a parse error occurred and sets @error appropriately.
+ * Returns: (transfer full): A newly-allocated `gchar *` representing the
+ * parsed value. NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -452,7 +686,7 @@ modulemd_yaml_parse_string (yaml_parser_t *parser, GError **error);
 /**
  * modulemd_yaml_parse_bool:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
- * int64 scalar entry.
+ * boolean scalar entry.
  * @error: (out): A #GError that will return the reason for a parsing or
  * validation error.
  *
@@ -499,12 +733,14 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error);
 
 /**
  * modulemd_yaml_parse_string_set:
- * @parser: (inout): A libyaml parser object positioned at the beginning of a sequence with string scalars.
- * @error: (out): A #GError that will return the reason for a parsing or validation error.
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * sequence with string scalars.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
  *
- * Returns: (transfer full): A newly-allocated #GHashTable * representing the parsed value.
- * All parsed sequence entries are added as keys in the hashtable.
- * NULL if a parse error occurred and sets @error appropriately.
+ * Returns: (transfer full): A newly-allocated #GHashTable * representing the
+ * parsed value. All parsed sequence entries are added as keys in the
+ * hashtable. NULL if a parse error occurred and sets @error appropriately.
  *
  * Since: 2.0
  */
@@ -561,12 +797,13 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
 /**
  * modulemd_yaml_parse_document_type:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
- * yaml subdocument immediately prior to a YAML_DOCUMENT_START_EVENT.
+ * yaml subdocument immediately prior to a `YAML_DOCUMENT_START_EVENT`.
  *
  * Reads through a YAML subdocument to retrieve the document type, metadata
  * version and the data section.
  *
- * Returns: (transfer full): A SubdocumentInfo with information on the parse results.
+ * Returns: (transfer full): A #ModulemdSubdocumentInfo with information on
+ * the parse results.
  *
  * Since: 2.0
  */
@@ -577,14 +814,14 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser);
 /**
  * modulemd_yaml_emit_document_headers:
  * @emitter: (inout): A libyaml emitter object that is positioned where the
- * YAML_DOCUMENT_START_EVENT should occur (so this must be after either a
- * YAML_STREAM_START_EVENT or YAML_DOCUMENT_END_EVENT).
+ * `YAML_DOCUMENT_START_EVENT` should occur (so this must be after either a
+ * `YAML_STREAM_START_EVENT` or `YAML_DOCUMENT_END_EVENT`).
  * @doctype: (in): The document type (see #ModulemdYamlDocumentTypeEnum)
  * @mdversion: (in): The metadata version for this document
  * @error: (out): A #GError that will return the reason for failing to emit.
  *
  * Creates the YAML header and returns @emitter positioned just before the
- * YAML_MAPPING_START for the "data:" section.
+ * `YAML_MAPPING_START` for the "data:" section.
  *
  * Returns: TRUE if the document emitted successfully. FALSE if an error was
  * encountered and sets @error appropriately.
@@ -596,6 +833,7 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
                                      ModulemdYamlDocumentTypeEnum doctype,
                                      guint64 mdversion,
                                      GError **error);
+
 
 /**
  * modulemd_yaml_emit_variant:
@@ -631,7 +869,7 @@ mmd_variant_from_scalar (const gchar *scalar);
 
 /**
  * mmd_variant_from_mapping:
- * @parser: (inout): A YAML parser positioned just after a MAPPING_START
+ * @parser: (inout): A YAML parser positioned just after a `MAPPING_START`
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
  * Returns: (transfer full): A new, floating #GVariant representing a hash
@@ -645,7 +883,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
 
 /**
  * mmd_variant_from_sequence:
- * @parser: (inout): A YAML parser positioned just after a SEQUENCE_START
+ * @parser: (inout): A YAML parser positioned just after a `SEQUENCE_START`
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
  * Returns: (transfer full): A new, floating #GVariant representing a list of
@@ -659,7 +897,7 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
 
 /**
  * skip_unknown_yaml:
- * @parser: (inout): A YAML parser positioned just after an unexpected map key
+ * @parser: (inout): A YAML parser positioned just after an unexpected map key.
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
  * This function is used to skip a section of YAML that contains unknown keys.
@@ -674,6 +912,24 @@ gboolean
 skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 
 
+/**
+ * SKIP_UNKNOWN:
+ * @_parser: (inout): A YAML parser positioned just after an unexpected map key.
+ * @_returnval: (in): The error value to return.
+ * @...: (in): Additional argument(s) to pass to g_set_error() when setting
+ * `error`.
+ *
+ * This convenience macro is a wrapper around skip_unknown_yaml() used to skip
+ * a section of YAML that contains unknown keys.
+ *
+ * NOTE: Local variables `strict` and `error` are expected to be present in the
+ * code from which this macro is used.
+ *
+ * Returns: If `strict` is TRUE or skip_unknown_yaml() fails, @_returnval is
+ * returned and `error` is set appropriately.
+ *
+ * Since: 2.0
+ */
 #define SKIP_UNKNOWN(_parser, _returnval, ...)                                \
   do                                                                          \
     {                                                                         \
@@ -692,11 +948,41 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 
 
 /* A set of macros for simple emitting of common elements */
+/**
+ * NON_EMPTY_TABLE:
+ * @table: A #GHashTable.
+ *
+ * Returns: FALSE if @table is empty, otherwise TRUE.
+ *
+ * Since: 2.0
+ */
 #define NON_EMPTY_TABLE(table) (g_hash_table_size (table) != 0)
 
+/**
+ * NON_EMPTY_ARRAY:
+ * @array: A #GPtrArray.
+ *
+ * Returns: FALSE if @array is empty, otherwise TRUE.
+ *
+ * Since: 2.0
+ */
 #define NON_EMPTY_ARRAY(array) (array->len != 0)
 
-
+/**
+ * EMIT_SCALAR_FULL:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @value: (in): The scalar (string) to be written.
+ * @style: (in): The YAML scalar style for the output.
+ *
+ * Emits scalar @value using style @style.
+ *
+ * Returns: Continues on if the YAML scalar was written successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.1
+ */
 #define EMIT_SCALAR_FULL(emitter, error, value, style)                        \
   do                                                                          \
     {                                                                         \
@@ -705,9 +991,42 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_SCALAR:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits scalar @value using style `YAML_PLAIN_SCALAR_STYLE`.
+ *
+ * Returns: Continues on if the YAML scalar was written successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_SCALAR(emitter, error, value)                                    \
   EMIT_SCALAR_FULL (emitter, error, value, YAML_PLAIN_SCALAR_STYLE)
 
+/**
+ * EMIT_KEY_VALUE_FULL:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @key: (in): The key (string) to be written.
+ * @value: (in): The scalar (string) to be written.
+ * @style: (in): The YAML scalar style for the output.
+ *
+ * Emits key/value pair (@key: @value) using style @style.
+ *
+ * NOTE: This macro outputs both a key and a value for that key, thus it must
+ * only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML key/value pair was written successfully.
+ * Returns FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.1
+ */
 #define EMIT_KEY_VALUE_FULL(emitter, error, key, value, style)                \
   do                                                                          \
     {                                                                         \
@@ -725,10 +1044,47 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_KEY_VALUE:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @key: (in): The key (string) to be written.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits key/value pair (@key: @value) using style `YAML_PLAIN_SCALAR_STYLE`.
+ *
+ * NOTE: This macro outputs both a key and a value for that key, thus it must
+ * only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML key/value pair was written successfully.
+ * Returns FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_KEY_VALUE(emitter, error, key, value)                            \
   EMIT_KEY_VALUE_FULL (emitter, error, key, value, YAML_PLAIN_SCALAR_STYLE)
 
 
+/**
+ * EMIT_KEY_VALUE_IF_SET:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @key: (in): The key (string) to be written.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits key/value pair (@key: @value) only if @value is not NULL.
+ *
+ * NOTE: This macro outputs both a key and a value for that key, thus it must
+ * only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if @value is NULL or the YAML key/value pair was
+ * written successfully. Returns FALSE if an error occurred and sets @error
+ * appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_KEY_VALUE_IF_SET(emitter, error, key, value)                     \
   do                                                                          \
     {                                                                         \
@@ -739,6 +1095,18 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_MAPPING_START_WITH_STYLE:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new mapping will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @style: (in): The YAML mapping style for the output.
+ *
+ * Returns: Continues on if the YAML mapping was started successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_MAPPING_START_WITH_STYLE(emitter, error, style)                  \
   do                                                                          \
     {                                                                         \
@@ -747,9 +1115,32 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_MAPPING_START:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new mapping will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: Continues on if the YAML mapping was started successfully using
+ * style `YAML_BLOCK_MAPPING_STYLE`. Returns FALSE if an error occurred and
+ * sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_MAPPING_START(emitter, error)                                    \
   EMIT_MAPPING_START_WITH_STYLE (emitter, error, YAML_BLOCK_MAPPING_STYLE)
 
+/**
+ * EMIT_MAPPING_END:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a mapping ending will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: Continues on if the YAML mapping was ended successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_MAPPING_END(emitter, error)                                      \
   do                                                                          \
     {                                                                         \
@@ -758,6 +1149,18 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_SEQUENCE_START_WITH_STYLE:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @style: (in): The YAML sequence style for the output.
+ *
+ * Returns: Continues on if the YAML sequence was started successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_SEQUENCE_START_WITH_STYLE(emitter, error, style)                 \
   do                                                                          \
     {                                                                         \
@@ -766,9 +1169,32 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_SEQUENCE_START:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: Continues on if the YAML sequence was started successfully using
+ * style `YAML_BLOCK_SEQUENCE_STYLE`. Returns FALSE if an error occurred and
+ * sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_SEQUENCE_START(emitter, error)                                   \
   EMIT_SEQUENCE_START_WITH_STYLE (emitter, error, YAML_BLOCK_SEQUENCE_STYLE)
 
+/**
+ * EMIT_SEQUENCE_END:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a sequence ending will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: Continues on if the YAML sequence was ended successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_SEQUENCE_END(emitter, error)                                     \
   do                                                                          \
     {                                                                         \
@@ -777,6 +1203,26 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_HASHTABLE_VALUES_IF_NON_EMPTY:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new mapping will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output mapping.
+ * @table: (in): The #GHashTable that is to be output.
+ * @emitfn: (in): A function used to emit each of the hash table values.
+ *
+ * Does nothing if the hash table @table is empty. Otherwise, calls @emitfn
+ * to emit each of the values from @table identified as @key.
+ *
+ * NOTE: This macro outputs both a key and a sub-mapping value for that key,
+ * thus it must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML mapping was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_HASHTABLE_VALUES_IF_NON_EMPTY(                                   \
   emitter, error, key, table, emitfn)                                         \
   do                                                                          \
@@ -801,6 +1247,26 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new mapping will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output mapping.
+ * @table: (in): The #GHashTable that is to be output. Both the keys and values
+ * must be strings.
+ *
+ * Does nothing if the hash table @table is empty. Otherwise, outputs a YAML
+ * mapping with the key/value pairs from @table identified as @key.
+ *
+ * NOTE: This macro outputs both a key and a sub-mapping value for that key,
+ * thus it must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML mapping was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY(emitter, error, key, table)    \
   do                                                                          \
     {                                                                         \
@@ -824,6 +1290,27 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_STRING_SET:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output sequence.
+ * @table: (in): The #GHashTable that is to be output. The keys are expected to
+ * be a set() of strings.
+ *
+ * Raises an error if the hash table @table is empty. Otherwise, outputs a YAML
+ * sequence using style `YAML_BLOCK_SEQUENCE_STYLE` with the keys from @table
+ * identified as @key.
+ *
+ * NOTE: This macro outputs both a key and an array value for that key, thus it
+ * must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML sequence was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_STRING_SET(emitter, error, key, table)                           \
   do                                                                          \
     {                                                                         \
@@ -841,6 +1328,27 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_STRING_SET_IF_NON_EMPTY:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output sequence.
+ * @table: (in): The #GHashTable that is to be output. The keys are expected to
+ * be a set() of strings.
+ *
+ * Does nothing if the hash table @table is empty. Otherwise, outputs a YAML
+ * sequence using style `YAML_BLOCK_SEQUENCE_STYLE` with the keys from @table
+ * identified as @key.
+ *
+ * NOTE: This macro outputs both a key and an array value for that key, thus it
+ * must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML sequence was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_STRING_SET_IF_NON_EMPTY(emitter, error, key, table)              \
   do                                                                          \
     {                                                                         \
@@ -851,6 +1359,26 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_STRING_SET_FULL:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output sequence.
+ * @table: (in): The #GHashTable that is to be output. The keys are expected to
+ * be a set() of strings.
+ * @sequence_style: (in): The YAML sequence style for the output.
+ *
+ * Outputs a YAML sequence with the keys from @table identified as @key.
+ *
+ * NOTE: This macro outputs both a key and an array value for that key, thus it
+ * must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML sequence was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.1
+ */
 #define EMIT_STRING_SET_FULL(emitter, error, key, table, sequence_style)      \
   do                                                                          \
     {                                                                         \
@@ -867,6 +1395,26 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_ARRAY_VALUES:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output sequence.
+ * @array: (in): The #GPtrArray that is to be output.
+ * @emitfn: (in): A function used to emit each of the array values.
+ *
+ * Raises an error if the array @array is empty. Otherwise, calls @emitfn
+ * to emit each of the values from @array identified as @key.
+ *
+ * NOTE: This macro outputs both a key and an array value for that key, thus it
+ * must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML sequence was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_ARRAY_VALUES(emitter, error, key, array, emitfn)                 \
   do                                                                          \
     {                                                                         \
@@ -891,6 +1439,26 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
     }                                                                         \
   while (0)
 
+/**
+ * EMIT_ARRAY_VALUES_IF_NON_EMPTY:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a new sequence will be written.
+ * @error: (out): A #GError that will return the reason for any error.
+ * @key: (in): The name to be used as the identifier for the output sequence.
+ * @array: (in): The #GPtrArray that is to be output.
+ * @emitfn: (in): A function used to emit each of the array values.
+ *
+ * Does nothing if the array @array is empty. Otherwise, calls @emitfn to emit
+ * each of the values from @array identified as @key.
+ *
+ * NOTE: This macro outputs both a key and an array value for that key, thus it
+ * must only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML sequence was output successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.0
+ */
 #define EMIT_ARRAY_VALUES_IF_NON_EMPTY(emitter, error, key, array, emitfn)    \
   do                                                                          \
     {                                                                         \

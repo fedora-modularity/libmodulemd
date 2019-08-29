@@ -57,6 +57,7 @@ modulemd_srcs = files(
     'modulemd-component.c',
     'modulemd-component-module.c',
     'modulemd-component-rpm.c',
+    'modulemd-compression.c',
     'modulemd-defaults.c',
     'modulemd-defaults-v1.c',
     'modulemd-dependencies.c',
@@ -86,6 +87,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-component.h',
     'include/modulemd-2.0/modulemd-component-module.h',
     'include/modulemd-2.0/modulemd-component-rpm.h',
+    'include/modulemd-2.0/modulemd-compression.h',
     'include/modulemd-2.0/modulemd-defaults.h',
     'include/modulemd-2.0/modulemd-defaults-v1.h',
     'include/modulemd-2.0/modulemd-dependencies.h',
@@ -111,6 +113,7 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-component-private.h',
     'include/private/modulemd-component-module-private.h',
     'include/private/modulemd-component-rpm-private.h',
+    'include/private/modulemd-compression-private.h',
     'include/private/modulemd-dependencies-private.h',
     'include/private/modulemd-profile-private.h',
     'include/private/modulemd-defaults-private.h',
@@ -133,6 +136,7 @@ test_srcs = files(
     'tests/test-modulemd-buildopts.c',
     'tests/test-modulemd-component-module.c',
     'tests/test-modulemd-component-rpm.c',
+    'tests/test-modulemd-compression.c',
     'tests/test-modulemd-defaults.c',
     'tests/test-modulemd-defaults-v1.c',
     'tests/test-modulemd-dependencies.c',
@@ -180,6 +184,8 @@ enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_hdrs)
 
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
+cdata.set('HAVE_RPMIO', rpm.found())
+cdata.set('HAVE_LIBMAGIC', magic.found())
 configure_file(
   output : 'config.h',
   configuration : cdata
@@ -191,6 +197,8 @@ modulemd_lib = library(
     include_directories : include_dirs,
     dependencies : [
         gobject,
+        magic,
+        rpm,
         yaml,
         build_lib,
     ],
@@ -298,6 +306,7 @@ c_tests = {
 'buildopts'           : [ 'tests/test-modulemd-buildopts.c' ],
 'component_module'    : [ 'tests/test-modulemd-component-module.c' ],
 'component_rpm'       : [ 'tests/test-modulemd-component-rpm.c' ],
+'compression'         : [ 'tests/test-modulemd-compression.c' ],
 'defaults'            : [ 'tests/test-modulemd-defaults.c' ],
 'defaultsv1'          : [ 'tests/test-modulemd-defaults-v1.c' ],
 'dependencies'        : [ 'tests/test-modulemd-dependencies.c' ],

@@ -17,6 +17,7 @@
 #include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-compression.h"
 #include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
 #include "modulemd-dependencies.h"

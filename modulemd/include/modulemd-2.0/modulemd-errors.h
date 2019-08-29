@@ -38,6 +38,11 @@ G_BEGIN_DECLS
  * @MODULEMD_ERROR_TOO_MANY_MATCHES: Represents an error indicating that
  * multiple streams matched when searching for a specific module
  * stream. Since: 2.2
+ * @MODULEMD_ERROR_MAGIC: Could not detect the mime type of a file for
+ * automatic detection of compression format. Since: 2.8
+ * @MODULEMD_ERROR_NOT_IMPLEMENTED: The requested function is not implemented
+ * on this platform, likely due to needing a newer version of a dependency
+ * library. Since: 2.8
  *
  * Since: 2.0
  */
@@ -47,7 +52,9 @@ typedef enum
   MODULEMD_ERROR_VALIDATE,
   MODULEMD_ERROR_FILE_ACCESS,
   MODULEMD_ERROR_NO_MATCHES,
-  MODULEMD_ERROR_TOO_MANY_MATCHES
+  MODULEMD_ERROR_TOO_MANY_MATCHES,
+  MODULEMD_ERROR_MAGIC,
+  MODULEMD_ERROR_NOT_IMPLEMENTED
 } ModulemdErrorEnum;
 
 /**

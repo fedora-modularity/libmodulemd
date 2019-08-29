@@ -14,13 +14,20 @@
 #include <errno.h>
 #include <glib.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include <yaml.h>
 
+#ifdef HAVE_RPMIO
+#include <rpm/rpmio.h>
+#endif
+
 #include "modulemd-errors.h"
+#include "modulemd-compression.h"
 #include "modulemd-module-index.h"
 #include "modulemd-subdocument-info.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-compression-private.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-subdocument-info-private.h"
@@ -472,6 +479,10 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
 
   int saved_errno;
   g_autoptr (FILE) yaml_stream = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  int fd;
+  ModulemdCompressionTypeEnum comtype;
+  g_autofree gchar *fmode = NULL;
 
   yaml_stream = g_fopen (yaml_file, "rb");
   saved_errno = errno;
@@ -486,8 +497,93 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
       return FALSE;
     }
 
-  return modulemd_module_index_update_from_stream (
-    self, yaml_stream, strict, failures, error);
+  /* To avoid TOCTOU race conditions, do everything from the same opened
+   * file
+   */
+  fd = fileno (yaml_stream);
+
+  /* Determine if the file is compressed */
+  comtype = modulemd_detect_compression (yaml_file, fd, &nested_error);
+  if (comtype == MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+  else if (comtype == MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION ||
+           comtype == MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION)
+    {
+      /* If it's not compressed (or we can't figure out what compression is in
+       * use), just use the libyaml function. It's fast and will fail quickly
+       * if the file is unreadable.
+       */
+      return modulemd_module_index_update_from_stream (
+        self, yaml_stream, strict, failures, error);
+    }
+
+#ifdef HAVE_RPMIO
+  /* We're handling a compressed input file, so we'll use librpm's "rpmio"
+   * suite of tools to deal with it. We need to construct a special "mode"
+   * argument to pass to Fdopen().
+   */
+  FD_t rpmio_fd = NULL;
+  g_auto (FD_t) fd_dup = NULL;
+
+  fmode = modulemd_get_rpmio_fmode ("r", comtype);
+  if (!fmode)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_FILE_ACCESS,
+                   "Unable to construct rpmio fmode from comtype [%d]",
+                   comtype);
+      return FALSE;
+    }
+
+  /* Create an rpmio file descriptor object from the current file descriptor,
+   * setting the appropriate "mode" so that librpm will read it with the
+   * correct handlers.
+   */
+  fd_dup = fdDup (fd);
+  saved_errno = errno;
+  if (!fd_dup)
+    {
+      g_set_error (
+        error,
+        MODULEMD_ERROR,
+        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        "Cannot open compressed file. Error in rpmio::fdDup(%d): %s",
+        fd,
+        strerror (saved_errno));
+      return FALSE;
+    }
+
+  g_debug ("Calling rpmio::Fdopen (%p, %s)", fd_dup, fmode);
+  rpmio_fd = Fdopen (fd_dup, fmode);
+
+  if (!rpmio_fd)
+    {
+      g_set_error_literal (
+        error,
+        MODULEMD_ERROR,
+        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        "Cannot open compressed file. Error in rpmio::Fdopen().");
+      return FALSE;
+    }
+
+  g_debug ("rpmio::Fdopen (%p, %s) succeeded", fd_dup, fmode);
+
+  return modulemd_module_index_update_from_custom (
+    self, compressed_stream_read_fn, rpmio_fd, strict, failures, error);
+
+#else /* HAVE_RPMIO */
+  g_set_error_literal (
+    error,
+    MODULEMD_ERROR,
+    MODULEMD_ERROR_NOT_IMPLEMENTED,
+    "Cannot open compressed file. libmodulemd was not compiled "
+    "with rpmio support.");
+  return FALSE;
+#endif /* HAVE_RPMIO */
 }
 
 

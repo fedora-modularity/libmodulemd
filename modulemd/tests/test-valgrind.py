@@ -45,6 +45,7 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
             [
                 'meson',
                 'test',
+                '--no-rebuild',
                 '-t', '10',
                 '--logbase=%s' % test,
                 '--wrap=%s' % valgrind_command,
@@ -55,8 +56,9 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
     with Pool() as pool:
         for returncode, test in pool.map(exec_valgrind, tests):
             if returncode != 0:
-                print("Valgrind exited with an error on %s" % test,
-                      file=sys.stderr)
+                print(
+                    "Valgrind exited with error [%d] on %s" %
+                    (returncode, test), file=sys.stderr)
                 failed = True
                 continue
 

@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <yaml.h>
 
+#include "config.h"
 #include "modulemd-defaults.h"
 #include "modulemd-module.h"
 #include "modulemd-module-index.h"
@@ -1018,6 +1019,173 @@ module_index_test_dump_empty_index (void)
 }
 
 
+struct expected_compressed_read_t
+{
+  const gchar *filename;
+
+  /* Whether this should succeed at reading */
+  gboolean succeeds;
+
+  /* If it fails, the expected error */
+  GQuark error_domain;
+  int error_code;
+};
+
+static void
+test_module_index_read_compressed (void)
+{
+  gboolean bret;
+  g_autoptr (ModulemdModuleIndex) baseline_idx = NULL;
+  g_autoptr (ModulemdModuleIndex) compressed_idx = NULL;
+  g_autofree gchar *file_path = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autofree gchar *baseline_text = NULL;
+  g_autofree gchar *compressed_text = NULL;
+
+#ifdef HAVE_RPMIO
+#ifdef HAVE_LIBMAGIC
+  struct expected_compressed_read_t expected[] = {
+    {
+      .filename = "bzipped",
+      .succeeds = TRUE,
+    },
+    {
+      .filename = "bzipped.yaml.bz2",
+      .succeeds = TRUE,
+    },
+    { .filename = "gzipped", .succeeds = TRUE },
+    { .filename = "gzipped.yaml.gz", .succeeds = TRUE },
+    { .filename = "xzipped", .succeeds = TRUE },
+    { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
+    { .filename = NULL }
+  };
+#else /* HAVE_LIBMAGIC */
+  struct expected_compressed_read_t expected[] = {
+    { .filename = "bzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_YAML_ERROR,
+      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+    {
+      .filename = "bzipped.yaml.bz2",
+      .succeeds = TRUE,
+    },
+    { .filename = "gzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_YAML_ERROR,
+      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+    { .filename = "gzipped.yaml.gz", .succeeds = TRUE },
+    { .filename = "xzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_YAML_ERROR,
+      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+    { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
+    { .filename = NULL }
+  };
+#endif /* HAVE_LIBMAGIC */
+
+#else /* HAVE_RPMIO */
+  struct expected_compressed_read_t expected[] = {
+    { .filename = "bzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = "bzipped.yaml.bz2",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = "gzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = "gzipped.yaml.gz",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = "xzipped",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = "xzipped.yaml.xz",
+      .succeeds = FALSE,
+      .error_domain = MODULEMD_ERROR,
+      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+    { .filename = NULL }
+  };
+#endif /* HAVE_RPMIO */
+
+  baseline_idx = modulemd_module_index_new ();
+  g_assert_nonnull (baseline_idx);
+
+  file_path = g_strdup_printf ("%s/compression/uncompressed.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (file_path);
+
+  bret = modulemd_module_index_update_from_file (
+    baseline_idx, file_path, TRUE, &failures, &error);
+  g_assert_true (bret);
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+
+  baseline_text = modulemd_module_index_dump_to_string (baseline_idx, &error);
+  g_assert_nonnull (baseline_text);
+  g_assert_no_error (error);
+
+  g_clear_pointer (&file_path, g_free);
+
+  for (size_t i = 0; expected[i].filename; i++)
+    {
+      compressed_idx = modulemd_module_index_new ();
+      g_assert_nonnull (compressed_idx);
+
+      file_path = g_strdup_printf ("%s/compression/%s",
+                                   g_getenv ("TEST_DATA_PATH"),
+                                   expected[i].filename);
+      g_assert_nonnull (file_path);
+
+      g_debug ("Processing %s, expecting %s",
+               file_path,
+               expected[i].succeeds ? "success" : "failure");
+      bret = modulemd_module_index_update_from_file (
+        compressed_idx, file_path, TRUE, &failures, &error);
+
+      if (error)
+        {
+          g_debug ("Error: %s", error->message);
+        }
+
+      if (expected[i].succeeds)
+        {
+          g_assert_true (bret);
+          g_assert_no_error (error);
+        }
+      else
+        {
+          g_assert_false (bret);
+          g_assert_error (
+            error, expected[i].error_domain, expected[i].error_code);
+
+          g_clear_error (&error);
+          g_clear_pointer (&file_path, g_free);
+          g_clear_object (&compressed_idx);
+          continue;
+        }
+      g_assert_cmpint (failures->len, ==, 0);
+
+      compressed_text =
+        modulemd_module_index_dump_to_string (compressed_idx, &error);
+      g_assert_nonnull (compressed_text);
+      g_assert_no_error (error);
+
+      g_assert_cmpstr (baseline_text, ==, compressed_text);
+
+      g_clear_pointer (&compressed_text, g_free);
+      g_clear_pointer (&file_path, g_free);
+      g_clear_object (&compressed_idx);
+    }
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1096,6 +1264,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/empty",
                    module_index_test_dump_empty_index);
+
+  g_test_add_func ("/modulemd/v2/module/index/compressed",
+                   test_module_index_read_compressed);
 
   return g_test_run ();
 }

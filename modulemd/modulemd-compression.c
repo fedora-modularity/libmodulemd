@@ -155,6 +155,8 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
                    magic_error (magic));
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
     }
+  /* Reset the file descriptor to the start of the file, if it has moved */
+  lseek (fd, 0, SEEK_SET);
 #endif /* HAVE_LIBMAGIC */
 
   return type;

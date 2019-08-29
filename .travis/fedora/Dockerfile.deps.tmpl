@@ -11,6 +11,7 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	"libmodulemd >= 2.3" \
 	curl \
 	elinks \
+	file-devel \
 	gcc \
 	gcc-c++ \
 	git-core \
@@ -35,6 +36,7 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	python3-rpm-macros \
 	redhat-rpm-config \
 	rpm-build \
+	rpm-devel \
 	rpmdevtools \
 	ruby \
 	"rubygem(json)" \

@@ -37,6 +37,7 @@ test_cflags = [
   '-Werror=return-type',
   '-Werror=array-bounds',
   '-Werror=write-strings',
+  '-D_POSIX_SOURCE',
   '-DG_LOG_USE_STRUCTURED',
   '-DG_LOG_DOMAIN="libmodulemd"',
 ]
@@ -52,6 +53,12 @@ pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
 yaml = dependency('yaml-0.1')
 gtkdoc = dependency('gtk-doc')
+
+with_rpmio = get_option('rpmio')
+with_libmagic = get_option('libmagic')
+
+rpm = dependency('rpm', required : with_rpmio)
+magic = cc.find_library('magic', required : with_libmagic)
 
 glib_prefix = dependency('glib-2.0').get_pkgconfig_variable('prefix')
 glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')

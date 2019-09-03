@@ -24,6 +24,8 @@ pushd coverity
  COVERITY_SCAN_BRANCH_PATTERN=${COVERITY_SCAN_BRANCH_PATTERN:-master} \
  /usr/bin/travisci_build_coverity_scan.sh ||:
 
+ cat /builddir/coverity/cov-int/build-log.txt
+
 popd #coverity
 
 popd #builddir

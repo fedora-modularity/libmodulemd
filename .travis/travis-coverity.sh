@@ -10,7 +10,7 @@ JOB_NAME=${TRAVIS_JOB_NAME:-Fedora rawhide}
 
 # Always run the Coverity scan on Fedora Rawhide
 os_name=Fedora
-release=rawhide
+release=30 # Temporarily switch to 30 since it's breaking on Rawhide
 
 # Create an archive of the current checkout
 TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`

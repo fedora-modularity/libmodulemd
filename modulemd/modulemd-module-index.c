@@ -39,6 +39,10 @@
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
+
+#define MMD_YAML_SUFFIX ".yaml"
+
+
 struct _ModulemdModuleIndex
 {
   GObject parent_instance;
@@ -664,6 +668,81 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
 
   return modulemd_module_index_update_from_parser (
     self, &parser, strict, FALSE, failures, error);
+}
+
+
+gboolean
+modulemd_module_index_update_from_defaults_directory (
+  ModulemdModuleIndex *self,
+  const gchar *path,
+  gboolean strict,
+  const gchar *overrides_path,
+  GError **error)
+{
+  const gchar *filename = NULL;
+  g_autofree gchar *filepath = NULL;
+  g_autoptr (GDir) defdir = NULL;
+  g_autoptr (GDir) overridedir = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (ModulemdModuleIndex) override_idx = NULL;
+
+  /* Read the regular path first */
+  defdir = g_dir_open (path, 0, error);
+  if (!defdir)
+    {
+      return FALSE;
+    }
+
+  while ((filename = g_dir_read_name (defdir)) != NULL)
+    {
+      if (g_str_has_suffix (filename, MMD_YAML_SUFFIX))
+        {
+          filepath = g_build_path ("/", path, filename, NULL);
+          g_debug ("Reading defaults from %s", filepath);
+          if (!modulemd_module_index_update_from_file (
+                self, filepath, strict, &failures, error))
+            {
+              return FALSE;
+            }
+          g_clear_pointer (&failures, g_ptr_array_unref);
+          g_clear_pointer (&filepath, g_free);
+        }
+    }
+
+  if (overrides_path)
+    {
+      overridedir = g_dir_open (overrides_path, 0, error);
+      if (!overridedir)
+        {
+          return FALSE;
+        }
+
+      override_idx = modulemd_module_index_new ();
+      while ((filename = g_dir_read_name (overridedir)) != NULL)
+        {
+          if (g_str_has_suffix (filename, MMD_YAML_SUFFIX))
+            {
+              filepath = g_build_path ("/", overrides_path, filename, NULL);
+              g_debug ("Reading default overrides from %s", filepath);
+              if (!modulemd_module_index_update_from_file (
+                    override_idx, filepath, strict, &failures, error))
+                {
+                  return FALSE;
+                }
+              g_clear_pointer (&failures, g_ptr_array_unref);
+              g_clear_pointer (&filepath, g_free);
+            }
+        }
+
+      if (!modulemd_module_index_merge (
+            override_idx, self, TRUE, FALSE, error))
+        {
+          return FALSE;
+        }
+    }
+
+
+  return TRUE;
 }
 
 

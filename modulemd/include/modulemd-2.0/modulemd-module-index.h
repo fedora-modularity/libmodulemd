@@ -247,6 +247,42 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
 
 
 /**
+ * modulemd_module_index_update_from_defaults_directory:
+ * @self: This #ModulemdModuleIndex object.
+ * @path: (in): The path to a directory containing defaults documents.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
+ * @overrides_path: (in) (nullable): If non-NULL, the path to a directory
+ * containing defaults documents that should override those in @path.
+ * @error: (out): A #GError indicating why this function failed.
+ *
+ * This function will open the directory at @path and iterate through it,
+ * adding any files with the suffix ".yaml" to @self. If @overrides_path is
+ * non-NULL, it will also open any files with the suffix ".yaml" in that
+ * location and import them, overriding any conflicts with the existing
+ * defaults.
+ *
+ * Note: If you need detailed information about what failed and why, it is
+ * better to implement the directory traversal yourself and use the
+ * modulemd_module_index_update_from_file() function, as it will return the
+ * failures information.
+ *
+ * Returns: TRUE if all ".yaml" files in the directory were imported
+ * successfully (this includes if no ".yaml" files were present). FALSE if one
+ * or more files could not be read successfully and sets @error appropriately.
+ *
+ * Since: 2.8
+ */
+gboolean
+modulemd_module_index_update_from_defaults_directory (
+  ModulemdModuleIndex *self,
+  const gchar *path,
+  gboolean strict,
+  const gchar *overrides_path,
+  GError **error);
+
+
+/**
  * modulemd_module_index_dump_to_string:
  * @self: This #ModulemdModuleIndex object.
  * @error: (out): A #GError containing the reason the function failed, NULL if

@@ -122,6 +122,72 @@ profiles:
             yaml = idx.dump_to_string()
             self.assertIsNone(yaml)
 
+    def test_update_from_defaults_directory(self):
+        idx = Modulemd.ModuleIndex.new()
+        self.assertIsNotNone(idx)
+
+        # First, verify that it works without overrides
+        ret = idx.update_from_defaults_directory(
+            path=path.join(self.test_data_path, 'defaults'),
+            strict=True)
+        self.assertTrue(ret)
+
+        # There should be three modules here: meson, ninja and nodejs
+        self.assertEqual(len(idx.get_module_names()), 3)
+        self.assertIn('meson', idx.get_module_names())
+        self.assertIn('ninja', idx.get_module_names())
+        self.assertIn('nodejs', idx.get_module_names())
+
+        # Check default streams
+        defs = idx.get_default_streams()
+        self.assertIn('meson', defs)
+        self.assertEqual('latest', defs['meson'])
+        self.assertIn('ninja', defs)
+        self.assertEqual('latest', defs['ninja'])
+        self.assertNotIn('nodejs', defs)
+
+        # Now add overrides too
+        # First, verify that it works without overrides
+        ret = idx.update_from_defaults_directory(
+            path=path.join(
+                self.test_data_path, 'defaults'), overrides_path=path.join(
+                self.test_data_path, 'defaults', 'overrides'), strict=True)
+        self.assertTrue(ret)
+
+        # There should be four modules here: meson, ninja, nodejs and
+        # testmodule
+        self.assertEqual(len(idx.get_module_names()), 4)
+        self.assertIn('meson', idx.get_module_names())
+        self.assertIn('ninja', idx.get_module_names())
+        self.assertIn('nodejs', idx.get_module_names())
+        self.assertIn('testmodule', idx.get_module_names())
+
+        # Check default streams
+        defs = idx.get_default_streams()
+        self.assertIn('meson', defs)
+        self.assertEqual('latest', defs['meson'])
+        self.assertIn('ninja', defs)
+        self.assertEqual('latest', defs['ninja'])
+        self.assertIn('nodejs', defs)
+        self.assertEqual('12', defs['nodejs'])
+        self.assertIn('testmodule', defs)
+        self.assertIn('teststream', defs['testmodule'])
+
+        # Nonexistent defaults dir
+        with self.assertRaisesRegexp(GLib.Error, 'No such file or directory'):
+            ret = idx.update_from_defaults_directory(
+                path=path.join(self.test_data_path, 'defaults_nonexistent'),
+                strict=True)
+            self.assertFalse(ret)
+
+        # Nonexistent override dir
+        with self.assertRaisesRegexp(GLib.Error, 'No such file or directory'):
+            ret = idx.update_from_defaults_directory(
+                path=path.join(self.test_data_path, 'defaults'),
+                overrides_path='overrides_nonexistent',
+                strict=True)
+            self.assertFalse(ret)
+
 
 if __name__ == '__main__':
     unittest.main()

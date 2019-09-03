@@ -1,0 +1,9 @@
+document: modulemd-defaults
+version: 1
+data:
+    modified: 201906261200
+    module: nodejs
+    profiles:
+        8: [default]
+        10: [default]
+        12: [default]

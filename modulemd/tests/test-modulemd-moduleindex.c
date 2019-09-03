@@ -1186,6 +1186,107 @@ test_module_index_read_compressed (void)
 }
 
 
+static void
+test_module_index_read_def_dir (void)
+{
+  g_autoptr (ModulemdModuleIndex) idx = modulemd_module_index_new ();
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *path =
+    g_build_path ("/", g_getenv ("TEST_DATA_PATH"), "defaults", NULL);
+  g_autofree gchar *overrides_path =
+    g_build_path ("/", path, "overrides", NULL);
+  g_auto (GStrv) module_names = NULL;
+  g_autoptr (GHashTable) defaultdict = NULL;
+
+  g_assert_nonnull (idx);
+
+  /* First verify that it works without overrides */
+  g_assert_true (modulemd_module_index_update_from_defaults_directory (
+    idx, path, TRUE, NULL, &error));
+  g_assert_no_error (error);
+
+  /* There should be three modules in the index now:
+   * - meson
+   * - ninja
+   * - nodejs
+   */
+  module_names = modulemd_module_index_get_module_names_as_strv (idx);
+  g_assert_nonnull (module_names);
+
+  g_assert_cmpint (g_strv_length (module_names), ==, 3);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "meson"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "ninja"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "nodejs"));
+
+  defaultdict =
+    modulemd_module_index_get_default_streams_as_hash_table (idx, NULL);
+  g_assert_nonnull (defaultdict);
+
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "meson"), ==, "latest");
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "ninja"), ==, "latest");
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "nodejs"), ==, NULL);
+
+  g_clear_pointer (&module_names, g_strfreev);
+  g_clear_pointer (&defaultdict, g_hash_table_unref);
+
+
+  /* Verify with overrides */
+  g_assert_true (modulemd_module_index_update_from_defaults_directory (
+    idx, path, TRUE, overrides_path, &error));
+  g_assert_no_error (error);
+
+  /* There should be four modules in the index now:
+   * - meson
+   * - ninja
+   * - nodejs
+   * - testmodule
+   */
+  module_names = modulemd_module_index_get_module_names_as_strv (idx);
+  g_assert_nonnull (module_names);
+
+  g_assert_cmpint (g_strv_length (module_names), ==, 4);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "meson"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "ninja"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "nodejs"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "testmodule"));
+
+  defaultdict =
+    modulemd_module_index_get_default_streams_as_hash_table (idx, NULL);
+  g_assert_nonnull (defaultdict);
+
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "meson"), ==, "latest");
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "ninja"), ==, "latest");
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "nodejs"), ==, "12");
+  g_assert_cmpstr (
+    g_hash_table_lookup (defaultdict, "testmodule"), ==, "teststream");
+
+  g_clear_pointer (&module_names, g_strfreev);
+  g_clear_pointer (&defaultdict, g_hash_table_unref);
+
+
+  /* Nonexistent defaults dir */
+  g_assert_false (modulemd_module_index_update_from_defaults_directory (
+    idx, "nonexistent", TRUE, NULL, &error));
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  g_clear_error (&error);
+
+  /* Nonexistent overrides dir */
+  g_assert_false (modulemd_module_index_update_from_defaults_directory (
+    idx, path, TRUE, "nonexistent", &error));
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  g_clear_error (&error);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1267,6 +1368,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/compressed",
                    test_module_index_read_compressed);
+
+  g_test_add_func ("/modulemd/v2/module/index/defaultdir",
+                   test_module_index_read_def_dir);
 
   return g_test_run ();
 }

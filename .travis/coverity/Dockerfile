@@ -1,4 +1,4 @@
-FROM fedora-modularity/libmodulemd-deps-rawhide
+FROM fedora-modularity/libmodulemd-deps-30
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 

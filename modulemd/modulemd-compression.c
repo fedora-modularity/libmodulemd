@@ -82,6 +82,14 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
   const char *mime_type;
   g_auto (magic_t) magic = NULL;
   int magic_fd = dup (fd);
+  if (magic_fd < 0)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MODULEMD_ERROR_MAGIC,
+                   "Could not dup() the file descriptor");
+      return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
+    }
 
   magic = magic_open (MAGIC_MIME);
   if (magic == NULL)

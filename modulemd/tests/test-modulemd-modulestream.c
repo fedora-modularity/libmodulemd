@@ -1537,7 +1537,7 @@ module_stream_v2_test_xmd_issue_290_with_example (void)
     modulemd_module_stream_v1_get_xmd (MODULEMD_MODULE_STREAM_V1 (stream)));
   modulemd_module_stream_v1_set_xmd (MODULEMD_MODULE_STREAM_V1 (stream), xmd);
 
-  modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_true (modulemd_module_index_add_module_stream (index, stream, &error));
   g_assert_no_error (error);
 
   output_yaml = modulemd_module_index_dump_to_string (index, &error);

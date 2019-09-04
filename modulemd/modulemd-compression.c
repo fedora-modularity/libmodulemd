@@ -256,14 +256,15 @@ compressed_stream_read_fn (void *data,
                            size_t *size_read)
 {
   FD_t rpmio_fd = (FD_t)data;
+  ssize_t read = Fread (buffer, sizeof (*buffer), size, rpmio_fd);
 
-  *size_read = Fread (buffer, sizeof (*buffer), size, rpmio_fd);
-
-  if (size_read < 0)
+  if (read < 0)
     {
       g_warning ("Got error [%d] reading the file", Ferror (rpmio_fd));
       return 0;
     }
+
+  *size_read = read;
 
   return 1;
 }

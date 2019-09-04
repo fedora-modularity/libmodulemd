@@ -96,12 +96,14 @@ static void
 test_compare (CommonMmdTestFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
+  ModulemdRpmMapEntry *entry_pointer;
   g_autoptr (ModulemdRpmMapEntry) entry2 = NULL;
   g_autoptr (ModulemdRpmMapEntry) entry3 = NULL;
 
   entry = modulemd_rpm_map_entry_new (
     "bar", 0, "1.23", "1.module_deadbeef", "x86_64");
   g_assert_nonnull (entry);
+  entry_pointer = entry;
 
   entry2 = modulemd_rpm_map_entry_new (
     "bar", 0, "1.23", "1.module_deadbeef", "x86_64");
@@ -112,7 +114,7 @@ test_compare (CommonMmdTestFixture *fixture, gconstpointer user_data)
   g_assert_nonnull (entry3);
 
   /* Test that passing the same pointer returns TRUE */
-  g_assert_true (modulemd_rpm_map_entry_equals (entry, entry));
+  g_assert_true (modulemd_rpm_map_entry_equals (entry, entry_pointer));
 
   /* Test that passing two equivalent entries returns TRUE */
   g_assert_true (modulemd_rpm_map_entry_equals (entry, entry2));

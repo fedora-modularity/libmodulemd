@@ -98,6 +98,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
                    MODULEMD_ERROR,
                    MODULEMD_ERROR_MAGIC,
                    "magic_open() failed: Cannot allocate the magic cookie");
+      close (magic_fd);
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
     }
 
@@ -108,6 +109,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
                    MODULEMD_ERROR_MAGIC,
                    "magic_load() failed: %s",
                    magic_error (magic));
+      close (magic_fd);
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
     }
 

@@ -671,6 +671,74 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
 }
 
 
+/*
+ * modules_from_directory:
+ * @path: A directory containing one or more modulemd YAML documents
+ * @file_suffix: A file suffix to limit the files to be read. Pass "" if you
+ * need to read all files.
+ * @strict: Whether to fail on unknown fields
+ * @strict_default_streams: Whether to fail on default stream merges.
+ * @error: Error return value
+ */
+static ModulemdModuleIndex *
+modules_from_directory (const gchar *path,
+                        const gchar *file_suffix,
+                        gboolean strict,
+                        gboolean strict_default_streams,
+                        GError **error)
+{
+  const gchar *filename = NULL;
+  g_autoptr (GDir) dir = NULL;
+  g_autofree gchar *filepath = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModuleIndex) intermediate = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  index = modulemd_module_index_new ();
+
+  /* Open the directory */
+  dir = g_dir_open (path, 0, &nested_error);
+  if (!dir)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
+  while ((filename = g_dir_read_name (dir)) != NULL)
+    {
+      if (g_str_has_suffix (filename, file_suffix))
+        {
+          intermediate = modulemd_module_index_new ();
+
+          filepath = g_build_path ("/", path, filename, NULL);
+          g_debug ("Reading modulemd from %s", filepath);
+          if (!modulemd_module_index_update_from_file (
+                intermediate, filepath, strict, &failures, error))
+            {
+              return FALSE;
+            }
+
+          if (!modulemd_module_index_merge (intermediate,
+                                            index,
+                                            FALSE,
+                                            strict_default_streams,
+                                            &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          g_clear_pointer (&failures, g_ptr_array_unref);
+          g_clear_pointer (&filepath, g_free);
+          g_clear_object (&intermediate);
+        }
+    }
+
+  return g_steal_pointer (&index);
+}
+
+
 gboolean
 modulemd_module_index_update_from_defaults_directory (
   ModulemdModuleIndex *self,
@@ -679,66 +747,46 @@ modulemd_module_index_update_from_defaults_directory (
   const gchar *overrides_path,
   GError **error)
 {
-  const gchar *filename = NULL;
-  g_autofree gchar *filepath = NULL;
-  g_autoptr (GDir) defdir = NULL;
-  g_autoptr (GDir) overridedir = NULL;
-  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (ModulemdModuleIndex) defaults_idx = NULL;
   g_autoptr (ModulemdModuleIndex) override_idx = NULL;
+  g_autoptr (GError) nested_error = NULL;
 
   /* Read the regular path first */
-  defdir = g_dir_open (path, 0, error);
-  if (!defdir)
+  defaults_idx = modules_from_directory (
+    path, MMD_YAML_SUFFIX, strict, strict, &nested_error);
+  if (!defaults_idx)
     {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
       return FALSE;
     }
 
-  while ((filename = g_dir_read_name (defdir)) != NULL)
-    {
-      if (g_str_has_suffix (filename, MMD_YAML_SUFFIX))
-        {
-          filepath = g_build_path ("/", path, filename, NULL);
-          g_debug ("Reading defaults from %s", filepath);
-          if (!modulemd_module_index_update_from_file (
-                self, filepath, strict, &failures, error))
-            {
-              return FALSE;
-            }
-          g_clear_pointer (&failures, g_ptr_array_unref);
-          g_clear_pointer (&filepath, g_free);
-        }
-    }
-
+  /* If an override path was provided, use that too */
   if (overrides_path)
     {
-      overridedir = g_dir_open (overrides_path, 0, error);
-      if (!overridedir)
+      override_idx = modules_from_directory (
+        overrides_path, MMD_YAML_SUFFIX, strict, strict, &nested_error);
+      if (!override_idx)
         {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
           return FALSE;
-        }
-
-      override_idx = modulemd_module_index_new ();
-      while ((filename = g_dir_read_name (overridedir)) != NULL)
-        {
-          if (g_str_has_suffix (filename, MMD_YAML_SUFFIX))
-            {
-              filepath = g_build_path ("/", overrides_path, filename, NULL);
-              g_debug ("Reading default overrides from %s", filepath);
-              if (!modulemd_module_index_update_from_file (
-                    override_idx, filepath, strict, &failures, error))
-                {
-                  return FALSE;
-                }
-              g_clear_pointer (&failures, g_ptr_array_unref);
-              g_clear_pointer (&filepath, g_free);
-            }
         }
 
       if (!modulemd_module_index_merge (
-            override_idx, self, TRUE, FALSE, error))
+            override_idx, defaults_idx, TRUE, strict, &nested_error))
         {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
           return FALSE;
         }
+    }
+
+  /* Now that we've verified that the content in the two paths is compatible,
+   * attempt to merge it into the existing index.
+   */
+  if (!modulemd_module_index_merge (
+        defaults_idx, self, TRUE, strict, &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
     }
 
 

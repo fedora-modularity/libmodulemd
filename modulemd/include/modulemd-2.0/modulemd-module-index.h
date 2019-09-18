@@ -251,7 +251,7 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
  * @self: This #ModulemdModuleIndex object.
  * @path: (in): The path to a directory containing defaults documents.
  * @strict: (in): Whether the parser should return failure if it encounters an
- * unknown mapping key or if it should ignore it.
+ * unknown mapping key or a conflict in module default streams.
  * @overrides_path: (in) (nullable): If non-NULL, the path to a directory
  * containing defaults documents that should override those in @path.
  * @error: (out): A #GError indicating why this function failed.

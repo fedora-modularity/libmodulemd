@@ -1193,6 +1193,8 @@ test_module_index_read_def_dir (void)
   g_autoptr (GError) error = NULL;
   g_autofree gchar *path =
     g_build_path ("/", g_getenv ("TEST_DATA_PATH"), "defaults", NULL);
+  g_autofree gchar *bad_path =
+    g_build_path ("/", g_getenv ("TEST_DATA_PATH"), "bad_defaults", NULL);
   g_autofree gchar *overrides_path =
     g_build_path ("/", path, "overrides", NULL);
   g_auto (GStrv) module_names = NULL;
@@ -1213,14 +1215,14 @@ test_module_index_read_def_dir (void)
   module_names = modulemd_module_index_get_module_names_as_strv (idx);
   g_assert_nonnull (module_names);
 
-  g_assert_cmpint (g_strv_length (module_names), ==, 3);
-
   g_assert_true (
     g_strv_contains ((const gchar *const *)module_names, "meson"));
   g_assert_true (
     g_strv_contains ((const gchar *const *)module_names, "ninja"));
   g_assert_true (
     g_strv_contains ((const gchar *const *)module_names, "nodejs"));
+
+  g_assert_cmpint (g_strv_length (module_names), ==, 3);
 
   defaultdict =
     modulemd_module_index_get_default_streams_as_hash_table (idx, NULL);
@@ -1248,8 +1250,6 @@ test_module_index_read_def_dir (void)
   module_names = modulemd_module_index_get_module_names_as_strv (idx);
   g_assert_nonnull (module_names);
 
-  g_assert_cmpint (g_strv_length (module_names), ==, 4);
-
   g_assert_true (
     g_strv_contains ((const gchar *const *)module_names, "meson"));
   g_assert_true (
@@ -1258,6 +1258,8 @@ test_module_index_read_def_dir (void)
     g_strv_contains ((const gchar *const *)module_names, "nodejs"));
   g_assert_true (
     g_strv_contains ((const gchar *const *)module_names, "testmodule"));
+
+  g_assert_cmpint (g_strv_length (module_names), ==, 4);
 
   defaultdict =
     modulemd_module_index_get_default_streams_as_hash_table (idx, NULL);
@@ -1284,6 +1286,65 @@ test_module_index_read_def_dir (void)
     idx, path, TRUE, "nonexistent", &error));
   g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
   g_clear_error (&error);
+
+
+  g_clear_object (&idx);
+  idx = modulemd_module_index_new ();
+  g_assert_nonnull (idx);
+
+  /* Base directory contains two defaults with conflicting streams for the
+   * same module in separate files. Strict mode.
+   */
+  g_assert_false (modulemd_module_index_update_from_defaults_directory (
+    idx, bad_path, TRUE, NULL, &error));
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_clear_error (&error);
+
+  /* Verify that the index has not been modified as a side-effect */
+  module_names = modulemd_module_index_get_module_names_as_strv (idx);
+  g_assert_cmpint (g_strv_length (module_names), ==, 0);
+
+  g_clear_pointer (&module_names, g_strfreev);
+  g_clear_object (&idx);
+  idx = modulemd_module_index_new ();
+  g_assert_nonnull (idx);
+
+  /* Base directory contains two defaults with conflicting streams for the
+   * same module in separate files. Non-strict mode.
+   */
+  g_assert_true (modulemd_module_index_update_from_defaults_directory (
+    idx, bad_path, FALSE, NULL, &error));
+  g_assert_no_error (error);
+
+
+  /* There should be three modules in the index now:
+   * - meson
+   * - ninja
+   * - nodejs
+   */
+  module_names = modulemd_module_index_get_module_names_as_strv (idx);
+  g_assert_nonnull (module_names);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "meson"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "ninja"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_names, "nodejs"));
+
+  g_assert_cmpint (g_strv_length (module_names), ==, 3);
+
+  defaultdict =
+    modulemd_module_index_get_default_streams_as_hash_table (idx, NULL);
+  g_assert_nonnull (defaultdict);
+
+  /* Make sure that in non-strict mode, meson's default is reset to NULL */
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "meson"), ==, NULL);
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "ninja"), ==, "latest");
+  g_assert_cmpstr (g_hash_table_lookup (defaultdict, "nodejs"), ==, NULL);
+
+  g_clear_pointer (&module_names, g_strfreev);
+  g_clear_pointer (&defaultdict, g_hash_table_unref);
 }
 
 

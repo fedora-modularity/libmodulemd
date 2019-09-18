@@ -37,8 +37,8 @@
  */
 ModulemdRpmMapEntry *
 modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
-                             gboolean strict,
-                             GError **error);
+                                   gboolean strict,
+                                   GError **error);
 
 
 /**

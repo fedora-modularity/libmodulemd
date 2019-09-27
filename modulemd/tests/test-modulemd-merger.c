@@ -14,6 +14,8 @@
 #include <glib.h>
 #include <yaml.h>
 
+#include "modulemd-defaults.h"
+#include "modulemd-defaults-v1.h"
 #include "modulemd-module-index.h"
 #include "modulemd-module-index-merger.h"
 #include "private/test-utils.h"
@@ -100,6 +102,142 @@ merger_test_deduplicate (CommonMmdTestFixture *fixture,
 }
 
 
+static void
+merger_test_add_only (void)
+{
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) add_only_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *httpd = NULL;
+  ModulemdDefaults *httpd_defs = NULL;
+  g_autofree gchar *base_yaml =
+    g_strdup_printf ("%s/merger/base.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *add_only_yaml =
+    g_strdup_printf ("%s/merger/add_only.yaml", g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_only_idx, add_only_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (merger, add_only_idx, 0);
+
+  merged_idx = modulemd_module_index_merger_resolve_ext (merger, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  httpd = modulemd_module_index_get_module (merged_idx, "httpd");
+  g_assert_nonnull (httpd);
+
+  httpd_defs = modulemd_module_get_defaults (httpd);
+  g_assert_nonnull (httpd_defs);
+
+  g_assert_cmpstr (modulemd_defaults_v1_get_default_stream (
+                     MODULEMD_DEFAULTS_V1 (httpd_defs), NULL),
+                   ==,
+                   "2.8");
+
+  g_assert_cmpstr (modulemd_defaults_v1_get_default_stream (
+                     MODULEMD_DEFAULTS_V1 (httpd_defs), "workstation"),
+                   ==,
+                   "2.4");
+}
+
+
+static void
+merger_test_add_conflicting_stream (void)
+{
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) add_conflicting_idx =
+    modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *psql = NULL;
+  ModulemdDefaults *psql_defs = NULL;
+  g_autofree gchar *base_yaml =
+    g_strdup_printf ("%s/merger/base.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *add_conflicting_yaml = g_strdup_printf (
+    "%s/merger/add_conflicting_stream.yaml", g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (
+    merger, add_conflicting_idx, 0);
+
+  merged_idx =
+    modulemd_module_index_merger_resolve_ext (merger, FALSE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  psql = modulemd_module_index_get_module (merged_idx, "postgresql");
+  g_assert_nonnull (psql);
+
+  psql_defs = modulemd_module_get_defaults (psql);
+  g_assert_nonnull (psql_defs);
+
+  g_assert_null (modulemd_defaults_v1_get_default_stream (
+    MODULEMD_DEFAULTS_V1 (psql_defs), NULL));
+}
+
+
+static void
+merger_test_add_conflicting_stream_and_profile_modified (void)
+{
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) add_conflicting_idx =
+    modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *psql = NULL;
+  ModulemdDefaults *psql_defs = NULL;
+  g_autofree gchar *base_yaml =
+    g_strdup_printf ("%s/merger/base.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *add_conflicting_yaml = g_strdup_printf (
+    "%s/merger/add_conflicting_stream_and_profile_modified.yaml",
+    g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (
+    merger, add_conflicting_idx, 0);
+
+  merged_idx =
+    modulemd_module_index_merger_resolve_ext (merger, FALSE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  psql = modulemd_module_index_get_module (merged_idx, "postgresql");
+  g_assert_nonnull (psql);
+
+  psql_defs = modulemd_module_get_defaults (psql);
+  g_assert_nonnull (psql_defs);
+
+  g_assert_cmpstr (modulemd_defaults_v1_get_default_stream (
+                     MODULEMD_DEFAULTS_V1 (psql_defs), NULL),
+                   ==,
+                   "8.2");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -123,6 +261,15 @@ main (int argc, char *argv[])
               NULL,
               merger_test_deduplicate,
               NULL);
+
+  g_test_add_func ("/modulemd/module/index/merger/add_only",
+                   merger_test_add_only);
+
+  g_test_add_func ("/modulemd/module/index/merger/add_conflicting_stream",
+                   merger_test_add_conflicting_stream);
+
+  g_test_add_func ("/modulemd/module/index/merger/add_conflicting_both",
+                   merger_test_add_conflicting_stream_and_profile_modified);
 
   return g_test_run ();
 }

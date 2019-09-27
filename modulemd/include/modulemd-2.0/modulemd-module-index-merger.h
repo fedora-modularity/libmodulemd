@@ -51,35 +51,48 @@ G_BEGIN_DECLS
  * there exists two #ModulemdModuleStream entries that have different content
  * for the same NSVC, the behavior is undefined.
  *
- * Merging #ModulemdDefaults entries behaves as follows:
+ * Merging #ModulemdDefaults entries behaves as follows (note that this
+ * behavior has changed slightly as of 2.8.1):
  *
- * - Within a ModuleIndex, if two or more default entries reference the same
- *   module, the one with the highest modified field will be used and the
- *   others discarded.
- * - When merging ModuleIndexes, if two or more indexes contain Defaults for
- *   the same module, but different modified values, the one with the highest
- *   modified value will be used and the others discarded.
- * - Any module default that is provided by a single repository is
- *   authoritative.
- * - If the repos have different priorities (not common), then the default for
- *   this module and stream name coming from the repo of higher priority will
- *   be used and the default from the lower-priority repo will not be included
- *   even if it has a higher modified value.
+ * - Any module defaults object that is provided by a single
+ *   #ModulemdModuleIndex will be the defaults object in the resulting merged
+ *   #ModulemdModuleIndex.
+ * - If the #ModulemdModuleIndex inputs have different priorities (not common),
+ *   then the defaults from the highest priority #ModulemdModuleIndex will be
+ *   used and the others entirely discarded. The `modified` value will not be
+ *   considered at all. (Priority is intended for providing a total override,
+ *   including an on-disk configuration).
  * - If the repos have the same priority (such as "fedora" and "updates" in the
- *   Fedora Project) and modified value, the entries will be merged as follows:
- *   - If both repositories specify the same default stream for the module, use
- *     it.
- *   - If either repository specifies a default stream for the module and the
- *     other does not, use the one specified.
- *   - If both repositories specify different default streams, the merge will
- *     unset the default stream and proceed with the merge.
- *   - If both repositories specify a set of default profiles for a stream and
- *     the sets are equivalent, use that set.
- *   - If one repository specifies a set of default profiles for a stream and
- *     the other does not, use the one specified.
- *   - If both repositories specify a set of default profiles for a stream and
- *     each are providing a different set, this is an unresolvable merge
- *     conflict and the merge resolution will fail and report an error.
+ *   Fedora Project) and `modified` value, the entries will be merged as
+ *   follows for default streams:
+ *   - If both #ModulemdModuleIndex objects specify the same default stream for
+ *     the module, that one will be used.
+ *   - If either #ModulemdModuleIndex specifies a default stream for the module
+ *     and the other does not, the provided one will be used.
+ *   - If both #ModulemdModuleIndex objects specify different default streams
+ *     and have different `modified` values, the default stream from the
+ *     #ModulemdDefaults object with the higher `modified` value will be used.
+ *   - If both #ModulemdModuleIndex objects specify different default streams
+ *     and have the same `modified` value, the merge will unset the default
+ *     stream and leave no default stream in the resulting merged
+ *     #ModulemdModuleIndex. This behavior can be controlled by using
+ *     modulemd_module_index_merger_resolve_ext() and setting
+ *     `strict_default_streams` to #TRUE. In that case, an error will be
+ *     returned if conflicting default streams have been provided.
+ * - and for profile defaults:
+ *   - If both #ModulemdModuleIndex objects specify a set of default profiles
+ *     for a particular module and stream and the sets are equivalent, use that
+ *     set.
+ *   - If one #ModulemdModuleIndex object specifies a set of default profiles
+ *     for a module and stream and the other does not, use the provided set.
+ *   - If both #ModulemdModuleIndex objects specify a set of default profiles
+ *     for a stream, each are providing a different set and the `modified`
+ *     value differs, the set from the object with the higher `modified` value
+ *     will be used.
+ *   - If both #ModulemdModuleIndex objects specify a set of default profiles
+ *     for a stream, each are providing a different set and the `modified`
+ *     value is the same, this is an unresolvable merge conflict and the merge
+ *     resolution will fail and return an error.
  *   - Intents behave in exactly the same manner as described for the top-level
  *     defaults, except that they merge beneath each intent name.
  *

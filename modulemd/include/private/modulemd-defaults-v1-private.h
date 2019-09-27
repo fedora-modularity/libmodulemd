@@ -72,7 +72,6 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
 
 /**
  * modulemd_defaults_v1_merge:
- * @module_name: (in): The name of the module for which defaults are being merged.
  * @from: (in): A #ModulemdDefaultsV1 object to merge from.
  * @into: (in): A #ModulemdDefaultsV1 object being merged into.
  * @strict_default_streams: (in): Whether a stream conflict should throw an
@@ -92,8 +91,7 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
  * Since: 2.0
  */
 ModulemdDefaults *
-modulemd_defaults_v1_merge (const gchar *module_name,
-                            ModulemdDefaultsV1 *from,
+modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
                             ModulemdDefaultsV1 *into,
                             gboolean strict_default_streams,
                             GError **error);

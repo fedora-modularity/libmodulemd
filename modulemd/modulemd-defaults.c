@@ -397,9 +397,6 @@ modulemd_defaults_merge (ModulemdDefaults *from,
 {
   g_autoptr (ModulemdDefaults) merged_defaults = NULL;
   guint64 mdversion;
-  const gchar *module_name = NULL;
-  guint64 from_modified;
-  guint64 into_modified;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (from), NULL);
@@ -417,36 +414,19 @@ modulemd_defaults_merge (ModulemdDefaults *from,
                         NULL);
   g_return_val_if_fail (mdversion == MD_DEFAULTS_VERSION_ONE, NULL);
 
-  from_modified = modulemd_defaults_get_modified (from);
-  into_modified = modulemd_defaults_get_modified (into);
-
-  if (from_modified > into_modified)
-    {
-      /* Just return 'from' if it has a higher modified value */
-      return modulemd_defaults_copy (from);
-    }
-  else if (into_modified > from_modified)
-    {
-      /* Just return 'into' if it has a higher modified value */
-      return modulemd_defaults_copy (into);
-    }
-
-  /* Modified value is the same, so we need to merge */
-
-  module_name = modulemd_defaults_get_module_name (into);
-  if (!g_str_equal (module_name, modulemd_defaults_get_module_name (from)))
+  if (!g_str_equal (modulemd_defaults_get_module_name (into),
+                    modulemd_defaults_get_module_name (from)))
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MODULEMD_ERROR_VALIDATE,
                    "Module name mismatch in merge: %s != %s",
-                   module_name,
+                   modulemd_defaults_get_module_name (into),
                    modulemd_defaults_get_module_name (from));
       return NULL;
     }
 
-  merged_defaults = modulemd_defaults_v1_merge (module_name,
-                                                MODULEMD_DEFAULTS_V1 (from),
+  merged_defaults = modulemd_defaults_v1_merge (MODULEMD_DEFAULTS_V1 (from),
                                                 MODULEMD_DEFAULTS_V1 (into),
                                                 strict_default_streams,
                                                 &nested_error);

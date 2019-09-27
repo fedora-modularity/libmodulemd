@@ -1,0 +1,8 @@
+---
+document: modulemd-defaults
+version: 1
+data:
+    module: httpd
+    stream: 2.8
+    profiles:
+        '2.10': [notreal]

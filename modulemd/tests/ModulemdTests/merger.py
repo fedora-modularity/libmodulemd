@@ -14,6 +14,7 @@
 
 from os import path
 import sys
+import logging
 try:
     import unittest
     import gi
@@ -230,6 +231,124 @@ data:
 
         with self.assertRaisesRegexp(gi.repository.GLib.GError, "Default stream mismatch in module python"):
             merger.resolve_ext(True)
+
+    def test_merge_add_only(self):
+        base_idx = Modulemd.ModuleIndex()
+        self.assertTrue(base_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "base.yaml"), True))
+
+        add_only_idx = Modulemd.ModuleIndex()
+        self.assertTrue(add_only_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "add_only.yaml"), True))
+
+        merger = Modulemd.ModuleIndexMerger()
+        merger.associate_index(base_idx, 0)
+        merger.associate_index(add_only_idx, 0)
+
+        merged_idx = merger.resolve()
+        self.assertIsNotNone(merged_idx)
+
+        httpd = merged_idx.get_module('httpd')
+        self.assertIsNotNone(httpd)
+        httpd_defs = httpd.get_defaults()
+
+        self.assertEqual(httpd_defs.get_default_stream(), "2.8")
+        expected_profile_defs = {
+            '2.2': set(['client', 'server']),
+            '2.8': set(['notreal', ]),
+            '2.10': set(['notreal', ])
+        }
+
+        for stream in expected_profile_defs.keys():
+            self.assertEqual(set(httpd_defs.get_default_profiles_for_stream(
+                stream)), expected_profile_defs[stream])
+
+        self.assertEqual(httpd_defs.get_default_stream("workstation"), "2.4")
+
+    def test_merge_add_conflicting_stream(self):
+        base_idx = Modulemd.ModuleIndex()
+        self.assertTrue(base_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "base.yaml"), True))
+
+        add_only_idx = Modulemd.ModuleIndex()
+        self.assertTrue(add_only_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "add_conflicting_stream.yaml"), True))
+
+        merger = Modulemd.ModuleIndexMerger()
+        merger.associate_index(base_idx, 0)
+        merger.associate_index(add_only_idx, 0)
+
+        merged_idx = merger.resolve()
+        self.assertIsNotNone(merged_idx)
+
+        psql = merged_idx.get_module('postgresql')
+        self.assertIsNotNone(psql)
+
+        psql_defs = psql.get_defaults()
+        self.assertIsNotNone(psql_defs)
+
+        self.assertIsNone(psql_defs.get_default_stream())
+
+        expected_profile_defs = {
+            '8.1': set(['client', 'server', 'foo']),
+            '8.2': set(['client', 'server', 'foo']),
+        }
+
+        for stream in expected_profile_defs.keys():
+            self.assertEqual(set(psql_defs.get_default_profiles_for_stream(
+                stream)), expected_profile_defs[stream])
+
+    def test_merge_add_conflicting_stream_and_profile_modified(self):
+        base_idx = Modulemd.ModuleIndex()
+        self.assertTrue(base_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "base.yaml"), True))
+
+        add_conflicting_idx = Modulemd.ModuleIndex()
+        self.assertTrue(add_conflicting_idx.update_from_file(
+            path.join(
+                self.test_data_path,
+                "merger",
+                "add_conflicting_stream_and_profile_modified.yaml"), True))
+
+        merger = Modulemd.ModuleIndexMerger()
+        merger.associate_index(base_idx, 0)
+        merger.associate_index(add_conflicting_idx, 0)
+
+        merged_idx = merger.resolve()
+        self.assertIsNotNone(merged_idx)
+
+        psql = merged_idx.get_module('postgresql')
+        self.assertIsNotNone(psql)
+
+        psql_defs = psql.get_defaults()
+        self.assertIsNotNone(psql_defs)
+
+        self.assertEqual(psql_defs.get_default_stream(), '8.2')
+
+        expected_profile_defs = {
+            '8.1': set(['client', 'server']),
+            '8.2': set(['client', 'server', 'foo']),
+            '8.3': set(['client', 'server']),
+        }
+
+        for stream in expected_profile_defs:
+            self.assertEqual(set(psql_defs.get_default_profiles_for_stream(
+                stream)), expected_profile_defs[stream])
 
 
 if __name__ == '__main__':

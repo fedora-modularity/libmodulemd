@@ -35,16 +35,16 @@ pushd $SCRIPT_DIR/..
 git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
 popd
 
-sed -e "s/@IMAGE@/$repository\/$MMD_OS:$release/" \
-    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$release
+sed -e "s/@IMAGE@/$repository\/$MMD_OS:$MMD_RELEASE/" \
+    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE
 
 sudo docker build \
-    -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$release \
-    -t fedora-modularity/libmodulemd-deps-$MMD_OS:$release .
+    -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
+    -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
 
 sudo docker build \
     -f $SCRIPT_DIR/docs/Dockerfile \
-    -t fedora-modularity/libmodulemd-docs-$MMD_OS:$release \
+    -t fedora-modularity/libmodulemd-docs-$MMD_OS:$MMD_RELEASE \
     --build-arg TARBALL=$TARBALL .
 
 

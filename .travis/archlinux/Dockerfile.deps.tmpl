@@ -2,8 +2,6 @@ FROM @IMAGE@
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-ARG TARBALL
-
 RUN pacman -Syu --needed --noconfirm \
 	base-devel \
 	file \

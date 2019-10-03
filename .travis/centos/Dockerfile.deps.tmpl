@@ -2,8 +2,6 @@ FROM @IMAGE@
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-ARG TARBALL
-
 RUN yum -y install epel-release \
     && yum -y --setopt=tsflags='' install \
         clang \

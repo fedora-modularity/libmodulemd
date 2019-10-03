@@ -2,15 +2,8 @@
 
 #Exit on failures
 set -e
-
 set -x
 
-
-JOB_NAME=${TRAVIS_JOB_NAME:- Mageia 7}
-
-arr=($JOB_NAME)
-os_name=${arr[0]:-Mageia}
-release=${arr[1]:-7}
 
 COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
 

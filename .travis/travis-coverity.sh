@@ -19,7 +19,7 @@ function coverity_finalize {
     return $exitcode
 }
 
-trap docs_finalize EXIT
+trap coverity_finalize EXIT
 
 # Always run the Coverity scan on Fedora Rawhide
 MMD_OS=fedora

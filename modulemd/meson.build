@@ -480,19 +480,20 @@ configure_file(
   configuration : xcdata
 )
 
-gnome.gtkdoc(
-    'modulemd-2.0',
-    install_dir: 'modulemd-2.0',
-    src_dir : './modulemd',
-    main_xml : 'modulemd-docs.xml',
-    gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
-    dependencies : [
-        modulemd_dep,
-    ],
-    fixxref_args: [
-                 '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
-                 '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
-               ],
-    install : true,
-)
-
+if with_docs
+    gnome.gtkdoc(
+        'modulemd-2.0',
+        install_dir: 'modulemd-2.0',
+        src_dir : './modulemd',
+        main_xml : 'modulemd-docs.xml',
+        gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
+        dependencies : [
+            modulemd_dep,
+        ],
+        fixxref_args: [
+                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
+                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
+                   ],
+        install : true,
+    )
+endif

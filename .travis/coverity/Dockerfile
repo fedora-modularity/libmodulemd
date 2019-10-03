@@ -1,4 +1,4 @@
-FROM fedora-modularity/libmodulemd-deps-30
+FROM fedora-modularity/libmodulemd-deps-fedora:30
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 

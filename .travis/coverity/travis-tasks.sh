@@ -2,11 +2,8 @@
 
 #Exit on failures
 set -e
-
 set -x
 
-os_name=Fedora
-release=rawhide
 
 pushd /builddir/
 

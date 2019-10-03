@@ -2,8 +2,6 @@ FROM @IMAGE@
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-ARG TARBALL
-
 RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	clang \
 	clang-analyzer \

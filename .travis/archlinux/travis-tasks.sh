@@ -2,13 +2,7 @@
 
 #Exit on failures
 set -e
-
 set -x
-
-JOB_NAME=${TRAVIS_JOB_NAME:-Arch Linux}
-
-os_name='Arch Linux'
-release=base
 
 
 pushd /builddir/

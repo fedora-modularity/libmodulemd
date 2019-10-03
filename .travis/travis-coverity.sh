@@ -32,10 +32,10 @@ repository="registry.fedoraproject.org"
 
 # Create an archive of the current checkout
 MMD_TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`
-TARBALL=`basename $TARBALL_PATH`
+TARBALL=`basename $MMD_TARBALL_PATH`
 
 pushd $SCRIPT_DIR/..
-git ls-files |xargs tar cfj $TARBALL_PATH .git
+git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
 popd
 
 sed -e "s/@IMAGE@/$repository\/$MMD_OS:$MMD_RELEASE/" \
@@ -50,7 +50,7 @@ sudo docker build \
     -t fedora-modularity/libmodulemd-coverity \
     --build-arg TARBALL=$TARBALL .
 
-rm -f $TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE $SCRIPT_DIR/fedora/Dockerfile-$MMD_RELEASE
+rm -f $MMD_TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE $SCRIPT_DIR/fedora/Dockerfile-$MMD_RELEASE
 
 # Override the standard tasks with the Coverity scan
 docker run \

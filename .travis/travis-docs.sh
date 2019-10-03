@@ -53,7 +53,7 @@ docker run \
     -e TRAVIS=$TRAVIS \
     -e TRAVIS_COMMIT="$TRAVIS_COMMIT" \
     -e DOC_TOKEN="$DOC_TOKEN" \
-    --rm fedora-modularity/libmodulemd-docs
+    --rm fedora-modularity/libmodulemd-docs-$MMD_OS:$MMD_RELEASE
 
 popd
 

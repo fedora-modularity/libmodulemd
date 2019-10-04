@@ -61,3 +61,18 @@ __pycache__/
 /so_locations
 /stamp-h1
 /tags
+# Common config files for IDEs
+/.buildconfig
+/.project
+/.vscode
+/settings.json
+# Common meson build directories
+/build
+/debugbuild
+/x86_64
+/i*86
+/aarch64
+/armv7hl
+/ppc64le
+/s390*
+

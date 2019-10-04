@@ -523,11 +523,13 @@ configure_file(
   configuration : xcdata
 )
 
-gnome.gtkdoc(
-    'modulemd-1.0',
-    install_dir: 'modulemd-1.0',
-    src_dir : './modulemd',
-    main_xml : 'modulemd-docs.xml',
-    install : true,
+if with_docs
+    gnome.gtkdoc(
+        'modulemd-1.0',
+        install_dir: 'modulemd-1.0',
+        src_dir : './modulemd',
+        main_xml : 'modulemd-docs.xml',
+        install : true,
 )
+endif
 

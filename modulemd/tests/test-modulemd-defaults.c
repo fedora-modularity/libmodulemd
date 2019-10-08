@@ -913,7 +913,7 @@ modulemd_defaults_test_prioritizer_modified (DefaultsFixture *fixture,
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "2.4");
   htable = modulemd_defaults_peek_profile_defaults (defaults);
-  g_assert_cmpint (g_hash_table_size (htable), ==, 2);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 3);
   g_assert_true (g_hash_table_contains (htable, "2.2"));
   g_assert_true (modulemd_simpleset_contains (
     g_hash_table_lookup (htable, "2.2"), "client"));
@@ -924,7 +924,10 @@ modulemd_defaults_test_prioritizer_modified (DefaultsFixture *fixture,
     g_hash_table_lookup (htable, "2.2"), "client"));
   g_assert_true (modulemd_simpleset_contains (
     g_hash_table_lookup (htable, "2.4"), "server"));
-  g_assert_false (g_hash_table_contains (htable, "2.8"));
+  g_assert_true (g_hash_table_contains (htable, "2.8"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "2.8"), "notreal"));
+
 
   /* NODEJS */
   defaults = MODULEMD_DEFAULTS (g_ptr_array_index (merged_objects, 1));
@@ -956,14 +959,21 @@ modulemd_defaults_test_prioritizer_modified (DefaultsFixture *fixture,
   g_assert_cmpstr (
     modulemd_defaults_peek_default_stream (defaults), ==, "8.1");
   htable = modulemd_defaults_peek_profile_defaults (defaults);
-  g_assert_cmpint (g_hash_table_size (htable), ==, 1);
+  g_assert_cmpint (g_hash_table_size (htable), ==, 2);
   g_assert_true (g_hash_table_contains (htable, "8.1"));
   g_assert_true (modulemd_simpleset_contains (
     g_hash_table_lookup (htable, "8.1"), "client"));
   g_assert_true (modulemd_simpleset_contains (
     g_hash_table_lookup (htable, "8.1"), "server"));
-  g_assert_true (
+  g_assert_false (
     modulemd_simpleset_contains (g_hash_table_lookup (htable, "8.1"), "foo"));
+  g_assert_true (g_hash_table_contains (htable, "8.2"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.2"), "client"));
+  g_assert_true (modulemd_simpleset_contains (
+    g_hash_table_lookup (htable, "8.2"), "server"));
+  g_assert_true (
+    modulemd_simpleset_contains (g_hash_table_lookup (htable, "8.2"), "foo"));
 }
 
 

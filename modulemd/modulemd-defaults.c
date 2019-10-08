@@ -725,27 +725,36 @@ modulemd_defaults_copy (ModulemdDefaults *self)
 }
 
 
+static gboolean
+modulemd_defaults_merge_default_profiles (GHashTable *from_profile_defaults,
+                                          GHashTable *merged_profile_defaults,
+                                          guint64 from_modified,
+                                          guint64 into_modified,
+                                          GError **error);
+
+static void
+modulemd_defaults_merge_intent_default_streams (ModulemdIntent *from_intent,
+                                                ModulemdIntent *into_intent,
+                                                const gchar *intent_name,
+                                                guint64 from_modified,
+                                                guint64 into_modified);
+
 ModulemdDefaults *
 modulemd_defaults_merge (ModulemdDefaults *first,
                          ModulemdDefaults *second,
                          gboolean override,
                          GError **error)
 {
-  g_autoptr (ModulemdDefaults) defaults = NULL;
-  GHashTable *profile_defaults = NULL;
-  g_autoptr (GHashTable) intents = NULL;
-  ModulemdIntent *base_intent = NULL;
-  ModulemdIntent *merge_intent = NULL;
-  g_autoptr (ModulemdIntent) new_intent = NULL;
-  g_autoptr (GHashTable) base_profiles = NULL;
-  GHashTable *merge_profiles = NULL;
+  g_autoptr (ModulemdDefaults) merged = NULL;
+  ModulemdIntent *from_intent = NULL;
+  ModulemdIntent *merged_intent = NULL;
   const gchar *intent_name = NULL;
-  ModulemdSimpleSet *profile = NULL;
-  GHashTableIter iter, profile_iter;
-  gpointer key, value, orig_value, prof_key, prof_value;
+  GHashTableIter iter;
+  gpointer key, value;
 
-  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (first), NULL);
-  g_return_val_if_fail (MODULEMD_IS_DEFAULTS (second), NULL);
+
+  g_return_val_if_fail (first && MODULEMD_IS_DEFAULTS (first), NULL);
+  g_return_val_if_fail (second && MODULEMD_IS_DEFAULTS (second), NULL);
 
   if (override)
     {
@@ -755,156 +764,250 @@ modulemd_defaults_merge (ModulemdDefaults *first,
       return modulemd_defaults_copy (second);
     }
 
-  /* Compare modified values */
-  if (modulemd_defaults_get_modified (first) >
-      modulemd_defaults_get_modified (second))
+  /* Start from a copy of the base */
+  merged = modulemd_defaults_copy (first);
+
+  /* == Merge default streams == */
+  if (second->default_stream && !merged->default_stream)
     {
-      /* If first has a higher modified value, return a copy of it */
-      return modulemd_defaults_copy (first);
+      /* Only the second Defaults had a default stream, so set that */
+      modulemd_defaults_set_default_stream (merged, second->default_stream);
     }
-  else if (modulemd_defaults_get_modified (second) >
-           modulemd_defaults_get_modified (first))
+  else if (merged->default_stream && second->default_stream)
     {
-      /* If second has a higher modified value, return a copy of it */
-      return modulemd_defaults_copy (second);
-    }
+      /* Both of them had a defaults set */
 
-
-  /* They had the same 'modified' value (such as both zero, for
-   * backwards-compatibility with 1.7.x and older.
-   * Merge them as best we can.
-   */
-
-  defaults = modulemd_defaults_copy (first);
-
-  /* First check for incompatibilities with the streams */
-  if (g_strcmp0 (first->default_stream, second->default_stream))
-    {
-      /* Default streams don't match and override is not set.
-       * Return an error
+      /* Shortcut past if we already know there are conflicts in this
+       * default stream.
        */
-      /* They have conflicting default streams */
-      g_info ("Module stream mismatch in merge: %s != %s",
-              first->default_stream,
-              second->default_stream);
-      modulemd_defaults_set_default_stream (defaults, DEFAULT_MERGE_CONFLICT);
-    }
-
-  /* Merge the profile defaults */
-  profile_defaults = modulemd_defaults_peek_profile_defaults (defaults);
-
-  g_hash_table_iter_init (&iter,
-                          modulemd_defaults_peek_profile_defaults (second));
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      orig_value = g_hash_table_lookup (profile_defaults, key);
-      if (orig_value)
+      if (!g_str_equal (merged->default_stream, DEFAULT_MERGE_CONFLICT))
         {
-          /* This key already exists in the first defaults object.
-           * Check whether they have identical values
+          /* If second has a higher modified value, use its value.
+           * If first has a higher modified value, it's already saved in
+           * merged from the copy()
            */
-          if (!modulemd_simpleset_is_equal (orig_value, value))
+          if (second->modified > first->modified)
             {
-              g_set_error (error,
-                           MODULEMD_DEFAULTS_ERROR,
-                           MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES,
-                           "Conflicting profile defaults when merging "
-                           "defaults for module %s",
-                           modulemd_defaults_peek_module_name (first));
-              return NULL;
+              modulemd_defaults_set_default_stream (merged,
+                                                    second->default_stream);
+            }
+          else if (first->modified == second->modified)
+            {
+              if (!g_str_equal (first->default_stream, second->default_stream))
+                {
+                  /* They have conflicting default streams */
+                  g_info ("Module stream mismatch in merge: %s != %s",
+                          first->default_stream,
+                          second->default_stream);
+
+                  /* Set the special conflicting value */
+                  modulemd_defaults_set_default_stream (
+                    merged, DEFAULT_MERGE_CONFLICT);
+                }
+              /* Otherwise, they are the same and merged will have the correct
+               * value from the copy()
+               */
             }
         }
-      else
-        {
-          /* This key is new. Add it */
-          g_hash_table_replace (profile_defaults,
-                                g_strdup (key),
-                                g_object_ref (MODULEMD_SIMPLESET (value)));
-        }
+    }
+  /* If neither of the above matched, both first and second had NULL for the
+   * default stream, so nothing to do
+   */
+
+
+  /* == Merge profile defaults == */
+  if (!modulemd_defaults_merge_default_profiles (second->profile_defaults,
+                                                 merged->profile_defaults,
+                                                 second->modified,
+                                                 first->modified,
+                                                 error))
+    {
+      return NULL;
     }
 
 
-  /* Merge intents */
-  intents = modulemd_defaults_dup_intents (defaults);
+  /* == Merge intent defaults == */
+
+  /* --- Merge intent default stream values --- */
+
+  /* Iterate through 'second', adding any new values and checking the existing
+   * ones for equivalence.
+   */
   g_hash_table_iter_init (&iter, modulemd_defaults_peek_intents (second));
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      merge_intent = MODULEMD_INTENT (value);
-      /* Check if this module name exists in the current table */
-      intent_name = modulemd_intent_peek_intent_name (merge_intent);
-      base_intent = g_hash_table_lookup (
-        intents, modulemd_intent_peek_intent_name (merge_intent));
+      g_return_val_if_fail (value && MODULEMD_IS_INTENT (value), FALSE);
 
-      if (!base_intent)
+      intent_name = (gchar *)key;
+      from_intent = MODULEMD_INTENT (value);
+
+      merged_intent = g_hash_table_lookup (merged->intents, intent_name);
+      if (!merged_intent)
         {
           /* This intent doesn't exist yet, so just add it completely. */
-          g_hash_table_insert (intents,
+          g_hash_table_insert (merged->intents,
                                g_strdup (intent_name),
-                               modulemd_intent_copy (merge_intent));
+                               modulemd_intent_copy (from_intent));
           continue;
         }
 
-      /* Compare the default stream for this intent */
-      if (g_strcmp0 (modulemd_intent_peek_default_stream (base_intent),
-                     modulemd_intent_peek_default_stream (merge_intent)))
+      /* Merge the intent default streams */
+      modulemd_defaults_merge_intent_default_streams (from_intent,
+                                                      merged_intent,
+                                                      intent_name,
+                                                      second->modified,
+                                                      first->modified);
+
+      /* Merge the intent default profiles */
+      if (!modulemd_defaults_merge_default_profiles (
+            modulemd_intent_peek_profile_defaults (from_intent),
+            modulemd_intent_peek_profile_defaults (merged_intent),
+            second->modified,
+            first->modified,
+            error))
         {
-          /* The streams didn't match, so bail out */
-          g_set_error (error,
-                       MODULEMD_DEFAULTS_ERROR,
-                       MODULEMD_DEFAULTS_ERROR_CONFLICTING_INTENT_STREAM,
-                       "Conflicting default stream for intent profile [%s]"
-                       "when merging defaults for module %s",
-                       (const gchar *)intent_name,
-                       modulemd_defaults_peek_module_name (first));
           return NULL;
         }
+    }
 
-      /* Construct a new Intent with the merged values which will replace
-       * the existing one at the end */
-      new_intent = modulemd_intent_copy (base_intent);
+  /* Set the modified value to the higher of the two provided */
+  if (second->modified > first->modified)
+    modulemd_defaults_set_modified (merged, second->modified);
 
-      /* Merge the profile definitions for this intent */
-      base_profiles = modulemd_intent_dup_profile_defaults (new_intent);
+  return g_steal_pointer (&merged);
+}
 
-      merge_profiles = modulemd_intent_peek_profile_defaults (merge_intent);
-      g_hash_table_iter_init (&profile_iter, merge_profiles);
-      while (g_hash_table_iter_next (&profile_iter, &prof_key, &prof_value))
+
+static gboolean
+modulemd_defaults_merge_default_profiles (GHashTable *from_profile_defaults,
+                                          GHashTable *merged_profile_defaults,
+                                          guint64 from_modified,
+                                          guint64 into_modified,
+                                          GError **error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  gchar *stream_name = NULL;
+  ModulemdSimpleSet *from_profiles = NULL;
+  ModulemdSimpleSet *merged_profiles = NULL;
+  ModulemdSimpleSet *copied_profiles = NULL;
+
+  g_hash_table_iter_init (&iter, from_profile_defaults);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      stream_name = (gchar *)key;
+      from_profiles = (ModulemdSimpleSet *)value;
+      merged_profiles =
+        g_hash_table_lookup (merged_profile_defaults, stream_name);
+
+      if (!merged_profiles)
         {
-          /* Check if this profile exists in this intent */
-          profile = g_hash_table_lookup (base_profiles, prof_key);
+          /* Didn't appear in the profiles list, so just add it to merged */
+          modulemd_simpleset_copy (from_profiles, &copied_profiles);
+          g_hash_table_insert (
+            merged_profile_defaults, g_strdup (stream_name), copied_profiles);
+          copied_profiles = NULL;
+          continue;
+        }
 
-          if (!profile)
+      /* Check to see if they match */
+      if (!modulemd_simpleset_is_equal (from_profiles, merged_profiles))
+        {
+          if (from_modified > into_modified)
             {
-              /* Add this profile to the intent */
-              modulemd_simpleset_copy (prof_value, &profile);
-              g_hash_table_insert (
-                base_profiles, g_strdup ((const gchar *)prof_key), profile);
+              modulemd_simpleset_copy (from_profiles, &copied_profiles);
+              g_hash_table_insert (merged_profile_defaults,
+                                   g_strdup (stream_name),
+                                   copied_profiles);
+              copied_profiles = NULL;
+            }
+          else if (into_modified > from_modified)
+            {
+              /* Already there, so just continue */
               continue;
             }
-
-          if (!modulemd_simpleset_is_equal (profile, prof_value))
+          else
             {
-              /* If we get here, the sets were unequal, so we need to fail */
+              /* The profile sets differed. This is an unresolvable merge
+               * conflict
+               */
               g_set_error (error,
                            MODULEMD_DEFAULTS_ERROR,
-                           MODULEMD_DEFAULTS_ERROR_CONFLICTING_INTENT_PROFILE,
-                           "Conflicting intent profile [%s:%s] when merging "
-                           "defaults for module %s",
-                           (const gchar *)intent_name,
-                           (const gchar *)prof_key,
-                           modulemd_defaults_peek_module_name (first));
-              return NULL;
+                           MODULEMD_DEFAULTS_ERROR_CONFLICTING_PROFILES,
+                           "Profile default mismatch in stream: %s",
+                           stream_name);
+              return FALSE;
             }
         }
 
-      modulemd_intent_set_profile_defaults (new_intent, base_profiles);
-      g_clear_pointer (&base_profiles, g_hash_table_unref);
-      g_hash_table_replace (
-        intents, g_strdup (intent_name), g_object_ref (new_intent));
-      g_clear_pointer (&new_intent, g_object_unref);
+      /* They were a complete match, so no need to add it a second time */
     }
 
-  modulemd_defaults_set_intents (defaults, intents);
+  return TRUE;
+}
 
-  return g_object_ref (defaults);
+static void
+modulemd_defaults_merge_intent_default_streams (ModulemdIntent *from_intent,
+                                                ModulemdIntent *into_intent,
+                                                const gchar *intent_name,
+                                                guint64 from_modified,
+                                                guint64 into_modified)
+{
+  const gchar *from_default_stream = NULL;
+  const gchar *into_default_stream = NULL;
+
+  g_return_if_fail (from_intent && MODULEMD_IS_INTENT (from_intent));
+  g_return_if_fail (into_intent && MODULEMD_IS_INTENT (into_intent));
+  g_return_if_fail (intent_name);
+
+  from_default_stream = modulemd_intent_peek_default_stream (from_intent);
+
+  /* If there is no new default stream, just jump to the next item */
+  if (!from_default_stream)
+    return;
+
+  into_default_stream = modulemd_intent_peek_default_stream (into_intent);
+
+
+  /* If a previous merge has already marked this as conflicting, just bail
+   * out here and move on to the next intent
+   */
+  if (g_str_equal (into_default_stream, DEFAULT_MERGE_CONFLICT))
+    return;
+
+
+  if (into_default_stream)
+    {
+      /* Both default stream names are present.
+       * If they are equal, there's nothing to do.
+       */
+
+      if (!g_str_equal (into_default_stream, from_default_stream))
+        {
+          if (from_modified > into_modified)
+            {
+              /* Set the default stream of from as the merged value */
+              modulemd_intent_set_default_stream (into_intent,
+                                                  from_default_stream);
+              return;
+            }
+          else if (into_modified == from_modified)
+            {
+              g_info (
+                "Module stream mismatch in merge: %s != %s for intent %s",
+                into_default_stream,
+                from_default_stream,
+                intent_name);
+              modulemd_intent_set_default_stream (into_intent,
+                                                  DEFAULT_MERGE_CONFLICT);
+              return;
+            }
+          /* Otherwise into is already set, so do nothing */
+        }
+    }
+  else /* !into_default_stream */
+    {
+      /* There was no default stream set yet, so just add the new one */
+      modulemd_intent_set_default_stream (into_intent, from_default_stream);
+    }
 }

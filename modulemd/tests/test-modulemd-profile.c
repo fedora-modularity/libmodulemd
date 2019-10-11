@@ -403,7 +403,7 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
   yaml_path = g_strdup_printf ("%s/p.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);

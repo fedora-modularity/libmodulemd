@@ -66,7 +66,9 @@ modulemd_module_copy (ModulemdModule *self)
   m->defaults = modulemd_defaults_copy (self->defaults);
 
   for (i = 0; i < self->streams->len; i++)
-    g_ptr_array_add (m->streams, g_ptr_array_index (self->streams, i));
+    {
+      g_ptr_array_add (m->streams, g_ptr_array_index (self->streams, i));
+    }
 
   return g_steal_pointer (&m);
 }
@@ -396,7 +398,9 @@ modulemd_module_get_stream_names_as_strv (ModulemdModule *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
   if (!self->streams)
-    return NULL;
+    {
+      return NULL;
+    }
 
   g_autoptr (GHashTable) stream_names =
     g_hash_table_new (g_str_hash, g_str_equal);
@@ -425,7 +429,8 @@ static gint
 compare_streams (gconstpointer a, gconstpointer b)
 {
   int cmp = 0;
-  guint64 a_ver, b_ver;
+  guint64 a_ver;
+  guint64 b_ver;
   ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
   ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
 
@@ -433,21 +438,29 @@ compare_streams (gconstpointer a, gconstpointer b)
   cmp = g_strcmp0 (modulemd_module_stream_get_stream_name (a_),
                    modulemd_module_stream_get_stream_name (b_));
   if (cmp != 0)
-    return cmp;
+    {
+      return cmp;
+    }
 
   /* Sort by the version, highest first */
   a_ver = modulemd_module_stream_get_version (a_);
   b_ver = modulemd_module_stream_get_version (b_);
   if (b_ver > a_ver)
-    return 1;
+    {
+      return 1;
+    }
   if (a_ver > b_ver)
-    return -1;
+    {
+      return -1;
+    }
 
   /* Sort alphabetically by context */
   cmp = g_strcmp0 (modulemd_module_stream_get_context (a_),
                    modulemd_module_stream_get_context (b_));
   if (cmp != 0)
-    return cmp;
+    {
+      return cmp;
+    }
 
   /* Sort alphabetically by architecture */
   cmp = g_strcmp0 (modulemd_module_stream_get_arch (a_),
@@ -505,7 +518,9 @@ modulemd_module_search_streams (ModulemdModule *self,
       if (g_strcmp0 (
             modulemd_module_stream_get_stream_name (under_consideration),
             stream_name) != 0)
-        continue;
+        {
+          continue;
+        }
 
       /* Skip this one unless the stream version matches OR the version is zero
        * which indicates that it shouldn't prevent the other cases from
@@ -513,17 +528,23 @@ modulemd_module_search_streams (ModulemdModule *self,
        */
       if (version &&
           modulemd_module_stream_get_version (under_consideration) != version)
-        continue;
+        {
+          continue;
+        }
 
       if (context &&
           g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
                      context) != 0)
-        continue;
+        {
+          continue;
+        }
 
       if (arch &&
           g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
                      arch) != 0)
-        continue;
+        {
+          continue;
+        }
 
       g_ptr_array_add (matching_streams, under_consideration);
     }
@@ -557,7 +578,7 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
                    "No streams matched");
       return NULL;
     }
-  else if (matching_streams->len > 1)
+  if (matching_streams->len > 1)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
@@ -601,25 +622,33 @@ match_nsvca (gconstpointer haystraw, gconstpointer needle)
 
   if (!g_str_equal (nsvca->stream_name,
                     modulemd_module_stream_get_stream_name (stream)))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (nsvca->version)
     {
       if (nsvca->version != modulemd_module_stream_get_version (stream))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (nsvca->context)
     {
       if (!g_str_equal (nsvca->context,
                         modulemd_module_stream_get_context (stream)))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (nsvca->arch)
     {
       if (!g_str_equal (nsvca->arch, modulemd_module_stream_get_arch (stream)))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -650,7 +679,9 @@ modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
       found = g_ptr_array_find_with_equal_func (
         self->streams, nsvca, match_nsvca, &index);
       if (found)
-        g_ptr_array_remove_index (self->streams, index);
+        {
+          g_ptr_array_remove_index (self->streams, index);
+        }
     }
   while (found);
 }
@@ -681,7 +712,9 @@ modulemd_module_add_translation (ModulemdModule *self,
 
       if (!g_str_equal (modulemd_translation_get_module_stream (newtrans),
                         modulemd_module_stream_get_stream_name (stream)))
-        continue;
+        {
+          continue;
+        }
 
       modulemd_module_stream_associate_translation (stream, newtrans);
     }

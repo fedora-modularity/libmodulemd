@@ -12,8 +12,8 @@
  */
 
 #include "modulemd-component-module.h"
-#include "private/modulemd-component-private.h"
 #include "private/modulemd-component-module-private.h"
+#include "private/modulemd-component-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -77,13 +77,19 @@ modulemd_component_module_equals (ModulemdComponent *self_1,
 
   if (!MODULEMD_COMPONENT_CLASS (modulemd_component_module_parent_class)
          ->equals (self_1, self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (module_self_1->ref, module_self_2->ref) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (module_self_1->repository, module_self_2->repository) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -245,39 +251,53 @@ modulemd_component_module_emit_yaml (ModulemdComponentModule *self,
 
   if (!modulemd_component_emit_yaml_start (
         MODULEMD_COMPONENT (self), emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (modulemd_component_module_get_repository (self) != NULL)
     {
       if (!mmd_emitter_scalar (
             emitter, "repository", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!mmd_emitter_scalar (emitter,
                                modulemd_component_module_get_repository (self),
                                YAML_PLAIN_SCALAR_STYLE,
                                error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (modulemd_component_module_get_ref (self) != NULL)
     {
       if (!mmd_emitter_scalar (emitter, "ref", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!mmd_emitter_scalar (emitter,
                                modulemd_component_module_get_ref (self),
                                YAML_PLAIN_SCALAR_STYLE,
                                error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (!modulemd_component_emit_yaml_build_common (
         MODULEMD_COMPONENT (self), emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -328,11 +348,13 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse rationale in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse rationale in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_set_rationale (MODULEMD_COMPONENT (m), value);
               g_clear_pointer (&value, g_free);
@@ -342,11 +364,13 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse repository in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse repository in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_module_set_repository (m, value);
               g_clear_pointer (&value, g_free);
@@ -355,11 +379,13 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse ref in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse ref in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_module_set_ref (m, value);
               g_clear_pointer (&value, g_free);
@@ -382,11 +408,13 @@ modulemd_component_module_parse_yaml (yaml_parser_t *parser,
             {
               buildorder = modulemd_yaml_parse_int64 (parser, &nested_error);
               if (buildorder == 0 && nested_error != NULL)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse buildorder in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse buildorder in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_set_buildorder (MODULEMD_COMPONENT (m),
                                                  buildorder);

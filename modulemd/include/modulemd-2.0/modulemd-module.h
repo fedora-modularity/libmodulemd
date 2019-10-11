@@ -13,11 +13,11 @@
 
 #pragma once
 
-#include <glib-object.h>
 #include "modulemd-defaults.h"
 #include "modulemd-deprecated.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-translation.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -131,7 +131,7 @@ MMD_DEPRECATED_FOR (modulemd_module_get_stream_by_NSVCA)
 ModulemdModuleStream *
 modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
                                     const gchar *stream_name,
-                                    const guint64 version,
+                                    guint64 version,
                                     const gchar *context);
 
 
@@ -158,7 +158,7 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
 GPtrArray *
 modulemd_module_search_streams (ModulemdModule *self,
                                 const gchar *stream_name,
-                                const guint64 version,
+                                guint64 version,
                                 const gchar *context,
                                 const gchar *arch);
 
@@ -185,7 +185,7 @@ modulemd_module_search_streams (ModulemdModule *self,
 ModulemdModuleStream *
 modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
                                      const gchar *stream_name,
-                                     const guint64 version,
+                                     guint64 version,
                                      const gchar *context,
                                      const gchar *arch,
                                      GError **error);
@@ -210,7 +210,7 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 void
 modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
                                          const gchar *stream_name,
-                                         const guint64 version,
+                                         guint64 version,
                                          const gchar *context,
                                          const gchar *arch);
 

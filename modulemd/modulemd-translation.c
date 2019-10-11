@@ -16,12 +16,12 @@
 #include <yaml.h>
 
 #include "modulemd-errors.h"
-#include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
+#include "modulemd-translation.h"
 #include "private/glib-extensions.h"
-#include "private/modulemd-translation-private.h"
-#include "private/modulemd-translation-entry-private.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-translation-entry-private.h"
+#include "private/modulemd-translation-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -78,7 +78,8 @@ ModulemdTranslation *
 modulemd_translation_copy (ModulemdTranslation *self)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   GHashTableIter iter;
 
   g_return_val_if_fail (MODULEMD_IS_TRANSLATION (self), NULL);
@@ -430,10 +431,13 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser,
             strict,
             &nested_error);
           if (te == NULL)
-            MMD_YAML_ERROR_EVENT_EXIT (error,
-                                       event,
-                                       "Failed to parse translation entry: %s",
-                                       nested_error->message);
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Failed to parse translation entry: %s",
+                nested_error->message);
+            }
 
 
           locale = g_strdup (modulemd_translation_entry_get_locale (te));
@@ -485,7 +489,9 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
   if (!modulemd_subdocument_info_get_data_parser (
         subdoc, &parser, strict, error))
-    return NULL;
+    {
+      return NULL;
+    }
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -519,11 +525,13 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                 }
               value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse module name in translation data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse module name in translation data: %s",
+                    nested_error->message);
+                }
 
               modulemd_translation_set_module_name (t, value);
               g_clear_pointer (&value, g_free);
@@ -538,11 +546,13 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                 }
               value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse module stream in translation data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse module stream in translation data: %s",
+                    nested_error->message);
+                }
 
               modulemd_translation_set_module_stream (t, value);
               g_clear_pointer (&value, g_free);
@@ -551,11 +561,13 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             {
               modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse modified in translation data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse modified in translation data: %s",
+                    nested_error->message);
+                }
 
               modulemd_translation_set_modified (t, modified);
             }
@@ -564,11 +576,13 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               entries = modulemd_translation_parse_yaml_entries (
                 &parser, strict, &nested_error);
               if (!entries)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse translations in translation data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse translations in translation data: %s",
+                    nested_error->message);
+                }
 
               g_hash_table_unref (t->translation_entries);
               t->translation_entries = g_steal_pointer (&entries);
@@ -596,10 +610,12 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
     }
 
   if (!modulemd_translation_validate (t, &nested_error))
-    MMD_YAML_ERROR_EVENT_EXIT (error,
-                               event,
-                               "Unable to validate translation object: %s",
-                               nested_error->message);
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (error,
+                                 event,
+                                 "Unable to validate translation object: %s",
+                                 nested_error->message);
+    }
 
   return g_steal_pointer (&t);
 }
@@ -611,10 +627,13 @@ modulemd_translation_emit_yaml_entries (ModulemdTranslation *self,
 {
   GHashTableIter iter;
   g_autoptr (GError) nested_error = NULL;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_hash_table_iter_init (&iter, self->translation_entries);
   while (g_hash_table_iter_next (&iter, &key, &value))
@@ -630,7 +649,9 @@ modulemd_translation_emit_yaml_entries (ModulemdTranslation *self,
     }
 
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -661,59 +682,85 @@ modulemd_translation_emit_yaml (ModulemdTranslation *self,
         MODULEMD_YAML_DOC_TRANSLATIONS,
         modulemd_translation_get_version (self),
         error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Start data: */
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter, "module", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter,
                            modulemd_translation_get_module_name (self),
                            YAML_PLAIN_SCALAR_STYLE,
                            error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter, "stream", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter,
                            modulemd_translation_get_module_stream (self),
                            YAML_PLAIN_SCALAR_STYLE,
                            error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, "modified", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, modified_string, YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_hash_table_size (self->translation_entries) != 0)
     {
       if (!mmd_emitter_scalar (
             emitter, "translations", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!modulemd_translation_emit_yaml_entries (self, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   /* Close the data: mapping */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Close top-level mapping */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Close document */
   if (!mmd_emitter_end_document (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }

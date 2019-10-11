@@ -646,7 +646,7 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 gboolean
 mmd_emitter_strv (yaml_emitter_t *emitter,
                   yaml_sequence_style_t seq_style,
-                  const GStrv list,
+                  GStrv list,
                   GError **error);
 
 

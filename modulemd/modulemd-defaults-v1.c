@@ -11,8 +11,6 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
-#include <inttypes.h>
 #include "modulemd-defaults-v1.h"
 #include "modulemd-errors.h"
 #include "private/modulemd-defaults-private.h"
@@ -20,6 +18,8 @@
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
+#include <glib.h>
+#include <inttypes.h>
 
 struct _ModulemdDefaultsV1
 {
@@ -450,7 +450,9 @@ modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
   /* These are the fallback defaults */
   profiles = g_hash_table_lookup (self->profile_defaults, stream_name);
   if (!profiles)
-    return NULL;
+    {
+      return NULL;
+    }
 
   return modulemd_ordered_str_keys_as_strv (profiles);
 }
@@ -527,7 +529,7 @@ static gboolean
 modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
                                    gboolean strict,
                                    gchar **_default_stream,
-                                   GHashTable **_profile_set,
+                                   GHashTable **_profile_defaults,
                                    GError **error);
 
 ModulemdDefaultsV1 *
@@ -591,11 +593,13 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
               scalar = modulemd_yaml_parse_string (&parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse module name in default data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse module name in default data: %s",
+                    nested_error->message);
+                }
 
               /* Use a private internal function to set the module_name.
                * External consumers should never be allowed to change this
@@ -609,11 +613,13 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             {
               modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse modified in defaults data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse modified in defaults data: %s",
+                    nested_error->message);
+                }
 
               modulemd_defaults_set_modified (MODULEMD_DEFAULTS (defaults),
                                               modified);
@@ -632,11 +638,13 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
               scalar = modulemd_yaml_parse_string (&parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse default stream in default data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse default stream in default data: %s",
+                    nested_error->message);
+                }
               modulemd_defaults_v1_set_default_stream (defaults, scalar, NULL);
               g_clear_pointer (&scalar, g_free);
             }
@@ -721,8 +729,12 @@ modulemd_defaults_v1_parse_yaml_profiles (yaml_parser_t *parser,
 
           stream_name = g_strdup ((const gchar *)event.data.scalar.value);
           if (!stream_name)
-            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-              error, event, "Failed to parse stream name in profile defaults");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "Failed to parse stream name in profile defaults");
+            }
 
           /* Check to see if we've encountered this stream name previously */
           if (g_hash_table_contains (profile_defaults, stream_name))
@@ -883,8 +895,10 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-              error, event, "Missing mapping in intent data");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Missing mapping in intent data");
+            }
           if (g_str_equal (event.data.scalar.value, "stream"))
             {
               if (default_stream)
@@ -899,11 +913,13 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
               default_stream =
                 modulemd_yaml_parse_string (parser, &nested_error);
               if (!default_stream)
-                MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                  error,
-                  event,
-                  "Failed to parse default stream in intent data: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error,
+                    event,
+                    "Failed to parse default stream in intent data: %s",
+                    nested_error->message);
+                }
             }
           else if (g_str_equal (event.data.scalar.value, "profiles"))
             {
@@ -946,7 +962,7 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
                                     GError **error);
 
 static gboolean
-modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *defaults,
+modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
                                    yaml_emitter_t *emitter,
                                    GError **error);
 
@@ -977,24 +993,32 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
         MODULEMD_YAML_DOC_DEFAULTS,
         modulemd_defaults_get_mdversion (MODULEMD_DEFAULTS (self)),
         error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Start the data: section mapping */
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Fill in the default data */
 
   /* The module name is mandatory */
   if (!mmd_emitter_scalar (emitter, "module", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter,
         modulemd_defaults_get_module_name (MODULEMD_DEFAULTS (self)),
         YAML_PLAIN_SCALAR_STYLE,
         error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* The modified field is optional */
   modified = modulemd_defaults_get_modified (MODULEMD_DEFAULTS (self));
@@ -1010,11 +1034,15 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
     {
       if (!mmd_emitter_scalar (
             emitter, "stream", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!mmd_emitter_scalar (
             emitter, default_stream, YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   /* Profiles are optional */
@@ -1022,7 +1050,9 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
     {
       if (!modulemd_defaults_v1_emit_profiles (
             self->profile_defaults, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   /* Intents are optional */
@@ -1034,15 +1064,21 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
 
   /* Close the data: section mapping */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Close the top-level section mapping */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* End the document */
   if (!mmd_emitter_end_document (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -1061,11 +1097,15 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
   /* Start the "profiles:" section */
   if (!mmd_emitter_scalar (
         emitter, "profiles", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Start the mapping for "profiles:" */
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
 
   stream_names =
@@ -1084,18 +1124,24 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
 
       if (!mmd_emitter_scalar (
             emitter, stream_name, YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       streams = modulemd_ordered_str_keys_as_strv (profile_set);
       if (!mmd_emitter_strv (
             emitter, YAML_FLOW_SEQUENCE_STYLE, streams, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
       g_clear_pointer (&streams, g_strfreev);
     }
 
   /* End the mapping for "profiles:" */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -1108,7 +1154,8 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
 {
   g_autoptr (GHashTable) intent_names = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   g_autoptr (GPtrArray) intents = NULL;
   gchar *intent = NULL;
   gchar *intent_default_stream = NULL;
@@ -1117,11 +1164,15 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
 
   /* Emit the section name */
   if (!mmd_emitter_scalar (emitter, "intents", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Start the mapping for "intents:" */
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Get the union of the keys from intents_stream_defaults and
    * intents_profile_defaults
@@ -1150,12 +1201,16 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
       /* Emit the intent name */
       if (!mmd_emitter_scalar (
             emitter, intent, YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       /* Start the mapping for this intent */
       if (!mmd_emitter_start_mapping (
             emitter, YAML_BLOCK_MAPPING_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       intent_default_stream =
         g_hash_table_lookup (self->intent_default_streams, intent);
@@ -1163,13 +1218,17 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
         {
           if (!mmd_emitter_scalar (
                 emitter, "stream", YAML_PLAIN_SCALAR_STYLE, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
 
           if (!mmd_emitter_scalar (emitter,
                                    intent_default_stream,
                                    YAML_PLAIN_SCALAR_STYLE,
                                    error))
-            return FALSE;
+            {
+              return FALSE;
+            }
         }
 
       intent_default_profiles =
@@ -1178,17 +1237,23 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
         {
           if (!modulemd_defaults_v1_emit_profiles (
                 intent_default_profiles, emitter, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
         }
 
       /* End the mapping for this intent */
       if (!mmd_emitter_end_mapping (emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   /* End the mapping for "intents:" */
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -1212,7 +1277,8 @@ modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
 {
   g_autoptr (ModulemdDefaultsV1) merged = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   GHashTable *intent_profiles = NULL;
   GHashTable *merged_intent_profiles = NULL;
   guint64 from_modified;
@@ -1316,7 +1382,9 @@ modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
 
       /* If there is no new default stream, just jump to the next item */
       if (!intent_default_stream)
-        continue;
+        {
+          continue;
+        }
 
       if (!merged_default_stream)
         {
@@ -1388,7 +1456,10 @@ modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
 
   /* Set the modified value to the higher of the two provided */
   if (from_modified > into_modified)
-    modulemd_defaults_set_modified (MODULEMD_DEFAULTS (merged), from_modified);
+    {
+      modulemd_defaults_set_modified (MODULEMD_DEFAULTS (merged),
+                                      from_modified);
+    }
 
   return MODULEMD_DEFAULTS (g_steal_pointer (&merged));
 }
@@ -1401,7 +1472,8 @@ modulemd_defaults_v1_copy_intent_profiles (GHashTable *intent_profiles)
   gchar *stream_name = NULL;
   GHashTable *profile_defaults = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
 
   intent_profile_defaults = g_hash_table_new_full (
@@ -1432,7 +1504,8 @@ modulemd_defaults_v1_merge_default_profiles (
   GError **error)
 {
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   gchar *stream_name = NULL;
   GHashTable *from_profiles = NULL;
   GHashTable *merged_profiles = NULL;

@@ -12,13 +12,13 @@
  */
 
 
-#include <inttypes.h>
 #include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
 #include "modulemd-errors.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-util.h"
+#include <inttypes.h>
 
 #define DEF_DEFAULT_NAME_STRING "__NAME_UNSET__"
 
@@ -51,10 +51,14 @@ modulemd_defaults_equals (ModulemdDefaults *self_1, ModulemdDefaults *self_2)
   ModulemdDefaultsClass *klass;
 
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self_2), FALSE);
@@ -72,15 +76,21 @@ modulemd_defaults_default_equals (ModulemdDefaults *self_1,
 {
   if (g_strcmp0 (modulemd_defaults_get_module_name (self_1),
                  modulemd_defaults_get_module_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (modulemd_defaults_get_modified (self_1) !=
       modulemd_defaults_get_modified (self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (modulemd_defaults_get_mdversion (self_1) !=
       modulemd_defaults_get_mdversion (self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -121,7 +131,9 @@ modulemd_defaults_copy (ModulemdDefaults *self)
   ModulemdDefaultsClass *klass;
 
   if (!self)
-    return NULL;
+    {
+      return NULL;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self), NULL);
 
@@ -152,7 +164,9 @@ modulemd_defaults_validate (ModulemdDefaults *self, GError **error)
   ModulemdDefaultsClass *klass;
 
   if (!self)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_DEFAULTS (self), FALSE);
 
@@ -178,7 +192,7 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
                            "Metadata version is unset.");
       return FALSE;
     }
-  else if (mdversion > MD_DEFAULTS_VERSION_LATEST)
+  if (mdversion > MD_DEFAULTS_VERSION_LATEST)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
@@ -220,7 +234,9 @@ modulemd_defaults_upgrade (ModulemdDefaults *self,
   g_assert_true (MODULEMD_IS_DEFAULTS (self));
 
   if (!mdversion)
-    mdversion = MD_DEFAULTS_VERSION_LATEST;
+    {
+      mdversion = MD_DEFAULTS_VERSION_LATEST;
+    }
 
   if (mdversion > MD_DEFAULTS_VERSION_LATEST)
     {

@@ -16,8 +16,8 @@
 #include <locale.h>
 #include <signal.h>
 
-#include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
+#include "modulemd-defaults.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-translation-entry-private.h"
 #include "private/modulemd-yaml.h"

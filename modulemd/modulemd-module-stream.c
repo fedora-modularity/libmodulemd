@@ -11,12 +11,10 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <errno.h>
-#include <inttypes.h>
 #include "modulemd-errors.h"
-#include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module-stream.h"
 #include "private/modulemd-component-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
@@ -24,6 +22,8 @@
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
+#include <errno.h>
+#include <inttypes.h>
 
 typedef struct
 {
@@ -77,8 +77,6 @@ modulemd_module_stream_new (guint64 mdversion,
 
 static ModulemdModuleStream *
 modulemd_module_stream_read_yaml (yaml_parser_t *parser,
-                                  const gchar *module_name,
-                                  const gchar *module_stream,
                                   gboolean strict,
                                   GError **error);
 
@@ -98,7 +96,7 @@ modulemd_module_stream_read_file (const gchar *path,
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   errno = 0;
-  yaml_stream = g_fopen (path, "rb");
+  yaml_stream = g_fopen (path, "rbe");
   err = errno;
 
   if (!yaml_stream)
@@ -113,8 +111,7 @@ modulemd_module_stream_read_file (const gchar *path,
 
   yaml_parser_set_input_file (&parser, yaml_stream);
 
-  return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, strict, error);
+  return modulemd_module_stream_read_yaml (&parser, strict, error);
 }
 
 
@@ -133,8 +130,7 @@ modulemd_module_stream_read_string (const gchar *yaml_string,
   yaml_parser_set_input_string (
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
 
-  return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, strict, error);
+  return modulemd_module_stream_read_yaml (&parser, strict, error);
 }
 
 
@@ -148,15 +144,12 @@ modulemd_module_stream_read_stream (FILE *stream,
   MMD_INIT_YAML_PARSER (parser);
   yaml_parser_set_input_file (&parser, stream);
 
-  return modulemd_module_stream_read_yaml (
-    &parser, module_name, module_stream, strict, error);
+  return modulemd_module_stream_read_yaml (&parser, strict, error);
 }
 
 
 static ModulemdModuleStream *
 modulemd_module_stream_read_yaml (yaml_parser_t *parser,
-                                  const gchar *module_name,
-                                  const gchar *module_stream,
                                   gboolean strict,
                                   GError **error)
 {
@@ -304,23 +297,33 @@ modulemd_module_stream_default_equals (ModulemdModuleStream *self_1,
 {
   if (modulemd_module_stream_get_version (self_1) !=
       modulemd_module_stream_get_version (self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_module_stream_get_module_name (self_1),
                  modulemd_module_stream_get_module_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_module_stream_get_stream_name (self_1),
                  modulemd_module_stream_get_stream_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_module_stream_get_context (self_1),
                  modulemd_module_stream_get_context (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_module_stream_get_arch (self_1),
                  modulemd_module_stream_get_arch (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -333,10 +336,14 @@ modulemd_module_stream_equals (ModulemdModuleStream *self_1,
   ModulemdModuleStreamClass *klass;
 
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self_2), FALSE);
@@ -358,7 +365,9 @@ modulemd_module_stream_default_copy (ModulemdModuleStream *self,
   const gchar *stream = NULL;
 
   if (!self)
-    return NULL;
+    {
+      return NULL;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
 
@@ -405,7 +414,9 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
   ModulemdModuleStreamClass *klass;
 
   if (!self)
-    return NULL;
+    {
+      return NULL;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
 
@@ -417,8 +428,7 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
-                                      GError **error);
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from);
 
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
@@ -462,8 +472,8 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
         {
         case 1:
           /* Upgrade to ModuleStreamV2 */
-          updated_stream = modulemd_module_stream_upgrade_to_v2 (
-            current_stream, &nested_error);
+          updated_stream =
+            modulemd_module_stream_upgrade_to_v2 (current_stream);
           if (!updated_stream)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -493,14 +503,14 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
-                                      GError **error)
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from)
 {
   ModulemdModuleStreamV1 *v1_stream = NULL;
   g_autoptr (ModulemdModuleStreamV2) copy = NULL;
   g_autoptr (ModulemdDependencies) deps = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V1 (from), NULL);
   v1_stream = MODULEMD_MODULE_STREAM_V1 (from);
@@ -553,7 +563,9 @@ modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
 
 
   if (v1_stream->xmd != NULL)
-    modulemd_module_stream_v2_set_xmd (copy, v1_stream->xmd);
+    {
+      modulemd_module_stream_v2_set_xmd (copy, v1_stream->xmd);
+    }
 
 
   /* Upgrade the Dependencies */
@@ -600,7 +612,7 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
                            "Metadata version is unset.");
       return FALSE;
     }
-  else if (mdversion > MD_MODULESTREAM_VERSION_LATEST)
+  if (mdversion > MD_MODULESTREAM_VERSION_LATEST)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
@@ -617,9 +629,12 @@ gboolean
 modulemd_module_stream_validate_components (GHashTable *components,
                                             GError **error)
 {
-  GHashTableIter iter, buildafter_iter;
-  gpointer key, value;
-  gpointer ba_key, ba_value;
+  GHashTableIter iter;
+  GHashTableIter buildafter_iter;
+  gpointer key;
+  gpointer value;
+  gpointer ba_key;
+  gpointer ba_value;
   gboolean has_buildorder = FALSE;
   gboolean has_buildafter = FALSE;
 
@@ -700,7 +715,9 @@ modulemd_module_stream_validate (ModulemdModuleStream *self, GError **error)
   ModulemdModuleStreamClass *klass;
 
   if (!self)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
 
@@ -717,7 +734,9 @@ modulemd_module_stream_get_mdversion (ModulemdModuleStream *self)
   ModulemdModuleStreamClass *klass;
 
   if (!self)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), 0);
 
@@ -1135,7 +1154,9 @@ modulemd_module_stream_associate_translation (ModulemdModuleStream *self,
 
   g_clear_pointer (&priv->translation, g_object_unref);
   if (translation != NULL)
-    priv->translation = g_object_ref (translation);
+    {
+      priv->translation = g_object_ref (translation);
+    }
 }
 
 
@@ -1158,16 +1179,22 @@ modulemd_module_stream_get_translation_entry (ModulemdModuleStream *self,
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
 
   if (locale == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   if (g_str_equal (locale, "C"))
-    return NULL;
+    {
+      return NULL;
+    }
 
   ModulemdModuleStreamPrivate *priv =
     modulemd_module_stream_get_instance_private (self);
 
   if (priv->translation == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   return modulemd_translation_get_translation_entry (priv->translation,
                                                      locale);
@@ -1194,7 +1221,9 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
         MODULEMD_YAML_DOC_MODULESTREAM,
         modulemd_module_stream_get_mdversion (self),
         error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* Start data: */
   EMIT_MAPPING_START (emitter, error);

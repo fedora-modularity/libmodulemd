@@ -16,9 +16,9 @@
 #include "private/modulemd-module-index-private.h"
 #include "private/modulemd-yaml.h"
 
+#include <errno.h>
 #include <glib.h>
 #include <locale.h>
-#include <errno.h>
 
 enum mmd_verbosity
 {
@@ -112,7 +112,7 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
     }
 
   /* Parse documents */
-  yaml_stream = g_fopen (filename, "rb");
+  yaml_stream = g_fopen (filename, "rbe");
   saved_errno = errno;
 
   if (yaml_stream == NULL)

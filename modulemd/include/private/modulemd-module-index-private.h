@@ -13,9 +13,9 @@
 
 #pragma once
 
+#include "modulemd-module-index.h"
 #include <glib-object.h>
 #include <yaml.h>
-#include "modulemd-module-index.h"
 
 G_BEGIN_DECLS
 

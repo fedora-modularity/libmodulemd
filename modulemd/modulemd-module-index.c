@@ -21,20 +21,20 @@
 #include <rpm/rpmio.h>
 #endif
 
-#include "modulemd-errors.h"
 #include "modulemd-compression.h"
+#include "modulemd-errors.h"
 #include "modulemd-module-index.h"
 #include "modulemd-subdocument-info.h"
 #include "private/glib-extensions.h"
-#include "private/modulemd-module-private.h"
 #include "private/modulemd-compression-private.h"
 #include "private/modulemd-defaults-private.h"
 #include "private/modulemd-defaults-v1-private.h"
-#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-module-index-private.h"
+#include "private/modulemd-module-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -168,7 +168,9 @@ add_subdoc (ModulemdModuleIndex *self,
         }
 
       if (stream == NULL)
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (autogen_module_name &&
           !modulemd_module_stream_get_module_name (stream))
@@ -190,7 +192,9 @@ add_subdoc (ModulemdModuleIndex *self,
 
 
       if (!modulemd_module_index_add_module_stream (self, stream, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       break;
 
@@ -201,9 +205,13 @@ add_subdoc (ModulemdModuleIndex *self,
           defaults = (ModulemdDefaults *)modulemd_defaults_v1_parse_yaml (
             subdoc, strict, error);
           if (defaults == NULL)
-            return FALSE;
+            {
+              return FALSE;
+            }
           if (!modulemd_module_index_add_defaults (self, defaults, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
           break;
 
         default:
@@ -218,9 +226,13 @@ add_subdoc (ModulemdModuleIndex *self,
     case MODULEMD_YAML_DOC_TRANSLATIONS:
       translation = modulemd_translation_parse_yaml (subdoc, strict, error);
       if (translation == NULL)
-        return FALSE;
+        {
+          return FALSE;
+        }
       if (!modulemd_module_index_add_translation (self, translation, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
       break;
 
     default:
@@ -249,12 +261,16 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
   MMD_INIT_YAML_EVENT (event);
 
   if (*failures == NULL)
-    *failures = g_ptr_array_new_with_free_func (g_object_unref);
+    {
+      *failures = g_ptr_array_new_with_free_func (g_object_unref);
+    }
 
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
   if (event.type != YAML_STREAM_START_EVENT)
-    MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-      error, event, "Did not encounter stream start");
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error, event, "Did not encounter stream start");
+    }
 
   while (!done)
     {
@@ -309,7 +325,9 @@ dump_defaults (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
   g_autoptr (GError) nested_error = NULL;
 
   if (defaults == NULL)
-    return TRUE; /* Nothing to dump -> all a success */
+    {
+      return TRUE; /* Nothing to dump -> all a success */
+    }
 
   if (!modulemd_defaults_validate (defaults, &nested_error))
     {
@@ -323,7 +341,9 @@ dump_defaults (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
     {
       if (!modulemd_defaults_v1_emit_yaml (
             (ModulemdDefaultsV1 *)defaults, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
   else
     {
@@ -354,7 +374,9 @@ dump_translations (ModulemdModule *module,
         module, g_ptr_array_index (streams, i));
 
       if (!modulemd_translation_emit_yaml (translation, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -402,14 +424,18 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
         {
           if (!modulemd_module_stream_v1_emit_yaml (
                 MODULEMD_MODULE_STREAM_V1 (stream), emitter, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
         }
       else if (modulemd_module_stream_get_mdversion (stream) ==
                MD_MODULESTREAM_VERSION_TWO)
         {
           if (!modulemd_module_stream_v2_emit_yaml (
                 MODULEMD_MODULE_STREAM_V2 (stream), emitter, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
         }
       else
         {
@@ -445,7 +471,9 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
     }
 
   if (!mmd_emitter_start_stream (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   for (i = 0; i < modules->len; i++)
     {
@@ -453,17 +481,25 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
         self, g_ptr_array_index (modules, i));
 
       if (!dump_defaults (module, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!dump_translations (module, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!dump_streams (module, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (!mmd_emitter_end_stream (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -477,7 +513,9 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
                                         GError **error)
 {
   if (*failures == NULL)
-    *failures = g_ptr_array_new_full (0, g_object_unref);
+    {
+      *failures = g_ptr_array_new_full (0, g_object_unref);
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
@@ -488,7 +526,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
   ModulemdCompressionTypeEnum comtype;
   g_autofree gchar *fmode = NULL;
 
-  yaml_stream = g_fopen (yaml_file, "rb");
+  yaml_stream = g_fopen (yaml_file, "rbe");
   saved_errno = errno;
 
   if (yaml_stream == NULL)
@@ -513,8 +551,8 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
       g_propagate_error (error, g_steal_pointer (&nested_error));
       return FALSE;
     }
-  else if (comtype == MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION ||
-           comtype == MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION)
+  if (comtype == MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION ||
+      comtype == MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION)
     {
       /* If it's not compressed (or we can't figure out what compression is in
        * use), just use the libyaml function. It's fast and will fail quickly
@@ -599,7 +637,9 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
                                           GError **error)
 {
   if (*failures == NULL)
-    *failures = g_ptr_array_new_full (0, g_object_unref);
+    {
+      *failures = g_ptr_array_new_full (0, g_object_unref);
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
@@ -628,7 +668,9 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
                                           GError **error)
 {
   if (*failures == NULL)
-    *failures = g_ptr_array_new_full (0, g_object_unref);
+    {
+      *failures = g_ptr_array_new_full (0, g_object_unref);
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
@@ -657,7 +699,9 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
                                           GError **error)
 {
   if (*failures == NULL)
-    *failures = g_ptr_array_new_full (0, g_object_unref);
+    {
+      *failures = g_ptr_array_new_full (0, g_object_unref);
+    }
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
   g_return_val_if_fail (custom_read_fn, FALSE);
@@ -804,7 +848,9 @@ modulemd_module_index_dump_to_string (ModulemdModuleIndex *self,
   MMD_INIT_YAML_STRING (&emitter, yaml_string);
 
   if (!modulemd_module_index_dump_to_emitter (self, &emitter, error))
-    return NULL;
+    {
+      return NULL;
+    }
 
   return g_steal_pointer (&yaml_string->str);
 }
@@ -924,7 +970,8 @@ modulemd_module_index_upgrade_streams (
   GError **error)
 {
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   g_autoptr (ModulemdModule) module = NULL;
   g_autoptr (GError) nested_error = NULL;
 
@@ -1013,7 +1060,8 @@ modulemd_module_index_get_default_streams_as_hash_table (
 {
   GHashTable *defaults = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   ModulemdDefaults *defs = NULL;
   const gchar *def_stream_name = NULL;
 
@@ -1060,7 +1108,8 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
                                         GError **error)
 {
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   g_autoptr (ModulemdModule) module = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   ModulemdDefaultsVersionEnum returned_mdversion = MD_DEFAULTS_VERSION_UNSET;
@@ -1146,7 +1195,8 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
 {
   MODULEMD_INIT_TRACE ();
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   const gchar *module_name = NULL;
   const gchar *trans_stream = NULL;
   ModulemdModule *module = NULL;

@@ -103,13 +103,13 @@ modulemd_subdocument_info_get_mdversion (ModulemdSubdocumentInfo *self);
 /**
  * modulemd_subdocument_info_set_yaml:
  * @self: This #ModulemdSubdocumentInfo object.
- * @contents: The contents of the document.
+ * @yaml: The contents of the document.
  *
  * Since: 2.0
  */
 void
 modulemd_subdocument_info_set_yaml (ModulemdSubdocumentInfo *self,
-                                    const gchar *contents);
+                                    const gchar *yaml);
 
 
 /**

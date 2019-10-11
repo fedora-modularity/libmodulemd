@@ -1,4 +1,5 @@
 *.o
+*.py[co]
 .deps
 /**/*.swp
 /*.bak

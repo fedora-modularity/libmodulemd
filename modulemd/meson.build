@@ -16,9 +16,15 @@ test_dirty_git = get_option('test_dirty_git')
 test_installed_lib = get_option('test_installed_lib')
 skip_introspection = get_option('skip_introspection')
 
-clang_format = find_program('clang-format', required: developer_build)
-if not clang_format.found()
+clang_tidy = find_program('clang-tidy', required: false)
+if clang_tidy.found()
     clang_format = disabler()
+else
+    clang_tidy = disabler()
+    clang_format = find_program('clang-format', required: developer_build)
+    if not clang_format.found()
+        clang_format = disabler()
+    endif
 endif
 
 python_formatter = find_program('black', required : developer_build)
@@ -380,15 +386,25 @@ endforeach
 
 
 # Fake test to ensure that all sources and headers are formatted properly
+clang_files = modulemd_srcs + \
+              modulemd_hdrs + \
+              modulemd_priv_hdrs + \
+              modulemd_validator_srcs + \
+              test_srcs + \
+              test_priv_hdrs \
+
 clang_args = [ '-i' ]
 test('clang_format', clang_format,
-     args : clang_args +
-            modulemd_srcs +
-            modulemd_hdrs +
-            modulemd_priv_hdrs +
-            modulemd_validator_srcs +
-            test_srcs +
-            test_priv_hdrs)
+     args : clang_args + clang_files)
+
+clang_tidy_args = [ '-p', meson.build_root(),
+                    '--checks=*,-llvm-header-guard,-bugprone-macro-parentheses',
+                    '--format-style=file',
+                    '--fix',
+                    '--fix-errors' ]
+test('clang_tidy', clang_tidy,
+     args: clang_tidy_args + clang_files,
+     timeout: 300)
 
 
 # Fake test to ensure that the python tests are formatted according to PEP8

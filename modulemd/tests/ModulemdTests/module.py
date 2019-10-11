@@ -14,10 +14,12 @@
 
 from os import path
 import sys
+
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', '2.0')
+
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import Modulemd
     from gi.repository.Modulemd import ModuleIndex
     from gi.repository import GLib
@@ -30,16 +32,14 @@ from base import TestBase
 
 
 class TestModule(TestBase):
-
     def test_search_streams(self):
         idx = Modulemd.ModuleIndex.new()
-        idx.update_from_file(path.join(self.test_data_path, "f29.yaml"),
-                             True)
-        module = idx.get_module('nodejs')
+        idx.update_from_file(path.join(self.test_data_path, "f29.yaml"), True)
+        module = idx.get_module("nodejs")
 
-        self.assertEquals(len(module.search_streams('8', 0)), 1)
-        self.assertEquals(len(module.search_streams('10', 0)), 1)
+        self.assertEquals(len(module.search_streams("8", 0)), 1)
+        self.assertEquals(len(module.search_streams("10", 0)), 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

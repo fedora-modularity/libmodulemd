@@ -13,10 +13,12 @@
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 import sys
+
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', '2.0')
+
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import Modulemd
 except ImportError:
     # Return error 77 to skip this test on platforms without the necessary
@@ -27,7 +29,6 @@ from base import TestBase
 
 
 class TestTranslation(TestBase):
-
     def test_constructors(self):
         # Test that the new() function works
         t = Modulemd.Translation.new(1, "testmodule", "teststream", 42)
@@ -36,9 +37,10 @@ class TestTranslation(TestBase):
         # Test that keywords are accepted
         t = Modulemd.Translation(
             version=1,
-            module_name='testmodule',
-            module_stream='teststream',
-            modified=42)
+            module_name="testmodule",
+            module_stream="teststream",
+            modified=42,
+        )
         assert t
         assert t.validate()
         assert t.get_locales() == []
@@ -51,5 +53,5 @@ class TestTranslation(TestBase):
         assert t.get_locales() == []
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -15,10 +15,12 @@
 from os import path
 import sys
 import logging
+
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', '2.0')
+
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import Modulemd
     from gi.repository import GLib
 except ImportError:
@@ -31,7 +33,6 @@ import random
 
 
 class TestModuleIndexMerger(TestBase):
-
     def test_constructors(self):
         merger = Modulemd.ModuleIndexMerger()
         self.assertIsNotNone(merger)
@@ -44,13 +45,15 @@ class TestModuleIndexMerger(TestBase):
         idx1 = Modulemd.ModuleIndex()
         idx2 = Modulemd.ModuleIndex()
 
-        res, failures = idx1.update_from_file(path.join(
-            self.test_data_path, "long-valid.yaml"), True)
+        res, failures = idx1.update_from_file(
+            path.join(self.test_data_path, "long-valid.yaml"), True
+        )
         self.assertTrue(res)
         self.assertEqual(len(failures), 0)
 
-        res, failures = idx2.update_from_file(path.join(
-            self.test_data_path, "long-valid.yaml"), True)
+        res, failures = idx2.update_from_file(
+            path.join(self.test_data_path, "long-valid.yaml"), True
+        )
         self.assertTrue(res)
         self.assertEqual(len(failures), 0)
 
@@ -70,47 +73,65 @@ class TestModuleIndexMerger(TestBase):
         # Get a set of objects in a ModuleIndex
         base_index = Modulemd.ModuleIndex()
         base_index.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merging-base.yaml"), True)
+            path.join(self.test_data_path, "merging-base.yaml"), True
+        )
 
         # Baseline
-        httpd_defaults = base_index.get_module('httpd').get_defaults()
+        httpd_defaults = base_index.get_module("httpd").get_defaults()
         self.assertIsNotNone(httpd_defaults)
-        self.assertEqual(httpd_defaults.get_default_stream(), '2.2')
-        httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles()
+        self.assertEqual(httpd_defaults.get_default_stream(), "2.2")
+        httpd_profile_streams = (
+            httpd_defaults.get_streams_with_default_profiles()
+        )
         self.assertEqual(len(httpd_profile_streams), 2)
-        self.assertTrue('2.2' in httpd_profile_streams)
-        self.assertTrue('2.8' in httpd_profile_streams)
+        self.assertTrue("2.2" in httpd_profile_streams)
+        self.assertTrue("2.8" in httpd_profile_streams)
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.2')), 2)
+            len(httpd_defaults.get_default_profiles_for_stream("2.2")), 2
+        )
         self.assertTrue(
-            'client' in httpd_defaults.get_default_profiles_for_stream('2.2'))
+            "client" in httpd_defaults.get_default_profiles_for_stream("2.2")
+        )
         self.assertTrue(
-            'server' in httpd_defaults.get_default_profiles_for_stream('2.2'))
+            "server" in httpd_defaults.get_default_profiles_for_stream("2.2")
+        )
         self.assertTrue(
-            'notreal' in httpd_defaults.get_default_profiles_for_stream('2.8'))
+            "notreal" in httpd_defaults.get_default_profiles_for_stream("2.8")
+        )
 
         self.assertEqual(
-            httpd_defaults.get_default_stream('workstation'), '2.4')
+            httpd_defaults.get_default_stream("workstation"), "2.4"
+        )
         httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles(
-            'workstation')
+            "workstation"
+        )
         self.assertEqual(len(httpd_profile_streams), 2)
-        self.assertTrue('2.4' in httpd_profile_streams)
-        self.assertTrue('2.6' in httpd_profile_streams)
+        self.assertTrue("2.4" in httpd_profile_streams)
+        self.assertTrue("2.6" in httpd_profile_streams)
 
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.4', 'workstation')), 1)
+            len(
+                httpd_defaults.get_default_profiles_for_stream(
+                    "2.4", "workstation"
+                )
+            ),
+            1,
+        )
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.6', 'workstation')), 3)
+            len(
+                httpd_defaults.get_default_profiles_for_stream(
+                    "2.6", "workstation"
+                )
+            ),
+            3,
+        )
 
         # Get another set of objects that will override the default stream for
         # nodejs
         override_nodejs_index = Modulemd.ModuleIndex()
         override_nodejs_index.update_from_file(
-            path.join(
-                self.test_data_path,
-                "overriding-nodejs.yaml"), True)
+            path.join(self.test_data_path, "overriding-nodejs.yaml"), True
+        )
 
         # Test that adding both of these at the same priority level results in
         # the no default stream
@@ -121,7 +142,7 @@ class TestModuleIndexMerger(TestBase):
         merged_index = merger.resolve()
         self.assertIsNotNone(merged_index)
 
-        nodejs = merged_index.get_module('nodejs')
+        nodejs = merged_index.get_module("nodejs")
         self.assertIsNotNone(nodejs)
 
         nodejs_defaults = nodejs.get_defaults()
@@ -131,9 +152,8 @@ class TestModuleIndexMerger(TestBase):
         # Get another set of objects that will override the above
         override_index = Modulemd.ModuleIndex()
         override_index.update_from_file(
-            path.join(
-                self.test_data_path,
-                "overriding.yaml"), True)
+            path.join(self.test_data_path, "overriding.yaml"), True
+        )
 
         # Test that override_index at a higher priority level succeeds
         # Test that adding both of these at the same priority level fails
@@ -144,8 +164,8 @@ class TestModuleIndexMerger(TestBase):
         random_low = random.randint(1, 100)
         random_high = random.randint(101, 999)
         print(
-            "Low priority: %d, High priority: %d" %
-            (random_low, random_high))
+            "Low priority: %d, High priority: %d" % (random_low, random_high)
+        )
         merger.associate_index(base_index, random_low)
         merger.associate_index(override_index, random_high)
 
@@ -155,51 +175,76 @@ class TestModuleIndexMerger(TestBase):
         # Validate merged results
 
         # HTTPD
-        httpd_defaults = merged_index.get_module('httpd').get_defaults()
+        httpd_defaults = merged_index.get_module("httpd").get_defaults()
         self.assertIsNotNone(httpd_defaults)
-        self.assertEqual(httpd_defaults.get_default_stream(), '2.4')
-        httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles()
+        self.assertEqual(httpd_defaults.get_default_stream(), "2.4")
+        httpd_profile_streams = (
+            httpd_defaults.get_streams_with_default_profiles()
+        )
         self.assertEqual(len(httpd_profile_streams), 2)
-        self.assertTrue('2.2' in httpd_profile_streams)
-        self.assertTrue('2.4' in httpd_profile_streams)
+        self.assertTrue("2.2" in httpd_profile_streams)
+        self.assertTrue("2.4" in httpd_profile_streams)
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.2')), 2)
+            len(httpd_defaults.get_default_profiles_for_stream("2.2")), 2
+        )
         self.assertTrue(
-            'client' in httpd_defaults.get_default_profiles_for_stream('2.2'))
+            "client" in httpd_defaults.get_default_profiles_for_stream("2.2")
+        )
         self.assertTrue(
-            'server' in httpd_defaults.get_default_profiles_for_stream('2.2'))
+            "server" in httpd_defaults.get_default_profiles_for_stream("2.2")
+        )
         self.assertTrue(
-            'client' in httpd_defaults.get_default_profiles_for_stream('2.4'))
+            "client" in httpd_defaults.get_default_profiles_for_stream("2.4")
+        )
         self.assertTrue(
-            'server' in httpd_defaults.get_default_profiles_for_stream('2.4'))
+            "server" in httpd_defaults.get_default_profiles_for_stream("2.4")
+        )
 
         self.assertEqual(
-            httpd_defaults.get_default_stream('workstation'), '2.8')
+            httpd_defaults.get_default_stream("workstation"), "2.8"
+        )
         httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles(
-            'workstation')
+            "workstation"
+        )
         self.assertEqual(len(httpd_profile_streams), 3)
-        self.assertTrue('2.4' in httpd_profile_streams)
-        self.assertTrue('2.6' in httpd_profile_streams)
-        self.assertTrue('2.8' in httpd_profile_streams)
+        self.assertTrue("2.4" in httpd_profile_streams)
+        self.assertTrue("2.6" in httpd_profile_streams)
+        self.assertTrue("2.8" in httpd_profile_streams)
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.4', 'workstation')), 1)
+            len(
+                httpd_defaults.get_default_profiles_for_stream(
+                    "2.4", "workstation"
+                )
+            ),
+            1,
+        )
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.6', 'workstation')), 3)
+            len(
+                httpd_defaults.get_default_profiles_for_stream(
+                    "2.6", "workstation"
+                )
+            ),
+            3,
+        )
         self.assertEqual(
-            len(httpd_defaults.get_default_profiles_for_stream('2.8', 'workstation')), 4)
+            len(
+                httpd_defaults.get_default_profiles_for_stream(
+                    "2.8", "workstation"
+                )
+            ),
+            4,
+        )
 
     def test_merger_with_real_world_data(self):
         fedora_index = Modulemd.ModuleIndex()
         fedora_index.update_from_file(
-            path.join(
-                self.test_data_path,
-                "f29.yaml"), True)
+            path.join(self.test_data_path, "f29.yaml"), True
+        )
 
         updates_index = Modulemd.ModuleIndex()
         updates_index.update_from_file(
-            path.join(
-                self.test_data_path,
-                "f29-updates.yaml"), True)
+            path.join(self.test_data_path, "f29-updates.yaml"), True
+        )
 
         merger = Modulemd.ModuleIndexMerger()
         merger.associate_index(fedora_index, 0)
@@ -223,29 +268,34 @@ data:
     module: python
     stream: %s
 ...
-""" % (stream)
+""" % (
+                stream
+            )
 
             index = Modulemd.ModuleIndex()
             index.update_from_string(default, strict=True)
             merger.associate_index(index, 0)
 
-        with self.assertRaisesRegexp(gi.repository.GLib.GError, "Default stream mismatch in module python"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError,
+            "Default stream mismatch in module python",
+        ):
             merger.resolve_ext(True)
 
     def test_merge_add_only(self):
         base_idx = Modulemd.ModuleIndex()
-        self.assertTrue(base_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "base.yaml"), True))
+        self.assertTrue(
+            base_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "base.yaml"), True
+            )
+        )
 
         add_only_idx = Modulemd.ModuleIndex()
-        self.assertTrue(add_only_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "add_only.yaml"), True))
+        self.assertTrue(
+            add_only_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "add_only.yaml"), True
+            )
+        )
 
         merger = Modulemd.ModuleIndexMerger()
         merger.associate_index(base_idx, 0)
@@ -254,37 +304,44 @@ data:
         merged_idx = merger.resolve()
         self.assertIsNotNone(merged_idx)
 
-        httpd = merged_idx.get_module('httpd')
+        httpd = merged_idx.get_module("httpd")
         self.assertIsNotNone(httpd)
         httpd_defs = httpd.get_defaults()
 
         self.assertEqual(httpd_defs.get_default_stream(), "2.8")
         expected_profile_defs = {
-            '2.2': set(['client', 'server']),
-            '2.8': set(['notreal', ]),
-            '2.10': set(['notreal', ])
+            "2.2": set(["client", "server"]),
+            "2.8": set(["notreal"]),
+            "2.10": set(["notreal"]),
         }
 
         for stream in expected_profile_defs.keys():
-            self.assertEqual(set(httpd_defs.get_default_profiles_for_stream(
-                stream)), expected_profile_defs[stream])
+            self.assertEqual(
+                set(httpd_defs.get_default_profiles_for_stream(stream)),
+                expected_profile_defs[stream],
+            )
 
         self.assertEqual(httpd_defs.get_default_stream("workstation"), "2.4")
 
     def test_merge_add_conflicting_stream(self):
         base_idx = Modulemd.ModuleIndex()
-        self.assertTrue(base_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "base.yaml"), True))
+        self.assertTrue(
+            base_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "base.yaml"), True
+            )
+        )
 
         add_only_idx = Modulemd.ModuleIndex()
-        self.assertTrue(add_only_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "add_conflicting_stream.yaml"), True))
+        self.assertTrue(
+            add_only_idx.update_from_file(
+                path.join(
+                    self.test_data_path,
+                    "merger",
+                    "add_conflicting_stream.yaml",
+                ),
+                True,
+            )
+        )
 
         merger = Modulemd.ModuleIndexMerger()
         merger.associate_index(base_idx, 0)
@@ -293,7 +350,7 @@ data:
         merged_idx = merger.resolve()
         self.assertIsNotNone(merged_idx)
 
-        psql = merged_idx.get_module('postgresql')
+        psql = merged_idx.get_module("postgresql")
         self.assertIsNotNone(psql)
 
         psql_defs = psql.get_defaults()
@@ -302,28 +359,35 @@ data:
         self.assertIsNone(psql_defs.get_default_stream())
 
         expected_profile_defs = {
-            '8.1': set(['client', 'server', 'foo']),
-            '8.2': set(['client', 'server', 'foo']),
+            "8.1": set(["client", "server", "foo"]),
+            "8.2": set(["client", "server", "foo"]),
         }
 
         for stream in expected_profile_defs.keys():
-            self.assertEqual(set(psql_defs.get_default_profiles_for_stream(
-                stream)), expected_profile_defs[stream])
+            self.assertEqual(
+                set(psql_defs.get_default_profiles_for_stream(stream)),
+                expected_profile_defs[stream],
+            )
 
     def test_merge_add_conflicting_stream_and_profile_modified(self):
         base_idx = Modulemd.ModuleIndex()
-        self.assertTrue(base_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "base.yaml"), True))
+        self.assertTrue(
+            base_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "base.yaml"), True
+            )
+        )
 
         add_conflicting_idx = Modulemd.ModuleIndex()
-        self.assertTrue(add_conflicting_idx.update_from_file(
-            path.join(
-                self.test_data_path,
-                "merger",
-                "add_conflicting_stream_and_profile_modified.yaml"), True))
+        self.assertTrue(
+            add_conflicting_idx.update_from_file(
+                path.join(
+                    self.test_data_path,
+                    "merger",
+                    "add_conflicting_stream_and_profile_modified.yaml",
+                ),
+                True,
+            )
+        )
 
         merger = Modulemd.ModuleIndexMerger()
         merger.associate_index(base_idx, 0)
@@ -332,24 +396,26 @@ data:
         merged_idx = merger.resolve()
         self.assertIsNotNone(merged_idx)
 
-        psql = merged_idx.get_module('postgresql')
+        psql = merged_idx.get_module("postgresql")
         self.assertIsNotNone(psql)
 
         psql_defs = psql.get_defaults()
         self.assertIsNotNone(psql_defs)
 
-        self.assertEqual(psql_defs.get_default_stream(), '8.2')
+        self.assertEqual(psql_defs.get_default_stream(), "8.2")
 
         expected_profile_defs = {
-            '8.1': set(['client', 'server']),
-            '8.2': set(['client', 'server', 'foo']),
-            '8.3': set(['client', 'server']),
+            "8.1": set(["client", "server"]),
+            "8.2": set(["client", "server", "foo"]),
+            "8.3": set(["client", "server"]),
         }
 
         for stream in expected_profile_defs:
-            self.assertEqual(set(psql_defs.get_default_profiles_for_stream(
-                stream)), expected_profile_defs[stream])
+            self.assertEqual(
+                set(psql_defs.get_default_profiles_for_stream(stream)),
+                expected_profile_defs[stream],
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

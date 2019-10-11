@@ -15,11 +15,12 @@
 
 import os
 import sys
+
 try:
     import unittest
     import gi
 
-    gi.require_version('Modulemd', '2.0')
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import GLib
     from gi.repository import Modulemd
 except ImportError:
@@ -31,40 +32,40 @@ from base import TestBase
 
 modulestream_versions = [
     Modulemd.ModuleStreamVersionEnum.ONE,
-    Modulemd.ModuleStreamVersionEnum.TWO]
+    Modulemd.ModuleStreamVersionEnum.TWO,
+]
 
 
 class TestModuleStream(TestBase):
-
     def test_constructors(self):
         for version in modulestream_versions:
 
             # Test that the new() function works
-            stream = Modulemd.ModuleStream.new(version, 'foo', 'latest')
+            stream = Modulemd.ModuleStream.new(version, "foo", "latest")
             assert stream
             assert isinstance(stream, Modulemd.ModuleStream)
 
             assert stream.props.mdversion == version
             assert stream.get_mdversion() == version
-            assert stream.props.module_name == 'foo'
-            assert stream.get_module_name() == 'foo'
-            assert stream.props.stream_name == 'latest'
-            assert stream.get_stream_name() == 'latest'
+            assert stream.props.module_name == "foo"
+            assert stream.get_module_name() == "foo"
+            assert stream.props.stream_name == "latest"
+            assert stream.get_stream_name() == "latest"
 
             # Test that the new() function works without a stream name
-            stream = Modulemd.ModuleStream.new(version, 'foo')
+            stream = Modulemd.ModuleStream.new(version, "foo")
             assert stream
             assert isinstance(stream, Modulemd.ModuleStream)
 
             assert stream.props.mdversion == version
             assert stream.get_mdversion() == version
-            assert stream.props.module_name == 'foo'
-            assert stream.get_module_name() == 'foo'
+            assert stream.props.module_name == "foo"
+            assert stream.get_module_name() == "foo"
             assert stream.props.stream_name is None
             assert stream.get_stream_name() is None
 
             # Test that the new() function works with no module name
-            stream = Modulemd.ModuleStream.new(version, None, 'latest')
+            stream = Modulemd.ModuleStream.new(version, None, "latest")
             assert stream
             assert isinstance(stream, Modulemd.ModuleStream)
 
@@ -72,8 +73,8 @@ class TestModuleStream(TestBase):
             assert stream.get_mdversion() == version
             assert stream.props.module_name is None
             assert stream.get_module_name() is None
-            assert stream.props.stream_name == 'latest'
-            assert stream.get_stream_name() == 'latest'
+            assert stream.props.stream_name == "latest"
+            assert stream.get_stream_name() == "latest"
 
             # Test that the new() function works with no module or stream
             stream = Modulemd.ModuleStream.new(version)
@@ -88,25 +89,28 @@ class TestModuleStream(TestBase):
             assert stream.get_stream_name() is None
 
         # Test that we cannot instantiate directly
-        with self.assertRaisesRegexp(TypeError, 'cannot create instance of abstract'):
+        with self.assertRaisesRegexp(
+            TypeError, "cannot create instance of abstract"
+        ):
             Modulemd.ModuleStream()
 
         # Test with a zero mdversion
-        with self.assertRaisesRegexp(TypeError, 'constructor returned NULL'):
+        with self.assertRaisesRegexp(TypeError, "constructor returned NULL"):
             with self.expect_signal():
                 defs = Modulemd.ModuleStream.new(0)
 
         # Test with an unknown mdversion
-        with self.assertRaisesRegexp(TypeError, 'constructor returned NULL'):
+        with self.assertRaisesRegexp(TypeError, "constructor returned NULL"):
             with self.expect_signal():
                 defs = Modulemd.ModuleStream.new(
-                    Modulemd.ModuleStreamVersionEnum.LATEST + 1)
+                    Modulemd.ModuleStreamVersionEnum.LATEST + 1
+                )
 
     def test_copy(self):
         for version in modulestream_versions:
 
             # Test that copying a stream with a stream name works
-            stream = Modulemd.ModuleStream.new(version, 'foo', 'stable')
+            stream = Modulemd.ModuleStream.new(version, "foo", "stable")
             copied_stream = stream.copy()
 
             assert copied_stream.props.module_name == stream.props.module_name
@@ -115,7 +119,7 @@ class TestModuleStream(TestBase):
             assert copied_stream.get_stream_name() == stream.get_stream_name()
 
             # Test that copying a stream without a stream name works
-            stream = Modulemd.ModuleStream.new(version, 'foo')
+            stream = Modulemd.ModuleStream.new(version, "foo")
             copied_stream = stream.copy()
 
             assert copied_stream.props.module_name == stream.props.module_name
@@ -124,18 +128,18 @@ class TestModuleStream(TestBase):
             assert copied_stream.get_stream_name() == stream.get_stream_name()
 
             # Test that copying a stream and changing the stream works
-            stream = Modulemd.ModuleStream.new(version, 'foo', 'stable')
-            copied_stream = stream.copy(module_stream='latest')
+            stream = Modulemd.ModuleStream.new(version, "foo", "stable")
+            copied_stream = stream.copy(module_stream="latest")
 
             assert copied_stream.props.module_name == stream.props.module_name
             assert copied_stream.get_module_name() == stream.get_module_name()
             assert copied_stream.props.stream_name != stream.props.stream_name
             assert copied_stream.get_stream_name() != stream.get_stream_name()
-            assert copied_stream.props.stream_name == 'latest'
-            assert copied_stream.get_stream_name() == 'latest'
+            assert copied_stream.props.stream_name == "latest"
+            assert copied_stream.get_stream_name() == "latest"
 
             # Test that copying a stream without a module name works
-            stream = Modulemd.ModuleStream.new(version, None, 'stable')
+            stream = Modulemd.ModuleStream.new(version, None, "stable")
             copied_stream = stream.copy()
 
             assert copied_stream.props.module_name == stream.props.module_name
@@ -144,11 +148,11 @@ class TestModuleStream(TestBase):
             assert copied_stream.get_stream_name() == stream.get_stream_name()
 
             # Test that copying a stream and changing the name works
-            stream = Modulemd.ModuleStream.new(version, 'foo', 'stable')
-            copied_stream = stream.copy(module_name='bar')
+            stream = Modulemd.ModuleStream.new(version, "foo", "stable")
+            copied_stream = stream.copy(module_name="bar")
 
-            assert copied_stream.props.module_name == 'bar'
-            assert copied_stream.get_module_name() == 'bar'
+            assert copied_stream.props.module_name == "bar"
+            assert copied_stream.get_module_name() == "bar"
             assert copied_stream.props.stream_name == stream.props.stream_name
             assert copied_stream.get_stream_name() == stream.get_stream_name()
 
@@ -177,21 +181,22 @@ class TestModuleStream(TestBase):
             assert stream.get_nsvc() is None
 
             # Next, test for no stream name
-            stream = Modulemd.ModuleStream.new(version, 'modulename')
+            stream = Modulemd.ModuleStream.new(version, "modulename")
             assert stream.get_nsvc() is None
 
             # Now with valid module and stream names
             stream = Modulemd.ModuleStream.new(
-                version, 'modulename', 'streamname')
-            assert stream.get_nsvc() == 'modulename:streamname:0'
+                version, "modulename", "streamname"
+            )
+            assert stream.get_nsvc() == "modulename:streamname:0"
 
             # Add a version number
             stream.props.version = 42
-            assert stream.get_nsvc() == 'modulename:streamname:42'
+            assert stream.get_nsvc() == "modulename:streamname:42"
 
             # Add a context
-            stream.props.context = 'deadbeef'
-            assert stream.get_nsvc() == 'modulename:streamname:42:deadbeef'
+            stream.props.context = "deadbeef"
+            assert stream.get_nsvc() == "modulename:streamname:42:deadbeef"
 
     def test_nsvca(self):
         for version in modulestream_versions:
@@ -200,47 +205,48 @@ class TestModuleStream(TestBase):
             self.assertIsNone(stream.get_NSVCA())
 
             # Next, test for no stream name
-            stream = Modulemd.ModuleStream.new(version, 'modulename')
+            stream = Modulemd.ModuleStream.new(version, "modulename")
             self.assertEqual(stream.get_NSVCA(), "modulename")
 
             # Now with valid module and stream names
             stream = Modulemd.ModuleStream.new(
-                version, 'modulename', 'streamname')
-            self.assertEqual(stream.get_NSVCA(), 'modulename:streamname')
+                version, "modulename", "streamname"
+            )
+            self.assertEqual(stream.get_NSVCA(), "modulename:streamname")
 
             # Add a version number
             stream.props.version = 42
-            self.assertEqual(stream.get_NSVCA(), 'modulename:streamname:42')
+            self.assertEqual(stream.get_NSVCA(), "modulename:streamname:42")
 
             # Add a context
-            stream.props.context = 'deadbeef'
+            stream.props.context = "deadbeef"
             self.assertEqual(
-                stream.get_NSVCA(),
-                'modulename:streamname:42:deadbeef')
+                stream.get_NSVCA(), "modulename:streamname:42:deadbeef"
+            )
 
             # Add an architecture
-            stream.props.arch = 'x86_64'
-            self.assertEqual(stream.get_NSVCA(),
-                             'modulename:streamname:42:deadbeef:x86_64')
+            stream.props.arch = "x86_64"
+            self.assertEqual(
+                stream.get_NSVCA(), "modulename:streamname:42:deadbeef:x86_64"
+            )
 
             # Now try removing some of the bits in the middle
             stream.props.context = None
-            self.assertEqual(stream.get_NSVCA(),
-                             'modulename:streamname:42::x86_64')
+            self.assertEqual(
+                stream.get_NSVCA(), "modulename:streamname:42::x86_64"
+            )
 
-            stream = Modulemd.ModuleStream.new(version, 'modulename')
-            stream.props.arch = 'x86_64'
-            self.assertEqual(stream.get_NSVCA(),
-                             'modulename::::x86_64')
+            stream = Modulemd.ModuleStream.new(version, "modulename")
+            stream.props.arch = "x86_64"
+            self.assertEqual(stream.get_NSVCA(), "modulename::::x86_64")
 
             stream.props.version = 2019
-            self.assertEqual(stream.get_NSVCA(),
-                             'modulename::2019::x86_64')
+            self.assertEqual(stream.get_NSVCA(), "modulename::2019::x86_64")
             # Add a context
-            stream.props.context = 'feedfeed'
+            stream.props.context = "feedfeed"
             self.assertEqual(
-                stream.get_NSVCA(),
-                'modulename::2019:feedfeed:x86_64')
+                stream.get_NSVCA(), "modulename::2019:feedfeed:x86_64"
+            )
 
     def test_arch(self):
         for version in modulestream_versions:
@@ -251,14 +257,14 @@ class TestModuleStream(TestBase):
             assert stream.get_arch() is None
 
             # Test property setting
-            stream.props.arch = 'x86_64'
-            assert stream.props.arch == 'x86_64'
-            assert stream.get_arch() == 'x86_64'
+            stream.props.arch = "x86_64"
+            assert stream.props.arch == "x86_64"
+            assert stream.get_arch() == "x86_64"
 
             # Test set_arch()
-            stream.set_arch('ppc64le')
-            assert stream.props.arch == 'ppc64le'
-            assert stream.get_arch() == 'ppc64le'
+            stream.set_arch("ppc64le")
+            assert stream.props.arch == "ppc64le"
+            assert stream.get_arch() == "ppc64le"
 
             # Test setting it to None
             stream.props.arch = None
@@ -274,12 +280,12 @@ class TestModuleStream(TestBase):
             assert stream.get_buildopts() is None
 
             buildopts = Modulemd.Buildopts()
-            buildopts.props.rpm_macros = '%demomacro 1'
+            buildopts.props.rpm_macros = "%demomacro 1"
             stream.set_buildopts(buildopts)
 
             assert stream.props.buildopts is not None
             assert stream.props.buildopts is not None
-            assert stream.props.buildopts.props.rpm_macros == '%demomacro 1'
+            assert stream.props.buildopts.props.rpm_macros == "%demomacro 1"
 
     def test_community(self):
         for version in modulestream_versions:
@@ -290,14 +296,14 @@ class TestModuleStream(TestBase):
             assert stream.get_community() is None
 
             # Test property setting
-            stream.props.community = 'http://example.com'
-            assert stream.props.community == 'http://example.com'
-            assert stream.get_community() == 'http://example.com'
+            stream.props.community = "http://example.com"
+            assert stream.props.community == "http://example.com"
+            assert stream.get_community() == "http://example.com"
 
             # Test set_community()
-            stream.set_community('http://redhat.com')
-            assert stream.props.community == 'http://redhat.com'
-            assert stream.get_community() == 'http://redhat.com'
+            stream.set_community("http://redhat.com")
+            assert stream.props.community == "http://redhat.com"
+            assert stream.get_community() == "http://redhat.com"
 
             # Test setting it to None
             stream.props.community = None
@@ -312,9 +318,10 @@ class TestModuleStream(TestBase):
             assert stream.get_description(locale="C") is None
 
             # Test set_description()
-            stream.set_description('A different description')
-            assert stream.get_description(
-                locale="C") == 'A different description'
+            stream.set_description("A different description")
+            assert (
+                stream.get_description(locale="C") == "A different description"
+            )
 
             # Test setting it to None
             stream.set_description(None)
@@ -329,14 +336,14 @@ class TestModuleStream(TestBase):
             assert stream.get_documentation() is None
 
             # Test property setting
-            stream.props.documentation = 'http://example.com'
-            assert stream.props.documentation == 'http://example.com'
-            assert stream.get_documentation() == 'http://example.com'
+            stream.props.documentation = "http://example.com"
+            assert stream.props.documentation == "http://example.com"
+            assert stream.get_documentation() == "http://example.com"
 
             # Test set_documentation()
-            stream.set_documentation('http://redhat.com')
-            assert stream.props.documentation == 'http://redhat.com'
-            assert stream.get_documentation() == 'http://redhat.com'
+            stream.set_documentation("http://redhat.com")
+            assert stream.props.documentation == "http://redhat.com"
+            assert stream.get_documentation() == "http://redhat.com"
 
             # Test setting it to None
             stream.props.documentation = None
@@ -351,8 +358,8 @@ class TestModuleStream(TestBase):
             assert stream.get_summary(locale="C") is None
 
             # Test set_summary()
-            stream.set_summary('A different summary')
-            assert stream.get_summary(locale="C") == 'A different summary'
+            stream.set_summary("A different summary")
+            assert stream.get_summary(locale="C") == "A different summary"
 
             # Test setting it to None
             stream.set_summary(None)
@@ -367,14 +374,14 @@ class TestModuleStream(TestBase):
             assert stream.get_tracker() is None
 
             # Test property setting
-            stream.props.tracker = 'http://example.com'
-            assert stream.props.tracker == 'http://example.com'
-            assert stream.get_tracker() == 'http://example.com'
+            stream.props.tracker = "http://example.com"
+            assert stream.props.tracker == "http://example.com"
+            assert stream.get_tracker() == "http://example.com"
 
             # Test set_tracker()
-            stream.set_tracker('http://redhat.com')
-            assert stream.props.tracker == 'http://redhat.com'
-            assert stream.get_tracker() == 'http://redhat.com'
+            stream.set_tracker("http://redhat.com")
+            assert stream.props.tracker == "http://redhat.com"
+            assert stream.get_tracker() == "http://redhat.com"
 
             # Test setting it to None
             stream.props.tracker = None
@@ -386,99 +393,101 @@ class TestModuleStream(TestBase):
             stream = Modulemd.ModuleStream.new(version)
 
             # Add an RPM component to a stream
-            rpm_comp = Modulemd.ComponentRpm(name='rpmcomponent')
+            rpm_comp = Modulemd.ComponentRpm(name="rpmcomponent")
             stream.add_component(rpm_comp)
-            assert 'rpmcomponent' in stream.get_rpm_component_names()
-            retrieved_comp = stream.get_rpm_component('rpmcomponent')
+            assert "rpmcomponent" in stream.get_rpm_component_names()
+            retrieved_comp = stream.get_rpm_component("rpmcomponent")
             assert retrieved_comp
-            assert retrieved_comp.props.name == 'rpmcomponent'
+            assert retrieved_comp.props.name == "rpmcomponent"
 
             # Add a Module component to a stream
-            mod_comp = Modulemd.ComponentModule(name='modulecomponent')
+            mod_comp = Modulemd.ComponentModule(name="modulecomponent")
             stream.add_component(mod_comp)
-            assert 'modulecomponent' in stream.get_module_component_names()
-            retrieved_comp = stream.get_module_component('modulecomponent')
+            assert "modulecomponent" in stream.get_module_component_names()
+            retrieved_comp = stream.get_module_component("modulecomponent")
             assert retrieved_comp
-            assert retrieved_comp.props.name == 'modulecomponent'
+            assert retrieved_comp.props.name == "modulecomponent"
 
             # Remove an RPM component from a stream
-            stream.remove_rpm_component('rpmcomponent')
+            stream.remove_rpm_component("rpmcomponent")
 
             # Remove a Module component from a stream
-            stream.remove_module_component('modulecomponent')
+            stream.remove_module_component("modulecomponent")
 
     def test_licenses(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
-            stream.add_content_license('GPLv2+')
-            assert 'GPLv2+' in stream.get_content_licenses()
+            stream.add_content_license("GPLv2+")
+            assert "GPLv2+" in stream.get_content_licenses()
 
-            stream.add_module_license('MIT')
-            assert 'MIT' in stream.get_module_licenses()
+            stream.add_module_license("MIT")
+            assert "MIT" in stream.get_module_licenses()
 
-            stream.remove_content_license('GPLv2+')
-            stream.remove_module_license('MIT')
+            stream.remove_content_license("GPLv2+")
+            stream.remove_module_license("MIT")
 
     def test_profiles(self):
         for version in modulestream_versions:
-            stream = Modulemd.ModuleStream.new(version, 'sssd')
+            stream = Modulemd.ModuleStream.new(version, "sssd")
 
-            profile = Modulemd.Profile(name='client')
-            profile.add_rpm('sssd-client')
+            profile = Modulemd.Profile(name="client")
+            profile.add_rpm("sssd-client")
 
             stream.add_profile(profile)
             assert len(stream.get_profile_names()) == 1
-            assert 'client' in stream.get_profile_names()
-            assert 'sssd-client' in stream.get_profile(
-                'client').get_rpms()
+            assert "client" in stream.get_profile_names()
+            assert "sssd-client" in stream.get_profile("client").get_rpms()
 
             stream.clear_profiles()
             assert len(stream.get_profile_names()) == 0
 
     def test_rpm_api(self):
         for version in modulestream_versions:
-            stream = Modulemd.ModuleStream.new(version, 'sssd')
+            stream = Modulemd.ModuleStream.new(version, "sssd")
 
-            stream.add_rpm_api('sssd-common')
-            assert 'sssd-common' in stream.get_rpm_api()
+            stream.add_rpm_api("sssd-common")
+            assert "sssd-common" in stream.get_rpm_api()
 
-            stream.remove_rpm_api('sssd-common')
+            stream.remove_rpm_api("sssd-common")
             assert len(stream.get_rpm_api()) == 0
 
     def test_rpm_artifacts(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
-            stream.add_rpm_artifact('bar-0:1.23-1.module_deadbeef.x86_64')
-            assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts()
+            stream.add_rpm_artifact("bar-0:1.23-1.module_deadbeef.x86_64")
+            assert (
+                "bar-0:1.23-1.module_deadbeef.x86_64"
+                in stream.get_rpm_artifacts()
+            )
 
-            stream.remove_rpm_artifact('bar-0:1.23-1.module_deadbeef.x86_64')
+            stream.remove_rpm_artifact("bar-0:1.23-1.module_deadbeef.x86_64")
             assert len(stream.get_rpm_artifacts()) == 0
 
     def test_rpm_filters(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
-            stream.add_rpm_filter('bar')
-            assert 'bar' in stream.get_rpm_filters()
+            stream.add_rpm_filter("bar")
+            assert "bar" in stream.get_rpm_filters()
 
-            stream.remove_rpm_filter('bar')
+            stream.remove_rpm_filter("bar")
             assert len(stream.get_rpm_filters()) == 0
 
     def test_servicelevels(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
-            sl = Modulemd.ServiceLevel.new('rawhide')
+            sl = Modulemd.ServiceLevel.new("rawhide")
             sl.set_eol_ymd(1980, 3, 2)
 
             stream.add_servicelevel(sl)
 
-            assert 'rawhide' in stream.get_servicelevel_names()
+            assert "rawhide" in stream.get_servicelevel_names()
 
-            retrieved_sl = stream.get_servicelevel('rawhide')
-            assert retrieved_sl.props.name == 'rawhide'
-            assert retrieved_sl.get_eol_as_string() == '1980-03-02'
+            retrieved_sl = stream.get_servicelevel("rawhide")
+            assert retrieved_sl.props.name == "rawhide"
+            assert retrieved_sl.get_eol_as_string() == "1980-03-02"
 
     def test_v1_eol(self):
         stream = Modulemd.ModuleStreamV1.new()
@@ -491,43 +500,43 @@ class TestModuleStream(TestBase):
         assert retrieved_eol.get_month() == 2
         assert retrieved_eol.get_year() == 1998
 
-        sl = stream.get_servicelevel('rawhide')
-        assert sl.get_eol_as_string() == '1998-02-03'
+        sl = stream.get_servicelevel("rawhide")
+        assert sl.get_eol_as_string() == "1998-02-03"
 
     def test_v1_dependencies(self):
         stream = Modulemd.ModuleStreamV1.new()
-        stream.add_buildtime_requirement('testmodule', 'stable')
+        stream.add_buildtime_requirement("testmodule", "stable")
 
         assert len(stream.get_buildtime_modules()) == 1
-        assert 'testmodule' in stream.get_buildtime_modules()
+        assert "testmodule" in stream.get_buildtime_modules()
 
-        assert stream.get_buildtime_requirement_stream('testmodule') == \
-            'stable'
+        assert (
+            stream.get_buildtime_requirement_stream("testmodule") == "stable"
+        )
 
-        stream.add_runtime_requirement('testmodule', 'latest')
+        stream.add_runtime_requirement("testmodule", "latest")
         assert len(stream.get_runtime_modules()) == 1
-        assert 'testmodule' in stream.get_runtime_modules()
-        assert stream.get_runtime_requirement_stream('testmodule') == 'latest'
+        assert "testmodule" in stream.get_runtime_modules()
+        assert stream.get_runtime_requirement_stream("testmodule") == "latest"
 
     def test_v2_dependencies(self):
         stream = Modulemd.ModuleStreamV2.new()
         deps = Modulemd.Dependencies()
 
-        deps.add_buildtime_stream('foo', 'stable')
-        deps.set_empty_runtime_dependencies_for_module('bar')
+        deps.add_buildtime_stream("foo", "stable")
+        deps.set_empty_runtime_dependencies_for_module("bar")
         stream.add_dependencies(deps)
 
         assert len(stream.get_dependencies()) == 1
         assert len(stream.get_dependencies()) == 1
 
-        assert 'foo' in stream.get_dependencies(
-        )[0].get_buildtime_modules()
+        assert "foo" in stream.get_dependencies()[0].get_buildtime_modules()
 
-        assert 'stable' in stream.get_dependencies(
-        )[0].get_buildtime_streams('foo')
+        assert "stable" in stream.get_dependencies()[0].get_buildtime_streams(
+            "foo"
+        )
 
-        assert 'bar' in stream.get_dependencies(
-        )[0].get_runtime_modules()
+        assert "bar" in stream.get_dependencies()[0].get_runtime_modules()
 
         retrieved_deps = stream.get_dependencies()
         stream.clear_dependencies()
@@ -541,7 +550,7 @@ class TestModuleStream(TestBase):
         self.assertEquals(len(stream.get_dependencies()), 0)
 
     def test_xmd(self):
-        if '_overrides_module' in dir(Modulemd):
+        if "_overrides_module" in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib
             # because the overrides that translate between python and GVariant
             # must be installed in /usr/lib/python*/site-packages/gi/overrides
@@ -550,16 +559,16 @@ class TestModuleStream(TestBase):
             # An empty dictionary should be returned if no xmd value is set
             assert stream.get_xmd() == {}
 
-            xmd = {'outer_key': {'inner_key': ['scalar', 'another_scalar']}}
+            xmd = {"outer_key": {"inner_key": ["scalar", "another_scalar"]}}
 
             stream.set_xmd(xmd)
 
             xmd_copy = stream.get_xmd()
             assert xmd_copy
-            assert 'outer_key' in xmd_copy
-            assert 'inner_key' in xmd_copy['outer_key']
-            assert 'scalar' in xmd_copy['outer_key']['inner_key']
-            assert 'another_scalar' in xmd_copy['outer_key']['inner_key']
+            assert "outer_key" in xmd_copy
+            assert "inner_key" in xmd_copy["outer_key"]
+            assert "scalar" in xmd_copy["outer_key"]["inner_key"]
+            assert "another_scalar" in xmd_copy["outer_key"]["inner_key"]
 
             # Verify that we can add content and save it back
             xmd["something"] = ["foo", "bar"]
@@ -593,7 +602,9 @@ class TestModuleStream(TestBase):
         idx = Modulemd.ModuleIndex.new()
         idx.add_module_stream(v2_stream)
 
-        self.assertEquals(idx.dump_to_string(), """---
+        self.assertEquals(
+            idx.dump_to_string(),
+            """---
 document: modulemd
 version: 2
 data:
@@ -613,7 +624,8 @@ data:
       ModuleA: [streamZ]
       ModuleB: [streamY]
 ...
-""")
+""",
+        )
 
     def test_v2_yaml(self):
         yaml = """
@@ -756,58 +768,62 @@ data:
         stream = Modulemd.ModuleStream.read_string(yaml, True)
 
         assert stream is not None
-        assert stream.props.module_name == 'modulename'
-        assert stream.props.stream_name == 'streamname'
+        assert stream.props.module_name == "modulename"
+        assert stream.props.stream_name == "streamname"
         assert stream.props.version == 1
-        assert stream.props.context == 'c0ffe3'
-        assert stream.props.arch == 'x86_64'
+        assert stream.props.context == "c0ffe3"
+        assert stream.props.arch == "x86_64"
         assert stream.get_summary(locale="C") == "Module Summary"
-        assert stream.get_description(
-            locale="C") == "Module Description"
+        assert stream.get_description(locale="C") == "Module Description"
 
-        assert 'rpm_a' in stream.get_rpm_api()
-        assert 'rpm_b' in stream.get_rpm_api()
+        assert "rpm_a" in stream.get_rpm_api()
+        assert "rpm_b" in stream.get_rpm_api()
 
-        assert 'rpm_c' in stream.get_rpm_filters()
+        assert "rpm_c" in stream.get_rpm_filters()
 
-        assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts()
+        assert (
+            "bar-0:1.23-1.module_deadbeef.x86_64" in stream.get_rpm_artifacts()
+        )
 
-        assert 'rawhide' in stream.get_servicelevel_names()
-        assert 'production' in stream.get_servicelevel_names()
+        assert "rawhide" in stream.get_servicelevel_names()
+        assert "production" in stream.get_servicelevel_names()
 
-        sl = stream.get_servicelevel('rawhide')
+        sl = stream.get_servicelevel("rawhide")
         assert sl is not None
-        assert sl.props.name == 'rawhide'
+        assert sl.props.name == "rawhide"
         assert sl.get_eol() is None
 
-        sl = stream.get_servicelevel('production')
+        sl = stream.get_servicelevel("production")
         assert sl is not None
-        assert sl.props.name == 'production'
+        assert sl.props.name == "production"
         assert sl.get_eol() is not None
-        assert sl.get_eol_as_string() == '2099-12-31'
+        assert sl.get_eol_as_string() == "2099-12-31"
 
-        assert 'BSD' in stream.get_content_licenses()
-        assert 'GPLv2+' in stream.get_content_licenses()
-        assert 'MIT' in stream.get_module_licenses()
+        assert "BSD" in stream.get_content_licenses()
+        assert "GPLv2+" in stream.get_content_licenses()
+        assert "MIT" in stream.get_module_licenses()
 
         assert len(stream.get_dependencies()) == 4
 
-        assert stream.props.community == 'http://www.example.com/'
-        assert stream.props.documentation == 'http://www.example.com/'
-        assert stream.props.tracker == 'http://www.example.com/'
+        assert stream.props.community == "http://www.example.com/"
+        assert stream.props.documentation == "http://www.example.com/"
+        assert stream.props.tracker == "http://www.example.com/"
 
         assert len(stream.get_profile_names()) == 5
 
         buildopts = stream.get_buildopts()
         assert buildopts is not None
 
-        assert '%demomacro 1\n%demomacro2 %{demomacro}23\n' == buildopts.props.rpm_macros
-        assert 'fooscl-1-bar' in buildopts.get_rpm_whitelist()
-        assert 'fooscl-1-baz' in buildopts.get_rpm_whitelist()
-        assert 'xxx' in buildopts.get_rpm_whitelist()
-        assert 'xyz' in buildopts.get_rpm_whitelist()
+        assert (
+            "%demomacro 1\n%demomacro2 %{demomacro}23\n"
+            == buildopts.props.rpm_macros
+        )
+        assert "fooscl-1-bar" in buildopts.get_rpm_whitelist()
+        assert "fooscl-1-baz" in buildopts.get_rpm_whitelist()
+        assert "xxx" in buildopts.get_rpm_whitelist()
+        assert "xyz" in buildopts.get_rpm_whitelist()
 
-        if os.getenv('MMD_TEST_INSTALLED_LIB'):
+        if os.getenv("MMD_TEST_INSTALLED_LIB"):
             # The XMD python tests can only be run against the installed
             # lib because the overrides that translate between python and
             # GVariant must be installed in
@@ -816,26 +832,27 @@ data:
             xmd = stream.get_xmd()
             assert xmd is not None
 
-            assert 'some_key' in xmd
-            assert xmd['some_key'] == 'some_data'
+            assert "some_key" in xmd
+            assert xmd["some_key"] == "some_data"
 
-            assert 'some_list' in xmd
+            assert "some_list" in xmd
 
-            assert 'a' in xmd['some_list']
-            assert 'b' in xmd['some_list']
+            assert "a" in xmd["some_list"]
+            assert "b" in xmd["some_list"]
 
-            assert 'some_dict' in xmd
-            assert 'a' in xmd['some_dict']
-            assert xmd['some_dict']['a'] == 'alpha'
+            assert "some_dict" in xmd
+            assert "a" in xmd["some_dict"]
+            assert xmd["some_dict"]["a"] == "alpha"
 
-            assert 'some_other_dict' in xmd['some_dict']
-            assert 'yet_another_key' in xmd[
-                'some_dict']['some_other_dict']
-            assert 'silly' in xmd['some_dict'][
-                'some_other_dict']['yet_another_key']
+            assert "some_other_dict" in xmd["some_dict"]
+            assert "yet_another_key" in xmd["some_dict"]["some_other_dict"]
+            assert (
+                "silly"
+                in xmd["some_dict"]["some_other_dict"]["yet_another_key"]
+            )
 
-            assert 'can_bool' in xmd
-            assert xmd['can_bool'] is True
+            assert "can_bool" in xmd
+            assert xmd["can_bool"] is True
 
         # Validate a trivial modulemd
         trivial_yaml = """
@@ -856,7 +873,8 @@ data:
 
         # Sanity check of spec.v2.yaml
         stream = Modulemd.ModuleStream.read_file(
-            os.path.join(self.source_root, "spec.v2.yaml"), True)
+            os.path.join(self.source_root, "spec.v2.yaml"), True
+        )
         assert stream
 
     def test_v1_yaml(self):
@@ -984,76 +1002,87 @@ data:
             stream = Modulemd.ModuleStream.read_string(yaml, True)
 
             assert stream is not None
-            assert stream.props.module_name == 'modulename'
-            assert stream.props.stream_name == 'streamname'
+            assert stream.props.module_name == "modulename"
+            assert stream.props.stream_name == "streamname"
             assert stream.props.version == 1
-            assert stream.props.context == 'c0ffe3'
-            assert stream.props.arch == 'x86_64'
+            assert stream.props.context == "c0ffe3"
+            assert stream.props.arch == "x86_64"
             assert stream.get_summary(locale="C") == "Module Summary"
-            assert stream.get_description(
-                locale="C") == "Module Description"
+            assert stream.get_description(locale="C") == "Module Description"
 
-            assert 'rpm_a' in stream.get_rpm_api()
-            assert 'rpm_b' in stream.get_rpm_api()
+            assert "rpm_a" in stream.get_rpm_api()
+            assert "rpm_b" in stream.get_rpm_api()
 
-            assert 'rpm_c' in stream.get_rpm_filters()
+            assert "rpm_c" in stream.get_rpm_filters()
 
-            assert 'bar-0:1.23-1.module_deadbeef.x86_64' in stream.get_rpm_artifacts()
+            assert (
+                "bar-0:1.23-1.module_deadbeef.x86_64"
+                in stream.get_rpm_artifacts()
+            )
 
-            assert 'rawhide' in stream.get_servicelevel_names()
-            assert 'production' in stream.get_servicelevel_names()
+            assert "rawhide" in stream.get_servicelevel_names()
+            assert "production" in stream.get_servicelevel_names()
 
-            sl = stream.get_servicelevel('rawhide')
+            sl = stream.get_servicelevel("rawhide")
             assert sl is not None
-            assert sl.props.name == 'rawhide'
-            assert sl.get_eol_as_string() == '2033-08-04'
+            assert sl.props.name == "rawhide"
+            assert sl.get_eol_as_string() == "2033-08-04"
 
-            sl = stream.get_servicelevel('foo')
+            sl = stream.get_servicelevel("foo")
             assert sl is not None
-            assert sl.props.name == 'foo'
+            assert sl.props.name == "foo"
             assert sl.get_eol() is None
 
-            sl = stream.get_servicelevel('production')
+            sl = stream.get_servicelevel("production")
             assert sl is not None
-            assert sl.props.name == 'production'
+            assert sl.props.name == "production"
             assert sl.get_eol() is not None
-            assert sl.get_eol_as_string() == '2099-12-31'
+            assert sl.get_eol_as_string() == "2099-12-31"
 
-            assert 'BSD' in stream.get_content_licenses()
-            assert 'GPLv2+' in stream.get_content_licenses()
-            assert 'MIT' in stream.get_module_licenses()
+            assert "BSD" in stream.get_content_licenses()
+            assert "GPLv2+" in stream.get_content_licenses()
+            assert "MIT" in stream.get_module_licenses()
 
             buildrequires = stream.get_buildtime_modules()
             assert len(buildrequires) == 2
-            assert 'platform' in buildrequires
-            assert stream.get_buildtime_requirement_stream(
-                'platform') == 'and-its-stream-name'
-            assert 'extra-build-env' in buildrequires
-            assert stream.get_buildtime_requirement_stream(
-                'extra-build-env') == 'and-its-stream-name-too'
+            assert "platform" in buildrequires
+            assert (
+                stream.get_buildtime_requirement_stream("platform")
+                == "and-its-stream-name"
+            )
+            assert "extra-build-env" in buildrequires
+            assert (
+                stream.get_buildtime_requirement_stream("extra-build-env")
+                == "and-its-stream-name-too"
+            )
 
             requires = stream.get_runtime_modules()
             assert len(requires) == 1
-            assert 'runtimeplatform' in requires
-            assert stream.get_runtime_requirement_stream(
-                'runtimeplatform') == 'and-its-stream-name-2'
+            assert "runtimeplatform" in requires
+            assert (
+                stream.get_runtime_requirement_stream("runtimeplatform")
+                == "and-its-stream-name-2"
+            )
 
-            assert stream.props.community == 'http://www.example.com/'
-            assert stream.props.documentation == 'http://www.example.com/'
-            assert stream.props.tracker == 'http://www.example.com/'
+            assert stream.props.community == "http://www.example.com/"
+            assert stream.props.documentation == "http://www.example.com/"
+            assert stream.props.tracker == "http://www.example.com/"
 
             assert len(stream.get_profile_names()) == 5
 
             buildopts = stream.get_buildopts()
             assert buildopts is not None
 
-            assert '%demomacro 1\n%demomacro2 %{demomacro}23\n' == buildopts.props.rpm_macros
-            assert 'fooscl-1-bar' in buildopts.get_rpm_whitelist()
-            assert 'fooscl-1-baz' in buildopts.get_rpm_whitelist()
-            assert 'xxx' in buildopts.get_rpm_whitelist()
-            assert 'xyz' in buildopts.get_rpm_whitelist()
+            assert (
+                "%demomacro 1\n%demomacro2 %{demomacro}23\n"
+                == buildopts.props.rpm_macros
+            )
+            assert "fooscl-1-bar" in buildopts.get_rpm_whitelist()
+            assert "fooscl-1-baz" in buildopts.get_rpm_whitelist()
+            assert "xxx" in buildopts.get_rpm_whitelist()
+            assert "xyz" in buildopts.get_rpm_whitelist()
 
-            if os.getenv('MMD_TEST_INSTALLED_LIB'):
+            if os.getenv("MMD_TEST_INSTALLED_LIB"):
                 # The XMD python tests can only be run against the installed
                 # lib because the overrides that translate between python and
                 # GVariant must be installed in
@@ -1062,26 +1091,27 @@ data:
                 xmd = stream.get_xmd()
                 assert xmd is not None
 
-                assert 'some_key' in xmd
-                assert xmd['some_key'] == 'some_data'
+                assert "some_key" in xmd
+                assert xmd["some_key"] == "some_data"
 
-                assert 'some_list' in xmd
+                assert "some_list" in xmd
 
-                assert 'a' in xmd['some_list']
-                assert 'b' in xmd['some_list']
+                assert "a" in xmd["some_list"]
+                assert "b" in xmd["some_list"]
 
-                assert 'some_dict' in xmd
-                assert 'a' in xmd['some_dict']
-                assert xmd['some_dict']['a'] == 'alpha'
+                assert "some_dict" in xmd
+                assert "a" in xmd["some_dict"]
+                assert xmd["some_dict"]["a"] == "alpha"
 
-                assert 'some_other_dict' in xmd['some_dict']
-                assert 'yet_another_key' in xmd[
-                    'some_dict']['some_other_dict']
-                assert 'silly' in xmd['some_dict'][
-                    'some_other_dict']['yet_another_key']
+                assert "some_other_dict" in xmd["some_dict"]
+                assert "yet_another_key" in xmd["some_dict"]["some_other_dict"]
+                assert (
+                    "silly"
+                    in xmd["some_dict"]["some_other_dict"]["yet_another_key"]
+                )
 
-                assert 'can_bool' in xmd
-                assert xmd['can_bool'] is True
+                assert "can_bool" in xmd
+                assert xmd["can_bool"] is True
 
             # Validate a trivial modulemd
             trivial_yaml = """
@@ -1102,43 +1132,44 @@ data:
 
             # Sanity check of spec.v1.yaml
             stream = Modulemd.ModuleStream.read_file(
-                "%s/spec.v1.yaml" % os.getenv('MESON_SOURCE_ROOT'), True)
+                "%s/spec.v1.yaml" % os.getenv("MESON_SOURCE_ROOT"), True
+            )
             assert stream
 
     def test_depends_on_stream(self):
 
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.read_file(
-                "%s/dependson_v%d.yaml" % (
-                    os.getenv('TEST_DATA_PATH'),
-                    version),
-                True)
+                "%s/dependson_v%d.yaml"
+                % (os.getenv("TEST_DATA_PATH"), version),
+                True,
+            )
             self.assertIsNotNone(stream)
 
-            self.assertEqual(stream.depends_on_stream('platform', 'f30'), True)
+            self.assertEqual(stream.depends_on_stream("platform", "f30"), True)
             self.assertEqual(
-                stream.build_depends_on_stream(
-                    'platform', 'f30'), True)
+                stream.build_depends_on_stream("platform", "f30"), True
+            )
 
             self.assertEqual(
-                stream.depends_on_stream(
-                    'platform', 'f28'), False)
+                stream.depends_on_stream("platform", "f28"), False
+            )
             self.assertEqual(
-                stream.build_depends_on_stream(
-                    'platform', 'f28'), False)
+                stream.build_depends_on_stream("platform", "f28"), False
+            )
 
-            self.assertEqual(stream.depends_on_stream('base', 'f30'), False)
+            self.assertEqual(stream.depends_on_stream("base", "f30"), False)
             self.assertEqual(
-                stream.build_depends_on_stream(
-                    'base', 'f30'), False)
+                stream.build_depends_on_stream("base", "f30"), False
+            )
 
             if version >= Modulemd.ModuleStreamVersionEnum.TWO:
                 self.assertEqual(
-                    stream.depends_on_stream(
-                        'streamname', 'f30'), True)
+                    stream.depends_on_stream("streamname", "f30"), True
+                )
                 self.assertEqual(
-                    stream.build_depends_on_stream(
-                        'streamname', 'f30'), True)
+                    stream.build_depends_on_stream("streamname", "f30"), True
+                )
 
     def test_validate_buildafter(self):
         # buildafter is supported only on v2
@@ -1146,39 +1177,58 @@ data:
         # Test a valid module stream with buildafter set
         stream = Modulemd.ModuleStream.read_file(
             os.path.join(
-                self.test_data_path,
-                'buildafter/good_buildafter.yaml'),
-            True)
+                self.test_data_path, "buildafter/good_buildafter.yaml"
+            ),
+            True,
+        )
 
         self.assertIsNotNone(stream)
         self.assertTrue(stream.validate())
 
         # Should fail validation if both buildorder and buildafter are set for
         # the same component.
-        with self.assertRaisesRegexp(gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"
+        ):
             stream = Modulemd.ModuleStream.read_file(
                 os.path.join(
-                    self.test_data_path,
-                    'buildafter/both_same_component.yaml'),
-                True)
+                    self.test_data_path, "buildafter/both_same_component.yaml"
+                ),
+                True,
+            )
 
         # Should fail validation if both buildorder and buildafter are set in
         # different components of the same stream.
-        with self.assertRaisesRegexp(gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"):
-            stream = Modulemd.ModuleStream.read_file(os.path.join(
-                self.test_data_path, 'buildafter/mixed_buildorder.yaml'), True)
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"
+        ):
+            stream = Modulemd.ModuleStream.read_file(
+                os.path.join(
+                    self.test_data_path, "buildafter/mixed_buildorder.yaml"
+                ),
+                True,
+            )
 
         # Should fail if a key specified in a buildafter set does not exist
         # for this module stream.
-        with self.assertRaisesRegexp(gi.repository.GLib.GError, "not found in components list"):
-            stream = Modulemd.ModuleStream.read_file(os.path.join(
-                self.test_data_path, 'buildafter/invalid_key.yaml'), True)
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "not found in components list"
+        ):
+            stream = Modulemd.ModuleStream.read_file(
+                os.path.join(
+                    self.test_data_path, "buildafter/invalid_key.yaml"
+                ),
+                True,
+            )
 
     def test_unicode_desc(self):
         # Test a valid module stream with unicode in the description
         stream = Modulemd.ModuleStream.read_file(
-            "%s/stream_unicode.yaml" %
-            (os.getenv('TEST_DATA_PATH')), True, '', '')
+            "%s/stream_unicode.yaml" % (os.getenv("TEST_DATA_PATH")),
+            True,
+            "",
+            "",
+        )
 
         self.assertIsNotNone(stream)
         self.assertTrue(stream.validate())
@@ -1186,31 +1236,34 @@ data:
     def test_xmd_issue_274(self):
         # Test a valid module stream with unicode in the description
         stream = Modulemd.ModuleStream.read_file(
-            "%s/stream_unicode.yaml" %
-            (os.getenv('TEST_DATA_PATH')), True, '', '')
+            "%s/stream_unicode.yaml" % (os.getenv("TEST_DATA_PATH")),
+            True,
+            "",
+            "",
+        )
 
         # In this bug, we were getting a traceback attemping to call
         # get_xmd() more than once on the same stream. There were subtle
         # memory issues at play here.
-        if '_overrides_module' in dir(Modulemd):
+        if "_overrides_module" in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib
             # because the overrides that translate between python and GVariant
             # must be installed in /usr/lib/python*/site-packages/gi/overrides
             # or they are not included when importing Modulemd
 
             xmd = stream.get_xmd()
-            mbs_xmd = stream.get_xmd()['mbs']
-            mbs_xmd2 = stream.get_xmd()['mbs']
+            mbs_xmd = stream.get_xmd()["mbs"]
+            mbs_xmd2 = stream.get_xmd()["mbs"]
 
         else:
             stream.get_xmd()
             stream.get_xmd()
 
     def test_xmd_issue_290(self):
-        if '_overrides_module' in dir(Modulemd):
+        if "_overrides_module" in dir(Modulemd):
             stream = Modulemd.ModuleStream.read_file(
-                "%s/290.yaml" %
-                (os.getenv('TEST_DATA_PATH')), True, '', '')
+                "%s/290.yaml" % (os.getenv("TEST_DATA_PATH")), True, "", ""
+            )
 
             self.assertIsNotNone(stream)
 
@@ -1227,5 +1280,5 @@ data:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

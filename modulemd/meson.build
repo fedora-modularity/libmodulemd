@@ -21,16 +21,15 @@ if not clang_format.found()
     clang_format = disabler()
 endif
 
+python_formatter = find_program('black', required : developer_build)
+if not python_formatter.found()
+    python_formatter = disabler()
+endif
+
 pycodestyle = find_program('pycodestyle-3', 'pycodestyle',
                            required : developer_build)
 if not pycodestyle.found()
     pycodestyle = disabler()
-endif
-
-autopep8 = find_program('python3-autopep8', 'autopep8',
-                        required : developer_build)
-if not autopep8.found()
-    autopep8 = disabler()
 endif
 
 valgrind = find_program('valgrind', required: developer_build)
@@ -393,23 +392,24 @@ test('clang_format', clang_format,
 
 
 # Fake test to ensure that the python tests are formatted according to PEP8
-autopep8_args = [ '--in-place', '-a', '-a', '--global-config', '../tox.ini' ]
-autopep8_scripts = [ files('tests/test-dirty.py',
-                           'tests/test-valgrind.py',
-                           '../bindings/python/gi/overrides/Modulemd.py') +
-                     test_python_scripts ]
-test('autopep8', autopep8,
-     args: autopep8_args + autopep8_scripts)
+python_formatter_args = [ '--verbose', '--line-length', '79' ]
+test('python_formatter', python_formatter,
+     args: python_formatter_args + [ meson.source_root() ] )
 
 
 # Test all python files for compliance with pycodestyle
 # Ignore line-length as there are a number of places where this is unavoidable
+python_scripts = [ files('tests/test-dirty.py',
+                         'tests/test-valgrind.py',
+                         '../bindings/python/gi/overrides/Modulemd.py') +
+                   test_python_scripts ]
+
 pycodestyle_args = [
     '--show-pep8',
     '--ignore=E121,E123,E126,E226,E24,E501,E704,W503,W504'
 ]
 test('pycodestyle', pycodestyle,
-     args: pycodestyle_args + autopep8_scripts)
+     args: pycodestyle_args + python_scripts)
 
 
 # Fake test to ensure that the autoformatters didn't end up making changes

@@ -15,11 +15,12 @@
 
 import os
 import sys
+
 try:
     import unittest
     import gi
 
-    gi.require_version('Modulemd', '2.0')
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import GLib
     from gi.repository import Modulemd
 except ImportError:
@@ -31,11 +32,11 @@ from base import TestBase
 
 
 class TestRpmMapEntry(TestBase):
-
     def test_basic(self):
         # Test that the new() function works
         entry = Modulemd.RpmMapEntry.new(
-            "bar", 0, "1.23", "1.module_deadbeef", "x86_64")
+            "bar", 0, "1.23", "1.module_deadbeef", "x86_64"
+        )
 
         self.assertIsNotNone(entry)
 
@@ -45,67 +46,76 @@ class TestRpmMapEntry(TestBase):
         self.assertEqual(entry.props.release, "1.module_deadbeef")
         self.assertEqual(entry.props.arch, "x86_64")
         self.assertEqual(
-            entry.props.nevra,
-            "bar-0:1.23-1.module_deadbeef.x86_64")
+            entry.props.nevra, "bar-0:1.23-1.module_deadbeef.x86_64"
+        )
 
         # Test that object instantiation with attributes works
-        entry2 = Modulemd.RpmMapEntry(name="bar",
-                                      version="1.23",
-                                      release="1.module_deadbeef",
-                                      arch="x86_64")
+        entry2 = Modulemd.RpmMapEntry(
+            name="bar",
+            version="1.23",
+            release="1.module_deadbeef",
+            arch="x86_64",
+        )
         self.assertEqual(
-            entry2.props.nevra,
-            "bar-0:1.23-1.module_deadbeef.x86_64")
+            entry2.props.nevra, "bar-0:1.23-1.module_deadbeef.x86_64"
+        )
 
         # Test that nevra returns NULL if attributes are missing
 
         # Remove name
         entry2.props.name = None
-        with self.assertRaisesRegexp(gi.repository.GLib.GError,
-                                     "Missing name attribute"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Missing name attribute"
+        ):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.name = "bar"
 
         # Remove the version
         entry2.props.version = None
-        with self.assertRaisesRegexp(gi.repository.GLib.GError,
-                                     "Missing version attribute"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Missing version attribute"
+        ):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.version = "1.23"
 
         # Remove the release
         entry2.props.release = None
-        with self.assertRaisesRegexp(gi.repository.GLib.GError,
-                                     "Missing release attribute"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Missing release attribute"
+        ):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.release = "1.module_deadbeef"
 
         # Remove the arch
         entry2.props.arch = None
-        with self.assertRaisesRegexp(gi.repository.GLib.GError,
-                                     "Missing arch attribute"):
+        with self.assertRaisesRegexp(
+            gi.repository.GLib.GError, "Missing arch attribute"
+        ):
             entry2.validate()
         self.assertIsNone(entry2.props.nevra)
         entry2.props.arch = "x86_64"
 
         self.assertEqual(
-            entry2.props.nevra,
-            "bar-0:1.23-1.module_deadbeef.x86_64")
+            entry2.props.nevra, "bar-0:1.23-1.module_deadbeef.x86_64"
+        )
 
     def test_compare(self):
         entry = Modulemd.RpmMapEntry.new(
-            "bar", 0, "1.23", "1.module_deadbeef", "x86_64")
+            "bar", 0, "1.23", "1.module_deadbeef", "x86_64"
+        )
         self.assertIsNotNone(entry)
 
         entry2 = Modulemd.RpmMapEntry.new(
-            "bar", 0, "1.23", "1.module_deadbeef", "x86_64")
+            "bar", 0, "1.23", "1.module_deadbeef", "x86_64"
+        )
         self.assertIsNotNone(entry2)
 
         entry3 = Modulemd.RpmMapEntry.new(
-            "foo", 0, "1.23", "1.module_deadbeef", "x86_64")
+            "foo", 0, "1.23", "1.module_deadbeef", "x86_64"
+        )
         self.assertIsNotNone(entry3)
 
         self.assertTrue(entry.equals(entry))
@@ -113,5 +123,5 @@ class TestRpmMapEntry(TestBase):
         self.assertFalse(entry.equals(entry3))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -19,7 +19,6 @@ import unittest
 
 
 class TestBase(unittest.TestCase):
-
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
         self._caught_signal = False
@@ -39,9 +38,8 @@ class TestBase(unittest.TestCase):
 
     @contextmanager
     def expect_signal(
-            self,
-            expected_signal=signal.SIGTRAP,
-            only_on_fatal_warnings=False):
+        self, expected_signal=signal.SIGTRAP, only_on_fatal_warnings=False
+    ):
         expect_signal = (not only_on_fatal_warnings) or self.warnings_fatal
 
         self._caught_signal = False

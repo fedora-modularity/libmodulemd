@@ -13,10 +13,12 @@
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 import sys
+
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', '2.0')
+
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import Modulemd
 except ImportError:
     # Return error 77 to skip this test on platforms without the necessary
@@ -27,30 +29,31 @@ from base import TestBase
 
 
 class TestDefaults(TestBase):
-
     def test_constructors(self):
         # Test that the new() function works
-        defs = Modulemd.DefaultsV1.new('foo')
+        defs = Modulemd.DefaultsV1.new("foo")
         assert defs
         assert defs.props.mdversion == Modulemd.DefaultsVersionEnum.ONE
         assert defs.get_mdversion() == Modulemd.DefaultsVersionEnum.ONE
-        assert defs.props.module_name == 'foo'
-        assert defs.get_module_name() == 'foo'
+        assert defs.props.module_name == "foo"
+        assert defs.get_module_name() == "foo"
 
         # Test gobject instantiation
-        defs = Modulemd.DefaultsV1(module_name='foo')
+        defs = Modulemd.DefaultsV1(module_name="foo")
         assert defs
         assert defs.props.mdversion == Modulemd.DefaultsVersionEnum.ONE
         assert defs.get_mdversion() == Modulemd.DefaultsVersionEnum.ONE
-        assert defs.props.module_name == 'foo'
-        assert defs.get_module_name() == 'foo'
+        assert defs.props.module_name == "foo"
+        assert defs.get_module_name() == "foo"
 
         # Test with no name
-        with self.assertRaisesRegexp(TypeError, 'does not allow None as a value'):
+        with self.assertRaisesRegexp(
+            TypeError, "does not allow None as a value"
+        ):
             defs = Modulemd.DefaultsV1.new(None)
 
     def test_copy(self):
-        defs = Modulemd.DefaultsV1.new('foo')
+        defs = Modulemd.DefaultsV1.new("foo")
         assert defs
 
         copied_defs = defs.copy()
@@ -68,10 +71,11 @@ class TestDefaults(TestBase):
         assert copied_defs.props.module_name == defs.props.module_name
         assert copied_defs.get_default_stream() == defs.get_default_stream()
         assert copied_defs.get_default_stream(
-            "server_intent") == defs.get_default_stream("server_intent")
+            "server_intent"
+        ) == defs.get_default_stream("server_intent")
 
     def test_get_set_default_stream(self):
-        defs = Modulemd.DefaultsV1.new('foo')
+        defs = Modulemd.DefaultsV1.new("foo")
         assert defs
         defs.set_default_stream("latest")
         assert defs.get_default_stream() == "latest"
@@ -86,25 +90,25 @@ class TestDefaults(TestBase):
         assert defs.get_default_stream("minimal_intent") is None
 
     def test_get_set_profiles(self):
-        defs = Modulemd.DefaultsV1.new('foo')
+        defs = Modulemd.DefaultsV1.new("foo")
 
         defs.add_default_profile_for_stream("latest", "client")
         defs.add_default_profile_for_stream("latest", "server")
         defs.add_default_profile_for_stream(
-            "latest", "server", "server_intent")
+            "latest", "server", "server_intent"
+        )
 
-        assert "client" in defs.get_default_profiles_for_stream(
-            "latest")
-        assert "client" in defs.get_default_profiles_for_stream(
-            "latest")
+        assert "client" in defs.get_default_profiles_for_stream("latest")
+        assert "client" in defs.get_default_profiles_for_stream("latest")
 
     def test_validate(self):
         defs = Modulemd.Defaults.new(
-            Modulemd.DefaultsVersionEnum.LATEST, 'foo')
+            Modulemd.DefaultsVersionEnum.LATEST, "foo"
+        )
         assert defs
 
         assert defs.validate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

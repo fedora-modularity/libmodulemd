@@ -13,10 +13,12 @@
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 import sys
+
 try:
     import unittest
     import gi
-    gi.require_version('Modulemd', '2.0')
+
+    gi.require_version("Modulemd", "2.0")
     from gi.repository import Modulemd
 except ImportError:
     # Return error 77 to skip this test on platforms without the necessary
@@ -27,7 +29,6 @@ from base import TestBase
 
 
 class TestDependencies(TestBase):
-
     def test_constructor(self):
         # Test that the new() function works
         d = Modulemd.Dependencies.new()
@@ -69,15 +70,13 @@ class TestDependencies(TestBase):
 
         d = d_orig.copy()
         assert d
-        assert d.get_buildtime_modules() == ['builddef', 'buildmod1']
-        assert d.get_buildtime_streams('builddef') == []
-        assert d.get_buildtime_streams(
-            'buildmod1') == ['stream1', 'stream2']
-        assert d.get_runtime_modules() == ['rundef', 'runmod1']
-        assert d.get_runtime_streams('rundef') == []
-        assert d.get_runtime_streams(
-            'runmod1') == ['stream3', 'stream4']
+        assert d.get_buildtime_modules() == ["builddef", "buildmod1"]
+        assert d.get_buildtime_streams("builddef") == []
+        assert d.get_buildtime_streams("buildmod1") == ["stream1", "stream2"]
+        assert d.get_runtime_modules() == ["rundef", "runmod1"]
+        assert d.get_runtime_streams("rundef") == []
+        assert d.get_runtime_streams("runmod1") == ["stream3", "stream4"]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

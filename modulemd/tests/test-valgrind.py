@@ -20,7 +20,7 @@ import xml.etree.ElementTree as ET
 
 from multiprocessing import Pool, TimeoutError
 
-if os.getenv('MMD_SKIP_VALGRIND'):
+if os.getenv("MMD_SKIP_VALGRIND"):
     sys.exit(77)
 
 
@@ -35,21 +35,27 @@ else:
 
 
 with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
+
     def exec_valgrind(test):
-        valgrind_command = "/usr/bin/valgrind " \
-                           "--leak-check=full " \
-                           "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp " \
-                           "--xml=yes " \
-                           "--xml-file=%s/%s.xml " % (tmpdirname, test)
+        valgrind_command = (
+            "/usr/bin/valgrind "
+            "--leak-check=full "
+            "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp "
+            "--xml=yes "
+            "--xml-file=%s/%s.xml " % (tmpdirname, test)
+        )
         proc_result = subprocess.run(
             [
-                'meson',
-                'test',
-                '--no-rebuild',
-                '-t', '10',
-                '--logbase=%s' % test,
-                '--wrap=%s' % valgrind_command,
-                test])
+                "meson",
+                "test",
+                "--no-rebuild",
+                "-t",
+                "10",
+                "--logbase=%s" % test,
+                "--wrap=%s" % valgrind_command,
+                test,
+            ]
+        )
 
         return proc_result.returncode, test
 
@@ -57,41 +63,51 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
         for returncode, test in pool.map(exec_valgrind, tests):
             if returncode != 0:
                 print(
-                    "Valgrind exited with error [%d] on %s" %
-                    (returncode, test), file=sys.stderr)
+                    "Valgrind exited with error [%d] on %s"
+                    % (returncode, test),
+                    file=sys.stderr,
+                )
                 failed = True
                 continue
 
             # Process the XML for leaks
-            tree = ET.parse('%s/%s.xml' % (tmpdirname, test))
+            tree = ET.parse("%s/%s.xml" % (tmpdirname, test))
             root = tree.getroot()
 
             for root_child in root:
-                if (root_child.tag == "error"):
+                if root_child.tag == "error":
                     for error_child in root_child:
-                        if error_child.tag == 'kind':
-                            if error_child.text == 'Leak_DefinitelyLost':
-                                print("Memory leak detected in %s" % test,
-                                      file=sys.stderr)
-                                failed = True
-
-                            elif error_child.text == 'InvalidFree':
-                                print("Invalid free() detected in %s" % test,
-                                      file=sys.stderr)
-                                failed = True
-
-                            elif error_child.text == 'InvalidRead':
-                                print("Invalid read detected in %s" % test,
-                                      file=sys.stderr)
-                                failed = True
-
-                            elif error_child.text == 'UninitCondition':
+                        if error_child.tag == "kind":
+                            if error_child.text == "Leak_DefinitelyLost":
                                 print(
-                                    "Uninitialized usage detected in %s" %
-                                    test, file=sys.stderr)
+                                    "Memory leak detected in %s" % test,
+                                    file=sys.stderr,
+                                )
+                                failed = True
+
+                            elif error_child.text == "InvalidFree":
+                                print(
+                                    "Invalid free() detected in %s" % test,
+                                    file=sys.stderr,
+                                )
+                                failed = True
+
+                            elif error_child.text == "InvalidRead":
+                                print(
+                                    "Invalid read detected in %s" % test,
+                                    file=sys.stderr,
+                                )
+                                failed = True
+
+                            elif error_child.text == "UninitCondition":
+                                print(
+                                    "Uninitialized usage detected in %s"
+                                    % test,
+                                    file=sys.stderr,
+                                )
                                 failed = True
             if failed:
-                with open('%s/%s.xml' % (tmpdirname, test), 'r') as xml:
+                with open("%s/%s.xml" % (tmpdirname, test), "r") as xml:
                     print(xml.read())
 
 

@@ -11,7 +11,7 @@
 # For more information on free software, see
 # <https://www.gnu.org/philosophy/free-sw.en.html>.
 
-SCANBUILD="scan-build --status-bugs" ninja scan-build
+ninja scan-build
 if [ $? -eq 0 ]; then
   exit 0
 else

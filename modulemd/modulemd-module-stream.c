@@ -278,6 +278,13 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
+
+  if (!modulemd_module_stream_validate (stream, &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
   return g_steal_pointer (&stream);
 }
 

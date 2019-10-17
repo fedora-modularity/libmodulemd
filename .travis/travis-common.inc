@@ -7,6 +7,22 @@ MMD_OS=
 MMD_RELEASE=
 MMD_TARBALL_PATH=
 
+BUILDAH_PATH=$(which buildah)
+DOCKER_PATH=/usr/bin/docker
+
+if [ -x ${BUILDAH_PATH--} ]; then
+    MMD_BUILDAH="$BUILDAH_PATH bud"
+else
+    MMD_BUILDAH="$DOCKER_PATH build"
+fi
+
+PODMAN_PATH=$(which podman)
+if [ -x ${PODMAN_PATH--} ]; then
+    MMD_OCI="$PODMAN_PATH"
+else
+    MMD_OCI="$DOCKER_PATH"
+fi
+
 function common_finalize {
     # If any specific test launcher needs to do its own cleanup as well,
     # it should set the EXIT trap and make sure to also call this functino
@@ -55,16 +71,16 @@ function mmd_run_docker_tests {
         $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
     sed -e "s/@RELEASE@/$MMD_OS:$MMD_RELEASE/" $SCRIPT_DIR/$MMD_OS/Dockerfile.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
 
-    sudo docker build \
+    $MMD_BUILDAH \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
         -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
 
-    sudo docker build \
+    $MMD_BUILDAH \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE \
         -t fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE \
         --build-arg TARBALL=${TARBALL} .
 
-    docker run --rm fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE
+    $MMD_OCI run --rm fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE
 
     popd
 

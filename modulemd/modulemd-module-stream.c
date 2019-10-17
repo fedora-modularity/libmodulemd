@@ -254,6 +254,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
                    MODULEMD_YAML_ERROR_PARSE,
                    "Unknown ModuleStream version: %" PRIu64,
                    modulemd_subdocument_info_get_mdversion (subdoc));
+      return NULL;
       break;
     }
 

@@ -79,14 +79,14 @@ modulemd_subdocument_info_finalize (GObject *object)
 
 void
 modulemd_subdocument_info_set_yaml (ModulemdSubdocumentInfo *self,
-                                    const gchar *yaml)
+                                    const gchar *contents)
 {
   g_return_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self));
 
-  g_debug ("Setting YAML: %s\n", yaml);
+  g_debug ("Setting YAML: %s\n", contents);
 
   g_clear_pointer (&self->contents, g_free);
-  self->contents = g_strdup (yaml);
+  self->contents = g_strdup (contents);
 }
 
 

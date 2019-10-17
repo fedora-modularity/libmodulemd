@@ -12,20 +12,20 @@
  */
 
 #include "modulemd-buildopts.h"
-#include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-component.h"
 #include "modulemd-errors.h"
-#include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v2.h"
-#include "modulemd-translation-entry.h"
-#include "modulemd-rpm-map-entry.h"
+#include "modulemd-module-stream.h"
 #include "modulemd-profile.h"
+#include "modulemd-rpm-map-entry.h"
 #include "modulemd-service-level.h"
+#include "modulemd-translation-entry.h"
 #include "private/modulemd-buildopts-private.h"
+#include "private/modulemd-component-module-private.h"
 #include "private/modulemd-component-private.h"
 #include "private/modulemd-component-rpm-private.h"
-#include "private/modulemd-component-module-private.h"
 #include "private/modulemd-dependencies-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
@@ -127,22 +127,34 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
   /*Check property equality*/
   if (g_strcmp0 (v2_self_1->community, v2_self_2->community) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (v2_self_1->description, v2_self_2->description) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (v2_self_1->documentation, v2_self_2->documentation) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (v2_self_1->summary, v2_self_2->summary) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (v2_self_1->tracker, v2_self_2->tracker) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_buildopts_equals (v2_self_1->buildopts, v2_self_2->buildopts))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_hash_table_equals (v2_self_1->rpm_components,
                                    v2_self_2->rpm_components,
@@ -214,7 +226,9 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
 
   if (v2_self_1->dependencies->len != v2_self_2->dependencies->len)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   for (guint i = 0; i < v2_self_1->dependencies->len; i++)
     {
@@ -223,17 +237,25 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
       if (!modulemd_dependencies_equals (
             g_ptr_array_index (v2_self_1->dependencies, i),
             g_ptr_array_index (v2_self_2->dependencies, i)))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   if (v2_self_1->xmd == NULL && v2_self_2->xmd == NULL)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (v2_self_1->xmd == NULL || v2_self_2->xmd == NULL)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!g_variant_equal (v2_self_1->xmd, v2_self_2->xmd))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -333,7 +355,9 @@ modulemd_module_stream_v2_get_description (ModulemdModuleStreamV2 *self,
       MODULEMD_MODULE_STREAM (self), locale);
   if (entry != NULL &&
       modulemd_translation_entry_get_description (entry) != NULL)
-    return modulemd_translation_entry_get_description (entry);
+    {
+      return modulemd_translation_entry_get_description (entry);
+    }
 
   return self->description;
 }
@@ -382,7 +406,9 @@ modulemd_module_stream_v2_get_summary (ModulemdModuleStreamV2 *self,
     modulemd_module_stream_get_translation_entry (
       MODULEMD_MODULE_STREAM (self), locale);
   if (entry != NULL && modulemd_translation_entry_get_summary (entry) != NULL)
-    return modulemd_translation_entry_get_summary (entry);
+    {
+      return modulemd_translation_entry_get_summary (entry);
+    }
 
   return self->summary;
 }
@@ -420,7 +446,9 @@ modulemd_module_stream_v2_add_component (ModulemdModuleStreamV2 *self,
 
   /* Do nothing if we were passed a NULL component */
   if (!component)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
   g_return_if_fail (MODULEMD_IS_COMPONENT (component));
@@ -454,7 +482,9 @@ modulemd_module_stream_v2_remove_module_component (
 {
   /* Do nothing if we were passed a NULL component_name */
   if (!component_name)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -478,7 +508,9 @@ modulemd_module_stream_v2_remove_rpm_component (ModulemdModuleStreamV2 *self,
 {
   /* Do nothing if we were passed a NULL component_name */
   if (!component_name)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -540,7 +572,9 @@ modulemd_module_stream_v2_add_content_license (ModulemdModuleStreamV2 *self,
                                                const gchar *license)
 {
   if (!license)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -563,7 +597,9 @@ modulemd_module_stream_v2_add_module_license (ModulemdModuleStreamV2 *self,
                                               const gchar *license)
 {
   if (!license)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -586,7 +622,9 @@ modulemd_module_stream_v2_remove_content_license (ModulemdModuleStreamV2 *self,
                                                   const gchar *license)
 {
   if (!license)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -599,7 +637,9 @@ modulemd_module_stream_v2_remove_module_license (ModulemdModuleStreamV2 *self,
                                                  const gchar *license)
 {
   if (!license)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -650,7 +690,9 @@ modulemd_module_stream_v2_add_profile (ModulemdModuleStreamV2 *self,
                                        ModulemdProfile *profile)
 {
   if (!profile)
-    return;
+    {
+      return;
+    }
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
   g_return_if_fail (MODULEMD_IS_PROFILE (profile));
 
@@ -697,7 +739,9 @@ modulemd_module_stream_v2_add_rpm_api (ModulemdModuleStreamV2 *self,
                                        const gchar *rpm)
 {
   if (!rpm)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -720,7 +764,9 @@ modulemd_module_stream_v2_remove_rpm_api (ModulemdModuleStreamV2 *self,
                                           const gchar *rpm)
 {
   if (!rpm)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -751,7 +797,9 @@ modulemd_module_stream_v2_add_rpm_artifact (ModulemdModuleStreamV2 *self,
                                             const gchar *nevr)
 {
   if (!nevr)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -774,7 +822,9 @@ modulemd_module_stream_v2_remove_rpm_artifact (ModulemdModuleStreamV2 *self,
                                                const gchar *nevr)
 {
   if (!nevr)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -847,7 +897,9 @@ modulemd_module_stream_v2_get_rpm_artifact_map_entry (
 
   digest_table = g_hash_table_lookup (self->rpm_artifact_map, digest);
   if (!digest_table)
-    return NULL;
+    {
+      return NULL;
+    }
 
   return g_hash_table_lookup (digest_table, checksum);
 }
@@ -858,7 +910,9 @@ modulemd_module_stream_v2_add_rpm_filter (ModulemdModuleStreamV2 *self,
                                           const gchar *rpm)
 {
   if (!rpm)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -881,7 +935,9 @@ modulemd_module_stream_v2_remove_rpm_filter (ModulemdModuleStreamV2 *self,
                                              const gchar *rpm)
 {
   if (!rpm)
-    return;
+    {
+      return;
+    }
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
@@ -913,7 +969,9 @@ modulemd_module_stream_v2_add_servicelevel (ModulemdModuleStreamV2 *self,
                                             ModulemdServiceLevel *servicelevel)
 {
   if (!servicelevel)
-    return;
+    {
+      return;
+    }
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
   g_return_if_fail (MODULEMD_IS_SERVICE_LEVEL (servicelevel));
 
@@ -1026,7 +1084,9 @@ modulemd_module_stream_v2_set_xmd (ModulemdModuleStreamV2 *self, GVariant *xmd)
 
   /* Do nothing if we were passed the same pointer */
   if (self->xmd == xmd)
-    return;
+    {
+      return;
+    }
 
   g_clear_pointer (&self->xmd, g_variant_unref);
   self->xmd = modulemd_variant_deep_copy (xmd);
@@ -1044,7 +1104,8 @@ static gboolean
 modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
 {
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   gchar *nevra = NULL;
   ModulemdModuleStreamV2 *v2_self = NULL;
   ModulemdDependencies *deps = NULL;
@@ -1211,9 +1272,12 @@ static void
 copy_rpm_artifact_map (ModulemdModuleStreamV2 *from,
                        ModulemdModuleStreamV2 *to)
 {
-  GHashTableIter outer, inner;
-  gpointer outer_key, outer_value;
-  gpointer inner_key, inner_value;
+  GHashTableIter outer;
+  GHashTableIter inner;
+  gpointer outer_key;
+  gpointer outer_value;
+  gpointer inner_key;
+  gpointer inner_value;
   GHashTable *to_digest_table = NULL;
 
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (from));
@@ -1300,13 +1364,17 @@ depends_on_stream (ModulemdModuleStreamV2 *self,
         {
           if (modulemd_dependencies_buildrequires_module_and_stream (
                 dep, module_name, stream_name))
-            return TRUE;
+            {
+              return TRUE;
+            }
         }
       else
         {
           if (modulemd_dependencies_requires_module_and_stream (
                 dep, module_name, stream_name))
-            return TRUE;
+            {
+              return TRUE;
+            }
         }
     }
 
@@ -1486,9 +1554,7 @@ modulemd_module_stream_v2_parse_artifacts (
   GError **error);
 
 static GVariant *
-modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
-                                     ModulemdModuleStreamV2 *modulestream,
-                                     GError **error);
+modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser, GError **error);
 
 
 ModulemdModuleStreamV2 *
@@ -1509,7 +1575,9 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
   if (!modulemd_subdocument_info_get_data_parser (
         subdoc, &parser, strict, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -1641,8 +1709,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           /* Extensible Metadata */
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "xmd"))
             {
-              xmd = modulemd_module_stream_v2_parse_raw (
-                &parser, modulestream, &nested_error);
+              xmd =
+                modulemd_module_stream_v2_parse_raw (&parser, &nested_error);
               if (!xmd)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -2633,9 +2701,7 @@ modulemd_module_stream_v2_parse_rpm_map_digest (
 
 
 static GVariant *
-modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser,
-                                     ModulemdModuleStreamV2 *modulestream,
-                                     GError **error)
+modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser, GError **error)
 {
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
@@ -2687,7 +2753,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
 
   if (!modulemd_module_stream_emit_yaml_base (
         MODULEMD_MODULE_STREAM (self), emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   EMIT_KEY_VALUE_IF_SET (
     emitter, error, "arch", modulemd_module_stream_v2_get_arch (self));
@@ -2724,7 +2792,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
     {
       EMIT_SCALAR (emitter, error, "xmd");
       if (!modulemd_yaml_emit_variant (emitter, self->xmd, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   EMIT_ARRAY_VALUES_IF_NON_EMPTY (emitter,
@@ -2768,7 +2838,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
       EMIT_SCALAR (emitter, error, "buildopts");
       EMIT_MAPPING_START (emitter, error);
       if (!modulemd_buildopts_emit_yaml (self->buildopts, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
       EMIT_MAPPING_END (emitter, error);
     }
 
@@ -2802,7 +2874,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
 
       /* Emit the rpm-map */
       if (!modulemd_module_stream_v2_emit_rpm_map (self, emitter, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       EMIT_MAPPING_END (emitter, error);
     }
@@ -2812,7 +2886,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
   /* The overall document mapping */
   EMIT_MAPPING_END (emitter, error);
   if (!mmd_emitter_end_document (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -2862,7 +2938,9 @@ modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
           entry = g_hash_table_lookup (digest_table, checksum);
 
           if (!modulemd_rpm_map_entry_emit_yaml (entry, emitter, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
         }
 
       EMIT_MAPPING_END (emitter, error);

@@ -14,27 +14,27 @@
 #pragma once
 
 #include "modulemd-buildopts.h"
-#include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-component.h"
 #include "modulemd-compression.h"
-#include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
+#include "modulemd-defaults.h"
 #include "modulemd-dependencies.h"
 #include "modulemd-deprecated.h"
 #include "modulemd-errors.h"
-#include "modulemd-module.h"
-#include "modulemd-module-index.h"
 #include "modulemd-module-index-merger.h"
-#include "modulemd-module-stream.h"
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module-stream.h"
+#include "modulemd-module.h"
 #include "modulemd-profile.h"
 #include "modulemd-rpm-map-entry.h"
 #include "modulemd-service-level.h"
 #include "modulemd-subdocument-info.h"
-#include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
+#include "modulemd-translation.h"
 
 G_BEGIN_DECLS
 

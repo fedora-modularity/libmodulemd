@@ -404,7 +404,7 @@ dependencies_test_parse_yaml (DependenciesFixture *fixture,
   yaml_path = g_strdup_printf ("%s/d.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);
@@ -454,7 +454,7 @@ dependencies_test_parse_bad_yaml (DependenciesFixture *fixture,
     g_strdup_printf ("%s/mismatched-deps.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);

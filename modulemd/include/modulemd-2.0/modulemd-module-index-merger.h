@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include <glib-object.h>
 #include "modulemd-module-index.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

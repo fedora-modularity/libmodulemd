@@ -91,34 +91,52 @@ modulemd_component_rpm_equals (ModulemdComponent *self_1,
 
   if (!MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
          ->equals (self_1, self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (rpm_self_1->override_name, rpm_self_2->override_name) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (rpm_self_1->ref, rpm_self_2->ref) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (rpm_self_1->repository, rpm_self_2->repository) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (rpm_self_1->cache, rpm_self_2->cache) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_boolean_equals (rpm_self_1->buildroot, rpm_self_2->buildroot))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_boolean_equals (rpm_self_1->srpm_buildroot,
                                 rpm_self_2->srpm_buildroot))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_hash_table_sets_are_equal (rpm_self_1->arches,
                                            rpm_self_2->arches))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_hash_table_sets_are_equal (rpm_self_1->multilib,
                                            rpm_self_2->multilib))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -224,7 +242,9 @@ modulemd_component_rpm_get_name (ModulemdComponent *self)
 
   /* If an override name was set, return it */
   if (rpm_self->override_name)
-    return rpm_self->override_name;
+    {
+      return rpm_self->override_name;
+    }
 
   /* Otherwise, return the hash table key as the name */
   return MODULEMD_COMPONENT_CLASS (modulemd_component_rpm_parent_class)
@@ -535,7 +555,9 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
 
   if (!modulemd_component_emit_yaml_start (
         MODULEMD_COMPONENT (self), emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "name", self->override_name);
 
@@ -547,26 +569,36 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
 
   /* Only output buildroot if it's TRUE */
   if (modulemd_component_rpm_get_buildroot (self))
-    EMIT_KEY_VALUE (emitter, error, "buildroot", "true");
+    {
+      EMIT_KEY_VALUE (emitter, error, "buildroot", "true");
+    }
 
   /* Only output srpm-buildroot if it's TRUE */
   if (modulemd_component_rpm_get_srpm_buildroot (self))
-    EMIT_KEY_VALUE (emitter, error, "srpm-buildroot", "true");
+    {
+      EMIT_KEY_VALUE (emitter, error, "srpm-buildroot", "true");
+    }
 
   if (!modulemd_component_emit_yaml_build_common (
         MODULEMD_COMPONENT (self), emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_hash_table_size (self->arches) != 0)
     {
       if (!mmd_emitter_scalar (
             emitter, "arches", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       list = modulemd_component_rpm_get_arches_as_strv (self);
 
       if (!mmd_emitter_strv (emitter, YAML_FLOW_SEQUENCE_STYLE, list, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       g_clear_pointer (&list, g_strfreev);
     }
@@ -575,18 +607,24 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
     {
       if (!mmd_emitter_scalar (
             emitter, "multilib", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       list = modulemd_component_rpm_get_multilib_arches_as_strv (self);
 
       if (!mmd_emitter_strv (emitter, YAML_FLOW_SEQUENCE_STYLE, list, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       g_clear_pointer (&list, g_strfreev);
     }
 
   if (!mmd_emitter_end_mapping (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -639,11 +677,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse rationale in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse rationale in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_set_rationale (MODULEMD_COMPONENT (r), value);
               g_clear_pointer (&value, g_free);
@@ -653,11 +693,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse override name in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse override name in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_set_name (MODULEMD_COMPONENT (r), value);
               g_clear_pointer (&value, g_free);
@@ -668,11 +710,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse repository in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse repository in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_rpm_set_repository (r, value);
               g_clear_pointer (&value, g_free);
@@ -681,11 +725,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse ref in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse ref in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_rpm_set_ref (r, value);
               g_clear_pointer (&value, g_free);
@@ -695,11 +741,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse cache in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse cache in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_rpm_set_cache (r, value);
               g_clear_pointer (&value, g_free);
@@ -709,11 +757,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               list = modulemd_yaml_parse_string_set (parser, &nested_error);
               if (!list)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse arches in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse arches in component: %s",
+                    nested_error->message);
+                }
 
               g_clear_pointer (&r->arches, g_hash_table_unref);
               r->arches = g_steal_pointer (&list);
@@ -723,11 +773,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               list = modulemd_yaml_parse_string_set (parser, &nested_error);
               if (!list)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse arches in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse arches in component: %s",
+                    nested_error->message);
+                }
 
               g_clear_pointer (&r->multilib, g_hash_table_unref);
               r->multilib = g_steal_pointer (&list);
@@ -793,11 +845,13 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
             {
               buildorder = modulemd_yaml_parse_int64 (parser, &nested_error);
               if (buildorder == 0 && nested_error != NULL)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse buildorder in component: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse buildorder in component: %s",
+                    nested_error->message);
+                }
 
               modulemd_component_set_buildorder (MODULEMD_COMPONENT (r),
                                                  buildorder);

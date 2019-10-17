@@ -13,15 +13,15 @@
 
 #pragma once
 
-#include <glib-object.h>
 #include "modulemd-buildopts.h"
-#include "modulemd-component.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-component.h"
 #include "modulemd-deprecated.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-profile.h"
 #include "modulemd-service-level.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

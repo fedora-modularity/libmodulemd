@@ -140,7 +140,7 @@ test_parse_yaml_valid (CommonMmdTestFixture *fixture, gconstpointer user_data)
     g_strdup_printf ("%s/rpm-map/valid.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);
@@ -170,7 +170,7 @@ test_parse_yaml_missing (CommonMmdTestFixture *fixture,
                                g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);
@@ -197,7 +197,7 @@ test_parse_yaml_mismatch (CommonMmdTestFixture *fixture,
                                g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);

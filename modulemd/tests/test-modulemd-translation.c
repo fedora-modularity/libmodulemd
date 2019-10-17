@@ -17,13 +17,13 @@
 #include <signal.h>
 
 #include "modulemd-subdocument-info.h"
-#include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
+#include "modulemd-translation.h"
 #include "private/glib-extensions.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
-#include "private/modulemd-subdocument-info-private.h"
 #include "private/test-utils.h"
 
 typedef struct _TranslationFixture
@@ -271,7 +271,7 @@ translation_test_parse_yaml (TranslationFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);

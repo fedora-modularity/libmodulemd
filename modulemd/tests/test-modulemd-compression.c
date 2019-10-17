@@ -16,8 +16,8 @@
 
 #include "modulemd-compression.h"
 #include "private/modulemd-compression-private.h"
-#include "private/test-utils.h"
 #include "private/modulemd-yaml.h"
+#include "private/test-utils.h"
 
 
 /* == Public Functions == */
@@ -92,7 +92,7 @@ test_modulemd_detect_compression (void)
                                   g_getenv ("TEST_DATA_PATH"),
                                   expected[i].filename);
       g_debug ("Getting compression type for %s", filename);
-      filestream = g_fopen (filename, "rb");
+      filestream = g_fopen (filename, "rbe");
       g_assert_nonnull (filestream);
       fd = fileno (filestream);
       result = modulemd_detect_compression (filename, fd, &error);
@@ -140,7 +140,7 @@ test_modulemd_detect_compression (void)
       filename = g_strdup_printf ("%s/compression/%s",
                                   g_getenv ("TEST_DATA_PATH"),
                                   expected_magic[j].filename);
-      filestream = g_fopen (filename, "rb");
+      filestream = g_fopen (filename, "rbe");
       g_assert_nonnull (filestream);
       fd = fileno (filestream);
       g_assert_cmpint (modulemd_detect_compression (filename, fd, &error),

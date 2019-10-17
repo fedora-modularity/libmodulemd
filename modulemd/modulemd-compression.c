@@ -12,10 +12,10 @@
  */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <glib.h>
 #include <inttypes.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 
 #ifdef HAVE_RPMIO
@@ -25,8 +25,8 @@
 #include "modulemd-compression.h"
 #include "modulemd-errors.h"
 
-#include "private/modulemd-util.h"
 #include "private/modulemd-compression-private.h"
+#include "private/modulemd-util.h"
 
 #ifdef HAVE_LIBMAGIC
 #include <magic.h>
@@ -62,18 +62,18 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       return MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION;
     }
-  else if (g_str_has_suffix (filename, ".bz2") ||
-           g_str_has_suffix (filename, ".bzip2"))
+  if (g_str_has_suffix (filename, ".bz2") ||
+      g_str_has_suffix (filename, ".bzip2"))
     {
       return MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION;
     }
-  else if (g_str_has_suffix (filename, ".xz"))
+  if (g_str_has_suffix (filename, ".xz"))
     {
       return MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
     }
-  else if (g_str_has_suffix (filename, ".yaml") ||
-           g_str_has_suffix (filename, ".yml") ||
-           g_str_has_suffix (filename, ".txt"))
+  if (g_str_has_suffix (filename, ".yaml") ||
+      g_str_has_suffix (filename, ".yml") ||
+      g_str_has_suffix (filename, ".txt"))
     {
       return MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION;
     }
@@ -179,19 +179,29 @@ ModulemdCompressionTypeEnum
 modulemd_compression_type (const gchar *name)
 {
   if (!name)
-    return MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION;
+    {
+      return MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION;
+    }
 
   int type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION;
 
   if (!g_strcmp0 (name, "gz") || !g_strcmp0 (name, "gzip") ||
       !g_strcmp0 (name, "gunzip"))
-    type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION;
+    {
+      type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION;
+    }
   if (!g_strcmp0 (name, "bz2") || !g_strcmp0 (name, "bzip2"))
-    type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION;
+    {
+      type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION;
+    }
   if (!g_strcmp0 (name, "xz"))
-    type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
+    {
+      type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
+    }
   if (!g_strcmp0 (name, "zck"))
-    type = MODULEMD_COMPRESSION_TYPE_ZCK_COMPRESSION;
+    {
+      type = MODULEMD_COMPRESSION_TYPE_ZCK_COMPRESSION;
+    }
 
   return type;
 }
@@ -240,12 +250,16 @@ modulemd_get_rpmio_fmode (const gchar *mode,
   const gchar *type_string;
 
   if (!mode)
-    return NULL;
+    {
+      return NULL;
+    }
 
   type_string = get_comtype_string (comtype);
 
   if (type_string == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   return g_strdup_printf ("%s.%s", mode, type_string);
 }

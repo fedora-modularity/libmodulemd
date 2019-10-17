@@ -17,11 +17,11 @@
 #include <signal.h>
 
 #include "modulemd-defaults.h"
-#include "modulemd-module.h"
-#include "modulemd-module-index.h"
 #include "modulemd-module-index-merger.h"
-#include "modulemd-module-stream.h"
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module-stream.h"
+#include "modulemd-module.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-private.h"
@@ -33,7 +33,6 @@ typedef struct _ModuleFixture
 {
 } ModuleFixture;
 
-extern int modulemd_test_signal;
 
 static void
 module_test_construct (ModuleFixture *fixture, gconstpointer user_data)

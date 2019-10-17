@@ -65,10 +65,14 @@ modulemd_component_equals (ModulemdComponent *self_1,
                            ModulemdComponent *self_2)
 {
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self_2), FALSE);
@@ -115,7 +119,9 @@ static gboolean
 modulemd_component_default_validate (ModulemdComponent *self, GError **error)
 {
   if (!self)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   ModulemdComponentPrivate *priv =
     modulemd_component_get_instance_private (self);
@@ -145,7 +151,9 @@ modulemd_component_validate (ModulemdComponent *self, GError **error)
   ModulemdComponentClass *klass;
 
   if (!self)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_COMPONENT (self), FALSE);
 
@@ -164,7 +172,9 @@ modulemd_component_copy_component (ModulemdComponent *self, const gchar *key)
   ModulemdComponentPrivate *m_priv = NULL;
   g_autoptr (ModulemdComponent) m = NULL;
   if (key == NULL)
-    key = priv->name;
+    {
+      key = priv->name;
+    }
 
   m = g_object_new (G_OBJECT_TYPE (self), "name", key, NULL);
 
@@ -190,24 +200,34 @@ modulemd_component_default_equals (ModulemdComponent *self_1,
 {
   if (modulemd_component_get_buildorder (self_1) !=
       modulemd_component_get_buildorder (self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (modulemd_component_get_buildonly (self_1) !=
       modulemd_component_get_buildonly (self_2))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_component_get_name (self_1),
                  modulemd_component_get_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_component_get_rationale (self_1),
                  modulemd_component_get_rationale (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_hash_table_sets_are_equal (
         modulemd_component_get_buildafter_internal (self_1),
         modulemd_component_get_buildafter_internal (self_2)))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -348,7 +368,9 @@ modulemd_component_set_name (ModulemdComponent *self, const gchar *name)
 
   /* Do nothing if the child class has not implemented this */
   if (!klass->set_name)
-    return;
+    {
+      return;
+    }
 
   klass->set_name (self, name);
 }
@@ -600,22 +622,30 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
 
   if (!mmd_emitter_scalar (
         emitter, priv->name, YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (modulemd_component_get_rationale (self) != NULL)
     {
       if (!mmd_emitter_scalar (
             emitter, "rationale", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!mmd_emitter_scalar (emitter,
                                modulemd_component_get_rationale (self),
                                YAML_PLAIN_SCALAR_STYLE,
                                error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   /* The rest of the fields are emitted by childs, after which they need to call
@@ -644,11 +674,15 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
       ;
       if (!mmd_emitter_scalar (
             emitter, "buildorder", YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
 
       if (!mmd_emitter_scalar (
             emitter, buildorder, YAML_PLAIN_SCALAR_STYLE, error))
-        return FALSE;
+        {
+          return FALSE;
+        }
     }
 
   else if (g_hash_table_size (priv->buildafter))

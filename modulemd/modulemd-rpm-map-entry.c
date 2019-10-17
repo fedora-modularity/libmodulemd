@@ -11,8 +11,8 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <inttypes.h>
 #include "yaml.h"
+#include <inttypes.h>
 
 #include "modulemd-errors.h"
 #include "modulemd-rpm-map-entry.h"
@@ -118,7 +118,9 @@ modulemd_rpm_map_entry_equals (ModulemdRpmMapEntry *self,
   g_return_val_if_fail (MODULEMD_IS_RPM_MAP_ENTRY (other), FALSE);
 
   if (self == other)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   /* Since all of the public attributes of these entries are captured by the
    * NEVRA output, we can short-cut the comparison process and just compare
@@ -141,7 +143,7 @@ modulemd_rpm_map_entry_validate (ModulemdRpmMapEntry *self, GError **error)
                            "Missing name attribute");
       return FALSE;
     }
-  else if (!self->version)
+  if (!self->version)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
@@ -149,7 +151,7 @@ modulemd_rpm_map_entry_validate (ModulemdRpmMapEntry *self, GError **error)
                            "Missing version attribute");
       return FALSE;
     }
-  else if (!self->release)
+  if (!self->release)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
@@ -157,7 +159,7 @@ modulemd_rpm_map_entry_validate (ModulemdRpmMapEntry *self, GError **error)
                            "Missing release attribute");
       return FALSE;
     }
-  else if (!self->arch)
+  if (!self->arch)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
@@ -402,10 +404,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (error,
-                                           event,
-                                           "Failed to parse package name: %s",
-                                           nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package name: %s",
+                    nested_error->message);
+                }
               modulemd_rpm_map_entry_set_name (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
@@ -413,10 +418,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               epoch = modulemd_yaml_parse_uint64 (parser, &nested_error);
               if (nested_error)
-                MMD_YAML_ERROR_EVENT_EXIT (error,
-                                           event,
-                                           "Failed to parse package epoch: %s",
-                                           nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package epoch: %s",
+                    nested_error->message);
+                }
               modulemd_rpm_map_entry_set_epoch (entry, epoch);
               seen_epoch = TRUE;
             }
@@ -424,11 +432,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse package version: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package version: %s",
+                    nested_error->message);
+                }
               modulemd_rpm_map_entry_set_version (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
@@ -436,11 +446,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse package release: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package release: %s",
+                    nested_error->message);
+                }
               modulemd_rpm_map_entry_set_release (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
@@ -448,11 +460,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse package architecture: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package architecture: %s",
+                    nested_error->message);
+                }
               modulemd_rpm_map_entry_set_arch (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
@@ -460,10 +474,13 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
             {
               nevra = modulemd_yaml_parse_string (parser, &nested_error);
               if (!nevra)
-                MMD_YAML_ERROR_EVENT_EXIT (error,
-                                           event,
-                                           "Failed to parse package nevra: %s",
-                                           nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse package nevra: %s",
+                    nested_error->message);
+                }
             }
           else
             {

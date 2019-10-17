@@ -434,15 +434,13 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
-                                      GError **error);
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from);
 
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
                                 GError **error)
 {
-  g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) current_stream = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
   guint64 current_mdversion = modulemd_module_stream_get_mdversion (self);
@@ -479,11 +477,17 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
         {
         case 1:
           /* Upgrade to ModuleStreamV2 */
-          updated_stream = modulemd_module_stream_upgrade_to_v2 (
-            current_stream, &nested_error);
+          updated_stream =
+            modulemd_module_stream_upgrade_to_v2 (current_stream);
           if (!updated_stream)
             {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
+              /* This should be impossible, since there are no failure returns
+               * from modulemd_module_stream_upgrade_to_v2()
+               */
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MODULEMD_ERROR_UPGRADE,
+                           "Upgrading to v2 failed for an unknown reason");
               return NULL;
             }
           break;
@@ -510,8 +514,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from,
-                                      GError **error)
+modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from)
 {
   ModulemdModuleStreamV1 *v1_stream = NULL;
   g_autoptr (ModulemdModuleStreamV2) copy = NULL;

@@ -278,6 +278,15 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     }
   yaml_event_delete (&event);
 
+  if (module_name)
+    {
+      modulemd_module_stream_set_module_name (stream, module_name);
+    }
+
+  if (module_stream)
+    {
+      modulemd_module_stream_set_stream_name (stream, module_stream);
+    }
 
   if (!modulemd_module_stream_validate (stream, &nested_error))
     {

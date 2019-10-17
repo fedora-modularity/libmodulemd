@@ -15,6 +15,7 @@
 #include <glib.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 
 #ifdef HAVE_RPMIO
@@ -81,13 +82,15 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
   /* No known suffix? Try using libmagic from file-utils */
   const char *mime_type;
   g_auto (magic_t) magic = NULL;
-  int magic_fd = dup (fd);
+  int magic_fd = fcntl (fd, F_DUPFD_CLOEXEC, 0);
+  int err = errno;
   if (magic_fd < 0)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MODULEMD_ERROR_MAGIC,
-                   "Could not dup() the file descriptor");
+                   "Could not dup() the file descriptor: %s",
+                   g_strerror (err));
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
     }
 

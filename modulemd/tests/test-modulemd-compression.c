@@ -69,6 +69,7 @@ test_modulemd_detect_compression (void)
   g_autofree gchar *filename = NULL;
   g_autoptr (FILE) filestream = NULL;
   g_autoptr (GError) error = NULL;
+  ModulemdCompressionTypeEnum result;
 
   struct expected_compression_t expected[] = {
     { .filename = "bzipped.yaml.bz2",
@@ -94,10 +95,9 @@ test_modulemd_detect_compression (void)
       filestream = g_fopen (filename, "rb");
       g_assert_nonnull (filestream);
       fd = fileno (filestream);
-      g_assert_cmpint (modulemd_detect_compression (filename, fd, &error),
-                       ==,
-                       expected[i].type);
+      result = modulemd_detect_compression (filename, fd, &error);
       g_assert_no_error (error);
+      g_assert_cmpint (result, ==, expected[i].type);
       g_clear_error (&error);
       g_clear_pointer (&filestream, fclose);
       g_clear_pointer (&filename, g_free);

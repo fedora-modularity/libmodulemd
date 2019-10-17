@@ -37,7 +37,7 @@ test_cflags = [
   '-Werror=return-type',
   '-Werror=array-bounds',
   '-Werror=write-strings',
-  '-D_POSIX_SOURCE',
+  '-D_GNU_SOURCE',
   '-DG_LOG_USE_STRUCTURED',
   '-DG_LOG_DOMAIN="libmodulemd"',
 ]

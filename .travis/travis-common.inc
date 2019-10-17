@@ -8,19 +8,25 @@ MMD_RELEASE=
 MMD_TARBALL_PATH=
 
 BUILDAH_PATH=$(which buildah)
-DOCKER_PATH=/usr/bin/docker
 
-if [ -x ${BUILDAH_PATH--} ]; then
-    MMD_BUILDAH="$BUILDAH_PATH bud"
+DOCKER_PATH=$(which docker)
+
+if [ x$BUILDAH_PATH == x ]; then
+    if [ x$DOCKER_PATH == x ]; then
+        >&2 echo "error: Neither docker nor podman available"
+        exit 1
+    else
+        MMD_BUILDAH="sudo $DOCKER_PATH build"
+    fi
 else
-    MMD_BUILDAH="$DOCKER_PATH build"
+    MMD_BUILDAH="$BUILDAH_PATH bud"
 fi
 
 PODMAN_PATH=$(which podman)
-if [ -x ${PODMAN_PATH--} ]; then
-    MMD_OCI="$PODMAN_PATH"
+if [  x$PODMAN_PATH == x ]; then
+    MMD_OCI="sudo $DOCKER_PATH"
 else
-    MMD_OCI="$DOCKER_PATH"
+    MMD_OCI="$PODMAN_PATH"
 fi
 
 function common_finalize {

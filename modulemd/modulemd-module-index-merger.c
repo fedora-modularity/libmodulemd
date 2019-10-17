@@ -11,14 +11,14 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
 #include "modulemd-defaults.h"
-#include "modulemd-module.h"
-#include "modulemd-module-index.h"
 #include "modulemd-module-index-merger.h"
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream.h"
+#include "modulemd-module.h"
 #include "private/modulemd-module-index-private.h"
 #include "private/modulemd-util.h"
+#include <glib.h>
 
 
 typedef struct _priorities

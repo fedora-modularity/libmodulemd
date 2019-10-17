@@ -19,10 +19,10 @@
 
 #include "config.h"
 #include "modulemd-defaults.h"
-#include "modulemd-module.h"
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
 #include "private/modulemd-util.h"

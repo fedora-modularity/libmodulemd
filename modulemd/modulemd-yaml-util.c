@@ -11,13 +11,13 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include <glib.h>
-#include <yaml.h>
-#include <inttypes.h>
 #include "modulemd-errors.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
+#include <glib.h>
+#include <inttypes.h>
+#include <yaml.h>
 
 
 GQuark
@@ -409,7 +409,7 @@ modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error)
     {
       return FALSE;
     }
-  else if (g_str_equal ((const gchar *)event.data.scalar.value, "true"))
+  if (g_str_equal ((const gchar *)event.data.scalar.value, "true"))
     {
       return TRUE;
     }
@@ -473,7 +473,10 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
 
         case YAML_SEQUENCE_END_EVENT:
           if (!in_list)
-            MMD_YAML_ERROR_EVENT_EXIT (error, event, "Unexpected end of list");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unexpected end of list");
+            }
           in_list = FALSE;
           done = TRUE;
           break;
@@ -527,15 +530,20 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
 
         case YAML_MAPPING_END_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (error, event, "Unexpected end of map");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unexpected end of map");
+            }
           in_map = FALSE;
           done = TRUE;
           break;
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Unexpected scalar outside of map.");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Unexpected scalar outside of map.");
+            }
 
           if (g_str_equal ((const gchar *)event.data.scalar.value, key))
             {
@@ -654,7 +662,9 @@ modulemd_yaml_parse_document_type_internal (
    * But we still emit it.
    */
   if (!mmd_emitter_start_document (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /* The second event must be the mapping start */
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
@@ -677,7 +687,9 @@ modulemd_yaml_parse_document_type_internal (
         {
         case YAML_MAPPING_END_EVENT:
           if (!mmd_emitter_end_mapping (emitter, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
           depth--;
           if (depth == 0)
             {
@@ -688,7 +700,9 @@ modulemd_yaml_parse_document_type_internal (
         case YAML_MAPPING_START_EVENT:
           if (!mmd_emitter_start_mapping (
                 emitter, event.data.mapping_start.style, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
           depth++;
           break;
 
@@ -697,7 +711,9 @@ modulemd_yaml_parse_document_type_internal (
                                    (const gchar *)event.data.scalar.value,
                                    event.data.scalar.style,
                                    error))
-            return FALSE;
+            {
+              return FALSE;
+            }
 
           if (depth == 1 && g_str_equal (event.data.scalar.value, "document"))
             {
@@ -718,7 +734,9 @@ modulemd_yaml_parse_document_type_internal (
                                        (const gchar *)doctype_scalar,
                                        YAML_PLAIN_SCALAR_STYLE,
                                        error))
-                return FALSE;
+                {
+                  return FALSE;
+                }
 
               if (g_str_equal (doctype_scalar, "modulemd"))
                 {
@@ -761,7 +779,9 @@ modulemd_yaml_parse_document_type_internal (
               mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
               if (!mmd_emitter_scalar (
                     emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))
-                return FALSE;
+                {
+                  return FALSE;
+                }
             }
           else if (depth == 1 && g_str_equal (event.data.scalar.value, "data"))
             {
@@ -793,7 +813,9 @@ modulemd_yaml_parse_document_type_internal (
   yaml_event_delete (&event);
 
   if (!mmd_emitter_end_stream (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (doctype == MODULEMD_YAML_DOC_UNKNOWN)
     {
@@ -880,28 +902,42 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
   g_autofree gchar *mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
 
   if (!mmd_emitter_start_document (emitter, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_start_mapping (emitter, YAML_BLOCK_MAPPING_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, "document", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, doctype_string, YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter, "version", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (
         emitter, mdversion_string, YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!mmd_emitter_scalar (emitter, "data", YAML_PLAIN_SCALAR_STYLE, error))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -925,9 +961,13 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
   else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
     {
       if (g_variant_get_boolean (variant))
-        EMIT_SCALAR (emitter, error, "TRUE");
+        {
+          EMIT_SCALAR (emitter, error, "TRUE");
+        }
       else
-        EMIT_SCALAR (emitter, error, "FALSE");
+        {
+          EMIT_SCALAR (emitter, error, "FALSE");
+        }
     }
   else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DICTIONARY))
     {
@@ -963,7 +1003,9 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
             }
           EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));
           if (!modulemd_yaml_emit_variant (emitter, value, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
 
           g_clear_pointer (&value, g_variant_unref);
         }
@@ -978,7 +1020,9 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
       while ((value = g_variant_iter_next_value (&iter)))
         {
           if (!modulemd_yaml_emit_variant (emitter, value, error))
-            return FALSE;
+            {
+              return FALSE;
+            }
           g_clear_pointer (&value, g_variant_unref);
         }
       EMIT_SEQUENCE_END (emitter, error);

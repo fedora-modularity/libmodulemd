@@ -68,15 +68,21 @@ modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2)
 
   if (g_strcmp0 (modulemd_profile_get_name (self_1),
                  modulemd_profile_get_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (modulemd_profile_get_description (self_1, NULL),
                  modulemd_profile_get_description (self_2, NULL)))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   //Check rpms: size, set values
   if (!modulemd_hash_table_sets_are_equal (self_1->rpms, self_2->rpms))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -172,7 +178,9 @@ modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale)
                                                                 self->name);
 
           if (translation != NULL)
-            return translation;
+            {
+              return translation;
+            }
         }
     }
 
@@ -322,8 +330,10 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error, event, "Missing mapping in profile entry");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error, event, "Missing mapping in profile entry");
+            }
           if (g_str_equal (event.data.scalar.value, "rpms"))
             {
               g_hash_table_unref (p->rpms);
@@ -341,11 +351,13 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT (
-                  error,
-                  event,
-                  "Failed to parse description in profile: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse description in profile: %s",
+                    nested_error->message);
+                }
               modulemd_profile_set_description (p, value);
               g_clear_pointer (&value, g_free);
             }

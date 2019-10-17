@@ -13,10 +13,10 @@
 
 #pragma once
 
-#include <glib-object.h>
-#include <yaml.h>
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-subdocument-info.h"
+#include <glib-object.h>
+#include <yaml.h>
 
 
 G_BEGIN_DECLS

@@ -19,8 +19,8 @@
 #include "modulemd-defaults-v1.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-defaults-v1-private.h"
-#include "private/modulemd-translation-entry-private.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-translation-entry-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
@@ -477,7 +477,7 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
-  yaml_stream = g_fopen (yaml_path, "rb");
+  yaml_stream = g_fopen (yaml_path, "rbe");
   g_assert_nonnull (yaml_stream);
 
   yaml_parser_set_input_file (&parser, yaml_stream);

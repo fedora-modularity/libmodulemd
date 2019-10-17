@@ -73,27 +73,39 @@ modulemd_service_level_equals (ModulemdServiceLevel *self_1,
                                ModulemdServiceLevel *self_2)
 {
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_SERVICE_LEVEL (self_2), FALSE);
 
   if (g_strcmp0 (modulemd_service_level_get_name (self_1),
                  modulemd_service_level_get_name (self_2)) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   /*if both eols are invalid, its equivalent*/
   if (!g_date_valid (self_1->eol) && !g_date_valid (self_2->eol))
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!g_date_valid (self_1->eol) || !g_date_valid (self_2->eol))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_date_compare (self_1->eol, self_2->eol) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }

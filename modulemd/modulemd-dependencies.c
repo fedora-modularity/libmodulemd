@@ -50,10 +50,14 @@ modulemd_dependencies_equals (ModulemdDependencies *self_1,
                               ModulemdDependencies *self_2)
 {
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_DEPENDENCIES (self_2), FALSE);
@@ -61,12 +65,16 @@ modulemd_dependencies_equals (ModulemdDependencies *self_1,
   if (!modulemd_hash_table_equals (self_1->buildtime_deps,
                                    self_2->buildtime_deps,
                                    modulemd_hash_table_sets_are_equal_wrapper))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (!modulemd_hash_table_equals (self_1->runtime_deps,
                                    self_2->runtime_deps,
                                    modulemd_hash_table_sets_are_equal_wrapper))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -110,7 +118,9 @@ modulemd_dependencies_nested_table_get_or_create (GHashTable *table,
   GHashTable *inner = NULL;
   inner = g_hash_table_lookup (table, key);
   if (inner != NULL)
-    return inner;
+    {
+      return inner;
+    }
 
   // We know that the hash table will end up holding on to it for us.
   keyi = g_strdup (key);
@@ -131,7 +141,9 @@ modulemd_dependencies_nested_table_add (GHashTable *table,
     modulemd_dependencies_nested_table_get_or_create (table, key);
   g_return_if_fail (inner);
   if (value != NULL)
-    g_hash_table_add (inner, g_strdup (value));
+    {
+      g_hash_table_add (inner, g_strdup (value));
+    }
 }
 
 
@@ -254,7 +266,8 @@ static gboolean
 modulemd_dependencies_validate_deps (GHashTable *deps, GError **error)
 {
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   gchar *module_name = NULL;
   gchar *stream_name = NULL;
   gssize signedness = 0;
@@ -412,11 +425,13 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
           key = g_strdup ((const gchar *)event.data.scalar.value);
           if (g_hash_table_contains (t,
                                      (const gchar *)event.data.scalar.value))
-            MMD_YAML_ERROR_EVENT_EXIT (
-              error,
-              event,
-              "Key %s encountered twice in dependencies",
-              (const gchar *)event.data.scalar.value);
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Key %s encountered twice in dependencies",
+                (const gchar *)event.data.scalar.value);
+            }
 
           value = modulemd_yaml_parse_string_set (parser, &nested_error);
           if (value == NULL)
@@ -670,7 +685,8 @@ requires_module_and_stream (GHashTable *modules,
 {
   GHashTable *streams = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   g_autofree gchar *negated = NULL;
 
   streams = g_hash_table_lookup (modules, module_name);

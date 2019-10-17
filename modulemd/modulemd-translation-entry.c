@@ -500,7 +500,8 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
   int ret;
   g_autoptr (GError) nested_error = NULL;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
   MMD_INIT_YAML_EVENT (event);
 
   ret = mmd_emitter_scalar (

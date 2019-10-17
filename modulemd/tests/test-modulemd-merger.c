@@ -14,10 +14,10 @@
 #include <glib.h>
 #include <yaml.h>
 
-#include "modulemd-defaults.h"
 #include "modulemd-defaults-v1.h"
-#include "modulemd-module-index.h"
+#include "modulemd-defaults.h"
 #include "modulemd-module-index-merger.h"
+#include "modulemd-module-index.h"
 #include "private/test-utils.h"
 
 

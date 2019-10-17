@@ -50,20 +50,28 @@ modulemd_buildopts_equals (ModulemdBuildopts *self_1,
                            ModulemdBuildopts *self_2)
 {
   if (!self_1 && !self_2)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!self_1 || !self_2)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_2), FALSE);
 
   if (!modulemd_hash_table_sets_are_equal (self_1->whitelist,
                                            self_2->whitelist))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (g_strcmp0 (self_1->rpm_macros, self_2->rpm_macros) != 0)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -266,8 +274,10 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-              error, event, "Missing mapping in buildopts");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Missing mapping in buildopts");
+            }
 
           if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
             {
@@ -330,8 +340,10 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
 
         case YAML_SCALAR_EVENT:
           if (!in_map)
-            MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-              error, event, "Missing mapping in buildopts rpms entry");
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error, event, "Missing mapping in buildopts rpms entry");
+            }
 
           if (g_str_equal (event.data.scalar.value, "whitelist"))
             {
@@ -351,11 +363,13 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
-                MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-                  error,
-                  event,
-                  "Failed to parse rpm_macros in buildopts: %s",
-                  nested_error->message);
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error,
+                    event,
+                    "Failed to parse rpm_macros in buildopts: %s",
+                    nested_error->message);
+                }
               modulemd_buildopts_set_rpm_macros (buildopts, value);
               g_clear_pointer (&value, g_free);
             }

@@ -228,14 +228,16 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
                   /* We have arrived at the "data". Return. */
                   return TRUE;
                 }
-              else if (g_str_equal (event.data.scalar.value, "document") ||
-                       g_str_equal (event.data.scalar.value, "version"))
+              if (g_str_equal (event.data.scalar.value, "document") ||
+                  g_str_equal (event.data.scalar.value, "version"))
                 {
                   /* Always kip over the contents of document and version,
                    * since it was already parsed when we created this subdoc.
                    */
                   if (!skip_unknown_yaml (parser, error))
-                    return FALSE;
+                    {
+                      return FALSE;
+                    }
                 }
               else
                 {

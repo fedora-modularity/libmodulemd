@@ -13,13 +13,13 @@
 
 #pragma once
 
-#include <glib-object.h>
 #include "modulemd-module-stream.h"
-#include "modulemd-translation.h"
 #include "modulemd-translation-entry.h"
-#include "private/modulemd-yaml.h"
+#include "modulemd-translation.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-yaml.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

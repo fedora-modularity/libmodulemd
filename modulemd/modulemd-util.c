@@ -49,7 +49,8 @@ modulemd_hash_table_deep_str_copy (GHashTable *orig)
 {
   GHashTable *new;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   g_return_val_if_fail (orig, NULL);
 
@@ -71,7 +72,8 @@ modulemd_hash_table_deep_set_copy (GHashTable *orig)
 {
   GHashTable *new;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   g_return_val_if_fail (orig, NULL);
 
@@ -92,7 +94,8 @@ modulemd_hash_table_deep_str_set_copy (GHashTable *orig)
 {
   GHashTable *new;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   g_return_val_if_fail (orig, NULL);
 
@@ -116,7 +119,8 @@ modulemd_hash_table_deep_str_str_set_copy (GHashTable *orig)
 {
   GHashTable *new;
   GHashTableIter iter;
-  gpointer key, value;
+  gpointer key;
+  gpointer value;
 
   g_return_val_if_fail (orig, NULL);
 
@@ -266,7 +270,9 @@ void
 modulemd_hash_table_unref (void *table)
 {
   if (!table)
-    return;
+    {
+      return;
+    }
 
   g_hash_table_unref ((GHashTable *)table);
 }
@@ -400,7 +406,9 @@ modulemd_boolean_equals (gboolean a, gboolean b)
    * be canonicalized before comparing for equality.
    */
   if (!!a == !!b)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   return FALSE;
 }

@@ -1773,15 +1773,6 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
       yaml_event_delete (&event);
     }
 
-
-  if (!modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (modulestream),
-                                        &nested_error))
-    {
-      g_propagate_error (error, g_steal_pointer (&nested_error));
-      return NULL;
-    }
-
-
   return g_steal_pointer (&modulestream);
 }
 

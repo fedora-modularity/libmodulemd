@@ -17,9 +17,13 @@ if [ x$BUILDAH_PATH == x ]; then
         exit 1
     else
         MMD_BUILDAH="sudo $DOCKER_PATH build"
+        MMD_LAYERS_TRUE=
+        MMD_LAYERS_FALSE=
     fi
 else
     MMD_BUILDAH="$BUILDAH_PATH bud"
+    MMD_LAYERS_TRUE="--layers=true"
+    MMD_LAYERS_FALSE="--layers=false"
 fi
 
 PODMAN_PATH=$(which podman)
@@ -77,11 +81,11 @@ function mmd_run_docker_tests {
         $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
     sed -e "s/@RELEASE@/$MMD_OS:$MMD_RELEASE/" $SCRIPT_DIR/$MMD_OS/Dockerfile.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
 
-    $MMD_BUILDAH \
+    $MMD_BUILDAH $MMD_LAYERS_TRUE \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
         -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
 
-    $MMD_BUILDAH \
+    $MMD_BUILDAH $MMD_LAYERS_FALSE \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE \
         -t fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE \
         --build-arg TARBALL=${TARBALL} .

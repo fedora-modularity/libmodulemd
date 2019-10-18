@@ -361,7 +361,8 @@ foreach name, sources : c_tests
         install : false,
     )
     test(name + '_debug', exe,
-         env : test_env)
+         env : test_env,
+         timeout : 60)
     test(name + '_release', exe,
          env : test_release_env)
 

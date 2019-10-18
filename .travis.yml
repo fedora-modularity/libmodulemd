@@ -27,23 +27,60 @@ notifications:
 
 jobs:
   include:
-    - name: "Fedora 29"
-      script: ./.travis/travis-fedora.sh
-    - name: "Fedora 30"
-      script: ./.travis/travis-fedora.sh
-    - name: "Fedora 31"
-      script: ./.travis/travis-fedora.sh
-    - name: "Fedora rawhide"
-      script: ./.travis/travis-fedora.sh
-    - name: "CentOS 7"
-      script: ./.travis/travis-centos.sh
     - name: "Documentation Update"
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-docs.sh; fi'
+      arch: amd64
+
+
+    - name: "CentOS 7 x86_64"
+      script: ./.travis/travis-centos.sh
+      arch: amd64
+
+
+    - name: "Fedora 29 x86_64"
+      script: ./.travis/travis-fedora.sh
+      arch: amd64
+
+    - name: "Fedora 30 x86_64"
+      script: ./.travis/travis-fedora.sh
+      arch: amd64
+
+    - name: "Fedora 31 x86_64"
+      script: ./.travis/travis-fedora.sh
+      arch: amd64
+
+    - name: "Fedora rawhide x86_64"
+      script: ./.travis/travis-fedora.sh
+      arch: amd64
+
+
+    - name: "Fedora 29 aarch64"
+      script: ./.travis/travis-fedora.sh
+      arch: arm64
+    - name: "Fedora 30 aarch64"
+      script: ./.travis/travis-fedora.sh
+      arch: arm64
+    - name: "Fedora 31 aarch64"
+      script: ./.travis/travis-fedora.sh
+      arch: arm64
+    - name: "Fedora rawhide aarch64"
+      script: ./.travis/travis-fedora.sh
+      arch: arm64
+
+
     - name: "Coverity Scan"
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-coverity.sh; fi'
+      arch: amd64
+
+
     - name: "openSUSE tumbleweed"
       script: ./.travis/travis-opensuse.sh
+      arch: amd64
+
     - name: "Arch Linux"
       script: ./.travis/travis-archlinux.sh
+      arch: amd64
+
     - name: "Mageia 7"
       script: ./.travis/travis-mageia.sh
+      arch: amd64

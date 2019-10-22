@@ -11,6 +11,7 @@ pushd /builddir/
 meson --buildtype=debug \
       -Dtest_dirty_git=false \
       -Ddeveloper_build=false \
+      -Dskip_clang_tidy=true \
       -Dpython_name=python3 \
       -Drpmio=disabled \
       travis

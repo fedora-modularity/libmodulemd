@@ -4,7 +4,7 @@
 set -e
 set -x
 
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
+COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Dskip_clang_tidy=${SKIP_CLANG_TIDY:-true}"
 
 pushd /builddir/
 

@@ -8,7 +8,7 @@ set -x
 # CentOS 7 doesn't have autopep8, so we'll drop the requirement for it
 # This implementation will still allow it to occur if autopep8 still shows
 # up later.
-COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=python3.6"
+COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=python3.6 -Dskip_clang_tidy=true"
 
 pushd /builddir/
 

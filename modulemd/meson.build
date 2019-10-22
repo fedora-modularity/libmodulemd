@@ -14,10 +14,18 @@
 developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
 test_installed_lib = get_option('test_installed_lib')
+skip_clang_tidy = get_option('skip_clang_tidy')
 skip_introspection = get_option('skip_introspection')
 
+
 clang_simple_version_script = find_program ('clang_simple_version.sh')
-clang_tidy = find_program('clang-tidy', required: false)
+
+if skip_clang_tidy
+    clang_tidy = disabler()
+else
+    clang_tidy = find_program('clang-tidy', required: false)
+endif
+
 if clang_tidy.found()
     ret = run_command (clang_simple_version_script, clang_tidy.path())
     if ret.returncode() != 0

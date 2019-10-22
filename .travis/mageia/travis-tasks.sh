@@ -5,7 +5,7 @@ set -e
 set -x
 
 
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Ddeveloper_build=false"
+COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Ddeveloper_build=false -Dskip_clang_tidy=true"
 
 
 pushd /builddir/

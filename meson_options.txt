@@ -10,12 +10,12 @@
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
 option('developer_build', type : 'boolean', value : true)
+option('libmagic', type : 'feature', value : 'enabled')
+option('python_name', type : 'string')
+option('rpmio', type : 'feature', value : 'enabled')
+option('skip_introspection', type : 'boolean', value : false)
 option('test_dirty_git', type : 'boolean', value : false)
 option('test_installed_lib', type : 'boolean', value : false)
-option('skip_introspection', type : 'boolean', value : false)
-option('python_name', type : 'string')
+option('with_docs', type : 'boolean', value : true)
 option('with_py2_overrides', type : 'boolean', value : true)
 option('with_py3_overrides', type : 'boolean', value : true)
-option('rpmio', type : 'feature', value : 'enabled')
-option('libmagic', type : 'feature', value : 'enabled')
-option('with_docs', type : 'boolean', value : true)

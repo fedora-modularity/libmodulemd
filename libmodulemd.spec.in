@@ -83,7 +83,9 @@ Development files for libmodulemd.
 
 
 %build
-%meson -Ddeveloper_build=false %{meson_python_flags}
+%meson -Ddeveloper_build=false \
+       -Dskip_formatters=true \
+       %{meson_python_flags}
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 # ALERT!!! PURE HACK FOR EPEL!

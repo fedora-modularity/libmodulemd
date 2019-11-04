@@ -4,6 +4,7 @@
 set -e
 set -x
 
+PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Dskip_clang_tidy=${SKIP_CLANG_TIDY:-true}"
 
 pushd /builddir/
@@ -13,7 +14,7 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-ninja -C travis test
+meson test -C travis --num-processes=$PROCESSORS --print-errorlogs -t 5
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later
@@ -69,10 +70,7 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       installed_lib_tests
 
-pushd installed_lib_tests
 # Run the tests against the installed RPMs
-ninja test
-
-popd #installed_lib_tests
+meson test -C installed_lib_tests --num-processes=$PROCESSORS --print-errorlogs -t 5
 
 popd #builddir

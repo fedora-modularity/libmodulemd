@@ -95,6 +95,7 @@ sed -r -i -e "/g-ir-scanner/s/-l(gobject-2.0|glib-2.0|yaml)//g" %{_vpath_builddi
 
 %meson_build
 
+
 %check
 
 export LC_CTYPE=C.utf8
@@ -105,7 +106,8 @@ export LC_CTYPE=C.utf8
 export MMD_SKIP_VALGRIND=1
 %endif
 
-%meson_test
+# The tests sometimes time out in CI, so give them a little extra time
+%{__meson} test -C %{_vpath_builddir} %{?_smp_mesonflags} --print-errorlogs -t 5
 
 
 %install

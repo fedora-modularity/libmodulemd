@@ -4,10 +4,8 @@ MAINTAINER Tomasz Paweł Gajc <tpgxyz@gmail.com>
 
 RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	clang \
-	clang-analyzer \
 	createrepo_c \
 	curl \
-	elinks \
 	file-devel \
 	git-core \
 	glib2-devel \
@@ -17,10 +15,9 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	libyaml-devel \
 	cmake \
 	meson \
-	ninja-build \
+	ninja \
 	openssl \
 	pkgconf \
-	popt-devel \
 	python2-six \
 	python3-autopep8 \
 	python3-devel \

@@ -8,7 +8,7 @@ source $SCRIPT_DIR/travis-common.inc
 set -e
 set -x
 
-JOB_NAME=${TRAVIS_JOB_NAME:-OpenMandriva Lx cooker }
+JOB_NAME=${TRAVIS_JOB_NAME:-OpenMandriva cooker}
 
 arr=($JOB_NAME)
 release=${arr[1]:-cooker}
@@ -16,5 +16,5 @@ release=${arr[1]:-cooker}
 mmd_run_docker_tests \
     os=openmandriva \
     release=$release \
-    repository=docker.io
-
+    repository=hub.docker.com \
+    image=openmandriva/$release

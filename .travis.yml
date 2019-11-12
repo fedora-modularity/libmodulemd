@@ -70,10 +70,10 @@ jobs:
       script: ./.travis/travis-mageia.sh
       arch: amd64
 
-    - name: "OpenMandriva Cooker"
+    - name: "OpenMandriva cooker"
       script: ./.travis/travis-openmandriva.sh
       arch: amd64
-      
+
     - stage: Fedora aarch64
       name: "Fedora 29 aarch64"
       script: ./.travis/travis-fedora.sh

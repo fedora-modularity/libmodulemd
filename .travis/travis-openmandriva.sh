@@ -16,4 +16,5 @@ release=${arr[1]:-cooker}
 mmd_run_docker_tests \
     os=openmandriva \
     release=$release \
+    repository=docker.io \
     image=openmandriva/$release

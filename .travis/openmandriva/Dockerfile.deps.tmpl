@@ -4,34 +4,20 @@ MAINTAINER Tomasz Paweł Gajc <tpgxyz@gmail.com>
 
 RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
 	clang \
-	createrepo_c \
-	curl \
-	file-devel \
-	git-core \
-	glib2-devel \
-	/usr/share/gtk-doc/html/glib/index.html \
-	gobject-introspection-devel \
-	gtk-doc \
-	libyaml-devel \
 	cmake \
 	meson \
 	ninja \
-	openssl \
-	pkgconf \
-	python2-six \
-	python3-autopep8 \
-	python3-devel \
-	python3-gitpython \
-	python3-gobject3 \
-	python3-pycodestyle \
-	rpm-mageia-setup-build \
-	rpm-build \
-	rpm-devel \
 	rpmdevtools \
-	ruby \
-	"rubygem(json)" \
-	rubygems \
 	sudo \
 	valgrind \
 	wget \
+	gtk-doc \
+	task-devel \
+	'pkgconfig(zlib)' \
+	'pkgconfig(gobject-introspection-1.0)' \
+	'python3egg(autopep8)' \
+	'python3dist(pygobject)' \
+	'pkgconfig(yaml-0.1)' \
+	'pkgconfig(rpm)' \
+	magic-devel \
     && dnf -y clean all

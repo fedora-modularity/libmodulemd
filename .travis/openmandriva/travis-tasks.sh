@@ -13,7 +13,8 @@ CC=clang CXX=clang++ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-ninja -C travis test
+# (tpg) skip valgrind tests taking too much time
+MMD_SKIP_VALGRIND=True ninja -C travis test
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later

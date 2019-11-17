@@ -4,7 +4,7 @@
 set -e
 set -x
 
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Ddeveloper_build=false -Dskip_clang_tidy=false -Dwith_py2_overrides=false -Dwith_docs=false"
+COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dskip_clang_tidy=false -Dwith_py2_overrides=false -Dwith_docs=false"
 
 cd /builddir/
 

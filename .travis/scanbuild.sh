@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 # This file is part of libmodulemd
 # Copyright (C) 2018 Stephen Gallagher
 #

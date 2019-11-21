@@ -8,7 +8,7 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dskip_clang_t
 
 cd /builddir/
 
-# Build the code under $CC and run standard tests
+# Build the code under LLVM/clang and run standard tests
 CC=clang CXX=clang++ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis

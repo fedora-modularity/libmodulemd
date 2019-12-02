@@ -33,5 +33,5 @@ CC=clang CXX=clang++ meson --buildtype=debug \
 
     cd travis_scanbuild
     /builddir/.travis/scanbuild.sh
-    cd - #travis_scanbuild
+    cd .. #travis_scanbuild
 fi

@@ -138,6 +138,7 @@ add_subdoc (ModulemdModuleIndex *self,
             gboolean autogen_module_name,
             GError **error)
 {
+  g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
@@ -190,6 +191,11 @@ add_subdoc (ModulemdModuleIndex *self,
           g_clear_pointer (&name, g_free);
         }
 
+      if (!modulemd_module_stream_validate (stream, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
 
       if (!modulemd_module_index_add_module_stream (self, stream, error))
         {
@@ -208,6 +214,13 @@ add_subdoc (ModulemdModuleIndex *self,
             {
               return FALSE;
             }
+
+          if (!modulemd_defaults_validate (defaults, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
           if (!modulemd_module_index_add_defaults (self, defaults, error))
             {
               return FALSE;
@@ -229,6 +242,13 @@ add_subdoc (ModulemdModuleIndex *self,
         {
           return FALSE;
         }
+
+      if (!modulemd_translation_validate (translation, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+
       if (!modulemd_module_index_add_translation (self, translation, error))
         {
           return FALSE;

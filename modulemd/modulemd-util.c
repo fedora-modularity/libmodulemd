@@ -352,12 +352,18 @@ modulemd_validate_nevra (const gchar *nevra)
 
   /* No need to validate Release; it's fairly arbitrary */
 
+  i--;
   /* Process the version */
   while (i >= tmp)
     {
       if (*i == ':')
         {
           break;
+        }
+      else if (*i == '-')
+        {
+          /* '-' between version and epoch is not allowed */
+          return FALSE;
         }
       i--;
     }

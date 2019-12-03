@@ -17,3 +17,4 @@ mmd_run_docker_tests \
     repository=docker.io \
     image=archlinux/base
 
+popd # $SCRIPT_DIR

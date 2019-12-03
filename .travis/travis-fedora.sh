@@ -18,3 +18,4 @@ mmd_run_docker_tests \
     release=$release \
     repository=registry.fedoraproject.org
 
+popd # $SCRIPT_DIR

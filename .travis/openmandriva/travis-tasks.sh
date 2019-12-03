@@ -6,7 +6,7 @@ set -x
 
 COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dskip_clang_tidy=false -Dwith_py2_overrides=false -Dwith_docs=false"
 
-cd /builddir/
+pushd /builddir/
 
 # Build the code under LLVM/clang and run standard tests
 CC=clang CXX=clang++ meson --buildtype=debug \
@@ -31,7 +31,7 @@ CC=clang CXX=clang++ meson --buildtype=debug \
           $COMMON_MESON_ARGS \
           travis_scanbuild
 
-    cd travis_scanbuild
+    pushd travis_scanbuild
     /builddir/.travis/scanbuild.sh
-    cd .. #travis_scanbuild
+    popd #travis_scanbuild
 fi

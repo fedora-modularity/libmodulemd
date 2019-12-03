@@ -17,3 +17,5 @@ mmd_run_docker_tests \
     os=centos \
     release=$release \
     repository=registry.centos.org
+
+popd # $SCRIPT_DIR

@@ -19,3 +19,4 @@ mmd_run_docker_tests \
     release=$release \
     repository=docker.io
 
+popd # $SCRIPT_DIR

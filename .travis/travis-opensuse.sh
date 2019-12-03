@@ -19,3 +19,4 @@ mmd_run_docker_tests \
     repository=registry.opensuse.org \
     image=opensuse/$release
 
+popd # $SCRIPT_DIR

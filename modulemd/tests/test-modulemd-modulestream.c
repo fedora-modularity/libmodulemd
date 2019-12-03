@@ -128,6 +128,78 @@ module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
 
 
 static void
+module_stream_v1_test_profiles (ModuleStreamFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+  g_auto (GStrv) profiles = NULL;
+  g_auto (GStrv) rpms = NULL;
+
+  stream = modulemd_module_stream_v1_new ("sssd", NULL);
+
+  profile = modulemd_profile_new ("client");
+  modulemd_profile_add_rpm (profile, "sssd-client");
+
+  modulemd_module_stream_v1_add_profile (stream, profile);
+  profiles = modulemd_module_stream_v1_get_profile_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (profiles), ==, 1);
+  g_assert_true (g_strv_contains ((const gchar *const *)profiles, "client"));
+
+  g_clear_pointer (&profiles, g_strfreev);
+
+  rpms = modulemd_profile_get_rpms_as_strv (
+    modulemd_module_stream_v1_get_profile (stream, "client"));
+  g_assert_true (g_strv_contains ((const gchar *const *)rpms, "sssd-client"));
+
+  modulemd_module_stream_v1_clear_profiles (stream);
+  profiles = modulemd_module_stream_v1_get_profile_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (profiles), ==, 0);
+
+  g_clear_object (&stream);
+  g_clear_object (&profile);
+  g_clear_pointer (&profiles, g_strfreev);
+  g_clear_pointer (&rpms, g_strfreev);
+}
+
+
+static void
+module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+  g_auto (GStrv) profiles = NULL;
+  g_auto (GStrv) rpms = NULL;
+
+  stream = modulemd_module_stream_v2_new ("sssd", NULL);
+
+  profile = modulemd_profile_new ("client");
+  modulemd_profile_add_rpm (profile, "sssd-client");
+
+  modulemd_module_stream_v2_add_profile (stream, profile);
+  profiles = modulemd_module_stream_v2_get_profile_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (profiles), ==, 1);
+  g_assert_true (g_strv_contains ((const gchar *const *)profiles, "client"));
+
+  g_clear_pointer (&profiles, g_strfreev);
+
+  rpms = modulemd_profile_get_rpms_as_strv (
+    modulemd_module_stream_v2_get_profile (stream, "client"));
+  g_assert_true (g_strv_contains ((const gchar *const *)rpms, "sssd-client"));
+
+  modulemd_module_stream_v2_clear_profiles (stream);
+  profiles = modulemd_module_stream_v2_get_profile_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (profiles), ==, 0);
+
+  g_clear_object (&stream);
+  g_clear_object (&profile);
+  g_clear_pointer (&profiles, g_strfreev);
+  g_clear_pointer (&rpms, g_strfreev);
+}
+
+
+static void
 module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -1568,6 +1640,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_arch,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/profiles",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_profiles,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/profiles",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_profiles,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/copy",

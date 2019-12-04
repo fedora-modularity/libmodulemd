@@ -200,6 +200,107 @@ module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
 
 
 static void
+module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_autofree const gchar *documentation = NULL;
+  g_autofree gchar *documentation_prop = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  documentation = modulemd_module_stream_v1_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_null (documentation);
+  g_assert_null (documentation_prop);
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, "documentation", "http://example.com", NULL);
+
+  documentation = modulemd_module_stream_v1_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, "http://example.com");
+  g_assert_cmpstr (documentation, ==, "http://example.com");
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test set_documentation()
+  modulemd_module_stream_v1_set_documentation (stream, "http://redhat.com");
+
+  documentation = modulemd_module_stream_v1_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, "http://redhat.com");
+  g_assert_cmpstr (documentation, ==, "http://redhat.com");
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test setting to NULL
+  g_object_set (stream, "documentation", NULL, NULL);
+
+  documentation = modulemd_module_stream_v1_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_null (documentation);
+  g_assert_null (documentation_prop);
+
+  g_clear_pointer (&documentation_prop, g_free);
+  g_clear_object (&stream);
+}
+
+
+static void
+module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autofree const gchar *documentation = NULL;
+  g_autofree gchar *documentation_prop = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  documentation = modulemd_module_stream_v2_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_null (documentation);
+  g_assert_null (documentation_prop);
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, "documentation", "http://example.com", NULL);
+
+  documentation = modulemd_module_stream_v2_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, "http://example.com");
+  g_assert_cmpstr (documentation, ==, "http://example.com");
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test set_documentation()
+  modulemd_module_stream_v2_set_documentation (stream, "http://redhat.com");
+
+  documentation = modulemd_module_stream_v2_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, "http://redhat.com");
+  g_assert_cmpstr (documentation, ==, "http://redhat.com");
+
+  g_clear_pointer (&documentation_prop, g_free);
+
+  // Test setting to NULL
+  g_object_set (stream, "documentation", NULL, NULL);
+
+  documentation = modulemd_module_stream_v2_get_documentation (stream);
+  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_assert_null (documentation);
+  g_assert_null (documentation_prop);
+
+  g_clear_pointer (&documentation_prop, g_free);
+  g_clear_object (&stream);
+}
+
+static void
 module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -1640,6 +1741,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_arch,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/documentation",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_documentation,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/documentation",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_documentation,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/profiles",

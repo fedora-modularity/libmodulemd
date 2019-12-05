@@ -350,6 +350,15 @@ class TestModuleStream(TestBase):
             assert stream.props.documentation is None
             assert stream.get_documentation() is None
 
+            # Test unicode characters
+            unicode_test_str = (
+                "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
+            )
+
+            stream.props.documentation = unicode_test_str
+            assert stream.props.documentation == unicode_test_str
+            assert stream.get_documentation() == unicode_test_str
+
     def test_summary(self):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)

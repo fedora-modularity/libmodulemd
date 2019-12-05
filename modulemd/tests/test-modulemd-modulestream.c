@@ -17,6 +17,10 @@
 #define MMD_TEST_DOC_TEXT "http://example.com"
 #define MMD_TEST_DOC_TEXT2 "http://redhat.com"
 #define MMD_TEST_DOC_PROP "documentation"
+#define MMD_TEST_DOC_UNICODE_TEXT                                             \
+  "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
+  "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
+
 typedef struct _ModuleStreamFixture
 {
 } ModuleStreamFixture;
@@ -249,6 +253,18 @@ module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
   g_assert_null (documentation_prop);
 
   g_clear_pointer (&documentation_prop, g_free);
+
+  // Test unicode characters
+  modulemd_module_stream_v1_set_documentation (stream,
+                                               MMD_TEST_DOC_UNICODE_TEXT);
+
+  documentation = modulemd_module_stream_v1_get_documentation (stream);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_UNICODE_TEXT);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_pointer (&documentation_prop, g_free);
+
   g_clear_object (&stream);
 }
 
@@ -300,6 +316,18 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
   g_assert_null (documentation_prop);
 
   g_clear_pointer (&documentation_prop, g_free);
+
+  // Test unicode characters
+  modulemd_module_stream_v2_set_documentation (stream,
+                                               MMD_TEST_DOC_UNICODE_TEXT);
+
+  documentation = modulemd_module_stream_v2_get_documentation (stream);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_UNICODE_TEXT);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_pointer (&documentation_prop, g_free);
+
   g_clear_object (&stream);
 }
 

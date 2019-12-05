@@ -14,6 +14,9 @@
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 
+#define MMD_TEST_DOC_TEXT "http://example.com"
+#define MMD_TEST_DOC_TEXT2 "http://redhat.com"
+#define MMD_TEST_DOC_PROP "documentation"
 typedef struct _ModuleStreamFixture
 {
 } ModuleStreamFixture;
@@ -211,37 +214,37 @@ module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
 
   // Check the defaults
   documentation = modulemd_module_stream_v1_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
   g_assert_null (documentation);
   g_assert_null (documentation_prop);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test property setting
-  g_object_set (stream, "documentation", "http://example.com", NULL);
+  g_object_set (stream, MMD_TEST_DOC_PROP, MMD_TEST_DOC_TEXT, NULL);
 
   documentation = modulemd_module_stream_v1_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
-  g_assert_cmpstr (documentation_prop, ==, "http://example.com");
-  g_assert_cmpstr (documentation, ==, "http://example.com");
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_TEXT);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test set_documentation()
-  modulemd_module_stream_v1_set_documentation (stream, "http://redhat.com");
+  modulemd_module_stream_v1_set_documentation (stream, MMD_TEST_DOC_TEXT2);
 
   documentation = modulemd_module_stream_v1_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
-  g_assert_cmpstr (documentation_prop, ==, "http://redhat.com");
-  g_assert_cmpstr (documentation, ==, "http://redhat.com");
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_TEXT2);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test setting to NULL
-  g_object_set (stream, "documentation", NULL, NULL);
+  g_object_set (stream, MMD_TEST_DOC_PROP, NULL, NULL);
 
   documentation = modulemd_module_stream_v1_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
   g_assert_null (documentation);
   g_assert_null (documentation_prop);
 
@@ -262,37 +265,37 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
 
   // Check the defaults
   documentation = modulemd_module_stream_v2_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
   g_assert_null (documentation);
   g_assert_null (documentation_prop);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test property setting
-  g_object_set (stream, "documentation", "http://example.com", NULL);
+  g_object_set (stream, MMD_TEST_DOC_PROP, MMD_TEST_DOC_TEXT, NULL);
 
   documentation = modulemd_module_stream_v2_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
-  g_assert_cmpstr (documentation_prop, ==, "http://example.com");
-  g_assert_cmpstr (documentation, ==, "http://example.com");
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_TEXT);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test set_documentation()
-  modulemd_module_stream_v2_set_documentation (stream, "http://redhat.com");
+  modulemd_module_stream_v2_set_documentation (stream, MMD_TEST_DOC_TEXT2);
 
   documentation = modulemd_module_stream_v2_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
-  g_assert_cmpstr (documentation_prop, ==, "http://redhat.com");
-  g_assert_cmpstr (documentation, ==, "http://redhat.com");
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
+  g_assert_cmpstr (documentation_prop, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (documentation, ==, MMD_TEST_DOC_TEXT2);
 
   g_clear_pointer (&documentation_prop, g_free);
 
   // Test setting to NULL
-  g_object_set (stream, "documentation", NULL, NULL);
+  g_object_set (stream, MMD_TEST_DOC_PROP, NULL, NULL);
 
   documentation = modulemd_module_stream_v2_get_documentation (stream);
-  g_object_get (stream, "documentation", &documentation_prop, NULL);
+  g_object_get (stream, MMD_TEST_DOC_PROP, &documentation_prop, NULL);
   g_assert_null (documentation);
   g_assert_null (documentation_prop);
 

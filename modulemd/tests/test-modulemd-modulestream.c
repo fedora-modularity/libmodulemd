@@ -204,7 +204,7 @@ module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
-  g_autofree const gchar *documentation = NULL;
+  const gchar *documentation = NULL;
   g_autofree gchar *documentation_prop = NULL;
 
   stream = modulemd_module_stream_v1_new (NULL, NULL);
@@ -255,7 +255,7 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
-  g_autofree const gchar *documentation = NULL;
+  const gchar *documentation = NULL;
   g_autofree gchar *documentation_prop = NULL;
 
   stream = modulemd_module_stream_v2_new (NULL, NULL);

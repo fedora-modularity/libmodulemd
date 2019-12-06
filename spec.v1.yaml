@@ -225,6 +225,8 @@ data:
                 # xxx is only available on the listed architectures.
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
+                # Instructs the build system to only build the
+                # component on this specific set of architectures.
                 # Optional, defaults to all available arches.
                 arches: [ i686, x86_64 ]
                 # A list of architectures with multilib

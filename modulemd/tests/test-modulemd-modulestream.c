@@ -332,6 +332,153 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
 }
 
 static void
+module_stream_v1_test_components (ModuleStreamFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
+  g_autoptr (ModulemdComponentModule) module_component = NULL;
+  ModulemdComponent *retrieved_component = NULL;
+  g_autofree gchar *component_name = NULL;
+  g_auto (GStrv) component_names = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Add a RPM component to a stream
+  rpm_component = modulemd_component_rpm_new ("rpmcomponent");
+  modulemd_module_stream_v1_add_component (stream,
+                                           (ModulemdComponent *)rpm_component);
+  component_names =
+    modulemd_module_stream_v1_get_rpm_component_names_as_strv (stream);
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)component_names, "rpmcomponent"));
+
+  retrieved_component =
+    (ModulemdComponent *)modulemd_module_stream_v1_get_rpm_component (
+      stream, "rpmcomponent");
+  g_assert_nonnull (retrieved_component);
+  g_object_get (retrieved_component, "name", &component_name, NULL);
+  g_assert_cmpstr (component_name, ==, "rpmcomponent");
+
+  g_clear_pointer (&component_name, g_free);
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Add a Module component to a stream
+  module_component = modulemd_component_module_new ("modulecomponent");
+  modulemd_module_stream_v1_add_component (
+    stream, (ModulemdComponent *)module_component);
+  component_names =
+    modulemd_module_stream_v1_get_module_component_names_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)component_names,
+                                  "modulecomponent"));
+
+  retrieved_component =
+    (ModulemdComponent *)modulemd_module_stream_v1_get_module_component (
+      stream, "modulecomponent");
+  g_assert_nonnull (retrieved_component);
+  g_object_get (retrieved_component, "name", &component_name, NULL);
+  g_assert_cmpstr (component_name, ==, "modulecomponent");
+
+  g_clear_pointer (&component_name, g_free);
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Remove an RPM component from a stream
+  modulemd_module_stream_v1_remove_rpm_component (stream, "rpmcomponent");
+  component_names =
+    modulemd_module_stream_v1_get_rpm_component_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (component_names), ==, 0);
+
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Remove a Module component from a stream
+  modulemd_module_stream_v1_remove_module_component (stream,
+                                                     "modulecomponent");
+  component_names =
+    modulemd_module_stream_v1_get_module_component_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (component_names), ==, 0);
+
+  g_clear_pointer (&component_names, g_strfreev);
+
+  g_clear_object (&module_component);
+  g_clear_object (&rpm_component);
+  g_clear_object (&stream);
+}
+
+
+static void
+module_stream_v2_test_components (ModuleStreamFixture *fixture,
+                                  gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
+  g_autoptr (ModulemdComponentModule) module_component = NULL;
+  ModulemdComponent *retrieved_component = NULL;
+  g_autofree gchar *component_name = NULL;
+  g_auto (GStrv) component_names = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Add a RPM component to a stream
+  rpm_component = modulemd_component_rpm_new ("rpmcomponent");
+  modulemd_module_stream_v2_add_component (stream,
+                                           (ModulemdComponent *)rpm_component);
+  component_names =
+    modulemd_module_stream_v2_get_rpm_component_names_as_strv (stream);
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)component_names, "rpmcomponent"));
+
+  retrieved_component =
+    (ModulemdComponent *)modulemd_module_stream_v2_get_rpm_component (
+      stream, "rpmcomponent");
+  g_assert_nonnull (retrieved_component);
+  g_object_get (retrieved_component, "name", &component_name, NULL);
+  g_assert_cmpstr (component_name, ==, "rpmcomponent");
+
+  g_clear_pointer (&component_name, g_free);
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Add a Module component to a stream
+  module_component = modulemd_component_module_new ("modulecomponent");
+  modulemd_module_stream_v2_add_component (
+    stream, (ModulemdComponent *)module_component);
+  component_names =
+    modulemd_module_stream_v2_get_module_component_names_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)component_names,
+                                  "modulecomponent"));
+
+  retrieved_component =
+    (ModulemdComponent *)modulemd_module_stream_v2_get_module_component (
+      stream, "modulecomponent");
+  g_assert_nonnull (retrieved_component);
+  g_object_get (retrieved_component, "name", &component_name, NULL);
+  g_assert_cmpstr (component_name, ==, "modulecomponent");
+
+  g_clear_pointer (&component_name, g_free);
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Remove an RPM component from a stream
+  modulemd_module_stream_v2_remove_rpm_component (stream, "rpmcomponent");
+  component_names =
+    modulemd_module_stream_v2_get_rpm_component_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (component_names), ==, 0);
+
+  g_clear_pointer (&component_names, g_strfreev);
+
+  // Remove a Module component from a stream
+  modulemd_module_stream_v2_remove_module_component (stream,
+                                                     "modulecomponent");
+  component_names =
+    modulemd_module_stream_v2_get_module_component_names_as_strv (stream);
+  g_assert_cmpint (g_strv_length (component_names), ==, 0);
+
+  g_clear_pointer (&component_names, g_strfreev);
+
+  g_clear_object (&module_component);
+  g_clear_object (&rpm_component);
+  g_clear_object (&stream);
+}
+
+static void
 module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -1800,6 +1947,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_profiles,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/components",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_components,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/components",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_components,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/copy",

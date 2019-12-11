@@ -52,10 +52,19 @@ class TestBuildopts(TestBase):
         assert b.get_rpm_macros() is None
         assert b.get_rpm_whitelist() == []
 
-        b_orig.set_rpm_macros("Test macros")
         b.add_rpm_to_whitelist("test2")
         b.add_rpm_to_whitelist("test3")
         b.add_rpm_to_whitelist("test1")
+
+        b = b_orig.copy()
+        assert b
+        # make sure whitelisted rpms added to b above got clobbered by copy
+        assert b.get_rpm_whitelist() == []
+
+        b_orig.set_rpm_macros("Test macros")
+        b_orig.add_rpm_to_whitelist("test2")
+        b_orig.add_rpm_to_whitelist("test3")
+        b_orig.add_rpm_to_whitelist("test1")
 
         b = b_orig.copy()
         assert b

@@ -95,8 +95,7 @@ modulemd_buildopts_copy (ModulemdBuildopts *self)
   modulemd_buildopts_set_rpm_macros (b,
                                      modulemd_buildopts_get_rpm_macros (self));
 
-  g_hash_table_unref (b->whitelist);
-  b->whitelist = g_hash_table_ref (self->whitelist);
+  MODULEMD_REPLACE_SET (b->whitelist, self->whitelist);
 
   return g_steal_pointer (&b);
 }

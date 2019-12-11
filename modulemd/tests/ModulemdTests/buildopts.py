@@ -36,6 +36,7 @@ class TestBuildopts(TestBase):
         assert b.props.rpm_macros is None
         assert b.get_rpm_macros() is None
         assert b.get_rpm_whitelist() == []
+        assert b.get_arches() == []
 
         # Test that init works with rpm_macros
         b = Modulemd.Buildopts(rpm_macros="Test macros")
@@ -43,6 +44,7 @@ class TestBuildopts(TestBase):
         assert b.props.rpm_macros == "Test macros"
         assert b.get_rpm_macros() == "Test macros"
         assert b.get_rpm_whitelist() == []
+        assert b.get_arches() == []
 
     def test_copy(self):
         b_orig = Modulemd.Buildopts()
@@ -51,26 +53,33 @@ class TestBuildopts(TestBase):
         assert b.props.rpm_macros is None
         assert b.get_rpm_macros() is None
         assert b.get_rpm_whitelist() == []
+        assert b.get_arches() == []
 
         b.add_rpm_to_whitelist("test2")
         b.add_rpm_to_whitelist("test3")
         b.add_rpm_to_whitelist("test1")
+        b.add_arch("x86_64")
+        b.add_arch("ppc64le")
 
         b = b_orig.copy()
         assert b
-        # make sure whitelisted rpms added to b above got clobbered by copy
+        # make sure lists added to b above got clobbered by copy
         assert b.get_rpm_whitelist() == []
+        assert b.get_arches() == []
 
         b_orig.set_rpm_macros("Test macros")
         b_orig.add_rpm_to_whitelist("test2")
         b_orig.add_rpm_to_whitelist("test3")
         b_orig.add_rpm_to_whitelist("test1")
+        b_orig.add_arch("x86_64")
+        b_orig.add_arch("ppc64le")
 
         b = b_orig.copy()
         assert b
         assert b.props.rpm_macros == "Test macros"
         assert b.get_rpm_macros() == "Test macros"
         assert b.get_rpm_whitelist() == ["test1", "test2", "test3"]
+        assert b.get_arches() == ["ppc64le", "x86_64"]
 
     def test_get_set_rpm_macros(self):
         b = Modulemd.Buildopts()
@@ -107,6 +116,30 @@ class TestBuildopts(TestBase):
 
         b.remove_rpm_from_whitelist("test1")
         assert b.get_rpm_whitelist() == ["test2", "test3"]
+
+        b.clear_rpm_whitelist()
+        assert b.get_rpm_whitelist() == []
+
+    def test_arches(self):
+        b = Modulemd.Buildopts()
+
+        assert b.get_arches() == []
+
+        b.add_arch("s390x")
+        assert b.get_arches() == ["s390x"]
+
+        b.add_arch("x86_64")
+        b.add_arch("ppc64le")
+        assert b.get_arches() == ["ppc64le", "s390x", "x86_64"]
+
+        b.add_arch("s390x")
+        assert b.get_arches() == ["ppc64le", "s390x", "x86_64"]
+
+        b.remove_arch("ppc64le")
+        assert b.get_arches() == ["s390x", "x86_64"]
+
+        b.clear_arches()
+        assert b.get_arches() == []
 
 
 if __name__ == "__main__":

@@ -731,6 +731,7 @@ data:
                 - fooscl-1-baz
                 - xxx
                 - xyz
+        arches: [ppc64le, x86_64]
   components:
         rpms:
             bar:
@@ -831,6 +832,8 @@ data:
         assert "fooscl-1-baz" in buildopts.get_rpm_whitelist()
         assert "xxx" in buildopts.get_rpm_whitelist()
         assert "xyz" in buildopts.get_rpm_whitelist()
+        assert "ppc64le" in buildopts.get_arches()
+        assert "x86_64" in buildopts.get_arches()
 
         if os.getenv("MMD_TEST_INSTALLED_LIB"):
             # The XMD python tests can only be run against the installed

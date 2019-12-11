@@ -1562,6 +1562,7 @@ module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
     "      - fooscl-1-baz\n"
     "      - xxx\n"
     "      - xyz\n"
+    "    arches: [i686, x86_64]\n"
     "  components:\n"
     "    rpms:\n"
     "      bar:\n"

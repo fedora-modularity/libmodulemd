@@ -24,6 +24,12 @@
 G_BEGIN_DECLS
 
 /**
+ * modulemd_buildopts_get_arches: (skip)
+ */
+GStrv
+modulemd_buildopts_get_arches (ModulemdBuildopts *self);
+
+/**
  * modulemd_buildopts_get_rpm_whitelist: (skip)
  */
 GStrv

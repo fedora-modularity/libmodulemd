@@ -29,6 +29,7 @@ struct _ModulemdBuildopts
   gchar *rpm_macros;
 
   GHashTable *whitelist;
+  GHashTable *arches;
 };
 
 G_DEFINE_TYPE (ModulemdBuildopts, modulemd_buildopts, G_TYPE_OBJECT)
@@ -62,13 +63,18 @@ modulemd_buildopts_equals (ModulemdBuildopts *self_1,
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_1), FALSE);
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self_2), FALSE);
 
+  if (g_strcmp0 (self_1->rpm_macros, self_2->rpm_macros) != 0)
+    {
+      return FALSE;
+    }
+
   if (!modulemd_hash_table_sets_are_equal (self_1->whitelist,
                                            self_2->whitelist))
     {
       return FALSE;
     }
 
-  if (g_strcmp0 (self_1->rpm_macros, self_2->rpm_macros) != 0)
+  if (!modulemd_hash_table_sets_are_equal (self_1->arches, self_2->arches))
     {
       return FALSE;
     }
@@ -87,17 +93,18 @@ modulemd_buildopts_new (void)
 ModulemdBuildopts *
 modulemd_buildopts_copy (ModulemdBuildopts *self)
 {
-  g_autoptr (ModulemdBuildopts) b = NULL;
+  g_autoptr (ModulemdBuildopts) copy = NULL;
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);
 
-  b = modulemd_buildopts_new ();
+  copy = modulemd_buildopts_new ();
 
-  modulemd_buildopts_set_rpm_macros (b,
+  modulemd_buildopts_set_rpm_macros (copy,
                                      modulemd_buildopts_get_rpm_macros (self));
 
-  MODULEMD_REPLACE_SET (b->whitelist, self->whitelist);
+  MODULEMD_REPLACE_SET (copy->whitelist, self->whitelist);
+  MODULEMD_REPLACE_SET (copy->arches, self->arches);
 
-  return g_steal_pointer (&b);
+  return g_steal_pointer (&copy);
 }
 
 
@@ -108,6 +115,7 @@ modulemd_buildopts_finalize (GObject *object)
 
   g_clear_pointer (&self->rpm_macros, g_free);
   g_clear_pointer (&self->whitelist, g_hash_table_unref);
+  g_clear_pointer (&self->arches, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_buildopts_parent_class)->finalize (object);
 }
@@ -166,6 +174,39 @@ modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self)
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);
 
   return modulemd_ordered_str_keys_as_strv (self->whitelist);
+}
+
+
+void
+modulemd_buildopts_add_arch (ModulemdBuildopts *self, const gchar *arch)
+{
+  g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
+  g_hash_table_add (self->arches, g_strdup (arch));
+}
+
+
+void
+modulemd_buildopts_remove_arch (ModulemdBuildopts *self, const gchar *arch)
+{
+  g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
+  g_hash_table_remove (self->arches, arch);
+}
+
+
+void
+modulemd_buildopts_clear_arches (ModulemdBuildopts *self)
+{
+  g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
+  g_hash_table_remove_all (self->arches);
+}
+
+
+GStrv
+modulemd_buildopts_get_arches_as_strv (ModulemdBuildopts *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);
+
+  return modulemd_ordered_str_keys_as_strv (self->arches);
 }
 
 
@@ -231,6 +272,7 @@ modulemd_buildopts_init (ModulemdBuildopts *self)
 {
   self->whitelist =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  self->arches = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 }
 
 
@@ -285,6 +327,20 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser,
                 {
                   g_propagate_error (error, nested_error);
                   return NULL;
+                }
+            }
+          else if (g_str_equal (event.data.scalar.value, "arches"))
+            {
+              g_hash_table_unref (buildopts->arches);
+              buildopts->arches =
+                modulemd_yaml_parse_string_set (parser, &nested_error);
+              if (buildopts->arches == NULL)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                    error,
+                    event,
+                    "Failed to parse arches list in buildopts: %s",
+                    nested_error->message);
                 }
             }
           else
@@ -403,7 +459,7 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
 {
   MODULEMD_INIT_TRACE ();
   int ret;
-  g_auto (GStrv) whitelist = NULL;
+  g_auto (GStrv) list = NULL;
   g_autoptr (GError) nested_error = NULL;
   MMD_INIT_YAML_EVENT (event);
 
@@ -467,10 +523,10 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
           return FALSE;
         }
 
-      whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (self);
+      list = modulemd_buildopts_get_rpm_whitelist_as_strv (self);
 
       ret = mmd_emitter_strv (
-        emitter, YAML_BLOCK_SEQUENCE_STYLE, whitelist, &nested_error);
+        emitter, YAML_BLOCK_SEQUENCE_STYLE, list, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (error,
@@ -478,6 +534,8 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
                                       "Failed to emit buildopts whitelist: ");
           return FALSE;
         }
+
+      g_clear_pointer (&list, g_strfreev);
     }
 
   ret = mmd_emitter_end_mapping (emitter, &nested_error);
@@ -488,5 +546,33 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
                                   "Failed to end buildopts mapping");
       return FALSE;
     }
+
+  if (g_hash_table_size (self->arches) != 0)
+    {
+      ret = mmd_emitter_scalar (
+        emitter, "arches", YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      if (!ret)
+        {
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit buildopts arches key: ");
+          return FALSE;
+        }
+
+      list = modulemd_buildopts_get_arches_as_strv (self);
+
+      ret = mmd_emitter_strv (
+        emitter, YAML_FLOW_SEQUENCE_STYLE, list, &nested_error);
+      if (!ret)
+        {
+          g_propagate_prefixed_error (error,
+                                      g_steal_pointer (&nested_error),
+                                      "Failed to emit buildopts arches: ");
+          return FALSE;
+        }
+
+      g_clear_pointer (&list, g_strfreev);
+    }
+
   return TRUE;
 }

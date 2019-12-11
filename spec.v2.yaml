@@ -241,6 +241,12 @@ data:
                 - fooscl-1-baz
                 - xxx
                 - xyz
+        # Instructs the build system to only build the
+        # module on this specific set of architectures.
+        # Includes specific hardware architectures, not families.
+        # See the data.arch field for details.
+        # Optional, defaults to all available arches.
+        arches: [i686, x86_64]
     # Functional components of the module, optional
     components:
         # RPM content of the module, optional

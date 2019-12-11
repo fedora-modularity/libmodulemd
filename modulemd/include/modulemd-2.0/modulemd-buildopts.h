@@ -145,4 +145,57 @@ modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self);
 GStrv
 modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self);
 
+
+/**
+ * modulemd_buildopts_add_arch:
+ * @self: This #ModulemdBuildopts object.
+ * @arch: An architecture for which to build this module.
+ *
+ * Restrict the list of architectures for which to build this module. It may be
+ * called any number of times to indicate support on additional architectures.
+ * Use modulemd_buildopts_clear_arches() to return to "all architectures".
+ *
+ * Since: 2.9
+ */
+void
+modulemd_buildopts_add_arch (ModulemdBuildopts *self, const gchar *arch);
+
+
+/**
+ * modulemd_buildopts_remove_arch:
+ * @self: This #ModulemdBuildopts object.
+ * @arch: An architecture to remove from the list of architectures for which to
+ * build this module.
+ *
+ * Since: 2.9
+ */
+void
+modulemd_buildopts_remove_arch (ModulemdBuildopts *self, const gchar *arch);
+
+
+/**
+ * modulemd_buildopts_clear_arches:
+ * @self: This #ModulemdBuildopts object.
+ *
+ * Indicate that this module should be built for all architectures.
+ *
+ * Since: 2.9
+ */
+void
+modulemd_buildopts_clear_arches (ModulemdBuildopts *self);
+
+
+/**
+ * modulemd_buildopts_get_arches_as_strv: (rename-to modulemd_buildopts_get_arches)
+ * @self: This #ModulemdBuildopts object.
+ *
+ * Returns: (transfer full): A #GStrv list of architectures for which this
+ * module should be built. If empty, this module should be built for all
+ * architectures.
+ *
+ * Since: 2.9
+ */
+GStrv
+modulemd_buildopts_get_arches_as_strv (ModulemdBuildopts *self);
+
 G_END_DECLS

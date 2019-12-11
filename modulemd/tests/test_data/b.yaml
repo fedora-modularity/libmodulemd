@@ -8,4 +8,5 @@ rpms:
         - fooscl-1-baz
         - xxx
         - xyz
+arches: [ppc64le, x86_64]
 ...

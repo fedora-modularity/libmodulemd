@@ -329,7 +329,7 @@ modulemd_boolean_equals (gboolean a, gboolean b);
       if (_set)                                                               \
         {                                                                     \
           g_clear_pointer (&_dest, g_hash_table_unref);                       \
-          _dest = modulemd_hash_table_deep_set_copy (set);                    \
+          _dest = modulemd_hash_table_deep_set_copy (_set);                   \
         }                                                                     \
       else                                                                    \
         {                                                                     \

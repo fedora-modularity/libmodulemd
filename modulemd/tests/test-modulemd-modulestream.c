@@ -339,7 +339,6 @@ module_stream_v1_test_components (ModuleStreamFixture *fixture,
   g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
   g_autoptr (ModulemdComponentModule) module_component = NULL;
   ModulemdComponent *retrieved_component = NULL;
-  g_autofree gchar *component_name = NULL;
   g_auto (GStrv) component_names = NULL;
 
   stream = modulemd_module_stream_v1_new (NULL, NULL);
@@ -352,15 +351,15 @@ module_stream_v1_test_components (ModuleStreamFixture *fixture,
     modulemd_module_stream_v1_get_rpm_component_names_as_strv (stream);
   g_assert_true (
     g_strv_contains ((const gchar *const *)component_names, "rpmcomponent"));
+  g_assert_cmpint (g_strv_length (component_names), ==, 1);
 
   retrieved_component =
     (ModulemdComponent *)modulemd_module_stream_v1_get_rpm_component (
       stream, "rpmcomponent");
   g_assert_nonnull (retrieved_component);
-  g_object_get (retrieved_component, "name", &component_name, NULL);
-  g_assert_cmpstr (component_name, ==, "rpmcomponent");
+  g_assert_true (modulemd_component_equals (
+    retrieved_component, (ModulemdComponent *)rpm_component));
 
-  g_clear_pointer (&component_name, g_free);
   g_clear_pointer (&component_names, g_strfreev);
 
   // Add a Module component to a stream
@@ -371,15 +370,15 @@ module_stream_v1_test_components (ModuleStreamFixture *fixture,
     modulemd_module_stream_v1_get_module_component_names_as_strv (stream);
   g_assert_true (g_strv_contains ((const gchar *const *)component_names,
                                   "modulecomponent"));
+  g_assert_cmpint (g_strv_length (component_names), ==, 1);
 
   retrieved_component =
     (ModulemdComponent *)modulemd_module_stream_v1_get_module_component (
       stream, "modulecomponent");
   g_assert_nonnull (retrieved_component);
-  g_object_get (retrieved_component, "name", &component_name, NULL);
-  g_assert_cmpstr (component_name, ==, "modulecomponent");
+  g_assert_true (modulemd_component_equals (
+    retrieved_component, (ModulemdComponent *)module_component));
 
-  g_clear_pointer (&component_name, g_free);
   g_clear_pointer (&component_names, g_strfreev);
 
   // Remove an RPM component from a stream
@@ -413,7 +412,6 @@ module_stream_v2_test_components (ModuleStreamFixture *fixture,
   g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
   g_autoptr (ModulemdComponentModule) module_component = NULL;
   ModulemdComponent *retrieved_component = NULL;
-  g_autofree gchar *component_name = NULL;
   g_auto (GStrv) component_names = NULL;
 
   stream = modulemd_module_stream_v2_new (NULL, NULL);
@@ -426,15 +424,15 @@ module_stream_v2_test_components (ModuleStreamFixture *fixture,
     modulemd_module_stream_v2_get_rpm_component_names_as_strv (stream);
   g_assert_true (
     g_strv_contains ((const gchar *const *)component_names, "rpmcomponent"));
+  g_assert_cmpint (g_strv_length (component_names), ==, 1);
 
   retrieved_component =
     (ModulemdComponent *)modulemd_module_stream_v2_get_rpm_component (
       stream, "rpmcomponent");
   g_assert_nonnull (retrieved_component);
-  g_object_get (retrieved_component, "name", &component_name, NULL);
-  g_assert_cmpstr (component_name, ==, "rpmcomponent");
+  g_assert_true (modulemd_component_equals (
+    retrieved_component, (ModulemdComponent *)rpm_component));
 
-  g_clear_pointer (&component_name, g_free);
   g_clear_pointer (&component_names, g_strfreev);
 
   // Add a Module component to a stream
@@ -445,15 +443,15 @@ module_stream_v2_test_components (ModuleStreamFixture *fixture,
     modulemd_module_stream_v2_get_module_component_names_as_strv (stream);
   g_assert_true (g_strv_contains ((const gchar *const *)component_names,
                                   "modulecomponent"));
+  g_assert_cmpint (g_strv_length (component_names), ==, 1);
 
   retrieved_component =
     (ModulemdComponent *)modulemd_module_stream_v2_get_module_component (
       stream, "modulecomponent");
   g_assert_nonnull (retrieved_component);
-  g_object_get (retrieved_component, "name", &component_name, NULL);
-  g_assert_cmpstr (component_name, ==, "modulecomponent");
+  g_assert_true (modulemd_component_equals (
+    retrieved_component, (ModulemdComponent *)module_component));
 
-  g_clear_pointer (&component_name, g_free);
   g_clear_pointer (&component_names, g_strfreev);
 
   // Remove an RPM component from a stream

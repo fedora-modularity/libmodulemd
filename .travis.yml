@@ -25,6 +25,7 @@ notifications:
   irc: "chat.freenode.net#fedora-modularity"
 
 jobs:
+  fast_finish: true
   include:
     - stage: Documentation
       name: "Documentation Update"
@@ -92,3 +93,6 @@ jobs:
       name: "Coverity Scan"
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-coverity.sh; fi'
       arch: amd64
+
+  allow_failures:
+    - name: "OpenMandriva cooker"

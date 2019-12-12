@@ -17,6 +17,7 @@ mmd_run_docker_tests \
     os=opensuse \
     release=$release \
     repository=registry.opensuse.org \
-    image=opensuse/$release
+    image=opensuse/$release \
+    use_ccache=true
 
 popd # $SCRIPT_DIR

@@ -16,6 +16,7 @@ release=${arr[1]:-rawhide}
 mmd_run_docker_tests \
     os=fedora \
     release=$release \
-    repository=registry.fedoraproject.org
+    repository=registry.fedoraproject.org \
+    use_ccache=true
 
 popd # $SCRIPT_DIR

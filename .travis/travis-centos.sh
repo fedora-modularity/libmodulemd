@@ -16,6 +16,7 @@ release=${arr[1]:-7}
 mmd_run_docker_tests \
     os=centos \
     release=$release \
-    repository=registry.centos.org
+    repository=registry.centos.org \
+    use_ccache=true
 
 popd # $SCRIPT_DIR

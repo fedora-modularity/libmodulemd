@@ -17,4 +17,5 @@ mmd_run_docker_tests \
     os=openmandriva \
     release=$release \
     repository=docker.io \
-    image=openmandriva/$release
+    image=openmandriva/$release \
+    use_ccache=true

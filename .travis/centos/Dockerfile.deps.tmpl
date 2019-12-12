@@ -4,6 +4,7 @@ MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 RUN yum -y install epel-release \
     && yum -y --setopt=tsflags='' install \
+        ccache \
         clang \
 	createrepo_c \
 	elinks \

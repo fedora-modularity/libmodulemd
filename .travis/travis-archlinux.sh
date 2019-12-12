@@ -15,6 +15,7 @@ mmd_run_docker_tests \
     os=archlinux \
     release=base \
     repository=docker.io \
-    image=archlinux/base
+    image=archlinux/base \
+    use_ccache=true
 
 popd # $SCRIPT_DIR

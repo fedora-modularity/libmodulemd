@@ -50,7 +50,7 @@ trap common_finalize EXIT
 
 
 function mmd_run_docker_tests {
-    local os release repository image
+    local os release repository image use_ccache
     local "${@}"
 
     if [ -z $SCRIPT_DIR ]; then
@@ -68,6 +68,11 @@ function mmd_run_docker_tests {
     MMD_RELEASE=${release,,}
 
     image=${image-$MMD_OS:$MMD_RELEASE}
+
+    if [ $use_ccache == 'true' ]; then
+      CCACHE_ARGS="-e 'CC=ccache gcc' -e 'CXX=ccache g++' -v '$HOME/.ccache:/root/.ccache:z'"
+    fi
+
 
     # Create an archive of the current checkout
     MMD_TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`
@@ -90,7 +95,9 @@ function mmd_run_docker_tests {
         -t fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE \
         --build-arg TARBALL=${TARBALL} .
 
-    $MMD_OCI run --rm fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE
+    $MMD_OCI run --rm \
+        "$CCACHE_ARGS" \
+        fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE
 }
 
 set +x

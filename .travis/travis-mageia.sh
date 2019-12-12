@@ -17,6 +17,7 @@ release=${arr[1]:-7}
 mmd_run_docker_tests \
     os=mageia \
     release=$release \
-    repository=docker.io
+    repository=docker.io \
+    use_ccache=true
 
 popd # $SCRIPT_DIR

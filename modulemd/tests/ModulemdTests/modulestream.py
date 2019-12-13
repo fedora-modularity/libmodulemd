@@ -478,10 +478,17 @@ class TestModuleStream(TestBase):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
+            stream.add_rpm_filter("foo")
             stream.add_rpm_filter("bar")
+            assert "foo" in stream.get_rpm_filters()
             assert "bar" in stream.get_rpm_filters()
+            assert len(stream.get_rpm_filters()) == 2
 
             stream.remove_rpm_filter("bar")
+            assert "foo" in stream.get_rpm_filters()
+            assert len(stream.get_rpm_filters()) == 1
+
+            stream.clear_rpm_filters()
             assert len(stream.get_rpm_filters()) == 0
 
     def test_servicelevels(self):

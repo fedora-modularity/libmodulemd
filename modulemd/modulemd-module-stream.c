@@ -739,6 +739,62 @@ modulemd_module_stream_validate_components (GHashTable *components,
 
 
 gboolean
+modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
+                                                      GStrv module_arches,
+                                                      GError **error)
+{
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  g_auto (GStrv) rpm_arches = NULL;
+  int num_arches;
+
+  /* If no module level arches are provided, there's nothing to check.
+   */
+  if (g_strv_length (module_arches) == 0)
+    {
+      return TRUE;
+    }
+
+  /* Iterate through rpm components and verify that any arches specified are a
+   * subset of the module level arches.
+   */
+  g_hash_table_iter_init (&iter, components);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (!MODULEMD_IS_COMPONENT_RPM (value))
+        {
+          continue;
+        }
+
+      rpm_arches = modulemd_component_rpm_get_arches_as_strv (
+        MODULEMD_COMPONENT_RPM (value));
+
+      num_arches = g_strv_length (rpm_arches);
+      for (int i = 0; i < num_arches; i++)
+        {
+          if (!g_strv_contains ((const gchar *const *)module_arches,
+                                rpm_arches[i]))
+            {
+              g_set_error (
+                error,
+                MODULEMD_ERROR,
+                MODULEMD_ERROR_VALIDATE,
+                "Component rpm '%s' arch '%s' not in module buildopts.arches",
+                modulemd_component_get_name (MODULEMD_COMPONENT (value)),
+                rpm_arches[i]);
+              return FALSE;
+            }
+        }
+
+      g_clear_pointer (&rpm_arches, g_strfreev);
+    }
+
+  return TRUE;
+}
+
+
+gboolean
 modulemd_module_stream_validate (ModulemdModuleStream *self, GError **error)
 {
   ModulemdModuleStreamClass *klass;

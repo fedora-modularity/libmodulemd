@@ -314,6 +314,8 @@ data:
                 # See the data.arch field for details.
                 # Instructs the build system to only build the
                 # component on this specific set of architectures.
+                # If data.buildopts.arches is also specified,
+                # this must be a subset of those architectures.
                 # Optional, defaults to all available arches.
                 arches: [i686, x86_64]
                 # A list of architectures with multilib

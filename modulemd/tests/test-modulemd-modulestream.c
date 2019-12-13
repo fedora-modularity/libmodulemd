@@ -1731,6 +1731,76 @@ module_stream_v2_test_validate_buildafter (ModuleStreamFixture *fixture,
 
 
 static void
+module_stream_v2_test_validate_buildarches (ModuleStreamFixture *fixture,
+                                            gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autofree gchar *path = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Test a valid module stream with no buildopts or component
+   * rpm arches set.
+   */
+  path = g_strdup_printf ("%s/buildarches/good_no_arches.yaml",
+                          g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_null (error);
+  g_clear_pointer (&path, g_free);
+  g_clear_object (&stream);
+
+  /* Test a valid module stream with buildopts arches but no component rpm
+   * arches set.
+   */
+  path = g_strdup_printf ("%s/buildarches/only_module_arches.yaml",
+                          g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_null (error);
+  g_clear_pointer (&path, g_free);
+  g_clear_object (&stream);
+
+  /* Test a valid module stream with component rpm arches but no buildopts
+   * arches set.
+   */
+  path = g_strdup_printf ("%s/buildarches/only_rpm_arches.yaml",
+                          g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_null (error);
+  g_clear_pointer (&path, g_free);
+  g_clear_object (&stream);
+
+  /* Test a valid module stream with buildopts arches set and a component rpm
+   * specified containing a subset of archs specified at the module level.
+   */
+  path = g_strdup_printf ("%s/buildarches/good_combo_arches.yaml",
+                          g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_nonnull (stream);
+  g_assert_null (error);
+  g_clear_pointer (&path, g_free);
+  g_clear_object (&stream);
+
+  /* Should fail validation if buildopts arches is set and a component rpm
+   * specified an arch not specified at the module level.
+   */
+  path = g_strdup_printf ("%s/buildarches/bad_combo_arches.yaml",
+                          g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (path);
+  stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_null (stream);
+  g_clear_error (&error);
+  g_clear_pointer (&path, g_free);
+}
+
+
+static void
 module_stream_v2_test_rpm_map (ModuleStreamFixture *fixture,
                                gconstpointer user_data)
 {
@@ -2051,6 +2121,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_validate_buildafter,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildarches",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_validate_buildarches,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v2/rpm_map",

@@ -205,6 +205,77 @@ module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
   g_clear_pointer (&rpms, g_strfreev);
 }
 
+static void
+module_stream_v1_test_rpm_filters (ModuleStreamFixture *fixture,
+                                   gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_auto (GStrv) filters = NULL;
+
+  stream = modulemd_module_stream_v1_new ("sssd", NULL);
+
+  // Test add_rpm_filter
+  modulemd_module_stream_v1_add_rpm_filter (stream, "foo");
+  modulemd_module_stream_v1_add_rpm_filter (stream, "bar");
+  filters = modulemd_module_stream_v1_get_rpm_filters_as_strv (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "foo"));
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "bar"));
+  g_assert_cmpint (g_strv_length (filters), ==, 2);
+  g_clear_pointer (&filters, g_strfreev);
+
+  // Test remove_rpm_filter
+  modulemd_module_stream_v1_remove_rpm_filter (stream, "foo");
+  filters = modulemd_module_stream_v1_get_rpm_filters_as_strv (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "bar"));
+  g_assert_cmpint (g_strv_length (filters), ==, 1);
+  g_clear_pointer (&filters, g_strfreev);
+
+  // Test clear_rpm_filters
+  modulemd_module_stream_v1_clear_rpm_filters (stream);
+  filters = modulemd_module_stream_v1_get_rpm_filters_as_strv (stream);
+  g_assert_cmpint (g_strv_length (filters), ==, 0);
+
+  g_clear_pointer (&filters, g_strfreev);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_rpm_filters (ModuleStreamFixture *fixture,
+                                   gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) filters = NULL;
+
+  stream = modulemd_module_stream_v2_new ("sssd", NULL);
+
+  // Test add_rpm_filter
+  modulemd_module_stream_v2_add_rpm_filter (stream, "foo");
+  modulemd_module_stream_v2_add_rpm_filter (stream, "bar");
+  filters = modulemd_module_stream_v2_get_rpm_filters_as_strv (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "foo"));
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "bar"));
+  g_assert_cmpint (g_strv_length (filters), ==, 2);
+  g_clear_pointer (&filters, g_strfreev);
+
+  // Test remove_rpm_filter
+  modulemd_module_stream_v2_remove_rpm_filter (stream, "foo");
+  filters = modulemd_module_stream_v2_get_rpm_filters_as_strv (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)filters, "bar"));
+  g_assert_cmpint (g_strv_length (filters), ==, 1);
+  g_clear_pointer (&filters, g_strfreev);
+
+  // Test clear_rpm_filters
+  modulemd_module_stream_v2_clear_rpm_filters (stream);
+  filters = modulemd_module_stream_v2_get_rpm_filters_as_strv (stream);
+  g_assert_cmpint (g_strv_length (filters), ==, 0);
+
+  g_clear_pointer (&filters, g_strfreev);
+  g_clear_object (&stream);
+}
 
 static void
 module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
@@ -2018,6 +2089,19 @@ main (int argc, char *argv[])
               module_stream_v2_test_profiles,
               NULL);
 
+  g_test_add ("/modulemd/v2/modulestream/v1/rpm_filters",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_rpm_filters,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/rpm_filters",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_rpm_filters,
+              NULL);
   g_test_add ("/modulemd/v2/modulestream/v1/components",
               ModuleStreamFixture,
               NULL,

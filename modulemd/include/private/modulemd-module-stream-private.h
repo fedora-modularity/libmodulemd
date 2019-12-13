@@ -112,6 +112,27 @@ modulemd_module_stream_validate_components (GHashTable *components,
                                             GError **error);
 
 
+/**
+ * modulemd_module_stream_validate_component_rpm_arches:
+ * @components: (in): A #GHashTable of #ModulemdComponent objects.
+ * @module_arches: (in): A #GStrv list of arches for which to build the module.
+ * @error: (out): A #GError that will return the reason for a validation error.
+ *
+ * Verifies that for each of the #ModulemdComponent RPM objects in @components,
+ * any arches specified must be a subset of @module_arches. If @module_arches
+ * is empty, all arches are allowed.
+ *
+ * Returns: TRUE if the component objects passed validation. FALSE and sets
+ * @error appropriately if validation fails.
+ *
+ * Since: 2.9
+ */
+gboolean
+modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
+                                                      GStrv module_arches,
+                                                      GError **error);
+
+
 /* Some macros used for copy operations */
 /**
  * STREAM_UPGRADE_IF_SET_FULL:

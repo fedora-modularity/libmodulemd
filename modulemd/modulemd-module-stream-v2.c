@@ -1110,6 +1110,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
   ModulemdModuleStreamV2 *v2_self = NULL;
   ModulemdDependencies *deps = NULL;
   g_autoptr (GError) nested_error = NULL;
+  g_auto (GStrv) buildopts_arches = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
   v2_self = MODULEMD_MODULE_STREAM_V2 (self);
@@ -1158,6 +1159,20 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
       return FALSE;
     }
 
+  if (v2_self->buildopts != NULL)
+    {
+      /* Verify that the component rpm arches are consistent with any module
+       * level arches.
+       */
+      buildopts_arches =
+        modulemd_buildopts_get_arches_as_strv (v2_self->buildopts);
+      if (!modulemd_module_stream_validate_component_rpm_arches (
+            v2_self->rpm_components, buildopts_arches, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+    }
 
   /* Iterate through the artifacts and validate that they are in the proper
    * NEVRA format

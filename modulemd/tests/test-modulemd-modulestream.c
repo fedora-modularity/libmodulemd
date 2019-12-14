@@ -21,6 +21,8 @@
   "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
 
+#define MMD_TEST_SUM_TEXT "A different summary"
+
 typedef struct _ModuleStreamFixture
 {
 } ModuleStreamFixture;
@@ -205,6 +207,63 @@ module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
   g_clear_pointer (&rpms, g_strfreev);
 }
 
+static void
+module_stream_v1_test_summary (ModuleStreamFixture *fixture,
+                               gconstpointer user_date)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  const gchar *summary = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting summary
+  modulemd_module_stream_v1_set_summary (stream, MMD_TEST_SUM_TEXT);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_SUM_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v1_set_summary (stream, NULL);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting unicode characters
+  modulemd_module_stream_v1_set_summary (stream, MMD_TEST_DOC_UNICODE_TEXT);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_DOC_UNICODE_TEXT);
+}
+
+static void
+module_stream_v2_test_summary (ModuleStreamFixture *fixture,
+                               gconstpointer user_date)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  const gchar *summary = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting summary
+  modulemd_module_stream_v2_set_summary (stream, MMD_TEST_SUM_TEXT);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_SUM_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v2_set_summary (stream, NULL);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting unicode characters
+  modulemd_module_stream_v2_set_summary (stream, MMD_TEST_DOC_UNICODE_TEXT);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_DOC_UNICODE_TEXT);
+}
 
 static void
 module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
@@ -2002,6 +2061,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_documentation,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/summary",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_summary,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/summary",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_summary,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/profiles",

@@ -20,6 +20,7 @@
 #define MMD_TEST_DOC_UNICODE_TEXT                                             \
   "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
+#define MMD_TEST_TRACKER_PROP "tracker"
 
 typedef struct _ModuleStreamFixture
 {
@@ -474,6 +475,136 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
 
   g_clear_pointer (&documentation_prop, g_free);
 
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v1_test_tracker (ModuleStreamFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_autofree gchar *tracker_prop = NULL;
+  const gchar *tracker = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v1_get_tracker (stream);
+
+  g_assert_null (tracker);
+  g_assert_null (tracker_prop);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, MMD_TEST_TRACKER_PROP, MMD_TEST_DOC_TEXT, NULL);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v1_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_TEXT);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test set_tracker
+  modulemd_module_stream_v1_set_tracker (stream, MMD_TEST_DOC_TEXT2);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v1_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_TEXT2);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test setting it to NULL
+  g_object_set (stream, MMD_TEST_TRACKER_PROP, NULL, NULL);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v1_get_tracker (stream);
+
+  g_assert_null (tracker);
+  g_assert_null (tracker_prop);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test Unicode values
+  modulemd_module_stream_v1_set_tracker (stream, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v1_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_UNICODE_TEXT);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_pointer (&tracker_prop, g_free);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_tracker (ModuleStreamFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autofree gchar *tracker_prop = NULL;
+  const gchar *tracker = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v2_get_tracker (stream);
+
+  g_assert_null (tracker);
+  g_assert_null (tracker_prop);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, MMD_TEST_TRACKER_PROP, MMD_TEST_DOC_TEXT, NULL);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v2_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_TEXT);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test set_tracker
+  modulemd_module_stream_v2_set_tracker (stream, MMD_TEST_DOC_TEXT2);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v2_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_TEXT2);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test setting it to NULL
+  g_object_set (stream, MMD_TEST_TRACKER_PROP, NULL, NULL);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v2_get_tracker (stream);
+
+  g_assert_null (tracker);
+  g_assert_null (tracker_prop);
+
+  g_clear_pointer (&tracker_prop, g_free);
+
+  // Test Unicode values
+  modulemd_module_stream_v2_set_tracker (stream, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_object_get (stream, MMD_TEST_TRACKER_PROP, &tracker_prop, NULL);
+  tracker = modulemd_module_stream_v2_get_tracker (stream);
+
+  g_assert_cmpstr (tracker, ==, MMD_TEST_DOC_UNICODE_TEXT);
+  g_assert_cmpstr (tracker_prop, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_pointer (&tracker_prop, g_free);
   g_clear_object (&stream);
 }
 
@@ -2163,6 +2294,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_licenses,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/tracker",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_tracker,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/tracker",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_tracker,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/profiles",

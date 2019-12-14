@@ -135,6 +135,81 @@ module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
 
 
 static void
+module_stream_v1_test_licenses (ModuleStreamFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_auto (GStrv) licenses = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  modulemd_module_stream_v1_add_content_license (stream, "GPLv2+");
+  licenses = modulemd_module_stream_v1_get_content_licenses_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "GPLv2+"));
+  g_assert_cmpint (g_strv_length (licenses), ==, 1);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v1_add_module_license (stream, "MIT");
+  licenses = modulemd_module_stream_v1_get_module_licenses_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "MIT"));
+  g_assert_cmpint (g_strv_length (licenses), ==, 1);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v1_remove_content_license (stream, "GPLv2+");
+  licenses = modulemd_module_stream_v1_get_content_licenses_as_strv (stream);
+  g_assert_cmpint (g_strv_length (licenses), ==, 0);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v1_remove_module_license (stream, "MIT");
+  licenses = modulemd_module_stream_v1_get_module_licenses_as_strv (stream);
+  g_assert_cmpint (g_strv_length (licenses), ==, 0);
+
+  g_clear_pointer (&licenses, g_strfreev);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_licenses (ModuleStreamFixture *fixture,
+                                gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) licenses = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  modulemd_module_stream_v2_add_content_license (stream, "GPLv2+");
+  licenses = modulemd_module_stream_v2_get_content_licenses_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "GPLv2+"));
+  g_assert_cmpint (g_strv_length (licenses), ==, 1);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v2_add_module_license (stream, "MIT");
+  licenses = modulemd_module_stream_v2_get_module_licenses_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "MIT"));
+  g_assert_cmpint (g_strv_length (licenses), ==, 1);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v2_remove_content_license (stream, "GPLv2+");
+  licenses = modulemd_module_stream_v2_get_content_licenses_as_strv (stream);
+  g_assert_cmpint (g_strv_length (licenses), ==, 0);
+
+  g_clear_pointer (&licenses, g_strfreev);
+
+  modulemd_module_stream_v2_remove_module_license (stream, "MIT");
+  licenses = modulemd_module_stream_v2_get_module_licenses_as_strv (stream);
+  g_assert_cmpint (g_strv_length (licenses), ==, 0);
+
+  g_clear_pointer (&licenses, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
+static void
 module_stream_v1_test_profiles (ModuleStreamFixture *fixture,
                                 gconstpointer user_data)
 {
@@ -2002,6 +2077,21 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_documentation,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/licenses",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_licenses,
+              NULL);
+
+
+  g_test_add ("/modulemd/v2/modulestream/v2/licenses",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_licenses,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/profiles",

@@ -353,6 +353,61 @@ module_stream_v2_test_rpm_filters (ModuleStreamFixture *fixture,
 }
 
 static void
+module_stream_v1_test_rpm_artifacts (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_auto (GStrv) artifacts = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  modulemd_module_stream_v1_add_rpm_artifact (
+    stream, "bar-0:1.23-1.module_deadbeef.x86_64");
+  artifacts = modulemd_module_stream_v1_get_rpm_artifacts_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)artifacts,
+                                  "bar-0:1.23-1.module_deadbeef.x86_64"));
+  g_assert_cmpint (g_strv_length (artifacts), ==, 1);
+
+  g_clear_pointer (&artifacts, g_strfreev);
+
+  modulemd_module_stream_v1_remove_rpm_artifact (
+    stream, "bar-0:1.23-1.module_deadbeef.x86_64");
+  artifacts = modulemd_module_stream_v1_get_rpm_artifacts_as_strv (stream);
+  g_assert_cmpint (g_strv_length (artifacts), ==, 0);
+
+  g_clear_pointer (&artifacts, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
+static void
+module_stream_v2_test_rpm_artifacts (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) artifacts = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  modulemd_module_stream_v2_add_rpm_artifact (
+    stream, "bar-0:1.23-1.module_deadbeef.x86_64");
+  artifacts = modulemd_module_stream_v2_get_rpm_artifacts_as_strv (stream);
+  g_assert_true (g_strv_contains ((const gchar *const *)artifacts,
+                                  "bar-0:1.23-1.module_deadbeef.x86_64"));
+  g_assert_cmpint (g_strv_length (artifacts), ==, 1);
+
+  g_clear_pointer (&artifacts, g_strfreev);
+
+  modulemd_module_stream_v2_remove_rpm_artifact (
+    stream, "bar-0:1.23-1.module_deadbeef.x86_64");
+  artifacts = modulemd_module_stream_v2_get_rpm_artifacts_as_strv (stream);
+  g_assert_cmpint (g_strv_length (artifacts), ==, 0);
+
+  g_clear_pointer (&artifacts, g_strfreev);
+  g_clear_object (&stream);
+}
+
+static void
 module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
 {
@@ -2192,6 +2247,20 @@ main (int argc, char *argv[])
               NULL,
               module_stream_v2_test_rpm_filters,
               NULL);
+  g_test_add ("/modulemd/v2/modulestream/v1/rpm_artifacts",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_rpm_artifacts,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/rpm_artifacts",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_rpm_artifacts,
+              NULL);
+
   g_test_add ("/modulemd/v2/modulestream/v1/components",
               ModuleStreamFixture,
               NULL,

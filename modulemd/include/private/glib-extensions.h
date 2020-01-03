@@ -13,4 +13,7 @@
 
 #include <glib.h>
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (GDate, g_date_free);
+/* GDate autoptr cleanup was finally added in GLib 2.63.3. */
+#if !GLIB_CHECK_VERSION(2, 63, 3)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GDate, g_date_free)
+#endif

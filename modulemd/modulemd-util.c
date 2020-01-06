@@ -360,7 +360,7 @@ modulemd_validate_nevra (const gchar *nevra)
         {
           break;
         }
-      else if (*i == '-')
+      if (*i == '-')
         {
           /* '-' between version and epoch is not allowed */
           return FALSE;

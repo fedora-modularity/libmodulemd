@@ -59,7 +59,8 @@ with_libmagic = get_option('libmagic')
 rpm = dependency('rpm', required : with_rpmio)
 magic = cc.find_library('magic', required : with_libmagic)
 
-glib_prefix = dependency('glib-2.0').get_pkgconfig_variable('prefix')
+glib = dependency('glib-2.0')
+glib_prefix = glib.get_pkgconfig_variable('prefix')
 
 sh = find_program('sh')
 sed = find_program('sed')
@@ -80,6 +81,20 @@ if with_docs
     error('Missing documentation for GObject.')
   endif
 endif
+
+
+# Check whether this version of glib has the GDate autoptr defined
+gdate_check = '''#include <glib.h>
+int main (int argc, char **argv)
+{
+  g_autoptr(GDate) date = NULL;
+  return 0;
+}
+'''
+has_gdate_autoptr = cc.compiles(
+    gdate_check,
+    dependencies : [ glib ],
+    name : 'g_autoptr(GDate)')
 
 python_name = get_option('python_name')
 

@@ -40,11 +40,7 @@ jobs:
 
 
     - stage: Fedora x86_64
-      name: "Fedora 29 x86_64"
-      script: ./.travis/travis-fedora.sh
-      arch: amd64
-
-    - name: "Fedora 30 x86_64"
+      name: "Fedora 30 x86_64"
       script: ./.travis/travis-fedora.sh
       arch: amd64
 
@@ -75,10 +71,7 @@ jobs:
       arch: amd64
 
     - stage: Fedora aarch64
-      name: "Fedora 29 aarch64"
-      script: ./.travis/travis-fedora.sh
-      arch: arm64
-    - name: "Fedora 30 aarch64"
+      name: "Fedora 30 aarch64"
       script: ./.travis/travis-fedora.sh
       arch: arm64
     - name: "Fedora 31 aarch64"

@@ -500,28 +500,28 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/construct",
+  g_test_add_func ("/modulemd/v2/module/construct",
               ModuleFixture,
               NULL,
               NULL,
               module_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/defaults",
+  g_test_add_func ("/modulemd/v2/module/defaults",
               ModuleFixture,
               NULL,
               NULL,
               module_test_defaults,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/stream_names",
+  g_test_add_func ("/modulemd/v2/module/stream_names",
               ModuleFixture,
               NULL,
               NULL,
               module_test_get_stream_names,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/streams",
+  g_test_add_func ("/modulemd/v2/module/streams",
               ModuleFixture,
               NULL,
               NULL,

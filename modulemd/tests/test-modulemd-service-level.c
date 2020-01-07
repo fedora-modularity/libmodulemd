@@ -453,49 +453,49 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/servicelevel/construct",
+  g_test_add_func ("/modulemd/v2/servicelevel/construct",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/get_set_name",
+  g_test_add_func ("/modulemd/v2/servicelevel/get_set_name",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_get_name,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/equals",
+  g_test_add_func ("/modulemd/v2/servicelevel/equals",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/copy",
+  g_test_add_func ("/modulemd/v2/servicelevel/copy",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/get_set_eol",
+  g_test_add_func ("/modulemd/v2/servicelevel/get_set_eol",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_get_set_eol,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/yaml/parse",
+  g_test_add_func ("/modulemd/v2/servicelevel/yaml/parse",
               ServiceLevelFixture,
               NULL,
               NULL,
               service_level_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/servicelevel/yaml/emit",
+  g_test_add_func ("/modulemd/v2/servicelevel/yaml/emit",
               ServiceLevelFixture,
               NULL,
               NULL,

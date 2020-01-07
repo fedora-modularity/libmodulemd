@@ -1976,77 +1976,77 @@ main (int argc, char *argv[])
 
   // Define the tests.o
 
-  g_test_add ("/modulemd/v2/modulestream/construct",
+  g_test_add_func ("/modulemd/v2/modulestream/construct",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/arch",
+  g_test_add_func ("/modulemd/v2/modulestream/arch",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_test_arch,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/documentation",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/documentation",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_documentation,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/documentation",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/documentation",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_documentation,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/profiles",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/profiles",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_profiles,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/profiles",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/profiles",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_profiles,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/components",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/components",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_components,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/components",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/components",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_components,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/copy",
+  g_test_add_func ("/modulemd/v2/modulestream/copy",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/equals",
+  g_test_add_func ("/modulemd/v2/modulestream/equals",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/nsvc",
+  g_test_add_func ("/modulemd/v2/modulestream/nsvc",
               ModuleStreamFixture,
               NULL,
               NULL,
@@ -2054,83 +2054,83 @@ main (int argc, char *argv[])
               NULL);
 
 
-  g_test_add ("/modulemd/v2/modulestream/nsvca",
+  g_test_add_func ("/modulemd/v2/modulestream/nsvca",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_test_nsvca,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/equals",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/equals",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/equals",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/equals",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/dependencies",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/dependencies",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_dependencies,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/dependencies",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/dependencies",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_dependencies,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/parse_dump",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/parse_dump",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_parse_dump,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/parse_dump",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/parse_dump",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_parse_dump,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/depends_on_stream",
+  g_test_add_func ("/modulemd/v2/modulestream/v1/depends_on_stream",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v1_test_depends_on_stream,
               NULL);
-  g_test_add ("/modulemd/v2/modulestream/v2/depends_on_stream",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/depends_on_stream",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_depends_on_stream,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildafter",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildafter",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_validate_buildafter,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildarches",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildarches",
               ModuleStreamFixture,
               NULL,
               NULL,
               module_stream_v2_test_validate_buildarches,
               NULL);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/rpm_map",
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_map",
               ModuleStreamFixture,
               NULL,
               NULL,

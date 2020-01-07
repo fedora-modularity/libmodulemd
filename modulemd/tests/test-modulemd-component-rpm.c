@@ -453,42 +453,42 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/component/rpm/construct",
+  g_test_add_func ("/modulemd/v2/component/rpm/construct",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/rpm/equals",
+  g_test_add_func ("/modulemd/v2/component/rpm/equals",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/rpm/copy",
+  g_test_add_func ("/modulemd/v2/component/rpm/copy",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/rpm/yaml/emit",
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_emit_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/rpm/yaml/parse",
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",
               ComponentRpmFixture,
               NULL,
               NULL,
               component_rpm_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/component/rpm/override_name",
+  g_test_add_func ("/modulemd/v2/component/rpm/override_name",
               ComponentRpmFixture,
               NULL,
               NULL,

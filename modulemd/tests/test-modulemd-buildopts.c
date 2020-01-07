@@ -557,56 +557,56 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/buildopts/construct",
+  g_test_add_func ("/modulemd/v2/buildopts/construct",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/equals",
+  g_test_add_func ("/modulemd/v2/buildopts/equals",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/copy",
+  g_test_add_func ("/modulemd/v2/buildopts/copy",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/get_set_rpm_macros",
+  g_test_add_func ("/modulemd/v2/buildopts/get_set_rpm_macros",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_get_set_rpm_macros,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/whitelist",
+  g_test_add_func ("/modulemd/v2/buildopts/whitelist",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_whitelist,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/arches",
+  g_test_add_func ("/modulemd/v2/buildopts/arches",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_arches,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/yaml/parse",
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/parse",
               BuildoptsFixture,
               NULL,
               NULL,
               buildopts_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/buildopts/yaml/emit",
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/emit",
               BuildoptsFixture,
               NULL,
               NULL,

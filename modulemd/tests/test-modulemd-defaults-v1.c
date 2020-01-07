@@ -746,56 +746,56 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/defaults/v1/equals",
+  g_test_add_func ("/modulemd/v2/defaults/v1/equals",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/construct",
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/copy",
+  g_test_add_func ("/modulemd/v2/defaults/v1/copy",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/default_stream",
+  g_test_add_func ("/modulemd/v2/defaults/v1/default_stream",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_get_set_default_stream,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/validate",
+  g_test_add_func ("/modulemd/v2/defaults/v1/validate",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_validate,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/profile_defaults",
+  g_test_add_func ("/modulemd/v2/defaults/v1/profile_defaults",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_profiles,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/yaml/parse",
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/parse",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/v1/yaml/emit",
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/emit",
               CommonMmdTestFixture,
               NULL,
               NULL,

@@ -274,49 +274,49 @@ main (int argc, char *argv[])
   g_test_init (&argc, &argv, NULL);
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
-  g_test_add ("/modulemd/v2/rpm_map/basic",
+  g_test_add_func ("/modulemd/v2/rpm_map/basic",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_basic,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/compare",
+  g_test_add_func ("/modulemd/v2/rpm_map/compare",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_compare,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/valid",
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/valid",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_parse_yaml_valid,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/missing",
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/missing",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_parse_yaml_missing,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/mismatch",
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/mismatch",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_parse_yaml_mismatch,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/emit/valid",
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/valid",
               CommonMmdTestFixture,
               NULL,
               NULL,
               test_emit_yaml_valid,
               NULL);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/emit/invalid",
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/invalid",
               CommonMmdTestFixture,
               NULL,
               NULL,

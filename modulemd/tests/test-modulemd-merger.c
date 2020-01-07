@@ -248,14 +248,14 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/index/merger/constructors",
+  g_test_add_func ("/modulemd/v2/module/index/merger/constructors",
               CommonMmdTestFixture,
               NULL,
               NULL,
               merger_test_constructors,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/merger/deduplicate",
+  g_test_add_func ("/modulemd/v2/module/index/merger/deduplicate",
               CommonMmdTestFixture,
               NULL,
               NULL,

@@ -1358,63 +1358,63 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/index/dump",
+  g_test_add_func ("/modulemd/v2/module/index/dump",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_dump,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/read",
+  g_test_add_func ("/modulemd/v2/module/index/read",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_read,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/read/mixed",
+  g_test_add_func ("/modulemd/v2/module/index/read/mixed",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_read_mixed,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/read/unknown",
+  g_test_add_func ("/modulemd/v2/module/index/read/unknown",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_read_unknown,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/upgrade/stream",
+  g_test_add_func ("/modulemd/v2/module/index/upgrade/stream",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_stream_upgrade,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/upgrade/index",
+  g_test_add_func ("/modulemd/v2/module/index/upgrade/index",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_index_upgrade,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/remove_module",
+  g_test_add_func ("/modulemd/v2/module/index/remove_module",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_remove_module,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/custom_read",
+  g_test_add_func ("/modulemd/v2/module/index/custom_read",
               ModuleIndexFixture,
               NULL,
               NULL,
               module_index_test_custom_read,
               NULL);
 
-  g_test_add ("/modulemd/v2/module/index/custom_write",
+  g_test_add_func ("/modulemd/v2/module/index/custom_write",
               ModuleIndexFixture,
               NULL,
               NULL,

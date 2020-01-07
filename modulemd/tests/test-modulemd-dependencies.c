@@ -598,49 +598,49 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/dependencies/construct",
+  g_test_add_func ("/modulemd/v2/dependencies/construct",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/dependencies",
+  g_test_add_func ("/modulemd/v2/dependencies/dependencies",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_dependencies,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/equals",
+  g_test_add_func ("/modulemd/v2/dependencies/equals",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/copy",
+  g_test_add_func ("/modulemd/v2/dependencies/copy",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/parse",
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/parse/bad",
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse/bad",
               DependenciesFixture,
               NULL,
               NULL,
               dependencies_test_parse_bad_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/emit",
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/emit",
               DependenciesFixture,
               NULL,
               NULL,
@@ -648,42 +648,42 @@ main (int argc, char *argv[])
               NULL);
 
   /*
-  g_test_add ("/modulemd/v2/profile/copy",
+  g_test_add_func ("/modulemd/v2/profile/copy",
               DependenciesFixture,
               NULL,
               NULL,
               profile_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/profile/get_name",
+  g_test_add_func ("/modulemd/v2/profile/get_name",
               DependenciesFixture,
               NULL,
               NULL,
               profile_test_get_name,
               NULL);
 
-  g_test_add ("/modulemd/v2/profile/get_set_description",
+  g_test_add_func ("/modulemd/v2/profile/get_set_description",
               DependenciesFixture,
               NULL,
               NULL,
               profile_test_get_set_description,
               NULL);
 
-  g_test_add ("/modulemd/v2/profile/rpms",
+  g_test_add_func ("/modulemd/v2/profile/rpms",
               DependenciesFixture,
               NULL,
               NULL,
               profile_test_rpms,
               NULL);
 
-  g_test_add ("/modulemd/v2/profile/yaml/parse",
+  g_test_add_func ("/modulemd/v2/profile/yaml/parse",
               DependenciesFixture,
               NULL,
               NULL,
               profile_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/profile/yaml/emit",
+  g_test_add_func ("/modulemd/v2/profile/yaml/emit",
               DependenciesFixture,
               NULL,
               NULL,

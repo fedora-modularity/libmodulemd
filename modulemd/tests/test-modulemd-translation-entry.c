@@ -584,56 +584,56 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/translationentry/construct",
+  g_test_add_func ("/modulemd/v2/translationentry/construct",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/copy",
+  g_test_add_func ("/modulemd/v2/translationentry/copy",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/get_locale",
+  g_test_add_func ("/modulemd/v2/translationentry/get_locale",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_get_locale,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/get_set_summary",
+  g_test_add_func ("/modulemd/v2/translationentry/get_set_summary",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_get_set_summary,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/get_set_description",
+  g_test_add_func ("/modulemd/v2/translationentry/get_set_description",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_get_set_description,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/profile_descriptions",
+  g_test_add_func ("/modulemd/v2/translationentry/profile_descriptions",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_profile_descriptions,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/yaml/parse",
+  g_test_add_func ("/modulemd/v2/translationentry/yaml/parse",
               TranslationEntryFixture,
               NULL,
               NULL,
               translation_entry_test_parse_yaml,
               NULL);
 
-  g_test_add ("/modulemd/v2/translationentry/yaml/emit",
+  g_test_add_func ("/modulemd/v2/translationentry/yaml/emit",
               TranslationEntryFixture,
               NULL,
               NULL,

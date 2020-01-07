@@ -206,49 +206,49 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/defaults/construct",
+  g_test_add_func ("/modulemd/v2/defaults/construct",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_construct,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/copy",
+  g_test_add_func ("/modulemd/v2/defaults/copy",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_copy,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/mdversion",
+  g_test_add_func ("/modulemd/v2/defaults/mdversion",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_get_mdversion,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/module_name",
+  g_test_add_func ("/modulemd/v2/defaults/module_name",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_get_module_name,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/validate",
+  g_test_add_func ("/modulemd/v2/defaults/validate",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_validate,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/equals",
+  g_test_add_func ("/modulemd/v2/defaults/equals",
               CommonMmdTestFixture,
               NULL,
               NULL,
               defaults_test_equals,
               NULL);
 
-  g_test_add ("/modulemd/v2/defaults/upgrade",
+  g_test_add_func ("/modulemd/v2/defaults/upgrade",
               CommonMmdTestFixture,
               NULL,
               NULL,

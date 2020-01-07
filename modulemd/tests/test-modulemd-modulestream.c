@@ -17,6 +17,7 @@
 #define MMD_TEST_DOC_TEXT "http://example.com"
 #define MMD_TEST_DOC_TEXT2 "http://redhat.com"
 #define MMD_TEST_DOC_PROP "documentation"
+#define MMD_TEST_COM_PROP "community"
 #define MMD_TEST_DOC_UNICODE_TEXT                                             \
   "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
@@ -2355,6 +2356,103 @@ module_stream_v2_test_xmd_issue_290_with_example (void)
   g_assert_no_error (error);
 }
 
+static void
+module_stream_v1_test_community (void)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  const gchar *community = NULL;
+  g_autofree gchar *community_prop = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  community = modulemd_module_stream_v1_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_null (community);
+  g_assert_null (community_prop);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, MMD_TEST_COM_PROP, MMD_TEST_DOC_TEXT, NULL);
+
+  community = modulemd_module_stream_v1_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_cmpstr (community_prop, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (community, ==, MMD_TEST_DOC_TEXT);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test set_community()
+  modulemd_module_stream_v1_set_community (stream, MMD_TEST_DOC_TEXT2);
+
+  community = modulemd_module_stream_v1_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_cmpstr (community_prop, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (community, ==, MMD_TEST_DOC_TEXT2);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test setting to NULL
+  g_object_set (stream, MMD_TEST_COM_PROP, NULL, NULL);
+
+  community = modulemd_module_stream_v1_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_null (community);
+  g_assert_null (community_prop);
+
+  g_clear_pointer (&community_prop, g_free);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_community (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  const gchar *community = NULL;
+  g_autofree gchar *community_prop = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  community = modulemd_module_stream_v2_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_null (community);
+  g_assert_null (community_prop);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test property setting
+  g_object_set (stream, MMD_TEST_COM_PROP, MMD_TEST_DOC_TEXT, NULL);
+
+  community = modulemd_module_stream_v2_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_cmpstr (community_prop, ==, MMD_TEST_DOC_TEXT);
+  g_assert_cmpstr (community, ==, MMD_TEST_DOC_TEXT);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test set_community()
+  modulemd_module_stream_v2_set_community (stream, MMD_TEST_DOC_TEXT2);
+
+  community = modulemd_module_stream_v2_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_cmpstr (community_prop, ==, MMD_TEST_DOC_TEXT2);
+  g_assert_cmpstr (community, ==, MMD_TEST_DOC_TEXT2);
+
+  g_clear_pointer (&community_prop, g_free);
+
+  // Test setting to NULL
+  g_object_set (stream, MMD_TEST_COM_PROP, NULL, NULL);
+
+  community = modulemd_module_stream_v2_get_community (stream);
+  g_object_get (stream, MMD_TEST_COM_PROP, &community_prop, NULL);
+  g_assert_null (community);
+  g_assert_null (community_prop);
+
+  g_clear_pointer (&community_prop, g_free);
+  g_clear_object (&stream);
+}
 
 int
 main (int argc, char *argv[])
@@ -2595,6 +2693,12 @@ main (int argc, char *argv[])
               NULL,
               module_stream_v2_test_rpm_map,
               NULL);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v1/community",
+                   module_stream_v1_test_community);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/community",
+                   module_stream_v2_test_community);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/unicode/description",
                    module_stream_v2_test_unicode_desc);

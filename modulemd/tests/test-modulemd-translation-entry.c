@@ -35,8 +35,7 @@ sigtrap_handler (int sig_num)
 }
 
 static void
-translation_entry_test_construct (TranslationEntryFixture *fixture,
-                                  gconstpointer user_data)
+translation_entry_test_construct (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_auto (GStrv) profile_names;
@@ -143,8 +142,7 @@ translation_entry_test_construct (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_copy (TranslationEntryFixture *fixture,
-                             gconstpointer user_data)
+translation_entry_test_copy (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autoptr (ModulemdTranslationEntry) te_copy = NULL;
@@ -323,8 +321,7 @@ translation_entry_test_copy (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_get_locale (TranslationEntryFixture *fixture,
-                                   gconstpointer user_data)
+translation_entry_test_get_locale (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autofree gchar *locale;
@@ -347,8 +344,7 @@ translation_entry_test_get_locale (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_get_set_summary (TranslationEntryFixture *fixture,
-                                        gconstpointer user_data)
+translation_entry_test_get_set_summary (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autofree gchar *summary;
@@ -387,8 +383,7 @@ translation_entry_test_get_set_summary (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_get_set_description (TranslationEntryFixture *fixture,
-                                            gconstpointer user_data)
+translation_entry_test_get_set_description (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autofree gchar *description;
@@ -428,8 +423,7 @@ translation_entry_test_get_set_description (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_profile_descriptions (TranslationEntryFixture *fixture,
-                                             gconstpointer user_data)
+translation_entry_test_profile_descriptions (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_auto (GStrv) profile_names;
@@ -482,8 +476,7 @@ translation_entry_test_profile_descriptions (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_parse_yaml (TranslationEntryFixture *fixture,
-                                   gconstpointer user_data)
+translation_entry_test_parse_yaml (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autoptr (GError) error = NULL;
@@ -520,8 +513,7 @@ translation_entry_test_parse_yaml (TranslationEntryFixture *fixture,
 
 
 static void
-translation_entry_test_emit_yaml (TranslationEntryFixture *fixture,
-                                  gconstpointer user_data)
+translation_entry_test_emit_yaml (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autoptr (GError) error = NULL;
@@ -584,61 +576,29 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/translationentry/construct",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/construct",
+              translation_entry_test_construct);
 
-  g_test_add ("/modulemd/v2/translationentry/copy",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/copy",
+              translation_entry_test_copy);
 
-  g_test_add ("/modulemd/v2/translationentry/get_locale",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_get_locale,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/get_locale",
+              translation_entry_test_get_locale);
 
-  g_test_add ("/modulemd/v2/translationentry/get_set_summary",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_get_set_summary,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/get_set_summary",
+              translation_entry_test_get_set_summary);
 
-  g_test_add ("/modulemd/v2/translationentry/get_set_description",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_get_set_description,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/get_set_description",
+              translation_entry_test_get_set_description);
 
-  g_test_add ("/modulemd/v2/translationentry/profile_descriptions",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_profile_descriptions,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/profile_descriptions",
+              translation_entry_test_profile_descriptions);
 
-  g_test_add ("/modulemd/v2/translationentry/yaml/parse",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/yaml/parse",
+              translation_entry_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/translationentry/yaml/emit",
-              TranslationEntryFixture,
-              NULL,
-              NULL,
-              translation_entry_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translationentry/yaml/emit",
+              translation_entry_test_emit_yaml);
 
   return g_test_run ();
 }

@@ -35,7 +35,7 @@ typedef struct _ModuleFixture
 
 
 static void
-module_test_construct (ModuleFixture *fixture, gconstpointer user_data)
+module_test_construct (void)
 {
   g_autoptr (ModulemdModule) m = NULL;
   g_autoptr (GPtrArray) list = NULL;
@@ -88,7 +88,7 @@ module_test_construct (ModuleFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_test_defaults (ModuleFixture *fixture, gconstpointer user_data)
+module_test_defaults (void)
 {
   g_autoptr (ModulemdModule) m = NULL;
   g_autoptr (ModulemdDefaultsV1) d = NULL;
@@ -134,7 +134,7 @@ module_test_defaults (ModuleFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
+module_test_streams (void)
 {
   g_autoptr (ModulemdModule) m = modulemd_module_new ("testmodule");
   g_autoptr (ModulemdTranslation) t = NULL;
@@ -330,7 +330,7 @@ module_test_streams (ModuleFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_test_get_stream_names (ModuleFixture *fixture, gconstpointer user_data)
+module_test_get_stream_names (void)
 {
   g_autoptr (ModulemdModule) m = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -500,33 +500,13 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/construct",
-              ModuleFixture,
-              NULL,
-              NULL,
-              module_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/construct",module_test_construct);
 
-  g_test_add ("/modulemd/v2/module/defaults",
-              ModuleFixture,
-              NULL,
-              NULL,
-              module_test_defaults,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/defaults",module_test_defaults);
 
-  g_test_add ("/modulemd/v2/module/stream_names",
-              ModuleFixture,
-              NULL,
-              NULL,
-              module_test_get_stream_names,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/stream_names",module_test_get_stream_names);
 
-  g_test_add ("/modulemd/v2/module/streams",
-              ModuleFixture,
-              NULL,
-              NULL,
-              module_test_streams,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/streams",module_test_streams);
 
   g_test_add_func ("/modulemd/v2/module/streams/remove",
                    modulemd_test_remove_streams);

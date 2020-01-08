@@ -24,8 +24,7 @@
 #include "private/test-utils.h"
 
 static void
-defaults_test_construct (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+defaults_test_construct (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
 
@@ -63,7 +62,7 @@ defaults_test_construct (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_copy (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_copy (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autoptr (ModulemdDefaults) copied_defaults = NULL;
@@ -88,8 +87,7 @@ defaults_test_copy (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_get_mdversion (CommonMmdTestFixture *fixture,
-                             gconstpointer user_data)
+defaults_test_get_mdversion (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
   guint64 mdversion;
@@ -103,8 +101,7 @@ defaults_test_get_mdversion (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_get_module_name (CommonMmdTestFixture *fixture,
-                               gconstpointer user_data)
+defaults_test_get_module_name (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
   const gchar *module_name;
@@ -118,7 +115,7 @@ defaults_test_get_module_name (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_validate (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_validate (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
 
@@ -134,7 +131,7 @@ defaults_test_validate (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_equals (void)
 {
   g_autoptr (ModulemdDefaults) defaults_1 = NULL;
   g_autoptr (ModulemdDefaults) defaults_2 = NULL;
@@ -164,7 +161,7 @@ defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_upgrade (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_upgrade (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autoptr (ModulemdDefaults) upgraded_defaults = NULL;
@@ -206,54 +203,19 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/defaults/construct",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/construct",defaults_test_construct);
 
-  g_test_add ("/modulemd/v2/defaults/copy",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/copy",defaults_test_copy);
 
-  g_test_add ("/modulemd/v2/defaults/mdversion",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_get_mdversion,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/mdversion",defaults_test_get_mdversion);
 
-  g_test_add ("/modulemd/v2/defaults/module_name",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_get_module_name,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/module_name",defaults_test_get_module_name);
 
-  g_test_add ("/modulemd/v2/defaults/validate",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_validate,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/validate",defaults_test_validate);
 
-  g_test_add ("/modulemd/v2/defaults/equals",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/equals",defaults_test_equals);
 
-  g_test_add ("/modulemd/v2/defaults/upgrade",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_upgrade,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/upgrade",defaults_test_upgrade);
 
   return g_test_run ();
 }

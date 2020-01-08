@@ -29,8 +29,7 @@ typedef struct _ModuleStreamFixture
 
 
 static void
-module_stream_test_construct (ModuleStreamFixture *fixture,
-                              gconstpointer user_data)
+module_stream_test_construct (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   guint64 version;
@@ -94,7 +93,7 @@ module_stream_test_construct (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
+module_stream_test_arch (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   guint64 version;
@@ -137,8 +136,7 @@ module_stream_test_arch (ModuleStreamFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_stream_v1_test_licenses (ModuleStreamFixture *fixture,
-                                gconstpointer user_data)
+module_stream_v1_test_licenses (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_auto (GStrv) licenses = NULL;
@@ -174,8 +172,7 @@ module_stream_v1_test_licenses (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_licenses (ModuleStreamFixture *fixture,
-                                gconstpointer user_data)
+module_stream_v2_test_licenses (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_auto (GStrv) licenses = NULL;
@@ -212,8 +209,7 @@ module_stream_v2_test_licenses (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_profiles (ModuleStreamFixture *fixture,
-                                gconstpointer user_data)
+module_stream_v1_test_profiles (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_autoptr (ModulemdProfile) profile = NULL;
@@ -248,8 +244,7 @@ module_stream_v1_test_profiles (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
-                                gconstpointer user_data)
+module_stream_v2_test_profiles (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autoptr (ModulemdProfile) profile = NULL;
@@ -284,8 +279,7 @@ module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_rpm_api (ModuleStreamFixture *fixture,
-                               gconstpointer user_data)
+module_stream_v1_test_rpm_api (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_auto (GStrv) rpm_apis = NULL;
@@ -312,8 +306,7 @@ module_stream_v1_test_rpm_api (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_rpm_api (ModuleStreamFixture *fixture,
-                               gconstpointer user_data)
+module_stream_v2_test_rpm_api (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_auto (GStrv) rpm_apis = NULL;
@@ -340,8 +333,7 @@ module_stream_v2_test_rpm_api (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_rpm_filters (ModuleStreamFixture *fixture,
-                                   gconstpointer user_data)
+module_stream_v1_test_rpm_filters (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_auto (GStrv) filters = NULL;
@@ -376,8 +368,7 @@ module_stream_v1_test_rpm_filters (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_rpm_filters (ModuleStreamFixture *fixture,
-                                   gconstpointer user_data)
+module_stream_v2_test_rpm_filters (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_auto (GStrv) filters = NULL;
@@ -412,8 +403,7 @@ module_stream_v2_test_rpm_filters (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v1_test_rpm_artifacts (ModuleStreamFixture *fixture,
-                                     gconstpointer user_data)
+module_stream_v1_test_rpm_artifacts (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_auto (GStrv) artifacts = NULL;
@@ -440,8 +430,7 @@ module_stream_v1_test_rpm_artifacts (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_rpm_artifacts (ModuleStreamFixture *fixture,
-                                     gconstpointer user_data)
+module_stream_v2_test_rpm_artifacts (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_auto (GStrv) artifacts = NULL;
@@ -467,8 +456,7 @@ module_stream_v2_test_rpm_artifacts (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
-                                     gconstpointer user_data)
+module_stream_v1_test_documentation (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   const gchar *documentation = NULL;
@@ -530,8 +518,7 @@ module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
-                                     gconstpointer user_data)
+module_stream_v2_test_documentation (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   const gchar *documentation = NULL;
@@ -592,8 +579,7 @@ module_stream_v2_test_documentation (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v1_test_tracker (ModuleStreamFixture *fixture,
-                               gconstpointer user_data)
+module_stream_v1_test_tracker (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_autofree gchar *tracker_prop = NULL;
@@ -657,8 +643,7 @@ module_stream_v1_test_tracker (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_tracker (ModuleStreamFixture *fixture,
-                               gconstpointer user_data)
+module_stream_v2_test_tracker (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autofree gchar *tracker_prop = NULL;
@@ -722,8 +707,7 @@ module_stream_v2_test_tracker (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v1_test_components (ModuleStreamFixture *fixture,
-                                  gconstpointer user_data)
+module_stream_v1_test_components (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
@@ -795,8 +779,7 @@ module_stream_v1_test_components (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_components (ModuleStreamFixture *fixture,
-                                  gconstpointer user_data)
+module_stream_v2_test_components (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autoptr (ModulemdComponentRpm) rpm_component = NULL;
@@ -867,7 +850,7 @@ module_stream_v2_test_components (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
+module_stream_test_copy (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdModuleStream) copied_stream = NULL;
@@ -926,8 +909,7 @@ module_stream_test_copy (ModuleStreamFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_stream_test_equals (ModuleStreamFixture *fixture,
-                           gconstpointer user_data)
+module_stream_test_equals (void)
 {
   g_autoptr (ModulemdModuleStream) stream_1 = NULL;
   g_autoptr (ModulemdModuleStream) stream_2 = NULL;
@@ -987,7 +969,7 @@ module_stream_test_equals (ModuleStreamFixture *fixture,
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
-module_stream_test_nsvc (ModuleStreamFixture *fixture, gconstpointer user_data)
+module_stream_test_nsvc (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *s_nsvc = NULL;
@@ -1036,8 +1018,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 static void
-module_stream_test_nsvca (ModuleStreamFixture *fixture,
-                          gconstpointer user_data)
+module_stream_test_nsvca (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *s_nsvca = NULL;
@@ -1116,8 +1097,7 @@ module_stream_test_nsvca (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_equals (ModuleStreamFixture *fixture,
-                              gconstpointer user_data)
+module_stream_v1_test_equals (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream_1 = NULL;
   g_autoptr (ModulemdModuleStreamV1) stream_2 = NULL;
@@ -1316,8 +1296,7 @@ module_stream_v1_test_equals (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_equals (ModuleStreamFixture *fixture,
-                              gconstpointer user_data)
+module_stream_v2_test_equals (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream_1 = NULL;
   g_autoptr (ModulemdModuleStreamV2) stream_2 = NULL;
@@ -1552,8 +1531,7 @@ module_stream_v2_test_equals (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_dependencies (ModuleStreamFixture *fixture,
-                                    gconstpointer user_data)
+module_stream_v1_test_dependencies (void)
 {
   g_auto (GStrv) list = NULL;
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
@@ -1584,8 +1562,7 @@ module_stream_v1_test_dependencies (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_dependencies (ModuleStreamFixture *fixture,
-                                    gconstpointer user_data)
+module_stream_v2_test_dependencies (void)
 {
   g_auto (GStrv) list = NULL;
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
@@ -1623,8 +1600,7 @@ module_stream_v2_test_dependencies (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
-                                  gconstpointer user_data)
+module_stream_v1_test_parse_dump (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
   g_autoptr (GError) error = NULL;
@@ -1793,8 +1769,7 @@ module_stream_v1_test_parse_dump (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
-                                  gconstpointer user_data)
+module_stream_v2_test_parse_dump (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autoptr (GError) error = NULL;
@@ -1999,8 +1974,7 @@ module_stream_v2_test_parse_dump (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v1_test_depends_on_stream (ModuleStreamFixture *fixture,
-                                         gconstpointer user_data)
+module_stream_v1_test_depends_on_stream (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *path = NULL;
@@ -2032,8 +2006,7 @@ module_stream_v1_test_depends_on_stream (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_depends_on_stream (ModuleStreamFixture *fixture,
-                                         gconstpointer user_data)
+module_stream_v2_test_depends_on_stream (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *path = NULL;
@@ -2065,8 +2038,7 @@ module_stream_v2_test_depends_on_stream (ModuleStreamFixture *fixture,
 }
 
 static void
-module_stream_v2_test_validate_buildafter (ModuleStreamFixture *fixture,
-                                           gconstpointer user_data)
+module_stream_v2_test_validate_buildafter (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *path = NULL;
@@ -2121,8 +2093,7 @@ module_stream_v2_test_validate_buildafter (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_validate_buildarches (ModuleStreamFixture *fixture,
-                                            gconstpointer user_data)
+module_stream_v2_test_validate_buildarches (void)
 {
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *path = NULL;
@@ -2191,8 +2162,7 @@ module_stream_v2_test_validate_buildarches (ModuleStreamFixture *fixture,
 
 
 static void
-module_stream_v2_test_rpm_map (ModuleStreamFixture *fixture,
-                               gconstpointer user_data)
+module_stream_v2_test_rpm_map (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
@@ -2463,236 +2433,105 @@ main (int argc, char *argv[])
 
   // Define the tests.o
 
-  g_test_add ("/modulemd/v2/modulestream/construct",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/construct",
+              module_stream_test_construct);
 
-  g_test_add ("/modulemd/v2/modulestream/arch",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_arch,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/arch",
+              module_stream_test_arch);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/documentation",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_documentation,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/documentation",
+              module_stream_v1_test_documentation);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/documentation",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_documentation,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/documentation",
+              module_stream_v2_test_documentation);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/licenses",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_licenses,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/licenses",
+              module_stream_v1_test_licenses);
 
 
-  g_test_add ("/modulemd/v2/modulestream/v2/licenses",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_licenses,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/licenses",
+              module_stream_v2_test_licenses);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/tracker",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_tracker,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/tracker",
+              module_stream_v1_test_tracker);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/tracker",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_tracker,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/tracker",
+              module_stream_v2_test_tracker);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/profiles",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_profiles,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/profiles",
+              module_stream_v1_test_profiles);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/profiles",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_profiles,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/profiles",
+              module_stream_v2_test_profiles);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/rpm_api",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_rpm_api,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_api",
+              module_stream_v1_test_rpm_api);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/rpm_api",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_rpm_api,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_api",
+              module_stream_v2_test_rpm_api);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/rpm_filters",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_rpm_filters,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_filters",
+              module_stream_v1_test_rpm_filters);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/rpm_filters",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_rpm_filters,
-              NULL);
-  g_test_add ("/modulemd/v2/modulestream/v1/rpm_artifacts",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_rpm_artifacts,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_filters",
+              module_stream_v2_test_rpm_filters);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/rpm_artifacts",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_rpm_artifacts,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_artifacts",
+              module_stream_v1_test_rpm_artifacts);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/components",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_components,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_artifacts",
+              module_stream_v2_test_rpm_artifacts);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/components",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_components,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/components",
+              module_stream_v1_test_components);
 
-  g_test_add ("/modulemd/v2/modulestream/copy",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/components",
+              module_stream_v2_test_components);
 
-  g_test_add ("/modulemd/v2/modulestream/equals",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/copy",
+              module_stream_test_copy);
 
-  g_test_add ("/modulemd/v2/modulestream/nsvc",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_nsvc,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/equals",
+              module_stream_test_equals);
+
+  g_test_add_func ("/modulemd/v2/modulestream/nsvc",
+              module_stream_test_nsvc);
 
 
-  g_test_add ("/modulemd/v2/modulestream/nsvca",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_test_nsvca,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/nsvca",
+              module_stream_test_nsvca);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/equals",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/equals",
+              module_stream_v1_test_equals);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/equals",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/equals",
+		module_stream_v2_test_equals);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/dependencies",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_dependencies,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/dependencies",
+              module_stream_v1_test_dependencies);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/dependencies",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_dependencies,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/dependencies",
+              module_stream_v2_test_dependencies);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/parse_dump",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_parse_dump,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/parse_dump",
+              module_stream_v1_test_parse_dump);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/parse_dump",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_parse_dump,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/parse_dump",
+              module_stream_v2_test_parse_dump);
 
-  g_test_add ("/modulemd/v2/modulestream/v1/depends_on_stream",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v1_test_depends_on_stream,
-              NULL);
-  g_test_add ("/modulemd/v2/modulestream/v2/depends_on_stream",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_depends_on_stream,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v1/depends_on_stream",
+              module_stream_v1_test_depends_on_stream);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/depends_on_stream",
+              module_stream_v2_test_depends_on_stream);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildafter",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_validate_buildafter,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildafter",
+              module_stream_v2_test_validate_buildafter);
 
-  g_test_add ("/modulemd/v2/modulestream/v2/validate/buildarches",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_validate_buildarches,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildarches",
+              module_stream_v2_test_validate_buildarches) ;
 
-  g_test_add ("/modulemd/v2/modulestream/v2/rpm_map",
-              ModuleStreamFixture,
-              NULL,
-              NULL,
-              module_stream_v2_test_rpm_map,
-              NULL);
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_map",
+              module_stream_v2_test_rpm_map);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/community",
                    module_stream_v1_test_community);

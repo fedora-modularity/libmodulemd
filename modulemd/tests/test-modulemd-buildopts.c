@@ -27,7 +27,7 @@ typedef struct _BuildoptsFixture
 } BuildoptsFixture;
 
 static void
-buildopts_test_construct (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_construct (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_auto (GStrv) whitelist = NULL;
@@ -60,7 +60,7 @@ buildopts_test_construct (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
-buildopts_test_equals (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_equals (void)
 {
   g_autoptr (ModulemdBuildopts) b_1 = NULL;
   g_autoptr (ModulemdBuildopts) b_2 = NULL;
@@ -210,7 +210,7 @@ buildopts_test_equals (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
-buildopts_test_copy (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_copy (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autoptr (ModulemdBuildopts) b_copy = NULL;
@@ -342,8 +342,7 @@ buildopts_test_copy (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
-buildopts_test_get_set_rpm_macros (BuildoptsFixture *fixture,
-                                   gconstpointer user_data)
+buildopts_test_get_set_rpm_macros (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autofree gchar *rpm_macros;
@@ -372,7 +371,7 @@ buildopts_test_get_set_rpm_macros (BuildoptsFixture *fixture,
 }
 
 static void
-buildopts_test_whitelist (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_whitelist (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_auto (GStrv) whitelist = NULL;
@@ -409,7 +408,7 @@ buildopts_test_whitelist (BuildoptsFixture *fixture, gconstpointer user_data)
 }
 
 static void
-buildopts_test_arches (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_arches (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_auto (GStrv) arches = NULL;
@@ -447,7 +446,7 @@ buildopts_test_arches (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
-buildopts_test_parse_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_parse_yaml (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autoptr (GError) error = NULL;
@@ -487,7 +486,7 @@ buildopts_test_parse_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
 
 
 static void
-buildopts_test_emit_yaml (BuildoptsFixture *fixture, gconstpointer user_data)
+buildopts_test_emit_yaml (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autoptr (GError) error = NULL;
@@ -557,61 +556,21 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/buildopts/construct",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/construct",buildopts_test_construct);
 
-  g_test_add ("/modulemd/v2/buildopts/equals",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/equals",buildopts_test_equals);
 
-  g_test_add ("/modulemd/v2/buildopts/copy",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/copy",buildopts_test_copy);
 
-  g_test_add ("/modulemd/v2/buildopts/get_set_rpm_macros",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_get_set_rpm_macros,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/get_set_rpm_macros",buildopts_test_get_set_rpm_macros);
 
-  g_test_add ("/modulemd/v2/buildopts/whitelist",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_whitelist,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/whitelist",buildopts_test_whitelist);
 
-  g_test_add ("/modulemd/v2/buildopts/arches",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_arches,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/arches",buildopts_test_arches);
 
-  g_test_add ("/modulemd/v2/buildopts/yaml/parse",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/parse",buildopts_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/buildopts/yaml/emit",
-              BuildoptsFixture,
-              NULL,
-              NULL,
-              buildopts_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/emit",buildopts_test_emit_yaml);
 
   return g_test_run ();
 }

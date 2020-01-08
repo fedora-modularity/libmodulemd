@@ -35,8 +35,7 @@ sigtrap_handler (int sig_num)
 }
 
 static void
-service_level_test_construct (ServiceLevelFixture *fixture,
-                              gconstpointer user_data)
+service_level_test_construct (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
 
@@ -92,8 +91,7 @@ service_level_test_construct (ServiceLevelFixture *fixture,
 
 
 static void
-service_level_test_equals (ServiceLevelFixture *fixture,
-                           gconstpointer user_data)
+service_level_test_equals (void)
 {
   g_autoptr (ModulemdServiceLevel) sl_1 = NULL;
   g_autoptr (ModulemdServiceLevel) sl_2 = NULL;
@@ -196,7 +194,7 @@ service_level_test_equals (ServiceLevelFixture *fixture,
 
 
 static void
-service_level_test_copy (ServiceLevelFixture *fixture, gconstpointer user_data)
+service_level_test_copy (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (ModulemdServiceLevel) sl_copy = NULL;
@@ -230,8 +228,7 @@ service_level_test_copy (ServiceLevelFixture *fixture, gconstpointer user_data)
 
 
 static void
-service_level_test_get_name (ServiceLevelFixture *fixture,
-                             gconstpointer user_data)
+service_level_test_get_name (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autofree gchar *name = NULL;
@@ -270,8 +267,7 @@ service_level_test_get_name (ServiceLevelFixture *fixture,
 
 
 static void
-service_level_test_get_set_eol (ServiceLevelFixture *fixture,
-                                gconstpointer user_data)
+service_level_test_get_set_eol (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GDate) eol = NULL;
@@ -345,8 +341,7 @@ service_level_test_get_set_eol (ServiceLevelFixture *fixture,
 }
 
 static void
-service_level_test_parse_yaml (ServiceLevelFixture *fixture,
-                               gconstpointer user_data)
+service_level_test_parse_yaml (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GError) error = NULL;
@@ -386,8 +381,7 @@ service_level_test_parse_yaml (ServiceLevelFixture *fixture,
 
 
 static void
-service_level_test_emit_yaml (ServiceLevelFixture *fixture,
-                              gconstpointer user_data)
+service_level_test_emit_yaml (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
   g_autoptr (GError) error = NULL;
@@ -453,54 +447,26 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/servicelevel/construct",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/construct",
+              service_level_test_construct);
 
-  g_test_add ("/modulemd/v2/servicelevel/get_set_name",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_get_name,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/get_set_name",
+              service_level_test_get_name);
 
-  g_test_add ("/modulemd/v2/servicelevel/equals",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/equals",
+              service_level_test_equals);
 
-  g_test_add ("/modulemd/v2/servicelevel/copy",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/copy",
+              service_level_test_copy);
 
-  g_test_add ("/modulemd/v2/servicelevel/get_set_eol",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_get_set_eol,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/get_set_eol",
+              service_level_test_get_set_eol);
 
-  g_test_add ("/modulemd/v2/servicelevel/yaml/parse",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/yaml/parse",
+              service_level_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/servicelevel/yaml/emit",
-              ServiceLevelFixture,
-              NULL,
-              NULL,
-              service_level_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/servicelevel/yaml/emit",
+              service_level_test_emit_yaml);
 
   return g_test_run ();
 }

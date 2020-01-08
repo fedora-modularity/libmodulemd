@@ -22,8 +22,7 @@
 
 
 static void
-merger_test_constructors (CommonMmdTestFixture *fixture,
-                          gconstpointer user_data)
+merger_test_constructors (void)
 {
   g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
 
@@ -40,8 +39,7 @@ merger_test_constructors (CommonMmdTestFixture *fixture,
 
 
 static void
-merger_test_deduplicate (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+merger_test_deduplicate (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleIndex) index2 = NULL;
@@ -248,19 +246,9 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/index/merger/constructors",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              merger_test_constructors,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/merger/constructors",merger_test_constructors);
 
-  g_test_add ("/modulemd/v2/module/index/merger/deduplicate",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              merger_test_deduplicate,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/merger/deduplicate",merger_test_deduplicate);
 
   g_test_add_func ("/modulemd/module/index/merger/add_only",
                    merger_test_add_only);

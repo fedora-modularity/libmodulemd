@@ -35,7 +35,7 @@ sigtrap_handler (int sig_num)
 }
 
 static void
-profile_test_construct (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_construct (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_auto (GStrv) rpms;
@@ -81,7 +81,7 @@ profile_test_construct (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_equals (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_equals (void)
 {
   g_autoptr (ModulemdProfile) p_1 = NULL;
   g_autoptr (ModulemdProfile) p_2 = NULL;
@@ -226,7 +226,7 @@ profile_test_equals (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_copy (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (ModulemdProfile) p_copy = NULL;
@@ -308,7 +308,7 @@ profile_test_copy (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_get_name (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_get_name (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_autofree gchar *name;
@@ -331,8 +331,7 @@ profile_test_get_name (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_get_set_description (ProfileFixture *fixture,
-                                  gconstpointer user_data)
+profile_test_get_set_description (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
 
@@ -353,7 +352,7 @@ profile_test_get_set_description (ProfileFixture *fixture,
 }
 
 static void
-profile_test_rpms (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_rpms (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_auto (GStrv) rpms = NULL;
@@ -391,7 +390,7 @@ profile_test_rpms (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_parse_yaml (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (GError) error = NULL;
@@ -431,7 +430,7 @@ profile_test_parse_yaml (ProfileFixture *fixture, gconstpointer user_data)
 
 
 static void
-profile_test_emit_yaml (ProfileFixture *fixture, gconstpointer user_data)
+profile_test_emit_yaml (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (GError) error = NULL;
@@ -490,61 +489,29 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/profile/construct",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/construct",
+              profile_test_construct);
 
-  g_test_add ("/modulemd/v2/profile/equals",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/equals",
+              profile_test_equals);
 
-  g_test_add ("/modulemd/v2/profile/copy",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/copy",
+              profile_test_copy);
 
-  g_test_add ("/modulemd/v2/profile/get_name",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_get_name,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/get_name",
+              profile_test_get_name);
 
-  g_test_add ("/modulemd/v2/profile/get_set_description",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_get_set_description,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/get_set_description",
+              profile_test_get_set_description);
 
-  g_test_add ("/modulemd/v2/profile/rpms",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_rpms,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/rpms",
+              profile_test_rpms);
 
-  g_test_add ("/modulemd/v2/profile/yaml/parse",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/yaml/parse",
+              profile_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/profile/yaml/emit",
-              ProfileFixture,
-              NULL,
-              NULL,
-              profile_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/yaml/emit",
+              profile_test_emit_yaml);
 
   return g_test_run ();
 }

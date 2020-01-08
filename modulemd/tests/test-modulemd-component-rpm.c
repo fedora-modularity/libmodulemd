@@ -30,8 +30,7 @@ typedef struct _ComponentRpmFixture
 
 
 static void
-component_rpm_test_construct (ComponentRpmFixture *fixture,
-                              gconstpointer user_data)
+component_rpm_test_construct (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
   ModulemdComponent *mc = NULL;
@@ -84,8 +83,7 @@ component_rpm_test_construct (ComponentRpmFixture *fixture,
 
 
 static void
-component_rpm_test_equals (ComponentRpmFixture *fixture,
-                           gconstpointer user_data)
+component_rpm_test_equals (void)
 {
   g_autoptr (ModulemdComponentRpm) r_1 = NULL;
   g_autoptr (ModulemdComponentRpm) r_2 = NULL;
@@ -195,7 +193,7 @@ component_rpm_test_equals (ComponentRpmFixture *fixture,
 
 
 static void
-component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
+component_rpm_test_copy (void)
 {
   g_autoptr (ModulemdComponentRpm) r_orig = NULL;
   g_autoptr (ModulemdComponentRpm) r = NULL;
@@ -281,8 +279,7 @@ component_rpm_test_copy (ComponentRpmFixture *fixture, gconstpointer user_data)
 
 
 static void
-component_rpm_test_emit_yaml (ComponentRpmFixture *fixture,
-                              gconstpointer user_data)
+component_rpm_test_emit_yaml (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
   g_autoptr (GError) error = NULL;
@@ -349,8 +346,7 @@ component_rpm_test_emit_yaml (ComponentRpmFixture *fixture,
 
 
 static void
-component_rpm_test_parse_yaml (ComponentRpmFixture *fixture,
-                               gconstpointer user_data)
+component_rpm_test_parse_yaml (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
   g_autoptr (GError) error = NULL;
@@ -406,8 +402,7 @@ component_rpm_test_parse_yaml (ComponentRpmFixture *fixture,
 }
 
 static void
-component_rpm_test_override_name (ComponentRpmFixture *fixture,
-                                  gconstpointer user_data)
+component_rpm_test_override_name (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
 
@@ -453,47 +448,17 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/component/rpm/construct",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/construct",component_rpm_test_construct);
 
-  g_test_add ("/modulemd/v2/component/rpm/equals",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/equals",component_rpm_test_equals);
 
-  g_test_add ("/modulemd/v2/component/rpm/copy",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/copy",component_rpm_test_copy);
 
-  g_test_add ("/modulemd/v2/component/rpm/yaml/emit",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",component_rpm_test_emit_yaml);
 
-  g_test_add ("/modulemd/v2/component/rpm/yaml/parse",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",component_rpm_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/component/rpm/override_name",
-              ComponentRpmFixture,
-              NULL,
-              NULL,
-              component_rpm_test_override_name,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/rpm/override_name",component_rpm_test_override_name);
 
   return g_test_run ();
 }

@@ -12,10 +12,14 @@ JOB_NAME=${TRAVIS_JOB_NAME:-CentOS 7}
 
 arr=($JOB_NAME)
 release=${arr[1]:-7}
+case $release in
+8)	repository=docker.io ;;
+*)	repository=registry.centos.org ;;
+esac
 
 mmd_run_docker_tests \
     os=centos \
     release=$release \
-    repository=registry.centos.org
+    repository=$repository
 
 popd # $SCRIPT_DIR

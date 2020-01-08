@@ -77,9 +77,12 @@ function mmd_run_docker_tests {
     git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
     popd
 
-    sed -e "s#@IMAGE@#$repository/$image#" \
-        $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
-    sed -e "s/@RELEASE@/$MMD_OS:$MMD_RELEASE/" $SCRIPT_DIR/$MMD_OS/Dockerfile.tmpl > $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
+    sed -e "s#@IMAGE@#$repository/$image#" $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.tmpl \
+        | m4 -D_RELEASE_=$release \
+        > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
+    sed -e "s/@RELEASE@/$MMD_OS:$MMD_RELEASE/" $SCRIPT_DIR/$MMD_OS/Dockerfile.tmpl \
+        | m4 -D_RELEASE_=$release \
+        > $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
 
     $MMD_BUILDAH $MMD_LAYERS_TRUE \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \

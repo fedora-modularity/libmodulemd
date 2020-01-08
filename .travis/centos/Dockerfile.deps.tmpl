@@ -3,6 +3,10 @@ FROM @IMAGE@
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 RUN yum -y install epel-release \
+ifelse(eval(_RELEASE_ >= 8), 1, `dnl
+    && yum -y install dnf-plugins-core \
+    && yum config-manager --enable PowerTools \
+')dnl
     && yum -y --setopt=tsflags='' install \
         clang \
 	createrepo_c \
@@ -21,9 +25,13 @@ RUN yum -y install epel-release \
 	pkgconfig \
 	python2-devel \
 	python2-six \
+ifelse(eval(_RELEASE_ < 8), 1, `dnl
 	python-gobject-base \
-	python36-devel \
 	python36-gobject-base \
+',`dnl
+	python3-gobject-base \
+')dnl
+	python36-devel \
 	python3-rpm-macros \
 	redhat-rpm-config \
 	rpm-build \

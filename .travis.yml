@@ -11,6 +11,7 @@ addons:
     - bash
     - tar
     - bzip2
+    - m4
 
 env:
   global:
@@ -35,6 +36,10 @@ jobs:
 
     - stage: CentOS x86_64
       name: "CentOS 7 x86_64"
+      script: ./.travis/travis-centos.sh
+      arch: amd64
+
+    - name: "CentOS 8 x86_64"
       script: ./.travis/travis-centos.sh
       arch: amd64
 

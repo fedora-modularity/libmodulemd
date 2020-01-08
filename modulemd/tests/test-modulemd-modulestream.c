@@ -281,6 +281,63 @@ module_stream_v2_test_profiles (ModuleStreamFixture *fixture,
   g_clear_pointer (&rpms, g_strfreev);
 }
 
+
+static void
+module_stream_v1_test_rpm_api (ModuleStreamFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_auto (GStrv) rpm_apis = NULL;
+
+  stream = modulemd_module_stream_v1_new ("sssd", NULL);
+
+  modulemd_module_stream_v1_add_rpm_api (stream, "sssd-common");
+  rpm_apis = modulemd_module_stream_v1_get_rpm_api_as_strv (stream);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)rpm_apis, "sssd-common"));
+  g_assert_cmpint (g_strv_length (rpm_apis), ==, 1);
+
+  g_clear_pointer (&rpm_apis, g_strfreev);
+
+  modulemd_module_stream_v1_remove_rpm_api (stream, "sssd-common");
+  rpm_apis = modulemd_module_stream_v1_get_rpm_api_as_strv (stream);
+
+  g_assert_cmpint (g_strv_length (rpm_apis), ==, 0);
+
+  g_clear_pointer (&rpm_apis, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
+static void
+module_stream_v2_test_rpm_api (ModuleStreamFixture *fixture,
+                               gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) rpm_apis = NULL;
+
+  stream = modulemd_module_stream_v2_new ("sssd", NULL);
+
+  modulemd_module_stream_v2_add_rpm_api (stream, "sssd-common");
+  rpm_apis = modulemd_module_stream_v2_get_rpm_api_as_strv (stream);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)rpm_apis, "sssd-common"));
+  g_assert_cmpint (g_strv_length (rpm_apis), ==, 1);
+
+  g_clear_pointer (&rpm_apis, g_strfreev);
+
+  modulemd_module_stream_v2_remove_rpm_api (stream, "sssd-common");
+  rpm_apis = modulemd_module_stream_v2_get_rpm_api_as_strv (stream);
+
+  g_assert_cmpint (g_strv_length (rpm_apis), ==, 0);
+
+  g_clear_pointer (&rpm_apis, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
 static void
 module_stream_v1_test_rpm_filters (ModuleStreamFixture *fixture,
                                    gconstpointer user_data)
@@ -2377,6 +2434,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_profiles,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/rpm_api",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_rpm_api,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/rpm_api",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_rpm_api,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/rpm_filters",

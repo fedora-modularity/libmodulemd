@@ -412,6 +412,76 @@ module_stream_v2_test_rpm_filters (ModuleStreamFixture *fixture,
 }
 
 static void
+module_stream_test_upgrade (ModuleStreamFixture *fixture,
+                            gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) streamV1 = NULL;
+  g_autoptr (ModulemdModuleStream) updated_stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_str = NULL;
+
+  streamV1 = modulemd_module_stream_v1_new ("SuperModule", "latest");
+
+  modulemd_module_stream_v1_set_summary (streamV1, "Summary");
+  modulemd_module_stream_v1_set_description (streamV1, "Description");
+  modulemd_module_stream_v1_add_module_license (streamV1, "BSD");
+
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    streamV1, "ModuleA", "streamZ");
+  modulemd_module_stream_v1_add_buildtime_requirement (
+    streamV1, "ModuleB", "streamY");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    streamV1, "ModuleA", "streamZ");
+  modulemd_module_stream_v1_add_runtime_requirement (
+    streamV1, "ModuleB", "streamY");
+
+  updated_stream = modulemd_module_stream_upgrade (
+    MODULEMD_MODULE_STREAM (streamV1), MD_MODULESTREAM_VERSION_LATEST, &error);
+
+  g_assert_no_error (error);
+  g_assert_nonnull (updated_stream);
+
+  index = modulemd_module_index_new ();
+  modulemd_module_index_add_module_stream (
+    index, MODULEMD_MODULE_STREAM (updated_stream), &error);
+
+  g_assert_no_error (error);
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+
+  g_assert_no_error (error);
+  g_assert_cmpstr (yaml_str,
+                   ==,
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data:\n"
+                   "  name: SuperModule\n"
+                   "  stream: latest\n"
+                   "  summary: Summary\n"
+                   "  description: >-\n"
+                   "    Description\n"
+                   "  license:\n"
+                   "    module:\n"
+                   "    - BSD\n"
+                   "  dependencies:\n"
+                   "  - buildrequires:\n"
+                   "      ModuleA: [streamZ]\n"
+                   "      ModuleB: [streamY]\n"
+                   "    requires:\n"
+                   "      ModuleA: [streamZ]\n"
+                   "      ModuleB: [streamY]\n"
+                   "...\n");
+
+  g_clear_object (&streamV1);
+  g_clear_object (&updated_stream);
+  g_clear_object (&index);
+  g_clear_object (&error);
+  g_clear_pointer (&yaml_str, g_free);
+}
+
+static void
 module_stream_v1_test_rpm_artifacts (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
 {
@@ -2561,6 +2631,14 @@ main (int argc, char *argv[])
               NULL,
               module_stream_v2_test_rpm_filters,
               NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/upgrade",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_upgrade,
+              NULL);
+
   g_test_add ("/modulemd/v2/modulestream/v1/rpm_artifacts",
               ModuleStreamFixture,
               NULL,

@@ -536,6 +536,85 @@ module_stream_v2_test_rpm_artifacts (ModuleStreamFixture *fixture,
   g_clear_object (&stream);
 }
 
+
+static void
+module_stream_v1_test_servicelevels (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  g_auto (GStrv) servicelevel_names = NULL;
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  ModulemdServiceLevel *sl_retrieved = NULL;
+  g_autofree gchar *name_prop = NULL;
+  g_autofree gchar *eol_str = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+  sl = modulemd_service_level_new ("rawhide");
+  modulemd_service_level_set_eol_ymd (sl, 1980, 3, 2);
+
+  modulemd_module_stream_v1_add_servicelevel (stream, sl);
+
+  servicelevel_names =
+    modulemd_module_stream_v1_get_servicelevel_names_as_strv (stream);
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)servicelevel_names, "rawhide"));
+  g_assert_cmpint (g_strv_length (servicelevel_names), ==, 1);
+
+  sl_retrieved =
+    modulemd_module_stream_v1_get_servicelevel (stream, "rawhide");
+  g_object_get (sl_retrieved, "name", &name_prop, NULL);
+  eol_str = modulemd_service_level_get_eol_as_string (sl_retrieved);
+
+  g_assert_cmpstr (name_prop, ==, "rawhide");
+  g_assert_cmpstr (eol_str, ==, "1980-03-02");
+
+  g_clear_object (&sl);
+  g_clear_object (&stream);
+  g_clear_pointer (&name_prop, g_free);
+  g_clear_pointer (&eol_str, g_free);
+  g_clear_pointer (&servicelevel_names, g_strfreev);
+}
+
+
+static void
+module_stream_v2_test_servicelevels (ModuleStreamFixture *fixture,
+                                     gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) servicelevel_names = NULL;
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  ModulemdServiceLevel *sl_retrieved = NULL;
+  g_autofree gchar *name_prop = NULL;
+  g_autofree gchar *eol_str = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  sl = modulemd_service_level_new ("rawhide");
+  modulemd_service_level_set_eol_ymd (sl, 1980, 3, 2);
+
+  modulemd_module_stream_v2_add_servicelevel (stream, sl);
+
+  servicelevel_names =
+    modulemd_module_stream_v2_get_servicelevel_names_as_strv (stream);
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)servicelevel_names, "rawhide"));
+  g_assert_cmpint (g_strv_length (servicelevel_names), ==, 1);
+
+  sl_retrieved =
+    modulemd_module_stream_v2_get_servicelevel (stream, "rawhide");
+  g_object_get (sl_retrieved, "name", &name_prop, NULL);
+  eol_str = modulemd_service_level_get_eol_as_string (sl_retrieved);
+
+  g_assert_cmpstr (name_prop, ==, "rawhide");
+  g_assert_cmpstr (eol_str, ==, "1980-03-02");
+
+  g_clear_object (&sl);
+  g_clear_object (&stream);
+  g_clear_pointer (&name_prop, g_free);
+  g_clear_pointer (&eol_str, g_free);
+  g_clear_pointer (&servicelevel_names, g_strfreev);
+}
+
+
 static void
 module_stream_v1_test_documentation (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
@@ -2651,6 +2730,20 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_v2_test_rpm_artifacts,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v1/servicelevels",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v1_test_servicelevels,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2/servicelevels",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_v2_test_servicelevels,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/components",

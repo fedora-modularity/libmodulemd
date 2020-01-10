@@ -482,6 +482,440 @@ module_stream_test_upgrade (ModuleStreamFixture *fixture,
 }
 
 static void
+module_stream_test_v2_yaml (ModuleStreamFixture *fixture,
+                            gconstpointer user_data)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  ModulemdModuleStreamV2 *streamV2 = NULL;
+  g_autofree gchar *module_name_prop = NULL;
+  g_autofree gchar *stream_name_prop = NULL;
+  g_autofree gchar *context_prop = NULL;
+  g_autofree gchar *arch_prop = NULL;
+  guint64 version_prop = 0;
+  g_autoptr (GError) error = NULL;
+
+  g_auto (GStrv) rpm_apis = NULL;
+  g_auto (GStrv) rpm_filters = NULL;
+  g_auto (GStrv) rpm_artifacts = NULL;
+  g_auto (GStrv) servicelevel_names = NULL;
+
+  ModulemdServiceLevel *sl = NULL;
+  g_autofree gchar *sl_name_prop = NULL;
+  g_autofree gchar *sl_eol_string = NULL;
+
+  g_auto (GStrv) content_licenses = NULL;
+  g_auto (GStrv) module_licenses = NULL;
+  g_auto (GStrv) stream_dependencies = NULL;
+
+  g_autofree gchar *community_prop = NULL;
+  g_autofree gchar *documentation_prop = NULL;
+  g_autofree gchar *tracker_prop = NULL;
+  g_auto (GStrv) profile_names = NULL;
+
+  ModulemdBuildopts *buildopts = NULL;
+  g_autofree gchar *buildopts_rpm_macros_prop = NULL;
+  g_auto (GStrv) buildopts_rpm_whitelist = NULL;
+  g_auto (GStrv) buildopts_arches = NULL;
+
+  GVariant *tmp_variant = NULL;
+  GVariantDict *xmd_dict = NULL;
+  GVariantDict *tmp_dict = NULL;
+  gchar *tmp_str = NULL;
+  gboolean *tmp_bool = NULL;
+
+  GPtrArray *dependencies = NULL;
+
+  stream = modulemd_module_stream_read_string (
+    "---\n"
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  name: modulename\n"
+    "  stream: streamname\n"
+    "  version: 1\n"
+    "  context: c0ffe3\n"
+    "  arch: x86_64\n"
+    "  summary: Module Summary\n"
+    "  description: >-\n"
+    "    Module Description\n"
+    "  api:\n"
+    "    rpms:\n"
+    "      - rpm_a\n"
+    "      - rpm_b\n"
+    "  filter:\n"
+    "    rpms: rpm_c\n"
+
+    "  artifacts:\n"
+    "    rpms:\n"
+    "      - bar-0:1.23-1.module_deadbeef.x86_64\n"
+
+    "  servicelevels:\n"
+    "    rawhide: {}\n"
+    "    production:\n"
+    "      eol: 2099-12-31\n"
+
+    "  license:\n"
+    "    content:\n"
+    "      - BSD\n"
+    "      - GPLv2+\n"
+    "    module: MIT\n"
+
+    "  dependencies:\n"
+    "    - buildrequires:\n"
+    "          platform: [-f27, -f28, -epel7]\n"
+    "      requires:\n"
+    "          platform: [-f27, -f28, -epel7]\n"
+    "    - buildrequires:\n"
+    "          platform: [f27]\n"
+    "          buildtools: [v1, v2]\n"
+    "          compatible: [v3]\n"
+    "      requires:\n"
+    "          platform: [f27]\n"
+    "          compatible: [v3, v4]\n"
+    "    - buildrequires:\n"
+    "          platform: [f28]\n"
+    "      requires:\n"
+    "          platform: [f28]\n"
+    "          runtime: [a, b]\n"
+    "    - buildrequires:\n"
+    "          platform: [epel7]\n"
+    "          extras: []\n"
+    "          moreextras: [foo, bar]\n"
+    "      requires:\n"
+    "          platform: [epel7]\n"
+    "          extras: []\n"
+    "          moreextras: [foo, bar]\n"
+    "  references:\n"
+    "        community: http://www.example.com/\n"
+    "        documentation: http://www.example.com/\n"
+    "        tracker: http://www.example.com/\n"
+    "  profiles:\n"
+    "        default:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-extras\n"
+    "                - baz\n"
+    "        container:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-devel\n"
+    "        minimal:\n"
+    "            description: Minimal profile installing only the bar "
+    "package.\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "        buildroot:\n"
+    "            rpms:\n"
+    "                - bar-devel\n"
+    "        srpm-buildroot:\n"
+    "            rpms:\n"
+    "                - bar-extras\n"
+    "  buildopts:\n"
+    "        rpms:\n"
+    "            macros: |\n"
+    "                %demomacro 1\n"
+    "                %demomacro2 %{demomacro}23\n"
+    "            whitelist:\n"
+    "                - fooscl-1-bar\n"
+    "                - fooscl-1-baz\n"
+    "                - xxx\n"
+    "                - xyz\n"
+    "        arches: [i686, x86_64]\n"
+    "  components:\n"
+    "        rpms:\n"
+    "            bar:\n"
+    "                rationale: We need this to demonstrate stuff.\n"
+    "                repository: https://pagure.io/bar.git\n"
+    "                cache: https://example.com/cache\n"
+    "                ref: 26ca0c0\n"
+    "            baz:\n"
+    "                rationale: This one is here to demonstrate other stuff.\n"
+    "            xxx:\n"
+    "                rationale: xxx demonstrates arches and multilib.\n"
+    "                arches: [i686, x86_64]\n"
+    "                multilib: [x86_64]\n"
+    "            xyz:\n"
+    "                rationale: xyz is a bundled dependency of xxx.\n"
+    "                buildorder: 10\n"
+    "        modules:\n"
+    "            includedmodule:\n"
+    "                rationale: Included in the stack, just because.\n"
+    "                repository: https://pagure.io/includedmodule.git\n"
+    "                ref: somecoolbranchname\n"
+    "                buildorder: 100\n"
+    "  xmd:\n"
+    "        some_key: some_data\n"
+    "        some_list:\n"
+    "            - a\n"
+    "            - b\n"
+    "        some_dict:\n"
+    "            a: alpha\n"
+    "            b: beta\n"
+    "            some_other_list:\n"
+    "                - c\n"
+    "                - d\n"
+    "            some_other_dict:\n"
+    "                another_key: more_data\n"
+    "                yet_another_key:\n"
+    "                    - this\n"
+    "                    - is\n"
+    "                    - getting\n"
+    "                    - silly\n"
+    "        can_bool: TRUE\n"
+    "...\n",
+    TRUE,
+    NULL,
+    NULL,
+    &error);
+
+  g_assert_no_error (error);
+
+  g_assert_nonnull (stream);
+  streamV2 = MODULEMD_MODULE_STREAM_V2 (stream);
+
+  g_object_get (streamV2, "module-name", &module_name_prop, NULL);
+  g_object_get (streamV2, "stream-name", &stream_name_prop, NULL);
+  g_object_get (streamV2, "version", &version_prop, NULL);
+  g_object_get (streamV2, "context", &context_prop, NULL);
+  g_object_get (streamV2, "arch", &arch_prop, NULL);
+
+  g_assert_cmpstr (module_name_prop, ==, "modulename");
+  g_assert_cmpstr (stream_name_prop, ==, "streamname");
+  g_assert_cmpuint (version_prop, ==, 1);
+  g_assert_cmpstr (context_prop, ==, "c0ffe3");
+  g_assert_cmpstr (arch_prop, ==, "x86_64");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_summary (streamV2, "C"),
+                   ==,
+                   "Module Summary");
+  g_assert_cmpstr (modulemd_module_stream_v2_get_description (streamV2, "C"),
+                   ==,
+                   "Module Description");
+
+  rpm_apis = modulemd_module_stream_v2_get_rpm_api_as_strv (streamV2);
+  rpm_filters = modulemd_module_stream_v2_get_rpm_filters_as_strv (streamV2);
+  rpm_artifacts =
+    modulemd_module_stream_v2_get_rpm_artifacts_as_strv (streamV2);
+  servicelevel_names =
+    modulemd_module_stream_v2_get_servicelevel_names_as_strv (streamV2);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)rpm_apis, "rpm_a"));
+  g_assert_true (g_strv_contains ((const gchar *const *)rpm_apis, "rpm_b"));
+
+  g_assert_true (g_strv_contains ((const gchar *const *)rpm_filters, "rpm_c"));
+
+  g_assert_true (g_strv_contains ((const gchar *const *)rpm_artifacts,
+                                  "bar-0:1.23-1.module_deadbeef.x86_64"));
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)servicelevel_names, "rawhide"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)servicelevel_names, "production"));
+
+  sl = modulemd_module_stream_v2_get_servicelevel (streamV2, "rawhide");
+  g_assert_nonnull (sl);
+  g_object_get (sl, "name", &sl_name_prop, NULL);
+  g_assert_cmpstr (sl_name_prop, ==, "rawhide");
+  g_assert_null (modulemd_service_level_get_eol (sl));
+
+  g_clear_pointer (&sl_name_prop, g_free);
+
+  sl = modulemd_module_stream_v2_get_servicelevel (streamV2, "production");
+  g_assert_nonnull (sl);
+  g_object_get (sl, "name", &sl_name_prop, NULL);
+  g_assert_cmpstr (sl_name_prop, ==, "production");
+  g_assert_nonnull (modulemd_service_level_get_eol (sl));
+  sl_eol_string = modulemd_service_level_get_eol_as_string (sl);
+  g_assert_cmpstr (sl_eol_string, ==, "2099-12-31");
+
+  g_clear_pointer (&sl_name_prop, g_free);
+  g_clear_pointer (&sl_eol_string, g_free);
+
+  content_licenses =
+    modulemd_module_stream_v2_get_content_licenses_as_strv (streamV2);
+  module_licenses =
+    modulemd_module_stream_v2_get_module_licenses_as_strv (streamV2);
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)content_licenses, "BSD"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)content_licenses, "GPLv2+"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)module_licenses, "MIT"));
+
+  dependencies = modulemd_module_stream_v2_get_dependencies (streamV2);
+  g_assert_cmpint (dependencies->len, ==, 4);
+
+  g_object_get (streamV2, "community", &community_prop, NULL);
+  g_object_get (streamV2, "documentation", &documentation_prop, NULL);
+  g_object_get (streamV2, "tracker", &tracker_prop, NULL);
+
+  g_assert_cmpstr (community_prop, ==, "http://www.example.com/");
+  g_assert_cmpstr (documentation_prop, ==, "http://www.example.com/");
+  g_assert_cmpstr (tracker_prop, ==, "http://www.example.com/");
+
+  profile_names =
+    modulemd_module_stream_v2_get_profile_names_as_strv (streamV2);
+  g_assert_cmpint (g_strv_length (profile_names), ==, 5);
+
+  buildopts = modulemd_module_stream_v2_get_buildopts (streamV2);
+  g_assert_nonnull (buildopts);
+
+  g_object_get (buildopts, "rpm_macros", &buildopts_rpm_macros_prop, NULL);
+  g_assert_cmpstr (buildopts_rpm_macros_prop,
+                   ==,
+                   "%demomacro 1\n%demomacro2 %{demomacro}23\n");
+
+  buildopts_rpm_whitelist =
+    modulemd_buildopts_get_rpm_whitelist_as_strv (buildopts);
+  buildopts_arches = modulemd_buildopts_get_arches_as_strv (buildopts);
+
+  g_assert_true (g_strv_contains (
+    (const gchar *const *)buildopts_rpm_whitelist, "fooscl-1-bar"));
+  g_assert_true (g_strv_contains (
+    (const gchar *const *)buildopts_rpm_whitelist, "fooscl-1-baz"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)buildopts_rpm_whitelist, "xxx"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)buildopts_rpm_whitelist, "xyz"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)buildopts_arches, "i686"));
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)buildopts_arches, "x86_64"));
+
+
+  // Load XMD into dictionary
+  tmp_variant = modulemd_module_stream_v2_get_xmd (streamV2);
+  g_assert_nonnull (tmp_variant);
+  xmd_dict = g_variant_dict_new (tmp_variant);
+
+  // Check xmd["some_key"] == "some_data"
+  g_assert_true (g_variant_dict_contains (xmd_dict, "some_key"));
+  g_assert_true (g_variant_dict_lookup (xmd_dict, "some_key", "&s", &tmp_str));
+  g_assert_cmpstr (tmp_str, ==, "some_data");
+
+  // Check xmd["some_list"][0] == "a" and xmd["some_list"][1] == "b"
+  g_assert_true (g_variant_dict_contains (xmd_dict, "some_list"));
+  g_assert_true (
+    g_variant_dict_lookup (xmd_dict, "some_list", "@as", &tmp_variant));
+
+  g_variant_get_child (tmp_variant, 0, "&s", &tmp_str);
+  g_assert_cmpstr (tmp_str, ==, "a");
+
+  g_variant_get_child (tmp_variant, 1, "&s", &tmp_str);
+  g_assert_cmpstr (tmp_str, ==, "b");
+
+  g_clear_pointer (&tmp_variant, g_variant_unref);
+
+  // Check xmd["some_dict"]["a"] == "alpha"
+  g_assert_true (g_variant_dict_contains (xmd_dict, "some_dict"));
+  g_assert_true (
+    g_variant_dict_lookup (xmd_dict, "some_dict", "@a{sv}", &tmp_variant));
+  tmp_dict = g_variant_dict_new (tmp_variant);
+
+  g_assert_true (g_variant_dict_contains (tmp_dict, "a"));
+  g_assert_true (g_variant_dict_lookup (tmp_dict, "a", "&s", &tmp_str));
+  g_assert_cmpstr (tmp_str, ==, "alpha");
+
+  g_clear_pointer (&tmp_variant, g_variant_unref);
+
+  // Check xmd["some_dict"]["some_other_dict"]["another_key"] == "more_data"
+  g_assert_true (g_variant_dict_contains (tmp_dict, "some_other_dict"));
+  g_assert_true (g_variant_dict_lookup (
+    tmp_dict, "some_other_dict", "@a{sv}", &tmp_variant));
+  g_clear_pointer (&tmp_dict, g_variant_dict_unref);
+  tmp_dict = g_variant_dict_new (tmp_variant);
+
+  g_assert_true (g_variant_dict_contains (tmp_dict, "another_key"));
+  g_assert_true (
+    g_variant_dict_lookup (tmp_dict, "another_key", "&s", &tmp_str));
+  g_assert_cmpstr (tmp_str, ==, "more_data");
+
+  g_clear_pointer (&tmp_variant, g_variant_unref);
+
+  // Check xmd["some_dict"]["some_other_dict"]["yet_another_key"][3] == "silly"
+  g_assert_true (
+    g_variant_dict_lookup (tmp_dict, "yet_another_key", "@as", &tmp_variant));
+
+  g_variant_get_child (tmp_variant, 3, "&s", &tmp_str);
+  g_assert_cmpstr (tmp_str, ==, "silly");
+
+  g_clear_pointer (&tmp_variant, g_variant_unref);
+  g_clear_pointer (&tmp_dict, g_variant_dict_unref);
+
+  // Check xmd["can_bool"] == TRUE
+  g_assert_true (g_variant_dict_lookup (xmd_dict, "can_bool", "b", &tmp_bool));
+  g_assert_true (tmp_bool);
+
+  g_clear_pointer (&xmd_dict, g_variant_dict_unref);
+
+
+  // Cleanup
+  g_clear_object (&stream);
+  g_clear_pointer (&module_name_prop, g_free);
+  g_clear_pointer (&stream_name_prop, g_free);
+  g_clear_pointer (&context_prop, g_free);
+  g_clear_pointer (&arch_prop, g_free);
+  g_clear_pointer (&error, g_error_free);
+
+  g_clear_pointer (&rpm_apis, g_strfreev);
+  g_clear_pointer (&rpm_filters, g_strfreev);
+  g_clear_pointer (&rpm_artifacts, g_strfreev);
+  g_clear_pointer (&servicelevel_names, g_strfreev);
+
+  g_clear_pointer (&sl_name_prop, g_free);
+  g_clear_pointer (&sl_eol_string, g_free);
+
+  g_clear_pointer (&content_licenses, g_strfreev);
+  g_clear_pointer (&module_licenses, g_strfreev);
+  g_clear_pointer (&stream_dependencies, g_strfreev);
+
+  g_clear_pointer (&community_prop, g_free);
+  g_clear_pointer (&documentation_prop, g_free);
+  g_clear_pointer (&tracker_prop, g_free);
+  g_clear_pointer (&profile_names, g_strfreev);
+
+  g_clear_pointer (&buildopts_rpm_macros_prop, g_free);
+  g_clear_pointer (&buildopts_rpm_whitelist, g_strfreev);
+  g_clear_pointer (&buildopts_arches, g_strfreev);
+
+
+  // Validate a trivial modulemd
+  stream = modulemd_module_stream_read_string (
+    "---\n"
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  summary: Trivial Summary\n"
+    "  description: >-\n"
+    "    Trivial Description\n"
+    "  license:\n"
+    "    module: MIT\n"
+    "...\n",
+    TRUE,
+    NULL,
+    NULL,
+    &error);
+
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  g_clear_object (&stream);
+
+
+  // Sanity check spec.v2.yaml
+  gchar *specV2Path =
+    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  stream =
+    modulemd_module_stream_read_file (specV2Path, TRUE, NULL, NULL, &error);
+
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  g_clear_object (&stream);
+  g_clear_pointer (&specV2Path, g_free);
+}
+
+static void
 module_stream_v1_test_rpm_artifacts (ModuleStreamFixture *fixture,
                                      gconstpointer user_data)
 {
@@ -2637,6 +3071,13 @@ main (int argc, char *argv[])
               NULL,
               NULL,
               module_stream_test_upgrade,
+              NULL);
+
+  g_test_add ("/modulemd/v2/modulestream/v2_yaml",
+              ModuleStreamFixture,
+              NULL,
+              NULL,
+              module_stream_test_v2_yaml,
               NULL);
 
   g_test_add ("/modulemd/v2/modulestream/v1/rpm_artifacts",

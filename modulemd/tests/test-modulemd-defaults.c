@@ -203,19 +203,21 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/defaults/construct",defaults_test_construct);
+  g_test_add_func ("/modulemd/v2/defaults/construct", defaults_test_construct);
 
-  g_test_add_func ("/modulemd/v2/defaults/copy",defaults_test_copy);
+  g_test_add_func ("/modulemd/v2/defaults/copy", defaults_test_copy);
 
-  g_test_add_func ("/modulemd/v2/defaults/mdversion",defaults_test_get_mdversion);
+  g_test_add_func ("/modulemd/v2/defaults/mdversion",
+                   defaults_test_get_mdversion);
 
-  g_test_add_func ("/modulemd/v2/defaults/module_name",defaults_test_get_module_name);
+  g_test_add_func ("/modulemd/v2/defaults/module_name",
+                   defaults_test_get_module_name);
 
-  g_test_add_func ("/modulemd/v2/defaults/validate",defaults_test_validate);
+  g_test_add_func ("/modulemd/v2/defaults/validate", defaults_test_validate);
 
-  g_test_add_func ("/modulemd/v2/defaults/equals",defaults_test_equals);
+  g_test_add_func ("/modulemd/v2/defaults/equals", defaults_test_equals);
 
-  g_test_add_func ("/modulemd/v2/defaults/upgrade",defaults_test_upgrade);
+  g_test_add_func ("/modulemd/v2/defaults/upgrade", defaults_test_upgrade);
 
   return g_test_run ();
 }

@@ -376,25 +376,24 @@ main (int argc, char *argv[])
   // Define the tests.
 
   g_test_add_func ("/modulemd/v2/translation/construct",
-              translation_test_construct);
+                   translation_test_construct);
 
-  g_test_add_func ("/modulemd/v2/translation/copy",
-              translation_test_copy);
+  g_test_add_func ("/modulemd/v2/translation/copy", translation_test_copy);
 
   g_test_add_func ("/modulemd/v2/translation/validate",
-              translation_test_validate);
+                   translation_test_validate);
 
   g_test_add_func ("/modulemd/v2/translation/set_modified",
-              translation_test_set_modified);
+                   translation_test_set_modified);
 
   g_test_add_func ("/modulemd/v2/translation/translations",
-              translation_test_translations);
+                   translation_test_translations);
 
   g_test_add_func ("/modulemd/v2/translation/yaml/parse",
-              translation_test_parse_yaml);
+                   translation_test_parse_yaml);
 
   g_test_add_func ("/modulemd/v2/translation/yaml/emit",
-              translation_test_emit_yaml);
+                   translation_test_emit_yaml);
 
   return g_test_run ();
 }

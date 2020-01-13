@@ -448,17 +448,22 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/component/rpm/construct",component_rpm_test_construct);
+  g_test_add_func ("/modulemd/v2/component/rpm/construct",
+                   component_rpm_test_construct);
 
-  g_test_add_func ("/modulemd/v2/component/rpm/equals",component_rpm_test_equals);
+  g_test_add_func ("/modulemd/v2/component/rpm/equals",
+                   component_rpm_test_equals);
 
-  g_test_add_func ("/modulemd/v2/component/rpm/copy",component_rpm_test_copy);
+  g_test_add_func ("/modulemd/v2/component/rpm/copy", component_rpm_test_copy);
 
-  g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",component_rpm_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",
+                   component_rpm_test_emit_yaml);
 
-  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",component_rpm_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",
+                   component_rpm_test_parse_yaml);
 
-  g_test_add_func ("/modulemd/v2/component/rpm/override_name",component_rpm_test_override_name);
+  g_test_add_func ("/modulemd/v2/component/rpm/override_name",
+                   component_rpm_test_override_name);
 
   return g_test_run ();
 }

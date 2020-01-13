@@ -577,28 +577,28 @@ main (int argc, char *argv[])
   // Define the tests.
 
   g_test_add_func ("/modulemd/v2/translationentry/construct",
-              translation_entry_test_construct);
+                   translation_entry_test_construct);
 
   g_test_add_func ("/modulemd/v2/translationentry/copy",
-              translation_entry_test_copy);
+                   translation_entry_test_copy);
 
   g_test_add_func ("/modulemd/v2/translationentry/get_locale",
-              translation_entry_test_get_locale);
+                   translation_entry_test_get_locale);
 
   g_test_add_func ("/modulemd/v2/translationentry/get_set_summary",
-              translation_entry_test_get_set_summary);
+                   translation_entry_test_get_set_summary);
 
   g_test_add_func ("/modulemd/v2/translationentry/get_set_description",
-              translation_entry_test_get_set_description);
+                   translation_entry_test_get_set_description);
 
   g_test_add_func ("/modulemd/v2/translationentry/profile_descriptions",
-              translation_entry_test_profile_descriptions);
+                   translation_entry_test_profile_descriptions);
 
   g_test_add_func ("/modulemd/v2/translationentry/yaml/parse",
-              translation_entry_test_parse_yaml);
+                   translation_entry_test_parse_yaml);
 
   g_test_add_func ("/modulemd/v2/translationentry/yaml/emit",
-              translation_entry_test_emit_yaml);
+                   translation_entry_test_emit_yaml);
 
   return g_test_run ();
 }

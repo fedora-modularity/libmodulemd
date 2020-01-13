@@ -489,29 +489,22 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/profile/construct",
-              profile_test_construct);
+  g_test_add_func ("/modulemd/v2/profile/construct", profile_test_construct);
 
-  g_test_add_func ("/modulemd/v2/profile/equals",
-              profile_test_equals);
+  g_test_add_func ("/modulemd/v2/profile/equals", profile_test_equals);
 
-  g_test_add_func ("/modulemd/v2/profile/copy",
-              profile_test_copy);
+  g_test_add_func ("/modulemd/v2/profile/copy", profile_test_copy);
 
-  g_test_add_func ("/modulemd/v2/profile/get_name",
-              profile_test_get_name);
+  g_test_add_func ("/modulemd/v2/profile/get_name", profile_test_get_name);
 
   g_test_add_func ("/modulemd/v2/profile/get_set_description",
-              profile_test_get_set_description);
+                   profile_test_get_set_description);
 
-  g_test_add_func ("/modulemd/v2/profile/rpms",
-              profile_test_rpms);
+  g_test_add_func ("/modulemd/v2/profile/rpms", profile_test_rpms);
 
-  g_test_add_func ("/modulemd/v2/profile/yaml/parse",
-              profile_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/profile/yaml/parse", profile_test_parse_yaml);
 
-  g_test_add_func ("/modulemd/v2/profile/yaml/emit",
-              profile_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/profile/yaml/emit", profile_test_emit_yaml);
 
   return g_test_run ();
 }

@@ -2434,104 +2434,101 @@ main (int argc, char *argv[])
   // Define the tests.o
 
   g_test_add_func ("/modulemd/v2/modulestream/construct",
-              module_stream_test_construct);
+                   module_stream_test_construct);
 
-  g_test_add_func ("/modulemd/v2/modulestream/arch",
-              module_stream_test_arch);
+  g_test_add_func ("/modulemd/v2/modulestream/arch", module_stream_test_arch);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/documentation",
-              module_stream_v1_test_documentation);
+                   module_stream_v1_test_documentation);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/documentation",
-              module_stream_v2_test_documentation);
+                   module_stream_v2_test_documentation);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/licenses",
-              module_stream_v1_test_licenses);
+                   module_stream_v1_test_licenses);
 
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/licenses",
-              module_stream_v2_test_licenses);
+                   module_stream_v2_test_licenses);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/tracker",
-              module_stream_v1_test_tracker);
+                   module_stream_v1_test_tracker);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/tracker",
-              module_stream_v2_test_tracker);
+                   module_stream_v2_test_tracker);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/profiles",
-              module_stream_v1_test_profiles);
+                   module_stream_v1_test_profiles);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/profiles",
-              module_stream_v2_test_profiles);
+                   module_stream_v2_test_profiles);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_api",
-              module_stream_v1_test_rpm_api);
+                   module_stream_v1_test_rpm_api);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_api",
-              module_stream_v2_test_rpm_api);
+                   module_stream_v2_test_rpm_api);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_filters",
-              module_stream_v1_test_rpm_filters);
+                   module_stream_v1_test_rpm_filters);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_filters",
-              module_stream_v2_test_rpm_filters);
+                   module_stream_v2_test_rpm_filters);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_artifacts",
-              module_stream_v1_test_rpm_artifacts);
+                   module_stream_v1_test_rpm_artifacts);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_artifacts",
-              module_stream_v2_test_rpm_artifacts);
+                   module_stream_v2_test_rpm_artifacts);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/components",
-              module_stream_v1_test_components);
+                   module_stream_v1_test_components);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/components",
-              module_stream_v2_test_components);
+                   module_stream_v2_test_components);
 
-  g_test_add_func ("/modulemd/v2/modulestream/copy",
-              module_stream_test_copy);
+  g_test_add_func ("/modulemd/v2/modulestream/copy", module_stream_test_copy);
 
   g_test_add_func ("/modulemd/v2/modulestream/equals",
-              module_stream_test_equals);
+                   module_stream_test_equals);
 
-  g_test_add_func ("/modulemd/v2/modulestream/nsvc",
-              module_stream_test_nsvc);
+  g_test_add_func ("/modulemd/v2/modulestream/nsvc", module_stream_test_nsvc);
 
 
   g_test_add_func ("/modulemd/v2/modulestream/nsvca",
-              module_stream_test_nsvca);
+                   module_stream_test_nsvca);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/equals",
-              module_stream_v1_test_equals);
+                   module_stream_v1_test_equals);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/equals",
-		module_stream_v2_test_equals);
+                   module_stream_v2_test_equals);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/dependencies",
-              module_stream_v1_test_dependencies);
+                   module_stream_v1_test_dependencies);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/dependencies",
-              module_stream_v2_test_dependencies);
+                   module_stream_v2_test_dependencies);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/parse_dump",
-              module_stream_v1_test_parse_dump);
+                   module_stream_v1_test_parse_dump);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/parse_dump",
-              module_stream_v2_test_parse_dump);
+                   module_stream_v2_test_parse_dump);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/depends_on_stream",
-              module_stream_v1_test_depends_on_stream);
+                   module_stream_v1_test_depends_on_stream);
   g_test_add_func ("/modulemd/v2/modulestream/v2/depends_on_stream",
-              module_stream_v2_test_depends_on_stream);
+                   module_stream_v2_test_depends_on_stream);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildafter",
-              module_stream_v2_test_validate_buildafter);
+                   module_stream_v2_test_validate_buildafter);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/validate/buildarches",
-              module_stream_v2_test_validate_buildarches) ;
+                   module_stream_v2_test_validate_buildarches);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_map",
-              module_stream_v2_test_rpm_map);
+                   module_stream_v2_test_rpm_map);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/community",
                    module_stream_v1_test_community);

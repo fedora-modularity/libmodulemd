@@ -742,21 +742,27 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/defaults/v1/equals",defaults_test_equals);
+  g_test_add_func ("/modulemd/v2/defaults/v1/equals", defaults_test_equals);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/construct",defaults_test_construct);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct",
+                   defaults_test_construct);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/copy",defaults_test_copy);
+  g_test_add_func ("/modulemd/v2/defaults/v1/copy", defaults_test_copy);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/default_stream",defaults_test_get_set_default_stream);
+  g_test_add_func ("/modulemd/v2/defaults/v1/default_stream",
+                   defaults_test_get_set_default_stream);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/validate",defaults_test_validate);
+  g_test_add_func ("/modulemd/v2/defaults/v1/validate",
+                   defaults_test_validate);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/profile_defaults",defaults_test_profiles);
+  g_test_add_func ("/modulemd/v2/defaults/v1/profile_defaults",
+                   defaults_test_profiles);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/parse",defaults_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/parse",
+                   defaults_test_parse_yaml);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/emit",defaults_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/emit",
+                   defaults_test_emit_yaml);
 
   return g_test_run ();
 }

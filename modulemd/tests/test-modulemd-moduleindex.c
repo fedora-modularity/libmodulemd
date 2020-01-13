@@ -1351,32 +1351,30 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/module/index/dump",
-              module_index_test_dump);
+  g_test_add_func ("/modulemd/v2/module/index/dump", module_index_test_dump);
 
-  g_test_add_func ("/modulemd/v2/module/index/read",
-              module_index_test_read);
+  g_test_add_func ("/modulemd/v2/module/index/read", module_index_test_read);
 
   g_test_add_func ("/modulemd/v2/module/index/read/mixed",
-	      module_index_test_read_mixed);
+                   module_index_test_read_mixed);
 
   g_test_add_func ("/modulemd/v2/module/index/read/unknown",
-              module_index_test_read_unknown);
+                   module_index_test_read_unknown);
 
   g_test_add_func ("/modulemd/v2/module/index/upgrade/stream",
-              module_index_test_stream_upgrade);
+                   module_index_test_stream_upgrade);
 
   g_test_add_func ("/modulemd/v2/module/index/upgrade/index",
-              module_index_test_index_upgrade);
+                   module_index_test_index_upgrade);
 
   g_test_add_func ("/modulemd/v2/module/index/remove_module",
-              module_index_test_remove_module);
+                   module_index_test_remove_module);
 
   g_test_add_func ("/modulemd/v2/module/index/custom_read",
-              module_index_test_custom_read);
+                   module_index_test_custom_read);
 
   g_test_add_func ("/modulemd/v2/module/index/custom_write",
-              module_index_test_custom_write);
+                   module_index_test_custom_write);
 
   g_test_add_func ("/modulemd/v2/module/index/get_default_streams",
                    module_index_test_get_default_streams);

@@ -246,9 +246,11 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/module/index/merger/constructors",merger_test_constructors);
+  g_test_add_func ("/modulemd/v2/module/index/merger/constructors",
+                   merger_test_constructors);
 
-  g_test_add_func ("/modulemd/v2/module/index/merger/deduplicate",merger_test_deduplicate);
+  g_test_add_func ("/modulemd/v2/module/index/merger/deduplicate",
+                   merger_test_deduplicate);
 
   g_test_add_func ("/modulemd/module/index/merger/add_only",
                    merger_test_add_only);

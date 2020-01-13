@@ -500,13 +500,14 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/module/construct",module_test_construct);
+  g_test_add_func ("/modulemd/v2/module/construct", module_test_construct);
 
-  g_test_add_func ("/modulemd/v2/module/defaults",module_test_defaults);
+  g_test_add_func ("/modulemd/v2/module/defaults", module_test_defaults);
 
-  g_test_add_func ("/modulemd/v2/module/stream_names",module_test_get_stream_names);
+  g_test_add_func ("/modulemd/v2/module/stream_names",
+                   module_test_get_stream_names);
 
-  g_test_add_func ("/modulemd/v2/module/streams",module_test_streams);
+  g_test_add_func ("/modulemd/v2/module/streams", module_test_streams);
 
   g_test_add_func ("/modulemd/v2/module/streams/remove",
                    modulemd_test_remove_streams);

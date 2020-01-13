@@ -556,21 +556,26 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/buildopts/construct",buildopts_test_construct);
+  g_test_add_func ("/modulemd/v2/buildopts/construct",
+                   buildopts_test_construct);
 
-  g_test_add_func ("/modulemd/v2/buildopts/equals",buildopts_test_equals);
+  g_test_add_func ("/modulemd/v2/buildopts/equals", buildopts_test_equals);
 
-  g_test_add_func ("/modulemd/v2/buildopts/copy",buildopts_test_copy);
+  g_test_add_func ("/modulemd/v2/buildopts/copy", buildopts_test_copy);
 
-  g_test_add_func ("/modulemd/v2/buildopts/get_set_rpm_macros",buildopts_test_get_set_rpm_macros);
+  g_test_add_func ("/modulemd/v2/buildopts/get_set_rpm_macros",
+                   buildopts_test_get_set_rpm_macros);
 
-  g_test_add_func ("/modulemd/v2/buildopts/whitelist",buildopts_test_whitelist);
+  g_test_add_func ("/modulemd/v2/buildopts/whitelist",
+                   buildopts_test_whitelist);
 
-  g_test_add_func ("/modulemd/v2/buildopts/arches",buildopts_test_arches);
+  g_test_add_func ("/modulemd/v2/buildopts/arches", buildopts_test_arches);
 
-  g_test_add_func ("/modulemd/v2/buildopts/yaml/parse",buildopts_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/parse",
+                   buildopts_test_parse_yaml);
 
-  g_test_add_func ("/modulemd/v2/buildopts/yaml/emit",buildopts_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/emit",
+                   buildopts_test_emit_yaml);
 
   return g_test_run ();
 }

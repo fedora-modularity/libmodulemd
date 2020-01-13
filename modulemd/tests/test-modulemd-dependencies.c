@@ -592,19 +592,25 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/dependencies/construct",dependencies_test_construct);
+  g_test_add_func ("/modulemd/v2/dependencies/construct",
+                   dependencies_test_construct);
 
-  g_test_add_func ("/modulemd/v2/dependencies/dependencies",dependencies_test_dependencies);
+  g_test_add_func ("/modulemd/v2/dependencies/dependencies",
+                   dependencies_test_dependencies);
 
-  g_test_add_func ("/modulemd/v2/dependencies/equals",dependencies_test_equals);
+  g_test_add_func ("/modulemd/v2/dependencies/equals",
+                   dependencies_test_equals);
 
-  g_test_add_func ("/modulemd/v2/dependencies/copy",dependencies_test_copy);
+  g_test_add_func ("/modulemd/v2/dependencies/copy", dependencies_test_copy);
 
-  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse",dependencies_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse",
+                   dependencies_test_parse_yaml);
 
-  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse/bad",dependencies_test_parse_bad_yaml);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse/bad",
+                   dependencies_test_parse_bad_yaml);
 
-  g_test_add_func ("/modulemd/v2/dependencies/yaml/emit",dependencies_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/emit",
+                   dependencies_test_emit_yaml);
 
   /*
   g_test_add_func ("/modulemd/v2/profile/copy",profile_test_copy);

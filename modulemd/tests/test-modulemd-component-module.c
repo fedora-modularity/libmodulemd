@@ -388,15 +388,20 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/component/module/construct",component_module_test_construct);
+  g_test_add_func ("/modulemd/v2/component/module/construct",
+                   component_module_test_construct);
 
-  g_test_add_func ("/modulemd/v2/component/module/equals",component_module_test_equals);
+  g_test_add_func ("/modulemd/v2/component/module/equals",
+                   component_module_test_equals);
 
-  g_test_add_func ("/modulemd/v2/component/module/copy",component_module_test_copy);
+  g_test_add_func ("/modulemd/v2/component/module/copy",
+                   component_module_test_copy);
 
-  g_test_add_func ("/modulemd/v2/component/module/yaml/emit",component_module_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/component/module/yaml/emit",
+                   component_module_test_emit_yaml);
 
-  g_test_add_func ("/modulemd/v2/component/module/yaml/parse",component_module_test_parse_yaml);
+  g_test_add_func ("/modulemd/v2/component/module/yaml/parse",
+                   component_module_test_parse_yaml);
 
   return g_test_run ();
 }

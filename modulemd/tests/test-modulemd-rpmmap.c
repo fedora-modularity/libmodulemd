@@ -271,26 +271,24 @@ main (int argc, char *argv[])
   g_test_init (&argc, &argv, NULL);
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
-  g_test_add_func ("/modulemd/v2/rpm_map/basic",
-              test_basic);
+  g_test_add_func ("/modulemd/v2/rpm_map/basic", test_basic);
 
-  g_test_add_func ("/modulemd/v2/rpm_map/compare",
-              test_compare);
+  g_test_add_func ("/modulemd/v2/rpm_map/compare", test_compare);
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/valid",
-              test_parse_yaml_valid);
+                   test_parse_yaml_valid);
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/missing",
-              test_parse_yaml_missing);
+                   test_parse_yaml_missing);
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/mismatch",
-              test_parse_yaml_mismatch);
+                   test_parse_yaml_mismatch);
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/valid",
-              test_emit_yaml_valid);
+                   test_emit_yaml_valid);
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/invalid",
-              test_emit_yaml_invalid);
+                   test_emit_yaml_invalid);
 
   return g_test_run ();
 }

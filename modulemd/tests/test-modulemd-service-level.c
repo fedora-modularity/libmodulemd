@@ -448,25 +448,24 @@ main (int argc, char *argv[])
   // Define the tests.
 
   g_test_add_func ("/modulemd/v2/servicelevel/construct",
-              service_level_test_construct);
+                   service_level_test_construct);
 
   g_test_add_func ("/modulemd/v2/servicelevel/get_set_name",
-              service_level_test_get_name);
+                   service_level_test_get_name);
 
   g_test_add_func ("/modulemd/v2/servicelevel/equals",
-              service_level_test_equals);
+                   service_level_test_equals);
 
-  g_test_add_func ("/modulemd/v2/servicelevel/copy",
-              service_level_test_copy);
+  g_test_add_func ("/modulemd/v2/servicelevel/copy", service_level_test_copy);
 
   g_test_add_func ("/modulemd/v2/servicelevel/get_set_eol",
-              service_level_test_get_set_eol);
+                   service_level_test_get_set_eol);
 
   g_test_add_func ("/modulemd/v2/servicelevel/yaml/parse",
-              service_level_test_parse_yaml);
+                   service_level_test_parse_yaml);
 
   g_test_add_func ("/modulemd/v2/servicelevel/yaml/emit",
-              service_level_test_emit_yaml);
+                   service_level_test_emit_yaml);
 
   return g_test_run ();
 }

@@ -977,6 +977,45 @@ modulemd_module_index_search_streams (ModulemdModuleIndex *self,
 }
 
 
+GPtrArray *
+modulemd_module_index_search_streams_by_nsvca_glob (ModulemdModuleIndex *self,
+                                                    const gchar *nsvca_pattern)
+{
+  g_autoptr (GPtrArray) module_names = NULL;
+  g_autoptr (GPtrArray) module_streams = NULL;
+  const gchar *mname = NULL;
+  ModulemdModule *module = NULL;
+
+  module_names =
+    modulemd_ordered_str_keys (self->modules, modulemd_strcmp_sort);
+
+  module_streams = g_ptr_array_new ();
+  for (guint i = 0; i < module_names->len; i++)
+    {
+      mname = g_ptr_array_index (module_names, i);
+      g_debug ("Searching through %s", mname);
+
+      module = modulemd_module_index_get_module (self, mname);
+      if (!module)
+        {
+          /* Since we're iterating through keys we just retrieved, this should
+           * be impossible. If we get here, it must be a bug.
+           */
+          g_assert_not_reached ();
+          continue;
+        }
+
+      g_ptr_array_extend_and_steal (
+        module_streams,
+        modulemd_module_search_streams_by_nsvca_glob (module, nsvca_pattern));
+    }
+
+  g_debug ("Module stream count: %d", module_streams->len);
+
+  return g_steal_pointer (&module_streams);
+}
+
+
 gboolean
 modulemd_module_index_remove_module (ModulemdModuleIndex *self,
                                      const gchar *module_name)

@@ -1461,6 +1461,52 @@ test_modulemd_index_search_streams (void)
 }
 
 
+static void
+test_module_index_search_streams_by_nsvca_glob (void)
+{
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GPtrArray) streams = NULL;
+  g_autofree gchar *yaml_path = NULL;
+
+  yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+
+  modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+
+  streams = modulemd_module_index_search_streams_by_nsvca_glob (index, "*");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 5);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_index_search_streams_by_nsvca_glob (index, "nodejs*");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 3);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_index_search_streams_by_nsvca_glob (index, "nodejs:?*");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 3);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams = modulemd_module_index_search_streams_by_nsvca_glob (index, "*8*");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 4);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_index_search_streams_by_nsvca_glob (index, "nodejs:[68]*");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 2);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1510,6 +1556,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/search",
                    test_modulemd_index_search_streams);
+
+  g_test_add_func ("/modulemd/v2/module/index/search_nsvca",
+                   test_module_index_search_streams_by_nsvca_glob);
 
   return g_test_run ();
 }

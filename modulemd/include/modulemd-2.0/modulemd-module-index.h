@@ -401,6 +401,27 @@ modulemd_module_index_search_streams (ModulemdModuleIndex *self,
 
 
 /**
+ * modulemd_module_index_search_streams_by_nsvca_glob:
+ * @self: This #ModulemdModuleIndex object.
+ * @nsvca_pattern: (not nullable): A [glob](https://www.mankier.com/3/glob)
+ * pattern to match against the NSVCA strings of the #ModulemdModuleStream
+ * objects in this module.
+ *
+ * Returns: (transfer container) (element-type ModulemdModuleStream): The list
+ * of stream objects matching all of the requested parameters. This function
+ * cannot fail, but it may return a zero-length list if no matches were found.
+ * The returned streams will be in a predictable order, sorted first by module
+ * name, then stream name, then by version (highest first), then by context
+ * and finally by architecture.
+ *
+ * Since: 2.9
+ */
+GPtrArray *
+modulemd_module_index_search_streams_by_nsvca_glob (
+  ModulemdModuleIndex *self, const gchar *nsvca_pattern);
+
+
+/**
  * modulemd_module_index_remove_module:
  * @self: This #ModulemdModuleIndex object.
  * @module_name: The name of the module to remove from the index.

@@ -14,6 +14,7 @@
 #pragma once
 
 #include "modulemd-module.h"
+#include "modulemd-module-stream.h"
 #include "modulemd-subdocument-info.h"
 #include "modulemd-translation.h"
 #include <glib-object.h>
@@ -362,6 +363,41 @@ modulemd_module_index_get_module_names_as_strv (ModulemdModuleIndex *self);
 ModulemdModule *
 modulemd_module_index_get_module (ModulemdModuleIndex *self,
                                   const gchar *module_name);
+
+
+/**
+ * modulemd_module_index_search_streams:
+ * @self: This #ModulemdModuleIndex object.
+ * @module_name: (nullable): The name of the module to retrieve. If NULL, will
+ * search all modules in the index.
+ * @stream_name: (nullable): The name of the stream to retrieve. If NULL, will
+ * search all streams in a module.
+ * @version: (nullable): The version of the stream to retrieve. If NULL, will
+ * search all versions.
+ * @context: (nullable): The context of the stream to retrieve. If NULL, will
+ * search all contexts.
+ * @arch: (nullable): The processor architecture of the stream to retrieve. If
+ * NULL, the architecture is not included in the search.
+ *
+ * All arguments to this method will be compared using
+ * [fnmatch(3)](https://www.mankier.com/3/fnmatch).
+ *
+ * Returns: (transfer container) (element-type ModulemdModuleStream): The list
+ * of stream objects matching all of the requested parameters. This function
+ * cannot fail, but it may return a zero-length list if no matches were found.
+ * The returned streams will be in a predictable order, sorted first by module
+ * name, then stream name, then by version (highest first), then by context
+ * and finally by architecture.
+ *
+ * Since: 2.9
+ */
+GPtrArray *
+modulemd_module_index_search_streams (ModulemdModuleIndex *self,
+                                      const gchar *module_name,
+                                      const gchar *stream_name,
+                                      const gchar *version,
+                                      const gchar *context,
+                                      const gchar *arch);
 
 
 /**

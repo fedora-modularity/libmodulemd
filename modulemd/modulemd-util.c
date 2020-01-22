@@ -487,10 +487,14 @@ gboolean
 modulemd_fnmatch (const gchar *pattern, const gchar *string)
 {
   if (!pattern)
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (!string)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return !fnmatch (pattern, string, 0);
 }

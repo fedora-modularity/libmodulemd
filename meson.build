@@ -96,6 +96,12 @@ has_gdate_autoptr = cc.compiles(
     dependencies : [ glib ],
     name : 'g_autoptr(GDate)')
 
+# Check whether glib2 has g_ptr_array_extend_and_steal or if we
+# need to bundle it.
+has_extend_and_steal = cc.has_function(
+    'g_ptr_array_extend_and_steal',
+    dependencies : [ glib ])
+
 python_name = get_option('python_name')
 
 if python_name != ''

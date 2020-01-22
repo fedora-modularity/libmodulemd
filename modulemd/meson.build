@@ -230,6 +230,7 @@ cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
 cdata.set('HAVE_RPMIO', rpm.found())
 cdata.set('HAVE_LIBMAGIC', magic.found())
 cdata.set('HAVE_GDATE_AUTOPTR', has_gdate_autoptr)
+cdata.set('HAVE_EXTEND_AND_STEAL', has_extend_and_steal)
 configure_file(
   output : 'config.h',
   configuration : cdata

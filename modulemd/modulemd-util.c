@@ -13,6 +13,7 @@
 
 #include <string.h>
 
+#include "private/glib-extensions.h"
 #include "private/modulemd-util.h"
 
 
@@ -418,3 +419,121 @@ modulemd_boolean_equals (gboolean a, gboolean b)
 
   return FALSE;
 }
+
+
+#ifndef HAVE_EXTEND_AND_STEAL
+
+#ifndef MIN_ARRAY_SIZE
+#define MIN_ARRAY_SIZE 16
+#endif
+
+typedef volatile gint gatomicrefcount;
+
+/*
+ * GPtrArray:
+ * @pdata: points to the array of pointers, which may be moved when the
+ *     array grows
+ * @len: number of pointers in the array
+ *
+ * Contains the public fields of a pointer array.
+ */
+struct _GRealPtrArray
+{
+  gpointer *pdata;
+  guint len;
+  guint alloc;
+  gatomicrefcount ref_count;
+  GDestroyNotify element_free_func;
+};
+
+typedef struct _GRealPtrArray GRealPtrArray;
+
+
+/* Returns the smallest power of 2 greater than n, or n if
+ * such power does not fit in a guint
+ */
+static guint
+g_nearest_pow (guint num)
+{
+  guint n = num - 1;
+
+  g_assert (num > 0);
+
+  n |= n >> 1;
+  n |= n >> 2;
+  n |= n >> 4;
+  n |= n >> 8;
+  n |= n >> 16;
+#if SIZEOF_INT == 8
+  n |= n >> 32;
+#endif
+
+  return n + 1;
+}
+
+static void
+g_ptr_array_maybe_expand (GRealPtrArray *array, guint len)
+{
+  /* Detect potential overflow */
+  if
+    G_UNLIKELY ((G_MAXUINT - array->len) < len)
+  g_error ("adding %u to array would overflow", len);
+
+  if ((array->len + len) > array->alloc)
+    {
+      guint old_alloc = array->alloc;
+      array->alloc = g_nearest_pow (array->len + len);
+      array->alloc = MAX (array->alloc, MIN_ARRAY_SIZE);
+      array->pdata =
+        g_realloc (array->pdata, sizeof (gpointer) * array->alloc);
+      if (G_UNLIKELY (g_mem_gc_friendly))
+        for (; old_alloc < array->alloc; old_alloc++)
+          array->pdata[old_alloc] = NULL;
+    }
+}
+
+void
+g_ptr_array_extend (GPtrArray *array_to_extend,
+                    GPtrArray *array,
+                    GCopyFunc func,
+                    gpointer user_data)
+{
+  GRealPtrArray *rarray_to_extend = (GRealPtrArray *)array_to_extend;
+  gsize i;
+
+  g_return_if_fail (array_to_extend != NULL);
+  g_return_if_fail (array != NULL);
+
+  g_ptr_array_maybe_expand (rarray_to_extend, array->len);
+
+  if (func != NULL)
+    {
+      for (i = 0; i < array->len; i++)
+        rarray_to_extend->pdata[i + rarray_to_extend->len] =
+          func (array->pdata[i], user_data);
+    }
+  else if (array->len > 0)
+    {
+      memcpy (rarray_to_extend->pdata + rarray_to_extend->len,
+              array->pdata,
+              array->len * sizeof (*array->pdata));
+    }
+
+  rarray_to_extend->len += array->len;
+}
+
+void
+g_ptr_array_extend_and_steal (GPtrArray *array_to_extend, GPtrArray *array)
+{
+  gpointer *pdata;
+
+  g_ptr_array_extend (array_to_extend, array, NULL, NULL);
+
+  /* Get rid of @array without triggering the GDestroyNotify attached
+   * to the elements moved from @array to @array_to_extend. */
+  pdata = g_steal_pointer (&array->pdata);
+  array->len = 0;
+  g_ptr_array_unref (array);
+  g_free (pdata);
+}
+#endif

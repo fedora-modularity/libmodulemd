@@ -509,6 +509,7 @@ else
         includes : [
             'GObject-2.0',
         ],
+        extra_args : [ '--accept-unprefixed' ],
         install : true,
     )
 endif

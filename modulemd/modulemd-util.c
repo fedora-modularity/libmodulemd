@@ -11,8 +11,10 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include <fnmatch.h>
 #include <string.h>
 
+#include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-util.h"
 
@@ -418,6 +420,79 @@ modulemd_boolean_equals (gboolean a, gboolean b)
     }
 
   return FALSE;
+}
+
+gboolean
+modulemd_is_glob_pattern (const char *pattern)
+{
+  g_return_val_if_fail (pattern, FALSE);
+
+  return strpbrk (pattern, "*[?") != NULL;
+}
+
+gint
+compare_streams (gconstpointer a, gconstpointer b)
+{
+  int cmp = 0;
+  guint64 a_ver;
+  guint64 b_ver;
+  ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
+  ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
+
+  /* Sort alphabetically by module name */
+  cmp = g_strcmp0 (modulemd_module_stream_get_module_name (a_),
+                   modulemd_module_stream_get_module_name (b_));
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  /* Sort alphabetically by stream name */
+  cmp = g_strcmp0 (modulemd_module_stream_get_stream_name (a_),
+                   modulemd_module_stream_get_stream_name (b_));
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  /* Sort by the version, highest first */
+  a_ver = modulemd_module_stream_get_version (a_);
+  b_ver = modulemd_module_stream_get_version (b_);
+  if (b_ver > a_ver)
+    {
+      return 1;
+    }
+  if (a_ver > b_ver)
+    {
+      return -1;
+    }
+
+  /* Sort alphabetically by context */
+  cmp = g_strcmp0 (modulemd_module_stream_get_context (a_),
+                   modulemd_module_stream_get_context (b_));
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  /* Sort alphabetically by architecture */
+  cmp = g_strcmp0 (modulemd_module_stream_get_arch (a_),
+                   modulemd_module_stream_get_arch (b_));
+
+  return cmp;
+}
+
+
+gboolean
+modulemd_fnmatch (const gchar *pattern, const gchar *string)
+{
+  if (!pattern)
+    return TRUE;
+
+  if (!string)
+    return FALSE;
+
+  return !fnmatch (pattern, string, 0);
 }
 
 

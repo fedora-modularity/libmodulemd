@@ -12,6 +12,7 @@
  */
 
 #include <glib.h>
+#include <inttypes.h>
 #include <yaml.h>
 
 #include "modulemd-errors.h"
@@ -425,51 +426,6 @@ modulemd_module_get_all_streams (ModulemdModule *self)
 }
 
 
-static gint
-compare_streams (gconstpointer a, gconstpointer b)
-{
-  int cmp = 0;
-  guint64 a_ver;
-  guint64 b_ver;
-  ModulemdModuleStream *a_ = *(ModulemdModuleStream **)a;
-  ModulemdModuleStream *b_ = *(ModulemdModuleStream **)b;
-
-  /* Sort alphabetically by stream name */
-  cmp = g_strcmp0 (modulemd_module_stream_get_stream_name (a_),
-                   modulemd_module_stream_get_stream_name (b_));
-  if (cmp != 0)
-    {
-      return cmp;
-    }
-
-  /* Sort by the version, highest first */
-  a_ver = modulemd_module_stream_get_version (a_);
-  b_ver = modulemd_module_stream_get_version (b_);
-  if (b_ver > a_ver)
-    {
-      return 1;
-    }
-  if (a_ver > b_ver)
-    {
-      return -1;
-    }
-
-  /* Sort alphabetically by context */
-  cmp = g_strcmp0 (modulemd_module_stream_get_context (a_),
-                   modulemd_module_stream_get_context (b_));
-  if (cmp != 0)
-    {
-      return cmp;
-    }
-
-  /* Sort alphabetically by architecture */
-  cmp = g_strcmp0 (modulemd_module_stream_get_arch (a_),
-                   modulemd_module_stream_get_arch (b_));
-
-  return cmp;
-}
-
-
 GPtrArray *
 modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
                                                     const gchar *stream_name)
@@ -492,15 +448,16 @@ modulemd_module_get_stream_by_NSVC (ModulemdModule *self,
 
 
 GPtrArray *
-modulemd_module_search_streams (ModulemdModule *self,
-                                const gchar *stream_name,
-                                const guint64 version,
-                                const gchar *context,
-                                const gchar *arch)
+modulemd_module_search_streams_by_glob (ModulemdModule *self,
+                                        const gchar *stream_name,
+                                        const gchar *version,
+                                        const gchar *context,
+                                        const gchar *arch)
 {
   gsize i = 0;
   g_autoptr (GPtrArray) matching_streams = NULL;
   ModulemdModuleStream *under_consideration = NULL;
+  g_autofree gchar *version_str = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
 
@@ -511,13 +468,14 @@ modulemd_module_search_streams (ModulemdModule *self,
 
   for (i = 0; i < self->streams->len; i++)
     {
+      g_clear_pointer (&version_str, g_free);
       under_consideration =
         (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
 
       /* Skip this one unless the stream name matches */
-      if (g_strcmp0 (
-            modulemd_module_stream_get_stream_name (under_consideration),
-            stream_name) != 0)
+      if (!modulemd_fnmatch (
+            stream_name,
+            modulemd_module_stream_get_stream_name (under_consideration)))
         {
           continue;
         }
@@ -526,22 +484,26 @@ modulemd_module_search_streams (ModulemdModule *self,
        * which indicates that it shouldn't prevent the other cases from
        * matching.
        */
-      if (version &&
-          modulemd_module_stream_get_version (under_consideration) != version)
+      if (version)
+        {
+          version_str = g_strdup_printf (
+            "%" PRIu64,
+            modulemd_module_stream_get_version (under_consideration));
+
+          if (!modulemd_fnmatch (version, version_str))
+            {
+              continue;
+            }
+        }
+
+      if (!modulemd_fnmatch (
+            context, modulemd_module_stream_get_context (under_consideration)))
         {
           continue;
         }
 
-      if (context &&
-          g_strcmp0 (modulemd_module_stream_get_context (under_consideration),
-                     context) != 0)
-        {
-          continue;
-        }
-
-      if (arch &&
-          g_strcmp0 (modulemd_module_stream_get_arch (under_consideration),
-                     arch) != 0)
+      if (!modulemd_fnmatch (
+            arch, modulemd_module_stream_get_arch (under_consideration)))
         {
           continue;
         }
@@ -552,6 +514,27 @@ modulemd_module_search_streams (ModulemdModule *self,
   g_ptr_array_sort (matching_streams, compare_streams);
 
   return g_steal_pointer (&matching_streams);
+}
+
+
+GPtrArray *
+modulemd_module_search_streams (ModulemdModule *self,
+                                const gchar *stream_name,
+                                const guint64 version,
+                                const gchar *context,
+                                const gchar *arch)
+{
+  g_autofree gchar *version_str = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  if (version)
+    {
+      version_str = g_strdup_printf ("%" PRIu64, version);
+    }
+
+  return modulemd_module_search_streams_by_glob (
+    self, stream_name, version_str, context, arch);
 }
 
 

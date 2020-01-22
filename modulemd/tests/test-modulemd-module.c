@@ -490,6 +490,82 @@ modulemd_test_remove_streams (void)
 }
 
 
+static void
+module_test_search_streams_by_glob (void)
+{
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GPtrArray) streams = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  ModulemdModule *module = NULL;
+
+  yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+
+  modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+
+  module = modulemd_module_index_get_module (index, "nodejs");
+  g_assert_nonnull (module);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, NULL, NULL, NULL, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 3);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, "8", NULL, NULL, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 1);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, "7", NULL, NULL, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 0);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, NULL, "1", NULL, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 3);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, NULL, "42", NULL, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 0);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams = modulemd_module_search_streams_by_glob (
+    module, NULL, NULL, "c2c572ec", NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 3);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams = modulemd_module_search_streams_by_glob (
+    module, NULL, NULL, "deadbeef", NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 0);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams = modulemd_module_search_streams_by_glob (
+    module, NULL, NULL, NULL, "x86_64");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 2);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  streams =
+    modulemd_module_search_streams_by_glob (module, NULL, NULL, NULL, "i686");
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 0);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -511,6 +587,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/streams/remove",
                    modulemd_test_remove_streams);
+
+  g_test_add_func ("/modulemd/v2/module/streams/glob",
+                   module_test_search_streams_by_glob);
 
   return g_test_run ();
 }

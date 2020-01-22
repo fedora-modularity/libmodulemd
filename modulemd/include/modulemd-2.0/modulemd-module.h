@@ -162,6 +162,37 @@ modulemd_module_search_streams (ModulemdModule *self,
                                 const gchar *context,
                                 const gchar *arch);
 
+/**
+ * modulemd_module_search_streams_by_glob:
+ * @self: This #ModulemdModule object.
+ * @stream_name: (nullable): The name of the stream to retrieve. If NULL, will
+ * search all streams.
+ * @version: (nullable): The version of the stream to retrieve. If NULL, will
+ * search all versions.
+ * @context: (nullable): The context of the stream to retrieve. If NULL, will
+ * search all contexts.
+ * @arch: (nullable): The processor architecture of the stream to retrieve. If
+ * NULL, the architecture is not included in the search.
+ *
+ * All arguments to this method will be compared using
+ * [fnmatch(3)](https://www.mankier.com/3/fnmatch).
+ *
+ * Returns: (transfer container) (element-type ModulemdModuleStream): The list
+ * of stream objects matching all of the requested parameters. This function
+ * cannot fail, but it may return a zero-length list if no matches were found.
+ * The returned streams will be in a predictable order, sorted first by module
+ * name, then stream name, then by version (highest first), then by context
+ * and finally by architecture.
+ *
+ * Since: 2.9
+ */
+GPtrArray *
+modulemd_module_search_streams_by_glob (ModulemdModule *self,
+                                        const gchar *stream_name,
+                                        const gchar *version,
+                                        const gchar *context,
+                                        const gchar *arch);
+
 
 /**
  * modulemd_module_get_stream_by_NSVCA:

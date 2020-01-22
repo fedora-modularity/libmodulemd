@@ -310,6 +310,48 @@ modulemd_validate_nevra (const gchar *nevra);
 gboolean
 modulemd_boolean_equals (gboolean a, gboolean b);
 
+
+/**
+ * modulemd_is_glob_pattern:
+ * @pattern: (nullable) A string to check for glob patterns as defined by
+ * [glob(7)[(https://www.mankier.com/7/glob)
+ *
+ * Returns: TRUE if @pattern contains any globbing characters. FALSE
+ * otherwise.
+ *
+ * Since: 2.9
+ */
+gboolean
+modulemd_is_glob_pattern (const char *pattern);
+
+
+/**
+ * compare_streams:
+ * @a: The first #ModulemdModuleStream to sort
+ * @b: The second #ModulemdModuleStream to sort
+ *
+ * Sorting function for GPtrArrays of #ModulemdModuleStream objects.
+ *
+ * Since: 2.9
+ */
+gint
+compare_streams (gconstpointer a, gconstpointer b);
+
+/**
+ * modulemd_fnmatch:
+ * @pattern: (nullable) A string to check for glob patterns as defined by
+ * [glob(7)[(https://www.mankier.com/7/glob)
+ * @string: (nullable) A string to check for matches.
+ *
+ * A wrapper around fnmatch() for use with modulemd.
+ *
+ * Returns: #TRUE if @pattern matched for this string or if @pattern is NULL.
+ * #FALSE if @pattern did not match or @string is NULL.
+ */
+gboolean
+modulemd_fnmatch (const gchar *pattern, const gchar *string);
+
+
 /**
  * MODULEMD_REPLACE_SET:
  * @_dest: A reference to a #GHashTable.

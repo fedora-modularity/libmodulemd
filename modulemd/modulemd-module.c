@@ -518,6 +518,40 @@ modulemd_module_search_streams_by_glob (ModulemdModule *self,
 
 
 GPtrArray *
+modulemd_module_search_streams_by_nsvca_glob (ModulemdModule *self,
+                                              const gchar *nsvca_pattern)
+{
+  gsize i = 0;
+  g_autoptr (GPtrArray) matching_streams = NULL;
+  ModulemdModuleStream *under_consideration = NULL;
+  g_autofree gchar *nsvca = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+  g_return_val_if_fail (nsvca_pattern, NULL);
+
+  /* Assume the worst-case scenario that all streams match to spare us extra
+   * mallocs.
+   */
+  matching_streams = g_ptr_array_sized_new (self->streams->len);
+
+  for (i = 0; i < self->streams->len; i++)
+    {
+      under_consideration =
+        (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
+
+      nsvca = modulemd_module_stream_get_NSVCA_as_string (under_consideration);
+      if (modulemd_fnmatch (nsvca_pattern, nsvca))
+        {
+          g_ptr_array_add (matching_streams, under_consideration);
+        }
+      g_clear_pointer (&nsvca, g_free);
+    }
+
+  return g_steal_pointer (&matching_streams);
+}
+
+
+GPtrArray *
 modulemd_module_search_streams (ModulemdModule *self,
                                 const gchar *stream_name,
                                 const guint64 version,

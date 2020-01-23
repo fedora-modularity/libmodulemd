@@ -22,6 +22,7 @@
   "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
 #define MMD_TEST_TRACKER_PROP "tracker"
+#define MMD_TEST_DESC_TEXT "A different description"
 
 
 static void
@@ -273,6 +274,67 @@ module_stream_v2_test_profiles (void)
   g_clear_pointer (&rpms, g_strfreev);
 }
 
+static void
+module_stream_v1_test_description (void)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  const gchar *description = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  description = modulemd_module_stream_v1_get_description (stream, "C");
+  g_assert_null (description);
+
+  // Test setting description
+  modulemd_module_stream_v1_set_description (stream, MMD_TEST_DESC_TEXT);
+  description = modulemd_module_stream_v1_get_description (stream, "C");
+  g_assert_cmpstr (description, ==, MMD_TEST_DESC_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v1_set_description (stream, NULL);
+  description = modulemd_module_stream_v1_get_description (stream, "C");
+  g_assert_null (description);
+
+  // Test unicode characters
+  modulemd_module_stream_v1_set_description (stream,
+                                             MMD_TEST_DOC_UNICODE_TEXT);
+  description = modulemd_module_stream_v1_get_description (stream, "C");
+  g_assert_cmpstr (description, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_v2_test_description (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  const gchar *description = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  description = modulemd_module_stream_v2_get_description (stream, "C");
+  g_assert_null (description);
+
+  // Test setting description
+  modulemd_module_stream_v2_set_description (stream, MMD_TEST_DESC_TEXT);
+  description = modulemd_module_stream_v2_get_description (stream, "C");
+  g_assert_cmpstr (description, ==, MMD_TEST_DESC_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v2_set_description (stream, NULL);
+  description = modulemd_module_stream_v2_get_description (stream, "C");
+  g_assert_null (description);
+
+  // Test unicode characters
+  modulemd_module_stream_v2_set_description (stream,
+                                             MMD_TEST_DOC_UNICODE_TEXT);
+  description = modulemd_module_stream_v2_get_description (stream, "C");
+  g_assert_cmpstr (description, ==, MMD_TEST_DOC_UNICODE_TEXT);
+
+  g_clear_object (&stream);
+}
 
 static void
 module_stream_v1_test_rpm_api (void)
@@ -2585,6 +2647,12 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/documentation",
                    module_stream_v2_test_documentation);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v1/description",
+                   module_stream_v1_test_description);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/description",
+                   module_stream_v2_test_description);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/licenses",
                    module_stream_v1_test_licenses);

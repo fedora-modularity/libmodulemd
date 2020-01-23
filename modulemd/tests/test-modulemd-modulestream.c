@@ -23,6 +23,7 @@
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
 #define MMD_TEST_TRACKER_PROP "tracker"
 #define MMD_TEST_DESC_TEXT "A different description"
+#define MMD_TEST_SUM_TEXT "A different summary"
 
 
 static void
@@ -272,6 +273,62 @@ module_stream_v2_test_profiles (void)
   g_clear_object (&profile);
   g_clear_pointer (&profiles, g_strfreev);
   g_clear_pointer (&rpms, g_strfreev);
+}
+
+static void
+module_stream_v1_test_summary (void)
+{
+  g_autoptr (ModulemdModuleStreamV1) stream = NULL;
+  const gchar *summary = NULL;
+
+  stream = modulemd_module_stream_v1_new (NULL, NULL);
+
+  // Check the defaults
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting summary
+  modulemd_module_stream_v1_set_summary (stream, MMD_TEST_SUM_TEXT);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_SUM_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v1_set_summary (stream, NULL);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting unicode characters
+  modulemd_module_stream_v1_set_summary (stream, MMD_TEST_DOC_UNICODE_TEXT);
+  summary = modulemd_module_stream_v1_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_DOC_UNICODE_TEXT);
+}
+
+static void
+module_stream_v2_test_summary (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  const gchar *summary = NULL;
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+
+  // Check the defaults
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting summary
+  modulemd_module_stream_v2_set_summary (stream, MMD_TEST_SUM_TEXT);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_SUM_TEXT);
+
+  // Test setting it back to NULL
+  modulemd_module_stream_v2_set_summary (stream, NULL);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_null (summary);
+
+  // Test setting unicode characters
+  modulemd_module_stream_v2_set_summary (stream, MMD_TEST_DOC_UNICODE_TEXT);
+  summary = modulemd_module_stream_v2_get_summary (stream, "C");
+  g_assert_cmpstr (summary, ==, MMD_TEST_DOC_UNICODE_TEXT);
 }
 
 static void
@@ -3081,6 +3138,12 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/modulestream/v2/documentation",
                    module_stream_v2_test_documentation);
 
+  g_test_add_func ("/modulemd/v2/modulestream/v1/summary",
+                   module_stream_v1_test_summary);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/summary",
+                   module_stream_v2_test_summary);
+
   g_test_add_func ("/modulemd/v2/modulestream/v1/description",
                    module_stream_v1_test_description);
 
@@ -3118,8 +3181,8 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_filters",
                    module_stream_v2_test_rpm_filters);
 
-  g_test_add_func  ("/modulemd/v2/modulestream/v2_yaml",
-                    module_stream_test_v2_yaml);
+  g_test_add_func ("/modulemd/v2/modulestream/v2_yaml",
+                  module_stream_test_v2_yaml);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade",
                    module_stream_test_upgrade);

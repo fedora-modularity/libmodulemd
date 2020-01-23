@@ -499,6 +499,12 @@ modulemd_fnmatch (const gchar *pattern, const gchar *string)
   return !fnmatch (pattern, string, 0);
 }
 
+gboolean
+modulemd_rpm_match (gpointer key, gpointer UNUSED (value), gpointer user_data)
+{
+  return modulemd_fnmatch (user_data, key);
+}
+
 
 #ifndef HAVE_EXTEND_AND_STEAL
 

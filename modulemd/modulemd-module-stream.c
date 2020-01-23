@@ -1356,3 +1356,33 @@ modulemd_module_stream_build_depends_on_stream (ModulemdModuleStream *self,
 
   return klass->build_depends_on_stream (self, module_name, stream_name);
 }
+
+
+gboolean
+modulemd_module_stream_includes_nevra (ModulemdModuleStream *self,
+                                       const gchar *nevra_pattern)
+{
+  ModulemdModuleStreamVersionEnum version;
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), FALSE);
+
+  version = modulemd_module_stream_get_mdversion (self);
+  switch (version)
+    {
+    case MD_MODULESTREAM_VERSION_ONE:
+      return modulemd_module_stream_v1_includes_nevra (
+        MODULEMD_MODULE_STREAM_V1 (self), nevra_pattern);
+      break;
+
+    case MD_MODULESTREAM_VERSION_TWO:
+      return modulemd_module_stream_v2_includes_nevra (
+        MODULEMD_MODULE_STREAM_V2 (self), nevra_pattern);
+      break;
+
+    default:
+      /* We should never reach here */
+      g_return_val_if_reached (FALSE);
+      break;
+    }
+
+  return FALSE;
+}

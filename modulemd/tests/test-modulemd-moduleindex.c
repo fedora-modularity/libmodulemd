@@ -1507,6 +1507,59 @@ test_module_index_search_streams_by_nsvca_glob (void)
 }
 
 
+static void
+test_module_index_search_rpms (void)
+{
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GPtrArray) streams = NULL;
+  g_autofree gchar *yaml_path = NULL;
+
+  yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+
+  modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+
+
+  /* Searching for "python*" should give us ReviewBoard and Django */
+  streams = modulemd_module_index_search_rpms (index, "python*");
+  g_assert_cmpint (streams->len, ==, 2);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  /* Searching for "[nR]*" should give us three Node.js streams, plus
+   * ReviewBoard
+   */
+  streams = modulemd_module_index_search_rpms (index, "[nR]*");
+  g_assert_cmpint (streams->len, ==, 4);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  /* Searching for "*1.6*" should give us Django and Node.js 6 (because of
+   * npm-1:3.10.10-1.6.13.1.1.module_1575+55808bea.x86_64)
+   */
+  streams = modulemd_module_index_search_rpms (index, "*1.6*");
+  g_assert_cmpint (streams->len, ==, 2);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  /* Searching for "*" should give us all five streams */
+  streams = modulemd_module_index_search_rpms (index, "*");
+  g_assert_cmpint (streams->len, ==, 5);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  /* Searching for NULL should give us all five streams */
+  streams = modulemd_module_index_search_rpms (index, NULL);
+  g_assert_cmpint (streams->len, ==, 5);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
+  /* Searching for "perl-*" should give us nothing */
+  streams = modulemd_module_index_search_rpms (index, "perl-*");
+  g_assert_cmpint (streams->len, ==, 0);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -1559,6 +1612,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/search_nsvca",
                    test_module_index_search_streams_by_nsvca_glob);
+
+  g_test_add_func ("/modulemd/v2/module/index/search_rpms",
+                   test_module_index_search_rpms);
 
   return g_test_run ();
 }

@@ -359,6 +359,23 @@ modulemd_fnmatch (const gchar *pattern, const gchar *string);
 
 
 /**
+ * modulemd_rpm_match:
+ * @key: The key in the RPM artifacts hash table.
+ * @value: The value in the RPM artifacts hash table (should be the same
+ * as @key).
+ * @user_data: A [glob](https://www.mankier.com/3/glob)
+ * pattern to match against the NEVRA strings of the RPM artifacts in @self.
+ *
+ * This is a #GHRFunc for use with g_hash_table_find() to search for RPMs. It
+ * is a wrapper around modulemd_fnmatch().
+ *
+ * Returns: TRUE if @key is a match for the pattern in @user_data.
+ */
+gboolean
+modulemd_rpm_match (gpointer key, gpointer UNUSED (value), gpointer user_data);
+
+
+/**
  * MODULEMD_REPLACE_SET:
  * @_dest: A reference to a #GHashTable.
  * @_set: (nullable): A reference to a #GHashTable.

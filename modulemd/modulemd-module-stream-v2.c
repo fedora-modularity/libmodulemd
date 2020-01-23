@@ -1100,6 +1100,18 @@ modulemd_module_stream_v2_get_xmd (ModulemdModuleStreamV2 *self)
 }
 
 
+gboolean
+modulemd_module_stream_v2_includes_nevra (ModulemdModuleStreamV2 *self,
+                                          const gchar *nevra_pattern)
+{
+  /* If g_hash_table_find() returns non-NULL, the nevra was found in this
+   * module stream, so return TRUE
+   */
+  return !!g_hash_table_find (
+    self->rpm_artifacts, modulemd_rpm_match, (void *)nevra_pattern);
+}
+
+
 static gboolean
 modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
 {

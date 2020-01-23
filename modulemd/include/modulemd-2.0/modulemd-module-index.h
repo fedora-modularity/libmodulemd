@@ -422,6 +422,31 @@ modulemd_module_index_search_streams_by_nsvca_glob (
 
 
 /**
+ * modulemd_module_index_search_rpms:
+ * @self: This #ModulemdModuleIndex object.
+ * @nevra_pattern: (not nullable): A [glob](https://www.mankier.com/3/glob)
+ * pattern to match against the NEVRA strings of the rpm artifacts in the
+ * #ModulemdModuleStream objects in this module.
+ *
+ * All arguments to this method will be compared using
+ * [fnmatch(3)](https://www.mankier.com/3/fnmatch).
+ *
+ * Returns: (transfer container) (element-type ModulemdModuleStream): The list
+ * of stream objects containing an RPM that matches the @nevra_pattern.
+ * This function cannot fail, but it may return a zero-length list if no
+ * matches were found.
+ * The returned streams will be in a predictable order, sorted first by module
+ * name, then stream name, then by version (highest first), then by context
+ * and finally by architecture.
+ *
+ * Since: 2.9
+ */
+GPtrArray *
+modulemd_module_index_search_rpms (ModulemdModuleIndex *self,
+                                   const gchar *nevra_pattern);
+
+
+/**
  * modulemd_module_index_remove_module:
  * @self: This #ModulemdModuleIndex object.
  * @module_name: The name of the module to remove from the index.

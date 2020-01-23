@@ -198,4 +198,19 @@ modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
                                                 GPtrArray *array);
 
 
+/**
+ * modulemd_module_stream_v2_includes_nevra:
+ * @self: This #ModulemdModuleStreamV2 object.
+ * @nevra_pattern: (not nullable): A [glob](https://www.mankier.com/3/glob)
+ * pattern to match against the NEVRA strings of the rpm artifacts in @self.
+ *
+ * Returns: TRUE if this stream includes at least one RPM artifact that
+ * matches @nevra_pattern. FALSE otherwise.
+ *
+ * Since: 2.9
+ */
+gboolean
+modulemd_module_stream_v2_includes_nevra (ModulemdModuleStreamV2 *self,
+                                          const gchar *nevra_pattern);
+
 G_END_DECLS

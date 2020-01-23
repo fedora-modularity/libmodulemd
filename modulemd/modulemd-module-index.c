@@ -1016,6 +1016,53 @@ modulemd_module_index_search_streams_by_nsvca_glob (ModulemdModuleIndex *self,
 }
 
 
+GPtrArray *
+modulemd_module_index_search_rpms (ModulemdModuleIndex *self,
+                                   const gchar *nevra_pattern)
+{
+  g_autoptr (GPtrArray) module_names = NULL;
+  g_autoptr (GPtrArray) found_streams = NULL;
+  GPtrArray *module_streams = NULL;
+  const gchar *mname = NULL;
+  ModulemdModule *module = NULL;
+  ModulemdModuleStream *stream = NULL;
+
+  module_names =
+    modulemd_ordered_str_keys (self->modules, modulemd_strcmp_sort);
+
+  found_streams = g_ptr_array_new ();
+  for (guint i = 0; i < module_names->len; i++)
+    {
+      mname = g_ptr_array_index (module_names, i);
+      g_debug ("Searching through %s", mname);
+
+      module = modulemd_module_index_get_module (self, mname);
+      if (!module)
+        {
+          /* Since we're iterating through keys we just retrieved, this should
+           * be impossible. If we get here, it must be a bug.
+           */
+          g_assert_not_reached ();
+          continue;
+        }
+
+      module_streams = modulemd_module_get_all_streams (module);
+      for (guint j = 0; j < module_streams->len; j++)
+        {
+          stream = g_ptr_array_index (module_streams, j);
+          if (modulemd_module_stream_includes_nevra (stream, nevra_pattern))
+            {
+              g_ptr_array_add (found_streams, stream);
+            }
+        }
+    }
+
+  g_debug ("Module stream count: %d", found_streams->len);
+
+  return g_steal_pointer (&found_streams);
+}
+
+
 gboolean
 modulemd_module_index_remove_module (ModulemdModuleIndex *self,
                                      const gchar *module_name)

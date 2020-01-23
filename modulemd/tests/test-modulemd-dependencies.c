@@ -36,8 +36,7 @@ sigtrap_handler (int sig_num)
 }
 
 static void
-dependencies_test_construct (DependenciesFixture *fixture,
-                             gconstpointer user_data)
+dependencies_test_construct (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_auto (GStrv) list = NULL;
@@ -61,8 +60,7 @@ dependencies_test_construct (DependenciesFixture *fixture,
 
 
 static void
-dependencies_test_dependencies (DependenciesFixture *fixture,
-                                gconstpointer user_data)
+dependencies_test_dependencies (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_auto (GStrv) list = NULL;
@@ -133,8 +131,7 @@ dependencies_test_dependencies (DependenciesFixture *fixture,
 
 
 static void
-dependencies_test_equals (DependenciesFixture *fixture,
-                          gconstpointer user_data)
+dependencies_test_equals (void)
 {
   g_autoptr (ModulemdDependencies) d_1 = NULL;
   g_autoptr (ModulemdDependencies) d_2 = NULL;
@@ -301,7 +298,7 @@ dependencies_test_equals (DependenciesFixture *fixture,
 
 
 static void
-dependencies_test_copy (DependenciesFixture *fixture, gconstpointer user_data)
+dependencies_test_copy (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (ModulemdDependencies) d_copy = NULL;
@@ -392,8 +389,7 @@ dependencies_test_copy (DependenciesFixture *fixture, gconstpointer user_data)
 }
 
 static void
-dependencies_test_parse_yaml (DependenciesFixture *fixture,
-                              gconstpointer user_data)
+dependencies_test_parse_yaml (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (GError) error = NULL;
@@ -442,8 +438,7 @@ dependencies_test_parse_yaml (DependenciesFixture *fixture,
 
 
 static void
-dependencies_test_parse_bad_yaml (DependenciesFixture *fixture,
-                                  gconstpointer user_data)
+dependencies_test_parse_bad_yaml (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (GError) error = NULL;
@@ -471,8 +466,7 @@ dependencies_test_parse_bad_yaml (DependenciesFixture *fixture,
 
 
 static void
-dependencies_test_emit_yaml (DependenciesFixture *fixture,
-                             gconstpointer user_data)
+dependencies_test_emit_yaml (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (GError) error = NULL;
@@ -598,97 +592,38 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/dependencies/construct",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/construct",
+                   dependencies_test_construct);
 
-  g_test_add ("/modulemd/v2/dependencies/dependencies",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_dependencies,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/dependencies",
+                   dependencies_test_dependencies);
 
-  g_test_add ("/modulemd/v2/dependencies/equals",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/equals",
+                   dependencies_test_equals);
 
-  g_test_add ("/modulemd/v2/dependencies/copy",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/copy", dependencies_test_copy);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/parse",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse",
+                   dependencies_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/parse/bad",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_parse_bad_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/parse/bad",
+                   dependencies_test_parse_bad_yaml);
 
-  g_test_add ("/modulemd/v2/dependencies/yaml/emit",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              dependencies_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/emit",
+                   dependencies_test_emit_yaml);
 
   /*
-  g_test_add ("/modulemd/v2/profile/copy",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/copy",profile_test_copy);
 
-  g_test_add ("/modulemd/v2/profile/get_name",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_get_name,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/get_name",profile_test_get_name);
 
-  g_test_add ("/modulemd/v2/profile/get_set_description",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_get_set_description,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/get_set_description",profile_test_get_set_description);
 
-  g_test_add ("/modulemd/v2/profile/rpms",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_rpms,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/rpms",profile_test_rpms);
 
-  g_test_add ("/modulemd/v2/profile/yaml/parse",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/profile/yaml/parse",profile_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/profile/yaml/emit",
-              DependenciesFixture,
-              NULL,
-              NULL,
-              profile_test_emit_yaml,
-              NULL);
+  g_test_add _func("/modulemd/v2/profile/yaml/emit",profile_test_emit_yaml);
               */
 
   return g_test_run ();

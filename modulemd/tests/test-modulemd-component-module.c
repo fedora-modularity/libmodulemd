@@ -37,8 +37,7 @@ sigtrap_handler (int sig_num)
 }
 
 static void
-component_module_test_construct (ComponentModuleFixture *fixture,
-                                 gconstpointer user_data)
+component_module_test_construct (void)
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
   ModulemdComponent *mc = NULL;
@@ -110,8 +109,7 @@ component_module_test_construct (ComponentModuleFixture *fixture,
 
 
 static void
-component_module_test_equals (ComponentModuleFixture *fixture,
-                              gconstpointer user_data)
+component_module_test_equals (void)
 {
   g_autoptr (ModulemdComponentModule) m_1 = NULL;
   g_autoptr (ModulemdComponentModule) m_2 = NULL;
@@ -233,8 +231,7 @@ component_module_test_equals (ComponentModuleFixture *fixture,
 
 
 static void
-component_module_test_copy (ComponentModuleFixture *fixture,
-                            gconstpointer user_data)
+component_module_test_copy (void)
 {
   g_autoptr (ModulemdComponentModule) m_orig = NULL;
   g_autoptr (ModulemdComponentModule) m = NULL;
@@ -283,8 +280,7 @@ component_module_test_copy (ComponentModuleFixture *fixture,
 
 
 static void
-component_module_test_emit_yaml (ComponentModuleFixture *fixture,
-                                 gconstpointer user_data)
+component_module_test_emit_yaml (void)
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
   g_autoptr (GError) error = NULL;
@@ -339,8 +335,7 @@ component_module_test_emit_yaml (ComponentModuleFixture *fixture,
 
 
 static void
-component_module_test_parse_yaml (ComponentModuleFixture *fixture,
-                                  gconstpointer user_data)
+component_module_test_parse_yaml (void)
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
   g_autoptr (GError) error = NULL;
@@ -393,40 +388,20 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/component/module/construct",
-              ComponentModuleFixture,
-              NULL,
-              NULL,
-              component_module_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/module/construct",
+                   component_module_test_construct);
 
-  g_test_add ("/modulemd/v2/component/module/equals",
-              ComponentModuleFixture,
-              NULL,
-              NULL,
-              component_module_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/module/equals",
+                   component_module_test_equals);
 
-  g_test_add ("/modulemd/v2/component/module/copy",
-              ComponentModuleFixture,
-              NULL,
-              NULL,
-              component_module_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/module/copy",
+                   component_module_test_copy);
 
-  g_test_add ("/modulemd/v2/component/module/yaml/emit",
-              ComponentModuleFixture,
-              NULL,
-              NULL,
-              component_module_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/module/yaml/emit",
+                   component_module_test_emit_yaml);
 
-  g_test_add ("/modulemd/v2/component/module/yaml/parse",
-              ComponentModuleFixture,
-              NULL,
-              NULL,
-              component_module_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/component/module/yaml/parse",
+                   component_module_test_parse_yaml);
 
   return g_test_run ();
 }

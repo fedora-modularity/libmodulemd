@@ -26,8 +26,7 @@
 
 
 static void
-defaults_test_construct (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+defaults_test_construct (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
 
@@ -80,7 +79,7 @@ defaults_test_construct (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_copy (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_copy (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
   g_autoptr (ModulemdDefaultsV1) copied_defaults = NULL;
@@ -148,8 +147,7 @@ defaults_test_copy (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_get_set_default_stream (CommonMmdTestFixture *fixture,
-                                      gconstpointer user_data)
+defaults_test_get_set_default_stream (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
 
@@ -168,7 +166,7 @@ defaults_test_get_set_default_stream (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_equals (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults_1 = NULL;
   g_autoptr (ModulemdDefaultsV1) defaults_2 = NULL;
@@ -352,7 +350,7 @@ defaults_test_equals (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_validate (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_validate (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
 
@@ -368,7 +366,7 @@ defaults_test_validate (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_profiles (CommonMmdTestFixture *fixture, gconstpointer user_data)
+defaults_test_profiles (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
   g_auto (GStrv) streams = NULL;
@@ -457,8 +455,7 @@ defaults_test_profiles (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
-                          gconstpointer user_data)
+defaults_test_parse_yaml (void)
 {
   MMD_INIT_YAML_PARSER (parser);
   MMD_INIT_YAML_EVENT (event);
@@ -577,8 +574,7 @@ defaults_test_parse_yaml (CommonMmdTestFixture *fixture,
 
 
 static void
-defaults_test_emit_yaml (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+defaults_test_emit_yaml (void)
 {
   MMD_INIT_YAML_EMITTER (emitter);
   MMD_INIT_YAML_EVENT (event);
@@ -746,61 +742,27 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add ("/modulemd/v2/defaults/v1/equals",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_equals,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/equals", defaults_test_equals);
 
-  g_test_add ("/modulemd/v2/defaults/v1/construct",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct",
+                   defaults_test_construct);
 
-  g_test_add ("/modulemd/v2/defaults/v1/copy",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/copy", defaults_test_copy);
 
-  g_test_add ("/modulemd/v2/defaults/v1/default_stream",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_get_set_default_stream,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/default_stream",
+                   defaults_test_get_set_default_stream);
 
-  g_test_add ("/modulemd/v2/defaults/v1/validate",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_validate,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/validate",
+                   defaults_test_validate);
 
-  g_test_add ("/modulemd/v2/defaults/v1/profile_defaults",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_profiles,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/profile_defaults",
+                   defaults_test_profiles);
 
-  g_test_add ("/modulemd/v2/defaults/v1/yaml/parse",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/parse",
+                   defaults_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/defaults/v1/yaml/emit",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              defaults_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/emit",
+                   defaults_test_emit_yaml);
 
   return g_test_run ();
 }

@@ -35,7 +35,7 @@ typedef struct _ModuleIndexFixture
 
 
 static void
-module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
+module_index_test_dump (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
@@ -164,7 +164,7 @@ module_index_test_dump (ModuleIndexFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
+module_index_test_read (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (GError) error = NULL;
@@ -278,8 +278,7 @@ module_index_test_read (ModuleIndexFixture *fixture, gconstpointer user_data)
 
 
 static void
-module_index_test_read_mixed (ModuleIndexFixture *fixture,
-                              gconstpointer user_data)
+module_index_test_read_mixed (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autofree gchar *yaml_path = NULL;
@@ -306,8 +305,7 @@ module_index_test_read_mixed (ModuleIndexFixture *fixture,
 
 
 static void
-module_index_test_read_unknown (ModuleIndexFixture *fixture,
-                                gconstpointer user_data)
+module_index_test_read_unknown (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autofree gchar *yaml_path = NULL;
@@ -333,8 +331,7 @@ module_index_test_read_unknown (ModuleIndexFixture *fixture,
 
 
 static void
-module_index_test_stream_upgrade (ModuleIndexFixture *fixture,
-                                  gconstpointer user_data)
+module_index_test_stream_upgrade (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -457,8 +454,7 @@ module_index_test_stream_upgrade (ModuleIndexFixture *fixture,
 
 
 static void
-module_index_test_index_upgrade (ModuleIndexFixture *fixture,
-                                 gconstpointer user_data)
+module_index_test_index_upgrade (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -655,8 +651,7 @@ module_index_test_index_upgrade (ModuleIndexFixture *fixture,
 
 
 static void
-module_index_test_remove_module (ModuleIndexFixture *fixture,
-                                 gconstpointer user_data)
+module_index_test_remove_module (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autofree gchar *yaml_path = NULL;
@@ -725,8 +720,7 @@ custom_string_read_handler (void *data,
 
 
 static void
-module_index_test_custom_read (ModuleIndexFixture *fixture,
-                               gconstpointer user_data)
+module_index_test_custom_read (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (GPtrArray) failures = NULL;
@@ -837,8 +831,7 @@ module_index_test_custom_read (ModuleIndexFixture *fixture,
 
 
 static void
-module_index_test_custom_write (ModuleIndexFixture *fixture,
-                                gconstpointer user_data)
+module_index_test_custom_write (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (GPtrArray) failures = NULL;
@@ -1358,68 +1351,30 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/module/index/dump",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_dump,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/dump", module_index_test_dump);
 
-  g_test_add ("/modulemd/v2/module/index/read",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_read,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/read", module_index_test_read);
 
-  g_test_add ("/modulemd/v2/module/index/read/mixed",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_read_mixed,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/read/mixed",
+                   module_index_test_read_mixed);
 
-  g_test_add ("/modulemd/v2/module/index/read/unknown",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_read_unknown,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/read/unknown",
+                   module_index_test_read_unknown);
 
-  g_test_add ("/modulemd/v2/module/index/upgrade/stream",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_stream_upgrade,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/upgrade/stream",
+                   module_index_test_stream_upgrade);
 
-  g_test_add ("/modulemd/v2/module/index/upgrade/index",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_index_upgrade,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/upgrade/index",
+                   module_index_test_index_upgrade);
 
-  g_test_add ("/modulemd/v2/module/index/remove_module",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_remove_module,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/remove_module",
+                   module_index_test_remove_module);
 
-  g_test_add ("/modulemd/v2/module/index/custom_read",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_custom_read,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/custom_read",
+                   module_index_test_custom_read);
 
-  g_test_add ("/modulemd/v2/module/index/custom_write",
-              ModuleIndexFixture,
-              NULL,
-              NULL,
-              module_index_test_custom_write,
-              NULL);
+  g_test_add_func ("/modulemd/v2/module/index/custom_write",
+                   module_index_test_custom_write);
 
   g_test_add_func ("/modulemd/v2/module/index/get_default_streams",
                    module_index_test_get_default_streams);

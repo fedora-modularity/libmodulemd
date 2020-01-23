@@ -23,7 +23,7 @@
 #include "private/test-utils.h"
 
 static void
-test_basic (CommonMmdTestFixture *fixture, gconstpointer user_data)
+test_basic (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -93,7 +93,7 @@ test_basic (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-test_compare (CommonMmdTestFixture *fixture, gconstpointer user_data)
+test_compare (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   ModulemdRpmMapEntry *entry_pointer;
@@ -125,7 +125,7 @@ test_compare (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-test_parse_yaml_valid (CommonMmdTestFixture *fixture, gconstpointer user_data)
+test_parse_yaml_valid (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -155,8 +155,7 @@ test_parse_yaml_valid (CommonMmdTestFixture *fixture, gconstpointer user_data)
 }
 
 static void
-test_parse_yaml_missing (CommonMmdTestFixture *fixture,
-                         gconstpointer user_data)
+test_parse_yaml_missing (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -182,8 +181,7 @@ test_parse_yaml_missing (CommonMmdTestFixture *fixture,
 }
 
 static void
-test_parse_yaml_mismatch (CommonMmdTestFixture *fixture,
-                          gconstpointer user_data)
+test_parse_yaml_mismatch (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -210,7 +208,7 @@ test_parse_yaml_mismatch (CommonMmdTestFixture *fixture,
 }
 
 static void
-test_emit_yaml_valid (CommonMmdTestFixture *fixture, gconstpointer user_data)
+test_emit_yaml_valid (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -248,7 +246,7 @@ test_emit_yaml_valid (CommonMmdTestFixture *fixture, gconstpointer user_data)
 
 
 static void
-test_emit_yaml_invalid (CommonMmdTestFixture *fixture, gconstpointer user_data)
+test_emit_yaml_invalid (void)
 {
   g_autoptr (ModulemdRpmMapEntry) entry = NULL;
   g_autoptr (GError) error = NULL;
@@ -265,7 +263,6 @@ test_emit_yaml_invalid (CommonMmdTestFixture *fixture, gconstpointer user_data)
   g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
 }
 
-
 int
 main (int argc, char *argv[])
 {
@@ -274,54 +271,24 @@ main (int argc, char *argv[])
   g_test_init (&argc, &argv, NULL);
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
-  g_test_add ("/modulemd/v2/rpm_map/basic",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_basic,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/basic", test_basic);
 
-  g_test_add ("/modulemd/v2/rpm_map/compare",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_compare,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/compare", test_compare);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/valid",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_parse_yaml_valid,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/valid",
+                   test_parse_yaml_valid);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/missing",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_parse_yaml_missing,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/missing",
+                   test_parse_yaml_missing);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/parse/mismatch",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_parse_yaml_mismatch,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/parse/mismatch",
+                   test_parse_yaml_mismatch);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/emit/valid",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_emit_yaml_valid,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/valid",
+                   test_emit_yaml_valid);
 
-  g_test_add ("/modulemd/v2/rpm_map/yaml/emit/invalid",
-              CommonMmdTestFixture,
-              NULL,
-              NULL,
-              test_emit_yaml_invalid,
-              NULL);
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/invalid",
+                   test_emit_yaml_invalid);
 
   return g_test_run ();
 }

@@ -40,8 +40,7 @@ sigtrap_handler (int sig_num)
 
 
 static void
-translation_test_construct (TranslationFixture *fixture,
-                            gconstpointer user_data)
+translation_test_construct (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   g_auto (GStrv) locales;
@@ -133,7 +132,7 @@ translation_test_construct (TranslationFixture *fixture,
 }
 
 static void
-translation_test_copy (TranslationFixture *fixture, gconstpointer user_data)
+translation_test_copy (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (ModulemdTranslation) t_copy = NULL;
@@ -186,8 +185,7 @@ translation_test_copy (TranslationFixture *fixture, gconstpointer user_data)
 }
 
 static void
-translation_test_validate (TranslationFixture *fixture,
-                           gconstpointer user_data)
+translation_test_validate (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (GError) error = NULL;
@@ -211,8 +209,7 @@ translation_test_validate (TranslationFixture *fixture,
 }
 
 static void
-translation_test_set_modified (TranslationFixture *fixture,
-                               gconstpointer user_data)
+translation_test_set_modified (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
 
@@ -227,8 +224,7 @@ translation_test_set_modified (TranslationFixture *fixture,
 }
 
 static void
-translation_test_translations (TranslationFixture *fixture,
-                               gconstpointer user_data)
+translation_test_translations (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   ModulemdTranslationEntry *te = NULL;
@@ -253,8 +249,7 @@ translation_test_translations (TranslationFixture *fixture,
 
 
 static void
-translation_test_parse_yaml (TranslationFixture *fixture,
-                             gconstpointer user_data)
+translation_test_parse_yaml (void)
 {
   MMD_INIT_YAML_PARSER (parser);
   MMD_INIT_YAML_EVENT (event);
@@ -313,8 +308,7 @@ translation_test_parse_yaml (TranslationFixture *fixture,
 
 
 static void
-translation_test_emit_yaml (TranslationFixture *fixture,
-                            gconstpointer user_data)
+translation_test_emit_yaml (void)
 {
   MMD_INIT_YAML_EMITTER (emitter);
   MMD_INIT_YAML_EVENT (event);
@@ -381,54 +375,25 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add ("/modulemd/v2/translation/construct",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_construct,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/construct",
+                   translation_test_construct);
 
-  g_test_add ("/modulemd/v2/translation/copy",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_copy,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/copy", translation_test_copy);
 
-  g_test_add ("/modulemd/v2/translation/validate",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_validate,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/validate",
+                   translation_test_validate);
 
-  g_test_add ("/modulemd/v2/translation/set_modified",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_set_modified,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/set_modified",
+                   translation_test_set_modified);
 
-  g_test_add ("/modulemd/v2/translation/translations",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_translations,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/translations",
+                   translation_test_translations);
 
-  g_test_add ("/modulemd/v2/translation/yaml/parse",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_parse_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/yaml/parse",
+                   translation_test_parse_yaml);
 
-  g_test_add ("/modulemd/v2/translation/yaml/emit",
-              TranslationFixture,
-              NULL,
-              NULL,
-              translation_test_emit_yaml,
-              NULL);
+  g_test_add_func ("/modulemd/v2/translation/yaml/emit",
+                   translation_test_emit_yaml);
 
   return g_test_run ();
 }

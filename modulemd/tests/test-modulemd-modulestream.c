@@ -3182,7 +3182,7 @@ main (int argc, char *argv[])
                    module_stream_v2_test_rpm_filters);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2_yaml",
-                  module_stream_test_v2_yaml);
+                   module_stream_test_v2_yaml);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade",
                    module_stream_test_upgrade);

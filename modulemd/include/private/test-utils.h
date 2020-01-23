@@ -27,17 +27,6 @@ G_BEGIN_DECLS
  */
 
 
-/**
- * CommonMmdTestFixture:
- *
- * A common data type for use as a libmodulemd GLib test fixture.
- *
- * Since: 2.0
- */
-typedef struct _CommonMmdTestFixture
-{
-} CommonMmdTestFixture;
-
 extern int modulemd_test_signal;
 
 

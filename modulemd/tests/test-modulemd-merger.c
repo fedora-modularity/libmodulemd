@@ -101,6 +101,227 @@ merger_test_deduplicate (void)
 
 
 static void
+merger_test_merger (void)
+{
+  g_autoptr (ModulemdModuleIndex) base_index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autofree gchar *module_name = NULL;
+  ModulemdModule *httpd = NULL;
+  ModulemdDefaultsV1 *httpd_defaults = NULL;
+  GStrv httpd_profile_streams = NULL;
+  g_autoptr (ModulemdModuleIndex) override_nodejs_index = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
+  g_autoptr (ModulemdModuleIndex) merged_index = NULL;
+  ModulemdModule *nodejs = NULL;
+  ModulemdDefaultsV1 *nodejs_defaults = NULL;
+  ModulemdDefaultsV1 *merged_httpd_defaults = NULL;
+  g_autoptr (ModulemdModuleIndex) override_index = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  gint32 random_low;
+  gint32 random_high;
+
+  /* Get a set of o = NULLbjects in a ModuleIndex */
+  yaml_path =
+    g_strdup_printf ("%s/merging-base.yaml", g_getenv ("TEST_DATA_PATH"));
+  base_index = modulemd_module_index_new ();
+  modulemd_module_index_update_from_file (
+    base_index, yaml_path, TRUE, &failures, &error);
+  g_clear_pointer (&yaml_path, g_free);
+
+  /* Baseline */
+  httpd = modulemd_module_index_get_module (base_index, "httpd");
+  httpd_defaults = (ModulemdDefaultsV1 *)modulemd_module_get_defaults (httpd);
+  g_assert_nonnull (httpd_defaults);
+
+  g_assert_cmpstr (
+    modulemd_defaults_v1_get_default_stream (httpd_defaults, NULL), ==, "2.2");
+
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
+      httpd_defaults, NULL);
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 2);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.2"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.8"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      httpd_defaults, "2.2", NULL);
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 2);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "client"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "server"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      httpd_defaults, "2.8", NULL);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "notreal"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+
+  g_assert_cmpstr (
+    modulemd_defaults_v1_get_default_stream (httpd_defaults, "workstation"),
+    ==,
+    "2.4");
+
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
+      httpd_defaults, "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 2);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.4"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.6"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      httpd_defaults, "2.4", "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 1);
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      httpd_defaults, "2.6", "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 3);
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+
+  /*
+   * Get another set of objects that will override the default stream for
+   * nodejs 
+   */
+
+  yaml_path =
+    g_strdup_printf ("%s/overriding-nodejs.yaml", g_getenv ("TEST_DATA_PATH"));
+  override_nodejs_index = modulemd_module_index_new ();
+  modulemd_module_index_update_from_file (
+    override_nodejs_index, yaml_path, TRUE, &failures, &error);
+  g_clear_pointer (&yaml_path, g_free);
+
+  /*
+   * Test that adding both of these at the same priority level results in
+   * the no default stream
+   */
+  merger = modulemd_module_index_merger_new ();
+  modulemd_module_index_merger_associate_index (merger, base_index, 0);
+  modulemd_module_index_merger_associate_index (
+    merger, override_nodejs_index, 0);
+
+  merged_index = modulemd_module_index_merger_resolve (merger, NULL);
+  g_clear_object (&merger);
+
+  nodejs = modulemd_module_index_get_module (merged_index, "nodejs");
+  g_assert_nonnull (nodejs);
+
+  nodejs_defaults =
+    (ModulemdDefaultsV1 *)modulemd_module_get_defaults (nodejs);
+  g_assert_nonnull (nodejs_defaults);
+  g_assert_null (
+    modulemd_defaults_v1_get_default_stream (nodejs_defaults, NULL));
+  g_clear_object (&merged_index);
+
+  /* Get another set of objects that will override  g_assert_null(modulemd_defaults_v1_get_default_stream the above */
+  yaml_path =
+    g_strdup_printf ("%s/overriding.yaml", g_getenv ("TEST_DATA_PATH"));
+  override_index = modulemd_module_index_new ();
+  modulemd_module_index_update_from_file (
+    override_index, yaml_path, TRUE, &failures, &error);
+  g_clear_pointer (&yaml_path, g_free);
+
+  /*
+   * Test that override_index at a higher priority level succeeds
+   * Test that adding both of these at the same priority level fails
+   * with a merge conflict.
+   * Use randomly-selected high and low values to make sure we don't have
+   * sorting issues.
+   */
+  merger = modulemd_module_index_merger_new ();
+  random_low = g_random_int_range (1, 100);
+  random_high = g_random_int_range (101, 999);
+  printf ("Low priority: %d, High priority: %d", random_low, random_high);
+  modulemd_module_index_merger_associate_index (
+    merger, base_index, random_low);
+  modulemd_module_index_merger_associate_index (
+    merger, override_index, random_high);
+
+  merged_index = modulemd_module_index_merger_resolve (merger, NULL);
+  g_assert_nonnull (merged_index);
+  g_clear_object (&merger);
+
+  /*Validate merged results*/
+
+  /*HTTPD*/
+  merged_httpd_defaults = (ModulemdDefaultsV1 *)modulemd_module_get_defaults (
+    modulemd_module_index_get_module (merged_index, "httpd"));
+  g_assert_nonnull (merged_httpd_defaults);
+
+  g_assert_cmpstr (
+    modulemd_defaults_v1_get_default_stream (merged_httpd_defaults, NULL),
+    ==,
+    "2.4");
+
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
+      merged_httpd_defaults, NULL);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.2"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.4"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      merged_httpd_defaults, "2.2", NULL);
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 2);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "client"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "server"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      merged_httpd_defaults, "2.4", NULL);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "client"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "server"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+
+  g_assert_cmpstr (modulemd_defaults_v1_get_default_stream (
+                     merged_httpd_defaults, "workstation"),
+                   ==,
+                   "2.8");
+
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
+      merged_httpd_defaults, "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 3);
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.4"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.6"));
+  g_assert_true (
+    g_strv_contains ((const char **)httpd_profile_streams, "2.8"));
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      merged_httpd_defaults, "2.4", "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 1);
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      merged_httpd_defaults, "2.6", "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 3);
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+  httpd_profile_streams =
+    modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
+      merged_httpd_defaults, "2.8", "workstation");
+  g_assert_cmpint (g_strv_length (httpd_profile_streams), ==, 4);
+  g_clear_pointer (&httpd_profile_streams, g_strfreev);
+}
+
+
+static void
 merger_test_add_only (void)
 {
   g_autoptr (GPtrArray) failures = NULL;
@@ -251,6 +472,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/merger/deduplicate",
                    merger_test_deduplicate);
+
+  g_test_add_func ("/modulemd/v2/module/index/merger/merger",
+                   merger_test_merger);
 
   g_test_add_func ("/modulemd/module/index/merger/add_only",
                    merger_test_add_only);

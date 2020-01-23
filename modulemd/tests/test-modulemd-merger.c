@@ -456,6 +456,44 @@ merger_test_add_conflicting_stream_and_profile_modified (void)
                    "8.2");
 }
 
+static void
+merger_test_with_real_world_data (void)
+{
+  g_autoptr (ModulemdModuleIndex) f29 = NULL;
+  g_autoptr (ModulemdModuleIndex) f29_updates = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autofree gchar *yaml_path = NULL;
+
+  f29 = modulemd_module_index_new ();
+  yaml_path = g_strdup_printf ("%s/f29.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  f29_updates = modulemd_module_index_new ();
+  yaml_path =
+    g_strdup_printf ("%s/f29-updates.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29_updates, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  merger = modulemd_module_index_merger_new ();
+  modulemd_module_index_merger_associate_index (merger, f29, 0);
+  modulemd_module_index_merger_associate_index (merger, f29_updates, 0);
+
+  index = modulemd_module_index_merger_resolve (merger, &error);
+  g_assert_nonnull (index);
+  g_assert_no_error (error);
+}
 
 int
 main (int argc, char *argv[])
@@ -484,6 +522,10 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/module/index/merger/add_conflicting_both",
                    merger_test_add_conflicting_stream_and_profile_modified);
+
+  g_test_add_func (
+    "/modulemd/module/index/merger/test_merger_with_real_world_data",
+    merger_test_with_real_world_data);
 
   return g_test_run ();
 }

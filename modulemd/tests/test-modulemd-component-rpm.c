@@ -279,6 +279,54 @@ component_rpm_test_copy (void)
 
 
 static void
+component_rpm_test_arches (void)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_auto (GStrv) list = NULL;
+
+  r = modulemd_component_rpm_new ("testmodule");
+  modulemd_component_rpm_add_restricted_arch (r, "x86_64");
+  modulemd_component_rpm_add_restricted_arch (r, "i686");
+  modulemd_component_rpm_add_multilib_arch (r, "ppc64le");
+  modulemd_component_rpm_add_multilib_arch (r, "s390x");
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "i686");
+  g_assert_cmpstr (list[1], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "ppc64le");
+  g_assert_cmpstr (list[1], ==, "s390x");
+  g_clear_pointer (&list, g_strfreev);
+
+  // Test rpm_clear_arches
+  modulemd_component_rpm_clear_arches (r);
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 0);
+  g_clear_pointer (&list, g_strfreev);
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_clear_pointer (&list, g_strfreev);
+
+  // Test rpm_clear_multilib_arches
+  modulemd_component_rpm_clear_multilib_arches (r);
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 0);
+  g_clear_pointer (&list, g_strfreev);
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 0);
+  g_clear_pointer (&list, g_strfreev);
+
+  g_clear_object (&r);
+}
+
+
+static void
 component_rpm_test_emit_yaml (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
@@ -455,6 +503,9 @@ main (int argc, char *argv[])
                    component_rpm_test_equals);
 
   g_test_add_func ("/modulemd/v2/component/rpm/copy", component_rpm_test_copy);
+
+  g_test_add_func ("/modulemd/v2/component/rpm/arches",
+                   component_rpm_test_arches);
 
   g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",
                    component_rpm_test_emit_yaml);

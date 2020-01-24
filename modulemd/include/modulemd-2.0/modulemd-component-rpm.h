@@ -14,6 +14,7 @@
 #pragma once
 
 #include "modulemd-component.h"
+#include "modulemd-deprecated.h"
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -53,7 +54,7 @@ modulemd_component_rpm_new (const gchar *key);
  *
  * Restrict the list of architectures on which this RPM will be available. It
  * may be called any number of times to indicate support on additional
- * architectures. Use modulemd_component_rpm_reset_arches() to return to "all
+ * architectures. Use modulemd_component_rpm_clear_arches() to return to "all
  * architectures".
  *
  * Since: 2.0
@@ -70,9 +71,23 @@ modulemd_component_rpm_add_restricted_arch (ModulemdComponentRpm *self,
  * Indicate that this RPM component is available on all arches.
  *
  * Since: 2.0
+ * Deprecated: 2.9
  */
+MMD_DEPRECATED_FOR (modulemd_component_rpm_clear_arches)
 void
 modulemd_component_rpm_reset_arches (ModulemdComponentRpm *self);
+
+
+/**
+ * modulemd_component_rpm_clear_arches:
+ * @self: This #ModulemdComponentRpm object.
+ *
+ * Indicate that this RPM component is available on all arches.
+ *
+ * Since: 2.9
+ */
+void
+modulemd_component_rpm_clear_arches (ModulemdComponentRpm *self);
 
 
 /**
@@ -94,7 +109,7 @@ modulemd_component_rpm_get_arches_as_strv (ModulemdComponentRpm *self);
  * @arch: An architecture on which this package should be multilib.
  *
  * Add an architecture on which this RPM will be multilib. It may be called
- * any number of times. Use modulemd_component_rpm_reset_multilib_arches() to
+ * any number of times. Use modulemd_component_rpm_clear_multilib_arches() to
  * return to "no architectures".
  *
  * Since: 2.0
@@ -111,9 +126,23 @@ modulemd_component_rpm_add_multilib_arch (ModulemdComponentRpm *self,
  * Indicate that this RPM component is multilib on no architectures.
  *
  * Since: 2.0
+ * Deprecated: 2.9
  */
+MMD_DEPRECATED_FOR (modulemd_component_rpm_clear_multilib_arches)
 void
 modulemd_component_rpm_reset_multilib_arches (ModulemdComponentRpm *self);
+
+
+/**
+ * modulemd_component_rpm_clear_multilib_arches:
+ * @self: This #ModulemdComponentRpm object.
+ *
+ * Indicate that this RPM component is multilib on no architectures.
+ *
+ * Since: 2.9
+ */
+void
+modulemd_component_rpm_clear_multilib_arches (ModulemdComponentRpm *self);
 
 
 /**

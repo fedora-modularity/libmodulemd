@@ -369,8 +369,16 @@ modulemd_component_rpm_add_restricted_arch (ModulemdComponentRpm *self,
 }
 
 
+/* Deprecated in favor of modulemd_component_rpm_clear_arches() */
 void
 modulemd_component_rpm_reset_arches (ModulemdComponentRpm *self)
+{
+  modulemd_component_rpm_clear_arches (self);
+}
+
+
+void
+modulemd_component_rpm_clear_arches (ModulemdComponentRpm *self)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
 
@@ -397,9 +405,16 @@ modulemd_component_rpm_add_multilib_arch (ModulemdComponentRpm *self,
   g_hash_table_add (self->multilib, g_strdup (arch));
 }
 
-
+/* Deprecated in favor of modulemd_component_rpm_clear_multilib_arches() */
 void
 modulemd_component_rpm_reset_multilib_arches (ModulemdComponentRpm *self)
+{
+  modulemd_component_rpm_clear_multilib_arches (self);
+}
+
+
+void
+modulemd_component_rpm_clear_multilib_arches (ModulemdComponentRpm *self)
 {
   g_return_if_fail (MODULEMD_IS_COMPONENT_RPM (self));
 

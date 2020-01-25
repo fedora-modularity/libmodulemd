@@ -1,0 +1,22 @@
+specfile_path: libmodulemd.spec
+upstream_package_name: libmodulemd
+downstream_package_name: libmodulemd
+
+synced_files:
+  - .packit.yml
+  - .make_packit_specfile.sh
+  - libmodulemd.spec
+
+actions:
+    post-upstream-clone: ./.make_packit_specfile.sh
+
+jobs:
+- job: copr_build
+  trigger: pull_request
+  metadata:
+    targets: fedora-all
+
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist-git-branch: fedora-all

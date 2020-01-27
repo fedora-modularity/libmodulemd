@@ -1160,6 +1160,14 @@ data:
             )
             assert stream
 
+    def test_packager_sanity(self):
+        stream = Modulemd.ModuleStream.read_file(
+            "%s/yaml_specs/modulemd_packager_v2.yaml"
+            % os.getenv("MESON_SOURCE_ROOT"),
+            True,
+        )
+        assert stream
+
     def test_depends_on_stream(self):
 
         for version in modulestream_versions:

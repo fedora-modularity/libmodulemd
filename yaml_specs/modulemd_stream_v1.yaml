@@ -1,4 +1,5 @@
 # Document type identifier
+# `document: modulemd` describes the contents of a module stream
 document: modulemd
 # Module metadata format version
 version: 1

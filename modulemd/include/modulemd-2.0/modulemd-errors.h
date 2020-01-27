@@ -43,6 +43,8 @@ G_BEGIN_DECLS
  * @MODULEMD_ERROR_NOT_IMPLEMENTED: The requested function is not implemented
  * on this platform, likely due to needing a newer version of a dependency
  * library. Since: 2.8
+ * @MODULEMD_ERROR_MISSING_REQUIRED: The object is missing some data necessary
+ * for proper operation. Since: 2.9
  *
  * Since: 2.0
  */

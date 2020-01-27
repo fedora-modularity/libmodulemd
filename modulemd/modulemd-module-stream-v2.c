@@ -1587,6 +1587,7 @@ modulemd_module_stream_v2_parse_raw (yaml_parser_t *parser, GError **error);
 ModulemdModuleStreamV2 *
 modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                       gboolean strict,
+                                      gboolean only_packager,
                                       GError **error)
 {
   MODULEMD_INIT_TRACE ();

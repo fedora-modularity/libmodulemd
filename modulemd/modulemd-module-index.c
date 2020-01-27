@@ -143,10 +143,13 @@ add_subdoc (ModulemdModuleIndex *self,
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autofree gchar *name = NULL;
+  ModulemdYamlDocumentTypeEnum doctype =
+    modulemd_subdocument_info_get_doctype (subdoc);
 
-  switch (modulemd_subdocument_info_get_doctype (subdoc))
+  switch (doctype)
     {
     case MODULEMD_YAML_DOC_MODULESTREAM:
+    case MODULEMD_YAML_DOC_PACKAGER:
       switch (modulemd_subdocument_info_get_mdversion (subdoc))
         {
         case MD_MODULESTREAM_VERSION_ONE:
@@ -156,8 +159,8 @@ add_subdoc (ModulemdModuleIndex *self,
 
         case MD_MODULESTREAM_VERSION_TWO:
           stream =
-            (ModulemdModuleStream *)modulemd_module_stream_v2_parse_yaml (
-              subdoc, strict, error);
+            MODULEMD_MODULE_STREAM (modulemd_module_stream_v2_parse_yaml (
+              subdoc, strict, doctype == MODULEMD_YAML_DOC_PACKAGER, error));
           break;
 
         default:

@@ -1021,6 +1021,24 @@ module_stream_test_v2_yaml (void)
   g_clear_pointer (&specV2Path, g_free);
 }
 
+
+static void
+module_packager_v2_sanity (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (GError) error = NULL;
+
+  g_autofree gchar *specV2Path = g_strdup_printf (
+    "%s/yaml_specs/modulemd_packager_v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  stream =
+    modulemd_module_stream_read_file (specV2Path, TRUE, NULL, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  g_clear_object (&stream);
+  g_clear_pointer (&specV2Path, g_free);
+}
+
 static void
 module_stream_v1_test_rpm_artifacts (void)
 {
@@ -2503,7 +2521,7 @@ module_stream_v2_test_parse_dump (void)
   g_assert_cmpint (modulemd_subdocument_info_get_mdversion (subdoc), ==, 2);
   g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
 
-  stream = modulemd_module_stream_v2_parse_yaml (subdoc, TRUE, &error);
+  stream = modulemd_module_stream_v2_parse_yaml (subdoc, TRUE, FALSE, &error);
   g_assert_no_error (error);
   g_assert_nonnull (stream);
 
@@ -3185,6 +3203,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2_yaml",
                    module_stream_test_v2_yaml);
+
+  g_test_add_func ("/modulemd/v2/packager/v2_sanity",
+                   module_packager_v2_sanity);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade",
                    module_stream_test_upgrade);

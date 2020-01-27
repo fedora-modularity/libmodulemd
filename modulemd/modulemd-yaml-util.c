@@ -750,6 +750,10 @@ modulemd_yaml_parse_document_type_internal (
                 {
                   doctype = MODULEMD_YAML_DOC_TRANSLATIONS;
                 }
+              else if (g_str_equal (doctype_scalar, "modulemd-packager"))
+                {
+                  doctype = MODULEMD_YAML_DOC_PACKAGER;
+                }
               else
                 {
                   MMD_YAML_ERROR_EVENT_EXIT_BOOL (
@@ -832,6 +836,16 @@ modulemd_yaml_parse_document_type_internal (
                            MODULEMD_YAML_ERROR,
                            MODULEMD_YAML_ERROR_MISSING_REQUIRED,
                            "No metadata version specified");
+      return FALSE;
+    }
+
+  if (doctype == MODULEMD_YAML_DOC_PACKAGER && mdversion < 2)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_YAML_ERROR,
+                           MODULEMD_YAML_ERROR_INCONSISTENT,
+                           "Document type 'modulemd-packager' is permissible "
+                           "only for module stream version 2 or higher.");
       return FALSE;
     }
 

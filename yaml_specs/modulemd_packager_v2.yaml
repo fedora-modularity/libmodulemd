@@ -1,60 +1,17 @@
 # Document type identifier
-# `document: modulemd` describes the contents of a module stream
-document: modulemd
+# `document: modulemd-packager` describes the contents of a packager's input
+# for a module stream. It is always a proper subset of a `document: modulemd`
+# of the same `version`.
+document: modulemd-packager
 # Module metadata format version
 version: 2
 data:
-    # Module name, optional
-    # Typically filled in by the buildsystem, using the VCS repository
-    # name as the name of the module.
-    name: foo
-    # Module update stream, optional
-    # Typically filled in by the buildsystem, using the VCS branch name
-    # as the name of the stream.
-    stream: latest
-    # Module version, integer, optional, cannot be negative
-    # Typically filled in by the buildsystem, using the VCS commit
-    # timestamp.  Module version defines upgrade path for the particular
-    # update stream.
-    version: 20160927144203
-    # Module context flag, optional
-    # The context flag serves to distinguish module builds with the
-    # same name, stream and version and plays an important role in
-    # future automatic module stream name expansion.
-    # Filled in by the buildsystem.  A short hash of the module's name,
-    # stream, version and its expanded runtime dependencies.
-    context: c0ffee43
-    # Module artifact architecture, optional
-    # Contains a string describing the module's artifacts' main hardware
-    # architecture compatibility, distinguishing the module artifact,
-    # e.g. a repository, from others with the same name, stream, version and
-    # context.  This is not a generic hardware family (i.e. basearch).
-    # Examples: i386, i486, armv7hl, x86_64
-    # Filled in by the buildsystem during the compose stage.
-    arch: x86_64
     # A short summary describing the module, required
     summary: An example module
     # A verbose description of the module, required
     description: >-
         A module for the demonstration of the metadata format. Also,
         the obligatory lorem ipsum dolor sit amet goes right here.
-    # Service levels, optional
-    # This is a dictionary of important dates (and possibly supplementary data
-    # in the future) that describes the end point of certain functionality,
-    # such as the date when the module will transition to "security fixes only"
-    # or go completely end-of-life.
-    # Filled in by the buildsystem.  Service level names might have special
-    # meaning to other systems.  Defined externally.
-    servicelevels:
-        rawhide:
-            # EOL dates are the ISO 8601 format.
-            eol: 2077-10-23
-        stable_api:
-            eol: 2077-10-23
-        bug_fixes:
-            eol: 2077-10-23
-        security_fixes:
-            eol: 2077-10-23
     # Module and content licenses in the Fedora license identifier
     # format, required
     license:
@@ -64,18 +21,6 @@ data:
         # module.
         module:
             - MIT
-        # Content license, optional
-        # A list of licenses used by the packages in the module.
-        # This should be populated by build tools, not the module author.
-        content:
-            - Beerware
-            - GPLv2+
-            - zlib
-    # Extensible metadata block
-    # A dictionary of user-defined keys and values.
-    # Optional.  Defaults to an empty dictionary.
-    xmd:
-        some_key: some_data
     # Module dependencies, if any.  Optional.
     # A list of dictionaries describing build and runtime dependencies
     # of this module.  Each list item describes a combination of dependencies
@@ -215,39 +160,6 @@ data:
         # Optional, defaults to an empty list.
         rpms:
             - baz-nonfoo
-    # Component build options
-    # Additional per component type module-wide build options.
-    # Optional
-    buildopts:
-        # RPM-specific build options
-        # Optional
-        rpms:
-            # Additional macros that should be defined in the
-            # RPM buildroot, appended to the default set.  Care should be
-            # taken so that the newlines are preserved.  Literal style
-            # block is recommended, with or without the trailing newline.
-            # Optional
-            macros: |
-                %demomacro 1
-                %demomacro2 %{demomacro}23
-            # Explicit list of package build names this module will produce.
-            # By default the build system only allows components listed under
-            # data.components.rpms to be built as part of this module.
-            # In case the expected RPM build names do not match the component
-            # names, the list can be defined here.
-            # This list overrides rather then just extends the default.
-            # Optional, list of package build names without versions.
-            whitelist:
-                - fooscl-1-bar
-                - fooscl-1-baz
-                - xxx
-                - xyz
-        # Instructs the build system to only build the
-        # module on this specific set of architectures.
-        # Includes specific hardware architectures, not families.
-        # See the data.arch field for details.
-        # Optional, defaults to all available arches.
-        arches: [i686, x86_64]
     # Functional components of the module, optional
     components:
         # RPM content of the module, optional
@@ -313,10 +225,6 @@ data:
                 # xxx is only available on the listed architectures.
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
-                # Instructs the build system to only build the
-                # component on this specific set of architectures.
-                # If data.buildopts.arches is also specified,
-                # this must be a subset of those architectures.
                 # Optional, defaults to all available arches.
                 arches: [i686, x86_64]
                 # A list of architectures with multilib
@@ -347,9 +255,7 @@ data:
         # other included content.  Keys are module names, values additional
         # component information.  Note this only includes components and their
         # properties from the referenced module and doesn't inherit any
-        # additional module metadata such as the module's dependencies or
-        # component buildopts.  The included components are built in their
-        # defined buildorder as sub-build groups.
+        # additional module metadata such as the module's dependencies.
         # Optional
         modules:
             includedmodule:
@@ -364,41 +270,3 @@ data:
                 ref: somecoolbranchname
                 # See the rpms buildorder.
                 buildorder: 100
-    # Artifacts shipped with this module
-    # This section lists binary artifacts shipped with the module, allowing
-    # software management tools to handle module bundles.  This section is
-    # populated by the module build system.
-    # Optional
-    artifacts:
-        # RPM artifacts shipped with this module
-        # A set of NEVRAs associated with this module.
-        # Optional
-        rpms:
-            - bar-0:1.23-1.module_deadbeef.x86_64
-            - bar-devel-0:1.23-1.module_deadbeef.x86_64
-            - bar-extras-0:1.23-1.module_deadbeef.x86_64
-            - baz-0:42-42.module_deadbeef.x86_64
-            - xxx-0:1-1.module_deadbeef.x86_64
-            - xxx-0:1-1.module_deadbeef.i686
-            - xyz-0:1-1.module_deadbeef.x86_64
-        # The rpm-map exists to link checksums from repomd to specific
-        # artifacts produced by this module. Any item in this list must match
-        # an entry in the data.artifacts.rpms section.
-        # Optional.
-        rpm-map:
-          # The digest-type of this checksum. Required.
-          sha256:
-            # The checksum of the artifact being sought. Required.
-            ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:
-              # The RPM name. Required.
-              name: bar
-              # The RPM epoch. Required.
-              epoch: 0
-              # The RPM version. Required.
-              version: 1.23
-              # The RPM release. Required.
-              release: 1.module_deadbeef
-              # The RPM architecture. Required.
-              arch: x86_64
-              # The complete RPM NEVRA. Required.
-              nevra: bar-0:1.23-1.module_deadbeef.x86_64

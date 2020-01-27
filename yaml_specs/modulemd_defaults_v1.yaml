@@ -1,4 +1,6 @@
 # Document type identifier
+# `document: modulemd-defaults` describes the default stream and profiles for
+# a module.
 document: modulemd-defaults
 # Module metadata format version
 version: 1

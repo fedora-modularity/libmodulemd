@@ -165,6 +165,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  ModulemdYamlDocumentTypeEnum doctype;
 
   /* The first event must be the stream start */
   if (!yaml_parser_parse (parser, &event))
@@ -214,13 +215,15 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       return NULL;
     }
 
-  if (modulemd_subdocument_info_get_doctype (subdoc) !=
-      MODULEMD_YAML_DOC_MODULESTREAM)
+  doctype = modulemd_subdocument_info_get_doctype (subdoc);
+
+  if (doctype != MODULEMD_YAML_DOC_MODULESTREAM &&
+      doctype != MODULEMD_YAML_DOC_PACKAGER)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
                    MODULEMD_YAML_ERROR_PARSE,
-                   "Expected `document: modulemd`, got %d",
+                   "Expected `document: modulemd[-packager]`, got %d",
                    modulemd_subdocument_info_get_doctype (subdoc));
       return NULL;
     }
@@ -239,8 +242,8 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       break;
 
     case MD_MODULESTREAM_VERSION_TWO:
-      stream = MODULEMD_MODULE_STREAM (
-        modulemd_module_stream_v2_parse_yaml (subdoc, strict, &nested_error));
+      stream = MODULEMD_MODULE_STREAM (modulemd_module_stream_v2_parse_yaml (
+        subdoc, strict, doctype == MODULEMD_YAML_DOC_PACKAGER, &nested_error));
       if (!stream)
         {
           g_propagate_error (error, g_steal_pointer (&nested_error));

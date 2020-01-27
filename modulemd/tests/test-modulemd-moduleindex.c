@@ -23,6 +23,7 @@
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-module.h"
+#include "modulemd-subdocument-info.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-module-private.h"
 #include "private/modulemd-util.h"
@@ -166,6 +167,7 @@ module_index_test_dump (void)
 static void
 module_index_test_read (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
@@ -184,12 +186,32 @@ module_index_test_read (void)
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
+
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* The modulemd-packager definition
+   * This should fail to be read into a ModuleIndex because it provides no
+   * NSVCA information. It should only be importable via
+   * ModuleStream.read_file()
+   */
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 1);
+  g_assert_false (ret);
+  g_assert_error (
+    modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
+    MODULEMD_ERROR,
+    MODULEMD_ERROR_MISSING_REQUIRED);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
 

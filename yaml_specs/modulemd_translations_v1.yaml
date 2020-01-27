@@ -1,4 +1,6 @@
 # Document type identifier
+# `document: modulemd-translations` describes the translation of module strings
+# into other languages.
 document: modulemd-translations
 # Module metadata format version
 version: 1

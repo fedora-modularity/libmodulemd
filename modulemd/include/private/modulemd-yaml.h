@@ -60,6 +60,9 @@ modulemd_yaml_error_quark (void);
  * #ModulemdDefaultsV1) YAML document type.
  * @MODULEMD_YAML_DOC_TRANSLATIONS: Represents a `modulemd-translations` (see
  * #ModulemdTranslation) YAML document type.
+ * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document,
+ * which is a subset of #ModuleStream containing only the attributes that a
+ * package maintainer should modify. Since: 2.9
  *
  * Since: 2.0
  */
@@ -68,7 +71,8 @@ typedef enum
   MODULEMD_YAML_DOC_UNKNOWN = 0,
   MODULEMD_YAML_DOC_MODULESTREAM,
   MODULEMD_YAML_DOC_DEFAULTS,
-  MODULEMD_YAML_DOC_TRANSLATIONS
+  MODULEMD_YAML_DOC_TRANSLATIONS,
+  MODULEMD_YAML_DOC_PACKAGER
 } ModulemdYamlDocumentTypeEnum;
 
 /**

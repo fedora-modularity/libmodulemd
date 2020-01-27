@@ -520,6 +520,7 @@ module_stream_v2_test_rpm_filters (void)
 static void
 module_stream_test_upgrade (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleStreamV1) streamV1 = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
   g_autoptr (ModulemdModuleIndex) index = NULL;
@@ -548,10 +549,11 @@ module_stream_test_upgrade (void)
   g_assert_nonnull (updated_stream);
 
   index = modulemd_module_index_new ();
-  modulemd_module_index_add_module_stream (
+  ret = modulemd_module_index_add_module_stream (
     index, MODULEMD_MODULE_STREAM (updated_stream), &error);
 
   g_assert_no_error (error);
+  g_assert_true (ret);
 
   yaml_str = modulemd_module_index_dump_to_string (index, &error);
 

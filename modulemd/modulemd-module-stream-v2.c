@@ -1539,6 +1539,7 @@ static gboolean
 modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
                                           gboolean strict,
+                                          gboolean only_packager,
                                           GError **error);
 
 static gboolean
@@ -1632,7 +1633,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           /* Mapping Keys */
 
           /* Module Name */
-          if (g_str_equal ((const gchar *)event.data.scalar.value, "name"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "name") &&
+              !only_packager)
             {
               MMD_SET_PARSED_YAML_STRING (
                 &parser,
@@ -1643,7 +1645,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Module Stream Name */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "stream"))
+                                "stream") &&
+                   !only_packager)
             {
               MMD_SET_PARSED_YAML_STRING (
                 &parser,
@@ -1654,7 +1657,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Module Version */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "version"))
+                                "version") &&
+                   !only_packager)
             {
               version = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
@@ -1669,7 +1673,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Module Context */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "context"))
+                                "context") &&
+                   !only_packager)
             {
               MMD_SET_PARSED_YAML_STRING (
                 &parser,
@@ -1680,7 +1685,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Module Artifact Architecture */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "arch"))
+                                "arch") &&
+                   !only_packager)
             {
               MMD_SET_PARSED_YAML_STRING (&parser,
                                           error,
@@ -1712,7 +1718,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Service Levels */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "servicelevels"))
+                                "servicelevels") &&
+                   !only_packager)
             {
               if (!modulemd_module_stream_v2_parse_servicelevels (
                     &parser, modulestream, strict, &nested_error))
@@ -1726,8 +1733,11 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "license"))
             {
-              if (!modulemd_module_stream_v2_parse_licenses (
-                    &parser, modulestream, strict, &nested_error))
+              if (!modulemd_module_stream_v2_parse_licenses (&parser,
+                                                             modulestream,
+                                                             strict,
+                                                             only_packager,
+                                                             &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -1735,7 +1745,9 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             }
 
           /* Extensible Metadata */
-          else if (g_str_equal ((const gchar *)event.data.scalar.value, "xmd"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "xmd") &&
+                   !only_packager)
             {
               xmd =
                 modulemd_module_stream_v2_parse_raw (&parser, &nested_error);
@@ -1806,7 +1818,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Build Options */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "buildopts"))
+                                "buildopts") &&
+                   !only_packager)
             {
               buildopts =
                 modulemd_buildopts_parse_yaml (&parser, strict, &nested_error);
@@ -1835,7 +1848,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
           /* Artifacts */
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "artifacts"))
+                                "artifacts") &&
+                   !only_packager)
             {
               if (!modulemd_module_stream_v2_parse_artifacts (
                     &parser, modulestream, strict, &nested_error))
@@ -1857,7 +1871,6 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             }
           break;
 
-
         default:
           MMD_YAML_ERROR_EVENT_EXIT (
             error,
@@ -1877,6 +1890,7 @@ static gboolean
 modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
                                           ModulemdModuleStreamV2 *modulestream,
                                           gboolean strict,
+                                          gboolean only_packager,
                                           GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -1935,7 +1949,8 @@ modulemd_module_stream_v2_parse_licenses (yaml_parser_t *parser,
               g_clear_pointer (&set, g_hash_table_unref);
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "content"))
+                                "content") &&
+                   !only_packager)
             {
               set = modulemd_yaml_parse_string_set (parser, &nested_error);
               modulemd_module_stream_v2_replace_content_licenses (modulestream,

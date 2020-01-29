@@ -368,6 +368,7 @@ python_tests = {
 'merger'           : 'tests/ModulemdTests/merger.py',
 'module'           : 'tests/ModulemdTests/module.py',
 'moduleindex'      : 'tests/ModulemdTests/moduleindex.py',
+'modulepackager'   : 'tests/ModulemdTests/modulepackager.py',
 'modulestream'     : 'tests/ModulemdTests/modulestream.py',
 'profile'          : 'tests/ModulemdTests/profile.py',
 'rpmmap'           : 'tests/ModulemdTests/rpmmap.py',

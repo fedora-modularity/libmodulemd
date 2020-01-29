@@ -117,7 +117,8 @@ class TestDefaults(TestBase):
         # Load a defaults object into an Index
         index = Modulemd.ModuleIndex.new()
         index.update_from_file(
-            "%s/mod-defaults/spec.v1.yaml" % (os.getenv("MESON_SOURCE_ROOT")),
+            "%s/yaml_specs/modulemd_defaults_v1.yaml"
+            % (os.getenv("MESON_SOURCE_ROOT")),
             True,
         )
         module_names = index.get_module_names()

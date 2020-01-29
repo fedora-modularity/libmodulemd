@@ -262,7 +262,7 @@ translation_test_parse_yaml (void)
 
 
   /* Validate that we can read the specification without issues */
-  yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_translations_v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 

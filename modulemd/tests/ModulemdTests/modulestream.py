@@ -892,7 +892,10 @@ data:
 
         # Sanity check of spec.v2.yaml
         stream = Modulemd.ModuleStream.read_file(
-            os.path.join(self.source_root, "spec.v2.yaml"), True
+            os.path.join(
+                self.source_root, "yaml_specs/modulemd_stream_v2.yaml"
+            ),
+            True,
         )
         assert stream
 
@@ -1151,7 +1154,9 @@ data:
 
             # Sanity check of spec.v1.yaml
             stream = Modulemd.ModuleStream.read_file(
-                "%s/spec.v1.yaml" % os.getenv("MESON_SOURCE_ROOT"), True
+                "%s/yaml_specs/modulemd_stream_v1.yaml"
+                % os.getenv("MESON_SOURCE_ROOT"),
+                True,
             )
             assert stream
 

@@ -1009,8 +1009,8 @@ module_stream_test_v2_yaml (void)
 
 
   // Sanity check spec.v2.yaml
-  gchar *specV2Path =
-    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  gchar *specV2Path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
+                                       g_getenv ("MESON_SOURCE_ROOT"));
   stream =
     modulemd_module_stream_read_file (specV2Path, TRUE, NULL, NULL, &error);
 
@@ -2308,8 +2308,8 @@ module_stream_v1_test_parse_dump (void)
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
-  yaml_path =
-    g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
   yaml_stream = g_fopen (yaml_path, "rbe");
@@ -2477,8 +2477,8 @@ module_stream_v2_test_parse_dump (void)
   g_autofree gchar *yaml_path = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
-  yaml_path =
-    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_nonnull (yaml_path);
 
   yaml_stream = g_fopen (yaml_path, "rbe");

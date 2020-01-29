@@ -176,16 +176,16 @@ module_index_test_read (void)
   index = modulemd_module_index_new ();
 
   /* The two stream definitions */
-  yaml_path =
-    g_strdup_printf ("%s/spec.v1.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
-  yaml_path =
-    g_strdup_printf ("%s/spec.v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
@@ -194,7 +194,7 @@ module_index_test_read (void)
   g_clear_pointer (&failures, g_ptr_array_unref);
 
   /* The translation definitions */
-  yaml_path = g_strdup_printf ("%s/translations/spec.v1.yaml",
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_translations_v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));
@@ -204,7 +204,7 @@ module_index_test_read (void)
   g_clear_pointer (&failures, g_ptr_array_unref);
 
   /* The defaults definitions */
-  yaml_path = g_strdup_printf ("%s/mod-defaults/spec.v1.yaml",
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_defaults_v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));

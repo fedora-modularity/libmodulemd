@@ -42,15 +42,18 @@ class TestModuleIndex(TestBase):
     def test_read(self):
         idx = ModuleIndex.new()
 
-        with open(path.join(self.source_root, "spec.v1.yaml"), "r") as v1:
+        with open(
+            path.join(self.source_root, "yaml_specs/modulemd_stream_v1.yaml"),
+            "r",
+        ) as v1:
             res, failures = idx.update_from_string(v1.read(), True)
             self.assertTrue(res)
             self.assertListEqual(failures, [])
 
         for fname in [
-            "spec.v2.yaml",
-            "translations/spec.v1.yaml",
-            "mod-defaults/spec.v1.yaml",
+            "yaml_specs/modulemd_stream_v2.yaml",
+            "yaml_specs/modulemd_translations_v1.yaml",
+            "yaml_specs/modulemd_defaults_v1.yaml",
         ]:
             res, failures = idx.update_from_file(
                 path.join(self.source_root, fname), True

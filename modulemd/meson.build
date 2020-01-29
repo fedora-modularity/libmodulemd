@@ -176,22 +176,6 @@ modulemd_priv_hdrs = files(
 )
 
 test_srcs = files(
-    'tests/test-modulemd-buildopts.c',
-    'tests/test-modulemd-component-module.c',
-    'tests/test-modulemd-component-rpm.c',
-    'tests/test-modulemd-compression.c',
-    'tests/test-modulemd-defaults.c',
-    'tests/test-modulemd-defaults-v1.c',
-    'tests/test-modulemd-dependencies.c',
-    'tests/test-modulemd-merger.c',
-    'tests/test-modulemd-module.c',
-    'tests/test-modulemd-moduleindex.c',
-    'tests/test-modulemd-modulestream.c',
-    'tests/test-modulemd-profile.c',
-    'tests/test-modulemd-rpmmap.c',
-    'tests/test-modulemd-service-level.c',
-    'tests/test-modulemd-translation.c',
-    'tests/test-modulemd-translation-entry.c',
     'tests/test-utils.c',
 )
 
@@ -201,20 +185,6 @@ test_priv_hdrs = files(
 
 test_python_scripts = files(
     'tests/ModulemdTests/base.py',
-    'tests/ModulemdTests/buildopts.py',
-    'tests/ModulemdTests/componentrpm.py',
-    'tests/ModulemdTests/defaults.py',
-    'tests/ModulemdTests/defaultsv1.py',
-    'tests/ModulemdTests/dependencies.py',
-    'tests/ModulemdTests/merger.py',
-    'tests/ModulemdTests/module.py',
-    'tests/ModulemdTests/moduleindex.py',
-    'tests/ModulemdTests/modulestream.py',
-    'tests/ModulemdTests/profile.py',
-    'tests/ModulemdTests/rpmmap.py',
-    'tests/ModulemdTests/servicelevel.py',
-    'tests/ModulemdTests/translation.py',
-    'tests/ModulemdTests/translationentry.py',
 )
 
 include_dirs = include_directories (
@@ -367,6 +337,7 @@ c_tests = {
 }
 
 foreach name, sources : c_tests
+    test_srcs += files(sources)
     exe = executable(
         name,
         sources,
@@ -406,6 +377,7 @@ python_tests = {
 }
 
 foreach name, script : python_tests
+    test_python_scripts += files(script)
     test (name + '_python3_debug', python3,
           env : py_test_env,
           args : files(script))

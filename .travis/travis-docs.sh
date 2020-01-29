@@ -38,11 +38,11 @@ popd
 sed -e "s/@IMAGE@/$repository\/$MMD_OS:$MMD_RELEASE/" \
     $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE
 
-sudo docker build \
+$RETRY_CMD sudo docker build \
     -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
     -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
 
-sudo docker build \
+$RETRY_CMD sudo docker build \
     -f $SCRIPT_DIR/docs/Dockerfile \
     -t fedora-modularity/libmodulemd-docs-$MMD_OS:$MMD_RELEASE \
     --build-arg TARBALL=$TARBALL .

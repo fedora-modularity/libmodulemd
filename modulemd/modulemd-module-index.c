@@ -1090,7 +1090,7 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   MMD_ERROR_MISSING_REQUIRED,
                    "The module and stream names are required when adding to "
                    "ModuleIndex.");
       return FALSE;

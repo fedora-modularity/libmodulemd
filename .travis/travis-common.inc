@@ -11,17 +11,19 @@ BUILDAH_PATH=$(which buildah)
 
 DOCKER_PATH=$(which docker)
 
+RETRY_CMD=$SCRIPT_DIR/retry-command.sh
+
 if [ x$BUILDAH_PATH == x ]; then
     if [ x$DOCKER_PATH == x ]; then
         >&2 echo "error: Neither docker nor podman available"
         exit 1
     else
-        MMD_BUILDAH="sudo $DOCKER_PATH build"
+        MMD_BUILDAH="$RETRY_CMD sudo $DOCKER_PATH build"
         MMD_LAYERS_TRUE=
         MMD_LAYERS_FALSE=
     fi
 else
-    MMD_BUILDAH="$BUILDAH_PATH bud"
+    MMD_BUILDAH="$RETRY_CMD $BUILDAH_PATH bud"
     MMD_LAYERS_TRUE="--layers=true"
     MMD_LAYERS_FALSE="--layers=false"
 fi
@@ -35,7 +37,7 @@ fi
 
 function common_finalize {
     # If any specific test launcher needs to do its own cleanup as well,
-    # it should set the EXIT trap and make sure to also call this functino
+    # it should set the EXIT trap and make sure to also call this function
     # internally.
     exitcode=$?
 

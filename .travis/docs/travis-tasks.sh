@@ -4,6 +4,7 @@
 set -e
 set -x
 
+RETRY_CMD=/builddir/.travis/retry-command.sh
 
 pushd /builddir/
 
@@ -26,7 +27,7 @@ pushd doc-generation/modulemd/html
 /builddir/contrib/doc-tools/fix-xref.sh
 popd
 
-git clone https://sgallagher:$DOC_TOKEN@github.com/fedora-modularity/fedora-modularity.github.io
+$RETRY_CMD git clone https://sgallagher:$DOC_TOKEN@github.com/fedora-modularity/fedora-modularity.github.io
 rsync -avh --delete-before --no-perms --omit-dir-times /builddir/doc-generation/modulemd/html/* fedora-modularity.github.io/libmodulemd/latest
 
 pushd fedora-modularity.github.io
@@ -42,7 +43,7 @@ if [ $err = 0 ]; then
     git config user.name "Travis CI"
     git config user.email "sgallagh@redhat.com"
     git commit -m "Updating libmodulemd docs for $TRAVIS_COMMIT"
-    git push origin master
+    $RETRY_CMD git push origin master
 fi
 set -e
 

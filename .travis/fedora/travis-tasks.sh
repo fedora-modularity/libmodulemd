@@ -6,6 +6,7 @@ set -x
 
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Dskip_clang_tidy=${SKIP_CLANG_TIDY:-true}"
+RETRY_CMD=/builddir/.travis/retry-command.sh
 
 pushd /builddir/
 
@@ -51,7 +52,7 @@ ninja
 
 createrepo_c rpmbuild/RPMS/
 
-dnf -y install --nogpgcheck \
+$RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
                --repofrompath libmodulemd-travis,rpmbuild/RPMS \
                python3-libmodulemd \
@@ -59,7 +60,7 @@ dnf -y install --nogpgcheck \
 
 # Also install the python2-libmodulemd if it was built for this release
 # the ||: at the end instructs bash to consider this a pass either way.
-dnf -y install --nogpgcheck \
+$RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
                --repofrompath libmodulemd-travis,rpmbuild/RPMS \
                python2-libmodulemd ||:

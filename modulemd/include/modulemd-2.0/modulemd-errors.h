@@ -26,6 +26,62 @@ G_BEGIN_DECLS
 
 
 /**
+ * MODULEMD_ERROR:
+ *
+ * A convenience macro for identifying an error in the general modulemd domain.
+ *
+ * Since: 2.9
+ */
+#define MODULEMD_ERROR modulemd_error_quark ()
+
+/**
+ * modulemd_error_quark:
+ *
+ * Returns: A #GQuark used to identify an error in the general modulemd domain.
+ *
+ * Since: 2.9
+ */
+GQuark
+modulemd_error_quark (void);
+
+
+/**
+ * ModulemdError:
+ * @MMD_ERROR_UPGRADE: Represents an error encountered while upgrading the
+ * metadata version of a module stream or module defaults.
+ * @MMD_ERROR_VALIDATE: Represents an error encountered while validating
+ * module metadata.
+ * @MMD_ERROR_FILE_ACCESS: Represents an error encountered when attempting
+ * to access a file.
+ * @MMD_ERROR_NO_MATCHES: Represents an error indicating that no streams
+ * matched when searching for a specific module stream.
+ * @MMD_ERROR_TOO_MANY_MATCHES: Represents an error indicating that
+ * multiple streams matched when searching for a specific module
+ * stream.
+ * @MMD_ERROR_MAGIC: Could not detect the mime type of a file for
+ * automatic detection of compression format.
+ * @MMD_ERROR_NOT_IMPLEMENTED: The requested function is not implemented
+ * on this platform, likely due to needing a newer version of a dependency
+ * library.
+ * @MMD_ERROR_MISSING_REQUIRED: The object is missing some data necessary
+ * for proper operation.
+ *
+ * Since: 2.9
+ */
+typedef enum
+{
+  MMD_ERROR_UPGRADE,
+  MMD_ERROR_VALIDATE,
+  MMD_ERROR_FILE_ACCESS,
+  MMD_ERROR_NO_MATCHES,
+  MMD_ERROR_TOO_MANY_MATCHES,
+  MMD_ERROR_MAGIC,
+  MMD_ERROR_NOT_IMPLEMENTED,
+  MMD_ERROR_MISSING_REQUIRED
+} ModulemdError;
+
+
+/**
  * ModulemdErrorEnum:
  * @MODULEMD_ERROR_UPGRADE: Represents an error encountered while upgrading the
  * metadata version of a module stream or module defaults.
@@ -43,10 +99,10 @@ G_BEGIN_DECLS
  * @MODULEMD_ERROR_NOT_IMPLEMENTED: The requested function is not implemented
  * on this platform, likely due to needing a newer version of a dependency
  * library. Since: 2.8
- * @MODULEMD_ERROR_MISSING_REQUIRED: The object is missing some data necessary
- * for proper operation. Since: 2.9
  *
  * Since: 2.0
+ * Deprecated: 2.9
+ * Use #ModulemdError instead.
  */
 typedef enum
 {
@@ -58,6 +114,62 @@ typedef enum
   MODULEMD_ERROR_MAGIC,
   MODULEMD_ERROR_NOT_IMPLEMENTED
 } ModulemdErrorEnum;
+
+
+/**
+ * MODULEMD_YAML_ERROR:
+ *
+ * A convenience macro for identifying an error in the modulemd yaml domain.
+ *
+ * Since: 2.9
+ */
+#define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
+
+/**
+ * modulemd_yaml_error_quark:
+ *
+ * Returns: A #GQuark used to identify an error in the modulemd yaml domain.
+ *
+ * Since: 2.9
+ */
+GQuark
+modulemd_yaml_error_quark (void);
+
+
+/**
+ * ModulemdYamlError:
+ * @MMD_YAML_ERROR_OPEN: Represents an error encountered while opening a
+ * YAML file.
+ * @MMD_YAML_ERROR_PROGRAMMING: Represents an internal programming error
+ * encountered while parsing a YAML document.
+ * @MMD_YAML_ERROR_UNPARSEABLE: Represents an error indicating that
+ * unexpected data or some other parsing error was encountered while parsing a
+ * YAML document.
+ * @MMD_YAML_ERROR_PARSE: Represents an error indicating invalid data was
+ * encountered while parsing a YAML document.
+ * @MMD_YAML_ERROR_EMIT: Represents an error encountered while writing a
+ * YAML file.
+ * @MMD_YAML_ERROR_MISSING_REQUIRED: Represents an error indicating that
+ * required elements are missing while parsing a YAML document.
+ * @MMD_YAML_ERROR_EVENT_INIT: Represents an error indicating that a YAML
+ * output event could not be initialized.
+ * @MMD_YAML_ERROR_INCONSISTENT: Represents a data inconsistency error
+ * encountered while parsing a YAML document.
+ *
+ * Since: 2.9
+ */
+typedef enum
+{
+  MMD_YAML_ERROR_OPEN,
+  MMD_YAML_ERROR_PROGRAMMING,
+  MMD_YAML_ERROR_UNPARSEABLE,
+  MMD_YAML_ERROR_PARSE,
+  MMD_YAML_ERROR_EMIT,
+  MMD_YAML_ERROR_MISSING_REQUIRED,
+  MMD_YAML_ERROR_EVENT_INIT,
+  MMD_YAML_ERROR_INCONSISTENT
+} ModulemdYamlError;
+
 
 /**
  * ModulemdYamlErrorEnum:
@@ -80,7 +192,10 @@ typedef enum
  * encountered while parsing a YAML document.
  *
  * Since: 2.0
+ * Deprecated: 2.9
+ * Use #ModulemdYamlError instead.
  */
+
 typedef enum
 {
   MODULEMD_YAML_ERROR_OPEN,

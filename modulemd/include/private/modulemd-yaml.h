@@ -33,25 +33,6 @@ G_BEGIN_DECLS
 
 
 /**
- * MODULEMD_YAML_ERROR:
- *
- * A convenience macro for identifying an error in the modulemd yaml domain.
- *
- * Since: 2.0
- */
-#define MODULEMD_YAML_ERROR modulemd_yaml_error_quark ()
-
-/**
- * modulemd_yaml_error_quark:
- *
- * Returns: A #GQuark used to identify an error in the modulemd yaml domain.
- *
- * Since: 2.0
- */
-GQuark
-modulemd_yaml_error_quark (void);
-
-/**
  * ModulemdYamlDocumentTypeEnum:
  * @MODULEMD_YAML_DOC_UNKNOWN: Represents an unknown YAML document type.
  * @MODULEMD_YAML_DOC_MODULESTREAM: Represents a `modulemd` (see

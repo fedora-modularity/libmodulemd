@@ -33,24 +33,6 @@ G_BEGIN_DECLS
 
 
 /**
- * MODULEMD_ERROR:
- *
- * A convenience macro for identifying an error in the general modulemd domain.
- *
- */
-#define MODULEMD_ERROR modulemd_error_quark ()
-
-/**
- * modulemd_error_quark:
- *
- * Returns: A #GQuark used to identify an error in the general modulemd domain.
- *
- * Since: 2.0
- */
-GQuark
-modulemd_error_quark (void);
-
-/**
  * modulemd_tracer:
  * @function_name: The name of the function to be tracked by this
  * #modulemd_tracer.

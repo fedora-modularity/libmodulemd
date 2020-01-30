@@ -166,6 +166,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
   ModulemdYamlDocumentTypeEnum doctype;
+  const GError *gerror = NULL;
 
   /* The first event must be the stream start */
   if (!yaml_parser_parse (parser, &event))
@@ -206,14 +207,17 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   yaml_event_delete (&event);
 
   subdoc = modulemd_yaml_parse_document_type (parser);
-  if (subdoc == NULL)
+  gerror = modulemd_subdocument_info_get_gerror (subdoc);
+  if (gerror)
     {
-      g_propagate_prefixed_error (
-        error,
-        g_steal_pointer (&nested_error),
-        "Parse error identifying document type and version: ");
+      g_set_error (error,
+                   gerror->domain,
+                   gerror->code,
+                   "Parse error identifying document type and version: %s",
+                   gerror->message);
       return NULL;
     }
+
 
   doctype = modulemd_subdocument_info_get_doctype (subdoc);
 

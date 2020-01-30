@@ -356,6 +356,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
 /**
  * MMD_YAML_ERROR_EVENT_EXIT_FULL:
  * @_error: (out): A #GError that will return the reason for the error.
+ * @_errorcode: (in): The exact error code that should be set on @_error.
  * @_event: (in): The libyaml event for which an error is to be reported.
  * @_returnval: (in): The error value to return.
  * @...: (in): Additional argument(s) to pass to g_set_error() when setting
@@ -370,7 +371,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  *
  * Since: 2.0
  */
-#define MMD_YAML_ERROR_EVENT_EXIT_FULL(_error, _event, _returnval, ...)       \
+#define MMD_YAML_ERROR_EVENT_EXIT_FULL(                                       \
+  _error, _errorcode, _event, _returnval, ...)                                \
   do                                                                          \
     {                                                                         \
       g_autofree gchar *formatted = g_strdup_printf (__VA_ARGS__);            \
@@ -381,7 +383,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                          _event.start_mark.column + 1);                       \
       g_debug ("%s", formatted2);                                             \
       g_set_error (                                                           \
-        _error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE, "%s", formatted2); \
+        _error, MODULEMD_YAML_ERROR, _errorcode, "%s", formatted2);           \
       return _returnval;                                                      \
     }                                                                         \
   while (0)
@@ -398,7 +400,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  * Since: 2.0
  */
 #define MMD_YAML_ERROR_EVENT_EXIT(_error, _event, ...)                        \
-  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, NULL, __VA_ARGS__)
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (                                            \
+    _error, MMD_YAML_ERROR_PARSE, _event, NULL, __VA_ARGS__)
 
 /**
  * MMD_YAML_ERROR_EVENT_EXIT_BOOL:
@@ -412,7 +415,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  * Since: 2.0
  */
 #define MMD_YAML_ERROR_EVENT_EXIT_BOOL(_error, _event, ...)                   \
-  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, FALSE, __VA_ARGS__)
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (                                            \
+    _error, MMD_YAML_ERROR_PARSE, _event, FALSE, __VA_ARGS__)
 
 /**
  * MMD_YAML_ERROR_EVENT_EXIT_INT:
@@ -426,7 +430,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  * Since: 2.0
  */
 #define MMD_YAML_ERROR_EVENT_EXIT_INT(_error, _event, ...)                    \
-  MMD_YAML_ERROR_EVENT_EXIT_FULL (_error, _event, 0, __VA_ARGS__)
+  MMD_YAML_ERROR_EVENT_EXIT_FULL (                                            \
+    _error, MMD_YAML_ERROR_PARSE, _event, 0, __VA_ARGS__)
 
 /**
  * MMD_SET_PARSED_YAML_STRING:
@@ -916,8 +921,11 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
       g_debug (__VA_ARGS__);                                                  \
       if (strict)                                                             \
         {                                                                     \
-          MMD_YAML_ERROR_EVENT_EXIT_FULL (                                    \
-            error, event, _returnval, __VA_ARGS__);                           \
+          MMD_YAML_ERROR_EVENT_EXIT_FULL (error,                              \
+                                          MMD_YAML_ERROR_UNKNOWN_ATTR,        \
+                                          event,                              \
+                                          _returnval,                         \
+                                          __VA_ARGS__);                       \
         }                                                                     \
                                                                               \
       if (!skip_unknown_yaml (_parser, error))                                \

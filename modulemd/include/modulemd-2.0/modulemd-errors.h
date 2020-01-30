@@ -156,6 +156,8 @@ modulemd_yaml_error_quark (void);
  * output event could not be initialized.
  * @MMD_YAML_ERROR_INCONSISTENT: Represents a data inconsistency error
  * encountered while parsing a YAML document.
+ * @MMD_YAML_ERROR_UNKNOWN_ATTRS: While parsing a document in strict mode, an
+ * attribute was encountered that does not belong in this document.
  *
  * Since: 2.9
  */
@@ -168,7 +170,8 @@ typedef enum
   MMD_YAML_ERROR_EMIT,
   MMD_YAML_ERROR_MISSING_REQUIRED,
   MMD_YAML_ERROR_EVENT_INIT,
-  MMD_YAML_ERROR_INCONSISTENT
+  MMD_YAML_ERROR_INCONSISTENT,
+  MMD_YAML_ERROR_UNKNOWN_ATTR
 } ModulemdYamlError;
 
 

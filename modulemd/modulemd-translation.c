@@ -110,7 +110,7 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Translation module name is unset.");
       return FALSE;
     }
@@ -118,7 +118,7 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Translation module name is empty.");
       return FALSE;
     }
@@ -127,7 +127,7 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Translation module stream is unset.");
       return FALSE;
     }
@@ -135,7 +135,7 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Translation module stream is unset.");
       return FALSE;
     }
@@ -143,7 +143,7 @@ modulemd_translation_validate (ModulemdTranslation *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Translation module modified is empty.");
       return FALSE;
     }
@@ -463,7 +463,7 @@ modulemd_translation_parse_yaml_entries (yaml_parser_t *parser,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EMIT,
+                   MMD_YAML_ERROR_EMIT,
                    "Somehow got a NULL hash table here.");
     }
 

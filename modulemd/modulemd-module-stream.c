@@ -103,11 +103,8 @@ modulemd_module_stream_read_file (const gchar *path,
 
   if (!yaml_stream)
     {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MODULEMD_ERROR_FILE_ACCESS,
-                   "%s",
-                   g_strerror (err));
+      g_set_error (
+        error, MODULEMD_ERROR, MMD_ERROR_FILE_ACCESS, "%s", g_strerror (err));
       return NULL;
     }
 
@@ -173,7 +170,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           MMD_YAML_ERROR_UNPARSEABLE,
                            "Parser error");
       return NULL;
     }
@@ -181,7 +178,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_PARSE,
+                           MMD_YAML_ERROR_PARSE,
                            "YAML didn't begin with STREAM_START.");
       return NULL;
     }
@@ -192,7 +189,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           MMD_YAML_ERROR_UNPARSEABLE,
                            "Parser error");
       return NULL;
     }
@@ -200,7 +197,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_PARSE,
+                           MMD_YAML_ERROR_PARSE,
                            "YAML didn't begin with STREAM_START.");
       return NULL;
     }
@@ -226,7 +223,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_PARSE,
+                   MMD_YAML_ERROR_PARSE,
                    "Expected `document: modulemd[-packager]`, got %d",
                    modulemd_subdocument_info_get_doctype (subdoc));
       return NULL;
@@ -258,7 +255,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     default:
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_PARSE,
+                   MMD_YAML_ERROR_PARSE,
                    "Unknown ModuleStream version: %" PRIu64,
                    modulemd_subdocument_info_get_mdversion (subdoc));
       return NULL;
@@ -270,7 +267,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           MMD_YAML_ERROR_UNPARSEABLE,
                            "Parser error");
       return NULL;
     }
@@ -279,7 +276,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_PARSE,
+                           MMD_YAML_ERROR_PARSE,
                            "YAML contained more than a single subdocument");
       return NULL;
     }
@@ -483,7 +480,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
       /* Downgrades are not supported */
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_UPGRADE,
+                           MMD_ERROR_UPGRADE,
                            "ModuleStream downgrades are not supported.");
       return NULL;
     }
@@ -511,7 +508,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                */
               g_set_error (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_UPGRADE,
+                           MMD_ERROR_UPGRADE,
                            "Upgrading to v2 failed for an unknown reason");
               return NULL;
             }
@@ -522,7 +519,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
           g_set_error (
             error,
             MODULEMD_ERROR,
-            MODULEMD_ERROR_UPGRADE,
+            MMD_ERROR_UPGRADE,
             "Cannot upgrade beyond metadata version %" G_GUINT64_FORMAT,
             current_mdversion);
           return NULL;
@@ -644,7 +641,7 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Metadata version is unset.");
       return FALSE;
     }
@@ -652,7 +649,7 @@ modulemd_module_stream_default_validate (ModulemdModuleStream *self,
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Unknown metadata version.");
       return FALSE;
     }
@@ -718,7 +715,7 @@ modulemd_module_stream_validate_components (GHashTable *components,
                       g_set_error (
                         error,
                         MODULEMD_ERROR,
-                        MODULEMD_ERROR_VALIDATE,
+                        MMD_ERROR_VALIDATE,
                         "Buildafter '%s' not found in components list",
                         (const gchar *)ba_key);
                       return FALSE;
@@ -735,7 +732,7 @@ modulemd_module_stream_validate_components (GHashTable *components,
           g_set_error (
             error,
             MODULEMD_ERROR,
-            MODULEMD_ERROR_VALIDATE,
+            MMD_ERROR_VALIDATE,
             "Cannot mix buildorder and buildafter in the same stream");
           return FALSE;
         }
@@ -786,7 +783,7 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
               g_set_error (
                 error,
                 MODULEMD_ERROR,
-                MODULEMD_ERROR_VALIDATE,
+                MMD_ERROR_VALIDATE,
                 "Component rpm '%s' arch '%s' not in module buildopts.arches",
                 modulemd_component_get_name (MODULEMD_COMPONENT (value)),
                 rpm_arches[i]);

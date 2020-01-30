@@ -54,7 +54,7 @@ module_test_construct (void)
   g_clear_pointer (&list, g_ptr_array_unref);
   g_assert_null (
     modulemd_module_get_stream_by_NSVCA (m, "test", 42, "test", NULL, &error));
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_NO_MATCHES);
   g_clear_error (&error);
   g_clear_object (&m);
 
@@ -252,13 +252,13 @@ module_test_streams (void)
   stream = modulemd_module_get_stream_by_NSVCA (
     m, "nosuch", 3, "nosuchctx", NULL, &error);
   g_assert_null (stream);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_NO_MATCHES);
   g_clear_error (&error);
 
   stream =
     modulemd_module_get_stream_by_NSVCA (m, "stream1", 1, NULL, NULL, &error);
   g_assert_null (stream);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_TOO_MANY_MATCHES);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_TOO_MANY_MATCHES);
   g_clear_error (&error);
 
   stream = modulemd_module_get_stream_by_NSVCA (
@@ -294,7 +294,7 @@ module_test_streams (void)
   stream = modulemd_module_get_stream_by_NSVCA (
     m, "stream1", 3, "context1", NULL, &error);
   g_assert_null (stream);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_NO_MATCHES);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_NO_MATCHES);
   g_clear_error (&error);
 
   stream = modulemd_module_get_stream_by_NSVCA (

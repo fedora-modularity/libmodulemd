@@ -166,7 +166,7 @@ add_subdoc (ModulemdModuleIndex *self,
         default:
           g_set_error (error,
                        MODULEMD_YAML_ERROR,
-                       MODULEMD_YAML_ERROR_PARSE,
+                       MMD_YAML_ERROR_PARSE,
                        "Invalid mdversion for a stream object");
           return FALSE;
         }
@@ -233,7 +233,7 @@ add_subdoc (ModulemdModuleIndex *self,
         default:
           g_set_error (error,
                        MODULEMD_YAML_ERROR,
-                       MODULEMD_YAML_ERROR_PARSE,
+                       MMD_YAML_ERROR_PARSE,
                        "Invalid mdversion for a defaults object");
           return FALSE;
         }
@@ -261,7 +261,7 @@ add_subdoc (ModulemdModuleIndex *self,
     default:
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_PARSE,
+                   MMD_YAML_ERROR_PARSE,
                    "Invalid doctype encountered");
       return FALSE;
     }
@@ -372,7 +372,7 @@ dump_defaults (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Provided defaults is not a recognized version");
       return FALSE;
     }
@@ -464,7 +464,7 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
         {
           g_set_error_literal (error,
                                MODULEMD_ERROR,
-                               MODULEMD_ERROR_VALIDATE,
+                               MMD_ERROR_VALIDATE,
                                "Provided stream is not a recognized version");
           return FALSE;
         }
@@ -488,7 +488,7 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Index contains no modules.");
       return FALSE;
     }
@@ -556,7 +556,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_YAML_ERROR_OPEN,
+                   MMD_YAML_ERROR_OPEN,
                    "Failed to open file: %s",
                    g_strerror (saved_errno));
       return FALSE;
@@ -598,7 +598,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_FILE_ACCESS,
+                   MMD_ERROR_FILE_ACCESS,
                    "Unable to construct rpmio fmode from comtype [%d]",
                    comtype);
       return FALSE;
@@ -615,7 +615,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
       g_set_error (
         error,
         MODULEMD_ERROR,
-        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        MMD_ERROR_NOT_IMPLEMENTED,
         "Cannot open compressed file. Error in rpmio::fdDup(%d): %s",
         fd,
         strerror (saved_errno));
@@ -630,7 +630,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
       g_set_error_literal (
         error,
         MODULEMD_ERROR,
-        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        MMD_ERROR_NOT_IMPLEMENTED,
         "Cannot open compressed file. Error in rpmio::Fdopen().");
       return FALSE;
     }
@@ -644,7 +644,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
   g_set_error_literal (
     error,
     MODULEMD_ERROR,
-    MODULEMD_ERROR_NOT_IMPLEMENTED,
+    MMD_ERROR_NOT_IMPLEMENTED,
     "Cannot open compressed file. libmodulemd was not compiled "
     "with rpmio support.");
   return FALSE;
@@ -669,7 +669,7 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
   if (!yaml_string)
     {
       g_set_error (
-        error, MODULEMD_ERROR, MODULEMD_YAML_ERROR_OPEN, "No string provided");
+        error, MODULEMD_ERROR, MMD_YAML_ERROR_OPEN, "No string provided");
       return FALSE;
     }
 
@@ -700,7 +700,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
   if (!yaml_stream)
     {
       g_set_error (
-        error, MODULEMD_ERROR, MODULEMD_YAML_ERROR_OPEN, "No stream provided");
+        error, MODULEMD_ERROR, MMD_YAML_ERROR_OPEN, "No stream provided");
       return FALSE;
     }
 
@@ -1141,7 +1141,7 @@ modulemd_module_index_upgrade_streams (
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_UPGRADE,
+                   MMD_ERROR_UPGRADE,
                    "Downgrades not permitted. mdversion %i < current %i",
                    mdversion,
                    self->stream_mdversion);
@@ -1281,7 +1281,7 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_UPGRADE,
+                   MMD_ERROR_UPGRADE,
                    "Downgrades not permitted. mdversion %i < current %i",
                    mdversion,
                    self->defaults_mdversion);
@@ -1292,7 +1292,7 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_UPGRADE,
+                   MMD_ERROR_UPGRADE,
                    "Unknown Defaults metadata version %i",
                    mdversion);
       return FALSE;

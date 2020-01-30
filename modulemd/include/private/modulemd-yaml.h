@@ -217,7 +217,7 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
           g_debug ("Parser error");                                           \
           g_set_error_literal (_error,                                        \
                                MODULEMD_YAML_ERROR,                           \
-                               MODULEMD_YAML_ERROR_UNPARSEABLE,               \
+                               MMD_YAML_ERROR_UNPARSEABLE,                    \
                                "Parser error");                               \
           return _returnval;                                                  \
         }                                                                     \
@@ -312,10 +312,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
       if (!_ret)                                                              \
         {                                                                     \
           g_debug (__VA_ARGS__);                                              \
-          g_set_error (_error,                                                \
-                       MODULEMD_YAML_ERROR,                                   \
-                       MODULEMD_YAML_ERROR_EMIT,                              \
-                       __VA_ARGS__);                                          \
+          g_set_error (                                                       \
+            _error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_EMIT, __VA_ARGS__);   \
           return _returnval;                                                  \
         }                                                                     \
     }                                                                         \
@@ -382,11 +380,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
                          _event.start_mark.line + 1,                          \
                          _event.start_mark.column + 1);                       \
       g_debug ("%s", formatted2);                                             \
-      g_set_error (_error,                                                    \
-                   MODULEMD_YAML_ERROR,                                       \
-                   MODULEMD_YAML_ERROR_PARSE,                                 \
-                   "%s",                                                      \
-                   formatted2);                                               \
+      g_set_error (                                                           \
+        _error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE, "%s", formatted2); \
       return _returnval;                                                      \
     }                                                                         \
   while (0)
@@ -1019,7 +1014,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         {                                                                     \
           g_set_error (error,                                                 \
                        MODULEMD_YAML_ERROR,                                   \
-                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       MMD_YAML_ERROR_EMIT,                                   \
                        "Value for key %s was NULL on emit",                   \
                        key);                                                  \
           return FALSE;                                                       \
@@ -1303,7 +1298,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         {                                                                     \
           g_set_error (error,                                                 \
                        MODULEMD_YAML_ERROR,                                   \
-                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       MMD_YAML_ERROR_EMIT,                                   \
                        "String set for key %s was empty on emit",             \
                        key);                                                  \
           return FALSE;                                                       \
@@ -1407,7 +1402,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         {                                                                     \
           g_set_error (error,                                                 \
                        MODULEMD_YAML_ERROR,                                   \
-                       MODULEMD_YAML_ERROR_EMIT,                              \
+                       MMD_YAML_ERROR_EMIT,                                   \
                        "Array for key %s was empty on emit",                  \
                        key);                                                  \
           return FALSE;                                                       \

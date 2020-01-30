@@ -213,7 +213,7 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
         {
           g_set_error (error,
                        MODULEMD_YAML_ERROR,
-                       MODULEMD_YAML_ERROR_UNPARSEABLE,
+                       MMD_YAML_ERROR_UNPARSEABLE,
                        "Unexpected end while waiting for data");
           return FALSE;
         }
@@ -265,7 +265,7 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
             {
               g_set_error (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_UNPARSEABLE,
+                           MMD_YAML_ERROR_UNPARSEABLE,
                            "Unexpected event while waiting for data: %s",
                            mmd_yaml_get_event_name (event.type));
               return FALSE;

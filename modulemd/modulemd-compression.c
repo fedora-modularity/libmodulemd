@@ -48,7 +48,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_FILE_ACCESS,
+                   MMD_ERROR_FILE_ACCESS,
                    "File %s does not exist or is not a regular file",
                    filename);
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
@@ -88,7 +88,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_MAGIC,
+                   MMD_ERROR_MAGIC,
                    "Could not dup() the file descriptor: %s",
                    g_strerror (err));
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
@@ -99,7 +99,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_MAGIC,
+                   MMD_ERROR_MAGIC,
                    "magic_open() failed: Cannot allocate the magic cookie");
       close (magic_fd);
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
@@ -109,7 +109,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_MAGIC,
+                   MMD_ERROR_MAGIC,
                    "magic_load() failed: %s",
                    magic_error (magic));
       close (magic_fd);
@@ -163,7 +163,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_MAGIC,
+                   MMD_ERROR_MAGIC,
                    "mime_type() detection failed: %s",
                    magic_error (magic));
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;

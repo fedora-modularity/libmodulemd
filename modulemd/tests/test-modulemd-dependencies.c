@@ -461,7 +461,7 @@ dependencies_test_parse_bad_yaml (void)
   g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
 
   g_assert_false (modulemd_dependencies_validate (d, &error));
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
 }
 
 

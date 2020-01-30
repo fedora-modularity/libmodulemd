@@ -59,7 +59,7 @@ test_basic (void)
   g_assert_null (modulemd_rpm_map_entry_get_release (entry));
   g_assert_null (modulemd_rpm_map_entry_get_arch (entry));
   g_assert_false (modulemd_rpm_map_entry_validate (entry, &error));
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_clear_error (&error);
   nevra = modulemd_rpm_map_entry_get_nevra_as_string (entry);
   g_assert_null (nevra);
@@ -177,7 +177,7 @@ test_parse_yaml_missing (void)
 
   entry = modulemd_rpm_map_entry_parse_yaml (&parser, TRUE, &error);
   g_assert_null (entry);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
 }
 
 static void
@@ -203,8 +203,7 @@ test_parse_yaml_mismatch (void)
 
   entry = modulemd_rpm_map_entry_parse_yaml (&parser, TRUE, &error);
   g_assert_null (entry);
-  g_assert_error (
-    error, MODULEMD_YAML_ERROR, MODULEMD_YAML_ERROR_INCONSISTENT);
+  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_INCONSISTENT);
 }
 
 static void
@@ -260,7 +259,7 @@ test_emit_yaml_invalid (void)
   g_assert_true (mmd_emitter_start_document (&emitter, &error));
 
   g_assert_false (modulemd_rpm_map_entry_emit_yaml (entry, &emitter, &error));
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
 }
 
 int

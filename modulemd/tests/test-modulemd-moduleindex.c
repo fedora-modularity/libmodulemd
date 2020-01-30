@@ -211,7 +211,7 @@ module_index_test_read (void)
   g_assert_error (
     modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
     MODULEMD_ERROR,
-    MODULEMD_ERROR_MISSING_REQUIRED);
+    MMD_ERROR_MISSING_REQUIRED);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
@@ -1030,7 +1030,7 @@ module_index_test_dump_empty_index (void)
 
   yaml = modulemd_module_index_dump_to_string (index, &error);
   g_assert_null (yaml);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
 }
 
 
@@ -1080,7 +1080,7 @@ test_module_index_read_compressed (void)
     { .filename = "bzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
     {
       .filename = "bzipped.yaml.bz2",
       .succeeds = TRUE,
@@ -1088,12 +1088,12 @@ test_module_index_read_compressed (void)
     { .filename = "gzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
     { .filename = "gzipped.yaml.gz", .succeeds = TRUE },
     { .filename = "xzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MODULEMD_YAML_ERROR_UNPARSEABLE },
+      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
     { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
     { .filename = NULL }
   };
@@ -1104,27 +1104,27 @@ test_module_index_read_compressed (void)
     { .filename = "bzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = "bzipped.yaml.bz2",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = "gzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = "gzipped.yaml.gz",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = "xzipped",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = "xzipped.yaml.xz",
       .succeeds = FALSE,
       .error_domain = MODULEMD_ERROR,
-      .error_code = MODULEMD_ERROR_NOT_IMPLEMENTED },
+      .error_code = MMD_ERROR_NOT_IMPLEMENTED },
     { .filename = NULL }
   };
 #endif /* HAVE_RPMIO */
@@ -1312,7 +1312,7 @@ test_module_index_read_def_dir (void)
    */
   g_assert_false (modulemd_module_index_update_from_defaults_directory (
     idx, bad_path, TRUE, NULL, &error));
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_clear_error (&error);
 
   /* Verify that the index has not been modified as a side-effect */

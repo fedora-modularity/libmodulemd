@@ -1138,7 +1138,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   MMD_YAML_ERROR_MISSING_REQUIRED,
                    "Summary is missing");
       return FALSE;
     }
@@ -1147,7 +1147,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   MMD_YAML_ERROR_MISSING_REQUIRED,
                    "Description is missing");
       return FALSE;
     }
@@ -1156,7 +1156,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                   MMD_YAML_ERROR_MISSING_REQUIRED,
                    "Module license is missing");
       return FALSE;
     }
@@ -1197,7 +1197,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
         {
           g_set_error (error,
                        MODULEMD_ERROR,
-                       MODULEMD_ERROR_VALIDATE,
+                       MMD_ERROR_VALIDATE,
                        "Artifact '%s' was not in valid N-E:V-R.A format.",
                        nevra);
           return FALSE;
@@ -2804,7 +2804,7 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EMIT,
+                   MMD_YAML_ERROR_EMIT,
                    "Module licenses is not allowed to be empty");
       return FALSE;
     }

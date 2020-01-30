@@ -188,7 +188,7 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Metadata version is unset.");
       return FALSE;
     }
@@ -196,7 +196,7 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_VALIDATE,
+                   MMD_ERROR_VALIDATE,
                    "Metadata version unknown: %" PRIu64 ".",
                    mdversion);
       return FALSE;
@@ -204,10 +204,8 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
 
   if (!priv->module_name)
     {
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
-                           "Module name is unset.");
+      g_set_error_literal (
+        error, MODULEMD_ERROR, MMD_ERROR_VALIDATE, "Module name is unset.");
       return FALSE;
     }
 
@@ -217,7 +215,7 @@ modulemd_defaults_default_validate (ModulemdDefaults *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Defaults did not specify a module name.");
       return FALSE;
     }
@@ -242,7 +240,7 @@ modulemd_defaults_upgrade (ModulemdDefaults *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_UPGRADE,
+                   MMD_ERROR_UPGRADE,
                    "Unknown metadata version for upgrade: %" PRIu64 ".",
                    mdversion);
       return NULL;
@@ -435,7 +433,7 @@ modulemd_defaults_merge (ModulemdDefaults *from,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_VALIDATE,
+                   MMD_ERROR_VALIDATE,
                    "Module name mismatch in merge: %s != %s",
                    modulemd_defaults_get_module_name (into),
                    modulemd_defaults_get_module_name (from));

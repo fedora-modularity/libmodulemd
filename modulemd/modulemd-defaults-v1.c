@@ -1330,7 +1330,7 @@ modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
                   g_set_error (
                     error,
                     MODULEMD_ERROR,
-                    MODULEMD_ERROR_VALIDATE,
+                    MMD_ERROR_VALIDATE,
                     "Default stream mismatch in module %s: %s != %s",
                     module_name,
                     into->default_stream,
@@ -1407,7 +1407,7 @@ modulemd_defaults_v1_merge (ModulemdDefaultsV1 *from,
               g_set_error (
                 error,
                 MODULEMD_ERROR,
-                MODULEMD_ERROR_VALIDATE,
+                MMD_ERROR_VALIDATE,
                 "Profile default stream mismatch in intents: %s != %s",
                 intent_default_stream,
                 merged_default_stream);
@@ -1550,7 +1550,7 @@ modulemd_defaults_v1_merge_default_profiles (
                */
               g_set_error (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Profile default mismatch in stream: %s",
                            stream_name);
               return FALSE;

@@ -2775,7 +2775,7 @@ module_stream_v2_test_validate_buildafter (void)
                           g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_assert_null (stream);
   g_clear_error (&error);
   g_clear_pointer (&path, g_free);
@@ -2787,7 +2787,7 @@ module_stream_v2_test_validate_buildafter (void)
                           g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_assert_null (stream);
   g_clear_error (&error);
   g_clear_pointer (&path, g_free);
@@ -2799,7 +2799,7 @@ module_stream_v2_test_validate_buildafter (void)
                           g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_assert_null (stream);
   g_clear_error (&error);
   g_clear_pointer (&path, g_free);
@@ -2868,7 +2868,7 @@ module_stream_v2_test_validate_buildarches (void)
                           g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_assert_null (stream);
   g_clear_error (&error);
   g_clear_pointer (&path, g_free);

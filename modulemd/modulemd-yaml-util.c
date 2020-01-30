@@ -102,7 +102,7 @@ mmd_emitter_start_stream (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the stream start event");
       return FALSE;
     }
@@ -125,7 +125,7 @@ mmd_emitter_end_stream (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the stream end event");
       return FALSE;
     }
@@ -147,7 +147,7 @@ mmd_emitter_start_document (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the document start event");
       return FALSE;
     }
@@ -170,7 +170,7 @@ mmd_emitter_end_document (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the document end event");
       return FALSE;
     }
@@ -195,7 +195,7 @@ mmd_emitter_start_mapping (yaml_emitter_t *emitter,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the mapping start event");
       return FALSE;
     }
@@ -217,7 +217,7 @@ mmd_emitter_end_mapping (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the mapping end event");
       return FALSE;
     }
@@ -241,7 +241,7 @@ mmd_emitter_start_sequence (yaml_emitter_t *emitter,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the sequence start event");
       return FALSE;
     }
@@ -263,7 +263,7 @@ mmd_emitter_end_sequence (yaml_emitter_t *emitter, GError **error)
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the sequence end event");
       return FALSE;
     }
@@ -296,7 +296,7 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EVENT_INIT,
+                   MMD_YAML_ERROR_EVENT_INIT,
                    "Could not initialize the scalar event");
       return FALSE;
     }
@@ -825,7 +825,7 @@ modulemd_yaml_parse_document_type_internal (
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           MMD_YAML_ERROR_MISSING_REQUIRED,
                            "No document type specified");
       return FALSE;
     }
@@ -834,7 +834,7 @@ modulemd_yaml_parse_document_type_internal (
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           MMD_YAML_ERROR_MISSING_REQUIRED,
                            "No metadata version specified");
       return FALSE;
     }
@@ -843,7 +843,7 @@ modulemd_yaml_parse_document_type_internal (
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_INCONSISTENT,
+                           MMD_YAML_ERROR_INCONSISTENT,
                            "Document type 'modulemd-packager' is permissible "
                            "only for module stream version 2 or higher.");
       return FALSE;
@@ -853,7 +853,7 @@ modulemd_yaml_parse_document_type_internal (
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           MMD_YAML_ERROR_MISSING_REQUIRED,
                            "No data section provided");
       return FALSE;
     }
@@ -1011,7 +1011,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
               g_set_error (
                 error,
                 MODULEMD_YAML_ERROR,
-                MODULEMD_YAML_ERROR_EMIT,
+                MMD_YAML_ERROR_EMIT,
                 "Got unexpected type while processing XMD dictionary.");
               return FALSE;
             }
@@ -1045,7 +1045,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EMIT,
+                   MMD_YAML_ERROR_EMIT,
                    "Unhandled variant type: \"%s\": %s",
                    g_variant_get_type_string (variant),
                    g_variant_print (variant, TRUE));
@@ -1301,7 +1301,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error)
       /* We received a YAML event we shouldn't expect at this level */
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_PARSE,
+                   MMD_YAML_ERROR_PARSE,
                    "Unexpected YAML event %s in skip_unknown_yaml()",
                    mmd_yaml_get_event_name (event.type));
       return FALSE;
@@ -1347,7 +1347,7 @@ skip_unknown_yaml_sequence (yaml_parser_t *parser, GError **error)
           g_set_error (
             error,
             MODULEMD_YAML_ERROR,
-            MODULEMD_YAML_ERROR_PARSE,
+            MMD_YAML_ERROR_PARSE,
             "Unexpected YAML event %s in skip_unknown_yaml_sequence()",
             mmd_yaml_get_event_name (event.type));
           return FALSE;
@@ -1396,7 +1396,7 @@ skip_unknown_yaml_mapping (yaml_parser_t *parser, GError **error)
           g_set_error (
             error,
             MODULEMD_YAML_ERROR,
-            MODULEMD_YAML_ERROR_PARSE,
+            MMD_YAML_ERROR_PARSE,
             "Unexpected YAML event %s in skip_unknown_yaml_sequence()",
             mmd_yaml_get_event_name (event.type));
           return FALSE;

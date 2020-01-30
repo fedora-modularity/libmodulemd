@@ -212,7 +212,7 @@ modulemd_module_set_defaults (ModulemdModule *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_VALIDATE,
+                   MMD_ERROR_VALIDATE,
                    "Attempted to add defaults for module '%s' to module '%s'",
                    modulemd_defaults_get_module_name (defaults),
                    modulemd_module_get_module_name (self));
@@ -288,7 +288,7 @@ modulemd_module_add_stream (ModulemdModule *self,
       g_set_error (
         error,
         MODULEMD_ERROR,
-        MODULEMD_ERROR_VALIDATE,
+        MMD_ERROR_VALIDATE,
         "Attempted to add stream with no module name to module '%s'",
         modulemd_module_get_module_name (self));
       return MD_MODULESTREAM_VERSION_ERROR;
@@ -299,7 +299,7 @@ modulemd_module_add_stream (ModulemdModule *self,
       g_set_error (
         error,
         MODULEMD_ERROR,
-        MODULEMD_ERROR_VALIDATE,
+        MMD_ERROR_VALIDATE,
         "Attempted to add stream with no stream name to module '%s'",
         modulemd_module_get_module_name (self));
       return MD_MODULESTREAM_VERSION_ERROR;
@@ -312,7 +312,7 @@ modulemd_module_add_stream (ModulemdModule *self,
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_VALIDATE,
+                   MMD_ERROR_VALIDATE,
                    "Attempted to add stream for module '%s' to module '%s'",
                    module_name,
                    modulemd_module_get_module_name (self));
@@ -338,7 +338,7 @@ modulemd_module_add_stream (ModulemdModule *self,
           /* The two streams have matching NSVCA, but differ in content */
           g_set_error (error,
                        MODULEMD_ERROR,
-                       MODULEMD_ERROR_VALIDATE,
+                       MMD_ERROR_VALIDATE,
                        "Encountered two streams with matching NSVCA %s but "
                        "differing content",
                        modulemd_module_stream_get_NSVCA_as_string (stream));
@@ -351,7 +351,7 @@ modulemd_module_add_stream (ModulemdModule *self,
     }
   else if (old == NULL && g_error_matches (nested_error,
                                            MODULEMD_ERROR,
-                                           MODULEMD_ERROR_TOO_MANY_MATCHES))
+                                           MMD_ERROR_TOO_MANY_MATCHES))
     {
       /* It should be impossible to get more than one error back here */
       g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -589,17 +589,15 @@ modulemd_module_get_stream_by_NSVCA (ModulemdModule *self,
 
   if (matching_streams->len == 0)
     {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MODULEMD_ERROR_NO_MATCHES,
-                   "No streams matched");
+      g_set_error (
+        error, MODULEMD_ERROR, MMD_ERROR_NO_MATCHES, "No streams matched");
       return NULL;
     }
   if (matching_streams->len > 1)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
-                   MODULEMD_ERROR_TOO_MANY_MATCHES,
+                   MMD_ERROR_TOO_MANY_MATCHES,
                    "Multiple ModulemdModuleStreams matched");
       return NULL;
     }
@@ -779,7 +777,7 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
         {
           g_set_error (error,
                        MODULEMD_ERROR,
-                       MODULEMD_ERROR_VALIDATE,
+                       MMD_ERROR_VALIDATE,
                        "ModuleStream %s had invalid mdversion %i",
                        nsvca,
                        current_mdversion);

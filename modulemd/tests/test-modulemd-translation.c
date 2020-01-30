@@ -204,7 +204,7 @@ translation_test_validate (void)
 
   g_assert_false (modulemd_translation_validate (t, &error));
   g_assert_nonnull (error);
-  g_assert_error (error, MODULEMD_ERROR, MODULEMD_ERROR_VALIDATE);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
   g_clear_object (&t);
 }
 

@@ -307,7 +307,7 @@ modulemd_dependencies_validate_deps (GHashTable *deps, GError **error)
             {
               g_set_error (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Runtime dependency %s contained a mix of positive "
                            "and negative entries.",
                            module_name);
@@ -465,7 +465,7 @@ modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_EMIT,
+                   MMD_YAML_ERROR_EMIT,
                    "Somehow got a NULL hash table here.");
     }
 

@@ -14,6 +14,7 @@
 #include <fnmatch.h>
 #include <string.h>
 
+#include "modulemd-errors.h"
 #include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-util.h"

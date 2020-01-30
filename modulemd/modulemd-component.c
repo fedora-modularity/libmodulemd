@@ -136,7 +136,7 @@ modulemd_component_default_validate (ModulemdComponent *self, GError **error)
       g_set_error (
         error,
         MODULEMD_ERROR,
-        MODULEMD_ERROR_VALIDATE,
+        MMD_ERROR_VALIDATE,
         "Cannot mix buildorder and buildafter in the same component");
       return FALSE;
     }

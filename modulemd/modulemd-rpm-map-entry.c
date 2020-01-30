@@ -137,17 +137,15 @@ modulemd_rpm_map_entry_validate (ModulemdRpmMapEntry *self, GError **error)
 {
   if (!self->name)
     {
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
-                           "Missing name attribute");
+      g_set_error_literal (
+        error, MODULEMD_ERROR, MMD_ERROR_VALIDATE, "Missing name attribute");
       return FALSE;
     }
   if (!self->version)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Missing version attribute");
       return FALSE;
     }
@@ -155,16 +153,14 @@ modulemd_rpm_map_entry_validate (ModulemdRpmMapEntry *self, GError **error)
     {
       g_set_error_literal (error,
                            MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
+                           MMD_ERROR_VALIDATE,
                            "Missing release attribute");
       return FALSE;
     }
   if (!self->arch)
     {
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MODULEMD_ERROR_VALIDATE,
-                           "Missing arch attribute");
+      g_set_error_literal (
+        error, MODULEMD_ERROR, MMD_ERROR_VALIDATE, "Missing arch attribute");
       return FALSE;
     }
 
@@ -515,7 +511,7 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           MMD_YAML_ERROR_MISSING_REQUIRED,
                            "Missing 'epoch' in rpm-map entry");
       return NULL;
     }
@@ -525,7 +521,7 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
     {
       g_set_error_literal (error,
                            MODULEMD_YAML_ERROR,
-                           MODULEMD_YAML_ERROR_MISSING_REQUIRED,
+                           MMD_YAML_ERROR_MISSING_REQUIRED,
                            "Missing 'nevra' in rpm-map entry");
       return NULL;
     }
@@ -535,7 +531,7 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
-                   MODULEMD_YAML_ERROR_INCONSISTENT,
+                   MMD_YAML_ERROR_INCONSISTENT,
                    "'nevra' field (%s) differs from exploded version (%s)",
                    nevra,
                    built_nevra);

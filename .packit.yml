@@ -1,6 +1,7 @@
 specfile_path: libmodulemd.spec
 upstream_package_name: libmodulemd
 downstream_package_name: libmodulemd
+upstream_tag_template: libmodulemd-{version}
 
 synced_files:
   - .packit.yml

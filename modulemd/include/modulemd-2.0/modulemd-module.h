@@ -125,7 +125,7 @@ modulemd_module_get_streams_by_stream_name_as_list (ModulemdModule *self,
  * Returns: (transfer none): The requested stream object or NULL if no match was found.
  *
  * Since: 2.0
- * Deprecated: 2.2
+ * Deprecated: 2.2: Use modulemd_module_get_stream_by_NSVCA() instead.
  */
 MMD_DEPRECATED_FOR (modulemd_module_get_stream_by_NSVCA)
 ModulemdModuleStream *

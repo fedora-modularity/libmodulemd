@@ -45,7 +45,7 @@ G_BEGIN_DECLS
  * @stability: stable
  * @short_description: User's Guide for libmodulemd
  *
- * # Working with repodata (DNF use-case) #
+ * # Working with repodata (DNF use-case)
  * The libmodulemd API provides a number of convenience tools for interacting
  * with repodata (that is, streams of YAML that contains information on multiple
  * streams, default data and translations). The documentation will use two
@@ -59,28 +59,21 @@ G_BEGIN_DECLS
  *
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModuleIndex * fedora_index = modulemd_module_index_new ();
- * gboolean ret = modulemd_module_index_update_from_string (fedora_index,
- *                                                          fedora_yaml,
- *                                                          TRUE,
- *                                                          &failures,
- *                                                          &error);
+ * ModulemdModuleIndex *fedora_index = modulemd_module_index_new ();
+ * gboolean ret = modulemd_module_index_update_from_string (
+ *   fedora_index, fedora_yaml, TRUE, &failures, &error);
  *
- * ModulemdModuleIndex * updates_index = modulemd_module_index_new ();
- * gboolean ret2 = modulemd_module_index_update_from_string (updates_index,
- *                                                           updates_yaml,
- *                                                           TRUE,
- *                                                           &failures,
- *                                                           &error);
+ * ModulemdModuleIndex *updates_index = modulemd_module_index_new ();
+ * gboolean ret2 = modulemd_module_index_update_from_string (
+ *   updates_index, updates_yaml, TRUE, &failures, &error);
  * ]|
  *
  * In Python:
- *
  * |[<!-- language="Python" -->
  * fedora_index = Modulemd.ModuleIndex.new()
  * ret, failures = fedora_index.update_from_string(fedora_yaml, True)
  *
- * fedora_index = Modulemd.ModuleIndex.new()
+ * updates_index = Modulemd.ModuleIndex.new()
  * ret, failures = updates_index.update_from_string(updates_yaml, True)
  * ]|
  *
@@ -94,12 +87,13 @@ G_BEGIN_DECLS
  *
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new ();
+ * ModulemdModuleIndexMerger *merger = modulemd_module_index_merger_new ();
  *
  * modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
  * modulemd_module_index_merger_associate_index (merger, updates_index, 0);
  *
- * ModulemdModuleIndex * merged_index = modulemd_module_index_merger_resolve (merger, &error);
+ * ModulemdModuleIndex *merged_index =
+ *   modulemd_module_index_merger_resolve (merger, &error);
  * ]|
  *
  * In Python:
@@ -126,34 +120,36 @@ G_BEGIN_DECLS
  * specification for a full list of information that can be retrieved.
  *
  * ## Discover the default stream for a particular module.
+ *
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModule * module =  modulemd_module_index_get_module (merged_index, "modulename");
- * ModulemdDefaults * defaults = modulemd_module_get_defaults (module);
+ * ModulemdModule *module =
+ *   modulemd_module_index_get_module (merged_index, "modulename");
+ * ModulemdDefaults *defaults = modulemd_module_get_defaults (module);
  * printf ("Default stream for modulename is %s\n",
- *         modulemd_defaults_v1_get_default_stream (MODULEMD_DEFAULTS_V1 (defaults), NULL));
+ *         modulemd_defaults_v1_get_default_stream (
+ *           MODULEMD_DEFAULTS_V1 (defaults), NULL));
  * ]|
  *
  * In Python:
  * |[<!-- language="Python" -->
- * module = merged_index.get_module ('modulename')
+ * module = merged_index.get_module("modulename")
  * defaults = module.get_defaults()
- * print ('Default stream for modulename is %s' % (
- *        defaults.get_default_stream())
+ * print("Default stream for modulename is %s" % defaults.get_default_stream())
  * ]|
- *
  *
  * ## Get the list of RPMs defining the public API for a particular module NSVCA
  * First, query the #ModulemdModuleIndex for the module with a given name.
  *
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ * ModulemdModule *module =
+ *   modulemd_module_index_get_module (merged_index, "modulename");
  * ]|
  *
  * In Python:
  * |[<!-- language="Python" -->
- * module = merged_index.get_module ('modulename')
+ * module = merged_index.get_module("modulename")
  * ]|
  *
  * Then, query the #ModulemdModule for the #ModulemdModuleStream associated with the
@@ -161,17 +157,13 @@ G_BEGIN_DECLS
  *
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module,
- *                                                                      "modulestream",
- *                                                                      0,
- *                                                                      "deadbeef",
- *                                                                      "coolarch",
- *                                                                      &error);
+ * ModulemdModuleStream *stream = modulemd_module_get_stream_by_NSVCA (
+ *   module, "modulestream", 0, "deadbeef", "coolarch", &error);
  * ]|
  *
  * In Python:
  * |[<!-- language="Python" -->
- * stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+ * stream = module.get_stream_by_NSVCA("modulestream", 0, "deadbeef", "coolarch")
  * ]|
  *
  * Lastly, read the RPM API from the #ModulemdModuleStream. Here, `api_list` is
@@ -179,7 +171,8 @@ G_BEGIN_DECLS
  *
  * In C:
  * |[<!-- language="C" -->
- * GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (MODULEMD_MODULE_STREAM_V2 (stream));
+ * GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (
+ *   MODULEMD_MODULE_STREAM_V2 (stream));
  * ]|
  *
  * In Python:
@@ -187,31 +180,68 @@ G_BEGIN_DECLS
  * api_list = stream.get_rpm_api()
  * ]|
  *
+ * Also note that in addition to accessor API methods, many objects also have
+ * properties that can be accessed directly.
  *
- * ## Retrieve the modular runtime dependencies for a particular module NSVCA
  * In C:
  * |[<!-- language="C" -->
- * ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
- * ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
- * GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (MODULEMD_MODULE_STREAM_V2 (stream));
+ * printf ("Documentation for module stream is at %s\n",
+ *         modulemd_module_stream_v2_get_documentation (
+ *           MODULEMD_MODULE_STREAM_V2 (stream)));
+ * g_autofree gchar *doc;
+ * g_object_get (MODULEMD_MODULE_STREAM_V2 (stream), "documentation", &doc, NULL);
+ * printf ("Documentation for module stream is at %s\n", doc);
+ * ]|
+ *
+ * In Python:
+ * |[<!-- language="Python" -->
+ * print("Documentation for module stream is at %s" % stream.get_documentation())
+ * print("Documentation for module stream is at %s" % stream.props.documentation)
+ * ]|
+ *
+ * ## Retrieve the modular runtime dependencies for a particular module NSVCA
+ *
+ * In C:
+ * |[<!-- language="C" -->
+ * ModulemdModule *module =
+ *   modulemd_module_index_get_module (merged_index, "modulename");
+ * ModulemdModuleStream *stream = modulemd_module_get_stream_by_NSVCA (
+ *   module, "modulestream", 0, "deadbeef", "coolarch", &error);
+ * GPtrArray *deps_list = modulemd_module_stream_v2_get_dependencies (
+ *   MODULEMD_MODULE_STREAM_V2 (stream));
  *
  * for (gint i = 0; i < deps_list->len; i++)
  *   {
- *     stuff with g_ptr_array_index(deps_list, i);
+ *     GStrv depmodules_list =
+ *      modulemd_dependencies_get_runtime_modules_as_strv (
+ *        g_ptr_array_index (deps_list, i));
+ *
+ *     for (gint j = 0; j < g_strv_length (depmodules_list); j++)
+ *       {
+ *         GStrv depstreams_list =
+ *           modulemd_dependencies_get_runtime_streams_as_strv (
+ *             g_ptr_array_index (deps_list, i), depmodules_list[j]);
+ *
+ *         for (gint k = 0; k < g_strv_length (depstreams_list); k++)
+ *           {
+ *             // do stuff with depmodules_list[j], depstreams_list[k]
+ *           }
+ *       }
  *   }
  * ]|
  *
  * In Python:
  * |[<!-- language="Python" -->
- * module = merged_index.get_module ('modulename')
- * stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+ * module = merged_index.get_module("modulename")
+ * stream = module.get_stream_by_NSVCA("modulestream", 0, "deadbeef", "coolarch")
  * deps_list = stream.get_dependencies()
- *
  * for dep in deps_list:
- *   depstream_list = dep.get_runtime_streams('depstreamname')
- *   <do_stuff>
+ *     depmodules_list = dep.get_runtime_modules()
+ *     for depmod in depmodules_list:
+ *         depstream_list = dep.get_runtime_streams(depmod)
+ *         for depstream in depstream_list:
+ *             # do stuff with depmod, depstream
  * ]|
- *
  *
  * # Working with a single module stream (Packager/MBS use-case)
  * One limitation of the #ModulemdModuleIndex format is that it requires that
@@ -226,15 +256,14 @@ G_BEGIN_DECLS
  * already been determined from the repodata and that they are stored in
  * string variables named `module_name` and `stream_name`, respectively.
  *
+ * In Python:
  * |[<!-- language="Python" -->
- * stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',
- *                                           True,
- *                                           module_name,
- *                                           stream_name)
+ * stream = Modulemd.ModuleStream.read_file(
+ *     "/path/to/module_name.yaml", True, module_name, stream_name
+ * )
  * v2_stream = stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
  * v2_stream.validate()
  * ]|
- *
  * In the example above, we upgraded the stream to v2, in case we were reading
  * from v1 metadata. This will allow us to avoid having to manage multiple
  * code-paths and support only the latest we understand. After that, it calls

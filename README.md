@@ -8,7 +8,6 @@ Full details can be found in the
 [API Documentation](https://fedora-modularity.github.io/libmodulemd/latest/)
 
 # Using libmodulemd from Python
-
 Using libmodulemd from Python is possible thanks to the gobject-introspection
 project. To use libmodulemd from Python, include the following at the top of
 your sources.
@@ -19,7 +18,7 @@ These packages provide the appropriate language bindings.
 
 ```python
 import gi
-gi.require_version('Modulemd', '2.0')
+gi.require_version("Modulemd", "2.0")
 from gi.repository import Modulemd
 ```
 
@@ -37,19 +36,13 @@ ModulemdModuleIndex objects. This is done as follows:
 
 ## C
 ```C
-ModulemdModuleIndex * fedora_index = modulemd_module_index_new ();
-gboolean ret = modulemd_module_index_update_from_string (fedora_index,
-                                                         fedora_yaml,
-                                                         TRUE,
-                                                         &failures,
-                                                         &error);
+ModulemdModuleIndex *fedora_index = modulemd_module_index_new ();
+gboolean ret = modulemd_module_index_update_from_string (
+  fedora_index, fedora_yaml, TRUE, &failures, &error);
 
-ModulemdModuleIndex * updates_index = modulemd_module_index_new ();
-gboolean ret2 = modulemd_module_index_update_from_string (updates_index,
-                                                          updates_yaml,
-                                                          TRUE,
-                                                          &failures,
-                                                          &error);
+ModulemdModuleIndex *updates_index = modulemd_module_index_new ();
+gboolean ret2 = modulemd_module_index_update_from_string (
+  updates_index, updates_yaml, TRUE, &failures, &error);
 ```
 
 ## Python
@@ -57,11 +50,13 @@ gboolean ret2 = modulemd_module_index_update_from_string (updates_index,
 fedora_index = Modulemd.ModuleIndex.new()
 ret, failures = fedora_index.update_from_string(fedora_yaml, True)
 
-fedora_index = Modulemd.ModuleIndex.new()
+updates_index = Modulemd.ModuleIndex.new()
 ret, failures = updates_index.update_from_string(updates_yaml, True)
 ```
 
-The `failures` are a list of subdocuments in the YAML that failed parsing, along with the reason they failed. Hence, by checking the return value of failures we will know if the YAML parsing was successful or not.
+The `failures` are a list of subdocuments in the YAML that failed parsing,
+along with the reason they failed. Hence, by checking the return value of
+failures we will know if the YAML parsing was successful or not.
 
 Since it doesn't really make sense to view the contents from separate
 repositories in isolation (in most cases), the next step is to merge the two
@@ -69,12 +64,13 @@ indexes into a combined one:
 
 ## C
 ```C
-ModulemdModuleIndexMerger * merger = modulemd_module_index_merger_new ();
+ModulemdModuleIndexMerger *merger = modulemd_module_index_merger_new ();
 
 modulemd_module_index_merger_associate_index (merger, fedora_index, 0);
 modulemd_module_index_merger_associate_index (merger, updates_index, 0);
 
-ModulemdModuleIndex * merged_index = modulemd_module_index_merger_resolve (merger, &error);
+ModulemdModuleIndex *merged_index =
+  modulemd_module_index_merger_resolve (merger, &error);
 ```
 
 ## Python
@@ -101,56 +97,59 @@ give only a brief overview of the most common operations. See the API
 specification for a full list of information that can be retrieved.
 
 ## Discover the default stream for a particular module.
+
 ## C
 ```C
-ModulemdModule * module =  modulemd_module_index_get_module (merged_index, "modulename");
-ModulemdDefaults * defaults = modulemd_module_get_defaults (module);
+ModulemdModule *module =
+  modulemd_module_index_get_module (merged_index, "modulename");
+ModulemdDefaults *defaults = modulemd_module_get_defaults (module);
 printf ("Default stream for modulename is %s\n",
-        modulemd_defaults_v1_get_default_stream (MODULEMD_DEFAULTS_V1 (defaults), NULL));
+        modulemd_defaults_v1_get_default_stream (
+          MODULEMD_DEFAULTS_V1 (defaults), NULL));
 ```
 
 ## Python
 ```python
-module = merged_index.get_module ('modulename')
+module = merged_index.get_module("modulename")
 defaults = module.get_defaults()
-print ('Default stream for modulename is %s' % (
-       defaults.get_default_stream())
+print("Default stream for modulename is %s" % defaults.get_default_stream())
 ```
 
 ## Get the list of RPMs defining the public API for a particular module NSVCA
 First, query the ModulemdModuleIndex for the module with a given name.
+
 ## C
 ```C
-ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
+ModulemdModule *module =
+  modulemd_module_index_get_module (merged_index, "modulename");
 ```
 
 ## Python
 ```python
- module = merged_index.get_module ('modulename')
+module = merged_index.get_module("modulename")
 ```
 
 Then, query the ModulemdModule for the ModulemdModuleStream associated with the
 provided NSVCA (name-stream-version-context-architecture identifier).
+
 ## C
 ```C
-ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module,
-                                                                     "modulestream",
-                                                                     0,
-                                                                     "deadbeef",
-                                                                     "coolarch",
-                                                                     &error);
+ModulemdModuleStream *stream = modulemd_module_get_stream_by_NSVCA (
+  module, "modulestream", 0, "deadbeef", "coolarch", &error);
 ```
 
 ## Python
 ```python
-stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+stream = module.get_stream_by_NSVCA("modulestream", 0, "deadbeef", "coolarch")
 ```
 
 Lastly, read the RPM API from the ModulemdModuleStream. Here, `api_list` is
 a list of strings containing package names.
+
 ## C
 ```C
-GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (MODULEMD_MODULE_STREAM_V2 (stream));
+GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (
+  MODULEMD_MODULE_STREAM_V2 (stream));
 ```
 
 ## Python
@@ -158,31 +157,70 @@ GStrv api_list = modulemd_module_stream_v2_get_rpm_api_as_strv (MODULEMD_MODULE_
 api_list = stream.get_rpm_api()
 ```
 
-## Retrieve the modular runtime dependencies for a particular module NSVCA
+Also note that in addition to accessor API methods, many objects also have
+properties that can be accessed directly.
+
 ## C
 ```C
-ModulemdModule * module = modulemd_module_index_get_module (merged_index, "modulename");
-ModulemdModuleStream * stream = modulemd_module_get_stream_by_NSVCA (module, "modulestream", 0, "deadbeef", "coolarch", &error);
-GPtrArray * deps_list = modulemd_module_stream_v2_get_dependencies (MODULEMD_MODULE_STREAM_V2 (stream));
+printf ("Documentation for module stream is at %s\n",
+        modulemd_module_stream_v2_get_documentation (
+          MODULEMD_MODULE_STREAM_V2 (stream)));
+g_autofree gchar *doc;
+g_object_get (MODULEMD_MODULE_STREAM_V2 (stream), "documentation", &doc, NULL);
+printf ("Documentation for module stream is at %s\n", doc);
+```
+
+## Python
+```python
+print("Documentation for module stream is at %s" % stream.get_documentation())
+print("Documentation for module stream is at %s" % stream.props.documentation)
+```
+
+## Retrieve the modular runtime dependencies for a particular module NSVCA
+
+## C
+```C
+ModulemdModule *module =
+  modulemd_module_index_get_module (merged_index, "modulename");
+ModulemdModuleStream *stream = modulemd_module_get_stream_by_NSVCA (
+  module, "modulestream", 0, "deadbeef", "coolarch", &error);
+GPtrArray *deps_list = modulemd_module_stream_v2_get_dependencies (
+  MODULEMD_MODULE_STREAM_V2 (stream));
 
 for (gint i = 0; i < deps_list->len; i++)
   {
-    stuff with g_ptr_array_index(deps_list, i);
+    GStrv depmodules_list =
+     modulemd_dependencies_get_runtime_modules_as_strv (
+       g_ptr_array_index (deps_list, i));
+
+    for (gint j = 0; j < g_strv_length (depmodules_list); j++)
+      {
+        GStrv depstreams_list =
+          modulemd_dependencies_get_runtime_streams_as_strv (
+            g_ptr_array_index (deps_list, i), depmodules_list[j]);
+
+        for (gint k = 0; k < g_strv_length (depstreams_list); k++)
+          {
+            // do stuff with depmodules_list[j], depstreams_list[k]
+          }
+      }
   }
 ```
 
 ## Python
 ```python
-module = merged_index.get_module ('modulename')
-stream = module.get_stream_by_NSVCA('modulestream', 0, 'deadbeef', 'coolarch')
+module = merged_index.get_module("modulename")
+stream = module.get_stream_by_NSVCA("modulestream", 0, "deadbeef", "coolarch")
 deps_list = stream.get_dependencies()
 for dep in deps_list:
-   depstream_list = dep.get_runtime_streams('depstreamname')
-   <do_stuff>
+    depmodules_list = dep.get_runtime_modules()
+    for depmod in depmodules_list:
+        depstream_list = dep.get_runtime_streams(depmod)
+        for depstream in depstream_list:
+            # do stuff with depmod, depstream
 ```
 
 # Working with a single module stream (Packager/MBS use-case)
-
 One limitation of the ModulemdModuleIndex format is that it requires that
 all module streams loaded into it have both a name and a stream name.
 This however is not possible when dealing with streams such as a packager
@@ -197,10 +235,9 @@ string variables named `module_name` and `stream_name`, respectively.
 
 ## Python
 ```python
-stream = Modulemd.ModuleStream.read_file ('/path/to/module_name.yaml',
-                                          True,
-                                          module_name,
-                                          stream_name)
+stream = Modulemd.ModuleStream.read_file(
+    "/path/to/module_name.yaml", True, module_name, stream_name
+)
 v2_stream = stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
 v2_stream.validate()
 ```
@@ -218,7 +255,8 @@ ModulemdModuleStream metadata format. This may change at any time.
 ## Prerequisites
 * A Fedora development environment (physical or virtual)
 
-To install all of the dependencies needed to build libmodulemd, the following command will work on Fedora 28+ (run as root or with sudo):
+To install all of the dependencies needed to build libmodulemd, the following
+command will work on Fedora 28+ (run as root or with sudo):
 ```
 dnf -y install clang git-core python3-pycodestyle python3-autopep8 redhat-rpm-config "dnf-command(builddep)"
 dnf -y builddep libmodulemd
@@ -229,17 +267,25 @@ To install the tools needed to run the docker-based tests, you will also need:
 dnf -y install docker
 sudo systemctl enable --now docker.service
 ```
-and to make sure that your user has privilege to run `sudo docker` (see the documentation for the `/etc/sudoers` file to figure this out).
+and to make sure that your user has privilege to run `sudo docker` (see the
+documentation for the `/etc/sudoers` file to figure this out).
 
 ## Forking and cloning the sources
-The libmodulemd project follows the [Github Fork-and-Pull](https://reflectoring.io/github-fork-and-pull/) model of development. To get started, create a fork of the upstream libmodulemd sources, clone those locally and create branches on your fork to make changes. When they are ready for review or feedback, create a pull-request.
+The libmodulemd project follows the
+[Github Fork-and-Pull](https://reflectoring.io/github-fork-and-pull/) model of
+development. To get started, create a fork of the upstream libmodulemd sources,
+clone those locally and create branches on your fork to make changes. When they
+are ready for review or feedback, create a pull-request.
 
 ## Building the sources
-Projects built with the meson build-system require a separate build directory from the source path. The `meson` command will generate this directory for you.
+Projects built with the meson build-system require a separate build directory from
+the source path. The `meson` command will generate this directory for you.
 ```
-meson --buildtype=debug -Db_coverage=true  debugbuild
+meson --buildtype=debug -Db_coverage=true debugbuild
 ```
-The above command (run from the root of the source checkout) will create a new subdirectory - `debugbuild` - configured to compile with debug symbols and `gcov` symbols to measure test coverage.
+The above command (run from the root of the source checkout) will create a new
+subdirectory - `debugbuild` - configured to compile with debug symbols and
+`gcov` symbols to measure test coverage.
 
 To build the sources, `chdir()` into the `debugbuild` directory and run
 ```
@@ -255,14 +301,19 @@ To generate HTML documentation, you can run
 ```
 ninja modulemd-2.0-doc
 ```
-(Be aware that the GLib documentation module in meson has some strange quirks and won't recognize newly-added pages without deleting and re-creating the build directory first.)
+(Be aware that the GLib documentation module in meson has some strange quirks
+and won't recognize newly-added pages without deleting and re-creating the
+build directory first.)
 
 
-To run the docker-based tests, you can run (from the source root and with `sudo` privilege to run `docker`):
+To run the docker-based tests, you can run (from the source root and with
+`sudo` privilege to run `docker`):
 ```
 ./.travis/travis-fedora.sh
 ```
-(Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`, `Fedora 29`, etc. to switch to building against those releases rather than Fedora Rawhide).
+(Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`,
+`Fedora 29`, etc. to switch to building against those releases rather than
+Fedora Rawhide).
 
 
 ## Tips and tricks

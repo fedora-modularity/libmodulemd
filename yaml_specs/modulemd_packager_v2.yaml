@@ -194,27 +194,19 @@ data:
                 # must be be ordered later than some other entries in this map.
                 # The values of this array come from the keys of this map and
                 # not the real component name to enable bootstrapping.
-                # Use of both buildafter and buildorder in the same document is
-                # prohibited, as they will conflict.
-                # buildafter:
-                #    - baz
-                # Use the "buildonly" value to indicate that all artifacts
-                # produced by this component are intended only for building
-                # this component and should be automatically added to the
-                # data.filter.rpms list after the build is complete.
-                # Optional. Defaults to "false" if not specified.
-                buildonly: false
+                buildafter:
+                    - baz
                 # If buildroot is set to True, the packages listed in this
                 # module's buildroot profile will be installed into the
                 # buildroot of any component built in subsequent
-                # buildorder/buildafter batches, even if that module does not
+                # buildafter batches, even if that module does not
                 # explicitly include these packages in its BuildRequires.
                 # Optional. Defaults to "false" if not specified.
                 buildroot: false
                 # If srpm-buildroot is set to True, the packages listed in this
                 # module's srpm-buildroot profile will be installed into the
                 # buildroot when performing the buildSRPMfromSCM step in
-                # subsequent buildorder/buildafter batches.
+                # subsequent buildafter batches.
                 # Optional. Defaults to "false" if not specified.
                 srpm-buildroot: false
             # baz has no extra options
@@ -234,28 +226,21 @@ data:
                 # See the data.arch field for details.
                 # Optional, defaults to no multilib.
                 multilib: [x86_64]
+                # This package requires a particular version of 'xyz' to be
+                # present in order to build correctly, so we inform the build
+                # system not to build this until 'xyz' has completed
+                # successfully.
+                buildafter:
+                    - xyz
             xyz:
                 rationale: xyz is a bundled dependency of xxx.
-                # Build order group
-                # When building, components are sorted by build order tag
-                # and built in batches grouped by their buildorder value.
-                # Built batches are then re-tagged into the buildroot.
-                # Multiple components can have the same buildorder index
-                # to map them into build groups.
-                # Optional, defaults to zero.
-                # Integer, negative values are allowed.
-                # In this example, bar, baz and xxx are built first in
-                # no particular order, then tagged into the buildroot,
-                # then, finally, xyz is built.
-                # Use of both buildafter and buildorder in the same document is
-                # prohibited, as they will conflict.
-                buildorder: 10
         # Module content of this module
         # Included modules are built in the shared buildroot, together with
         # other included content.  Keys are module names, values additional
         # component information.  Note this only includes components and their
         # properties from the referenced module and doesn't inherit any
-        # additional module metadata such as the module's dependencies.
+        # additional module metadata such as the module's dependencies or
+        # component buildopts.
         # Optional
         modules:
             includedmodule:
@@ -268,5 +253,3 @@ data:
                 repository: https://pagure.io/includedmodule.git
                 # See the rpms ref.
                 ref: somecoolbranchname
-                # See the rpms buildorder.
-                buildorder: 100

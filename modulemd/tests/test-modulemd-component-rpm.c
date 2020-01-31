@@ -404,7 +404,8 @@ component_rpm_test_parse_yaml (void)
   g_autofree gchar *yaml_path = NULL;
   g_auto (GStrv) list = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
-  yaml_path = g_strdup_printf ("%s/cr.yaml", g_getenv ("TEST_DATA_PATH"));
+  yaml_path =
+    g_strdup_printf ("%s/component-rpm/cr.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);
 
   yaml_stream = g_fopen (yaml_path, "rbe");
@@ -418,7 +419,7 @@ component_rpm_test_parse_yaml (void)
   g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
   yaml_event_delete (&event);
 
-  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, &error);
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, FALSE, &error);
   g_assert_nonnull (r);
   g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
   g_assert_cmpstr (
@@ -448,6 +449,105 @@ component_rpm_test_parse_yaml (void)
   g_assert_cmpstr (list[0], ==, "x86_64");
   g_clear_pointer (&list, g_strfreev);
 }
+
+
+static void
+component_rpm_test_parse_packager_yaml (void)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_autoptr (GError) error = NULL;
+  int result;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  g_autofree gchar *yaml_path = NULL;
+  g_auto (GStrv) list = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+
+  /* First test a valid component RPM */
+  yaml_path = g_strdup_printf ("%s/component-rpm/cr_buildafter.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rbe");
+  g_assert_nonnull (yaml_stream);
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  parser_skip_headers (&parser);
+  result = yaml_parser_parse (&parser, &event);
+  g_assert_cmpint (result, ==, 1);
+  g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
+  yaml_event_delete (&event);
+
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (r);
+  g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
+  g_assert_cmpstr (
+    modulemd_component_get_name (MODULEMD_COMPONENT (r)), ==, "bar");
+  g_assert_cmpstr (modulemd_component_get_rationale (MODULEMD_COMPONENT (r)),
+                   ==,
+                   "We need this to demonstrate stuff.");
+  list = modulemd_component_get_buildafter_as_strv (MODULEMD_COMPONENT (r));
+  g_assert_nonnull (list);
+  g_assert_cmpstr (list[0], ==, "foo");
+  g_assert_null (list[1]);
+  g_clear_pointer (&list, g_strfreev);
+
+  g_assert_cmpstr (modulemd_component_rpm_get_repository (r),
+                   ==,
+                   "https://pagure.io/bar.git");
+  g_assert_cmpstr (modulemd_component_rpm_get_ref (r), ==, "26ca0c0");
+  g_assert_cmpstr (
+    modulemd_component_rpm_get_cache (r), ==, "https://example.com/cache");
+  g_assert_true (modulemd_component_rpm_get_buildroot (r));
+  g_assert_true (modulemd_component_rpm_get_srpm_buildroot (r));
+
+  list = modulemd_component_rpm_get_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 2);
+  g_assert_cmpstr (list[0], ==, "i686");
+  g_assert_cmpstr (list[1], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+
+  list = modulemd_component_rpm_get_multilib_arches_as_strv (r);
+  g_assert_cmpint (g_strv_length (list), ==, 1);
+  g_assert_cmpstr (list[0], ==, "x86_64");
+  g_clear_pointer (&list, g_strfreev);
+}
+
+
+static void
+component_rpm_test_parse_buildorder_packager_yaml (void)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_autoptr (GError) error = NULL;
+  int result;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+
+  /* First test a valid component RPM */
+  yaml_path =
+    g_strdup_printf ("%s/component-rpm/cr.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (yaml_path);
+
+  yaml_stream = g_fopen (yaml_path, "rbe");
+  g_assert_nonnull (yaml_stream);
+
+  yaml_parser_set_input_file (&parser, yaml_stream);
+
+  parser_skip_headers (&parser);
+  result = yaml_parser_parse (&parser, &event);
+  g_assert_cmpint (result, ==, 1);
+  g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
+  yaml_event_delete (&event);
+
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, TRUE, &error);
+  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_UNKNOWN_ATTR);
+  g_assert_null (r);
+}
+
 
 static void
 component_rpm_test_override_name (void)
@@ -512,6 +612,12 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",
                    component_rpm_test_parse_yaml);
+
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse/packager",
+                   component_rpm_test_parse_packager_yaml);
+
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse/packager/buildorder",
+                   component_rpm_test_parse_buildorder_packager_yaml);
 
   g_test_add_func ("/modulemd/v2/component/rpm/override_name",
                    component_rpm_test_override_name);

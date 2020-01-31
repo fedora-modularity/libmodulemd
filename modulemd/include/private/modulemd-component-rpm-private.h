@@ -33,6 +33,9 @@
  * @name: (in): A string with the name of the component.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
+ * @only_packager: (in): Whether the parser should return failure if it
+ * encounters a mapping key that is not intended for packager use. Ignored
+ * if @strict is #FALSE.
  * @error: (out): A #GError that will return the reason for parsing error.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdComponentRpm object
@@ -45,6 +48,7 @@ ModulemdComponentRpm *
 modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
                                    const gchar *name,
                                    gboolean strict,
+                                   gboolean only_packager,
                                    GError **error);
 
 

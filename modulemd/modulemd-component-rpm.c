@@ -649,6 +649,7 @@ ModulemdComponentRpm *
 modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
                                    const gchar *name,
                                    gboolean strict,
+                                   gboolean only_packager,
                                    GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -856,7 +857,8 @@ modulemd_component_rpm_parse_yaml (yaml_parser_t *parser,
                 }
             }
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
-                                "buildorder"))
+                                "buildorder") &&
+                   !only_packager)
             {
               buildorder = modulemd_yaml_parse_int64 (parser, &nested_error);
               if (buildorder == 0 && nested_error != NULL)

@@ -128,6 +128,41 @@ data:
             )
         )
 
+        # Handle buildorder as a special case as well
+        minimal_plus_extra = deepcopy(minimal_valid)
+        minimal_plus_extra["data"]["components"] = {
+            "rpms": {
+                "foo": {
+                    "rationale": "A dependency of bar that must be built first",
+                    "ref": "master",
+                },
+                "bar": {
+                    "rationale": "The important package",
+                    "ref": "master",
+                    "buildorder": 10,
+                },
+            }
+        }
+
+        logging.debug(
+            "YAML: {}".format(json.dumps(minimal_plus_extra, indent=2))
+        )
+
+        # This code takes advantage of the fact that JSON is a proper
+        # subset of YAML, so we can avoid requiring pyYAML for the tests.
+        with self.assertRaises(gi.repository.GLib.GError) as cm:
+            stream = Modulemd.ModuleStream.read_string(
+                json.dumps(minimal_plus_extra), True
+            )
+
+        gerror = cm.exception
+        self.assertTrue(
+            gerror.matches(
+                domain=Modulemd.yaml_error_quark(),
+                code=Modulemd.YamlError.UNKNOWN_ATTR,
+            )
+        )
+
     def test_fail_v1(self):
         minimal_v1 = {
             "document": "modulemd-packager",

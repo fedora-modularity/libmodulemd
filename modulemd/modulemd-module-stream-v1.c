@@ -2424,6 +2424,7 @@ modulemd_module_stream_v1_parse_rpm_components (
             parser,
             (const gchar *)event.data.scalar.value,
             strict,
+            FALSE,
             &nested_error);
           if (!component)
             {

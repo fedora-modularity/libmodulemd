@@ -1,0 +1,13 @@
+---
+bar:
+    rationale: We need this to demonstrate stuff.
+    repository: https://pagure.io/bar.git
+    cache: https://example.com/cache
+    buildafter:
+        - foo
+    ref: 26ca0c0
+    buildroot: true
+    srpm-buildroot: true
+    arches: [i686, x86_64]
+    multilib: [x86_64]
+...

@@ -94,5 +94,3 @@ jobs:
 
   allow_failures:
     - name: "OpenMandriva cooker"
-    - name: "Fedora rawhide x86_64"
-    - name: "Fedora rawhide aarch64"

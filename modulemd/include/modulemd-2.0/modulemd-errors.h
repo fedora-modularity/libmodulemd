@@ -14,6 +14,7 @@
 #pragma once
 
 #include <glib.h>
+#include "modulemd-deprecated.h"
 
 G_BEGIN_DECLS
 
@@ -104,6 +105,7 @@ typedef enum
  * Deprecated: 2.9
  * Use #ModulemdError instead.
  */
+MMD_DEPRECATED_TYPE_FOR (ModulemdError)
 typedef enum
 {
   MODULEMD_ERROR_UPGRADE,
@@ -114,7 +116,6 @@ typedef enum
   MODULEMD_ERROR_MAGIC,
   MODULEMD_ERROR_NOT_IMPLEMENTED
 } ModulemdErrorEnum;
-
 
 /**
  * MODULEMD_YAML_ERROR:
@@ -195,7 +196,7 @@ typedef enum
  * Deprecated: 2.9
  * Use #ModulemdYamlError instead.
  */
-
+MMD_DEPRECATED_TYPE_FOR (ModulemdYamlError)
 typedef enum
 {
   MODULEMD_YAML_ERROR_OPEN,

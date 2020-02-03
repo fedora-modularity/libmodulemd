@@ -760,7 +760,7 @@ modulemd_module_stream_v1_get_servicelevel (ModulemdModuleStreamV1 *self,
  * a wrapper for `modulemd_module_stream_v1_add_servicelevel("rawhide", eol)`.
  *
  * Since: 2.0
- * Deprecated: 2.0
+ * Deprecated: 2.0: Use modulemd_module_stream_v1_add_servicelevel() instead.
  */
 MMD_DEPRECATED_FOR (modulemd_module_stream_v1_add_servicelevel)
 void
@@ -778,7 +778,7 @@ modulemd_module_stream_v1_set_eol (ModulemdModuleStreamV1 *self, GDate *eol);
  * level.
  *
  * Since: 2.0
- * Deprecated: 2.0
+ * Deprecated: 2.0: Use modulemd_module_stream_v1_get_servicelevel() instead.
  */
 MMD_DEPRECATED_FOR (modulemd_module_stream_v1_get_servicelevel)
 GDate *

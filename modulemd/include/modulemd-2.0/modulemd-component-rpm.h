@@ -71,7 +71,7 @@ modulemd_component_rpm_add_restricted_arch (ModulemdComponentRpm *self,
  * Indicate that this RPM component is available on all arches.
  *
  * Since: 2.0
- * Deprecated: 2.9
+ * Deprecated: 2.9: Use modulemd_component_rpm_clear_arches() instead.
  */
 MMD_DEPRECATED_FOR (modulemd_component_rpm_clear_arches)
 void
@@ -126,7 +126,7 @@ modulemd_component_rpm_add_multilib_arch (ModulemdComponentRpm *self,
  * Indicate that this RPM component is multilib on no architectures.
  *
  * Since: 2.0
- * Deprecated: 2.9
+ * Deprecated: 2.9: Use modulemd_component_rpm_clear_multilib_arches() instead.
  */
 MMD_DEPRECATED_FOR (modulemd_component_rpm_clear_multilib_arches)
 void

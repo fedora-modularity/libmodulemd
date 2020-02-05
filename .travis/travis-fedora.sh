@@ -13,9 +13,14 @@ JOB_NAME=${TRAVIS_JOB_NAME:-Fedora rawhide}
 arr=($JOB_NAME)
 release=${arr[1]:-rawhide}
 
+if [ $release = rawhide ]; then
+    release=$($SCRIPT_DIR/get_rawhide_version.py)
+fi
+
 mmd_run_docker_tests \
     os=fedora \
     release=$release \
-    repository=registry.fedoraproject.org
+    repository=quay.io \
+    image=fedora/fedora:$release-$(uname -m)
 
 popd # $SCRIPT_DIR

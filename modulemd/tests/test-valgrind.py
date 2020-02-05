@@ -23,6 +23,12 @@ from multiprocessing import Pool, TimeoutError
 if os.getenv("MMD_SKIP_VALGRIND"):
     sys.exit(77)
 
+supp_file = os.path.join(
+    os.getenv("MESON_SOURCE_ROOT", "."),
+    "contrib",
+    "valgrind",
+    "libmodulemd-python.supp",
+)
 
 failed = False
 
@@ -41,8 +47,9 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
             "/usr/bin/valgrind "
             "--leak-check=full "
             "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp "
+            "--suppressions=%s "
             "--xml=yes "
-            "--xml-file=%s/%s.xml " % (tmpdirname, test)
+            "--xml-file=%s/%s.xml " % (supp_file, tmpdirname, test)
         )
         proc_result = subprocess.run(
             [
@@ -70,6 +77,8 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                 failed = True
                 continue
 
+            test_failed = False
+
             # Process the XML for leaks
             tree = ET.parse("%s/%s.xml" % (tmpdirname, test))
             root = tree.getroot()
@@ -83,21 +92,21 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                                     "Memory leak detected in %s" % test,
                                     file=sys.stderr,
                                 )
-                                failed = True
+                                test_failed = True
 
                             elif error_child.text == "InvalidFree":
                                 print(
                                     "Invalid free() detected in %s" % test,
                                     file=sys.stderr,
                                 )
-                                failed = True
+                                test_failed = True
 
                             elif error_child.text == "InvalidRead":
                                 print(
                                     "Invalid read detected in %s" % test,
                                     file=sys.stderr,
                                 )
-                                failed = True
+                                test_failed = True
 
                             elif error_child.text == "UninitCondition":
                                 print(
@@ -105,11 +114,12 @@ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
                                     % test,
                                     file=sys.stderr,
                                 )
-                                failed = True
-            if failed:
+                                test_failed = True
+
+            if test_failed:
                 with open("%s/%s.xml" % (tmpdirname, test), "r") as xml:
                     print(xml.read())
-
+                failed = True
 
 if failed:
     sys.exit(1)

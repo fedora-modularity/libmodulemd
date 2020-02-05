@@ -1,0 +1,80 @@
+# libmodulemd valgrind suppressions file
+#
+# This provides a list of suppressions for libmodulemd for valgrind for
+# the false positives that are reported when running under valgrind.
+#
+# Pass this suppression file to valgrind using --suppressions=/path/to/this-file.supp
+#
+# See http://valgrind.org/docs/manual/manual-core.html#manual-core.suppress
+# for details about the format of this file.
+#
+# Also see https://wiki.wxwidgets.org/Parse_valgrind_suppressions.sh for a
+# handy script to extract suppression entries from the valgrind test log.
+#
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_PyObject_GC_New
+}
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_PyObject_GC_NewVar
+}
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Leak
+   fun:realloc
+   ...
+   fun:_PyObject_GC_Resize
+}
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_PyMem_RawWcsdup
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_Py_InitializeCore
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_Py_UnixMain
+   fun:(below main)
+}
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Cond
+   fun:PyUnicode_Decode
+   fun:PyUnicode_FromEncodedObject
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_PyObject_FastCallKeywords
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyFunction_FastCallDict
+   fun:_PyObject_Call_Prepend
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_PyObject_FastCallKeywords
+   obj:/usr/lib64/libpython3.7m.so.1.0
+   fun:_PyEval_EvalFrameDefault
+}
+{
+   Handle PyMalloc confusing valgrind
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:g_malloc
+   fun:g_strdup
+   obj:/usr/lib64/python3.7/site-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+   obj:/usr/lib64/python3.7/site-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+   obj:/usr/lib64/python3.7/site-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+   obj:/usr/lib64/python3.7/site-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+   obj:/usr/lib64/python3.7/site-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+   fun:PyObject_SetAttr
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyFunction_FastCallKeywords
+   obj:/usr/lib64/libpython3.7m.so.1.0
+}

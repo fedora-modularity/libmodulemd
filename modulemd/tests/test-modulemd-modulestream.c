@@ -3138,6 +3138,44 @@ module_stream_v2_test_community (void)
   g_clear_object (&stream);
 }
 
+
+/*
+ * This is a regression test for a memory leak that occurred when reading a
+ * v1 ModuleStream YAML document if the `data.license.content` field appeared
+ * before the `data.license.module` field.
+ */
+static void
+module_stream_v1_regression_content_license (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (GError) error = NULL;
+  const char *content_first =
+    "---\n"
+    "document: modulemd\n"
+    "version: 1\n"
+    "data:\n"
+    "  summary: summary\n"
+    "  description: >-\n"
+    "    desc\n"
+    "  license:\n"
+    "    content:\n"
+    "    - BSD\n"
+    "    module:\n"
+    "    - MIT\n"
+    "  xmd:\n"
+    "    something:\n"
+    "    - foo\n"
+    "    - bar\n"
+    "...\n";
+
+  stream = modulemd_module_stream_read_string (
+    content_first, TRUE, NULL, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V1 (stream));
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -3288,6 +3326,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/xmd/issue290plus",
                    module_stream_v2_test_xmd_issue_290_with_example);
+
+  g_test_add_func ("/modulemd/v2/modulestream/regression/memleak/v1_licenses",
+                   module_stream_v1_regression_content_license);
 
   return g_test_run ();
 }

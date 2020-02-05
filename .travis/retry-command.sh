@@ -1,17 +1,20 @@
 #!/bin/bash
 
 function retry_command {
-    local usage="Usage: ${FUNCNAME[0]} [-n numtries] [-d delay]"
+    local usage="Usage: ${FUNCNAME[0]} [-b backoff-factor] [-d delay] [-n numtries]"
     local OPTIND OPTION
-    local numtries=3 delay=2
+    local backoff_factor=2 delay=3 numtries=4
 
-    while getopts ":n:d:" OPTION; do
+    while getopts ":b:d:n:" OPTION; do
         case "${OPTION}" in
-        n)
-            numtries=${OPTARG}
+        b)
+            backoff_factor=${OPTARG}
             ;;
         d)
             delay=${OPTARG}
+            ;;
+        n)
+            numtries=${OPTARG}
             ;;
         *)
             echo "$usage" 1>&2
@@ -27,6 +30,7 @@ function retry_command {
         exitcode=$?
         (( exitcode == 0 )) && break
         (( --numtries > 0 )) && sleep $delay
+        (( delay *= backoff_factor ))
     done
 
     return $exitcode

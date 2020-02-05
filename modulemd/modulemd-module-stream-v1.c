@@ -1923,6 +1923,7 @@ modulemd_module_stream_v1_parse_licenses (yaml_parser_t *parser,
               set = modulemd_yaml_parse_string_set (parser, &nested_error);
               modulemd_module_stream_v1_replace_content_licenses (modulestream,
                                                                   set);
+              g_clear_pointer (&set, g_hash_table_unref);
             }
           else
             {

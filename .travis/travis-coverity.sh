@@ -36,21 +36,25 @@ git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
 popd
 
 sed -e "s#@IMAGE@#$repository/${MMD_IMAGE}#" \
-    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE
+    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/coverity/Dockerfile.deps.$MMD_RELEASE
 
-sudo docker build \
-    -f $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE \
+sed -e "s#@RELEASE@#${MMD_RELEASE}#" $SCRIPT_DIR/coverity/Dockerfile.tmpl \
+    | m4 -D_RELEASE_=$release \
+    > $SCRIPT_DIR/coverity/Dockerfile-$MMD_RELEASE
+
+$RETRY_CMD $MMD_BUILDAH $MMD_LAYERS_TRUE \
+    -f $SCRIPT_DIR/coverity/Dockerfile.deps.$MMD_RELEASE \
     -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
 
-sudo docker build \
-    -f $SCRIPT_DIR/coverity/Dockerfile \
+$RETRY_CMD $MMD_BUILDAH $MMD_LAYERS_FALSE \
+    -f $SCRIPT_DIR/coverity/Dockerfile-$MMD_RELEASE \
     -t fedora-modularity/libmodulemd-coverity \
     --build-arg TARBALL=$TARBALL .
 
 rm -f $MMD_TARBALL_PATH $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE $SCRIPT_DIR/fedora/Dockerfile-$MMD_RELEASE
 
 # Override the standard tasks with the Coverity scan
-docker run \
+$RETRY_CMD $MMD_OCI run \
     -e COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN \
     -e TRAVIS=$TRAVIS \
     -e TRAVIS_COMMIT="$TRAVIS_COMMIT" \

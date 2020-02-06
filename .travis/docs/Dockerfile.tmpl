@@ -1,4 +1,4 @@
-FROM fedora-modularity/libmodulemd-deps-fedora:30
+FROM fedora-modularity/libmodulemd-deps-fedora:@RELEASE@
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
@@ -9,6 +9,4 @@ ARG TARBALL
 
 ADD $TARBALL /builddir/
 
-RUN  /builddir/.travis/coverity_prep.sh
-
-ENTRYPOINT /builddir/.travis/coverity/travis-tasks.sh
+ENTRYPOINT /builddir/.travis/docs/travis-tasks.sh

@@ -37,20 +37,24 @@ git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
 popd
 
 sed -e "s#@IMAGE@#$repository/${MMD_IMAGE}#" \
-    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE
+    $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/docs/Dockerfile.deps.$MMD_RELEASE
 
-$RETRY_CMD sudo docker build \
-    -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
-    -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
+sed -e "s#@RELEASE@#${MMD_RELEASE}#" $SCRIPT_DIR/docs/Dockerfile.tmpl \
+    | m4 -D_RELEASE_=$release \
+    > $SCRIPT_DIR/docs/Dockerfile-$MMD_RELEASE
 
-$RETRY_CMD sudo docker build \
-    -f $SCRIPT_DIR/docs/Dockerfile \
+$RETRY_CMD $MMD_BUILDAH $MMD_LAYERS_TRUE \
+    -f $SCRIPT_DIR/docs/Dockerfile.deps.$MMD_RELEASE \
+    -t fedora-modularity/libmodulemd-deps-fedora:$MMD_RELEASE .
+
+$RETRY_CMD $MMD_BUILDAH $MMD_LAYERS_FALSE \
+    -f $SCRIPT_DIR/docs/Dockerfile-$MMD_RELEASE \
     -t fedora-modularity/libmodulemd-docs-$MMD_OS:$MMD_RELEASE \
     --build-arg TARBALL=$TARBALL .
 
 
 # Override the standard tasks with the doc-generation
-docker run \
+$RETRY_CMD $MMD_OCI run \
     -e TRAVIS=$TRAVIS \
     -e TRAVIS_COMMIT="$TRAVIS_COMMIT" \
     -e DOC_TOKEN="$DOC_TOKEN" \

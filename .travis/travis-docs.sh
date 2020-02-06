@@ -24,8 +24,9 @@ trap docs_finalize EXIT
 
 # Always generate the docs on Fedora Rawhide
 MMD_OS=fedora
-MMD_RELEASE=rawhide
-repository="registry.fedoraproject.org"
+MMD_RELEASE=$($SCRIPT_DIR/get_rawhide_version.py)
+MMD_IMAGE=fedora/fedora:${MMD_RELEASE}-$(uname -m)
+repository="quay.io"
 
 # Create an archive of the current checkout
 MMD_TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`
@@ -35,7 +36,7 @@ pushd $SCRIPT_DIR/..
 git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
 popd
 
-sed -e "s/@IMAGE@/$repository\/$MMD_OS:$MMD_RELEASE/" \
+sed -e "s#@IMAGE@#$repository/${MMD_IMAGE}#" \
     $SCRIPT_DIR/fedora/Dockerfile.deps.tmpl > $SCRIPT_DIR/fedora/Dockerfile.deps.$MMD_RELEASE
 
 $RETRY_CMD sudo docker build \

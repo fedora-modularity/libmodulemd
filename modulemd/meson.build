@@ -388,14 +388,16 @@ foreach name, script : python_tests
 
     valgrind_tests += name + '_python3_debug'
 
-    test (name + '_python2_debug', python2,
-          env : py_test_env,
-          args : files(script))
-    test (name + '_python2_release', python2,
-          env : py_test_release_env,
-          args : files(script))
+    if with_py2
+        test (name + '_python2_debug', python2,
+              env : py_test_env,
+              args : files(script))
+        test (name + '_python2_release', python2,
+              env : py_test_release_env,
+              args : files(script))
 
-    valgrind_tests += name + '_python2_debug'
+        valgrind_tests += name + '_python2_debug'
+    endif #with_py2
 endforeach
 
 

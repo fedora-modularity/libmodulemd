@@ -112,8 +112,8 @@ else
     python3 = pymod.find_installation()
 endif
 
-with_py2_overrides = get_option('with_py2_overrides')
-if with_py2_overrides
+with_py2 = get_option('with_py2')
+if with_py2
     python2 = pymod.find_installation('python2')
 else
     python2 = disabler()

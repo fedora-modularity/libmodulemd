@@ -15,6 +15,6 @@ meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
-ninja -C travis test
+MMD_SKIP_VALGRIND=TRUE ninja -C travis test
 
 popd #builddir

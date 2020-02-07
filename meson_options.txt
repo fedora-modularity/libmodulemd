@@ -9,15 +9,36 @@
 # For more information on the license, see COPYING.
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
-option('developer_build', type : 'boolean', value : true)
-option('libmagic', type : 'feature', value : 'enabled')
-option('python_name', type : 'string')
-option('rpmio', type : 'feature', value : 'enabled')
-option('skip_clang_tidy', type : 'boolean', value : false)
-option('skip_formatters', type : 'boolean', value : false)
-option('skip_introspection', type : 'boolean', value : false)
-option('test_dirty_git', type : 'boolean', value : false)
-option('test_installed_lib', type : 'boolean', value : false)
-option('with_docs', type : 'boolean', value : true)
-option('with_py2', type : 'boolean', value : false)
+option('developer_build', type : 'boolean', value : true,
+       description : 'Enables automatic code formatters and memory leak checks. This option should be set to FALSE for release builds.')
+
+option('libmagic', type : 'feature', value : 'enabled',
+       description : 'Enables the use of libmagic to detect compression of YAML files.')
+
+option('python_name', type : 'string',
+       description : 'The name of the Python 3 interpreter to use for generating Python bindings and running tests. If left blank, it defaults to the version of Python 3 being used to run meson.')
+
+option('rpmio', type : 'feature', value : 'enabled',
+       description : 'Use the rpmio library to automatically decompress gzip, bzip2 and xz YAML streams.')
+
+option('skip_clang_tidy', type : 'boolean', value : false,
+       description : 'Do not use the clang-tidy utility for code formatting.')
+
+option('skip_formatters', type : 'boolean', value : false,
+       description : 'Do not do any automatic formatting of source code.')
+
+option('skip_introspection', type : 'boolean', value : false,
+       description : 'Do not generate GObject Introspection data.')
+
+option('test_dirty_git', type : 'boolean', value : false,
+       description : 'Check whether the automatic formatting tools have made changes. Used during CI to verify coding style compliance')
+
+option('test_installed_lib', type : 'boolean', value : false,
+       description : 'Build only the test suite and run it against a copy of libmodulemd installed on the local system.')
+
+option('with_docs', type : 'boolean', value : true,
+       description : 'Build API documentation.')
+
+option('with_py2', type : 'boolean', value : false,
+       description : 'Build Python 2 language bindings and run Python 2 tests')
 

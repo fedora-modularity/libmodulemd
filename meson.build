@@ -82,6 +82,9 @@ if with_docs
   endif
 endif
 
+with_manpages = get_option('with_manpages')
+help2man = find_program('help2man', required: with_manpages)
+
 
 # Check whether this version of glib has the GDate autoptr defined
 gdate_check = '''#include <glib.h>

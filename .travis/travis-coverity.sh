@@ -22,9 +22,8 @@ function coverity_finalize {
 trap coverity_finalize EXIT
 
 # Always run the Coverity scan on Fedora Rawhide
-# Temporary change: Coverity doesn't work with GCC 10.x yet
 MMD_OS=fedora
-MMD_RELEASE=31
+MMD_RELEASE=$($SCRIPT_DIR/get_rawhide_version.py)
 MMD_IMAGE=fedora/fedora:${MMD_RELEASE}-$(uname -m)
 repository="quay.io"
 

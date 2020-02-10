@@ -36,6 +36,7 @@ BuildRequires:  python3-gobject-base
 %ifarch %{valgrind_arches}
 BuildRequires:  valgrind
 %endif
+BuildRequires:  help2man
 
 # Patches
 
@@ -134,6 +135,7 @@ mv %{buildroot}%{_bindir}/modulemd-validator \
 %else
 %{_bindir}/modulemd-validator
 %endif
+%{_mandir}/man1/modulemd-validator.1*
 %{_libdir}/%{name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib

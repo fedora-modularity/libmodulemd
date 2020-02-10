@@ -37,6 +37,16 @@ struct validator_options
 struct validator_options options = { 0, NULL };
 
 static gboolean
+print_version (const gchar *option_name,
+               const gchar *value,
+               gpointer data,
+               GError **error)
+{
+  g_fprintf (stdout, "modulemd-validator %s\n", modulemd_get_version ());
+  exit (1);
+}
+
+static gboolean
 set_verbosity (const gchar *option_name,
                const gchar *value,
                gpointer data,
@@ -89,9 +99,10 @@ set_verbosity (const gchar *option_name,
 
 // clang-format off
 static GOptionEntry entries[] = {
+  { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
-  { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
+  { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, "Files to be validated", NULL },
   { NULL } };
 // clang-format on

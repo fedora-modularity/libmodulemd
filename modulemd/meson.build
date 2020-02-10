@@ -529,3 +529,16 @@ if with_docs
         install : true,
     )
 endif
+
+help2man_opts = [
+  '--no-info',
+  '--section=1',
+]
+custom_target(
+    'modulemd-validator.1',
+    output: 'modulemd-validator.1',
+    command: [
+      help2man, help2man_opts, '--output=@OUTPUT@', modulemd_validator,
+    ],
+    install: true,
+    install_dir: join_paths(get_option('mandir'), 'man1'))

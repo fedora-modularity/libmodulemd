@@ -31,7 +31,7 @@ option('skip_introspection', type : 'boolean', value : false,
        description : 'Do not generate GObject Introspection data.')
 
 option('test_dirty_git', type : 'boolean', value : false,
-       description : 'Check whether the automatic formatting tools have made changes. Used during CI to verify coding style compliance')
+       description : 'Check whether the automatic formatting tools have made changes. Used during CI to verify coding style compliance.')
 
 option('test_installed_lib', type : 'boolean', value : false,
        description : 'Build only the test suite and run it against a copy of libmodulemd installed on the local system.')
@@ -39,6 +39,8 @@ option('test_installed_lib', type : 'boolean', value : false,
 option('with_docs', type : 'boolean', value : true,
        description : 'Build API documentation.')
 
-option('with_py2', type : 'boolean', value : false,
-       description : 'Build Python 2 language bindings and run Python 2 tests')
+option('with_manpages', type : 'feature', value : 'auto',
+       description : 'Build manual pages for included executables.')
 
+option('with_py2', type : 'boolean', value : false,
+       description : 'Build Python 2 language bindings and run Python 2 tests.')

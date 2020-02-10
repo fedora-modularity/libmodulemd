@@ -135,6 +135,10 @@
       <xi:include href="xml/api-index-2.8.xml"/>
     </chapter>
     <chapter>
+      <title>2.9 API Index</title>
+      <xi:include href="xml/api-index-2.9.xml"/>
+    </chapter>
+    <chapter>
       <title>Deprecated API Index</title>
       <xi:include href="xml/api-index-deprecated.xml"/>
     </chapter>

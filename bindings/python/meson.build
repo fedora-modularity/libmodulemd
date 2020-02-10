@@ -21,20 +21,18 @@ print(overridedir)
 '''
 
 # Python 3
-if (get_option('with_py3_overrides'))
-  ret = run_command([python3, '-c', get_overridedir])
+ret = run_command([python3, '-c', get_overridedir])
 
-  if ret.returncode() != 0
-    error('Failed to determine Python 3 pygobject overridedir')
-  else
-    pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
-  endif
-
-  install_data('gi/overrides/Modulemd.py', install_dir: pygobject_override_dir)
+if ret.returncode() != 0
+  error('Failed to determine Python 3 pygobject overridedir')
+else
+  pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
 endif
 
+install_data('gi/overrides/Modulemd.py', install_dir: pygobject_override_dir)
+
 # Python 2
-if (get_option('with_py2_overrides'))
+if with_py2
   ret2 = run_command([python2, '-c', get_overridedir])
 
   if ret2.returncode() != 0

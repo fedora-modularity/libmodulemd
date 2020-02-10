@@ -1,15 +1,14 @@
-%global libmodulemd_version @VERSION@
-
+# Python 2 is dead on F31+
 %if ( 0%{?fedora} && 0%{?fedora} <= 30 ) || ( 0%{?rhel} && 0%{?rhel} <= 7)
-%global build_python2 1
-%global meson_python_flags -Dwith_py3_overrides=true -Dwith_py2_overrides=true
+  %global meson_python_flags -Dwith_py2=true
+  %global build_python2 1
 %else
-%global build_python2 0
-%global meson_python_flags -Dwith_py3_overrides=true -Dwith_py2_overrides=false
+  %global meson_python_flags -Dwith_py2=false
+  %global build_python2 0
 %endif
 
 Name:           libmodulemd
-Version:        %{libmodulemd_version}
+Version:        @VERSION@
 Release:        0%{?dist}.@DATETIME@
 Summary:        Module metadata manipulation library
 
@@ -25,16 +24,18 @@ BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  pkgconfig(gtk-doc)
+BuildRequires:  glib2-doc
+BuildRequires:  rpm-devel
+BuildRequires:  file-devel
 %if %{build_python2}
 BuildRequires:  python2-devel
 BuildRequires:  python-gobject-base
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-gobject-base
+%ifarch %{valgrind_arches}
 BuildRequires:  valgrind
-BuildRequires:  glib2-doc
-BuildRequires:  rpm-devel
-BuildRequires:  file-devel
+%endif
 
 # Patches
 
@@ -58,15 +59,15 @@ Python 2 bindings for %{name}
 %endif
 
 
-%package -n python3-%{name}
+%package -n python%{python3_pkgversion}-%{name}
 Summary: Python 3 bindings for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: python3-gobject-base
+Requires: python%{python3_pkgversion}-gobject-base
 Requires: %{py3_dist six}
-Obsoletes: python3-modulemd < 1.3.4
+Obsoletes: python%{python3_pkgversion}-modulemd < 1.3.4
 
-%description -n python3-%{name}
-Python 3 bindings for %{name}
+%description -n python%{python3_pkgversion}-%{name}
+Python %{python3_pkgversion} bindings for %{name}
 
 
 %package devel
@@ -79,19 +80,13 @@ Development files for libmodulemd.
 
 
 %prep
-%autosetup -p1 -n modulemd-%{libmodulemd_version}
+%autosetup -p1 -n modulemd-%{version}
 
 
 %build
 %meson -Ddeveloper_build=false \
        -Dskip_formatters=true \
        %{meson_python_flags}
-
-%if 0%{?rhel} && 0%{?rhel} <= 7
-# ALERT!!! PURE HACK FOR EPEL!
-# https://bugzilla.redhat.com/show_bug.cgi?id=1546757
-sed -r -i -e "/g-ir-scanner/s/-l(gobject-2.0|glib-2.0|yaml)//g" %{_vpath_builddir}/build.ninja
-%endif
 
 %meson_build
 
@@ -100,22 +95,45 @@ sed -r -i -e "/g-ir-scanner/s/-l(gobject-2.0|glib-2.0|yaml)//g" %{_vpath_builddi
 
 export LC_CTYPE=C.utf8
 
+%ifarch %{power64} s390x
+# Valgrind is broken on ppc64[le] with GCC7:
+# https://bugs.kde.org/show_bug.cgi?id=386945
+export MMD_SKIP_VALGRIND=1
+%endif
 %ifnarch %{valgrind_arches}
 export MMD_SKIP_VALGRIND=1
 %endif
 
+# Don't run tests on ARM for now. There are problems with
+# performance on the builders and often these time out.
+%ifnarch %{arm} aarch64
 # The tests sometimes time out in CI, so give them a little extra time
 %{__meson} test -C %{_vpath_builddir} %{?_smp_mesonflags} --print-errorlogs -t 5
+%endif
 
 
 %install
 %meson_install
 
+%if ( 0%{?rhel} && 0%{?rhel} <= 7)
+# Don't conflict with modulemd-validator from 1.x included in the official
+# RHEL 7 repos
+mv %{buildroot}%{_bindir}/modulemd-validator \
+   %{buildroot}%{_bindir}/modulemd-validator2
+%endif
+
+
+%ldconfig_scriptlets
+
 
 %files
 %license COPYING
 %doc README.md
+%if ( 0%{?rhel} && 0%{?rhel} <= 7)
+%{_bindir}/modulemd-validator2
+%else
 %{_bindir}/modulemd-validator
+%endif
 %{_libdir}/%{name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib
@@ -137,9 +155,9 @@ export MMD_SKIP_VALGRIND=1
 %{python2_sitearch}/gi/overrides/
 %endif
 
-%files -n python3-%{name}
-%{python3_sitearch}/gi/overrides/
 
+%files -n python%{python3_pkgversion}-%{name}
+%{python3_sitearch}/gi/overrides/
 
 
 %changelog

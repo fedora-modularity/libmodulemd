@@ -270,6 +270,7 @@ install_headers(
 test_release_env = environment()
 test_release_env.set('LC_ALL', 'C')
 test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+test_release_env.set ('MESON_BUILD_ROOT', meson.build_root())
 test_release_env.set ('TEST_DATA_PATH', meson.source_root() + '/modulemd/tests/test_data')
 
 # Test env with fatal warnings and criticals
@@ -302,6 +303,12 @@ py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
 valgrind_tests = []
 
+
+# Make sure we remembered to bump the version number since the last release
+version_test = find_program('tests/test-version.sh')
+if developer_build
+    test('version', version_test, env : test_env)
+endif
 
 # --- Test utility library --- #
 test_utils_lib = library(

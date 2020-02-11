@@ -1311,6 +1311,94 @@ data:
             self.assertIsNotNone(output_yaml)
         pass
 
+    def test_search_profiles(self):
+        stream = Modulemd.ModuleStreamV2.new("themodule", "thestream")
+
+        # First with no profiles added. Make sure we get back a zero-length
+        # array
+
+        profiles = stream.search_profiles(None)
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 0)
+
+        profiles = stream.search_profiles("*")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 0)
+
+        profiles = stream.search_profiles("thefirstprofile")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 0)
+
+        # Now add three profiles, and confirm that searches are
+        # returned in alphabetical order
+        stream.add_profile(Modulemd.Profile.new("thesecondprofile"))
+        stream.add_profile(Modulemd.Profile.new("thefirstprofile"))
+        stream.add_profile(Modulemd.Profile.new("thethirdprofile"))
+
+        profiles = stream.search_profiles(None)
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 3)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[2], Modulemd.Profile)
+        self.assertEqual(profiles[2].get_name(), "thethirdprofile")
+
+        profiles = stream.search_profiles("*")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 3)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[2], Modulemd.Profile)
+        self.assertEqual(profiles[2].get_name(), "thethirdprofile")
+
+        profiles = stream.search_profiles("thefirstprofile")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 1)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+
+        profiles = stream.search_profiles("*profile")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 3)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[2], Modulemd.Profile)
+        self.assertEqual(profiles[2].get_name(), "thethirdprofile")
+
+        profiles = stream.search_profiles("*dprofile*")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 2)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thethirdprofile")
+
+        profiles = stream.search_profiles("the*profile")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 3)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[2], Modulemd.Profile)
+        self.assertEqual(profiles[2].get_name(), "thethirdprofile")
+
+        profiles = stream.search_profiles("the*")
+        self.assertIsNotNone(profiles)
+        self.assertEqual(len(profiles), 3)
+        self.assertIsInstance(profiles[0], Modulemd.Profile)
+        self.assertEqual(profiles[0].get_name(), "thefirstprofile")
+        self.assertIsInstance(profiles[1], Modulemd.Profile)
+        self.assertEqual(profiles[1].get_name(), "thesecondprofile")
+        self.assertIsInstance(profiles[2], Modulemd.Profile)
+        self.assertEqual(profiles[2].get_name(), "thethirdprofile")
+
 
 if __name__ == "__main__":
     unittest.main()

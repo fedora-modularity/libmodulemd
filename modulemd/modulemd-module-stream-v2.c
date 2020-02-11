@@ -734,6 +734,52 @@ modulemd_module_stream_v2_get_profile (ModulemdModuleStreamV2 *self,
 }
 
 
+struct profile_match_ctx
+{
+  GHashTable *profiles;
+  GPtrArray *found;
+  const gchar *pattern;
+};
+
+static void
+profile_match (gpointer data, gpointer user_data)
+{
+  struct profile_match_ctx *match_ctx = (struct profile_match_ctx *)user_data;
+
+  /* Add it to the found list if it matches the pattern */
+  if (modulemd_fnmatch (match_ctx->pattern, (const gchar *)data))
+    {
+      g_ptr_array_add (match_ctx->found,
+                       g_object_ref (g_hash_table_lookup (
+                         match_ctx->profiles, (const gchar *)data)));
+    }
+}
+
+GPtrArray *
+modulemd_module_stream_v2_search_profiles (ModulemdModuleStreamV2 *self,
+                                           const gchar *profile_pattern)
+{
+  /* The list of profiles will probably never be large, so we'll optimize for
+   * the worst-case and preallocate the array to the number of profiles.
+   */
+  GPtrArray *found =
+    g_ptr_array_new_full (g_hash_table_size (self->profiles), g_object_unref);
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), found);
+
+  g_autoptr (GPtrArray) profile_names =
+    modulemd_ordered_str_keys (self->profiles, modulemd_strcmp_sort);
+
+  struct profile_match_ctx match_ctx = { .profiles = self->profiles,
+                                         .found = found,
+                                         .pattern = profile_pattern };
+
+  g_ptr_array_foreach (profile_names, profile_match, &match_ctx);
+
+  return found;
+}
+
+
 void
 modulemd_module_stream_v2_add_rpm_api (ModulemdModuleStreamV2 *self,
                                        const gchar *rpm)

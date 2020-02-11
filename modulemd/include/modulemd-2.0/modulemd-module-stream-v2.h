@@ -544,6 +544,23 @@ modulemd_module_stream_v2_get_profile (ModulemdModuleStreamV2 *self,
 
 
 /**
+ * modulemd_module_stream_v2_search_profiles:
+ * @self: This #ModulemdModuleStreamV2 object.
+ * @profile_pattern: (nullable): A globbing pattern to locate one or more
+ * profiles in this #ModulemdModuleStreamV2 object. The names will be compared
+ * using [fnmatch(3)](https://www.mankier.com/3/fnmatch).
+ *
+ * Returns: (transfer container) (element-type ModulemdProfile): The list of
+ * #ModulemdProfile objects whose name matched @profile_pattern. This function
+ * cannot fail, but it may return a zero-length list if no matches were found.
+ * The returned profiles will be sorted alphabetically by profile name.
+ */
+GPtrArray *
+modulemd_module_stream_v2_search_profiles (ModulemdModuleStreamV2 *self,
+                                           const gchar *profile_pattern);
+
+
+/**
  * modulemd_module_stream_v2_add_rpm_api:
  * @self: (in): This #ModulemdModuleStreamV2 object.
  * @rpm: (in): The name of a binary RPM present in this module that is

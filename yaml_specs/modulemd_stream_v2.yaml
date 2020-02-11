@@ -1,50 +1,134 @@
+##############################################################################
+# Glossary:                                                                  #
+#                                                                            #
+# build system: The process by which a module is built and packaged. In many #
+# cases, this will be the Module Build Service tool, but this term is used   #
+# as a catch-all to describe any mechanism for producing a yum repository    #
+# containing modular content from input module metadata files.               #
+#                                                                            #
+#                                                                            #
+# == Attribute Types ==                                                      #
+#                                                                            #
+# MANDATORY: Attributes of this type must be filled in by the packager of    #
+# this module. They must also be preserved and provided in the output        #
+# metadata produced by the build system for inclusion into a repository.     #
+#                                                                            #
+# OPTIONAL: Attributes of this type may be provided by the packager of this  #
+# module, when appropriate. If they are provided, they must also be          #
+# preserved and provided in the output metadata produced by the build        #
+# system for inclusion into a repository.                                    #
+#                                                                            #
+# AUTOMATIC: Attributes of this type must be present in the repository       #
+# metadata, but they may be left unspecified by the packager. In this case,  #
+# the build system is responsible for generating an appropriate value for    #
+# the attribute and including it in the repository metadata. If the packager #
+# specifies this attribute explicitly, it must be preserved and provided in  #
+# the output metadata for inclusion into a repository.                       #
+#                                                                            #
+# The definitions above describe the expected behavior of the build system   #
+# operating in its default configuration. It is permissible for the build    #
+# system to override user-provided entries through non-default operating     #
+# modes. If such changes are made, all items indicated as being required for #
+# the output repository must still be present.                               #
+##############################################################################
+
+
 # Document type identifier
 # `document: modulemd` describes the contents of a module stream
 document: modulemd
+
 # Module metadata format version
 version: 2
+
 data:
-    # Module name, optional
-    # Typically filled in by the buildsystem, using the VCS repository
-    # name as the name of the module.
+    # name:
+    # The name of the module
+    # Filled in by the build system, using the VCS repository name as the name
+    # of the module.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     name: foo
-    # Module update stream, optional
-    # Typically filled in by the buildsystem, using the VCS branch name
-    # as the name of the stream.
+
+    # stream:
+    # Module update stream
+    # Filled in by the buildsystem, using the VCS branch name as the name of
+    # the stream.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     stream: latest
-    # Module version, integer, optional, cannot be negative
-    # Typically filled in by the buildsystem, using the VCS commit
-    # timestamp.  Module version defines upgrade path for the particular
-    # update stream.
+
+    # version:
+    # Module version, integer, cannot be negative
+    # If this value is unset (or set to zero), it will be filled in by the
+    # buildsystem, using the VCS commit timestamp.  Module version defines the
+    # upgrade path for the particular update stream.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     version: 20160927144203
-    # Module context flag, optional
+
+    # context:
+    # Module context flag
     # The context flag serves to distinguish module builds with the
     # same name, stream and version and plays an important role in
-    # future automatic module stream name expansion.
+    # automatic module stream name expansion.
+    #
     # Filled in by the buildsystem.  A short hash of the module's name,
-    # stream, version and its expanded runtime dependencies.
+    # stream, version and its expanded runtime dependencies. The exact
+    # mechanism for generating the hash is unspecified.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     context: c0ffee43
-    # Module artifact architecture, optional
+
+    # arch:
+    # Module artifact architecture
     # Contains a string describing the module's artifacts' main hardware
     # architecture compatibility, distinguishing the module artifact,
     # e.g. a repository, from others with the same name, stream, version and
     # context.  This is not a generic hardware family (i.e. basearch).
     # Examples: i386, i486, armv7hl, x86_64
     # Filled in by the buildsystem during the compose stage.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     arch: x86_64
-    # A short summary describing the module, required
+
+    # summary:
+    # A short summary describing the module
+    #
+    # Type: MANDATORY
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     summary: An example module
-    # A verbose description of the module, required
+
+    # description:
+    # A verbose description of the module
+    #
+    # Type: MANDATORY
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
     description: >-
         A module for the demonstration of the metadata format. Also,
         the obligatory lorem ipsum dolor sit amet goes right here.
-    # Service levels, optional
+
+    # servicelevels:
+    # Service levels
     # This is a dictionary of important dates (and possibly supplementary data
     # in the future) that describes the end point of certain functionality,
     # such as the date when the module will transition to "security fixes only"
     # or go completely end-of-life.
     # Filled in by the buildsystem.  Service level names might have special
     # meaning to other systems.  Defined externally.
+    #
+    # Type: AUTOMATIC
     servicelevels:
         rawhide:
             # EOL dates are the ISO 8601 format.
@@ -55,28 +139,47 @@ data:
             eol: 2077-10-23
         security_fixes:
             eol: 2077-10-23
+
+    # license:
     # Module and content licenses in the Fedora license identifier
-    # format, required
+    # format
+    #
+    # Type: MANDATORY
     license:
-        # Module license, required
+        # module:
+        # Module license
         # This list covers licenses used for the module metadata and
         # possibly other files involved in the creation of this specific
         # module.
+        #
+        # Type: MANDATORY
         module:
             - MIT
-        # Content license, optional
+
+        # content:
+        # Content license
         # A list of licenses used by the packages in the module.
         # This should be populated by build tools, not the module author.
+        #
+        # Type: AUTOMATIC
+        #
+        # Mandatory for module metadata in a yum/dnf repository.
         content:
             - Beerware
             - GPLv2+
             - zlib
+
+    # xmd:
     # Extensible metadata block
     # A dictionary of user-defined keys and values.
-    # Optional.  Defaults to an empty dictionary.
+    # Defaults to an empty dictionary.
+    #
+    # Type: OPTIONAL
     xmd:
         some_key: some_data
-    # Module dependencies, if any.  Optional.
+
+    # dependencies:
+    # Module dependencies, if any
     # A list of dictionaries describing build and runtime dependencies
     # of this module.  Each list item describes a combination of dependencies
     # this module can be built or run against.
@@ -91,10 +194,10 @@ data:
     # the runtime block so that it matches the stream the module was built
     # against.  Multiple builds result in multiple output modulemd files.
     # See below for an example.
-    # TODO: Provides, conflicts, obsoletes, recommends, etc.
-    #       Do we even need those?
     # The example below illustrates how to build the same module in four
     # different ways, with varying build time and runtime dependencies.
+    #
+    # Type: OPTIONAL
     dependencies:
         # Build on all available platforms except for f27, f28 and epel7
         # After build, the runtime dependency will match the one used for
@@ -103,6 +206,7 @@ data:
               platform: [-f27, -f28, -epel7]
           requires:
               platform: [-f27, -f28, -epel7]
+
         # For platform:f27 perform two builds, one with buildtools:v1, another
         # with buildtools:v2 in the buildroot.  Both will also utilize
         # compatible:v3.  At runtime, buildtools isn't required and either
@@ -114,6 +218,7 @@ data:
           requires:
               platform: [f27]
               compatible: [v3, v4]
+
         # For platform:f28 builds, require either runtime:a or runtime:b at
         # runtime.  Only one build is performed.
         - buildrequires:
@@ -121,6 +226,7 @@ data:
           requires:
               platform: [f28]
               runtime: [a, b]
+
         # For platform:epel7, build against against all available extras
         # streams and moreextras:foo and moreextras:bar.  The number of builds
         # in this case will be 2 * <the number of extras streams available>.
@@ -134,14 +240,31 @@ data:
               platform: [epel7]
               extras: []
               moreextras: [foo, bar]
-    # References to external resources, typically upstream, optional
+
+    # references:
+    # References to external resources, typically upstream
+    #
+    # Type: OPTIONAL
     references:
-        # Upstream community website, if it exists, optional
+        # community:
+        # Upstream community website, if it exists
+        #
+        # Type: OPTIONAL
         community: http://www.example.com/
-        # Upstream documentation, if it exists, optional
+
+        # documentation:
+        # Upstream documentation, if it exists
+        #
+        # Type: OPTIONAL
         documentation: http://www.example.com/
-        # Upstream bug tracker, if it exists, optional
+
+        # tracker:
+        # Upstream bug tracker, if it exists
+        #
+        # Type: OPTIONAL
         tracker: http://www.example.com/
+
+    # profiles:
     # Profiles define the end user's use cases for the module. They consist of
     # package lists of components to be installed by default if the module is
     # enabled. The keys are the profile names and contain package lists by
@@ -150,48 +273,76 @@ data:
     # module. Then users are able to install packages on their own. If they
     # select a specific profile, the package manager should install all
     # packages of that profile.
-    # Optional, defaults to no profile definitions.
+    # Defaults to no profile definitions.
+    #
+    # Type: OPTIONAL
     profiles:
-        # The default profile, used unless any other profile was selected.
-        # Optional, defaults to empty lists.
-        default:
-            rpms:
-                - bar
-                - bar-extras
-                - baz
-        # Defines a set of packages which are meant to be installed inside
-        # container image artifact.
-        # Optional.
+
+        # An example profile that defines a set of packages which are meant to
+        # be installed inside a container image artifact.
+        #
+        # Type: OPTIONAL
         container:
             rpms:
                 - bar
                 - bar-devel
-        # This profile provides minimal set of packages providing functionality
-        # of this module. This is meant to be used on target systems where size
-        # of the distribution is a real concern.
-        # Optional.
+
+        # An example profile that delivers a minimal set of packages to
+        # provide this module's basic functionality. This is meant to be used
+        # on target systems where size of the distribution is a real concern.
+        #
+        # Type: Optional
         minimal:
             # A verbose description of the module, optional
             description: Minimal profile installing only the bar package.
             rpms:
                 - bar
-        # A set of packages which should be installed into the buildroot of a
-        # module which depends on this module.  Specifically, it is used to
-        # flesh out the build group in koji.
-        # Optional.
+
+        # buildroot:
+        # This is a special reserved profile name.
+        #
+        # This provides a listing of packages that will be automatically
+        # installed into the buildroot of all component builds that are started
+        # after a component builds with its `buildroot: True` option set.
+        #
+        # The primary purpose of this is for building RPMs that change
+        # the build environment, such as those that provide new RPM
+        # macro definitions that can be used by subsequent builds.
+        #
+        # Specifically, it is used to flesh out the build group in koji.
+        #
+        # Type: OPTIONAL
         buildroot:
             rpms:
                 - bar-devel
+
+        # srpm-buildroot:
+        # This is a special reserved profile name.
+        #
+        # This provides a listing of packages that will be automatically
+        # installed into the buildroot of all component builds that are started
+        # after a component builds with its `srpm-buildroot: True` option set.
+        #
+        # The primary purpose of this is for building RPMs that change
+        # the build environment, such as those that provide new RPM
+        # macro definitions that can be used by subsequent builds.
+        #
         # Very similar to the buildroot profile above, this is used by the
         # build system to specify any additional packages which should be
         # installed during the buildSRPMfromSCM step in koji.
-        # Optional.
+        #
+        # Type: OPTIONAL
         srpm-buildroot:
             rpms:
                 - bar-extras
+
+    # api:
     # Module API
-    # Optional, defaults to no API.
+    # Defaults to no API.
+    #
+    # Type: OPTIONAL
     api:
+        # rpms:
         # The module's public RPM-level API.
         # A list of binary RPM names that are considered to be the
         # main and stable feature of the module; binary RPMs not listed
@@ -199,117 +350,200 @@ data:
         # In the example here we don't list the xyz package as it's only
         # included as a dependency of xxx.  However, we list a subpackage
         # of bar, bar-extras.
-        # Optional, defaults to an empty list.
+        # Defaults to an empty list.
+        #
+        # Type: OPTIONAL
         rpms:
             - bar
             - bar-extras
             - bar-devel
             - baz
             - xxx
+
+    # filter:
     # Module component filters
-    # Optional, defaults to no filters.
+    # Defaults to no filters.
+    #
+    # Type: OPTIONAL
     filter:
+        # rpms:
         # RPM names not to be included in the module.
         # By default, all built binary RPMs are included.  In the example
         # we exclude a subpackage of bar, bar-nonfoo from our module.
-        # Optional, defaults to an empty list.
+        # Defaults to an empty list.
+        #
+        # Type: OPTIONAL
         rpms:
             - baz-nonfoo
+
+    # buildopts:
     # Component build options
     # Additional per component type module-wide build options.
-    # Optional
+    #
+    # Type: OPTIONAL
     buildopts:
+        # rpms:
         # RPM-specific build options
-        # Optional
+        #
+        # Type: OPTIONAL
         rpms:
+            # macros:
             # Additional macros that should be defined in the
             # RPM buildroot, appended to the default set.  Care should be
             # taken so that the newlines are preserved.  Literal style
             # block is recommended, with or without the trailing newline.
-            # Optional
+            #
+            # Type: OPTIONAL
             macros: |
                 %demomacro 1
                 %demomacro2 %{demomacro}23
+
+            # whitelist:
             # Explicit list of package build names this module will produce.
             # By default the build system only allows components listed under
             # data.components.rpms to be built as part of this module.
             # In case the expected RPM build names do not match the component
             # names, the list can be defined here.
             # This list overrides rather then just extends the default.
-            # Optional, list of package build names without versions.
+            # List of package build names without versions.
+            #
+            # Type: OPTIONAL
             whitelist:
                 - fooscl-1-bar
                 - fooscl-1-baz
                 - xxx
                 - xyz
+
+        # arches:
         # Instructs the build system to only build the
         # module on this specific set of architectures.
         # Includes specific hardware architectures, not families.
         # See the data.arch field for details.
-        # Optional, defaults to all available arches.
+        # Defaults to all available arches.
+        #
+        # Type: OPTIONAL
         arches: [i686, x86_64]
-    # Functional components of the module, optional
+
+    # components:
+    # Functional components of the module
+    #
+    # Type: OPTIONAL
     components:
-        # RPM content of the module, optional
+        # rpms:
+        # RPM content of the module
         # Keys are the VCS/SRPM names, values dictionaries holding
         # additional information.
+        #
+        # Type: OPTIONAL
         rpms:
             bar:
+                # name:
                 # The real name of the package, if it differs from the key in
                 # this dictionary. Used when bootstrapping to build a
                 # bootstrapping ref before building the package for real.
-                # Optional
+                #
+                # Type: OPTIONAL
                 name: bar-real
+
+                # rationale:
                 # Why is this component present.
                 # A simple, free-form string.
-                # Required.
+                #
+                # Type: MANDATORY
                 rationale: We need this to demonstrate stuff.
+
+                # repository:
                 # Use this repository if it's different from the build
                 # system configuration.
-                # Optional.
+                #
+                # Type: AUTOMATIC
                 repository: https://pagure.io/bar.git
+
+                # cache:
                 # Use this lookaside cache if it's different from the
                 # build system configuration.
-                # Optional.
+                #
+                # Type: AUTOMATIC
                 cache: https://example.com/cache
+
+                # ref:
                 # Use this specific commit hash, branch name or tag for
                 # the build.  If ref is a branch name, the branch HEAD
                 # will be used.  If no ref is given, the master branch
                 # is assumed.
-                # Optional.
+                #
+                # Type: AUTOMATIC
                 ref: 26ca0c0
+
+                # buildafter:
                 # Use the "buildafter" value to specify that this component
                 # must be be ordered later than some other entries in this map.
                 # The values of this array come from the keys of this map and
                 # not the real component name to enable bootstrapping.
                 # Use of both buildafter and buildorder in the same document is
                 # prohibited, as they will conflict.
+                #
+                # Type: AUTOMATIC
+                #
                 # buildafter:
                 #    - baz
+
+                # buildonly:
                 # Use the "buildonly" value to indicate that all artifacts
                 # produced by this component are intended only for building
                 # this component and should be automatically added to the
                 # data.filter.rpms list after the build is complete.
-                # Optional. Defaults to "false" if not specified.
+                # Defaults to "false" if not specified.
+                #
+                # Type: AUTOMATIC
                 buildonly: false
-                # If buildroot is set to True, the packages listed in this
-                # module's buildroot profile will be installed into the
-                # buildroot of any component built in subsequent
-                # buildorder/buildafter batches, even if that module does not
-                # explicitly include these packages in its BuildRequires.
-                # Optional. Defaults to "false" if not specified.
-                buildroot: false
-                # If srpm-buildroot is set to True, the packages listed in this
-                # module's srpm-buildroot profile will be installed into the
-                # buildroot when performing the buildSRPMfromSCM step in
-                # subsequent buildorder/buildafter batches.
-                # Optional. Defaults to "false" if not specified.
-                srpm-buildroot: false
-            # baz has no extra options
+
+            # baz builds RPM macros for the other components to use
             baz:
-                rationale: This one is here to demonstrate other stuff.
+                rationale: Demonstrate updating the buildroot contents.
+
+                # buildroot:
+                # If buildroot is set to True, the packages listed in this
+                # module's 'buildroot' profile will be installed into the
+                # buildroot of any component built in buildorder/buildafter
+                # batches begun after this one, without requiring that those
+                # packages are listed among BuildRequires.
+                #
+                # The primary purpose of this is for building RPMs that change
+                # the build environment, such as those that provide new RPM
+                # macro definitions that can be used by subsequent builds.
+                #
+                # Defaults to "false" if not specified.
+                #
+                # Type: OPTIONAL
+                buildroot: true
+
+                # srpm-buildroot:
+                # If srpm-buildroot is set to True, the packages listed in this
+                # module's 'srpm-buildroot' profile will be installed into the
+                # buildroot of any component built in buildorder/buildafter
+                # batches begun after this one, without requiring that those
+                # packages are listed among BuildRequires.
+                #
+                # The primary purpose of this is for building RPMs that change
+                # the build environment, such as those that provide new RPM
+                # macro definitions that can be used by subsequent builds.
+                #
+                # Defaults to "false" if not specified.
+                #
+                # Type: OPTIONAL
+                srpm-buildroot: true
+
+                # See component zyx for a complete description of buildorder
+                #
+                # build this component before any others so that the macros it
+                # creates are available to all of them.
+                buildorder: -1
+
             xxx:
                 rationale: xxx demonstrates arches and multilib.
+
+                # arches:
                 # xxx is only available on the listed architectures.
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
@@ -317,31 +551,44 @@ data:
                 # component on this specific set of architectures.
                 # If data.buildopts.arches is also specified,
                 # this must be a subset of those architectures.
-                # Optional, defaults to all available arches.
+                # Defaults to all available arches.
+                #
+                # Type: AUTOMATIC
                 arches: [i686, x86_64]
+
+                # multilib:
                 # A list of architectures with multilib
                 # installs, i.e. both i686 and x86_64
                 # versions will be installed on x86_64.
                 # Includes specific hardware architectures, not families.
                 # See the data.arch field for details.
-                # Optional, defaults to no multilib.
+                # Defaults to no multilib.
+                #
+                # Type: AUTOMATIC
                 multilib: [x86_64]
+
             xyz:
                 rationale: xyz is a bundled dependency of xxx.
+
+                # buildorder:
                 # Build order group
                 # When building, components are sorted by build order tag
                 # and built in batches grouped by their buildorder value.
                 # Built batches are then re-tagged into the buildroot.
                 # Multiple components can have the same buildorder index
                 # to map them into build groups.
-                # Optional, defaults to zero.
+                # Defaults to zero.
                 # Integer, negative values are allowed.
                 # In this example, bar, baz and xxx are built first in
                 # no particular order, then tagged into the buildroot,
                 # then, finally, xyz is built.
                 # Use of both buildafter and buildorder in the same document is
                 # prohibited, as they will conflict.
+                #
+                # Type: OPTIONAL
                 buildorder: 10
+
+        # modules:
         # Module content of this module
         # Included modules are built in the shared buildroot, together with
         # other included content.  Keys are module names, values additional
@@ -350,29 +597,50 @@ data:
         # additional module metadata such as the module's dependencies or
         # component buildopts.  The included components are built in their
         # defined buildorder as sub-build groups.
-        # Optional
+        #
+        # Type: OPTIONAL
         modules:
             includedmodule:
+
+                # rationale:
                 # Why is this module included?
-                # Required
+                #
+                # Type: MANDATORY
                 rationale: Included in the stack, just because.
+
+                # repository:
                 # Link to VCS repository that contains the modulemd file
                 # if it differs from the buildsystem default configuration.
-                # Optional.
+                #
+                # Type: AUTOMATIC
                 repository: https://pagure.io/includedmodule.git
+
+                # ref:
                 # See the rpms ref.
+                #
+                # Type: AUTOMATIC
                 ref: somecoolbranchname
+
+                # buildorder:
                 # See the rpms buildorder.
+                #
+                # Type: AUTOMATIC
                 buildorder: 100
+
+    # artifacts:
     # Artifacts shipped with this module
     # This section lists binary artifacts shipped with the module, allowing
     # software management tools to handle module bundles.  This section is
     # populated by the module build system.
-    # Optional
+    #
+    # Type: AUTOMATIC
     artifacts:
+
+        # rpms:
         # RPM artifacts shipped with this module
         # A set of NEVRAs associated with this module.
-        # Optional
+        #
+        # Type: AUTOMATIC
         rpms:
             - bar-0:1.23-1.module_deadbeef.x86_64
             - bar-devel-0:1.23-1.module_deadbeef.x86_64
@@ -381,24 +649,57 @@ data:
             - xxx-0:1-1.module_deadbeef.x86_64
             - xxx-0:1-1.module_deadbeef.i686
             - xyz-0:1-1.module_deadbeef.x86_64
+
+        # rpm-map:
         # The rpm-map exists to link checksums from repomd to specific
         # artifacts produced by this module. Any item in this list must match
         # an entry in the data.artifacts.rpms section.
-        # Optional.
+        #
+        # Type: AUTOMATIC
         rpm-map:
-          # The digest-type of this checksum. Required.
+
+          # The digest-type of this checksum.
+          #
+          # Type: MANDATORY
           sha256:
-            # The checksum of the artifact being sought. Required.
+
+            # The checksum of the artifact being sought.
+            #
+            # Type: MANDATORY
             ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:
-              # The RPM name. Required.
+
+              # name:
+              # The RPM name.
+              #
+              # Type: Mandatory
               name: bar
-              # The RPM epoch. Required.
+
+              # epoch:
+              # The RPM epoch.
+              #
+              # Type: OPTIONAL
               epoch: 0
-              # The RPM version. Required.
+
+              # version:
+              # The RPM version.
+              #
+              # Type: MANDATORY
               version: 1.23
-              # The RPM release. Required.
+
+              # release:
+              # The RPM release.
+              #
+              # Type: MANDATORY
               release: 1.module_deadbeef
-              # The RPM architecture. Required.
+
+              # arch:
+              # The RPM architecture.
+              #
+              # Type: MANDATORY
               arch: x86_64
-              # The complete RPM NEVRA. Required.
+
+              # nevra:
+              # The complete RPM NEVRA.
+              #
+              # Type: MANDATORY
               nevra: bar-0:1.23-1.module_deadbeef.x86_64

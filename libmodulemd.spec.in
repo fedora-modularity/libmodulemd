@@ -9,7 +9,7 @@
 
 Name:           libmodulemd
 Version:        @VERSION@
-Release:        0%{?dist}.@DATETIME@
+Release:        @RELEASE@
 Summary:        Module metadata manipulation library
 
 License:        MIT

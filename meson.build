@@ -62,7 +62,7 @@ magic = cc.find_library('magic', required : with_libmagic)
 glib = dependency('glib-2.0')
 glib_prefix = glib.get_pkgconfig_variable('prefix')
 
-sh = find_program('sh')
+bash = find_program('bash')
 sed = find_program('sed')
 test = find_program('test')
 
@@ -144,9 +144,9 @@ spec_target = custom_target(
     capture: true,
     build_by_default: true,
     build_always_stale: true,
-    command: [sh, spec_tmpl,
-              meson.project_version(),
-              '@INPUT@'],
+    command: [bash, spec_tmpl,
+              'version=' + meson.project_version(),
+              'template=@INPUT@'],
     input: specfile_template,
     output: 'libmodulemd.spec',
     depends: rpmsetup_target,

@@ -92,3 +92,7 @@ jobs:
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./.travis/travis-coverity.sh; fi'
       arch: amd64
 
+
+  allow_failures:
+    - name: "Fedora rawhide x86_64"
+    - name: "Fedora rawhide aarch64"

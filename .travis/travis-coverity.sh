@@ -23,7 +23,9 @@ trap coverity_finalize EXIT
 
 # Always run the Coverity scan on Fedora Rawhide
 MMD_OS=fedora
-MMD_RELEASE=$($SCRIPT_DIR/get_rawhide_version.py)
+#MMD_RELEASE=$($SCRIPT_DIR/get_rawhide_version.py)
+# Temporarily use F32 until F33 base images are ready
+MMD_RELEASE=32
 MMD_IMAGE=fedora/fedora:${MMD_RELEASE}-$(uname -m)
 repository="quay.io"
 

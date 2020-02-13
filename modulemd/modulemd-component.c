@@ -670,7 +670,7 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
   if (modulemd_component_get_buildorder (self) != 0)
     {
       buildorder =
-        g_strdup_printf ("%" PRIu64, modulemd_component_get_buildorder (self));
+        g_strdup_printf ("%" PRId64, modulemd_component_get_buildorder (self));
       ;
       if (!mmd_emitter_scalar (
             emitter, "buildorder", YAML_PLAIN_SCALAR_STYLE, error))

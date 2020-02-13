@@ -5,7 +5,7 @@ set -e
 set -x
 
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Dskip_clang_tidy=${SKIP_CLANG_TIDY:-true}"
+COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
 RETRY_CMD=/builddir/.travis/retry-command.sh
 
 pushd /builddir/

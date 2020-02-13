@@ -14,7 +14,6 @@
 developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
 test_installed_lib = get_option('test_installed_lib')
-skip_clang_tidy = get_option('skip_clang_tidy')
 skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
 
@@ -22,46 +21,13 @@ skip_introspection = get_option('skip_introspection')
 clang_simple_version_script = find_program ('clang_simple_version.sh')
 
 if skip_formatters
-    clang_tidy = disabler()
     clang_format = disabler()
     python_formatter = disabler()
     pycodestyle = disabler()
 else
-    if skip_clang_tidy
-        clang_tidy = disabler()
-    else
-        clang_tidy = find_program('clang-tidy', required: false)
-    endif
-
-    if clang_tidy.found()
-        ret = run_command (clang_simple_version_script, clang_tidy.path())
-        if ret.returncode() != 0
-            warning('Unable to determine clang-tidy version.')
-            clang_tidy = disabler()
-        else
-            clang_tidy_version = ret.stdout().strip()
-
-            # Older versions of clang_tidy have issues with producing changes that
-            # do not compile. Only use this tool if we have a sufficiently new
-            # version.
-            if not clang_tidy_version.version_compare('>=9.0.0')
-                warning('clang-tidy version too old: ' +
-                        clang_tidy_version +
-                        ' < 9.0.0')
-                clang_tidy = disabler()
-            endif
-        endif
-    else
-        clang_tidy = disabler()
-    endif
-
-    if clang_tidy.found()
+    clang_format = find_program('clang-format', required: developer_build)
+    if not clang_format.found()
         clang_format = disabler()
-    else
-        clang_format = find_program('clang-format', required: developer_build)
-        if not clang_format.found()
-            clang_format = disabler()
-        endif
     endif
 
     python_formatter = find_program('black', required : developer_build)
@@ -418,15 +384,6 @@ clang_files = modulemd_srcs + modulemd_hdrs + modulemd_priv_hdrs + modulemd_vali
 clang_args = [ '-i' ]
 test('clang_format', clang_format,
      args : clang_args + clang_files)
-
-clang_tidy_args = [ '-p', meson.build_root(),
-                    '--checks=*,-llvm-header-guard,-bugprone-macro-parentheses',
-                    '--format-style=file',
-                    '--fix',
-                    '--fix-errors' ]
-test('clang_tidy', clang_tidy,
-     args: clang_tidy_args + clang_files,
-     timeout: 300)
 
 
 # Fake test to ensure that the python tests are formatted according to PEP8

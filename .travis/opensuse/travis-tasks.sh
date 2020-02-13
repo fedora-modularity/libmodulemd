@@ -5,7 +5,7 @@ set -e
 set -x
 
 
-COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=python3 -Dskip_clang_tidy=true"
+COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=python3"
 
 
 pushd /builddir/

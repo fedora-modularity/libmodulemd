@@ -21,9 +21,6 @@ option('python_name', type : 'string',
 option('rpmio', type : 'feature', value : 'enabled',
        description : 'Use the rpmio library to automatically decompress gzip, bzip2 and xz YAML streams.')
 
-option('skip_clang_tidy', type : 'boolean', value : false,
-       description : 'Do not use the clang-tidy utility for code formatting.')
-
 option('skip_formatters', type : 'boolean', value : false,
        description : 'Do not do any automatic formatting of source code.')
 

@@ -27,7 +27,7 @@ trap common_finalize EXIT
 # Don't release if the git repo has uncommitted changes
 git diff --quiet || error_out code=127 message="There are uncommitted changes. Refusing to release."
 
-git remote get-url upstream |grep "fedora-modularity/libmodulemd.git\$" -q || error_out code=127 message="There must be a git remote named 'upstream' available. The user running this script must have privilege to push commits to the 'upstream' remote"
+[[ $(git remote get-url upstream) =~ fedora-modularity/libmodulemd.git$ ]] || error_out code=127 message="There must be a git remote named 'upstream' available. The user running this script must have privilege to push commits to the 'upstream' remote"
 [ $(git branch --show-current) = master ] || error_out code=127 message="This script may only be run on the 'master' branch"
 
 hub --version >/dev/null || error_out code=127 message="Install 'hub' to use this script"
@@ -84,4 +84,3 @@ hub release create -a $TMPDIR/meson-dist/modulemd-$NEWVERSION.tar.xz \
                    -a $TMPDIR/meson-dist/modulemd-$NEWVERSION.tar.xz.sha256sum \
                    -F $TMPDIR/github_message \
                    $NEWTAG || error_out code=10 message="Couldn't publish the release"
-

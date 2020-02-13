@@ -24,6 +24,9 @@ function common_finalize {
 
 trap common_finalize EXIT
 
+git remote get-url upstream |grep "fedora-modularity/libmodulemd.git\$" -q || error_out code=127 message="There must be a git remote named 'upstream' available. The user running this script must have privilege to push commits to the 'upstream' remote"
+[ $(git branch --show-current) = master ] || error_out code=127 message="This script may only be run on the 'master' branch"
+
 hub --version >/dev/null || error_out code=127 message="Install 'hub' to use this script"
 jq --version >/dev/null || error_out code=127 message="Install 'jq' to use this script"
 
@@ -68,7 +71,7 @@ if [ $($SCRIPT_DIR/semver compare 0.50.0 $(meson --version)) = -1 ]; then
 fi
 
 # Make sure everything is up-to-date on Github
-git push --follow-tags || error_out code=5 message="Couldn't push the new tags to Github"
+git push --follow-tags upstream master || error_out code=5 message="Couldn't push the new tags to Github"
 
 echo "libmodulemd $NEWVERSION" > $TMPDIR/github_message
 echo >> $TMPDIR/github_message

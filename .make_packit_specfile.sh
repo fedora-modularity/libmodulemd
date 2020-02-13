@@ -15,7 +15,7 @@ hash=$(echo $version_desc | cut -d '-' -f4)
 if [ x$patch_count != x ]; then
     release=0.${date}.${patch_count}git${hash}%{?dist}
 else
-    release=0.${date}%{?dist}
+    release=1%{?dist}
 fi
 
 ./spec_tmpl.sh version=$version release=$release template=libmodulemd.spec.in > libmodulemd.spec

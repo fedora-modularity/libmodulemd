@@ -24,6 +24,9 @@ function common_finalize {
 
 trap common_finalize EXIT
 
+# Don't release if the git repo has uncommitted changes
+git diff --quiet || error_out code=127 message="There are uncommitted changes. Refusing to release."
+
 git remote get-url upstream |grep "fedora-modularity/libmodulemd.git\$" -q || error_out code=127 message="There must be a git remote named 'upstream' available. The user running this script must have privilege to push commits to the 'upstream' remote"
 [ $(git branch --show-current) = master ] || error_out code=127 message="This script may only be run on the 'master' branch"
 

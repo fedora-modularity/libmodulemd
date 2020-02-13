@@ -9,16 +9,14 @@
 # For more information on the license, see COPYING.
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
 
-project('modulemd', 'c',
-        version : '2.9.0',
-        default_options : [
-          'buildtype=debugoptimized',
-          'c_std=c11',
-          'warning_level=1',
-          'b_asneeded=true',
-        ],
-        license : 'MIT',
-        meson_version : '>=0.47.0')
+project(
+  'modulemd',
+  'c',
+  version : '2.9.0',
+  default_options : ['buildtype=debugoptimized', 'c_std=c11', 'warning_level=1', 'b_asneeded=true'],
+  license : 'MIT',
+  meson_version : '>=0.47.0'
+)
 
 libmodulemd_version = meson.project_version()
 

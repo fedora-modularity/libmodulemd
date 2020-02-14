@@ -7,14 +7,20 @@
   %global build_python2 0
 %endif
 
-Name:           libmodulemd
+%global upstream_name libmodulemd
+
+%if (0%{?rhel} && 0%{?rhel} <= 7)
+  %global v2_suffix 2
+%endif
+
+Name:           %{upstream_name}%{?v2_suffix}
 Version:        @VERSION@
 Release:        @RELEASE@
 Summary:        Module metadata manipulation library
 
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
-Source0:        %{url}/releases/download/%{name}-%{version}/modulemd-%{version}.tar.xz
+Source0:        %{url}/releases/download/%{upstream_name}-%{version}/modulemd-%{version}.tar.xz
 
 BuildRequires:  meson >= 0.47
 BuildRequires:  pkgconfig
@@ -31,12 +37,13 @@ BuildRequires:  file-devel
 BuildRequires:  python2-devel
 BuildRequires:  python-gobject-base
 %endif
-BuildRequires:  python3-devel
-BuildRequires:  python3-gobject-base
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-gobject-base
 %ifarch %{valgrind_arches}
 BuildRequires:  valgrind
 %endif
 BuildRequires:  help2man
+
 
 # Patches
 
@@ -74,6 +81,10 @@ Python %{python3_pkgversion} bindings for %{name}
 %package devel
 Summary:        Development files for libmodulemd
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+%if (0%{?rhel} && 0%{?rhel} <= 7)
+Conflicts:      libmodulemd1-devel
+Conflicts:      libmodulemd-devel
+%endif
 
 
 %description devel
@@ -120,7 +131,10 @@ export MMD_SKIP_VALGRIND=1
 # Don't conflict with modulemd-validator from 1.x included in the official
 # RHEL 7 repos
 mv %{buildroot}%{_bindir}/modulemd-validator \
-   %{buildroot}%{_bindir}/modulemd-validator2
+   %{buildroot}%{_bindir}/modulemd-validator%{?v2_suffix}
+
+mv %{buildroot}%{_mandir}/man1/modulemd-validator.1 \
+   %{buildroot}%{_mandir}/man1/modulemd-validator%{?v2_suffix}.1
 %endif
 
 
@@ -130,19 +144,15 @@ mv %{buildroot}%{_bindir}/modulemd-validator \
 %files
 %license COPYING
 %doc README.md
-%if ( 0%{?rhel} && 0%{?rhel} <= 7)
-%{_bindir}/modulemd-validator2
-%else
-%{_bindir}/modulemd-validator
-%endif
-%{_mandir}/man1/modulemd-validator.1*
-%{_libdir}/%{name}.so.2*
+%{_bindir}/modulemd-validator%{?v2_suffix}
+%{_mandir}/man1/modulemd-validator%{?v2_suffix}.1*
+%{_libdir}/%{upstream_name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib
 
 
 %files devel
-%{_libdir}/%{name}.so
+%{_libdir}/%{upstream_name}.so
 %{_libdir}/pkgconfig/modulemd-2.0.pc
 %{_includedir}/modulemd-2.0/
 %dir %{_datadir}/gir-1.0

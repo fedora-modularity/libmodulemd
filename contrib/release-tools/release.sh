@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SOURCE_ROOT=$SCRIPT_DIR/../..
-pushd $SCRIPT_DIR
+pushd $SOURCE_ROOT
 
 function error_out {
     local code message

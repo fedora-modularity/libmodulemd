@@ -2,6 +2,11 @@ language: c
 compiler: gcc
 sudo: required
 
+# Don't run Travis against tags, just new builds.
+# Tagged builds will always fail the test for whether we remembered to bump
+# the version number after a release.
+if: tag IS blank
+
 services:
   - docker
 

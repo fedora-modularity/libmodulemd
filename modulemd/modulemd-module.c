@@ -527,7 +527,6 @@ modulemd_module_search_streams_by_nsvca_glob (ModulemdModule *self,
   g_autofree gchar *nsvca = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
-  g_return_val_if_fail (nsvca_pattern, NULL);
 
   /* Assume the worst-case scenario that all streams match to spare us extra
    * mallocs.
@@ -540,7 +539,7 @@ modulemd_module_search_streams_by_nsvca_glob (ModulemdModule *self,
         (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
 
       nsvca = modulemd_module_stream_get_NSVCA_as_string (under_consideration);
-      if (modulemd_fnmatch (nsvca_pattern, nsvca))
+      if (nsvca_pattern == NULL || modulemd_fnmatch (nsvca_pattern, nsvca))
         {
           g_ptr_array_add (matching_streams, under_consideration);
         }

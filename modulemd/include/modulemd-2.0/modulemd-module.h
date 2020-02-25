@@ -196,9 +196,9 @@ modulemd_module_search_streams_by_glob (ModulemdModule *self,
 /**
  * modulemd_module_search_streams_by_nsvca_glob:
  * @self: This #ModulemdModule object.
- * @nsvca_pattern: (not nullable): A [glob](https://www.mankier.com/3/glob)
+ * @nsvca_pattern: (nullable): A [glob](https://www.mankier.com/3/glob)
  * pattern to match against the NSVCA strings of the #ModulemdModuleStream
- * objects in this module.
+ * objects in this module. If NULL, this will match all NSVCAs.
  *
  * Returns: (transfer container) (element-type ModulemdModuleStream): An array
  * of #ModulemdModuleStream objects whose NSVCA string matches the provided

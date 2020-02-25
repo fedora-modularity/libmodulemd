@@ -1504,6 +1504,11 @@ test_module_index_search_streams_by_nsvca_glob (void)
   g_assert_cmpint (streams->len, ==, 5);
   g_clear_pointer (&streams, g_ptr_array_unref);
 
+  streams = modulemd_module_index_search_streams_by_nsvca_glob (index, NULL);
+  g_assert_nonnull (streams);
+  g_assert_cmpint (streams->len, ==, 5);
+  g_clear_pointer (&streams, g_ptr_array_unref);
+
   streams =
     modulemd_module_index_search_streams_by_nsvca_glob (index, "nodejs*");
   g_assert_nonnull (streams);

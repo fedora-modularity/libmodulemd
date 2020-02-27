@@ -335,13 +335,15 @@ modulemd_module_add_stream (ModulemdModule *self,
 
       if (!modulemd_module_stream_equals (old, stream))
         {
+          g_autofree gchar *nsvca =
+            modulemd_module_stream_get_NSVCA_as_string (stream);
           /* The two streams have matching NSVCA, but differ in content */
           g_set_error (error,
                        MODULEMD_ERROR,
                        MMD_ERROR_VALIDATE,
                        "Encountered two streams with matching NSVCA %s but "
                        "differing content",
-                       modulemd_module_stream_get_NSVCA_as_string (stream));
+                       nsvca);
           return MD_MODULESTREAM_VERSION_ERROR;
         }
 

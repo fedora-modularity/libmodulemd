@@ -416,6 +416,40 @@ data:
                 expected_profile_defs[stream],
             )
 
+    def test_merge_incompatible_streams(self):
+        # This test verifies that if we encounter two streams with the same
+        # NSVCA, but different content, we only retain one of them.
+        # Note: the specification of the merger states that the behavior is
+        # undefined, so we will only validate that the merge completes and
+        # it only contains a single stream
+        merger = Modulemd.ModuleIndexMerger.new()
+
+        base_idx = Modulemd.ModuleIndex()
+        self.assertTrue(
+            base_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "conflict_base.yaml"),
+                True,
+            )
+        )
+        merger.associate_index(base_idx, 0)
+
+        bad_idx = Modulemd.ModuleIndex()
+        self.assertTrue(
+            bad_idx.update_from_file(
+                path.join(self.test_data_path, "merger", "conflict_base.yaml"),
+                True,
+            )
+        )
+        # Modify the stream to have a different summary
+        stream = bad_idx.search_streams_by_nsvca_glob()[0]
+        stream.set_summary("Invalid summary, should not merge successfully")
+        merger.associate_index(bad_idx, 0)
+
+        merged_idx = merger.resolve()
+        all_streams = merged_idx.search_streams_by_nsvca_glob()
+        self.assertEqual(len(all_streams), 1)
+        self.assertEqual(all_streams[0].props.module_name, "nodejs")
+
 
 if __name__ == "__main__":
     unittest.main()

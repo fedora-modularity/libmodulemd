@@ -46,10 +46,9 @@ G_BEGIN_DECLS
  *
  * When merging module streams, entries will be deduplicated based on whether
  * they share the same module name, stream name, version number, and context.
- * At present, libmodulemd does not interrogate more closely to determine if
- * they have the same content, so if the repository configuration is broken and
- * there exists two #ModulemdModuleStream entries that have different content
- * for the same NSVC, the behavior is undefined.
+ * If the repository configuration is broken and there exists two
+ * #ModulemdModuleStream entries that have different content for the same
+ * NSVCA, the behavior is undefined.
  *
  * Merging #ModulemdDefaults entries behaves as follows (note that this
  * behavior has changed slightly as of 2.8.1):

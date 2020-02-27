@@ -1375,6 +1375,7 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
   guint i;
   g_autoptr (GPtrArray) translated_stream_names = NULL;
   gchar *translated_stream_name = NULL;
+  g_autofree gchar *nsvca = NULL;
 
 
   /* Loop through each module in the Index */
@@ -1400,13 +1401,17 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
       for (i = 0; i < streams->len; i++)
         {
           stream = g_ptr_array_index (streams, i);
+          nsvca = modulemd_module_stream_get_NSVCA_as_string (stream);
 
           if (!modulemd_module_index_add_module_stream (
                 into, stream, &nested_error))
             {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return FALSE;
+              g_info ("Could not add stream %s due to %s",
+                      nsvca,
+                      nested_error->message);
+              g_clear_error (&nested_error);
             }
+          g_clear_pointer (&nsvca, g_free);
         }
 
 

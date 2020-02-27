@@ -561,9 +561,8 @@ static void
 g_ptr_array_maybe_expand (GRealPtrArray *array, guint len)
 {
   /* Detect potential overflow */
-  if
-    G_UNLIKELY ((G_MAXUINT - array->len) < len)
-  g_error ("adding %u to array would overflow", len);
+  if (G_UNLIKELY ((G_MAXUINT - array->len) < len))
+    g_error ("adding %u to array would overflow", len);
 
   if ((array->len + len) > array->alloc)
     {

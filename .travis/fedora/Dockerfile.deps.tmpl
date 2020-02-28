@@ -2,7 +2,8 @@ FROM @IMAGE@
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags=''  --skip-broken install \
+RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
+           --nogpgcheck --skip-broken install \
 	python3-black \
 	clang \
 	clang-analyzer \

@@ -21,11 +21,10 @@ function coverity_finalize {
 
 trap coverity_finalize EXIT
 
-# Always run the Coverity scan on Fedora Rawhide
+# Always run the Coverity scan on the oldest supported Fedora
+# because it generally lags behind with GCC compatibility.
 MMD_OS=fedora
-#MMD_RELEASE=$($SCRIPT_DIR/get_rawhide_version.py)
-# Temporarily use F32 until F33 base images are ready
-MMD_RELEASE=32
+MMD_RELEASE=30
 MMD_IMAGE=fedora/fedora:${MMD_RELEASE}-$(uname -m)
 repository="quay.io"
 

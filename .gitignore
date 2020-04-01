@@ -76,4 +76,4 @@ __pycache__/
 /armv7hl
 /ppc64le
 /s390*
-
+/libmodulemd.spec

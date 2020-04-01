@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # This file is part of libmodulemd
 # Copyright (C) 2016 Red Hat, Inc.
 # Copyright (C) 2017-2018 Stephen Gallagher

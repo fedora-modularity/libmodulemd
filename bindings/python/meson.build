@@ -1,3 +1,6 @@
+pygobject_override_dir = get_option('pygobject_override_dir')
+pygobject2_override_dir = get_option('py2_pygobject_override_dir')
+
 get_overridedir = '''
 import os
 import sysconfig
@@ -21,24 +24,28 @@ print(overridedir)
 '''
 
 # Python 3
-ret = run_command([python3, '-c', get_overridedir])
+if pygobject_override_dir == ''
+  ret = run_command([python3, '-c', get_overridedir])
 
-if ret.returncode() != 0
-  error('Failed to determine Python 3 pygobject overridedir')
-else
-  pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
+  if ret.returncode() != 0
+    error('Failed to determine Python 3 pygobject overridedir')
+  else
+    pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
+  endif
 endif
 
 install_data('gi/overrides/Modulemd.py', install_dir: pygobject_override_dir)
 
 # Python 2
 if with_py2
-  ret2 = run_command([python2, '-c', get_overridedir])
+  if pygobject2_override_dir == ''
+    ret2 = run_command([python2, '-c', get_overridedir])
 
-  if ret2.returncode() != 0
-    error('Failed to determine Python 2 pygobject overridedir')
-  else
-    pygobject2_override_dir = join_paths(get_option('libdir'), ret2.stdout().strip())
+    if ret2.returncode() != 0
+      error('Failed to determine Python 2 pygobject overridedir')
+    else
+      pygobject2_override_dir = join_paths(get_option('libdir'), ret2.stdout().strip())
+    endif
   endif
 
   install_data('gi/overrides/Modulemd.py', install_dir: pygobject2_override_dir)

@@ -39,5 +39,11 @@ option('with_docs', type : 'boolean', value : true,
 option('with_manpages', type : 'feature', value : 'auto',
        description : 'Build manual pages for included executables.')
 
+option('pygobject_override_dir', type : 'string', value : '',
+       description : 'Path to Python 3 PyGObject overrides directory. Leave empty to try to determine it automatically.')
+
+option('py2_pygobject_override_dir', type : 'string', value : '',
+       description : 'Path to Python 2 PyGObject overrides directory. Leave empty to try to determine it automatically.')
+
 option('with_py2', type : 'boolean', value : false,
        description : 'Build Python 2 language bindings and run Python 2 tests.')

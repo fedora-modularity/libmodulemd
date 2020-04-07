@@ -41,3 +41,9 @@ option('with_manpages', type : 'feature', value : 'auto',
 
 option('with_py2', type : 'boolean', value : false,
        description : 'Build Python 2 language bindings and run Python 2 tests.')
+
+option('gobject_overrides_dir_py2', type : 'string',
+       description : 'Path to Python 2 PyGObject overrides directory. Leave empty to determine it automatically.')
+
+option('gobject_overrides_dir_py3', type : 'string',
+       description : 'Path to Python 3 PyGObject overrides directory. Leave empty to determine it automatically.')

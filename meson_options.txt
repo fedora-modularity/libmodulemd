@@ -8,6 +8,8 @@
 # This program is free software.
 # For more information on the license, see COPYING.
 # For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
+#
+# REMEMBER TO UPDATE THE SUMMARY() IN meson.build when adding options here
 
 option('developer_build', type : 'boolean', value : true,
        description : 'Enables automatic code formatters and memory leak checks. This option should be set to FALSE for release builds.')

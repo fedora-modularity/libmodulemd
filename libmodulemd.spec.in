@@ -39,9 +39,6 @@ BuildRequires:  python-gobject-base
 %endif
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-gobject-base
-%ifarch %{valgrind_arches}
-BuildRequires:  valgrind
-%endif
 BuildRequires:  help2man
 
 
@@ -101,7 +98,6 @@ Development files for libmodulemd.
 
 %build
 %meson -Ddeveloper_build=false \
-       -Dskip_formatters=true \
        %{meson_python_flags}
 
 %meson_build
@@ -110,15 +106,6 @@ Development files for libmodulemd.
 %check
 
 export LC_CTYPE=C.utf8
-
-%ifarch %{power64} s390x
-# Valgrind is broken on ppc64[le] with GCC7:
-# https://bugs.kde.org/show_bug.cgi?id=386945
-export MMD_SKIP_VALGRIND=1
-%endif
-%ifnarch %{valgrind_arches}
-export MMD_SKIP_VALGRIND=1
-%endif
 
 # Don't run tests on ARM for now. There are problems with
 # performance on the builders and often these time out.

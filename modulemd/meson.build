@@ -11,12 +11,15 @@
 
 # -- Configuration Options -- #
 
-developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
 test_installed_lib = get_option('test_installed_lib')
 skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
+developer_build = get_option('developer_build')
 
+if not developer_build
+    skip_formatters = true
+endif
 
 clang_simple_version_script = find_program ('clang_simple_version.sh')
 
@@ -42,9 +45,13 @@ else
     endif
 endif
 
-valgrind = find_program('valgrind', required: developer_build)
+if developer_build
+    valgrind = find_program('valgrind')
 
-if not valgrind.found()
+    if not valgrind.found()
+        valgrind = disabler()
+    endif
+else
     valgrind = disabler()
 endif
 

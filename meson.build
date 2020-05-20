@@ -245,7 +245,7 @@ if meson.version().version_compare('>=0.53')
              'Generate Manpages': manpages_status,
              'Generate HTML Documentation': get_option('with_docs'),
              'Python 2 Support': get_option('with_py2'),
-             'Skip Formatters': get_option('skip_formatters'),
+             'Skip Formatters': skip_formatters,
              'Skip Introspection': get_option('skip_introspection'),
              'Test Dirty Git': get_option('test_dirty_git'),
              'Test Installed Library': get_option('test_installed_lib'),

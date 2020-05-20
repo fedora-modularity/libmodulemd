@@ -1,5 +1,4 @@
-# Python 2 is dead on F31+
-%if ( 0%{?fedora} && 0%{?fedora} <= 30 ) || ( 0%{?rhel} && 0%{?rhel} <= 7)
+%if  0%{?rhel} && 0%{?rhel} <= 7
   %global meson_python_flags -Dwith_py2=true
   %global build_python2 1
 %else

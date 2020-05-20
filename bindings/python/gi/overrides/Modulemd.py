@@ -45,17 +45,17 @@ class ModulemdUtil(object):
         return GLib.Variant.new_boolean(b)
 
     @staticmethod
-    def variant_list(l):
+    def variant_list(vl):
         """ Converts a list to a GLib.Variant
         """
 
         # If this is a zero-length array, handle it specially
-        if len(l) == 0:
+        if len(vl) == 0:
             return GLib.Variant.new_array(GLib.VariantType("v"))
 
         # Build the array from each entry
         builder = GLib.VariantBuilder(GLib.VariantType("a*"))
-        for item in l:
+        for item in vl:
             if item is None:
                 item = ""
             builder.add_value(ModulemdUtil.python_to_variant(item))

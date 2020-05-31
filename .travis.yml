@@ -102,4 +102,3 @@ jobs:
   allow_failures:
     - name: "Fedora rawhide x86_64"
     - name: "Fedora rawhide aarch64"
-    - name: "openSUSE tumbleweed"

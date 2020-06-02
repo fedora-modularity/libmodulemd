@@ -152,7 +152,7 @@ modulemd_module_index_new (void);
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
  * Since: 2.0
@@ -179,7 +179,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
  * Since: 2.0
@@ -206,7 +206,7 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
  * Since: 2.0
@@ -233,7 +233,7 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
  * Since: 2.3
@@ -499,7 +499,7 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
  *
  * Returns: TRUE if the #ModulemdDefaults was added successfully. If the defaults
  * already existed in the index, it will be replaced by the new one. On failure,
- * returns FALSE and sets @error approriately.
+ * returns FALSE and sets @error appropriately.
  *
  * Since: 2.0
  */

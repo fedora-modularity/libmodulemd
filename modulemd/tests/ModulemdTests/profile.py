@@ -38,7 +38,7 @@ class TestProfile(TestBase):
         assert p.get_description() is None
         assert p.get_rpms() == []
 
-        # Test that keywork name is accepted
+        # Test that keyword name is accepted
         p = Modulemd.Profile(name="testprofile")
         assert p
         assert p.props.name == "testprofile"

@@ -58,7 +58,7 @@ module_test_construct (void)
   g_clear_error (&error);
   g_clear_object (&m);
 
-  /* Test that object instantiation works wiht a name */
+  /* Test that object instantiation works with a name */
   m = g_object_new (MODULEMD_TYPE_MODULE, "module-name", "testmodule", NULL);
   g_assert_true (MODULEMD_IS_MODULE (m));
   g_assert_cmpstr (modulemd_module_get_module_name (m), ==, "testmodule");

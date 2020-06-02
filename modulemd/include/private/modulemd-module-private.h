@@ -53,7 +53,7 @@ modulemd_module_new (const gchar *module_name);
  * defaults version added so far in the #ModulemdModuleIndex. If non-zero,
  * perform an upgrade to this version while adding @defaults to @self. If
  * the @defaults already has a higher version, just copy it.
- * @error: (out): A #GError containing information about why this fucntion
+ * @error: (out): A #GError containing information about why this function
  * failed.
  *
  * This function takes a defaults object, upgrades it to @index_mdversion if it
@@ -113,7 +113,7 @@ modulemd_module_get_translated_streams (ModulemdModule *self);
  * stream version added so far in the #ModulemdModuleIndex. If non-zero,
  * perform an upgrade to this version while adding @stream to @self. If
  * the @stream already has the same or a higher version, just copy it.
- * @error: (out): A #GError containing information about why this fucntion
+ * @error: (out): A #GError containing information about why this function
  * failed.
  *
  * This function takes a stream object, upgrades it to index_mdversion if

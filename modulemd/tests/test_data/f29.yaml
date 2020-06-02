@@ -7498,7 +7498,7 @@ data:
         buildorder: 2
         arches: [aarch64, ppc64le, s390x, x86_64]
       python-pymongo:
-        rationale: Python MongoDB driver | MongoDB dependecy for running testsuite.
+        rationale: Python MongoDB driver | MongoDB dependency for running testsuite.
         repository: git://pkgs.fedoraproject.org/rpms/python-pymongo
         cache: http://pkgs.fedoraproject.org/repo/pkgs/python-pymongo
         ref: f28
@@ -7601,7 +7601,7 @@ data:
         buildorder: 2
         arches: [aarch64, ppc64le, s390x, x86_64]
       python-pymongo:
-        rationale: Python MongoDB driver | MongoDB dependecy for running testsuite.
+        rationale: Python MongoDB driver | MongoDB dependency for running testsuite.
         repository: git://pkgs.fedoraproject.org/rpms/python-pymongo
         cache: http://pkgs.fedoraproject.org/repo/pkgs/python-pymongo
         ref: f28

@@ -40,7 +40,7 @@ class TestDependencies(TestBase):
         with self.expect_signal(only_on_fatal_warnings=True):
             d.get_runtime_streams("foobar123")
 
-        # Test that keywork name is accepted
+        # Test that keyword name is accepted
         d = Modulemd.Dependencies()
         assert d
         assert d.get_buildtime_modules() == []

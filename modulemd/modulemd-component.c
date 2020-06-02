@@ -648,7 +648,7 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
         }
     }
 
-  /* The rest of the fields are emitted by childs, after which they need to call
+  /* The rest of the fields are emitted by children, after which they need to call
 emit_yaml_end to end the mapping. */
   return TRUE;
 }

@@ -48,7 +48,7 @@ G_BEGIN_DECLS
  * fails in a way that prevents program continuation.
  *
  * Returns: TRUE if the update was successful. Returns FALSE and sets failures
- * approriately if any of the YAML subdocuments were invalid or sets @error if
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
  * there was a fatal parse error.
  *
  * Since: 2.0

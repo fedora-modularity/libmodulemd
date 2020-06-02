@@ -671,7 +671,7 @@ modulemd_yaml_parse_document_type_internal (
   if (event.type != YAML_MAPPING_START_EVENT)
     {
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error, event, "Document did not start with a mappping");
+        error, event, "Document did not start with a mapping");
     }
   MMD_EMIT_WITH_EXIT_FULL (
     emitter, FALSE, &event, error, "Error starting mapping");

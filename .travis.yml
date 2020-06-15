@@ -1,6 +1,7 @@
 language: c
 compiler: gcc
 sudo: required
+dist: bionic
 
 # Don't run Travis against tags, just new builds.
 # Tagged builds will always fail the test for whether we remembered to bump

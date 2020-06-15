@@ -258,7 +258,7 @@ ModulemdModuleStream metadata format. This may change at any time.
 To install all of the dependencies needed to build libmodulemd, the following
 command will work on Fedora 28+ (run as root or with sudo):
 ```
-dnf -y install clang git-core python3-pycodestyle python3-autopep8 redhat-rpm-config "dnf-command(builddep)"
+dnf -y install clang git-core python3-pycodestyle python3-black redhat-rpm-config "dnf-command(builddep)"
 dnf -y builddep libmodulemd
 ```
 
@@ -329,13 +329,20 @@ cause the application to `abort()` on programming errors that would be logged
 and ignored at runtime.
 
 
-### Skipping the valgrind tests
+### Running tests with valgrind
+Assuming your current working directory is `debugbuild` as described above:
+```
+meson test --suite=ci_valgrind \
+  --wrap="valgrind \
+          --leak-check=full \
+          --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
+          --suppressions=../contrib/valgrind/libmodulemd-python.supp
+```
 
-If you are trying to iterate quickly, you can temporarily skip the valgrind
-memory tests by running the test suite with:
-```
-MMD_SKIP_VALGRIND=True ninja test
-```
+If not, you may need to adjust the path to libmodulemd-python.supp.
+
+You can also specify individual tests to run against. See `meson test --list`
+for the available tests.
 
 The automated CI tests will always run with valgrind on all platforms where it
 is supported.

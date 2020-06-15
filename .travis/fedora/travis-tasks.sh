@@ -5,17 +5,43 @@ set -e
 set -x
 
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
+MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true}"
 RETRY_CMD=/builddir/.travis/retry-command.sh
 
 pushd /builddir/
 
+valgrind_cmd='
+    valgrind --error-exitcode=1
+             --errors-for-leak-kinds=definite
+             --leak-check=full
+             --show-leak-kinds=definite
+             --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
+             --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp
+'
+
 # Build the code under GCC and run standard tests
 meson --buildtype=debug \
-      $COMMON_MESON_ARGS \
+      $MESON_DIRTY_REPO_ARGS \
       travis
 
-meson test -C travis --num-processes=$PROCESSORS --print-errorlogs -t 5
+meson test --suite formatters \
+           -C travis \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 5
+
+meson test --suite ci \
+           -C travis \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 5
+
+meson test --suite ci_valgrind \
+           --wrap="$valgrind_cmd" \
+           -C travis \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 10
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later
@@ -68,10 +94,13 @@ popd #build_rpm
 
 meson --buildtype=debug \
       -Dtest_installed_lib=true \
-      $COMMON_MESON_ARGS \
       installed_lib_tests
 
 # Run the tests against the installed RPMs
-meson test -C installed_lib_tests --num-processes=$PROCESSORS --print-errorlogs -t 5
+meson test --suite ci \
+           -C installed_lib_tests \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 5
 
 popd #builddir

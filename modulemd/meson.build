@@ -45,16 +45,6 @@ else
     endif
 endif
 
-if developer_build
-    valgrind = find_program('valgrind')
-
-    if not valgrind.found()
-        valgrind = disabler()
-    endif
-else
-    valgrind = disabler()
-endif
-
 
 # -- Library -- #
 
@@ -274,13 +264,14 @@ endif
 py_test_release_env = py_test_env
 py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
-valgrind_tests = []
-
 
 # Make sure we remembered to bump the version number since the last release
 version_test = find_program('tests/test-version.sh')
 if developer_build
-    test('version', version_test, env : test_env)
+    test('version',
+         version_test,
+         env : test_env,
+         suite : ['smoketest', 'ci'])
 endif
 
 # --- Test utility library --- #
@@ -331,11 +322,12 @@ foreach name, sources : c_tests
     )
     test(name + '_debug', exe,
          env : test_env,
-         timeout : 60)
+         timeout : 60,
+         suite : ['ci', 'ci_valgrind', 'c', 'c_debug'])
     test(name + '_release', exe,
-         env : test_release_env)
-
-    valgrind_tests += name + '_debug'
+         env : test_release_env,
+         timeout : 60,
+         suite : ['ci', 'c', 'c_release'])
 endforeach
 
 
@@ -361,22 +353,26 @@ foreach name, script : python_tests
     test_python_scripts += files(script)
     test (name + '_python3_debug', python3,
           env : py_test_env,
-          args : files(script))
+          timeout : 60,
+          args : files(script),
+          suite : ['ci', 'py3', 'py3_debug'])
     test (name + '_python3_release', python3,
           env : py_test_release_env,
-          args : files(script))
-
-    valgrind_tests += name + '_python3_debug'
+          timeout : 60,
+          args : files(script),
+          suite : ['ci', 'py3', 'py3_release'])
 
     if with_py2
         test (name + '_python2_debug', python2,
               env : py_test_env,
-              args : files(script))
+              timeout : 60,
+              args : files(script),
+              suite : ['ci', 'py2', 'py2_debug'])
         test (name + '_python2_release', python2,
               env : py_test_release_env,
-              args : files(script))
-
-        valgrind_tests += name + '_python2_debug'
+              timeout : 60,
+              args : files(script),
+              suite : ['ci', 'py2', 'py2_release'])
     endif #with_py2
 endforeach
 
@@ -390,19 +386,20 @@ clang_files = modulemd_srcs + modulemd_hdrs + modulemd_priv_hdrs + modulemd_vali
 
 clang_args = [ '-i' ]
 test('clang_format', clang_format,
-     args : clang_args + clang_files)
+     args : clang_args + clang_files,
+     suite : 'formatters')
 
 
 # Fake test to ensure that the python tests are formatted according to PEP8
 python_formatter_args = [ '--verbose', '--line-length', '79' ]
 test('python_formatter', python_formatter,
-     args: python_formatter_args + [ meson.source_root() ] )
+     args : python_formatter_args + [ meson.source_root() ],
+     suite : 'formatters')
 
 
 # Test all python files for compliance with pycodestyle
 # Ignore line-length as there are a number of places where this is unavoidable
 python_scripts = [ files('tests/test-dirty.py',
-                         'tests/test-valgrind.py',
                          '../bindings/python/gi/overrides/Modulemd.py') +
                    test_python_scripts ]
 
@@ -411,7 +408,8 @@ pycodestyle_args = [
     '--ignore=E121,E123,E126,E226,E24,E501,E704,W503,W504'
 ]
 test('pycodestyle', pycodestyle,
-     args: pycodestyle_args + python_scripts)
+     args : pycodestyle_args + python_scripts,
+     suite : 'formatters')
 
 
 # Fake test to ensure that the autoformatters didn't end up making changes
@@ -421,7 +419,8 @@ test('pycodestyle', pycodestyle,
 if test_dirty_git
     dirty_repo_scripts = [ files('tests/test-dirty.py') ]
     test('test_dirty_repo', python3,
-         args: dirty_repo_scripts)
+         args : dirty_repo_scripts,
+         suite : ['ci', 'dirty'])
 endif
 
 
@@ -430,20 +429,11 @@ endif
 # This test takes a while, so run it near the end so that the functional test
 # results are visible more quickly.
 import_header_script = find_program('tests/test-import-headers.sh')
-test ('test_import_headers', import_header_script,
+test('test_import_headers', import_header_script,
       env : test_env,
       args : modulemd_hdrs,
-      timeout : 300)
-
-
-# -- Run Valgrind against all tests that support it -- #
-if valgrind.found()
-    modulemd_valgrind_scripts = files('tests/test-valgrind.py')
-    test ('valgrind', python3,
-          env : test_env,
-          args : modulemd_valgrind_scripts + valgrind_tests,
-          timeout : 1200)
-endif
+      timeout : 300,
+      suite : ['smoketest', 'ci'])
 
 
 # --- GOBject Introspection -- #

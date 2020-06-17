@@ -17,6 +17,7 @@
 #include "modulemd-deprecated.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-translation.h"
+#include "modulemd-obsoletes.h"
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -303,5 +304,36 @@ modulemd_module_get_defaults (ModulemdModule *self);
  */
 ModulemdTranslation *
 modulemd_module_get_translation (ModulemdModule *self, const gchar *stream);
+
+
+/**
+ * modulemd_module_get_obsoletes:
+ * @self: (in): This #ModulemdModule object.
+ *
+ * Returns: (transfer none) (element-type ModulemdObsoletes): A list of all obsoletes attached
+ * to this module. These are pointers to the internal memory objects and must not be modified or freed.
+ *
+ * Since: 2.10
+ */
+GPtrArray *
+modulemd_module_get_obsoletes (ModulemdModule *self);
+
+
+/**
+ * modulemd_module_get_newest_active_obsoletes:
+ * @self: (in): This #ModulemdModule object.
+ * @stream: (in): The stream to look up obsoletes for.
+ * @context: (in) (nullable): The stream context to look up obsoletes for.
+ *
+ * Returns: (transfer none): The newest active obsoletes attached to this module with
+ * specified stream and context (when eol_date is not set or it already occured
+ * the obsoletes is active). If no context is passed it matches obsoletes without context.
+ *
+ * Since: 2.10
+ */
+ModulemdObsoletes *
+modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
+                                             const gchar *stream,
+                                             const gchar *context);
 
 G_END_DECLS

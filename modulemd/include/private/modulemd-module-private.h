@@ -18,6 +18,7 @@
 
 #include "modulemd-module.h"
 #include "modulemd-translation.h"
+#include "modulemd-obsoletes.h"
 
 
 G_BEGIN_DECLS
@@ -103,6 +104,23 @@ modulemd_module_get_translated_streams (ModulemdModule *self);
 
 
 /**
+ * modulemd_module_add_obsoletes:
+ * @self: This #ModulemdModule object.
+ * @obsoletes: (in): A #ModulemdObsoletes object which is copied into the
+ * #ModulemdModule object.
+ *
+ * This function copies the @obsoletes object into @self. In addition if @obsoletes is
+ * the newest active obsoletes for existing #ModulemdModuleStream in @self, the stream is
+ * upgraded to at least version two and @obsoletes is associated with it.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_add_obsoletes (ModulemdModule *self,
+                               ModulemdObsoletes *obsoletes);
+
+
+/**
  * modulemd_module_add_stream:
  * @self: This #ModulemdModule object.
  * @stream: A #ModulemdModuleStream object to associate with this
@@ -110,14 +128,16 @@ modulemd_module_get_translated_streams (ModulemdModule *self);
  * name and stream name set on it or it will be rejected. If the module name
  * does not match this module, it will also be rejected.
  * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum of the highest
- * stream version added so far in the #ModulemdModuleIndex. If non-zero,
+ * stream version added so far in the #ModulemdModuleIndex. When obsoletes is present
+ * for @stream it is set to at least version two. If non-zero,
  * perform an upgrade to this version while adding @stream to @self. If
  * the @stream already has the same or a higher version, just copy it.
  * @error: (out): A #GError containing information about why this function
  * failed.
  *
  * This function takes a stream object, upgrades it to index_mdversion if
- * needed and then adds it to the #ModulemdModule. If it cannot upgrade it
+ * needed (if the module contains active obsoletes for this @stream it is upgraded
+ * to at least version two) and then adds it to the #ModulemdModule. If it cannot upgrade it
  * safely or the defaults are not for this module, it will return an
  * appropriate error.
  *

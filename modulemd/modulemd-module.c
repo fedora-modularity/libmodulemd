@@ -21,6 +21,7 @@
 #include "private/modulemd-module-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-translation-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -33,6 +34,7 @@ struct _ModulemdModule
   GPtrArray *streams;
   ModulemdDefaults *defaults;
   GHashTable *translations;
+  GPtrArray *obsoletes;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
@@ -71,6 +73,13 @@ modulemd_module_copy (ModulemdModule *self)
       g_ptr_array_add (m->streams, g_ptr_array_index (self->streams, i));
     }
 
+  for (i = 0; i < self->obsoletes->len; i++)
+    {
+      g_ptr_array_add (
+        m->obsoletes,
+        modulemd_obsoletes_copy (g_ptr_array_index (self->obsoletes, i)));
+    }
+
   return g_steal_pointer (&m);
 }
 
@@ -92,6 +101,7 @@ modulemd_module_finalize (GObject *object)
   g_clear_object (&self->defaults);
   g_clear_pointer (&self->streams, g_ptr_array_unref);
   g_clear_pointer (&self->translations, g_hash_table_unref);
+  g_clear_pointer (&self->obsoletes, g_ptr_array_unref);
 
   G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (object);
 }
@@ -182,6 +192,7 @@ modulemd_module_init (ModulemdModule *self)
   self->streams = g_ptr_array_new_full (0, g_object_unref);
   self->translations =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  self->obsoletes = g_ptr_array_new_full (0, g_object_unref);
 }
 
 
@@ -261,7 +272,6 @@ modulemd_module_get_defaults (ModulemdModule *self)
   return self->defaults;
 }
 
-
 ModulemdModuleStreamVersionEnum
 modulemd_module_add_stream (ModulemdModule *self,
                             ModulemdModuleStream *stream,
@@ -270,6 +280,7 @@ modulemd_module_add_stream (ModulemdModule *self,
 {
   ModulemdModuleStream *old = NULL;
   ModulemdTranslation *translation = NULL;
+  ModulemdObsoletes *obsoletes = NULL;
   ModulemdModuleStream *newstream = NULL;
   g_autoptr (GError) nested_error = NULL;
   const gchar *module_name = NULL;
@@ -361,6 +372,15 @@ modulemd_module_add_stream (ModulemdModule *self,
     }
   g_clear_error (&nested_error);
 
+  obsoletes = modulemd_module_get_newest_active_obsoletes (
+    self, stream_name, modulemd_module_stream_get_context (stream));
+
+  // Obsoletes work only with version two (and possibly higher)
+  if (obsoletes && index_mdversion < MD_MODULESTREAM_VERSION_TWO)
+    {
+      index_mdversion = MD_MODULESTREAM_VERSION_TWO;
+    }
+
   if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
     {
       /* If the stream we were passed is of a lower version than the index has
@@ -389,6 +409,12 @@ modulemd_module_add_stream (ModulemdModule *self,
   if (translation != NULL)
     {
       modulemd_module_stream_associate_translation (newstream, translation);
+    }
+
+  if (obsoletes != NULL)
+    {
+      modulemd_module_stream_v2_associate_obsoletes (
+        (ModulemdModuleStreamV2 *)newstream, obsoletes);
     }
 
   return modulemd_module_stream_get_mdversion (newstream);
@@ -751,6 +777,148 @@ modulemd_module_get_translation (ModulemdModule *self, const gchar *stream)
 }
 
 
+void
+modulemd_module_add_obsoletes (ModulemdModule *self,
+                               ModulemdObsoletes *obsoletes)
+{
+  gsize i;
+  ModulemdModuleStream *stream = NULL;
+  ModulemdObsoletes *new_obsoletes = NULL;
+  ModulemdObsoletes *current_obsoletes = NULL;
+
+  g_return_if_fail (
+    g_str_equal (modulemd_obsoletes_get_module_name (obsoletes),
+                 modulemd_module_get_module_name (self)));
+
+  new_obsoletes = modulemd_obsoletes_copy (obsoletes);
+
+  const gchar *stream_str =
+    modulemd_obsoletes_get_module_stream (new_obsoletes);
+  const gchar *context_str =
+    modulemd_obsoletes_get_module_context (new_obsoletes);
+
+  // First if we already have an obsolete with identical module,
+  // stream, contex tand modified time override it
+  ModulemdObsoletes *temp_obsoletes = NULL;
+  for (guint j = 0; j < self->obsoletes->len; j++)
+    {
+      temp_obsoletes = g_ptr_array_index (self->obsoletes, j);
+      if (g_strcmp0 (modulemd_obsoletes_get_module_stream (obsoletes),
+                     modulemd_obsoletes_get_module_stream (temp_obsoletes)))
+        {
+          continue;
+        }
+      if (modulemd_obsoletes_get_modified (temp_obsoletes) !=
+          modulemd_obsoletes_get_modified (obsoletes))
+        {
+          continue;
+        }
+      if (g_strcmp0 (modulemd_obsoletes_get_module_context (obsoletes),
+                     modulemd_obsoletes_get_module_context (temp_obsoletes)))
+        {
+          continue;
+        }
+      g_info (
+        "Overriding existing obsolete because of idenical stream: %s, "
+        "context: %s and modified time: %lu.",
+        modulemd_obsoletes_get_module_stream (obsoletes),
+        modulemd_obsoletes_get_module_context (obsoletes),
+        modulemd_obsoletes_get_modified (obsoletes));
+      g_ptr_array_remove (self->obsoletes, temp_obsoletes);
+      break;
+    }
+
+  g_ptr_array_add (self->obsoletes, new_obsoletes);
+
+  if (!modulemd_obsoletes_is_active (new_obsoletes))
+    {
+      return;
+    }
+
+  for (i = 0; i < self->streams->len; i++)
+    {
+      stream = (ModulemdModuleStream *)g_ptr_array_index (self->streams, i);
+
+      if (!g_str_equal (stream_str,
+                        modulemd_module_stream_get_stream_name (stream)))
+        {
+          continue;
+        }
+
+
+      /* If no context specified and new_obsoletes is newer set it for all matching
+       * streams */
+
+      if (context_str)
+        {
+          if (g_strcmp0 (context_str,
+                         modulemd_module_stream_get_context (stream)))
+            {
+              continue;
+            }
+        }
+
+      if (modulemd_module_stream_get_mdversion (stream) <
+          MD_MODULESTREAM_VERSION_TWO)
+        {
+          /* If the stream we need to associate obsoletes is of a lower version than 2
+           * upgrade it to the version 2, so it can use obsoletes.
+           *
+           * We only call this if the mdversion is definitely lower, because the
+           * upgrade() routine is not designed to handle downgrades.
+           */
+          ModulemdModuleStream *newstream = NULL;
+          newstream = modulemd_module_stream_upgrade (
+            stream, MD_MODULESTREAM_VERSION_TWO, NULL);
+          g_ptr_array_remove (self->streams, stream);
+          g_ptr_array_add (self->streams, newstream);
+          stream = newstream;
+        }
+
+      current_obsoletes = modulemd_module_stream_v2_get_obsoletes (
+        (ModulemdModuleStreamV2 *)stream);
+      if (current_obsoletes)
+        {
+          guint64 cur_obsoletes_mod =
+            modulemd_obsoletes_get_modified (current_obsoletes);
+          guint64 new_obsoletes_mod =
+            modulemd_obsoletes_get_modified (new_obsoletes);
+          if (cur_obsoletes_mod > new_obsoletes_mod)
+            {
+              continue;
+            }
+          else if (cur_obsoletes_mod == new_obsoletes_mod)
+            {
+              /* In case of identical modified dates, do not override more specific
+               * obsoletes (obsoletes with context) with obsoletes without context. Otherwise override
+               * with a warning. */
+              if (!context_str &&
+                  modulemd_obsoletes_get_module_context (current_obsoletes))
+                {
+                  continue;
+                }
+              /* Print a warning only if both obsoletes (don't) have specified context */
+              else if (!context_str || modulemd_obsoletes_get_module_context (
+                                         current_obsoletes))
+                {
+                  g_info (
+                    "Multiple obsoletes for module: %s, stream: %s, context: "
+                    "%s "
+                    "with identical modified time: %lu",
+                    modulemd_module_get_module_name (self),
+                    stream_str,
+                    context_str,
+                    new_obsoletes_mod);
+                }
+            }
+        }
+
+      modulemd_module_stream_v2_associate_obsoletes (
+        (ModulemdModuleStreamV2 *)stream, new_obsoletes);
+    }
+}
+
+
 gboolean
 modulemd_module_upgrade_streams (ModulemdModule *self,
                                  ModulemdModuleStreamVersionEnum mdversion,
@@ -813,4 +981,49 @@ modulemd_module_upgrade_streams (ModulemdModule *self,
   self->streams = g_steal_pointer (&new_streams);
 
   return TRUE;
+}
+
+
+GPtrArray *
+modulemd_module_get_obsoletes (ModulemdModule *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE (self), NULL);
+
+  return self->obsoletes;
+}
+
+
+ModulemdObsoletes *
+modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
+                                             const gchar *stream,
+                                             const gchar *context)
+{
+  ModulemdObsoletes *obsoletes = NULL;
+  ModulemdObsoletes *newestActiveObsoletes = NULL;
+
+  for (guint i = 0; i < self->obsoletes->len; i++)
+    {
+      obsoletes = (ModulemdObsoletes *)g_ptr_array_index (self->obsoletes, i);
+      if (g_strcmp0 (modulemd_obsoletes_get_module_stream (obsoletes),
+                     stream) ||
+          g_strcmp0 (modulemd_obsoletes_get_module_context (obsoletes),
+                     context) ||
+          !modulemd_obsoletes_is_active (obsoletes))
+        {
+          continue;
+        }
+
+      if (newestActiveObsoletes)
+        {
+          if (modulemd_obsoletes_get_modified (obsoletes) <=
+              modulemd_obsoletes_get_modified (newestActiveObsoletes))
+            {
+              continue;
+            }
+        }
+
+      newestActiveObsoletes = obsoletes;
+    }
+
+  return newestActiveObsoletes;
 }

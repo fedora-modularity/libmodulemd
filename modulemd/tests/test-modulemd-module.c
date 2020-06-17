@@ -25,6 +25,8 @@
 #include "private/glib-extensions.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-private.h"
+#include "private/modulemd-module-stream-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
@@ -139,6 +141,7 @@ module_test_streams (void)
   g_autoptr (ModulemdModule) m = modulemd_module_new ("testmodule");
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (ModulemdTranslationEntry) te = NULL;
+  ModulemdObsoletes *o = NULL;
   g_autoptr (GError) error = NULL;
   ModulemdModuleStream *stream = NULL;
   GPtrArray *list = NULL;
@@ -151,6 +154,13 @@ module_test_streams (void)
   g_clear_pointer (&te, g_object_unref);
   modulemd_module_add_translation (m, t);
   g_clear_pointer (&t, g_object_unref);
+
+  /* Create an obsoletes pre-adding streams */
+  o = modulemd_obsoletes_new (
+    1, 2, "testmodule", "stream1", "obsolete1 added to context1");
+  modulemd_obsoletes_set_module_context (o, "context1");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
 
   /* Create and add some streams to cross */
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
@@ -202,6 +212,12 @@ module_test_streams (void)
   g_clear_pointer (&te, g_object_unref);
   modulemd_module_add_translation (m, t);
   g_clear_pointer (&t, g_object_unref);
+
+  /* Create an obsoletes post-adding streams */
+  o = modulemd_obsoletes_new (
+    1, 2, "testmodule", "stream1", "obsolete2 added to all stream");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
 
   /* Verify that we get all streams */
   list = modulemd_module_get_all_streams (m);
@@ -279,6 +295,11 @@ module_test_streams (void)
                      MODULEMD_MODULE_STREAM_V2 (stream), "nl_NL"),
                    ==,
                    "Een test omschrijving");
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (
+    (ModulemdModuleStreamV2 *)stream);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_message (o), ==, "obsolete1 added to context1");
 
   stream = modulemd_module_get_stream_by_NSVCA (
     m, "stream1", 1, "context2", NULL, &error);
@@ -290,6 +311,11 @@ module_test_streams (void)
   g_assert_cmpint (modulemd_module_stream_get_version (stream), ==, 1);
   g_assert_cmpstr (
     modulemd_module_stream_get_context (stream), ==, "context2");
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (
+    (ModulemdModuleStreamV2 *)stream);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_message (o), ==, "obsolete2 added to all stream");
 
   stream = modulemd_module_get_stream_by_NSVCA (
     m, "stream1", 3, "context1", NULL, &error);
@@ -301,6 +327,11 @@ module_test_streams (void)
     m, "stream1", 3, "context2", NULL, &error);
   g_assert_nonnull (stream);
   g_assert_no_error (error);
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (
+    (ModulemdModuleStreamV2 *)stream);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_message (o), ==, "obsolete2 added to all stream");
 
   g_assert_cmpstr (
     modulemd_module_stream_get_stream_name (stream), ==, "stream1");
@@ -612,6 +643,119 @@ module_test_search_streams_by_nsvca_glob (void)
   g_clear_pointer (&streams, g_ptr_array_unref);
 }
 
+static void
+module_test_get_newest_active_obsoletes (void)
+{
+  ModulemdModule *m = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  m = modulemd_module_new ("testmodule");
+
+  o = modulemd_obsoletes_new (
+    1, 3, "testmodule", "stream1", "The newest active obsolete");
+  modulemd_obsoletes_set_eol_date (o, 201807011200);
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  o = modulemd_obsoletes_new (
+    1, 1, "testmodule", "stream1", "obsolete2 added to all stream");
+  modulemd_obsoletes_set_eol_date (o, 2);
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  o = modulemd_obsoletes_new (
+    1, 1, "testmodule", "stream1", "obsolete3 added to all stream");
+  modulemd_obsoletes_set_eol_date (o, 291807011200);
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  o = modulemd_module_get_newest_active_obsoletes (m, "stream1", NULL);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_message (o), ==, "The newest active obsolete");
+
+  g_clear_object (&m);
+}
+
+static void
+module_test_get_obsoletes (void)
+{
+  ModulemdModule *m = NULL;
+  ModulemdModuleStream *stream = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  m = modulemd_module_new ("testmodule");
+
+  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream2");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+  stream = modulemd_module_stream_new (2, "testmodule", "stream3");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  g_clear_object (&stream);
+
+  o = modulemd_obsoletes_new (
+    1, 2, "testmodule", "stream1", "obsolete1 added to all stream1");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  o = modulemd_obsoletes_new (
+    1, 3, "testmodule", "stream2", "obsolete2 added to all stream2");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  o = modulemd_obsoletes_new (
+    1, 3, "testmodule", "stream2", "obsolete3 added to all stream2");
+  modulemd_obsoletes_set_module_context (o, "context");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+
+  GPtrArray *obsoletes = modulemd_module_get_obsoletes (m);
+  g_assert_cmpint (obsoletes->len, ==, 3);
+
+  g_clear_object (&m);
+}
+
+static void
+module_test_add_stream_to_module_with_obsoletes (void)
+{
+  ModulemdModule *m = NULL;
+  GPtrArray *streams = NULL;
+  ModulemdModuleStream *s = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  m = modulemd_module_new ("nodejs");
+  g_assert_nonnull (m);
+  o = modulemd_obsoletes_new (1, 3, "nodejs", "8.0", "test message");
+  modulemd_obsoletes_set_module_context (o, "42");
+  modulemd_obsoletes_set_obsoleted_by (o, "nodejs", "12");
+  modulemd_module_add_obsoletes (m, o);
+  g_clear_pointer (&o, g_object_unref);
+
+  s = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_LATEST, "nodejs", "8.0");
+  modulemd_module_stream_set_context (s, "42");
+  modulemd_module_add_stream (m, s, MD_MODULESTREAM_VERSION_LATEST, NULL);
+  g_clear_pointer (&s, g_object_unref);
+
+  streams = modulemd_module_get_all_streams (m);
+  g_assert_cmpint (streams->len, ==, 1);
+  s = g_ptr_array_index (streams, 0);
+  g_assert_nonnull (s);
+
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (
+    (ModulemdModuleStreamV2 *)s);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_stream (o), ==, "12");
+
+  g_clear_pointer (&m, g_object_unref);
+}
 
 int
 main (int argc, char *argv[])
@@ -640,6 +784,16 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/streams/glob_nsvca",
                    module_test_search_streams_by_nsvca_glob);
+
+  g_test_add_func ("/modulemd/v2/module/obsoletes/get_newest_active_obsoletes",
+                   module_test_get_newest_active_obsoletes);
+
+  g_test_add_func ("/modulemd/v2/module/obsoletes/get_obsoletes",
+                   module_test_get_obsoletes);
+
+  g_test_add_func (
+    "/modulemd/v2/module/obsoletes/add_stream_to_module_with_obsoletes",
+    module_test_add_stream_to_module_with_obsoletes);
 
   return g_test_run ();
 }

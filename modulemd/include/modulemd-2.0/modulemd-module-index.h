@@ -17,6 +17,7 @@
 #include "modulemd-module-stream.h"
 #include "modulemd-subdocument-info.h"
 #include "modulemd-translation.h"
+#include "modulemd-obsoletes.h"
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -507,6 +508,25 @@ gboolean
 modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
                                     ModulemdDefaults *defaults,
                                     GError **error);
+
+
+/**
+ * modulemd_module_index_add_obsoletes:
+ * @self: This #ModulemdModuleIndex object.
+ * @obsoletes: (in): The #ModulemdObsoletes object to add to the index.
+ * @error: (out): A #GError containing the reason the #ModulemdObsoletes object
+ * could not be added or NULL if the function succeeded.
+ *
+ * Returns: TRUE if the #ModulemdObsoletes was added successfully. If the obsoletes
+ * already existed in the index, it will be replaced by the new one. On failure,
+ * returns FALSE and sets @error appropriately.
+ *
+ * Since: 2.10
+ */
+gboolean
+modulemd_module_index_add_obsoletes (ModulemdModuleIndex *self,
+                                     ModulemdObsoletes *obsoletes,
+                                     GError **error);
 
 
 /**

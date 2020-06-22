@@ -36,6 +36,7 @@
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -141,6 +142,7 @@ add_subdoc (ModulemdModuleIndex *self,
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (ModulemdObsoletes) obsoletes = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autofree gchar *name = NULL;
   ModulemdYamlDocumentTypeEnum doctype =
@@ -253,6 +255,25 @@ add_subdoc (ModulemdModuleIndex *self,
         }
 
       if (!modulemd_module_index_add_translation (self, translation, error))
+        {
+          return FALSE;
+        }
+      break;
+
+    case MODULEMD_YAML_DOC_OBSOLETES:
+      obsoletes = modulemd_obsoletes_parse_yaml (subdoc, strict, error);
+      if (obsoletes == NULL)
+        {
+          return FALSE;
+        }
+
+      if (!modulemd_obsoletes_validate (obsoletes, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+
+      if (!modulemd_module_index_add_obsoletes (self, obsoletes, error))
         {
           return FALSE;
         }
@@ -405,6 +426,28 @@ dump_translations (ModulemdModule *module,
   return TRUE;
 }
 
+static gboolean
+dump_obsoletes (ModulemdModule *module,
+                yaml_emitter_t *emitter,
+                GError **error)
+{
+  ModulemdObsoletes *o = NULL;
+  gsize i = 0;
+  GPtrArray *obsoletes = modulemd_module_get_obsoletes (module);
+
+  for (i = 0; i < obsoletes->len; i++)
+    {
+      o = g_ptr_array_index (obsoletes, i);
+
+      if (!modulemd_obsoletes_emit_yaml (o, emitter, error))
+        {
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
 
 static gint
 compare_stream_SVCA (gconstpointer a, gconstpointer b)
@@ -504,6 +547,11 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
         self, g_ptr_array_index (modules, i));
 
       if (!dump_defaults (module, emitter, error))
+        {
+          return FALSE;
+        }
+
+      if (!dump_obsoletes (module, emitter, error))
         {
           return FALSE;
         }
@@ -1233,6 +1281,23 @@ modulemd_module_index_add_defaults (ModulemdModuleIndex *self,
 }
 
 
+gboolean
+modulemd_module_index_add_obsoletes (ModulemdModuleIndex *self,
+                                     ModulemdObsoletes *obsoletes,
+                                     GError **error)
+{
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  modulemd_module_add_obsoletes (
+    get_or_create_module (self,
+                          modulemd_obsoletes_get_module_name (obsoletes)),
+    obsoletes);
+  return TRUE;
+}
+
+
 GHashTable *
 modulemd_module_index_get_default_streams_as_hash_table (
   ModulemdModuleIndex *self, const gchar *intent)
@@ -1385,12 +1450,14 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
   g_autoptr (GPtrArray) translations = NULL;
   ModulemdTranslation *translation = NULL;
   ModulemdTranslation *current_translation = NULL;
+  ModulemdObsoletes *obsoletes = NULL;
   ModulemdDefaults *defaults = NULL;
   ModulemdDefaults *into_defaults = NULL;
   g_autoptr (ModulemdDefaults) merged_defaults = NULL;
   g_autoptr (GError) nested_error = NULL;
   guint i;
   g_autoptr (GPtrArray) translated_stream_names = NULL;
+  GPtrArray *obsoletes_array = NULL;
   gchar *translated_stream_name = NULL;
   g_autofree gchar *nsvca = NULL;
 
@@ -1512,6 +1579,27 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
             }
         }
       g_clear_pointer (&translated_stream_names, g_ptr_array_unref);
+
+      /* Merge obsoletes for this module */
+      g_debug ("Prioritizer: merging obsoletes for %s", module_name);
+      obsoletes_array = modulemd_module_get_obsoletes (module);
+      for (i = 0; i < obsoletes_array->len; i++)
+        {
+          obsoletes = g_ptr_array_index (obsoletes_array, i);
+
+          if (obsoletes)
+            {
+              /* Add obsoletes, overriding if we enounter one with
+               * identical module, stream, context and modified time.
+               */
+              if (!modulemd_module_index_add_obsoletes (
+                    into, obsoletes, &nested_error))
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return FALSE;
+                }
+            }
+        }
 
       g_debug ("Prioritizer: all documents merged for %s", module_name);
       g_clear_pointer (&translations, g_ptr_array_unref);

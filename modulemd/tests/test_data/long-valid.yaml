@@ -1,4 +1,13 @@
 ---
+document: modulemd-obsoletes
+version: 1
+data:
+  module: nodejs
+  stream: 8
+  modified: 1
+  message: test
+...
+---
 document: modulemd-translations
 version: 1
 data:

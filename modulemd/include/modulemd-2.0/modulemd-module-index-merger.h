@@ -103,6 +103,18 @@ G_BEGIN_DECLS
  *   containing the empty string will be interpreted as removing the
  *   translation. Subsequent processing of a higher modified value may restore
  *   it.
+ *
+ * Merging #ModulemdObsoletes entries with identical module, stream, context
+ * and modified values behaves as follows (when accessed through module):
+ *
+ * - Any obsoletes object that is provided by a single #ModulemdModuleIndex
+ *   will be the obsoletes object in the resulting merged #ModulemdModuleIndex.
+ * - If the #ModulemdModuleIndex inputs have different priorities (not common),
+ *   then the obsoletes from the highest priority #ModulemdModuleIndex will be
+ *   used and the others entirely discarded. (Priority is intended for providing
+ *   a total override, including an on-disk configuration).
+ * - If the repos have the same priority (such as "fedora" and "updates" in the
+ *   Fedora Project) the behaviour is undefined.
  */
 
 

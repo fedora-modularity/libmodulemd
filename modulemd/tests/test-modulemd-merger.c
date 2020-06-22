@@ -16,9 +16,13 @@
 
 #include "modulemd-defaults-v1.h"
 #include "modulemd-defaults.h"
+#include "modulemd-obsoletes.h"
 #include "modulemd-module-index-merger.h"
 #include "modulemd-module-index.h"
 #include "private/test-utils.h"
+
+#include "private/modulemd-module-private.h"
+#include "private/modulemd-obsoletes-private.h"
 
 
 static void
@@ -495,6 +499,218 @@ merger_test_with_real_world_data (void)
   g_assert_no_error (error);
 }
 
+
+static void
+merger_test_obsoletes_add (void)
+{
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) add_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *module = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  g_autofree gchar *base_yaml = g_strdup_printf (
+    "%s/merger/base_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *add_yaml = g_strdup_printf ("%s/merger/add_obsoletes.yaml",
+                                                g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_idx, add_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (merger, add_idx, 0);
+
+  merged_idx = modulemd_module_index_merger_resolve_ext (merger, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  module = modulemd_module_index_get_module (merged_idx, "nodejs");
+  g_assert_nonnull (module);
+
+  GPtrArray *obsoletes = NULL;
+  obsoletes = modulemd_module_get_obsoletes (module);
+  g_assert_cmpuint (obsoletes->len, ==, 2);
+
+  o = g_ptr_array_index (obsoletes, 0);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "8.0");
+  g_assert_cmpstr (modulemd_obsoletes_get_message (o), ==, "test message");
+  g_assert_cmpuint (modulemd_obsoletes_get_eol_date (o), ==, 0);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_stream (o), ==, "12");
+
+  o = g_ptr_array_index (obsoletes, 1);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "devel");
+  g_assert_cmpstr (modulemd_obsoletes_get_message (o), ==, "test message");
+  g_assert_cmpuint (modulemd_obsoletes_get_eol_date (o), ==, 0);
+  g_assert_null (modulemd_obsoletes_get_obsoleted_by_module_name (o));
+  g_assert_null (modulemd_obsoletes_get_obsoleted_by_module_stream (o));
+}
+
+
+static void
+merger_test_obsoletes_newer (void)
+{
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) newer_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *module = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  g_autofree gchar *base_yaml = g_strdup_printf (
+    "%s/merger/base_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *newer_yaml = g_strdup_printf (
+    "%s/merger/newer_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    newer_idx, newer_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (merger, newer_idx, 0);
+
+  merged_idx = modulemd_module_index_merger_resolve_ext (merger, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  module = modulemd_module_index_get_module (merged_idx, "nodejs");
+  g_assert_nonnull (module);
+
+  GPtrArray *obsoletes = NULL;
+  obsoletes = modulemd_module_get_obsoletes (module);
+  g_assert_cmpint (obsoletes->len, ==, 2);
+
+  o = g_ptr_array_index (obsoletes, 0);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "8.0");
+  g_assert_cmpstr (modulemd_obsoletes_get_message (o), ==, "test message");
+  g_assert_cmpuint (modulemd_obsoletes_get_modified (o), ==, 201909270000);
+
+  o = g_ptr_array_index (obsoletes, 1);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "8.0");
+  g_assert_cmpstr (modulemd_obsoletes_get_message (o), ==, "test message");
+  g_assert_cmpuint (modulemd_obsoletes_get_eol_date (o), ==, 202005231425);
+
+  g_assert_null (modulemd_obsoletes_get_obsoleted_by_module_name (o));
+  g_assert_null (modulemd_obsoletes_get_obsoleted_by_module_stream (o));
+}
+
+static void
+merger_test_obsoletes_priority (void)
+{
+  // When priority specified override existing obsolete
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) conflicting_idx =
+    modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *module = NULL;
+  ModulemdObsoletes *o = NULL;
+
+  g_autofree gchar *base_yaml = g_strdup_printf (
+    "%s/merger/base_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *newer_yaml = g_strdup_printf (
+    "%s/merger/conflict_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    conflicting_idx, newer_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 1);
+  modulemd_module_index_merger_associate_index (merger, conflicting_idx, 0);
+
+  merged_idx = modulemd_module_index_merger_resolve_ext (merger, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  module = modulemd_module_index_get_module (merged_idx, "nodejs");
+  g_assert_nonnull (module);
+
+  GPtrArray *obsoletes = NULL;
+  obsoletes = modulemd_module_get_obsoletes (module);
+  g_assert_cmpint (obsoletes->len, ==, 1);
+
+  o = g_ptr_array_index (obsoletes, 0);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "8.0");
+  g_assert_cmpstr (modulemd_obsoletes_get_message (o), ==, "test message");
+  g_assert_cmpuint (modulemd_obsoletes_get_eol_date (o), ==, 0);
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_name (o), ==, "nodejs");
+  g_assert_cmpstr (
+    modulemd_obsoletes_get_obsoleted_by_module_stream (o), ==, "12");
+}
+
+static void
+merger_test_obsoletes_incompatible (void)
+{
+  /* This test verifies that if we encounter two obsoletes with the same
+   * stream, context and modified date, but different content, we
+   * only retain one of them.
+   * Note: the specification of the merger states that the behavior is
+   * undefined, so we will only validate that the merge completes and
+   * it only contains a single obsoletes
+   */
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) incompatible_idx =
+    modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  ModulemdModule *module = NULL;
+
+  g_autofree gchar *base_yaml = g_strdup_printf (
+    "%s/merger/base_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_autofree gchar *incompatible_yaml = g_strdup_printf (
+    "%s/merger/conflict_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
+
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    incompatible_idx, incompatible_yaml, TRUE, &failures, &error));
+
+  modulemd_module_index_merger_associate_index (merger, base_idx, 0);
+  modulemd_module_index_merger_associate_index (merger, incompatible_idx, 0);
+
+  merged_idx = modulemd_module_index_merger_resolve_ext (merger, TRUE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (merged_idx);
+
+  module = modulemd_module_index_get_module (merged_idx, "nodejs");
+  g_assert_nonnull (module);
+
+  GPtrArray *obsoletes = NULL;
+  obsoletes = modulemd_module_get_obsoletes (module);
+  g_assert_cmpint (obsoletes->len, ==, 1);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -526,6 +742,18 @@ main (int argc, char *argv[])
   g_test_add_func (
     "/modulemd/module/index/merger/test_merger_with_real_world_data",
     merger_test_with_real_world_data);
+
+  g_test_add_func ("/modulemd/module/index/merger/obsoletes/add",
+                   merger_test_obsoletes_add);
+
+  g_test_add_func ("/modulemd/module/index/merger/obsoletes/newer",
+                   merger_test_obsoletes_newer);
+
+  g_test_add_func ("/modulemd/module/index/merger/obsoletes/priority",
+                   merger_test_obsoletes_priority);
+
+  g_test_add_func ("/modulemd/module/index/merger/obsoletes/incompatibility",
+                   merger_test_obsoletes_incompatible);
 
   return g_test_run ();
 }

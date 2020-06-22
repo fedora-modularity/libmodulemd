@@ -1,0 +1,12 @@
+---
+document: modulemd-obsoletes
+version: 1
+data:
+    module: nodejs
+    stream: '8.0'
+    context: 42
+    modified: 201909270000
+    message: test message
+    obsoleted_by:
+        module: nodejs
+        stream: 12

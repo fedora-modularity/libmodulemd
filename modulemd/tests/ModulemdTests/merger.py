@@ -450,6 +450,72 @@ data:
         self.assertEqual(len(all_streams), 1)
         self.assertEqual(all_streams[0].props.module_name, "nodejs")
 
+    def test_merge_order_independent_obsoletes(self):
+        # This test verifies that if we encounter two obsoletes with the same
+        # module, stream and context we associate the newer one with exisitng
+        # stream
+        idx = Modulemd.ModuleIndex.new()
+        stream = Modulemd.ModuleStream.new(2, "nodejs", "8.0")
+        stream.props.context = "42"
+        res = idx.add_module_stream(stream)
+
+        newer_idx = Modulemd.ModuleIndex()
+        self.assertTrue(
+            newer_idx.update_from_file(
+                path.join(
+                    self.test_data_path,
+                    "merger",
+                    "newer_obsoletes_resseted.yaml",
+                ),
+                True,
+            )
+        )
+
+        base_idx = Modulemd.ModuleIndex()
+        self.assertTrue(
+            base_idx.update_from_file(
+                path.join(
+                    self.test_data_path, "merger", "base_obsoletes.yaml"
+                ),
+                True,
+            )
+        )
+
+        merger = Modulemd.ModuleIndexMerger.new()
+        merger.associate_index(idx, 0)
+        merger.associate_index(newer_idx, 0)
+        merger.associate_index(base_idx, 0)
+        merged_idx = merger.resolve()
+
+        module = merged_idx.get_module("nodejs")
+        self.assertEqual(len(module.get_obsoletes()), 2)
+
+        all_streams = merged_idx.search_streams_by_nsvca_glob()
+        self.assertEqual(len(all_streams), 1)
+        self.assertEqual(all_streams[0].props.module_name, "nodejs")
+
+        obsoletes = all_streams[0].get_obsoletes_resolved()
+        # obsoletes is None because it has reset: true
+        self.assertEqual(obsoletes, None)
+
+        # Merge the indexes in reverse order
+        merger = Modulemd.ModuleIndexMerger.new()
+        merger.associate_index(idx, 0)
+        merger.associate_index(base_idx, 0)
+        merger.associate_index(newer_idx, 0)
+        merged_idx = merger.resolve()
+
+        module = merged_idx.get_module("nodejs")
+        self.assertEqual(len(module.get_obsoletes()), 2)
+
+        all_streams = merged_idx.search_streams_by_nsvca_glob()
+        self.assertEqual(len(all_streams), 1)
+        self.assertEqual(all_streams[0].props.module_name, "nodejs")
+
+        obsoletes = all_streams[0].get_obsoletes_resolved()
+        # obsoletes is None because it has reset: true
+        self.assertEqual(obsoletes, None)
+
 
 if __name__ == "__main__":
     unittest.main()

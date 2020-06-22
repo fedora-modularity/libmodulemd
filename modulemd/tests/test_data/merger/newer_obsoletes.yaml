@@ -1,0 +1,10 @@
+---
+document: modulemd-obsoletes
+version: 1
+data:
+    module: nodejs
+    stream: '8.0'
+    context: 42
+    modified: 202002270000
+    message: test message
+    eol_date: 202005231425

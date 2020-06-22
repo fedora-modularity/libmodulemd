@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "modulemd-defaults.h"
+#include "modulemd-obsoletes.h"
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
@@ -40,6 +41,7 @@ module_index_test_dump (void)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
+  g_autoptr (ModulemdObsoletes) obsoletes = NULL;
   g_autoptr (ModulemdTranslationEntry) translation_entry = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
@@ -72,7 +74,15 @@ module_index_test_dump (void)
   g_assert_no_error (error);
   g_clear_pointer (&defaults, g_object_unref);
 
-  /* Third: some streams */
+  /* Third: some obsoletes */
+  obsoletes = modulemd_obsoletes_new (
+    1, 202001012020, "testmodule1", "teststream2", "testmessage");
+  g_assert_true (
+    modulemd_module_index_add_obsoletes (index, obsoletes, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&obsoletes, g_object_unref);
+
+  /* Fourth: some streams */
   stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
     "testmodule1", "teststream1");
   modulemd_module_stream_set_version (stream, 1);
@@ -117,6 +127,15 @@ module_index_test_dump (void)
                    "version: 1\n"
                    "data:\n"
                    "  module: testmodule1\n"
+                   "...\n"
+                   "---\n"
+                   "document: modulemd-obsoletes\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  modified: 42\n"
+                   "  module: testmodule1\n"
+                   "  stream: teststream2\n"
+                   "  message: testmessage\n"
                    "...\n"
                    "---\n"
                    "document: modulemd-translations\n"
@@ -217,6 +236,16 @@ module_index_test_read (void)
 
   /* The translation definitions */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_translations_v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* The obsoletes definitions */
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_obsoletes_v1.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   g_assert_true (modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error));

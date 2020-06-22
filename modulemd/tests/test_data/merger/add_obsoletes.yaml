@@ -1,0 +1,9 @@
+---
+document: modulemd-obsoletes
+version: 1
+data:
+    module: nodejs
+    stream: devel
+    modified: 201709270000
+    message: test message
+    reset: true

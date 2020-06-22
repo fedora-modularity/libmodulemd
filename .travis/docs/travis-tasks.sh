@@ -43,7 +43,7 @@ if [ $err = 0 ]; then
     git config user.name "Travis CI"
     git config user.email "sgallagh@redhat.com"
     git commit -m "Updating libmodulemd docs for $TRAVIS_COMMIT"
-    $RETRY_CMD git push origin master
+    $RETRY_CMD git push origin main
 fi
 set -e
 

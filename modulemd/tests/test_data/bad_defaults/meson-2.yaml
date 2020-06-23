@@ -1,7 +1,0 @@
-document: modulemd-defaults
-version: 1
-data:
-  module: meson
-  stream: old
-  profiles:
-    latest: [default]

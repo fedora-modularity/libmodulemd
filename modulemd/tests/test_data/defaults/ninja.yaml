@@ -1,7 +1,0 @@
-document: modulemd-defaults
-version: 1
-data:
-  module: ninja
-  stream: latest
-  profiles:
-    latest: [default]

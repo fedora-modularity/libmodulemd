@@ -1,7 +1,0 @@
-document: modulemd-defaults
-version: 1
-data:
-    module: postgresql
-    stream: '8.1'
-    profiles:
-        '8.1': [client, server]

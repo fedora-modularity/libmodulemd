@@ -1,8 +1,0 @@
-document: modulemd-defaults
-version: 1
-data:
-    modified: 201906261200
-    module: testmodule
-    stream: teststream
-    profiles:
-        teststream: [ common ]

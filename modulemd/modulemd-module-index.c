@@ -529,11 +529,12 @@ modulemd_module_index_dump_to_emitter (ModulemdModuleIndex *self,
 
 
 gboolean
-modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
-                                        const gchar *yaml_file,
-                                        gboolean strict,
-                                        GPtrArray **failures,
-                                        GError **error)
+modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
+                                            const gchar *yaml_file,
+                                            gboolean strict,
+                                            gboolean autogen_module_name,
+                                            GPtrArray **failures,
+                                            GError **error)
 {
   if (*failures == NULL)
     {
@@ -542,6 +543,7 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
+  MMD_INIT_YAML_PARSER (parser);
   int saved_errno;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) nested_error = NULL;
@@ -581,8 +583,11 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
        * use), just use the libyaml function. It's fast and will fail quickly
        * if the file is unreadable.
        */
-      return modulemd_module_index_update_from_stream (
-        self, yaml_stream, strict, failures, error);
+
+      yaml_parser_set_input_file (&parser, yaml_stream);
+
+      return modulemd_module_index_update_from_parser (
+        self, &parser, strict, autogen_module_name, failures, error);
     }
 
 #ifdef HAVE_RPMIO
@@ -649,6 +654,18 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
     "with rpmio support.");
   return FALSE;
 #endif /* HAVE_RPMIO */
+}
+
+
+gboolean
+modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
+                                        const gchar *yaml_file,
+                                        gboolean strict,
+                                        GPtrArray **failures,
+                                        GError **error)
+{
+  return modulemd_module_index_update_from_file_ext (
+    self, yaml_file, strict, FALSE, failures, error);
 }
 
 

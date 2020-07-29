@@ -213,6 +213,8 @@ modulemd_validator = executable(
     include_directories : include_dirs,
     dependencies : [
         gobject,
+        magic,
+        rpm,
         yaml,
         modulemd_dep
     ],
@@ -452,6 +454,7 @@ else
         ],
         extra_args : [ '--accept-unprefixed' ],
         install : true,
+        fatal_warnings : true,
     )
 endif
 

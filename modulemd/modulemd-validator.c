@@ -114,7 +114,6 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
   MMD_INIT_YAML_PARSER (parser);
   MMD_INIT_YAML_EVENT (event);
   g_autoptr (FILE) yaml_stream = NULL;
-  int saved_errno;
   g_autoptr (ModulemdModuleIndex) index = NULL;
 
   if (options.verbosity >= MMD_VERBOSE)
@@ -122,28 +121,9 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
       g_fprintf (stdout, "Validating %s\n", filename);
     }
 
-  /* Parse documents */
-  yaml_stream = g_fopen (filename, "rbe");
-  saved_errno = errno;
-
-  if (yaml_stream == NULL)
-    {
-      if (options.verbosity >= MMD_DEFAULT)
-        {
-          g_fprintf (stdout,
-                     "Failed to open file %s: %s\n",
-                     filename,
-                     g_strerror (saved_errno));
-        }
-      return FALSE;
-    }
-
-
-  yaml_parser_set_input_file (&parser, yaml_stream);
-
   index = modulemd_module_index_new ();
-  return modulemd_module_index_update_from_parser (
-    index, &parser, TRUE, TRUE, failures, error);
+  return modulemd_module_index_update_from_file_ext (
+    index, filename, TRUE, TRUE, failures, error);
 }
 
 

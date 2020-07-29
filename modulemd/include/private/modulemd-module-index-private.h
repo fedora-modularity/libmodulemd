@@ -29,6 +29,37 @@ G_BEGIN_DECLS
 
 
 /**
+ * modulemd_module_index_update_from_file_ext:
+ * @self: This #ModulemdModuleIndex object.
+ * @yaml_file: (in): A YAML file containing the module metadata and other
+ * related information such as default streams.
+ * @strict: (in): Whether the parser should return failure if it encounters an
+ * unknown mapping key or if it should ignore it.
+ * @autogen_module_name: (in): Whether the parser should automatically generate
+ * a module name and stream name if they are not provided by the file being read
+ * in. This is intended mainly for applications interacting with modulemd docs
+ * that are build input.
+ * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
+ * An array containing any subdocuments from the YAML file that failed to parse.
+ * See #ModulemdSubdocumentInfo for more details.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
+ * appropriately if any of the YAML subdocuments were invalid or sets @error if
+ * there was a fatal parse error.
+ *
+ * Since: 2.9
+ */
+gboolean
+modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
+                                            const gchar *yaml_file,
+                                            gboolean strict,
+                                            gboolean autogen_module_name,
+                                            GPtrArray **failures,
+                                            GError **error);
+
+/**
  * modulemd_module_index_update_from_parser:
  * @self: (in): This #ModulemdModuleIndex object.
  * @parser: (inout): An initialized YAML parser that has not yet processed any

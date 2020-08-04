@@ -111,9 +111,6 @@ static GOptionEntry entries[] = {
 static gboolean
 parse_file (const gchar *filename, GPtrArray **failures, GError **error)
 {
-  MMD_INIT_YAML_PARSER (parser);
-  MMD_INIT_YAML_EVENT (event);
-  g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (ModulemdModuleIndex) index = NULL;
 
   if (options.verbosity >= MMD_VERBOSE)

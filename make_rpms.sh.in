@@ -16,6 +16,7 @@ if [ $retcode != 0 ]; then
 fi
 set -e
 
+mkdir -p ./rpmbuild
 ln -sf ../meson-dist/ ./rpmbuild/SOURCES
 
 rpmbuild @BUILDFLAG@ $1 libmodulemd.spec --define "_topdir $(pwd)/rpmbuild"

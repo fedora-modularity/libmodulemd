@@ -12,6 +12,9 @@
   %global v2_suffix 2
 %endif
 
+# Rawhide builds currently fail when building with LTO
+%define _lto_cflags %{nil}
+
 Name:           %{upstream_name}%{?v2_suffix}
 Version:        @VERSION@
 Release:        @RELEASE@

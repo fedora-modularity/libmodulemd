@@ -59,6 +59,10 @@ jobs:
       script: ./.travis/travis-fedora.sh
       arch: amd64
 
+    - name: "Fedora 33 x86_64"
+      script: ./.travis/travis-fedora.sh
+      arch: amd64
+
     - name: "Fedora rawhide x86_64"
       script: ./.travis/travis-fedora.sh
       arch: amd64
@@ -86,6 +90,9 @@ jobs:
       script: ./.travis/travis-fedora.sh
       arch: arm64
     - name: "Fedora 32 aarch64"
+      script: ./.travis/travis-fedora.sh
+      arch: arm64
+    - name: "Fedora 33 aarch64"
       script: ./.travis/travis-fedora.sh
       arch: arm64
     - name: "Fedora rawhide aarch64"

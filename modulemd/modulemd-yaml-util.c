@@ -754,6 +754,10 @@ modulemd_yaml_parse_document_type_internal (
                 {
                   doctype = MODULEMD_YAML_DOC_PACKAGER;
                 }
+              else if (g_str_equal (doctype_scalar, "modulemd-obsoletes"))
+                {
+                  doctype = MODULEMD_YAML_DOC_OBSOLETES;
+                }
               else
                 {
                   MMD_YAML_ERROR_EVENT_EXIT_BOOL (
@@ -899,6 +903,8 @@ modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype)
     case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
 
     case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
+
+    case MODULEMD_YAML_DOC_OBSOLETES: return "modulemd-obsoletes";
 
     default: return NULL;
     }

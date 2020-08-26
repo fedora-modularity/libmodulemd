@@ -81,6 +81,7 @@ modulemd_srcs = files(
     'modulemd-translation-entry.c',
     'modulemd-util.c',
     'modulemd-yaml-util.c',
+    'modulemd-obsoletes.c',
 )
 
 modulemd_validator_srcs = files (
@@ -111,6 +112,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-subdocument-info.h',
     'include/modulemd-2.0/modulemd-translation.h',
     'include/modulemd-2.0/modulemd-translation-entry.h',
+    'include/modulemd-2.0/modulemd-obsoletes.h',
 )
 
 modulemd_priv_hdrs = files(
@@ -136,6 +138,7 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-util.h',
     'include/private/modulemd-yaml.h',
     'include/private/gi-binding-renames.h',
+    'include/private/modulemd-obsoletes-private.h',
 )
 
 test_srcs = files(
@@ -308,6 +311,7 @@ c_tests = {
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
+'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
 }
 
 foreach name, sources : c_tests

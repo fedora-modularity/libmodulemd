@@ -65,6 +65,8 @@ struct _ModulemdModuleStreamV2
 
   GPtrArray *dependencies; /* <Modulemd.Dependencies> */
 
+  ModulemdObsoletes *obsoletes;
+
   GVariant *xmd;
 };
 
@@ -216,5 +218,32 @@ modulemd_module_stream_v2_replace_dependencies (ModulemdModuleStreamV2 *self,
 gboolean
 modulemd_module_stream_v2_includes_nevra (ModulemdModuleStreamV2 *self,
                                           const gchar *nevra_pattern);
+
+/**
+ * modulemd_module_stream_v2_associate_obsoletes:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @obsoletes: (in): The #ModulemdObsoletes information to associate with
+ * this object.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_stream_v2_associate_obsoletes (ModulemdModuleStreamV2 *self,
+                                               ModulemdObsoletes *obsoletes);
+
+/**
+ * modulemd_module_stream_v2_get_obsoletes:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Returns: (transfer none): The #ModulemdObsoletes information associated with this
+ * object. This function doesn't resolve the reset attribute of obsoletes, this means
+ * even if obsoletes associated with this stream has attribute reset set the obsoletes
+ * object is still returned.
+ *
+ * Since: 2.10
+ */
+ModulemdObsoletes *
+modulemd_module_stream_v2_get_obsoletes (ModulemdModuleStreamV2 *self);
+
 
 G_END_DECLS

@@ -22,6 +22,7 @@
 #include "modulemd-profile.h"
 #include "modulemd-rpm-map-entry.h"
 #include "modulemd-service-level.h"
+#include "modulemd-obsoletes.h"
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -256,6 +257,23 @@ modulemd_module_stream_v2_set_tracker (ModulemdModuleStreamV2 *self,
  */
 const gchar *
 modulemd_module_stream_v2_get_tracker (ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_get_obsoletes_resolved:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Returns: (transfer none): The #ModulemdObsoletes information associated with
+ * this object. If the associated obsoletes has reset attribute set, this
+ * function doesn't return it. From outside obsoletes with reset looks like
+ * there is no obsoletes set for this stream. Every obsoletes (even with reset) can
+ * be accessed from the streams module.
+ *
+ * Since: 2.10
+ */
+ModulemdObsoletes *
+modulemd_module_stream_v2_get_obsoletes_resolved (
+  ModulemdModuleStreamV2 *self);
 
 
 /* ===== Non-property Methods ===== */

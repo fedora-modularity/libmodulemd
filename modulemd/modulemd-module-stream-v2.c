@@ -101,6 +101,8 @@ modulemd_module_stream_v2_finalize (GObject *object)
 
   g_clear_pointer (&self->dependencies, g_ptr_array_unref);
 
+  g_clear_pointer (&self->obsoletes, g_object_unref);
+
   g_clear_pointer (&self->xmd, g_variant_unref);
 
   G_OBJECT_CLASS (modulemd_module_stream_v2_parent_class)->finalize (object);
@@ -433,6 +435,42 @@ modulemd_module_stream_v2_get_tracker (ModulemdModuleStreamV2 *self)
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
 
   return self->tracker;
+}
+
+
+ModulemdObsoletes *
+modulemd_module_stream_v2_get_obsoletes_resolved (ModulemdModuleStreamV2 *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
+
+  ModulemdObsoletes *o = self->obsoletes;
+  if (o && modulemd_obsoletes_get_reset (o))
+    {
+      return NULL;
+    }
+
+  return o;
+}
+
+void
+modulemd_module_stream_v2_associate_obsoletes (ModulemdModuleStreamV2 *self,
+                                               ModulemdObsoletes *obsoletes)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_clear_pointer (&self->obsoletes, g_object_unref);
+  if (obsoletes != NULL)
+    {
+      self->obsoletes = g_object_ref (obsoletes);
+    }
+}
+
+ModulemdObsoletes *
+modulemd_module_stream_v2_get_obsoletes (ModulemdModuleStreamV2 *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
+
+  return self->obsoletes;
 }
 
 
@@ -1416,6 +1454,9 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
   copy_rpm_artifact_map (v2_self, copy);
 
   STREAM_COPY_IF_SET (v2, copy, v2_self, xmd);
+
+  modulemd_module_stream_v2_associate_obsoletes (
+    copy, modulemd_module_stream_v2_get_obsoletes (v2_self));
 
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
 }

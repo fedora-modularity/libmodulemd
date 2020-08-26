@@ -10,6 +10,7 @@
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
@@ -3174,6 +3175,47 @@ module_stream_v1_regression_content_license (void)
 }
 
 
+static void
+module_stream_test_obsoletes (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdObsoletes) o = NULL;
+
+  stream = modulemd_module_stream_v2_new ("foo", "latest");
+  g_assert_nonnull (stream);
+  o = modulemd_obsoletes_new (1, 2, "testmodule", "teststream", "testmessage");
+  g_assert_nonnull (o);
+
+  g_assert_null (modulemd_module_stream_v2_get_obsoletes_resolved (stream));
+
+  modulemd_module_stream_v2_associate_obsoletes (stream, o);
+  g_clear_object (&o);
+
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (stream);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "testmodule");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "teststream");
+  g_assert_null (modulemd_obsoletes_get_module_context (o));
+
+  o = modulemd_obsoletes_new (1, 2, "testmodule", "teststream", "testmessage");
+  g_assert_nonnull (o);
+  modulemd_obsoletes_set_reset (o, TRUE);
+  modulemd_module_stream_v2_associate_obsoletes (stream, o);
+  o = modulemd_module_stream_v2_get_obsoletes_resolved (stream);
+  g_assert_null (o);
+  g_clear_object (&o);
+
+  o = modulemd_module_stream_v2_get_obsoletes (stream);
+  g_assert_nonnull (o);
+  g_assert_cmpstr (modulemd_obsoletes_get_module_name (o), ==, "testmodule");
+  g_assert_cmpstr (modulemd_obsoletes_get_module_stream (o), ==, "teststream");
+  g_assert_null (modulemd_obsoletes_get_module_context (o));
+
+  g_clear_object (&o);
+  g_clear_object (&stream);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -3327,6 +3369,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/regression/memleak/v1_licenses",
                    module_stream_v1_regression_content_license);
+
+  g_test_add_func ("/modulemd/v2/modulestream/obsoletes",
+                   module_stream_test_obsoletes);
 
   return g_test_run ();
 }

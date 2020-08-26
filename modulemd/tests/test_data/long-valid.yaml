@@ -4,7 +4,7 @@ version: 1
 data:
   module: nodejs
   stream: 8
-  modified: 1
+  modified: 2020-03-19T00:00Z
   message: test
 ...
 ---

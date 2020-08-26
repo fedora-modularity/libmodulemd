@@ -132,7 +132,7 @@ module_index_test_dump (void)
                    "document: modulemd-obsoletes\n"
                    "version: 1\n"
                    "data:\n"
-                   "  modified: 42\n"
+                   "  modified: 2020-01-01T20:20Z\n"
                    "  module: testmodule1\n"
                    "  stream: teststream2\n"
                    "  message: testmessage\n"

@@ -4,6 +4,6 @@ version: 1
 data:
     module: nodejs
     stream: devel
-    modified: 201709270000
+    modified: 2017-09-27T00:00Z
     message: test message
     reset: true

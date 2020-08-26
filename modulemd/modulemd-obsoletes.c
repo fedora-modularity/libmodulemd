@@ -18,6 +18,7 @@
 #include "modulemd-errors.h"
 #include "modulemd-obsoletes.h"
 #include "private/modulemd-obsoletes-private.h"
+#include "private/modulemd-util.h"
 
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
@@ -856,7 +857,7 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
             }
           else if (g_str_equal (event.data.scalar.value, "modified"))
             {
-              modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
+              value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (nested_error)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT (
@@ -865,12 +866,23 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                     "Failed to parse modified in obsoletes data: %s",
                     nested_error->message);
                 }
+              modified = modulemd_iso8601date_to_guint64 (value);
+              if (modified == 0)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse UTC date in ISO 8601 format: "
+                    "YYYY-MM-DDTHH:MMZ modified in eol data: %s",
+                    value);
+                }
 
               modulemd_obsoletes_set_modified (o, modified);
+              g_clear_pointer (&value, g_free);
             }
           else if (g_str_equal (event.data.scalar.value, "eol_date"))
             {
-              eol_date = modulemd_yaml_parse_uint64 (&parser, &nested_error);
+              value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (nested_error)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT (
@@ -880,7 +892,19 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                     nested_error->message);
                 }
 
+              eol_date = modulemd_iso8601date_to_guint64 (value);
+              if (eol_date == 0)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "Failed to parse UTC date in ISO 8601 format: "
+                    "YYYY-MM-DD[T ]HH:MMZ eol_date in obsoletes data: %s",
+                    value);
+                }
+
               modulemd_obsoletes_set_eol_date (o, eol_date);
+              g_clear_pointer (&value, g_free);
             }
           else if (g_str_equal (event.data.scalar.value, "reset"))
             {
@@ -1136,7 +1160,16 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
   eol_date = modulemd_obsoletes_get_eol_date (MODULEMD_OBSOLETES (self));
   if (eol_date)
     {
-      eol_date_string = g_strdup_printf ("%" PRIu64, eol_date);
+      eol_date_string = modulemd_guint64_to_iso8601date (eol_date);
+      if (eol_date_string == NULL)
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MMD_ERROR_VALIDATE,
+                       "Cannot convert eol_date: %lu to iso8601 date.",
+                       eol_date);
+          return FALSE;
+        }
       EMIT_KEY_VALUE (emitter, error, "eol_date", eol_date_string);
     }
 

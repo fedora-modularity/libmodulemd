@@ -5,7 +5,7 @@ data:
     module: nodejs
     stream: '8.0'
     context: 42
-    modified: 201909270000
+    modified: 2019-09-27T00:00Z
     message: test message
     obsoleted_by:
         module: nodejs

@@ -13,6 +13,7 @@
 
 #include <fnmatch.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "modulemd-errors.h"
 #include "modulemd-module-stream.h"
@@ -504,6 +505,42 @@ gboolean
 modulemd_rpm_match (gpointer key, gpointer UNUSED (value), gpointer user_data)
 {
   return modulemd_fnmatch (user_data, key);
+}
+
+
+guint64
+modulemd_iso8601date_to_guint64 (const gchar *iso8601)
+{
+  struct tm tm = { 0 };
+  char *s = strptime (iso8601, "%FT%H:%MZ", &tm);
+  if (s == NULL || *s != '\0')
+    {
+      return 0;
+    }
+
+  char buf[32];
+  strftime (buf, sizeof (buf), "%Y%m%d%H%M", &tm);
+
+  return atol (buf);
+}
+
+
+gchar *
+modulemd_guint64_to_iso8601date (guint64 date)
+{
+  char date_str[32];
+  sprintf (date_str, "%" PRIu64, date);
+  struct tm tm = { 0 };
+  char *s = strptime (date_str, "%Y%m%d%H%M", &tm);
+  if (s == NULL || *s != '\0')
+    {
+      return NULL;
+    }
+
+  gchar *buf = g_malloc0_n (32, sizeof (gchar));
+  strftime (buf, 32, "%FT%H:%MZ", &tm);
+
+  return buf;
 }
 
 

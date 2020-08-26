@@ -6,7 +6,7 @@ data:
   # A string representing UTC date in ISO 8601 format: YYYY-MM-DDTHH:MMZ
   # When merging, entries with a newer 'modified' value will override any earlier values.
   # MANDATORY
-  modified: 201805231425
+  modified: 2018-05-23T14:25Z
   # A boolean option to cancel/reset all previously specified obsoletes
   # Example: repo 'fedora' has Obsoletes:nodejs:12; we want to bring nodejs:12 back in 'updates'
   # If used, following options will be ignored: eol_date, obsoleted_by
@@ -27,7 +27,7 @@ data:
   # It is strongly recommended to keep HH:MM to 00:00.
   # If not specified, the module is EOLed immediately.
   # OPTIONAL
-  eol_date: 201805231425
+  eol_date: 2020-03-19T00:00Z
   # A string describing the change, reason, etc.
   # MANDATORY
   message: "Module stream nodejs:11 is no longer supported. It is recommended to switch to nodejs:12"

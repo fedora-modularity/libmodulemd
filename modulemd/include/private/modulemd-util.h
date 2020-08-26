@@ -358,6 +358,30 @@ modulemd_rpm_match (gpointer key, gpointer UNUSED (value), gpointer user_data);
 
 
 /**
+ * modulemd_iso8601date_to_guint64:
+ * @iso8601: (in): string containing a date in ISO 8601 format.
+ *
+ * Returns: date represented as a 64-bit integer (such as 201807011200).
+ *
+ * Since: 2.10
+ */
+guint64
+modulemd_iso8601date_to_guint64 (const gchar *iso8601);
+
+
+/**
+ * modulemd_guint64_to_iso8601date:
+ * @date: (in): date represented as a 64-bit integer (such as 201807011200).
+ *
+ * Returns: (transfer full): A newly-allocated string containing a date in ISO 8601 format.
+ *
+ * Since: 2.10
+ */
+gchar *
+modulemd_guint64_to_iso8601date (guint64 date);
+
+
+/**
  * MODULEMD_REPLACE_SET:
  * @_dest: A reference to a #GHashTable.
  * @_set: (nullable): A reference to a #GHashTable.

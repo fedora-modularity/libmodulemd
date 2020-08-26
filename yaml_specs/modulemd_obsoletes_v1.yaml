@@ -1,0 +1,38 @@
+# Document type identifier
+# `document: modulemd-obsoletes` describes information about a stream obsoleting another one or a stream being EOLed
+document: modulemd-obsoletes
+version: 1
+data:
+  # A string representing UTC date in ISO 8601 format: YYYY-MM-DDTHH:MMZ
+  # When merging, entries with a newer 'modified' value will override any earlier values.
+  # MANDATORY
+  modified: 201805231425
+  # A boolean option to cancel/reset all previously specified obsoletes
+  # Example: repo 'fedora' has Obsoletes:nodejs:12; we want to bring nodejs:12 back in 'updates'
+  # If used, following options will be ignored: eol_date, obsoleted_by
+  # OPTIONAL
+  reset: false
+  # A string representing a Name of a module that is obsoleted
+  # MANDATORY
+  module: nodejs
+  # A string representing a Stream of a module that is obsoleted
+  # MANDATORY
+  stream: 11
+  # A string representing a Context of a module that is obsoleted
+  # If not specified, all contexts get obsoleted.
+  # NOTE: consider specifying a list of contexts
+  # OPTIONAL
+  context: aabbccddee
+  # A string representing UTC date in ISO 8601 format: YYYY-MM-DDTHH:MMZ
+  # It is strongly recommended to keep HH:MM to 00:00.
+  # If not specified, the module is EOLed immediately.
+  # OPTIONAL
+  eol_date: 201805231425
+  # A string describing the change, reason, etc.
+  # MANDATORY
+  message: "Module stream nodejs:11 is no longer supported. It is recommended to switch to nodejs:12"
+  # If a stream is not EOLed but Obsoleted, provide details about the obsoleting stream:
+  # OPTIONAL
+  obsoleted_by:
+    module: nodejs
+    stream: 12

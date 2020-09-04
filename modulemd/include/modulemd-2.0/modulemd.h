@@ -287,4 +287,57 @@ const gchar *
 modulemd_get_version (void);
 
 
+/**
+ * modulemd_load_file:
+ * @yaml_file: (in): A YAML file containing the module metadata and other
+ * related information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * This is a convenience function that is a wrapper around
+ * modulemd_module_index_new() and modulemd_module_index_update_from_file()
+ * with `strict=False`.
+ *
+ * It will return the imported module metadata if all subdocuments are
+ * parseable and valid. If any part of the document is unreadable or fails
+ * validation, it will return NULL and set @error appropriately. If you need
+ * more detail about which parts of the document failed, use the lower-level
+ * functions.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
+ * initialized with the content from @yaml_file. Returns NULL and sets @error
+ * if the file is not completely valid.
+ *
+ * Since: 2.10
+ */
+ModulemdModuleIndex *
+modulemd_load_file (const gchar *yaml_file, GError **error);
+
+
+/**
+ * modulemd_load_string:
+ * @yaml_string: (in): A YAML string containing the module metadata and other
+ * related information such as default streams.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * This is a convenience function that is a wrapper around
+ * modulemd_module_index_new() and modulemd_module_index_update_from_string()
+ * with `strict=False`.
+ *
+ * It will return the imported module metadata if all subdocuments are
+ * parseable and valid. If any part of the document is unreadable or fails
+ * validation, it will return NULL and set @error appropriately. If you need
+ * more detail about which parts of the document failed, use the lower-level
+ * functions.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
+ * initialized with the content from @yaml_file. Returns NULL and sets @error
+ * if the metadata is not completely valid.
+ *
+ * Since: 2.10
+ */
+ModulemdModuleIndex *
+modulemd_load_string (const gchar *yaml_string, GError **error);
+
 G_END_DECLS

@@ -292,6 +292,7 @@ test_utils_lib = library(
 
 c_tests = {
 'buildopts'           : [ 'tests/test-modulemd-buildopts.c' ],
+'common'              : [ 'tests/test-modulemd-common.c' ],
 'component_module'    : [ 'tests/test-modulemd-component-module.c' ],
 'component_rpm'       : [ 'tests/test-modulemd-component-rpm.c' ],
 'compression'         : [ 'tests/test-modulemd-compression.c' ],

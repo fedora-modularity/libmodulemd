@@ -557,7 +557,7 @@ modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
   if (yaml_stream == NULL)
     {
       g_set_error (error,
-                   MODULEMD_ERROR,
+                   MODULEMD_YAML_ERROR,
                    MMD_YAML_ERROR_OPEN,
                    "Failed to open file: %s",
                    g_strerror (saved_errno));

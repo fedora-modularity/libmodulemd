@@ -128,7 +128,7 @@ modulemd_module_stream_new (guint64 mdversion,
  * Returns: (transfer full): A newly-allocated #ModulemdModuleStream object if
  * the YAML file was valid and contained exactly one `document: modulemd`
  * subdocument. NULL if the document fails validation or multiple documents are
- * encountered and sets NULL appropriately. See #ModulemdModuleIndex for
+ * encountered and sets @error appropriately. See #ModulemdModuleIndex for
  * functions to read in multiple-subdocument YAML.
  *
  * Since: 2.0
@@ -160,7 +160,7 @@ modulemd_module_stream_read_file (const gchar *path,
  * Returns: (transfer full): A newly-allocated #ModulemdModuleStream object if
  * the YAML string was valid and contained exactly one `document: modulemd`
  * subdocument. NULL if the document fails validation or multiple documents are
- * encountered and sets NULL appropriately. See #ModulemdModuleIndex for
+ * encountered and sets @error appropriately. See #ModulemdModuleIndex for
  * functions to read in multiple-subdocument YAML.
  *
  * Since: 2.0

@@ -30,7 +30,7 @@ OLDTAG=$(git describe --first-parent --abbrev=0)
 NEWVERSION=$(meson introspect $MESON_BUILD_ROOT --projectinfo |jq -r .version)
 NEWTAG=libmodulemd-$NEWVERSION
 
-if [ $NEWTAG = $OLDTAG ]; then
+if [ "$NEWTAG" = "$OLDTAG" ]; then
     error_out code=2 message="Version is already tagged. Update meson.build with the new version."
 fi
 

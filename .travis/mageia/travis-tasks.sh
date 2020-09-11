@@ -5,7 +5,7 @@ set -e
 set -x
 
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-true} -Ddeveloper_build=false"
+COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false} -Ddeveloper_build=false"
 
 
 pushd /builddir/

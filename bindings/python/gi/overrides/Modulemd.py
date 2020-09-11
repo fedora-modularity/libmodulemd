@@ -28,8 +28,7 @@ __all__ = []
 class ModulemdUtil(object):
     @staticmethod
     def variant_str(s):
-        """ Converts a string to a GLib.Variant
-        """
+        """Converts a string to a GLib.Variant"""
         if not isinstance(s, str):
             raise TypeError("Only strings are supported for scalars")
 
@@ -37,8 +36,7 @@ class ModulemdUtil(object):
 
     @staticmethod
     def variant_bool(b):
-        """ Converts a boolean to a GLib.Varant
-        """
+        """Converts a boolean to a GLib.Varant"""
         if not isinstance(b, bool):
             raise TypeError("Only booleans are supported")
 
@@ -46,8 +44,7 @@ class ModulemdUtil(object):
 
     @staticmethod
     def variant_list(vl):
-        """ Converts a list to a GLib.Variant
-        """
+        """Converts a list to a GLib.Variant"""
 
         # If this is a zero-length array, handle it specially
         if len(vl) == 0:
@@ -64,8 +61,7 @@ class ModulemdUtil(object):
 
     @staticmethod
     def variant_dict(d):
-        """ Converts a dictionary to a dictionary of GLib.Variant
-        """
+        """Converts a dictionary to a dictionary of GLib.Variant"""
         if not isinstance(d, dict):
             raise TypeError("Only dictionaries are supported for mappings")
 

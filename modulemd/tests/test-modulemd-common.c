@@ -82,6 +82,75 @@ test_modulemd_load_file (void)
 }
 
 
+static void
+test_modulemd_load_string (void)
+{
+  const gchar *yaml_string = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) idx = NULL;
+  g_autofree gchar *output = NULL;
+
+  /* This function is a wrapper around lower-level functions, so it should be
+   * okay to just test basic success and failure here.
+   */
+
+  /* Trivial modulemd */
+  g_clear_error (&error);
+  g_clear_object (&idx);
+  yaml_string =
+    "---\n"
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  name: trivialname\n"
+    "  stream: trivialstream\n"
+    "  summary: Trivial Summary\n"
+    "  description: >-\n"
+    "    Trivial Description\n"
+    "  license:\n"
+    "    module: MIT\n"
+    "...\n";
+  idx = modulemd_load_string (yaml_string, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (idx);
+
+  /* Make sure loaded index dumps to string cleanly */
+  g_clear_error (&error);
+  g_clear_pointer (&output, g_free);
+  output = modulemd_module_index_dump_to_string (idx, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (output);
+
+
+  /* NULL string should raise an exception */
+  g_clear_error (&error);
+  g_clear_object (&idx);
+  modulemd_test_signal = 0;
+  signal (SIGTRAP, modulemd_test_signal_handler);
+  idx = modulemd_load_string (NULL, &error);
+  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
+  g_assert_null (idx);
+
+
+  /* An empty string is valid YAML, so it returns a non-NULL but empty index. */
+  g_clear_error (&error);
+  g_clear_object (&idx);
+  yaml_string = "";
+  idx = modulemd_load_string (yaml_string, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (idx);
+
+
+  /* Invalid YAML string */
+  g_clear_error (&error);
+  g_clear_object (&idx);
+  yaml_string = "Hello, World!\n";
+  idx = modulemd_load_string (yaml_string, &error);
+  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE);
+  g_assert_null (idx);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -93,6 +162,8 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/common/get_version",
                    test_modulemd_get_version);
   g_test_add_func ("/modulemd/v2/common/load_file", test_modulemd_load_file);
+  g_test_add_func ("/modulemd/v2/common/load_string",
+                   test_modulemd_load_string);
 
   return g_test_run ();
 }

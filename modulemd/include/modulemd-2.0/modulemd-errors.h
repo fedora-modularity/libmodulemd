@@ -144,10 +144,11 @@ modulemd_yaml_error_quark (void);
  * @MMD_YAML_ERROR_PROGRAMMING: Represents an internal programming error
  * encountered while parsing a YAML document.
  * @MMD_YAML_ERROR_UNPARSEABLE: Represents an error indicating that
- * unexpected data or some other parsing error was encountered while parsing a
- * YAML document.
- * @MMD_YAML_ERROR_PARSE: Represents an error indicating invalid data was
- * encountered while parsing a YAML document.
+ * unexpected data or some other parsing error that violates the YAML spec
+ * was encountered while parsing a YAML document.
+ * @MMD_YAML_ERROR_PARSE: Represents an error indicating invalid data
+ * violating the modulemd YAML spec was encountered while parsing a YAML
+ * document.
  * @MMD_YAML_ERROR_EMIT: Represents an error encountered while writing a
  * YAML file.
  * @MMD_YAML_ERROR_MISSING_REQUIRED: Represents an error indicating that

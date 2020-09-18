@@ -24,7 +24,7 @@ trap coverity_finalize EXIT
 # Always run the Coverity scan on the oldest supported Fedora
 # because it generally lags behind with GCC compatibility.
 MMD_OS=fedora
-MMD_RELEASE=30
+MMD_RELEASE=31
 MMD_IMAGE=fedora/fedora:${MMD_RELEASE}-$(uname -m)
 repository="quay.io"
 

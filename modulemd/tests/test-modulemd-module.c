@@ -534,8 +534,8 @@ module_test_search_streams_by_glob (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
 
   module = modulemd_module_index_get_module (index, "nodejs");
@@ -610,8 +610,8 @@ module_test_search_streams_by_nsvca_glob (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
 
   module = modulemd_module_index_get_module (index, "nodejs");

@@ -1404,8 +1404,8 @@ test_modulemd_index_search_streams (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
 
   streams = modulemd_module_index_search_streams (
@@ -1524,8 +1524,8 @@ test_module_index_search_streams_by_nsvca_glob (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
 
   streams = modulemd_module_index_search_streams_by_nsvca_glob (index, "*");
@@ -1575,8 +1575,8 @@ test_module_index_search_rpms (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
 
 

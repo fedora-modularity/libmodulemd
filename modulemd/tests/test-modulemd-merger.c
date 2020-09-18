@@ -129,8 +129,9 @@ merger_test_merger (void)
   yaml_path =
     g_strdup_printf ("%s/merging-base.yaml", g_getenv ("TEST_DATA_PATH"));
   base_index = modulemd_module_index_new ();
-  modulemd_module_index_update_from_file (
-    base_index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_index, yaml_path, TRUE, &failures, &error));
+  g_assert_no_error (error);
   g_clear_pointer (&yaml_path, g_free);
 
   /* Baseline */

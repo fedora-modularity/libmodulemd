@@ -43,7 +43,7 @@ function common_finalize {
 
     rm -f $MMD_TARBALL_PATH \
           $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
-          $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
+          $SCRIPT_DIR/$MMD_OS/Dockerfile.test.$MMD_RELEASE
 
     return $exitcode
 }
@@ -53,6 +53,9 @@ trap common_finalize EXIT
 
 function mmd_run_docker_tests {
     local os release repository image
+    local deps_template deps_image
+    local test_template test_image
+    local oci_extra_args
     local "${@}"
 
     if [ -z $SCRIPT_DIR ]; then
@@ -64,12 +67,15 @@ function mmd_run_docker_tests {
     release=${release-rawhide}
     repository=${repository-registry.fedoraproject.org}
 
-
     # Lower-case the os and release for the container registry
     MMD_OS=${os,,}
     MMD_RELEASE=${release,,}
-
     image=${image-$MMD_OS:$MMD_RELEASE}
+
+    deps_template=${deps_template-$MMD_OS/Dockerfile.deps.tmpl}
+    test_template=${test_template-$MMD_OS/Dockerfile.tmpl}
+    deps_image=${deps_image-libmodulemd-deps-$MMD_OS:$MMD_RELEASE}
+    test_image=${test_image-libmodulemd-$MMD_OS:$MMD_RELEASE}
 
     # Create an archive of the current checkout
     MMD_TARBALL_PATH=`mktemp -p $SCRIPT_DIR tarball-XXXXXX.tar.bz2`
@@ -79,23 +85,30 @@ function mmd_run_docker_tests {
     git ls-files |xargs tar cfj $MMD_TARBALL_PATH .git
     popd
 
-    sed -e "s#@IMAGE@#$repository/$image#" $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.tmpl \
-        | m4 -D_RELEASE_=$release \
+    m4  -D__IMAGE__="$repository/$image" \
+        -D__OS__=$os \
+        -D__RELEASE__=$release \
+        $SCRIPT_DIR/${deps_template} \
         > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
-    sed -e "s/@RELEASE@/$MMD_OS:$MMD_RELEASE/" $SCRIPT_DIR/$MMD_OS/Dockerfile.tmpl \
-        | m4 -D_RELEASE_=$release \
-        > $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE
+
+    m4  -D__DEPS_IMAGE__="fedora-modularity/${deps_image}" \
+        -D__OS__=$os \
+        -D__RELEASE__=$release \
+        $SCRIPT_DIR/${test_template} \
+        > $SCRIPT_DIR/$MMD_OS/Dockerfile.test.$MMD_RELEASE
 
     $MMD_BUILDAH $MMD_LAYERS_TRUE \
         -f $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE \
-        -t fedora-modularity/libmodulemd-deps-$MMD_OS:$MMD_RELEASE .
+        -t fedora-modularity/${deps_image} .
 
     $MMD_BUILDAH $MMD_LAYERS_FALSE \
-        -f $SCRIPT_DIR/$MMD_OS/Dockerfile-$MMD_RELEASE \
-        -t fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE \
+        -f $SCRIPT_DIR/$MMD_OS/Dockerfile.test.$MMD_RELEASE \
+        -t fedora-modularity/${test_image} \
         --build-arg TARBALL=${TARBALL} .
 
-    $MMD_OCI run --rm fedora-modularity/libmodulemd-$MMD_OS:$MMD_RELEASE
+    eval $MMD_OCI run \
+        ${oci_extra_args} \
+        --rm fedora-modularity/${test_image}
 }
 
 set +x

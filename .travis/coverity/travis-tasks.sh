@@ -4,6 +4,17 @@
 set -e
 set -x
 
+if [ -e /usr/lib/os-release ]; then
+    source /usr/lib/os-release
+    case "${ID-unknown} ${VERSION_ID-unknown}" in
+    "centos 7")
+        COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=python3.6"
+        ;;
+    "centos "*)
+        COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false"
+        ;;
+    esac
+fi
 
 pushd /builddir/
 

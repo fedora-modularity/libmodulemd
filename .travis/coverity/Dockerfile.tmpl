@@ -1,9 +1,15 @@
-FROM fedora-modularity/libmodulemd-deps-fedora:@RELEASE@
+FROM __DEPS_IMAGE__
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-RUN dnf -y --setopt=install_weak_deps=False --nogpgcheck install rsync \
-    && dnf -y clean all
+RUN yum -y --setopt=install_weak_deps=False --setopt=tsflags='' \
+           --nogpgcheck install \
+        rsync \
+        ruby \
+        rubygems \
+        "rubygem(json)" \
+        wget \
+    && yum -y clean all
 
 ARG TARBALL
 

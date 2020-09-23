@@ -1,9 +1,9 @@
-FROM @IMAGE@
+FROM __IMAGE__
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 RUN yum -y install epel-release \
-ifelse(eval(_RELEASE_ >= 8), 1, `dnl
+ifelse(eval(__RELEASE__ >= 8), 1, `dnl
     && yum -y install dnf-plugins-core \
     && yum config-manager --enable PowerTools \
 ')dnl
@@ -27,7 +27,7 @@ ifelse(eval(_RELEASE_ >= 8), 1, `dnl
 	pkgconfig \
 	python2-devel \
 	python2-six \
-ifelse(eval(_RELEASE_ < 8), 1, `dnl
+ifelse(eval(__RELEASE__ < 8), 1, `dnl
 	python-gobject-base \
 	python36-gobject-base \
 ',`dnl

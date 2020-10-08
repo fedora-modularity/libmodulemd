@@ -79,7 +79,7 @@ data:
 ...
 ---
 document: modulemd
-version: 2
+version: 3
 data:
     name: testmodule
     stream: teststream
@@ -152,3 +152,4 @@ data:
                 ref: somecoolbranchname
                 buildorder: 100
 ...
+

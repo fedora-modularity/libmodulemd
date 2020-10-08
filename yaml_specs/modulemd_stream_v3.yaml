@@ -34,8 +34,10 @@
 
 
 # Document type identifier
-# `document: modulemd` describes the contents of a module stream
-document: modulemd
+# `document: modulemd-stream` describes the contents of a module stream
+# For backwards-compatibility with version 2 of this document type,
+# implementations may accept `document: modulemd` as an equivalent value.
+document: modulemd-stream
 
 # Module metadata format version
 version: 3

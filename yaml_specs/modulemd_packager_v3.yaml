@@ -76,6 +76,14 @@ data:
         # Type: OPTIONAL
         module:
             - MIT
+    # xmd:
+    # Extensible metadata block
+    # A dictionary of user-defined keys and values.
+    # Defaults to an empty dictionary.
+    #
+    # Type: OPTIONAL
+    xmd:
+        some_key: some_data
 
     # configurations:
     # A list of build and dependency configurations
@@ -86,11 +94,11 @@ data:
     #
     # Type: MANDATORY
     configurations:
-          # context:
-          # A string of up to ten [a-zA-Z0-9] characters representing a
-          # a build and runtime configuration for this stream. This string is
-          # arbitrary but must be unique in this module stream.
-          # Type: MANDATORY
+        # context:
+        # A string of up to ten [a-zA-Z0-9] characters representing a
+        # a build and runtime configuration for this stream. This string is
+        # arbitrary but must be unique in this module stream.
+        # Type: MANDATORY
         - context: CTX1
           # platform:
           # Defines the distribution and release to build on and run against.
@@ -110,8 +118,50 @@ data:
           # Type: Optional
           requires:
               appframework: v1
+          # buildopts:
+          # Component build options
+          # Additional per component type module-wide build options.
+          #
+          # IMPORTANT: Due to limitations in the modulemd-stream v2 format, the
+          # buildopts from the first configuration in the list will apply to
+          # ALL configurations when building for modulemd-stream v2. They will
+          # apply separately when building for module-stream v3.
+          #
+          # Type: OPTIONAL
+          buildopts:
+            # rpms:
+            # RPM-specific build options
+            #
+            # Type: OPTIONAL
+            rpms:
+                # macros:
+                # Additional macros that should be defined in the
+                # RPM buildroot, appended to the default set.  Care should be
+                # taken so that the newlines are preserved.  Literal style
+                # block is recommended, with or without the trailing newline.
+                #
+                # Type: OPTIONAL
+                macros: |
+                    %demomacro 1
+                    %demomacro2 %{demomacro}23
 
-          # Alternate example with no dependencies
+                # whitelist:
+                # Explicit list of package build names this module will produce.
+                # By default the build system only allows components listed under
+                # data.components.rpms to be built as part of this module.
+                # In case the expected RPM build names do not match the component
+                # names, the list can be defined here.
+                # This list overrides rather then just extends the default.
+                # List of package build names without versions.
+                #
+                # Type: OPTIONAL
+                whitelist:
+                    - fooscl-1-bar
+                    - fooscl-1-baz
+                    - xxx
+                    - xyz
+
+        # Alternate example with no dependencies
         - context: CTX2
           platform: f33
 

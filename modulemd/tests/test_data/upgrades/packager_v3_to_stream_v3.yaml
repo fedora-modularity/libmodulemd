@@ -14,6 +14,8 @@ data:
     license:
         module:
             - MIT
+    xmd:
+        some_key: some_data
     dependencies:
         platform: f32
         buildrequires:
@@ -49,6 +51,17 @@ data:
     filter:
         rpms:
             - baz-nonfoo
+    buildopts:
+        rpms:
+            macros: |
+                %demomacro 1
+                %demomacro2 %{demomacro}23
+            whitelist:
+                - fooscl-1-bar
+                - fooscl-1-baz
+                - xxx
+                - xyz
+        arches: [i686, x86_64]
     components:
         rpms:
             bar:
@@ -93,6 +106,8 @@ data:
     license:
         module:
             - MIT
+    xmd:
+        some_key: some_data
     dependencies:
         platform: f33
     references:
@@ -152,4 +167,11 @@ data:
                 ref: somecoolbranchname
                 buildorder: 100
 ...
-
+---
+document: modulemd-defaults
+version: 1
+data:
+  module: testmodule
+  profiles:
+    'teststream': [minimal]
+...

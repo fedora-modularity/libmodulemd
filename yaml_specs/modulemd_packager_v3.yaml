@@ -223,8 +223,12 @@ data:
                 - bar
             # default (boolean):
             # Whether this profile should be installed if none is explicitly
-            # specified
-            default: True
+            # specified. No more than one configuration may have `default: true`.
+            #
+            # Defaults to "false" if not specified.
+            #
+            # Type: OPTIONAL
+            default: true
 
         # buildroot:
         # This is a special reserved profile name.

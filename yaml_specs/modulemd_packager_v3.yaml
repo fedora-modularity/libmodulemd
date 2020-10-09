@@ -221,6 +221,10 @@ data:
             description: Minimal profile installing only the bar package.
             rpms:
                 - bar
+            # default (boolean):
+            # Whether this profile should be installed if none is explicitly
+            # specified
+            default: True
 
         # buildroot:
         # This is a special reserved profile name.

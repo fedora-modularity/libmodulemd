@@ -34,14 +34,75 @@
 
 
 # Document type identifier
-# `document: modulemd-packager` describes the contents of a packager's input
-# for a module stream.
-document: modulemd-packager
+# `document: modulemd-stream` describes the contents of a module stream
+# For backwards-compatibility with version 2 of this document type,
+# implementations may accept `document: modulemd` as an equivalent value.
+document: modulemd-stream
 
 # Module metadata format version
-version: 2
+version: 3
 
 data:
+    # name:
+    # The name of the module
+    # Filled in by the build system, using the VCS repository name as the name
+    # of the module.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    name: foo
+
+    # stream:
+    # Module update stream
+    # Filled in by the buildsystem, using the VCS branch name as the name of
+    # the stream.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    stream: latest
+
+    # version:
+    # Module version, integer, cannot be negative
+    # If this value is unset (or set to zero), it will be filled in by the
+    # buildsystem, using the VCS commit timestamp.  Module version defines the
+    # upgrade path for the particular update stream.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    version: 20160927144203
+
+    # context:
+    # Module context flag
+    # The context flag serves to distinguish module builds with the
+    # same name, stream and version and plays an important role in
+    # updates.
+    #
+    # Filled in by the buildsystem. A string of up to ten [a-zA-Z0-9]
+    # characters that represents the build configuration that was used to
+    # produce this stream. See "configurations" in the modulemd-packager
+    # specification.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    context: CTX1
+
+    # arch:
+    # Module artifact architecture
+    # Contains a string describing the module's artifacts' main hardware
+    # architecture compatibility, distinguishing the module artifact,
+    # e.g. a repository, from others with the same name, stream, version and
+    # context.  This is not a generic hardware family (i.e. basearch).
+    # Examples: i386, i486, armv7hl, x86_64
+    # Filled in by the buildsystem during the compose stage.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    arch: x86_64
 
     # summary:
     # A short summary describing the module
@@ -65,80 +126,73 @@ data:
     # Module and content licenses in the Fedora license identifier
     # format
     #
-    # Type: MANDATORY
+    # Type: OPTIONAL
     license:
         # module:
         # Module license
         # This list covers licenses used for the module metadata and
         # possibly other files involved in the creation of this specific
-        # module.
+        # module. If unspecified, the default license for documents of this
+        # type and version is MIT (https://opensource.org/licenses/MIT)
         #
-        # Type: MANDATORY
+        # Type: OPTIONAL
         module:
             - MIT
 
-    # dependencies:
-    # Module dependencies, if any
-    # A list of dictionaries describing build and runtime dependencies
-    # of this module.  Each list item describes a combination of dependencies
-    # this module can be built or run against.
-    # Dependency keys are module names, dependency values are lists of
-    # required streams.  The lists can be both inclusive (listing compatible
-    # streams) or exclusive (accepting every stream except for those listed).
-    # An empty list implies all active existing streams are supported.
-    # Requiring multiple streams at build time will result in multiple
-    # builds.  Requiring multiple streams at runtime implies the module
-    # is compatible with all of them.  If the same module streams are listed
-    # in both the build time and the runtime block, the build tools translate
-    # the runtime block so that it matches the stream the module was built
-    # against.  Multiple builds result in multiple output modulemd files.
-    # See below for an example.
-    # The example below illustrates how to build the same module in four
-    # different ways, with varying build time and runtime dependencies.
+        # content:
+        # Content license
+        # A list of licenses used by the packages in the module.
+        # This should be populated by build tools, not the module author.
+        #
+        # Type: AUTOMATIC
+        #
+        # Mandatory for module metadata in a yum/dnf repository.
+        content:
+            - Beerware
+            - GPLv2+
+            - zlib
+
+    # xmd:
+    # Extensible metadata block
+    # A dictionary of user-defined keys and values.
+    # Defaults to an empty dictionary.
     #
     # Type: OPTIONAL
+    xmd:
+        some_key: some_data
+        a_list: [ a, b ]
+
+    # dependencies:
+    # Module stream dependencies
+    #
+    # If this stream has build or runtime dependencies on another module's
+    # stream, it can be specified in this section.
+    #
+    # Type: MANDATORY
     dependencies:
-        # Build on all available platforms except for f27, f28 and epel7
-        # After build, the runtime dependency will match the one used for
-        # the build.
-        - buildrequires:
-              platform: [-f27, -f28, -epel7]
-          requires:
-              platform: [-f27, -f28, -epel7]
+        # platform:
+        # The platform field describes the buildroot and runtime platform for
+        # this module stream.
+        # Type: MANDATORY
+        platform: f32
 
-        # For platform:f27 perform two builds, one with buildtools:v1, another
-        # with buildtools:v2 in the buildroot.  Both will also utilize
-        # compatible:v3.  At runtime, buildtools isn't required and either
-        # compatible:v3 or compatible:v4 can be installed.
-        - buildrequires:
-              platform: [f27]
-              buildtools: [v1, v2]
-              compatible: [v3]
-          requires:
-              platform: [f27]
-              compatible: [v3, v4]
+        # buildrequires:
+        # A dictionary of modules and their streams that this stream depends on
+        # while building. The dictionary key is the name of the module and the
+        # dictionary value is the name of the stream.
+        #
+        # Type: OPTIONAL
+        buildrequires:
+            appframework: v1
 
-        # For platform:f28 builds, require either runtime:a or runtime:b at
-        # runtime.  Only one build is performed.
-        - buildrequires:
-              platform: [f28]
-          requires:
-              platform: [f28]
-              runtime: [a, b]
-
-        # For platform:epel7, build against against all available extras
-        # streams and moreextras:foo and moreextras:bar.  The number of builds
-        # in this case will be 2 * <the number of extras streams available>.
-        # At runtime, both extras and moreextras will match whatever stream was
-        # used for build.
-        - buildrequires:
-              platform: [epel7]
-              extras: []
-              moreextras: [foo, bar]
-          requires:
-              platform: [epel7]
-              extras: []
-              moreextras: [foo, bar]
+        # requires:
+        # A dictionary of modules and their streams that this stream depends on
+        # at runtime. The dictionary key is the name of the module and the
+        # dictionary value is the name of the stream.
+        #
+        # Type: OPTIONAL
+        requires:
+            appframework: v1
 
     # references:
     # References to external resources, typically upstream
@@ -275,6 +329,54 @@ data:
         rpms:
             - baz-nonfoo
 
+    # buildopts:
+    # Component build options
+    # Additional per component type module-wide build options.
+    #
+    # Type: OPTIONAL
+    buildopts:
+        # rpms:
+        # RPM-specific build options
+        #
+        # Type: OPTIONAL
+        rpms:
+            # macros:
+            # Additional macros that should be defined in the
+            # RPM buildroot, appended to the default set.  Care should be
+            # taken so that the newlines are preserved.  Literal style
+            # block is recommended, with or without the trailing newline.
+            #
+            # Type: OPTIONAL
+            macros: |
+                %demomacro 1
+                %demomacro2 %{demomacro}23
+
+            # whitelist:
+            # Explicit list of package build names this module will produce.
+            # By default the build system only allows components listed under
+            # data.components.rpms to be built as part of this module.
+            # In case the expected RPM build names do not match the component
+            # names, the list can be defined here.
+            # This list overrides rather then just extends the default.
+            # List of package build names without versions.
+            #
+            # Type: OPTIONAL
+            whitelist:
+                - fooscl-1-bar
+                - fooscl-1-baz
+                - xxx
+                - xyz
+
+        # arches:
+        # Instructs the build system to only build the
+        # module on this specific set of architectures.
+        # Includes specific hardware architectures, not families.
+        # See the data.arch field for details.
+        # Defaults to all available arches.
+        #
+        # Type: OPTIONAL
+        arches: [i686, x86_64]
+
     # components:
     # Functional components of the module
     #
@@ -331,13 +433,13 @@ data:
                 # must be be ordered later than some other entries in this map.
                 # The values of this array come from the keys of this map and
                 # not the real component name to enable bootstrapping.
-                #
-                # In this example, 'baz' makes some changes to the default
-                # buildroot that 'bar' must use.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
                 #
                 # Type: AUTOMATIC
-                buildafter:
-                    - baz
+                #
+                # buildafter:
+                #    - baz
 
                 # buildonly:
                 # Use the "buildonly" value to indicate that all artifacts
@@ -385,6 +487,12 @@ data:
                 # Type: OPTIONAL
                 srpm-buildroot: true
 
+                # See component zyx for a complete description of buildorder
+                #
+                # build this component before any others so that the macros it
+                # creates are available to all of them.
+                buildorder: -1
+
             xxx:
                 rationale: xxx demonstrates arches and multilib.
 
@@ -412,12 +520,26 @@ data:
                 # Type: AUTOMATIC
                 multilib: [x86_64]
 
-                # This package requires a particular version of 'bar' to be
-                # present in order to build correctly, so we inform the build
-                # system not to build this until 'bar' has completed
-                # successfully.
-                buildafter:
-                    - bar
+            xyz:
+                rationale: xyz is a bundled dependency of xxx.
+
+                # buildorder:
+                # Build order group
+                # When building, components are sorted by build order tag
+                # and built in batches grouped by their buildorder value.
+                # Built batches are then re-tagged into the buildroot.
+                # Multiple components can have the same buildorder index
+                # to map them into build groups.
+                # Defaults to zero.
+                # Integer, negative values are allowed.
+                # In this example, bar, baz and xxx are built first in
+                # no particular order, then tagged into the buildroot,
+                # then, finally, xyz is built.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
+                #
+                # Type: OPTIONAL
+                buildorder: 10
 
         # modules:
         # Module content of this module
@@ -451,3 +573,86 @@ data:
                 #
                 # Type: AUTOMATIC
                 ref: somecoolbranchname
+
+                # buildorder:
+                # See the rpms buildorder.
+                #
+                # Type: AUTOMATIC
+                buildorder: 100
+
+    # artifacts:
+    # Artifacts shipped with this module
+    # This section lists binary artifacts shipped with the module, allowing
+    # software management tools to handle module bundles.  This section is
+    # populated by the module build system.
+    #
+    # Type: AUTOMATIC
+    artifacts:
+
+        # rpms:
+        # RPM artifacts shipped with this module
+        # A set of NEVRAs associated with this module.
+        #
+        # Type: AUTOMATIC
+        rpms:
+            - bar-0:1.23-1.module_deadbeef.x86_64
+            - bar-devel-0:1.23-1.module_deadbeef.x86_64
+            - bar-extras-0:1.23-1.module_deadbeef.x86_64
+            - baz-0:42-42.module_deadbeef.x86_64
+            - xxx-0:1-1.module_deadbeef.x86_64
+            - xxx-0:1-1.module_deadbeef.i686
+            - xyz-0:1-1.module_deadbeef.x86_64
+
+        # rpm-map:
+        # The rpm-map exists to link checksums from repomd to specific
+        # artifacts produced by this module. Any item in this list must match
+        # an entry in the data.artifacts.rpms section.
+        #
+        # Type: AUTOMATIC
+        rpm-map:
+
+          # The digest-type of this checksum.
+          #
+          # Type: MANDATORY
+          sha256:
+
+            # The checksum of the artifact being sought.
+            #
+            # Type: MANDATORY
+            ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:
+
+              # name:
+              # The RPM name.
+              #
+              # Type: Mandatory
+              name: bar
+
+              # epoch:
+              # The RPM epoch.
+              #
+              # Type: OPTIONAL
+              epoch: 0
+
+              # version:
+              # The RPM version.
+              #
+              # Type: MANDATORY
+              version: 1.23
+
+              # release:
+              # The RPM release.
+              #
+              # Type: MANDATORY
+              release: 1.module_deadbeef
+
+              # arch:
+              # The RPM architecture.
+              #
+              # Type: MANDATORY
+              arch: x86_64
+
+              # nevra:
+              # The complete RPM NEVRA.
+              #
+              # Type: MANDATORY
+              nevra: bar-0:1.23-1.module_deadbeef.x86_64

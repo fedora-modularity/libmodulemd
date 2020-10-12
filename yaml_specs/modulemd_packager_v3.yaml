@@ -39,10 +39,9 @@
 document: modulemd-packager
 
 # Module metadata format version
-version: 2
+version: 3
 
 data:
-
     # summary:
     # A short summary describing the module
     #
@@ -65,80 +64,106 @@ data:
     # Module and content licenses in the Fedora license identifier
     # format
     #
-    # Type: MANDATORY
+    # Type: OPTIONAL
     license:
         # module:
         # Module license
         # This list covers licenses used for the module metadata and
         # possibly other files involved in the creation of this specific
-        # module.
+        # module. If unspecified, the default license for documents of this
+        # type and version is MIT (https://opensource.org/licenses/MIT)
         #
-        # Type: MANDATORY
+        # Type: OPTIONAL
         module:
             - MIT
-
-    # dependencies:
-    # Module dependencies, if any
-    # A list of dictionaries describing build and runtime dependencies
-    # of this module.  Each list item describes a combination of dependencies
-    # this module can be built or run against.
-    # Dependency keys are module names, dependency values are lists of
-    # required streams.  The lists can be both inclusive (listing compatible
-    # streams) or exclusive (accepting every stream except for those listed).
-    # An empty list implies all active existing streams are supported.
-    # Requiring multiple streams at build time will result in multiple
-    # builds.  Requiring multiple streams at runtime implies the module
-    # is compatible with all of them.  If the same module streams are listed
-    # in both the build time and the runtime block, the build tools translate
-    # the runtime block so that it matches the stream the module was built
-    # against.  Multiple builds result in multiple output modulemd files.
-    # See below for an example.
-    # The example below illustrates how to build the same module in four
-    # different ways, with varying build time and runtime dependencies.
+    # xmd:
+    # Extensible metadata block
+    # A dictionary of user-defined keys and values.
+    # Defaults to an empty dictionary.
     #
     # Type: OPTIONAL
-    dependencies:
-        # Build on all available platforms except for f27, f28 and epel7
-        # After build, the runtime dependency will match the one used for
-        # the build.
-        - buildrequires:
-              platform: [-f27, -f28, -epel7]
-          requires:
-              platform: [-f27, -f28, -epel7]
+    xmd:
+        some_key: some_data
 
-        # For platform:f27 perform two builds, one with buildtools:v1, another
-        # with buildtools:v2 in the buildroot.  Both will also utilize
-        # compatible:v3.  At runtime, buildtools isn't required and either
-        # compatible:v3 or compatible:v4 can be installed.
-        - buildrequires:
-              platform: [f27]
-              buildtools: [v1, v2]
-              compatible: [v3]
+    # configurations:
+    # A list of build and dependency configurations
+    #
+    # Each entry in the list represents a build of this module stream against
+    # one platform (usually a distribution release name/number) and optionally
+    # a set of dependencies.
+    #
+    # Type: MANDATORY
+    configurations:
+        # context:
+        # A string of up to ten [a-zA-Z0-9] characters representing a
+        # a build and runtime configuration for this stream. This string is
+        # arbitrary but must be unique in this module stream.
+        # Type: MANDATORY
+        - context: CTX1
+          # platform:
+          # Defines the distribution and release to build on and run against.
+          # Type: MANDATORY
+          platform: f32
+          # buildrequires:
+          # A dictionary of the build-time dependencies on other module streams
+          # Each configuration may depend on a single stream of a dependency.
+          #
+          # Type: Optional
+          buildrequires:
+              appframework: v1
+          # requires:
+          # A dictionary of the run-time dependencies on other module streams
+          # Each configuration may depend on a single stream of a dependency.
+          #
+          # Type: Optional
           requires:
-              platform: [f27]
-              compatible: [v3, v4]
+              appframework: v1
+          # buildopts:
+          # Component build options
+          # Additional per component type module-wide build options.
+          #
+          # IMPORTANT: Due to limitations in the modulemd-stream v2 format, the
+          # buildopts from the first configuration in the list will apply to
+          # ALL configurations when building for modulemd-stream v2. They will
+          # apply separately when building for module-stream v3.
+          #
+          # Type: OPTIONAL
+          buildopts:
+            # rpms:
+            # RPM-specific build options
+            #
+            # Type: OPTIONAL
+            rpms:
+                # macros:
+                # Additional macros that should be defined in the
+                # RPM buildroot, appended to the default set.  Care should be
+                # taken so that the newlines are preserved.  Literal style
+                # block is recommended, with or without the trailing newline.
+                #
+                # Type: OPTIONAL
+                macros: |
+                    %demomacro 1
+                    %demomacro2 %{demomacro}23
 
-        # For platform:f28 builds, require either runtime:a or runtime:b at
-        # runtime.  Only one build is performed.
-        - buildrequires:
-              platform: [f28]
-          requires:
-              platform: [f28]
-              runtime: [a, b]
+                # whitelist:
+                # Explicit list of package build names this module will produce.
+                # By default the build system only allows components listed under
+                # data.components.rpms to be built as part of this module.
+                # In case the expected RPM build names do not match the component
+                # names, the list can be defined here.
+                # This list overrides rather then just extends the default.
+                # List of package build names without versions.
+                #
+                # Type: OPTIONAL
+                whitelist:
+                    - fooscl-1-bar
+                    - fooscl-1-baz
+                    - xxx
+                    - xyz
 
-        # For platform:epel7, build against against all available extras
-        # streams and moreextras:foo and moreextras:bar.  The number of builds
-        # in this case will be 2 * <the number of extras streams available>.
-        # At runtime, both extras and moreextras will match whatever stream was
-        # used for build.
-        - buildrequires:
-              platform: [epel7]
-              extras: []
-              moreextras: [foo, bar]
-          requires:
-              platform: [epel7]
-              extras: []
-              moreextras: [foo, bar]
+        # Alternate example with no dependencies
+        - context: CTX2
+          platform: f33
 
     # references:
     # References to external resources, typically upstream
@@ -196,6 +221,14 @@ data:
             description: Minimal profile installing only the bar package.
             rpms:
                 - bar
+            # default (boolean):
+            # Whether this profile should be installed if none is explicitly
+            # specified.
+            #
+            # Defaults to "false" if not specified.
+            #
+            # Type: OPTIONAL
+            default: true
 
         # buildroot:
         # This is a special reserved profile name.

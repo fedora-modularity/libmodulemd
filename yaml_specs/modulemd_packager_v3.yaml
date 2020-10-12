@@ -223,7 +223,7 @@ data:
                 - bar
             # default (boolean):
             # Whether this profile should be installed if none is explicitly
-            # specified. No more than one configuration may have `default: true`.
+            # specified.
             #
             # Defaults to "false" if not specified.
             #

@@ -34,6 +34,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-obsoletes-private.h"
@@ -141,6 +142,7 @@ add_subdoc (ModulemdModuleIndex *self,
 {
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdObsoletes) obsoletes = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
@@ -150,8 +152,33 @@ add_subdoc (ModulemdModuleIndex *self,
 
   switch (doctype)
     {
-    case MODULEMD_YAML_DOC_MODULESTREAM:
     case MODULEMD_YAML_DOC_PACKAGER:
+      if (modulemd_subdocument_info_get_mdversion (subdoc) <
+          MD_PACKAGER_VERSION_TWO)
+        {
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MMD_YAML_ERROR_PARSE,
+                       "Invalid mdversion for a packager document");
+          return FALSE;
+        }
+
+      if (modulemd_subdocument_info_get_mdversion (subdoc) ==
+          MD_PACKAGER_VERSION_THREE)
+        {
+          packager = modulemd_packager_v3_parse_yaml (subdoc, error);
+
+          /* TODO: Determine which stream version to convert the packager
+           * object into and do so here.
+           */
+          break;
+        }
+
+      /* Fall through intentionally
+       * We will handle the v2 packager format below
+       */
+
+    case MODULEMD_YAML_DOC_MODULESTREAM:
       switch (modulemd_subdocument_info_get_mdversion (subdoc))
         {
         case MD_MODULESTREAM_VERSION_ONE:

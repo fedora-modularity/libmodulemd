@@ -427,7 +427,7 @@ modulemd_build_config_replace_runtime_deps (ModulemdBuildConfig *self,
 
   if (deps)
     {
-      g_hash_table_unref (self->requires);
+      g_clear_pointer (&self->requires, g_hash_table_unref);
       self->requires = modulemd_hash_table_deep_str_copy (deps);
     }
   else
@@ -445,7 +445,7 @@ modulemd_build_config_replace_buildtime_deps (ModulemdBuildConfig *self,
 
   if (deps)
     {
-      g_hash_table_unref (self->buildrequires);
+      g_clear_pointer (&self->buildrequires, g_hash_table_unref);
       self->buildrequires = modulemd_hash_table_deep_str_copy (deps);
     }
   else
@@ -530,13 +530,12 @@ modulemd_build_config_copy (ModulemdBuildConfig *self)
 
   if (self->requires)
     {
-      copy->requires = modulemd_hash_table_deep_str_copy (self->requires);
+      modulemd_build_config_replace_runtime_deps (copy, self->requires);
     }
 
   if (self->buildrequires)
     {
-      copy->buildrequires =
-        modulemd_hash_table_deep_str_copy (self->buildrequires);
+      modulemd_build_config_replace_buildtime_deps (copy, self->buildrequires);
     }
 
   modulemd_build_config_set_buildopts (

@@ -42,6 +42,26 @@ document: modulemd-packager
 version: 3
 
 data:
+    # name:
+    # The name of the module
+    # Filled in by the build system, using the VCS repository name as the name
+    # of the module.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    name: foo
+
+    # stream:
+    # Module update stream
+    # Filled in by the buildsystem, using the VCS branch name as the name of
+    # the stream.
+    #
+    # Type: AUTOMATIC
+    #
+    # Mandatory for module metadata in a yum/dnf repository.
+    stream: latest
+
     # summary:
     # A short summary describing the module
     #
@@ -61,21 +81,15 @@ data:
         the obligatory lorem ipsum dolor sit amet goes right here.
 
     # license:
-    # Module and content licenses in the Fedora license identifier
-    # format
+    # Module license
+    # This list covers licenses used for the module metadata and
+    # possibly other files involved in the creation of this specific
+    # module. If unspecified, the default license for documents of this
+    # type and version is MIT (https://opensource.org/licenses/MIT)
     #
     # Type: OPTIONAL
     license:
-        # module:
-        # Module license
-        # This list covers licenses used for the module metadata and
-        # possibly other files involved in the creation of this specific
-        # module. If unspecified, the default license for documents of this
-        # type and version is MIT (https://opensource.org/licenses/MIT)
-        #
-        # Type: OPTIONAL
-        module:
-            - MIT
+        - MIT
     # xmd:
     # Extensible metadata block
     # A dictionary of user-defined keys and values.

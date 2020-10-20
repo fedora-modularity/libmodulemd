@@ -1,0 +1,20 @@
+---
+context: CTX1
+platform: f32
+unknown: key
+buildrequires:
+  appframework: v1
+  doctool: rolling
+requires:
+  appframework: v2
+buildopts:
+  rpms:
+    macros: |
+      %demomacro 1
+      %demomacro2 %{demomacro}23
+    whitelist:
+    - fooscl-1-bar
+    - fooscl-1-baz
+    - xxx
+    - xyz
+...

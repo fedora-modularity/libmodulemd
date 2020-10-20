@@ -30,6 +30,16 @@ G_BEGIN_DECLS
  */
 
 /**
+ * MMD_MAXCONTEXTLEN:
+ *
+ * The ModuleStream v3 specification defines the maximum lenth of the context
+ * field.
+ *
+ * Since: 2.10
+ */
+#define MMD_MAXCONTEXTLEN 10
+
+/**
  * ModulemdModuleStreamVersionEnum:
  * @MD_MODULESTREAM_VERSION_ERROR: Represents an error handling module stream
  * version.

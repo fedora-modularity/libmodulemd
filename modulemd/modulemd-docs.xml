@@ -61,6 +61,7 @@
     </chapter>
     <chapter>
       <title>Modulemd 2.0 Private Object Methods</title>
+       <xi:include href="xml/modulemd-build-config.xml"/>
        <xi:include href="xml/modulemd-buildopts-private.xml"/>
        <xi:include href="xml/modulemd-component-private.xml"/>
        <xi:include href="xml/modulemd-component-module-private.xml"/>

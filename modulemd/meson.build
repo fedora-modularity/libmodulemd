@@ -59,6 +59,7 @@ endif
 
 modulemd_srcs = files(
     'modulemd.c',
+    'modulemd-build-config.c',
     'modulemd-buildopts.c',
     'modulemd-component.c',
     'modulemd-component-module.c',
@@ -117,6 +118,7 @@ modulemd_hdrs = files(
 
 modulemd_priv_hdrs = files(
     'include/private/glib-extensions.h',
+    'include/private/modulemd-build-config.h',
     'include/private/modulemd-buildopts-private.h',
     'include/private/modulemd-component-private.h',
     'include/private/modulemd-component-module-private.h',
@@ -294,6 +296,7 @@ test_utils_lib = library(
 )
 
 c_tests = {
+'buildconfig'         : [ 'tests/test-modulemd-build-config.c' ],
 'buildopts'           : [ 'tests/test-modulemd-buildopts.c' ],
 'common'              : [ 'tests/test-modulemd-common.c' ],
 'component_module'    : [ 'tests/test-modulemd-component-module.c' ],

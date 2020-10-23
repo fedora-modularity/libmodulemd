@@ -1,5 +1,5 @@
 ---
-document: modulemd
+document: modulemd-stream
 version: 3
 data:
     name: testmodule
@@ -91,7 +91,7 @@ data:
                 buildorder: 100
 ...
 ---
-document: modulemd
+document: modulemd-stream
 version: 3
 data:
     name: testmodule

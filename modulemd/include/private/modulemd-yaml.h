@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2017-2018 Stephen Gallagher
+ * Copyright (C) 2017-2020 Stephen Gallagher
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -41,9 +41,12 @@ G_BEGIN_DECLS
  * #ModulemdDefaultsV1) YAML document type.
  * @MODULEMD_YAML_DOC_TRANSLATIONS: Represents a `modulemd-translations` (see
  * #ModulemdTranslation) YAML document type.
- * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document,
- * which is a subset of #ModuleStream containing only the attributes that a
- * package maintainer should modify. Since: 2.9
+ * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document.
+ * V2 is a subset of #ModuleStreamV2 containing only the attributes that a
+ * package maintainer should modify. V3 (see #ModulemdPackagerV3) is a new YAML
+ * document type. Since: 2.9
+ * @MODULEMD_YAML_DOC_OBSOLETES: Represents a `modulemd-obsoletes` document (see
+ * #ModulemdObsoletes) YAML document type. Since: 2.10
  *
  * Since: 2.0
  */

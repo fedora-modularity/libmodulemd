@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018 Red Hat, Inc.
+ * Copyright (C) 2018-2020 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -27,6 +27,7 @@
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module-stream-v3.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module.h"
 #include "modulemd-profile.h"

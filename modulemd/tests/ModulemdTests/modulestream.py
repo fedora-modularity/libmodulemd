@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of libmodulemd
-# Copyright (C) 2018 Red Hat, Inc.
+# Copyright (C) 2018-2020 Red Hat, Inc.
 #
 # Fedora-License-Identifier: MIT
 # SPDX-2.0-License-Identifier: MIT
@@ -33,6 +33,7 @@ from base import TestBase
 modulestream_versions = [
     Modulemd.ModuleStreamVersionEnum.ONE,
     Modulemd.ModuleStreamVersionEnum.TWO,
+    Modulemd.ModuleStreamVersionEnum.THREE,
 ]
 
 
@@ -493,6 +494,9 @@ class TestModuleStream(TestBase):
 
     def test_servicelevels(self):
         for version in modulestream_versions:
+            # servicelevels are not supported after v2
+            if version > Modulemd.ModuleStreamVersionEnum.TWO:
+                continue
             stream = Modulemd.ModuleStream.new(version)
             sl = Modulemd.ServiceLevel.new("rawhide")
             sl.set_eol_ymd(1980, 3, 2)
@@ -565,6 +569,22 @@ class TestModuleStream(TestBase):
         stream.remove_dependencies(deps)
         self.assertEquals(len(stream.get_dependencies()), 0)
 
+    def test_v3_dependencies(self):
+        stream = Modulemd.ModuleStreamV3.new()
+        stream.add_buildtime_requirement("testmodule", "stable")
+
+        assert len(stream.get_buildtime_modules()) == 1
+        assert "testmodule" in stream.get_buildtime_modules()
+
+        assert (
+            stream.get_buildtime_requirement_stream("testmodule") == "stable"
+        )
+
+        stream.add_runtime_requirement("testmodule", "latest")
+        assert len(stream.get_runtime_modules()) == 1
+        assert "testmodule" in stream.get_runtime_modules()
+        assert stream.get_runtime_requirement_stream("testmodule") == "latest"
+
     def test_xmd(self):
         if "_overrides_module" in dir(Modulemd):
             # The XMD python tests can only be run against the installed lib
@@ -601,7 +621,7 @@ class TestModuleStream(TestBase):
 
             self.assertIsNotNone(out_yaml)
 
-    def test_upgrade(self):
+    def test_upgrade_v1_to_v2(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
         v1_stream.set_summary("Summary")
         v1_stream.set_description("Description")
@@ -612,7 +632,7 @@ class TestModuleStream(TestBase):
         v1_stream.add_runtime_requirement("ModuleA", "streamZ")
         v1_stream.add_runtime_requirement("ModuleB", "streamY")
 
-        v2_stream = v1_stream.upgrade(Modulemd.ModuleStreamVersionEnum.LATEST)
+        v2_stream = v1_stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
         self.assertIsNotNone(v2_stream)
 
         idx = Modulemd.ModuleIndex.new()
@@ -1171,6 +1191,9 @@ data:
     def test_depends_on_stream(self):
 
         for version in modulestream_versions:
+            if version >= Modulemd.ModuleStreamVersionEnum.THREE:
+                # see test_depends_on_stream_v3()
+                continue
             stream = Modulemd.ModuleStream.read_file(
                 "%s/dependson_v%d.yaml"
                 % (os.getenv("TEST_DATA_PATH"), version),
@@ -1203,72 +1226,103 @@ data:
                     stream.build_depends_on_stream("streamname", "f30"), True
                 )
 
+    def test_depends_on_stream_v3(self):
+
+        for version in modulestream_versions:
+            if version < Modulemd.ModuleStreamVersionEnum.THREE:
+                # see test_depends_on_stream()
+                continue
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/dependson_v%d.yaml"
+                % (os.getenv("TEST_DATA_PATH"), version),
+                True,
+            )
+            self.assertIsNotNone(stream)
+
+            self.assertEqual(stream.depends_on_stream("runtime", "a"), True)
+            self.assertEqual(
+                stream.build_depends_on_stream("buildtools", "v1"), True
+            )
+
+            self.assertEqual(
+                stream.depends_on_stream("buildtools", "v1"), False
+            )
+            self.assertEqual(
+                stream.build_depends_on_stream("runtime", "a"), False
+            )
+
+            self.assertEqual(stream.depends_on_stream("base", "f30"), False)
+            self.assertEqual(
+                stream.build_depends_on_stream("base", "f30"), False
+            )
+
     def test_validate_buildafter(self):
-        # buildafter is supported only on v2
-
-        # Test a valid module stream with buildafter set
-        stream = Modulemd.ModuleStream.read_file(
-            os.path.join(
-                self.test_data_path, "buildafter/good_buildafter.yaml"
-            ),
-            True,
-        )
-
-        self.assertIsNotNone(stream)
-        self.assertTrue(stream.validate())
-
-        # Should fail validation if both buildorder and buildafter are set for
-        # the same component.
-        with self.assertRaisesRegexp(
-            gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"
-        ):
+        for version in modulestream_versions:
+            # buildafter is supported starting with v2
+            if version < Modulemd.ModuleStreamVersionEnum.TWO:
+                continue
+            # Test a valid module stream with buildafter set
             stream = Modulemd.ModuleStream.read_file(
-                os.path.join(
-                    self.test_data_path, "buildafter/both_same_component.yaml"
-                ),
+                "%s/buildafter/good_buildafter_v%d.yaml"
+                % (self.test_data_path, version),
                 True,
             )
+            self.assertIsNotNone(stream)
+            self.assertTrue(stream.validate())
 
-        # Should fail validation if both buildorder and buildafter are set in
-        # different components of the same stream.
-        with self.assertRaisesRegexp(
-            gi.repository.GLib.GError, "Cannot mix buildorder and buildafter"
-        ):
-            stream = Modulemd.ModuleStream.read_file(
-                os.path.join(
-                    self.test_data_path, "buildafter/mixed_buildorder.yaml"
-                ),
-                True,
-            )
+            # Should fail validation if both buildorder and buildafter are set for
+            # the same component.
+            with self.assertRaisesRegexp(
+                gi.repository.GLib.GError,
+                "Cannot mix buildorder and buildafter",
+            ):
+                stream = Modulemd.ModuleStream.read_file(
+                    "%s/buildafter/both_same_component_v%d.yaml"
+                    % (self.test_data_path, version),
+                    True,
+                )
 
-        # Should fail if a key specified in a buildafter set does not exist
-        # for this module stream.
-        with self.assertRaisesRegexp(
-            gi.repository.GLib.GError, "not found in components list"
-        ):
-            stream = Modulemd.ModuleStream.read_file(
-                os.path.join(
-                    self.test_data_path, "buildafter/invalid_key.yaml"
-                ),
-                True,
-            )
+            # Should fail validation if both buildorder and buildafter are set in
+            # different components of the same stream.
+            with self.assertRaisesRegexp(
+                gi.repository.GLib.GError,
+                "Cannot mix buildorder and buildafter",
+            ):
+                stream = Modulemd.ModuleStream.read_file(
+                    "%s/buildafter/mixed_buildorder_v%d.yaml"
+                    % (self.test_data_path, version),
+                    True,
+                )
+
+            # Should fail if a key specified in a buildafter set does not exist
+            # for this module stream.
+            with self.assertRaisesRegexp(
+                gi.repository.GLib.GError, "not found in components list"
+            ):
+                stream = Modulemd.ModuleStream.read_file(
+                    "%s/buildafter/invalid_key_v%d.yaml"
+                    % (self.test_data_path, version),
+                    True,
+                )
 
     def test_unicode_desc(self):
-        # Test a valid module stream with unicode in the description
-        stream = Modulemd.ModuleStream.read_file(
-            "%s/stream_unicode.yaml" % (os.getenv("TEST_DATA_PATH")),
-            True,
-            "",
-            "",
-        )
+        for version in modulestream_versions:
+            # Test a valid module stream with unicode in the description
+            stream = Modulemd.ModuleStream.read_file(
+                "%s/stream_unicode_v%d.yaml"
+                % (os.getenv("TEST_DATA_PATH"), version),
+                True,
+                "",
+                "",
+            )
 
-        self.assertIsNotNone(stream)
-        self.assertTrue(stream.validate())
+            self.assertIsNotNone(stream)
+            self.assertTrue(stream.validate())
 
     def test_xmd_issue_274(self):
         # Test a valid module stream with unicode in the description
         stream = Modulemd.ModuleStream.read_file(
-            "%s/stream_unicode.yaml" % (os.getenv("TEST_DATA_PATH")),
+            "%s/stream_unicode_v2.yaml" % (os.getenv("TEST_DATA_PATH")),
             True,
             "",
             "",

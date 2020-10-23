@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018 Red Hat, Inc.
+ * Copyright (C) 2018-2020 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -38,6 +38,8 @@ G_BEGIN_DECLS
  * metadata format.
  * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #ModulemdModuleStream
  * metadata format.
+ * @MD_MODULESTREAM_VERSION_THREE: Represents v3 of the #ModulemdModuleStream
+ * metadata format. Since: 2.10
  * @MD_MODULESTREAM_VERSION_LATEST: Represents the highest-supported version of
  * the #ModulemdModuleStream metadata format.
  *
@@ -50,8 +52,9 @@ typedef enum
 
   MD_MODULESTREAM_VERSION_ONE = 1,
   MD_MODULESTREAM_VERSION_TWO = 2,
+  MD_MODULESTREAM_VERSION_THREE = 3,
 
-  MD_MODULESTREAM_VERSION_LATEST = MD_MODULESTREAM_VERSION_TWO
+  MD_MODULESTREAM_VERSION_LATEST = MD_MODULESTREAM_VERSION_THREE
 } ModulemdModuleStreamVersionEnum;
 
 

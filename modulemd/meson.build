@@ -1,5 +1,5 @@
 # This file is part of libmodulemd
-# Copyright (C) 2017-2018 Stephen Gallagher
+# Copyright (C) 2017-2020 Stephen Gallagher
 #
 # Fedora-License-Identifier: MIT
 # SPDX-2.0-License-Identifier: MIT
@@ -73,6 +73,7 @@ modulemd_srcs = files(
     'modulemd-module-stream.c',
     'modulemd-module-stream-v1.c',
     'modulemd-module-stream-v2.c',
+    'modulemd-module-stream-v3.c',
     'modulemd-profile.c',
     'modulemd-rpm-map-entry.c',
     'modulemd-service-level.c',
@@ -106,6 +107,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-module-stream.h',
     'include/modulemd-2.0/modulemd-module-stream-v1.h',
     'include/modulemd-2.0/modulemd-module-stream-v2.h',
+    'include/modulemd-2.0/modulemd-module-stream-v3.h',
     'include/modulemd-2.0/modulemd-profile.h',
     'include/modulemd-2.0/modulemd-rpm-map-entry.h',
     'include/modulemd-2.0/modulemd-service-level.h',
@@ -131,6 +133,7 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-module-stream-private.h',
     'include/private/modulemd-module-stream-v1-private.h',
     'include/private/modulemd-module-stream-v2-private.h',
+    'include/private/modulemd-module-stream-v3-private.h',
     'include/private/modulemd-service-level-private.h',
     'include/private/modulemd-subdocument-info-private.h',
     'include/private/modulemd-translation-private.h',

@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2017-2018 Stephen Gallagher
+ * Copyright (C) 2017-2020 Stephen Gallagher
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -738,7 +738,8 @@ modulemd_yaml_parse_document_type_internal (
                   return FALSE;
                 }
 
-              if (g_str_equal (doctype_scalar, "modulemd"))
+              if (g_str_equal (doctype_scalar, "modulemd") ||
+                  g_str_equal (doctype_scalar, "modulemd-stream"))
                 {
                   doctype = MODULEMD_YAML_DOC_MODULESTREAM;
                 }
@@ -894,17 +895,25 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
 
 
 static const gchar *
-modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype)
+modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype,
+                                  guint64 mdversion)
 {
   switch (doctype)
     {
-    case MODULEMD_YAML_DOC_MODULESTREAM: return "modulemd";
+    case MODULEMD_YAML_DOC_MODULESTREAM:
+      if (mdversion <= 2)
+        {
+          return "modulemd";
+        }
+      return "modulemd-stream";
 
     case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
 
     case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
 
     case MODULEMD_YAML_DOC_OBSOLETES: return "modulemd-obsoletes";
+
+    case MODULEMD_YAML_DOC_PACKAGER: return "modulemd-packager";
 
     default: return NULL;
     }
@@ -918,7 +927,8 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
                                      GError **error)
 {
   MODULEMD_INIT_TRACE ();
-  const gchar *doctype_string = modulemd_yaml_get_doctype_string (doctype);
+  const gchar *doctype_string =
+    modulemd_yaml_get_doctype_string (doctype, mdversion);
   g_autofree gchar *mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
 
   if (!mmd_emitter_start_document (emitter, error))

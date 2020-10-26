@@ -1748,9 +1748,6 @@ modulemd_module_stream_v3_parse_artifacts (
   gboolean strict,
   GError **error);
 
-static GVariant *
-modulemd_module_stream_v3_parse_raw (yaml_parser_t *parser, GError **error);
-
 
 ModulemdModuleStreamV3 *
 modulemd_module_stream_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
@@ -1892,8 +1889,7 @@ modulemd_module_stream_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           /* Extensible Metadata */
           else if (g_str_equal ((const gchar *)event.data.scalar.value, "xmd"))
             {
-              xmd =
-                modulemd_module_stream_v3_parse_raw (&parser, &nested_error);
+              xmd = mmd_parse_xmd (&parser, &nested_error);
               if (!xmd)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -2837,45 +2833,6 @@ modulemd_module_stream_v3_parse_rpm_map_digest (
     }
 
   return TRUE;
-}
-
-
-static GVariant *
-modulemd_module_stream_v3_parse_raw (yaml_parser_t *parser, GError **error)
-{
-  MODULEMD_INIT_TRACE ();
-  MMD_INIT_YAML_EVENT (event);
-  GVariant *variant = NULL;
-  g_autoptr (GError) nested_error = NULL;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-
-  switch (event.type)
-    {
-    case YAML_SCALAR_EVENT:
-      variant =
-        mmd_variant_from_scalar ((const gchar *)event.data.scalar.value);
-      if (!variant)
-        {
-          MMD_YAML_ERROR_EVENT_EXIT (error, event, "Error parsing scalar");
-        }
-      break;
-
-    case YAML_MAPPING_START_EVENT:
-      variant = mmd_variant_from_mapping (parser, &nested_error);
-      break;
-
-    default:
-      MMD_YAML_ERROR_EVENT_EXIT (error,
-                                 event,
-                                 "Unexpected YAML event in raw parsing: %s",
-                                 mmd_yaml_get_event_name (event.type));
-      break;
-    }
-
-  return g_variant_ref_sink (variant);
 }
 
 

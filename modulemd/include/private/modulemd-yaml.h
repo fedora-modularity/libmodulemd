@@ -885,6 +885,20 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
 
 
 /**
+ * mmd_parse_xmd:
+ * @parser: (inout): A YAML parser positioned just after an 'xmd' mapping key.
+ * @error: (out): A #GError that will return the reason for failing to parse.
+ *
+ * Returns: (transfer full): A new, floating #GVariant representing the parsed
+ * XMD (eXtensible MetaData).
+ *
+ * Since: 2.10
+ */
+GVariant *
+mmd_parse_xmd (yaml_parser_t *parser, GError **error);
+
+
+/**
  * skip_unknown_yaml:
  * @parser: (inout): A YAML parser positioned just after an unexpected map key.
  * @error: (out): A #GError that will return the reason for failing to parse.

@@ -299,6 +299,25 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
 
 
 /**
+ * modulemd_build_config_emit_yaml:
+ * @self: This #ModulemdBuildConfig object.
+ * @emitter: (inout): A libyaml emitter object positioned where a BuidConfig
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an emission or
+ * validation error.
+ *
+ * Returns: TRUE if the BuildConfig was emitted successfully. FALSE and sets
+ * @error appropriately if the YAML could not be emitted.
+ *
+ * Since: 2.10
+ */
+gboolean
+modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
+                                 yaml_emitter_t *emitter,
+                                 GError **error);
+
+
+/**
  * modulemd_build_config_validate:
  * @self: (in): This #ModulemdBuildConfig object.
  * @error: (out): A #GError explaining any validation failure.

@@ -364,6 +364,61 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
 }
 
 
+gboolean
+modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
+                                 yaml_emitter_t *emitter,
+                                 GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  int ret;
+  g_autoptr (GError) nested_error = NULL;
+  MMD_INIT_YAML_EVENT (event);
+
+  ret = mmd_emitter_start_mapping (
+    emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to start BuildConfig mapping: ");
+      return FALSE;
+    }
+
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "context", self->context);
+  EMIT_KEY_VALUE_IF_SET (emitter, error, "platform", self->platform);
+  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
+    emitter, error, "buildrequires", self->buildrequires);
+  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
+    emitter, error, "requires", self->requires);
+
+  if (self->buildopts != NULL)
+    {
+      EMIT_SCALAR (emitter, error, "buildopts");
+      EMIT_MAPPING_START (emitter, error);
+      if (!modulemd_buildopts_emit_yaml (
+            self->buildopts, emitter, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Failed to emit BuildConfig buildopts: ");
+          return FALSE;
+        }
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  ret = mmd_emitter_end_mapping (emitter, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end BuildConfig mapping");
+      return FALSE;
+    }
+  return TRUE;
+}
+
+
 static void
 modulemd_build_config_replace_runtime_deps (ModulemdBuildConfig *self,
                                             GHashTable *deps)

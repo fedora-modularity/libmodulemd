@@ -680,6 +680,84 @@ buildconfig_test_parse_yaml_no_platform (void)
   g_assert_null (bc);
 }
 
+static void
+buildconfig_test_emit_yaml (void)
+{
+  g_autoptr (ModulemdBuildConfig) bc = NULL;
+  g_autoptr (ModulemdBuildopts) opts = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  bc = modulemd_build_config_new ();
+  modulemd_build_config_set_context (bc, "CTX1");
+  modulemd_build_config_set_platform (bc, "f32");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (modulemd_build_config_emit_yaml (bc, &emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "context: CTX1\n"
+                   "platform: f32\n"
+                   "...\n");
+
+  MMD_REINIT_YAML_STRING (&emitter, yaml_string);
+
+  opts = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (opts, "%global test 1");
+  modulemd_build_config_set_buildopts (bc, opts);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (modulemd_build_config_emit_yaml (bc, &emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "context: CTX1\n"
+                   "platform: f32\n"
+                   "buildopts:\n"
+                   "  rpms:\n"
+                   "    macros: >-\n"
+                   "      %global test 1\n"
+                   "...\n");
+
+  MMD_REINIT_YAML_STRING (&emitter, yaml_string);
+
+  modulemd_build_config_add_buildtime_requirement (bc, "appframework", "v1");
+  modulemd_build_config_add_buildtime_requirement (bc, "doctool", "rolling");
+  modulemd_build_config_add_runtime_requirement (bc, "appframework", "v2");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (modulemd_build_config_emit_yaml (bc, &emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "context: CTX1\n"
+                   "platform: f32\n"
+                   "buildrequires:\n"
+                   "  appframework: v1\n"
+                   "  doctool: rolling\n"
+                   "requires:\n"
+                   "  appframework: v2\n"
+                   "buildopts:\n"
+                   "  rpms:\n"
+                   "    macros: >-\n"
+                   "      %global test 1\n"
+                   "...\n");
+}
+
 
 int
 main (int argc, char *argv[])
@@ -728,6 +806,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/buildconfig/yaml/parse/bad/platform/none",
                    buildconfig_test_parse_yaml_no_platform);
+
+  g_test_add_func ("/modulemd/v2/buildconfig/yaml/emit",
+                   buildconfig_test_emit_yaml);
 
   return g_test_run ();
 }

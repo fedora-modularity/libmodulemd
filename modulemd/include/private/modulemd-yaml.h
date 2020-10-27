@@ -171,9 +171,9 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  * Since: 2.0
  */
 #define MMD_INIT_YAML_STRING(_emitter, _string)                               \
-  g_autoptr (modulemd_yaml_string) yaml_string =                              \
+  g_autoptr (modulemd_yaml_string) _string =                                  \
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
-  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)_string)
 
 /**
  * MMD_REINIT_YAML_STRING:
@@ -191,8 +191,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   yaml_emitter_delete (_emitter);                                             \
   yaml_emitter_initialize (_emitter);                                         \
   g_clear_pointer (&_string, modulemd_yaml_string_free);                      \
-  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));               \
-  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
+  _string = g_malloc0_n (1, sizeof (modulemd_yaml_string));                   \
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)_string)
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT_FULL:

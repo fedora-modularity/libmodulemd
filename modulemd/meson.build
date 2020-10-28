@@ -335,7 +335,7 @@ foreach name, sources : c_tests
     )
     test(name + '_debug', exe,
          env : test_env,
-         timeout : 60,
+         timeout : 120,
          suite : ['ci', 'ci_valgrind', 'c', 'c_debug'])
     test(name + '_release', exe,
          env : test_release_env,

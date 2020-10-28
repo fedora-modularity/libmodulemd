@@ -544,3 +544,51 @@ modulemd_build_config_copy (ModulemdBuildConfig *self)
 
   return g_steal_pointer (&copy);
 }
+
+
+gboolean
+modulemd_build_config_equals (ModulemdBuildConfig *self_1,
+                              ModulemdBuildConfig *self_2)
+{
+  if (!self_1 && !self_2)
+    {
+      return TRUE;
+    }
+
+  if (!self_1 || !self_2)
+    {
+      return FALSE;
+    }
+
+  g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self_1), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self_2), FALSE);
+
+  if (g_strcmp0 (self_1->context, self_2->context) != 0)
+    {
+      return FALSE;
+    }
+
+  if (g_strcmp0 (self_1->platform, self_2->platform) != 0)
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (
+        self_1->requires, self_2->requires, g_str_equal))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_equals (
+        self_1->buildrequires, self_2->buildrequires, g_str_equal))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_buildopts_equals (self_1->buildopts, self_2->buildopts))
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}

@@ -346,4 +346,20 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
  */
 ModulemdBuildConfig *
 modulemd_build_config_copy (ModulemdBuildConfig *self);
+
+/**
+ * modulemd_build_config_equals:
+ * @self_1: A pointer to a #ModulemdBuildConfig object.
+ * @self_2: A pointer to a #ModulemdBuildConfig object.
+ *
+ * Returns: TRUE, if @self_1 and @self_2 are pointers to #ModulemdBuildConfig
+ * objects containing equivalent data. FALSE, otherwise.
+ *
+ * Since: 2.10
+ */
+
+gboolean
+modulemd_build_config_equals (ModulemdBuildConfig *self_1,
+                              ModulemdBuildConfig *self_2);
+
 G_END_DECLS

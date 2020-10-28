@@ -759,6 +759,261 @@ buildconfig_test_emit_yaml (void)
 }
 
 
+static void
+buildconfig_test_equals (void)
+{
+  g_autoptr (ModulemdBuildConfig) bc_1 = NULL;
+  g_autoptr (ModulemdBuildConfig) bc_2 = NULL;
+  g_autoptr (ModulemdBuildopts) opts = NULL;
+
+  /* with no properties */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same contexts */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_context (bc_1, "CTX1");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_context (bc_2, "CTX1");
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with different contexts */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_context (bc_1, "CTX1");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_context (bc_2, "CTX2");
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same platforms */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_platform (bc_1, "f33");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_platform (bc_2, "f33");
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with different platforms */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_platform (bc_1, "f33");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_platform (bc_2, "f32");
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same buildtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod2", "stream2");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod2", "stream2");
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with different buildtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod2", "stream2");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod2", "stream2");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod3", "stream3");
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same runtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod2", "stream4");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with different runtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod2", "stream4");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod3", "stream5");
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same buildtime and runtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod2", "stream2");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod2", "stream4");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod2", "stream2");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with different buildtime and same runtime requirements */
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod2", "stream2");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_1, "buildmod3", "stream8");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_1, "runmod2", "stream4");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod1", "stream1");
+  modulemd_build_config_add_buildtime_requirement (
+    bc_2, "buildmod2", "stream2");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod1", "stream3");
+  modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+
+  /* with same buildopts */
+  opts = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (opts, "%global test 1");
+
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_buildopts (bc_1, opts);
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_buildopts (bc_2, opts);
+
+  g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+  g_clear_object (&opts);
+
+  /* with different buildopts */
+  opts = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (opts, "%global test 1");
+
+  bc_1 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_1);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_1));
+  modulemd_build_config_set_buildopts (bc_1, opts);
+
+  g_clear_object (&opts);
+  opts = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (opts, "%global test 2");
+
+  bc_2 = modulemd_build_config_new ();
+  g_assert_nonnull (bc_2);
+  g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
+  modulemd_build_config_set_buildopts (bc_2, opts);
+
+  g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_clear_object (&bc_1);
+  g_clear_object (&bc_2);
+  g_clear_object (&opts);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -809,6 +1064,8 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/buildconfig/yaml/emit",
                    buildconfig_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/buildconfig/equals", buildconfig_test_equals);
 
   return g_test_run ();
 }

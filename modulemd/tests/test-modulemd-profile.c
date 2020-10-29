@@ -351,6 +351,26 @@ profile_test_get_set_description (void)
   g_assert_null (modulemd_profile_get_description (p, "C"));
 }
 
+
+static void
+profile_test_default (void)
+{
+  g_autoptr (ModulemdProfile) p = NULL;
+
+  p = modulemd_profile_new ("testprofile");
+  g_assert_nonnull (p);
+  g_assert_true (MODULEMD_IS_PROFILE (p));
+
+  g_assert_false (modulemd_profile_is_default (p));
+
+  modulemd_profile_set_default (p);
+  g_assert_true (modulemd_profile_is_default (p));
+
+  modulemd_profile_unset_default (p);
+  g_assert_false (modulemd_profile_is_default (p));
+}
+
+
 static void
 profile_test_rpms (void)
 {
@@ -499,6 +519,8 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/profile/get_set_description",
                    profile_test_get_set_description);
+
+  g_test_add_func ("/modulemd/v2/profile/default", profile_test_default);
 
   g_test_add_func ("/modulemd/v2/profile/rpms", profile_test_rpms);
 

@@ -30,6 +30,7 @@ struct _ModulemdProfile
 
   gchar *name;
   gchar *description;
+  gboolean is_default;
 
   GHashTable *rpms;
 
@@ -80,6 +81,14 @@ modulemd_profile_equals (ModulemdProfile *self_1, ModulemdProfile *self_2)
 
   //Check rpms: size, set values
   if (!modulemd_hash_table_sets_are_equal (self_1->rpms, self_2->rpms))
+    {
+      return FALSE;
+    }
+
+  /* Test the negations of is_default just in case somehow they are different
+   * non-zero values
+   */
+  if (!self_1->is_default != !self_2->is_default)
     {
       return FALSE;
     }
@@ -185,6 +194,30 @@ modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale)
     }
 
   return self->description;
+}
+
+
+void
+modulemd_profile_set_default (ModulemdProfile *self)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+  self->is_default = TRUE;
+}
+
+void
+modulemd_profile_unset_default (ModulemdProfile *self)
+{
+  g_return_if_fail (MODULEMD_IS_PROFILE (self));
+  self->is_default = FALSE;
+}
+
+
+gboolean
+modulemd_profile_is_default (ModulemdProfile *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_PROFILE (self), FALSE);
+
+  return self->is_default;
 }
 
 
@@ -305,12 +338,19 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
   MODULEMD_INIT_TRACE ();
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
-  gboolean in_map = FALSE;
+  gboolean is_default = FALSE;
   g_autofree gchar *value = NULL;
   g_autoptr (ModulemdProfile) p = NULL;
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (
+        error, event, "No map in profile: %s", nested_error->message);
+    }
 
   p = modulemd_profile_new (name);
 
@@ -321,19 +361,9 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
 
       switch (event.type)
         {
-        case YAML_MAPPING_START_EVENT: in_map = TRUE; break;
-
-        case YAML_MAPPING_END_EVENT:
-          in_map = FALSE;
-          done = TRUE;
-          break;
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (!in_map)
-            {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error, event, "Missing mapping in profile entry");
-            }
           if (g_str_equal (event.data.scalar.value, "rpms"))
             {
               g_hash_table_unref (p->rpms);
@@ -347,6 +377,7 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
                     nested_error->message);
                 }
             }
+
           else if (g_str_equal (event.data.scalar.value, "description"))
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
@@ -361,6 +392,26 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
               modulemd_profile_set_description (p, value);
               g_clear_pointer (&value, g_free);
             }
+
+          else if (g_str_equal (event.data.scalar.value, "default"))
+            {
+              is_default = modulemd_yaml_parse_bool (parser, &nested_error);
+              if (nested_error)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+
+              if (is_default)
+                {
+                  modulemd_profile_set_default (p);
+                }
+              else
+                {
+                  modulemd_profile_unset_default (p);
+                }
+            }
+
           else
             {
               SKIP_UNKNOWN (parser,

@@ -678,6 +678,14 @@ data:
 """,
         )
 
+    def test_upgrade_v2_to_v3(self):
+        # TODO: implement test
+        pass
+
+    def test_upgrade_v1_to_v3(self):
+        # TODO: implement test
+        pass
+
     def test_v2_yaml(self):
         yaml = """
 ---

@@ -20,6 +20,7 @@
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
+#include "private/modulemd-build-config.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
@@ -794,6 +795,413 @@ module_stream_test_upgrade_v1_to_v2 (void)
   g_clear_object (&index);
   g_clear_object (&error);
   g_clear_pointer (&yaml_str, g_free);
+}
+
+static void
+module_stream_test_upgrade_v2_to_v3 (void)
+{
+  /* TODO: implement test */
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  ModulemdModuleStreamV2 *streamV2 = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_str = NULL;
+
+  stream = modulemd_module_stream_read_string (
+    "---\n"
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  name: modulename\n"
+    "  stream: streamname\n"
+    "  version: 1\n"
+    "  context: c0ffe3\n"
+    "  arch: x86_64\n"
+    "  summary: Module Summary\n"
+    "  description: >-\n"
+    "    Module Description\n"
+    "  api:\n"
+    "    rpms:\n"
+    "      - rpm_a\n"
+    "      - rpm_b\n"
+    "  filter:\n"
+    "    rpms: rpm_c\n"
+
+    "  artifacts:\n"
+    "    rpms:\n"
+    "      - bar-0:1.23-1.module_deadbeef.x86_64\n"
+
+    "  servicelevels:\n"
+    "    rawhide: {}\n"
+    "    production:\n"
+    "      eol: 2099-12-31\n"
+
+    "  license:\n"
+    "    content:\n"
+    "      - BSD\n"
+    "      - GPLv2+\n"
+    "    module: MIT\n"
+
+    "  dependencies:\n"
+    "    - buildrequires:\n"
+    "          platform: [f27, f28, epel7]\n"
+    "      requires:\n"
+    "          platform: [f27, f28, epel7]\n"
+    "    - buildrequires:\n"
+    "          platform: [f27]\n"
+    "          buildtools: [v1, v2]\n"
+    "          compatible: [v3]\n"
+    "      requires:\n"
+    "          platform: [f27]\n"
+    "          compatible: [v3, v4]\n"
+    "    - buildrequires:\n"
+    "          platform: [f28]\n"
+    "      requires:\n"
+    "          platform: [f28]\n"
+    "          runtime: [a, b]\n"
+    "    - buildrequires:\n"
+    "          platform: [epel7]\n"
+    "          extras: [v1]\n"
+    "          moreextras: [foo, bar]\n"
+    "      requires:\n"
+    "          platform: [epel7]\n"
+    "          extras: [v1]\n"
+    "          moreextras: [foo, bar]\n"
+    "  references:\n"
+    "        community: http://www.example.com/\n"
+    "        documentation: http://www.example.com/\n"
+    "        tracker: http://www.example.com/\n"
+    "  profiles:\n"
+    "        default:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-extras\n"
+    "                - baz\n"
+    "        container:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-devel\n"
+    "        minimal:\n"
+    "            description: Minimal profile installing only the bar "
+    "package.\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "        buildroot:\n"
+    "            rpms:\n"
+    "                - bar-devel\n"
+    "        srpm-buildroot:\n"
+    "            rpms:\n"
+    "                - bar-extras\n"
+    "  buildopts:\n"
+    "        rpms:\n"
+    "            macros: |\n"
+    "                %demomacro 1\n"
+    "                %demomacro2 %{demomacro}23\n"
+    "            whitelist:\n"
+    "                - fooscl-1-bar\n"
+    "                - fooscl-1-baz\n"
+    "                - xxx\n"
+    "                - xyz\n"
+    "        arches: [i686, x86_64]\n"
+    "  components:\n"
+    "        rpms:\n"
+    "            bar:\n"
+    "                rationale: We need this to demonstrate stuff.\n"
+    "                repository: https://pagure.io/bar.git\n"
+    "                cache: https://example.com/cache\n"
+    "                ref: 26ca0c0\n"
+    "            baz:\n"
+    "                rationale: This one is here to demonstrate other stuff.\n"
+    "            xxx:\n"
+    "                rationale: xxx demonstrates arches and multilib.\n"
+    "                arches: [i686, x86_64]\n"
+    "                multilib: [x86_64]\n"
+    "            xyz:\n"
+    "                rationale: xyz is a bundled dependency of xxx.\n"
+    "                buildorder: 10\n"
+    "        modules:\n"
+    "            includedmodule:\n"
+    "                rationale: Included in the stack, just because.\n"
+    "                repository: https://pagure.io/includedmodule.git\n"
+    "                ref: somecoolbranchname\n"
+    "                buildorder: 100\n"
+    "  xmd:\n"
+    "        some_key: some_data\n"
+    "        some_list:\n"
+    "            - a\n"
+    "            - b\n"
+    "        some_dict:\n"
+    "            a: alpha\n"
+    "            b: beta\n"
+    "            some_other_list:\n"
+    "                - c\n"
+    "                - d\n"
+    "            some_other_dict:\n"
+    "                another_key: more_data\n"
+    "                yet_another_key:\n"
+    "                    - this\n"
+    "                    - is\n"
+    "                    - getting\n"
+    "                    - silly\n"
+    "        can_bool: TRUE\n"
+    "...\n",
+    TRUE,
+    NULL,
+    NULL,
+    &error);
+
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  streamV2 = MODULEMD_MODULE_STREAM_V2 (stream);
+  g_assert_nonnull (streamV2);
+
+  index = modulemd_module_stream_upgrade_v2_to_v3_ext (stream, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (index);
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+
+  g_assert_no_error (error);
+
+  g_assert_nonnull (yaml_str);
+  /* g_assert_cmpstr (yaml_str, ==, ""); */
+
+  g_debug ("YAML dump of upgraded module index:\n%s", yaml_str);
+
+  /* TODO: fix this test to do something useful */
+
+  g_clear_pointer (&yaml_str, g_free);
+}
+
+static void
+module_stream_test_upgrade_v1_to_v3 (void)
+{
+  /* TODO: implement test */
+}
+
+
+static void
+module_stream_test_stream_deps_expansion_v2_to_v3 (void)
+{
+  gboolean ret;
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+  ModulemdBuildConfig *ex_dep = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_buildtime_stream (dep, "buildtools", "v1");
+  modulemd_dependencies_add_buildtime_stream (dep, "buildtools", "v2");
+  modulemd_dependencies_add_buildtime_stream (dep, "compatible", "v3");
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "f27");
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "f28");
+
+  modulemd_dependencies_add_runtime_stream (dep, "compatible", "v3");
+  modulemd_dependencies_add_runtime_stream (dep, "compatible", "v4");
+  modulemd_dependencies_add_runtime_stream (dep, "platform", "f27");
+  modulemd_dependencies_add_runtime_stream (dep, "platform", "f28");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (expanded_deps);
+
+  g_debug ("Got %d expanded dependencies", expanded_deps->len);
+
+  /* validate each dependency and dump as YAML for debugging */
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  for (guint i = 0; i < expanded_deps->len; i++)
+    {
+      ex_dep = (ModulemdBuildConfig *)g_ptr_array_index (expanded_deps, i);
+      g_assert_true (MODULEMD_IS_BUILD_CONFIG (ex_dep));
+
+      g_assert_true (modulemd_build_config_validate (ex_dep, &error));
+
+      g_assert_true (mmd_emitter_start_document (&emitter, &error));
+      ret = modulemd_build_config_emit_yaml (ex_dep, &emitter, &error);
+      g_assert_no_error (error);
+      g_assert_true (ret);
+      g_assert_true (mmd_emitter_end_document (&emitter, &error));
+    }
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_debug ("YAML dump of expanded dependencies:\n%s", yaml_string->str);
+
+  /* TODO: fix this test to do something useful */
+
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+  g_clear_object (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+}
+
+static void
+module_stream_test_stream_deps_expansion_v2_to_v3_no_streams (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Only the MBS can do "all active existing streams" expansion */
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+    dep, "buildtime_no_deps");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (
+    dep, "runtime_no_deps");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+}
+
+static void
+module_stream_test_stream_deps_expansion_v2_to_v3_exclusions (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Only the MBS can do expansion with stream exclusions */
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "-f27");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_runtime_stream (dep, "platform", "-f27");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+}
+
+static void
+module_stream_test_stream_deps_expansion_v2_to_v3_no_platform (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Dependencies must have either a buildtime or runtime platform to be */
+  /* expanded */
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_buildtime_stream (dep, "foo", "A");
+  modulemd_dependencies_add_buildtime_stream (dep, "foo", "B");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_runtime_stream (dep, "bar", "C");
+  modulemd_dependencies_add_runtime_stream (dep, "bar", "D");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+}
+
+static void
+module_stream_test_stream_deps_expansion_v2_to_v3_conflicting_platforms (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Dependencies can't be expanded if they have only conflicting buildtime */
+  /* and runtime platforms */
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "f32");
+  modulemd_dependencies_add_runtime_stream (dep, "platform", "f33");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_null (expanded_deps);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
 }
 
 
@@ -4830,6 +5238,32 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade_v1_to_v2",
                    module_stream_test_upgrade_v1_to_v2);
+
+  g_test_add_func ("/modulemd/v2/modulestream/upgrade_v2_to_v3",
+                   module_stream_test_upgrade_v2_to_v3);
+
+  g_test_add_func ("/modulemd/v2/modulestream/upgrade_v1_to_v3",
+                   module_stream_test_upgrade_v1_to_v3);
+
+  g_test_add_func ("/modulemd/v2/modulestream/stream_expansion_v2_to_v3",
+                   module_stream_test_stream_deps_expansion_v2_to_v3);
+
+  g_test_add_func (
+    "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/no_streams",
+    module_stream_test_stream_deps_expansion_v2_to_v3_no_streams);
+
+  g_test_add_func (
+    "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/exclusions",
+    module_stream_test_stream_deps_expansion_v2_to_v3_exclusions);
+
+  g_test_add_func (
+    "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/no_platform",
+    module_stream_test_stream_deps_expansion_v2_to_v3_no_platform);
+
+  g_test_add_func (
+    "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/"
+    "conflicting_platforms",
+    module_stream_test_stream_deps_expansion_v2_to_v3_conflicting_platforms);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/rpm_artifacts",
                    module_stream_v1_test_rpm_artifacts);

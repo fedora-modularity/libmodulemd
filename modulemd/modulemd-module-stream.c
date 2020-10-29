@@ -13,9 +13,13 @@
 
 #include "modulemd.h"
 #include "modulemd-errors.h"
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
+#include "modulemd-module-stream-v3.h"
 #include "modulemd-module-stream.h"
+#include "private/glib-extensions.h"
+#include "private/modulemd-build-config.h"
 #include "private/modulemd-component-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
@@ -517,7 +521,11 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from);
+modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from);
+
+static ModulemdModuleStream *
+modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStream *from,
+                                         GError **error);
 
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
@@ -526,6 +534,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 {
   g_autoptr (ModulemdModuleStream) current_stream = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
+  g_autoptr (GError) nested_error = NULL;
   guint64 current_mdversion = modulemd_module_stream_get_mdversion (self);
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
@@ -559,18 +568,31 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
       switch (current_mdversion)
         {
         case 1:
-          /* Upgrade to ModuleStreamV2 */
+          /* Upgrade from ModuleStreamV1 to ModuleStreamV2 */
           updated_stream =
-            modulemd_module_stream_upgrade_to_v2 (current_stream);
+            modulemd_module_stream_upgrade_v1_to_v2 (current_stream);
           if (!updated_stream)
             {
               /* This should be impossible, since there are no failure returns
-               * from modulemd_module_stream_upgrade_to_v2()
+               * from modulemd_module_stream_upgrade_v1_to_v2()
                */
               g_set_error (error,
                            MODULEMD_ERROR,
                            MMD_ERROR_UPGRADE,
                            "Upgrading to v2 failed for an unknown reason");
+              return NULL;
+            }
+          break;
+
+        case 2:
+          /* Upgrade from ModuleStreamV2 to ModuleStreamV3 */
+          updated_stream = modulemd_module_stream_upgrade_v2_to_v3 (
+            current_stream, &nested_error);
+          if (!updated_stream)
+            {
+              g_propagate_prefixed_error (error,
+                                          g_steal_pointer (&nested_error),
+                                          "Upgrading to v3 failed: ");
               return NULL;
             }
           break;
@@ -597,7 +619,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from)
+modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from)
 {
   ModulemdModuleStreamV1 *v1_stream = NULL;
   g_autoptr (ModulemdModuleStreamV2) copy = NULL;
@@ -687,6 +709,704 @@ modulemd_module_stream_upgrade_to_v2 (ModulemdModuleStream *from)
     }
 
   return MODULEMD_MODULE_STREAM (g_steal_pointer (&copy));
+}
+
+
+/*
+ * stream_expansion_helper:
+ * @deps: (in): A pointer to a #ModulemdDependencies object that is currently
+ * being stream expanded.
+ * @is_buildtime: (in): A #gboolean indicating if the helper is expanding
+ * buildtime dependencies (TRUE) or runtime dependencies (FALSE).
+ * @module_list: A #GStrv list of the buildtime/runtime module names belonging
+ * to @deps.
+ * @expanded_deps: (inout): A pointer to a pointer to a #GPtrArray of pointers
+ * to #ModulemdBuildConfig objects that is the current set of stream expanded
+ * dependencies.
+ * @error: (out): A #GError that will return the reason for an expansion error.
+ *
+ * Calculates the Cartesian product of the the module:stream dependencies in
+ * @deps and the set of previously calculated module:stream dependencies in
+ * @expanded_deps. The product is stored back to @expanded_deps.
+ *
+ * Returns: TRUE if expansion succeeded, FALSE otherwise.
+ */
+
+static gboolean
+stream_expansion_helper (ModulemdDependencies *deps,
+                         gboolean is_buildtime,
+                         GStrv module_list,
+                         GPtrArray **expanded_deps,
+                         GError **error)
+{
+  GStrv (*dependencies_get_streams_as_strv) (ModulemdDependencies *,
+                                             const gchar *) = NULL;
+  void (*build_config_add_requirement) (
+    ModulemdBuildConfig *, const gchar *, const gchar *) = NULL;
+  g_autoptr (GPtrArray) new_expanded_deps = NULL;
+  g_autoptr (ModulemdBuildConfig) new_dep = NULL;
+  g_auto (GStrv) streams = NULL;
+  gchar *module;
+  gchar *stream;
+  const gchar *which;
+
+  if (is_buildtime)
+    {
+      which = "buildtime";
+      dependencies_get_streams_as_strv =
+        &modulemd_dependencies_get_buildtime_streams_as_strv;
+      build_config_add_requirement =
+        &modulemd_build_config_add_buildtime_requirement;
+    }
+  else
+    {
+      which = "runtime";
+      dependencies_get_streams_as_strv =
+        &modulemd_dependencies_get_runtime_streams_as_strv;
+      build_config_add_requirement =
+        &modulemd_build_config_add_runtime_requirement;
+    }
+
+  g_debug ("Expansion: stream_expansion_helper (%s) called", which);
+
+  /* for each module... */
+  for (guint i = 0; i < g_strv_length (module_list); i++)
+    {
+      module = module_list[i];
+      streams = (*dependencies_get_streams_as_strv) (deps, module);
+
+      g_debug ("Expansion: module %s dependency %s has %d streams",
+               which,
+               module,
+               g_strv_length (streams));
+
+      if (g_strv_length (streams) == 0)
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MMD_ERROR_UPGRADE,
+                       "Cannot expand module %s dependency %s for all active "
+                       "existing streams.",
+                       which,
+                       module);
+          return FALSE;
+        }
+
+      new_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
+
+      /* for each module stream... */
+      for (guint j = 0; j < g_strv_length (streams); j++)
+        {
+          stream = streams[j];
+          g_debug ("Expansion: looking at %s stream dependency %s:%s",
+                   which,
+                   module,
+                   stream);
+
+          if (stream[0] == '-')
+            {
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Cannot expand module %s dependency %s using "
+                           "stream exclusion (%s).",
+                           which,
+                           module,
+                           stream);
+              return FALSE;
+            }
+
+          /* if no expanded dependencies yet, just create a new dep for this module and stream */
+          if ((*expanded_deps)->len == 0)
+            {
+              g_debug ("Expansion: creating new dependency");
+
+              new_dep = modulemd_build_config_new ();
+              (*build_config_add_requirement) (new_dep, module, stream);
+              g_ptr_array_add (new_expanded_deps, g_steal_pointer (&new_dep));
+            }
+          /* otherwise, expand on what we already have */
+          else
+            {
+              /* for every expanded dependency we have so far... */
+              for (guint k = 0; k < (*expanded_deps)->len; k++)
+                {
+                  g_debug ("Expansion: expanding existing dependency");
+                  /* Make a copy of the existing expanded dependency and add this module and stream */
+                  new_dep = modulemd_build_config_copy (
+                    g_ptr_array_index (*expanded_deps, k));
+                  (*build_config_add_requirement) (new_dep, module, stream);
+                  g_ptr_array_add (new_expanded_deps,
+                                   g_steal_pointer (&new_dep));
+                }
+            }
+
+        } /* for each module stream... */
+
+      g_clear_pointer (&streams, g_strfreev);
+
+      if (new_expanded_deps->len > 0)
+        {
+          g_debug (
+            "Expansion: replacing old set of %d deps with new set of %d deps",
+            (*expanded_deps)->len,
+            new_expanded_deps->len);
+          g_clear_pointer (expanded_deps, g_ptr_array_unref);
+          *expanded_deps = g_steal_pointer (&new_expanded_deps);
+        }
+
+    } /* for each module... */
+
+  return TRUE;
+}
+
+/*
+ * stream_expansion_resolve_platform:
+ * @expanded_deps: (inout): A pointer to a pointer to a #GPtrArray of pointers
+ * to #ModulemdBuildConfig objects that is the set of stream expanded
+ * dependencies.
+ * @error: (out): A #GError that will return the reason for an expansion error.
+ *
+ * The stream expanded V2 dependencies still have the "platform" module in their
+ * buildtime/runtime requirements. This function safely drops expanded
+ * dependencies that have a platform stream mis-match. For those that match, the
+ * platform attribute is set and the "platform" module is dropped from the
+ * buildtime and runtime requirements.
+ *
+ * Returns: TRUE if platform resolution succeeded, FALSE otherwise.
+ */
+static gboolean
+stream_expansion_resolve_platform (GPtrArray **expanded_deps, GError **error)
+{
+  g_autoptr (GPtrArray) new_expanded_deps = NULL;
+  g_autoptr (ModulemdBuildConfig) new_dep = NULL;
+  ModulemdBuildConfig *dep = NULL;
+  const gchar *platform;
+  const gchar *build_platform;
+  const gchar *run_platform;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("Expansion: stream_expansion_resolve_platform called with %d deps",
+           (*expanded_deps)->len);
+
+  new_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
+
+  /* for every expanded dependency... */
+  for (guint i = 0; i < (*expanded_deps)->len; i++)
+    {
+      dep = g_ptr_array_index (*expanded_deps, i);
+
+      build_platform = modulemd_build_config_get_buildtime_requirement_stream (
+        dep, "platform");
+      run_platform =
+        modulemd_build_config_get_runtime_requirement_stream (dep, "platform");
+
+      /* safely drop any expanded dependencies that have a platform mis-match */
+      if (build_platform && run_platform &&
+          g_strcmp0 (build_platform, run_platform) != 0)
+        {
+          g_debug (
+            "Expansion: dropping dep with mis-matched buildtime (%s) and "
+            "runtime (%s) platforms",
+            build_platform,
+            run_platform);
+          continue;
+        }
+
+      platform = NULL;
+
+      if (build_platform)
+        {
+          platform = build_platform;
+        }
+      else if (run_platform)
+        {
+          platform = run_platform;
+        }
+      else
+        {
+          /* this should have previously flagged a fatal error */
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MMD_ERROR_UPGRADE,
+                       "Internal error: platform missing.");
+          return FALSE;
+        }
+
+      /*
+       * - make a copy of the existing dependency
+       * - set the platform property
+       * - drop any "platform" module from the buildtime/runtime dependencies
+       * - add dep to the new list
+       */
+      new_dep = modulemd_build_config_copy (dep);
+      modulemd_build_config_set_platform (new_dep, platform);
+      if (build_platform)
+        {
+          modulemd_build_config_remove_buildtime_requirement (new_dep,
+                                                              "platform");
+        }
+      if (run_platform)
+        {
+          modulemd_build_config_remove_runtime_requirement (new_dep,
+                                                            "platform");
+        }
+      g_ptr_array_add (new_expanded_deps, g_steal_pointer (&new_dep));
+    }
+
+  if (new_expanded_deps->len == 0)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Stream v2 dependencies expanded to nothing.");
+      return FALSE;
+    }
+
+  g_debug ("Expansion: replacing old set of %d deps with new set of %d deps",
+           (*expanded_deps)->len,
+           new_expanded_deps->len);
+  g_clear_pointer (expanded_deps, g_ptr_array_unref);
+  *expanded_deps = g_steal_pointer (&new_expanded_deps);
+
+  return TRUE;
+}
+
+/*
+ * stream_expansion_dedup:
+ * @expanded_deps: (inout): A pointer to a pointer to a #GPtrArray of pointers
+ * to #ModulemdBuildConfig objects that is the set of stream expanded
+ * dependencies.
+ * @error: (out): A #GError that will return the reason for an error.
+ *
+ * This method goes through the stream expanded dependencies and drops any
+ * duplicates.
+ *
+ * Returns: TRUE if deduplication succeeded, FALSE otherwise.
+ */
+static gboolean
+stream_expansion_dedup (GPtrArray **expanded_deps, GError **error)
+{
+  g_autoptr (GPtrArray) deduped_expanded_deps = NULL;
+  ModulemdBuildConfig *dep = NULL;
+  gboolean duplicate;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("Expansion: stream_expansion_dedup called with %d deps",
+           (*expanded_deps)->len);
+
+  deduped_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
+
+  /*
+   * this is horribly inefficient, but it's the best one can do without a way
+   * to sort the objects
+   */
+
+  /* for every expanded dependency... */
+  for (guint i = 0; i < (*expanded_deps)->len; i++)
+    {
+      dep = g_ptr_array_index (*expanded_deps, i);
+
+      duplicate = FALSE;
+
+      /* for every previously deduplicated dependency... */
+      for (guint j = 0; j < deduped_expanded_deps->len; j++)
+        {
+          if (modulemd_build_config_equals (
+                dep, g_ptr_array_index (deduped_expanded_deps, j)))
+            {
+              duplicate = TRUE;
+              break;
+            }
+        }
+
+      if (!duplicate)
+        {
+          g_ptr_array_add (deduped_expanded_deps,
+                           modulemd_build_config_copy (dep));
+        }
+    }
+
+  if (deduped_expanded_deps->len == 0)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Stream v2 dependencies deduped to nothing.");
+      return FALSE;
+    }
+
+  g_debug ("Expansion: replacing old set of %d deps with new set of %d deps",
+           (*expanded_deps)->len,
+           deduped_expanded_deps->len);
+  g_clear_pointer (expanded_deps, g_ptr_array_unref);
+  *expanded_deps = g_steal_pointer (&deduped_expanded_deps);
+
+  return TRUE;
+}
+
+/*
+ * stream_expansion_gen_contexts:
+ * @v2_stream: Pointer to #ModulemdModuleStreamV2 being stream expanded.
+ * @expanded_deps: (inout): A pointer to a #GPtrArray of pointers to
+ * #ModulemdBuildConfig objects that is the set of stream expanded
+ * dependencies.
+ * @error: (out): A #GError that will return the reason for an error.
+ *
+ * This method goes through the stream expanded dependencies and auto-generates
+ * a context attribute. If there is only a single expanded stream, and
+ * @v2_stream has a context set, that will be preserved as the context
+ * attribute.
+ *
+ * Returns: TRUE if context generation succeeded, FALSE otherwise.
+ */
+static gboolean
+stream_expansion_gen_contexts (ModulemdModuleStreamV2 *v2_stream,
+                               GPtrArray *expanded_deps,
+                               GError **error)
+{
+  g_autofree gchar *context = NULL;
+  ModulemdBuildConfig *dep = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  g_debug ("Expansion: stream_expansion_gen_contexts called with %d deps",
+           expanded_deps->len);
+
+  if (expanded_deps->len == 1)
+    {
+      context = (gchar *)modulemd_module_stream_get_context (
+        MODULEMD_MODULE_STREAM (v2_stream));
+      if (context)
+        {
+          dep = g_ptr_array_index (expanded_deps, 0);
+          modulemd_build_config_set_context (dep, context);
+          context = NULL;
+          return TRUE;
+        }
+    }
+
+  /* for every expanded dependency... */
+  for (guint i = 0; i < expanded_deps->len; i++)
+    {
+      dep = g_ptr_array_index (expanded_deps, i);
+
+      context = g_strdup_printf ("AUTO%04u", i + 1);
+
+      modulemd_build_config_set_context (dep, context);
+
+      g_clear_pointer (&context, g_free);
+    }
+
+  return TRUE;
+}
+
+GPtrArray *
+modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
+                                             GError **error)
+{
+  ModulemdDependencies *v2_deps = NULL;
+  g_autoptr (GPtrArray) all_expanded_deps = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  g_auto (GStrv) buildtime_modules = NULL;
+  g_auto (GStrv) runtime_modules = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  g_debug ("Expansion: beginning v2 to v3 stream dependency expansion");
+
+  all_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
+
+  /* iterate through all of the V2 stream dependencies */
+  for (guint i = 0; i < v2_stream->dependencies->len; i++)
+    {
+      g_debug ("Expansion: expanding stream v2 dependency #%d", i + 1);
+
+      v2_deps =
+        MODULEMD_DEPENDENCIES (g_ptr_array_index (v2_stream->dependencies, i));
+
+      buildtime_modules =
+        modulemd_dependencies_get_buildtime_modules_as_strv (v2_deps);
+      runtime_modules =
+        modulemd_dependencies_get_runtime_modules_as_strv (v2_deps);
+
+      g_debug ("Expansion: %d buildtime and %d runtime module dependencies",
+               g_strv_length (buildtime_modules),
+               g_strv_length (runtime_modules));
+
+      if (g_strv_length (buildtime_modules) == 0 &&
+          g_strv_length (runtime_modules) == 0)
+        {
+          g_set_error_literal (error,
+                               MODULEMD_ERROR,
+                               MMD_ERROR_UPGRADE,
+                               "Stream v2 has no dependencies.");
+          return NULL;
+        }
+
+
+      if (!g_strv_contains ((const gchar *const *)buildtime_modules,
+                            "platform") &&
+          !g_strv_contains ((const gchar *const *)runtime_modules, "platform"))
+        {
+          g_set_error_literal (error,
+                               MODULEMD_ERROR,
+                               MMD_ERROR_UPGRADE,
+                               "Stream v2 has no platform dependencies.");
+          return NULL;
+        }
+
+      expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
+
+      if (!stream_expansion_helper (
+            v2_deps, TRUE, buildtime_modules, &expanded_deps, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Unable to expand buildtime dependencies: ");
+          return NULL;
+        }
+
+      if (!stream_expansion_helper (
+            v2_deps, FALSE, runtime_modules, &expanded_deps, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Unable to expand runtime dependencies: ");
+          return NULL;
+        }
+
+      if (!stream_expansion_resolve_platform (&expanded_deps, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Unable to resolve platform for expanded dependencies: ");
+          return NULL;
+        }
+
+      g_debug ("Expansion: stream v2 dependency #%d completed with %d deps",
+               i + 1,
+               expanded_deps->len);
+
+      g_ptr_array_extend_and_steal (all_expanded_deps, expanded_deps);
+      expanded_deps = NULL;
+
+      g_clear_pointer (&buildtime_modules, g_strfreev);
+      g_clear_pointer (&runtime_modules, g_strfreev);
+    } /* iterate through all of the V2 stream dependencies */
+
+  if (!stream_expansion_dedup (&all_expanded_deps, &nested_error))
+    {
+      g_propagate_prefixed_error (
+        error,
+        g_steal_pointer (&nested_error),
+        "Unable to deduplicate expanded dependencies: ");
+      return NULL;
+    }
+
+  if (!stream_expansion_gen_contexts (
+        v2_stream, all_expanded_deps, &nested_error))
+    {
+      g_propagate_prefixed_error (
+        error,
+        g_steal_pointer (&nested_error),
+        "Unable to generate context for expanded dependencies: ");
+      return NULL;
+    }
+
+  g_debug ("Expansion: complete with %d total deps", all_expanded_deps->len);
+  return g_steal_pointer (&all_expanded_deps);
+}
+
+
+ModulemdModuleIndex *
+modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
+                                             GError **error)
+{
+  ModulemdModuleStreamV2 *v2_stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModuleStreamV3) v3_stream = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_auto (GStrv) modules = NULL;
+  ModulemdBuildConfig *ex_dep = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (from), NULL);
+  v2_stream = MODULEMD_MODULE_STREAM_V2 (from);
+
+  expanded_deps =
+    modulemd_module_stream_expand_v2_to_v3_deps (v2_stream, &nested_error);
+  if (!expanded_deps)
+    {
+      g_propagate_prefixed_error (
+        error,
+        g_steal_pointer (&nested_error),
+        "Unable to expand v2 to v3 stream dependencies: ");
+      return NULL;
+    }
+
+  /* create an index for the expanded streams */
+  index = modulemd_module_index_new ();
+
+  /* create a V3 stream for each of the expanded V2 deps */
+  for (guint i = 0; i < expanded_deps->len; i++)
+    {
+      ex_dep = (ModulemdBuildConfig *)g_ptr_array_index (expanded_deps, i);
+
+      v3_stream = modulemd_module_stream_v3_new (
+        modulemd_module_stream_get_module_name (from),
+        modulemd_module_stream_get_stream_name (from));
+
+      /* copy in expanded context, platform, runtime_deps, buildtime_deps */
+      modulemd_module_stream_set_context (
+        MODULEMD_MODULE_STREAM (v3_stream),
+        modulemd_build_config_get_context (ex_dep));
+      modulemd_module_stream_v3_set_platform (
+        v3_stream, modulemd_build_config_get_platform (ex_dep));
+
+      modules = modulemd_build_config_get_runtime_modules_as_strv (ex_dep);
+      for (guint j = 0; j < g_strv_length (modules); j++)
+        {
+          modulemd_module_stream_v3_add_runtime_requirement (
+            v3_stream,
+            modules[j],
+            modulemd_build_config_get_runtime_requirement_stream (ex_dep,
+                                                                  modules[j]));
+        }
+      g_clear_pointer (&modules, g_strfreev);
+
+      modules = modulemd_build_config_get_buildtime_modules_as_strv (ex_dep);
+      for (guint j = 0; j < g_strv_length (modules); j++)
+        {
+          modulemd_module_stream_v3_add_buildtime_requirement (
+            v3_stream,
+            modules[j],
+            modulemd_build_config_get_buildtime_requirement_stream (
+              ex_dep, modules[j]));
+        }
+      g_clear_pointer (&modules, g_strfreev);
+
+      /* Now copy everything else that's the same for every expansion */
+
+      /* Parent class copy */
+      /* Note: any v2_stream context is overwritten by stream expansion */
+      modulemd_module_stream_set_version (
+        MODULEMD_MODULE_STREAM (v3_stream),
+        modulemd_module_stream_get_version (from));
+      modulemd_module_stream_associate_translation (
+        MODULEMD_MODULE_STREAM (v3_stream),
+        modulemd_module_stream_get_translation (from));
+
+      /* Copy all attributes that are the same as V2 */
+
+      /* Properties */
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, arch);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, buildopts);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, community);
+      STREAM_UPGRADE_IF_SET_WITH_LOCALE (
+        v2, v3, v3_stream, v2_stream, description);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, documentation);
+      STREAM_UPGRADE_IF_SET_WITH_LOCALE (
+        v2, v3, v3_stream, v2_stream, summary);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, tracker);
+
+      /* Internal Data Structures: With replace function */
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, content_licenses);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, module_licenses);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_api);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_artifacts);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_filters);
+
+      /* Internal Data Structures: With add on value */
+      COPY_HASHTABLE_BY_VALUE_ADDER (v3_stream,
+                                     v2_stream,
+                                     rpm_components,
+                                     modulemd_module_stream_v3_add_component);
+      COPY_HASHTABLE_BY_VALUE_ADDER (v3_stream,
+                                     v2_stream,
+                                     module_components,
+                                     modulemd_module_stream_v3_add_component);
+      COPY_HASHTABLE_BY_VALUE_ADDER (
+        v3_stream, v2_stream, profiles, modulemd_module_stream_v3_add_profile);
+
+      /* Note: servicelevels have been dropped in v3 */
+
+      if (v2_stream->xmd != NULL)
+        {
+          modulemd_module_stream_v3_set_xmd (v3_stream, v2_stream->xmd);
+        }
+
+      if (!modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (v3_stream),
+                                            &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+
+      if (!modulemd_module_index_add_module_stream (
+            index, MODULEMD_MODULE_STREAM (v3_stream), &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+
+      g_clear_object (&v3_stream);
+    }
+
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+
+  return g_steal_pointer (&index);
+}
+
+
+static ModulemdModuleStream *
+modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStream *from,
+                                         GError **error)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_auto (GStrv) module_names = NULL;
+  g_autoptr (ModulemdModule) module = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  GPtrArray *module_streams = NULL;
+
+  index = modulemd_module_stream_upgrade_v2_to_v3_ext (from, &nested_error);
+  if (!index)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  module_names = modulemd_module_index_get_module_names_as_strv (index);
+  if (!module_names || g_strv_length (module_names) != 1)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Stream v2 upgrade must return a single module.");
+      return NULL;
+    }
+
+  module = modulemd_module_index_get_module (index, module_names[0]);
+  module_streams = modulemd_module_get_all_streams (module);
+
+  if (module_streams->len != 1)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Stream v2 upgrade must return a single stream.");
+      return NULL;
+    }
+
+  /* return the single stream */
+  return g_ptr_array_index (module_streams, 0);
 }
 
 
@@ -790,7 +1510,7 @@ modulemd_module_stream_validate_components (GHashTable *components,
        */
       if (has_buildafter && has_buildorder)
         {
-          g_set_error (
+          g_set_error_literal (
             error,
             MODULEMD_ERROR,
             MMD_ERROR_VALIDATE,

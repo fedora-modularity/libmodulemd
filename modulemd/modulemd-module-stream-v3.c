@@ -1281,10 +1281,6 @@ modulemd_module_stream_v3_includes_nevra (ModulemdModuleStreamV3 *self,
     self->rpm_artifacts, modulemd_rpm_match, (void *)nevra_pattern);
 }
 
-#ifndef MMD_MAXCONTEXTLEN
-/* TODO: remove this when available elsewhere */
-#define MMD_MAXCONTEXTLEN 10
-#endif
 
 static gboolean
 modulemd_module_stream_v3_validate_context (const gchar *context,

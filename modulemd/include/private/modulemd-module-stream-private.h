@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "modulemd-module-index.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-translation-entry.h"
 #include "modulemd-translation.h"
@@ -381,5 +382,46 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
 gboolean
 modulemd_module_stream_includes_nevra (ModulemdModuleStream *self,
                                        const gchar *nevra_pattern);
+
+
+/**
+ * modulemd_module_stream_expand_v2_to_v3_deps:
+ * @v2_stream: (in): A pointer to a #ModulemdModuleStreamV2 object that is to
+ * have its dependencies expanded.
+ * @error: (out): A #GError that will return the reason for an expansion error.
+ *
+ * Stream V2 #ModulemdDependencies can have multiple streams specified per
+ * dependent buildtime and runtime modules. Stream V3 dependencies can only
+ * have a single stream per module. Additionally, Stream V2 dependencies treated
+ * "platform" the same as any other module dependency, while Stream V3
+ * dependencies have "platform" as a seperate property. This function expands
+ * the Stream V2 dependencies into the different possible combinations and
+ * explicitly sets the "platform".
+ *
+ * Returns: (transfer full): A #GPtrArray of #ModulemdBuildConfig objects
+ * containing the fully stream expanded version of @v2_stream.
+ *
+ * Since: 2.10
+ */
+GPtrArray *
+modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
+                                             GError **error);
+
+/**
+ * modulemd_module_stream_expand_v2_to_v3_ext:
+ * @from: (in): A pointer to a #ModulemdModuleStream object (must be StreamV2)
+ * that is to be upgraded to StreamV3.
+ * @error: (out): A #GError that will return the reason for an expansion error.
+ *
+ * TODO: document this
+ *
+ * Returns: (transfer full): A #ModulemdModuleIndex containing #StreamV3
+ * objects.
+ *
+ * Since: 2.10
+ */
+ModulemdModuleIndex *
+modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
+                                             GError **error);
 
 G_END_DECLS

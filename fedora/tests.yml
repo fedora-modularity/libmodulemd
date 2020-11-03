@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  tags:
+    - classic
+  roles:
+  - role: standard-test-source
+
+- hosts: localhost
+  tags:
+    - classic
+  tasks:
+  - name: Make sure fedpkg and selinux bindings are installed
+    shell: dnf -y install fedpkg python{2,3}-libselinux libmodulemd-devel --skip-broken
+  - name: Copy spec file to remote machine
+    copy:
+      src: "{{ playbook_dir }}/../libmodulemd.spec"
+      dest: /tmp/libmodulemd.spec
+  - name: Install build deps
+    shell: dnf -y build-dep /tmp/libmodulemd.spec
+
+- hosts: localhost
+  tags:
+    - classic
+  roles:
+  - role: standard-test-basic
+    tests:
+    - build:
+        dir: .
+        run: meson -Dtest_installed_lib=true -Ddeveloper_build=false source
+    - unittests:
+        dir: .
+        run: ninja test

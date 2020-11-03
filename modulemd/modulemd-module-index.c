@@ -538,6 +538,15 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
               return FALSE;
             }
         }
+      else if (modulemd_module_stream_get_mdversion (stream) ==
+               MD_MODULESTREAM_VERSION_THREE)
+        {
+          if (!modulemd_module_stream_v3_emit_yaml (
+                MODULEMD_MODULE_STREAM_V3 (stream), emitter, error))
+            {
+              return FALSE;
+            }
+        }
       else
         {
           g_set_error_literal (error,

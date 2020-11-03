@@ -304,6 +304,38 @@ profile_test_copy (void)
   g_clear_pointer (&rpms, g_strfreev);
   g_clear_object (&p);
   g_clear_object (&p_copy);
+
+  /* Test copying profile with default set */
+  p = modulemd_profile_new ("testprofile");
+  modulemd_profile_set_default (p);
+  g_assert_nonnull (p);
+  g_assert_true (MODULEMD_IS_PROFILE (p));
+  g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
+  g_assert_true (modulemd_profile_is_default (p));
+
+  p_copy = modulemd_profile_copy (p);
+  g_assert_nonnull (p_copy);
+  g_assert_true (MODULEMD_IS_PROFILE (p_copy));
+  g_assert_cmpstr (modulemd_profile_get_name (p_copy), ==, "testprofile");
+  g_assert_true (modulemd_profile_is_default (p_copy));
+  g_clear_object (&p);
+  g_clear_object (&p_copy);
+
+  /* Test copying profile with default unset */
+  p = modulemd_profile_new ("testprofile");
+  modulemd_profile_unset_default (p);
+  g_assert_nonnull (p);
+  g_assert_true (MODULEMD_IS_PROFILE (p));
+  g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
+  g_assert_false (modulemd_profile_is_default (p));
+
+  p_copy = modulemd_profile_copy (p);
+  g_assert_nonnull (p_copy);
+  g_assert_true (MODULEMD_IS_PROFILE (p_copy));
+  g_assert_cmpstr (modulemd_profile_get_name (p_copy), ==, "testprofile");
+  g_assert_false (modulemd_profile_is_default (p_copy));
+  g_clear_object (&p);
+  g_clear_object (&p_copy);
 }
 
 
@@ -477,6 +509,7 @@ profile_test_emit_yaml (void)
   modulemd_profile_add_rpm (p, "test2");
   modulemd_profile_add_rpm (p, "test3");
   modulemd_profile_add_rpm (p, "test1");
+  modulemd_profile_set_default (p);
 
   g_assert_true (mmd_emitter_start_stream (&emitter, &error));
   g_assert_true (mmd_emitter_start_document (&emitter, &error));
@@ -495,6 +528,7 @@ profile_test_emit_yaml (void)
                    "  - test1\n"
                    "  - test2\n"
                    "  - test3\n"
+                   "  default: true\n"
                    "...\n");
 }
 

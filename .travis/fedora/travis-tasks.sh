@@ -67,29 +67,24 @@ fi
 # Always install and run the installed RPM tests last so we don't pollute the
 # testing environment above.
 
-meson --buildtype=debug \
-      $COMMON_MESON_ARGS \
-      build_rpm
-
-pushd build_rpm
-
-ninja
-./make_rpms.sh
-
-createrepo_c rpmbuild/RPMS/
+arch=$(uname -m)
+mkdir -p rpmbuild/RPMS/
+pushd rpmbuild/RPMS/
+packit local-build ../..
+createrepo_c $arch
 
 $RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
-               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
-               python3-libmodulemd \
-               "libmodulemd-devel > 2"
+               --repofrompath libmodulemd-travis,$arch \
+               $arch/python3-libmodulemd*.rpm \
+               $arch/libmodulemd-devel*.rpm
 
 # Also install the python2-libmodulemd if it was built for this release
 # the ||: at the end instructs bash to consider this a pass either way.
 $RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
-               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
-               python2-libmodulemd ||:
+               --repofrompath libmodulemd-travis,$arch \
+               $arch/python2-libmodulemd*.rpm ||:
 popd #build_rpm
 
 meson --buildtype=debug \

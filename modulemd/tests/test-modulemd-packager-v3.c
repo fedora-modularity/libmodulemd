@@ -354,6 +354,98 @@ packager_test_map_to_stream_v3 (void)
   g_clear_pointer (&expected_str, g_free);
 }
 
+static void
+packager_test_read_to_index (void)
+{
+  gboolean ret;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autofree gchar *yaml_str = NULL;
+  g_autofree gchar *expected_path = NULL;
+  g_autofree gchar *expected_str = NULL;
+
+  index = modulemd_module_index_new ();
+
+  /* The modulemd-packager v3 definition */
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (ret);
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  g_assert_cmpint (MD_MODULESTREAM_VERSION_TWO,
+                   ==,
+                   modulemd_module_index_get_stream_mdversion (index));
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (yaml_str);
+
+  g_debug ("packager_test_read_to_index() dump of v2 index:\n%s", yaml_str);
+
+  /* the index should contain the packager v2 document converted to stream v2 */
+  expected_path = g_strdup_printf ("%s/upgrades/packager_v3_to_stream_v2.yaml",
+                                   g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (expected_path);
+  g_assert_true (
+    g_file_get_contents (expected_path, &expected_str, NULL, &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (expected_str);
+  g_clear_pointer (&expected_path, g_free);
+
+  g_assert_cmpstr (expected_str, ==, yaml_str);
+
+  g_clear_object (&index);
+  g_clear_pointer (&yaml_str, g_free);
+  g_clear_pointer (&expected_str, g_free);
+
+  /* create new empty index and immediately upgrade it to modulemd v3 */
+  index = modulemd_module_index_new ();
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_THREE, &error);
+  g_assert_true (ret);
+  g_assert_no_error (error);
+
+  /* The modulemd-packager v3 definition */
+  yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  g_assert_true (ret);
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (yaml_str);
+
+  g_debug ("packager_test_read_to_index() dump of v3 index:\n%s", yaml_str);
+
+  /* the index should contain the packager v2 document converted to stream v3 */
+  expected_path = g_strdup_printf ("%s/upgrades/packager_v3_to_stream_v3.yaml",
+                                   g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (expected_path);
+  g_assert_true (
+    g_file_get_contents (expected_path, &expected_str, NULL, &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (expected_str);
+  g_clear_pointer (&expected_path, g_free);
+
+  g_assert_cmpstr (expected_str, ==, yaml_str);
+
+  g_clear_object (&index);
+  g_clear_pointer (&yaml_str, g_free);
+  g_clear_pointer (&expected_str, g_free);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -377,6 +469,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/packager/to_stream_v3",
                    packager_test_map_to_stream_v3);
+
+  g_test_add_func ("/modulemd/v2/packager/index/read",
+                   packager_test_read_to_index);
 
   return g_test_run ();
 }

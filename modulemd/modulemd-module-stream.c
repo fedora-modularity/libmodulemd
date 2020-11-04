@@ -19,6 +19,8 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-module-stream-v3-private.h"
+#include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -166,6 +168,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  g_autoptr (ModulemdPackagerV3) packager_v3 = NULL;
   ModulemdYamlDocumentTypeEnum doctype;
   const GError *gerror = NULL;
 
@@ -259,18 +262,35 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
     case MD_MODULESTREAM_VERSION_THREE:
       if (doctype == MODULEMD_YAML_DOC_PACKAGER)
         {
-          g_set_error (error,
-                       MODULEMD_YAML_ERROR,
-                       MMD_YAML_ERROR_PROGRAMMING,
-                       "Incorrect function to parse modulemd-packager v3");
-          return NULL;
+          packager_v3 =
+            modulemd_packager_v3_parse_yaml (subdoc, &nested_error);
+          if (!packager_v3)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+
+          /* convert packager v3 to stream v2 for backwards compatibility */
+          stream = MODULEMD_MODULE_STREAM (
+            modulemd_packager_v3_to_stream_v2 (packager_v3, &nested_error));
+          if (!stream)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+
+          g_clear_object (&packager_v3);
         }
-      stream = MODULEMD_MODULE_STREAM (
-        modulemd_module_stream_v3_parse_yaml (subdoc, strict, &nested_error));
-      if (!stream)
+      else
         {
-          g_propagate_error (error, g_steal_pointer (&nested_error));
-          return NULL;
+          stream =
+            MODULEMD_MODULE_STREAM (modulemd_module_stream_v3_parse_yaml (
+              subdoc, strict, &nested_error));
+          if (!stream)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
         }
       break;
 

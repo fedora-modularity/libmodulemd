@@ -532,6 +532,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
                                 GError **error)
 {
+  /* TODO: deprecate? */
   g_autoptr (ModulemdModuleStream) current_stream = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
   g_autoptr (GError) nested_error = NULL;
@@ -615,6 +616,20 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
     }
 
   return g_steal_pointer (&current_stream);
+}
+
+ModulemdModuleIndex *
+modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
+                                    guint64 mdversion,
+                                    GError **error)
+{
+  /* TODO: implement */
+  g_set_error (
+    error,
+    MODULEMD_ERROR,
+    MMD_ERROR_UPGRADE,
+    "modulemd_module_stream_upgrade_ext() has not yet been implemented");
+  return NULL;
 }
 
 

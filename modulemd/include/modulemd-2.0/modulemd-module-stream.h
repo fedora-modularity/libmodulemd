@@ -39,6 +39,9 @@ G_BEGIN_DECLS
  */
 #define MMD_MAXCONTEXTLEN 10
 
+/* Forward declarations */
+typedef struct _ModulemdModuleIndex ModulemdModuleIndex;
+
 /**
  * ModulemdModuleStreamVersionEnum:
  * @MD_MODULESTREAM_VERSION_ERROR: Represents an error handling module stream
@@ -275,6 +278,25 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
                                 GError **error);
 
+/**
+ * modulemd_module_stream_upgrade_ext:
+ * @self: (in): This #ModulemdModuleStream object.
+ * @mdversion: (in): The metadata version to upgrade to. If zero, upgrades to
+ * the highest-supported version.
+ * @error: (out): A #GError that will return the reason for an upgrade error.
+ *
+ * Return an upgraded copy of this object. Does not modify the original.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing a
+ * copy of this object upgraded to the requested version. Returns NULL and sets
+ * @error appropriately if the upgrade could not be completed automatically.
+ *
+ * Since: 2.10
+ */
+ModulemdModuleIndex *
+modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
+                                    guint64 mdversion,
+                                    GError **error);
 
 /**
  * modulemd_module_stream_validate:

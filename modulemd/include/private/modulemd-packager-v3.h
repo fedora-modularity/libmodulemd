@@ -721,16 +721,25 @@ modulemd_packager_v3_get_rpm_component (ModulemdPackagerV3 *self,
 /**
  * modulemd_packager_v3_to_defaults:
  * @self: (in): This #ModulemdPackagerV3 object.
+ * @defaults_ptr: (out): (transfer-full): A pointer to a pointer to a new
+ * #ModulemdDefaults object. Must be a valid pointer to a NULL object when
+ * called.
  * @error: (out): A #GError that will return the reason for a conversion error.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdDefaults object
+ * Sets @defaults_ptr to point to a newly-allocated #ModulemdDefaults object
  * corresponding to the #ModulemdPackagerV3 object @self if @self contains any
- * profiles marked as default. NULL if no default profiles.
+ * profiles marked as default. Leaves @defaults_ptr pointing to NULL if @self
+ * contained no default profiles.
+ *
+ * Returns: TRUE if the conversion succeeded, including the case where there
+ * @self contains no default profiles. FALSE otherwise and @error will be set.
  *
  * Since: 2.10
  */
-ModulemdDefaults *
-modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self, GError **error);
+gboolean
+modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self,
+                                  ModulemdDefaults **defaults,
+                                  GError **error);
 
 /**
  * modulemd_packager_v3_to_stream_v2:
@@ -751,9 +760,14 @@ modulemd_packager_v3_to_stream_v2 (ModulemdPackagerV3 *self, GError **error);
  * @self: (in): This #ModulemdPackagerV3 object.
  * @error: (out): A #GError that will return the reason for a conversion error.
  *
+ * Note: If buildopts (#ModulemdBuildopts) are in use in one or more build
+ * configurations in the #ModulemdPackagerV3 object @self, only the buildopts
+ * present in the first listed configuration (if any) will be applied to the
+ * #ModulemdModuleStreamV2 object in the returned index.
+ *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
  * containing a #ModulemdModuleStreamV2 object and possibly a
- * #ModulemdDefaultsV1 object corresponding to the #ModulemdPackagerV3 object
+ * #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
  * @self. NULL if there was an error doing the mapping and sets @error
  * appropriately.
  *
@@ -787,7 +801,7 @@ modulemd_packager_v3_to_stream_v3 (ModulemdPackagerV3 *self, GError **error);
  *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
  * containing one or more #ModulemdModuleStreamV3 objects and possibly a
- * #ModulemdDefaultsV1 object corresponding to the #ModulemdPackagerV3 object
+ * #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
  * @self. NULL if there was an error doing the mapping and sets @error
  * appropriately.
  *

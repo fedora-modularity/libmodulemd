@@ -739,8 +739,10 @@ modulemd_packager_v3_get_rpm_component (ModulemdPackagerV3 *self,
 }
 
 
-ModulemdDefaults *
-modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self, GError **error)
+gboolean
+modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self,
+                                  ModulemdDefaults **defaults_ptr,
+                                  GError **error)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
   ModulemdProfile *profile;
@@ -748,8 +750,9 @@ modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self, GError **error)
   GHashTableIter iter;
   gpointer value;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (MODULEMD_IS_PACKAGER_V3 (self), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (defaults_ptr == NULL || *defaults_ptr == NULL, FALSE);
+  g_return_val_if_fail (MODULEMD_IS_PACKAGER_V3 (self), FALSE);
 
   g_hash_table_iter_init (&iter, self->profiles);
   while (g_hash_table_iter_next (&iter, NULL, &value))
@@ -769,21 +772,20 @@ modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self, GError **error)
         }
     }
 
-  if (defaults)
+  if (!defaults)
     {
-      if (!modulemd_defaults_validate (MODULEMD_DEFAULTS (defaults),
-                                       &nested_error))
-        {
-          g_propagate_error (error, g_steal_pointer (&nested_error));
-          return NULL;
-        }
+      return TRUE;
+    }
 
-      return MODULEMD_DEFAULTS (g_steal_pointer (&defaults));
-    }
-  else
+  if (!modulemd_defaults_validate (MODULEMD_DEFAULTS (defaults),
+                                   &nested_error))
     {
-      return NULL;
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
     }
+
+  *defaults_ptr = MODULEMD_DEFAULTS (g_steal_pointer (&defaults));
+  return TRUE;
 }
 
 ModulemdModuleStreamV2 *
@@ -950,8 +952,7 @@ modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
 
   g_clear_object (&v2_stream);
 
-  defaults = modulemd_packager_v3_to_defaults (self, &nested_error);
-  if (nested_error)
+  if (!modulemd_packager_v3_to_defaults (self, &defaults, &nested_error))
     {
       g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;
@@ -1006,10 +1007,11 @@ modulemd_packager_v3_to_stream_v3 (ModulemdPackagerV3 *self, GError **error)
 
   if (module_streams->len != 1)
     {
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MMD_ERROR_UPGRADE,
-                           "Stream v2 upgrade must return a single stream.");
+      g_set_error_literal (
+        error,
+        MODULEMD_ERROR,
+        MMD_ERROR_UPGRADE,
+        "PackagerV3 to StreamV3 must return a single stream.");
       return NULL;
     }
 
@@ -1160,8 +1162,7 @@ modulemd_packager_v3_to_stream_v3_ext (ModulemdPackagerV3 *self,
       g_clear_object (&v3_stream);
     }
 
-  defaults = modulemd_packager_v3_to_defaults (self, &nested_error);
-  if (nested_error)
+  if (!modulemd_packager_v3_to_defaults (self, &defaults, &nested_error))
     {
       g_propagate_error (error, g_steal_pointer (&nested_error));
       return NULL;

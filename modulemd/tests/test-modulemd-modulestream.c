@@ -954,9 +954,8 @@ module_stream_test_upgrade_v2_to_v3 (void)
   g_assert_nonnull (stream);
 
   streamV2 = MODULEMD_MODULE_STREAM_V2 (stream);
-  g_assert_nonnull (streamV2);
 
-  index = modulemd_module_stream_upgrade_v2_to_v3_ext (stream, &error);
+  index = modulemd_module_stream_upgrade_v2_to_v3_ext (streamV2, &error);
   g_assert_no_error (error);
   g_assert_nonnull (index);
 

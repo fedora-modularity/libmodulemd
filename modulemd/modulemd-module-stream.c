@@ -524,7 +524,7 @@ static ModulemdModuleStream *
 modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from);
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStream *from,
+modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStreamV2 *from,
                                          GError **error);
 
 ModulemdModuleStream *
@@ -588,7 +588,7 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
         case 2:
           /* Upgrade from ModuleStreamV2 to ModuleStreamV3 */
           updated_stream = modulemd_module_stream_upgrade_v2_to_v3 (
-            current_stream, &nested_error);
+            MODULEMD_MODULE_STREAM_V2 (current_stream), &nested_error);
           if (!updated_stream)
             {
               g_propagate_prefixed_error (error,
@@ -1241,10 +1241,9 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
 
 
 ModulemdModuleIndex *
-modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
+modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStreamV2 *from,
                                              GError **error)
 {
-  ModulemdModuleStreamV2 *v2_stream = NULL;
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStreamV3) v3_stream = NULL;
   g_autoptr (GError) nested_error = NULL;
@@ -1254,10 +1253,9 @@ modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (from), NULL);
-  v2_stream = MODULEMD_MODULE_STREAM_V2 (from);
 
   expanded_deps =
-    modulemd_module_stream_expand_v2_to_v3_deps (v2_stream, &nested_error);
+    modulemd_module_stream_expand_v2_to_v3_deps (from, &nested_error);
   if (!expanded_deps)
     {
       g_propagate_prefixed_error (
@@ -1276,8 +1274,9 @@ modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
       ex_dep = (ModulemdBuildConfig *)g_ptr_array_index (expanded_deps, i);
 
       v3_stream = modulemd_module_stream_v3_new (
-        modulemd_module_stream_get_module_name (from),
-        modulemd_module_stream_get_stream_name (from));
+        modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (from)),
+        modulemd_module_stream_get_stream_name (
+          MODULEMD_MODULE_STREAM (from)));
 
       /* copy in expanded context, platform, runtime_deps, buildtime_deps */
       modulemd_module_stream_set_context (
@@ -1311,51 +1310,50 @@ modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
       /* Now copy everything else that's the same for every expansion */
 
       /* Parent class copy */
-      /* Note: any v2_stream context is overwritten by stream expansion */
+      /* Note: context is handled stream expansion so not copied here */
       modulemd_module_stream_set_version (
         MODULEMD_MODULE_STREAM (v3_stream),
-        modulemd_module_stream_get_version (from));
+        modulemd_module_stream_get_version (MODULEMD_MODULE_STREAM (from)));
       modulemd_module_stream_associate_translation (
         MODULEMD_MODULE_STREAM (v3_stream),
-        modulemd_module_stream_get_translation (from));
+        modulemd_module_stream_get_translation (
+          MODULEMD_MODULE_STREAM (from)));
 
       /* Copy all attributes that are the same as V2 */
 
       /* Properties */
-      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, arch);
-      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, buildopts);
-      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, community);
-      STREAM_UPGRADE_IF_SET_WITH_LOCALE (
-        v2, v3, v3_stream, v2_stream, description);
-      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, documentation);
-      STREAM_UPGRADE_IF_SET_WITH_LOCALE (
-        v2, v3, v3_stream, v2_stream, summary);
-      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, v2_stream, tracker);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, from, arch);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, from, buildopts);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, from, community);
+      STREAM_UPGRADE_IF_SET_WITH_LOCALE (v2, v3, v3_stream, from, description);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, from, documentation);
+      STREAM_UPGRADE_IF_SET_WITH_LOCALE (v2, v3, v3_stream, from, summary);
+      STREAM_UPGRADE_IF_SET (v2, v3, v3_stream, from, tracker);
 
       /* Internal Data Structures: With replace function */
-      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, content_licenses);
-      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, module_licenses);
-      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_api);
-      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_artifacts);
-      STREAM_REPLACE_HASHTABLE (v3, v3_stream, v2_stream, rpm_filters);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, from, content_licenses);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, from, module_licenses);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, from, rpm_api);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, from, rpm_artifacts);
+      STREAM_REPLACE_HASHTABLE (v3, v3_stream, from, rpm_filters);
 
       /* Internal Data Structures: With add on value */
       COPY_HASHTABLE_BY_VALUE_ADDER (v3_stream,
-                                     v2_stream,
+                                     from,
                                      rpm_components,
                                      modulemd_module_stream_v3_add_component);
       COPY_HASHTABLE_BY_VALUE_ADDER (v3_stream,
-                                     v2_stream,
+                                     from,
                                      module_components,
                                      modulemd_module_stream_v3_add_component);
       COPY_HASHTABLE_BY_VALUE_ADDER (
-        v3_stream, v2_stream, profiles, modulemd_module_stream_v3_add_profile);
+        v3_stream, from, profiles, modulemd_module_stream_v3_add_profile);
 
       /* Note: servicelevels have been dropped in v3 */
 
-      if (v2_stream->xmd != NULL)
+      if (from->xmd != NULL)
         {
-          modulemd_module_stream_v3_set_xmd (v3_stream, v2_stream->xmd);
+          modulemd_module_stream_v3_set_xmd (v3_stream, from->xmd);
         }
 
       if (!modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (v3_stream),
@@ -1382,7 +1380,7 @@ modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
 
 
 static ModulemdModuleStream *
-modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStream *from,
+modulemd_module_stream_upgrade_v2_to_v3 (ModulemdModuleStreamV2 *from,
                                          GError **error)
 {
   g_autoptr (ModulemdModuleIndex) index = NULL;

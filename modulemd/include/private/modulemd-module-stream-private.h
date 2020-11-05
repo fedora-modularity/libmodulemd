@@ -421,7 +421,7 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
  * Since: 2.10
  */
 ModulemdModuleIndex *
-modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStream *from,
+modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStreamV2 *from,
                                              GError **error);
 
 G_END_DECLS

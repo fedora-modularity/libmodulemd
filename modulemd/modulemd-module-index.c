@@ -21,6 +21,7 @@
 #include <rpm/rpmio.h>
 #endif
 
+#include "modulemd.h"
 #include "modulemd-compression.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-index.h"
@@ -117,6 +118,7 @@ modulemd_module_index_init (ModulemdModuleIndex *self)
 {
   self->modules =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  self->stream_mdversion = modulemd_get_default_stream_mdversion ();
 }
 
 

@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "modulemd.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
@@ -270,13 +271,31 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
               return NULL;
             }
 
-          /* convert packager v3 to stream v2 for backwards compatibility */
-          stream = MODULEMD_MODULE_STREAM (
-            modulemd_packager_v3_to_stream_v2 (packager_v3, &nested_error));
-          if (!stream)
+          if (modulemd_get_default_stream_mdversion () <=
+              MD_MODULESTREAM_VERSION_TWO)
             {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return NULL;
+              stream =
+                MODULEMD_MODULE_STREAM (modulemd_packager_v3_to_stream_v2 (
+                  packager_v3, &nested_error));
+              if (!stream)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+            }
+          else
+            {
+              /* Note: this will fail if the packager v3 contains multiple build
+               * configurations which causes it to expand to multiple
+               * stream v3s */
+              stream =
+                MODULEMD_MODULE_STREAM (modulemd_packager_v3_to_stream_v3 (
+                  packager_v3, &nested_error));
+              if (!stream)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
             }
 
           g_clear_object (&packager_v3);

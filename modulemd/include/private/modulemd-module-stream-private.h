@@ -390,13 +390,20 @@ modulemd_module_stream_includes_nevra (ModulemdModuleStream *self,
  * have its dependencies expanded.
  * @error: (out): A #GError that will return the reason for an expansion error.
  *
- * Stream V2 #ModulemdDependencies can have multiple streams specified per
- * dependent buildtime and runtime modules. Stream V3 dependencies can only
- * have a single stream per module. Additionally, Stream V2 dependencies treated
+ * Stream V2 dependencies can be a list of #ModulemdDependencies, each of which
+ * consists of a list of buildtime and runtime modules, each of which can have
+ * multiple streams specified. Stream V3 dependencies are much simpler compared
+ * to Stream V2, and have just a single list of buildtime modules and single
+ * list of runtime modules. Additionally, each dependent module in Stream V3 can
+ * specify only a single stream. Furthermore, Stream V2 dependencies treated
  * "platform" the same as any other module dependency, while Stream V3
- * dependencies have "platform" as a seperate property. This function expands
- * the Stream V2 dependencies into the different possible combinations and
- * explicitly sets the "platform".
+ * dependencies have "platform" as a seperate property.
+ *
+ * This function takes the Stream V2 dependencies and expands them into a
+ * #GPtrArray of #ModulemdBuildConfig objects representing the flattened
+ * combinations of module:stream dependencies, explicitly extracting
+ * "platform" from the list of dependent modules and using it to set the
+ * seperate "platform" property.
  *
  * Returns: (transfer full): A #GPtrArray of #ModulemdBuildConfig objects
  * containing the fully stream expanded version of @v2_stream.

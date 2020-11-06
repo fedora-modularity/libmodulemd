@@ -744,6 +744,25 @@ modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from)
  * @deps and the set of previously calculated module:stream dependencies in
  * @expanded_deps. The product is stored back to @expanded_deps.
  *
+ * BACKGROUND:
+ * Stream V2 dependencies can be a list of #ModulemdDependencies, each of which
+ * consists of a list of buildtime and runtime modules, each of which can have
+ * multiple streams specified. Stream V3 dependencies are much simpler compared
+ * to Stream V2, and have just a single list of buildtime modules and single
+ * list of runtime modules.
+ *
+ * This function takes @deps, which is a Stream V2 #ModulemdDependencies object,
+ * looks at the buildtime dependencies (if @is_buildtime is TRUE) or runtime
+ * dependencies (if @is_buildtime is FALSE), and iteratively builds up the
+ * Cartesian product of each combination of module:stream in the dependencies
+ * and the previously calculated module:stream combinations currently stored in
+ * @expanded_deps. The interim product is stored back to @expanded_deps at the
+ * end of the iteration for each module in the dependencies.
+ *
+ * Note: This function is called twice in succession for each of a Stream V2's
+ * #ModulemdDependencies. Once with the buildtime dependencies module list and
+ * again with the runtime dependencies module list.
+ *
  * Returns: TRUE if expansion succeeded, FALSE otherwise.
  */
 
@@ -765,6 +784,10 @@ stream_expansion_helper (ModulemdDependencies *deps,
   gchar *stream;
   const gchar *which;
 
+  /*
+   * Buildtime and runtime dependencies are handled the same, they just have different
+   * getter/setter routines.
+   */
   if (is_buildtime)
     {
       which = "buildtime";
@@ -784,10 +807,18 @@ stream_expansion_helper (ModulemdDependencies *deps,
 
   g_debug ("Expansion: stream_expansion_helper (%s) called", which);
 
-  /* for each module... */
+  /*
+   * Loop through each module in the Stream V2's #ModulemdDependencies
+   * buildtime/runtime module list...
+   */
   for (guint i = 0; i < g_strv_length (module_list); i++)
     {
       module = module_list[i];
+
+      /*
+       * Fetch the list of stream names from the dependencies for the current
+       * module.
+       */
       streams = (*dependencies_get_streams_as_strv) (deps, module);
 
       g_debug ("Expansion: module %s dependency %s has %d streams",
@@ -795,6 +826,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
                module,
                g_strv_length (streams));
 
+      /*
+       * If a module is present in the dependency list but has no associated
+       * streams (which corresponds to "modulename: []" in the spec), the
+       * intention is to expand the list to be all active existing streams for
+       * the module. Unfortunately, that is something only the Module Build
+       * Service can do, so we must fail the stream expansion.
+       */
       if (g_strv_length (streams) == 0)
         {
           g_set_error (error,
@@ -807,9 +845,15 @@ stream_expansion_helper (ModulemdDependencies *deps,
           return FALSE;
         }
 
+      /* Create a new #GPtrArray to capture the results of the stream expansion. */
       new_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
 
-      /* for each module stream... */
+      /*
+       * We now loop through each stream of the current module, iteratively
+       * building up the Cartesian product of each module:stream combination
+       * and the previous iterations of module:stream combinations currently
+       * present in expanded_deps.
+       */
       for (guint j = 0; j < g_strv_length (streams); j++)
         {
           stream = streams[j];
@@ -818,6 +862,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
                    module,
                    stream);
 
+          /*
+           * If a stream name begins with a '-' sign (which corresponds to
+           * "modulename: [-streamname]" in the spec), the intention is to
+           * exclude this stream from the list of all active streams for this
+           * module. Unfortunately, that is something only the Module Build
+           * Service can do, so we must fail the stream expansion.
+           */
           if (stream[0] == '-')
             {
               g_set_error (error,
@@ -831,7 +882,11 @@ stream_expansion_helper (ModulemdDependencies *deps,
               return FALSE;
             }
 
-          /* if no expanded dependencies yet, just create a new dep for this module and stream */
+          /*
+           * If the expanded_deps list is still empty, create a new
+           * #ModulemdBuildConfig object and add this module:stream to it, and
+           * add it to new_expanded_deps.
+           */
           if ((*expanded_deps)->len == 0)
             {
               g_debug ("Expansion: creating new dependency");
@@ -840,7 +895,11 @@ stream_expansion_helper (ModulemdDependencies *deps,
               (*build_config_add_requirement) (new_dep, module, stream);
               g_ptr_array_add (new_expanded_deps, g_steal_pointer (&new_dep));
             }
-          /* otherwise, expand on what we already have */
+          /*
+           * If the expanded_deps list is not empty, create a copy of existing
+           * #ModulemdBuildConfig object in expanded_deps, add this
+           * module:stream to the copy, and add it to new_expanded_deps.
+           */
           else
             {
               /* for every expanded dependency we have so far... */
@@ -860,6 +919,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
 
       g_clear_pointer (&streams, g_strfreev);
 
+      /*
+       * After going through every stream for the current module and creating
+       * creating the next iteration of the partial Cartesian product in
+       * new_expanded_deps, free up the previous partial product in expanded_deps
+       * and replace it with new_expanded_deps before moving on to the next
+       * module in the dependency list.
+       */
       if (new_expanded_deps->len > 0)
         {
           g_debug (
@@ -871,6 +937,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
         }
 
     } /* for each module... */
+
+  /*
+   * After going through each module, expanded_deps will have the latest set
+   * of expanded dependencies--but it may not be complete yet since this
+   * function is called twice in succession for both the buildtime and runtime
+   * dependencies module lists.
+   */
 
   return TRUE;
 }
@@ -1133,9 +1206,13 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
 
   g_debug ("Expansion: beginning v2 to v3 stream dependency expansion");
 
+  /*
+   * Create a #GPtrArray to capture the combined results of the stream
+   * expansions for each set of dependencies.
+   */
   all_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
 
-  /* iterate through all of the V2 stream dependencies */
+  /* iterate through each of the StreamV2's #ModulemdDependencies */
   for (guint i = 0; i < v2_stream->dependencies->len; i++)
     {
       g_debug ("Expansion: expanding stream v2 dependency #%d", i + 1);
@@ -1143,6 +1220,7 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
       v2_deps =
         MODULEMD_DEPENDENCIES (g_ptr_array_index (v2_stream->dependencies, i));
 
+      /* get the lists of both buildtime and runtime dependency module names */
       buildtime_modules =
         modulemd_dependencies_get_buildtime_modules_as_strv (v2_deps);
       runtime_modules =
@@ -1152,6 +1230,11 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
                g_strv_length (buildtime_modules),
                g_strv_length (runtime_modules));
 
+      /*
+       * If the ModulemdDependencies has no dependencies, we can't convert to
+       * StreamV3 since, at the very least, we won't know which platform it
+       * should be.
+       */
       if (g_strv_length (buildtime_modules) == 0 &&
           g_strv_length (runtime_modules) == 0)
         {
@@ -1162,7 +1245,10 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
           return NULL;
         }
 
-
+      /*
+       * Explicitly check if ModulemdDependencies contains a "platform" module
+       * dependency, else we can't convert to StreamV3.
+       */
       if (!g_strv_contains ((const gchar *const *)buildtime_modules,
                             "platform") &&
           !g_strv_contains ((const gchar *const *)runtime_modules, "platform"))
@@ -1174,8 +1260,16 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
           return NULL;
         }
 
+      /*
+       * Create a #GPtrArray to capture the stream expansions for the current
+       * StreamV2 #ModulemdDependencies.
+       */
       expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
 
+      /*
+       * Create the initial partial Cartesian product for the modular buildtime
+       * dependencies.
+       */
       if (!stream_expansion_helper (
             v2_deps, TRUE, buildtime_modules, &expanded_deps, &nested_error))
         {
@@ -1186,6 +1280,9 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
           return NULL;
         }
 
+      /*
+       * Complete the Cartesian product with the modular runtime dependencies.
+       */
       if (!stream_expansion_helper (
             v2_deps, FALSE, runtime_modules, &expanded_deps, &nested_error))
         {
@@ -1196,6 +1293,9 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
           return NULL;
         }
 
+      /*
+       * Next, resolve the "platform" for each stream expanded dependency.
+       */
       if (!stream_expansion_resolve_platform (&expanded_deps, &nested_error))
         {
           g_propagate_prefixed_error (
@@ -1209,6 +1309,11 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
                i + 1,
                expanded_deps->len);
 
+      /*
+       * Add the results from expanding the current StreamV2's
+       * #ModulemdDependencies to the combined results all_expanded_deps while
+       * clearing expanded_deps for the next iteration.
+       */
       g_ptr_array_extend_and_steal (all_expanded_deps, expanded_deps);
       expanded_deps = NULL;
 
@@ -1216,6 +1321,10 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
       g_clear_pointer (&runtime_modules, g_strfreev);
     } /* iterate through all of the V2 stream dependencies */
 
+  /*
+   * Eliminate any duplicate entries from the combined expanded dependencies
+   * from all of StreamV2's #ModulemdDependencies.
+   */
   if (!stream_expansion_dedup (&all_expanded_deps, &nested_error))
     {
       g_propagate_prefixed_error (
@@ -1225,6 +1334,10 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
       return NULL;
     }
 
+  /*
+   * Finally, assign unique contexts to each of the expanded dependencies so
+   * the StreamV3 conversion can be completed.
+   */
   if (!stream_expansion_gen_contexts (
         v2_stream, all_expanded_deps, &nested_error))
     {

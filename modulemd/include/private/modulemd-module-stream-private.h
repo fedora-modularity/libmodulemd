@@ -406,7 +406,8 @@ modulemd_module_stream_includes_nevra (ModulemdModuleStream *self,
  * seperate "platform" property.
  *
  * Returns: (transfer full): A #GPtrArray of #ModulemdBuildConfig objects
- * containing the fully stream expanded version of @v2_stream.
+ * containing the fully stream expanded version of @v2_stream, else NULL
+ * if an error occurred and @error will be set accordingly.
  *
  * Since: 2.10
  */
@@ -415,19 +416,24 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
                                              GError **error);
 
 /**
- * modulemd_module_stream_expand_v2_to_v3_ext:
- * @from: (in): A pointer to a #ModulemdModuleStream object (must be StreamV2)
- * that is to be upgraded to StreamV3.
+ * modulemd_module_stream_upgrade_v2_to_v3_ext:
+ * @from: (in): A pointer to a #ModulemdModuleStream object (must be
+ * #ModulemdModuleStreamV2) that is to be upgraded to #ModulemdModuleStreamV3.
  * @error: (out): A #GError that will return the reason for an expansion error.
  *
- * TODO: document this
+ * This function takes @v2_stream and maps it into one or more
+ * #ModulemdModuleStreamV3 objects representing the flattened combinations of
+ * module:stream dependencies found in the #ModulemdModuleStreamV2 object,
+ * along with explicitly setting the "platform" property. These
+ * #ModulemdModuleStreamV3 objects are bundled together in a #ModulemdModule
+ * object that is returned to the caller.
  *
- * Returns: (transfer full): A #ModulemdModuleIndex containing #StreamV3
- * objects.
+ * Returns: (transfer full): A #ModulemdModule containing one or more #StreamV3
+ * objects, else NULL if an error occured and @error will be set accordingly.
  *
  * Since: 2.10
  */
-ModulemdModuleIndex *
+ModulemdModule *
 modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStreamV2 *from,
                                              GError **error);
 

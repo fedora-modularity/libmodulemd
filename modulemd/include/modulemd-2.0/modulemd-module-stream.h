@@ -40,7 +40,7 @@ G_BEGIN_DECLS
 #define MMD_MAXCONTEXTLEN 10
 
 /* Forward declarations */
-typedef struct _ModulemdModuleIndex ModulemdModuleIndex;
+typedef struct _ModulemdModule ModulemdModule;
 
 /**
  * ModulemdModuleStreamVersionEnum:
@@ -273,6 +273,8 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
  *
  * Since: 2.0
  */
+/* TODO: Deprecated: 2.10: Use modulemd_module_stream_upgrade_ext() instead. */
+/* TODO: MMD_DEPRECATED_FOR (modulemd_module_stream_upgrade_ext) */
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
@@ -285,15 +287,16 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
  * the highest-supported version.
  * @error: (out): A #GError that will return the reason for an upgrade error.
  *
- * Return an upgraded copy of this object. Does not modify the original.
+ * Does not modify the original #ModulemdModuleStream object, @from.
  *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex containing a
- * copy of this object upgraded to the requested version. Returns NULL and sets
- * @error appropriately if the upgrade could not be completed automatically.
+ * Returns: (transfer full): A newly-allocated #ModulemdModule containing a copy
+ * of this object upgraded to the requested version, possibly with multiple
+ * streams. Returns NULL and sets @error appropriately if the upgrade could not
+ * be completed automatically.
  *
  * Since: 2.10
  */
-ModulemdModuleIndex *
+ModulemdModule *
 modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
                                     guint64 mdversion,
                                     GError **error);

@@ -798,14 +798,204 @@ module_stream_test_upgrade_v1_to_v2 (void)
 }
 
 static void
+module_stream_test_upgrade_v2_to_v3_internal (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdModule) moduleV3 = NULL;
+  g_autoptr (GError) error = NULL;
+  GPtrArray *allstreams;
+  ModulemdModuleStream *s = NULL;
+  gboolean ret;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  stream = modulemd_module_stream_read_string (
+    "---\n"
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  name: modulename\n"
+    "  stream: streamname\n"
+    "  version: 1\n"
+    "  context: c0ffe3\n"
+    "  arch: x86_64\n"
+    "  summary: Module Summary\n"
+    "  description: >-\n"
+    "    Module Description\n"
+    "  api:\n"
+    "    rpms:\n"
+    "      - rpm_a\n"
+    "      - rpm_b\n"
+    "  filter:\n"
+    "    rpms: rpm_c\n"
+
+    "  artifacts:\n"
+    "    rpms:\n"
+    "      - bar-0:1.23-1.module_deadbeef.x86_64\n"
+
+    "  servicelevels:\n"
+    "    rawhide: {}\n"
+    "    production:\n"
+    "      eol: 2099-12-31\n"
+
+    "  license:\n"
+    "    content:\n"
+    "      - BSD\n"
+    "      - GPLv2+\n"
+    "    module: MIT\n"
+
+    "  dependencies:\n"
+    "    - buildrequires:\n"
+    "          platform: [f27, f28, epel7]\n"
+    "      requires:\n"
+    "          platform: [f27, f28, epel7]\n"
+    "    - buildrequires:\n"
+    "          platform: [f27]\n"
+    "          buildtools: [v1, v2]\n"
+    "          compatible: [v3]\n"
+    "      requires:\n"
+    "          platform: [f27]\n"
+    "          compatible: [v3, v4]\n"
+    "    - buildrequires:\n"
+    "          platform: [f28]\n"
+    "      requires:\n"
+    "          platform: [f28]\n"
+    "          runtime: [a, b]\n"
+    "    - buildrequires:\n"
+    "          platform: [epel7]\n"
+    "          extras: [v1]\n"
+    "          moreextras: [foo, bar]\n"
+    "      requires:\n"
+    "          platform: [epel7]\n"
+    "          extras: [v1]\n"
+    "          moreextras: [foo, bar]\n"
+    "  references:\n"
+    "        community: http://www.example.com/\n"
+    "        documentation: http://www.example.com/\n"
+    "        tracker: http://www.example.com/\n"
+    "  profiles:\n"
+    "        default:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-extras\n"
+    "                - baz\n"
+    "        container:\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "                - bar-devel\n"
+    "        minimal:\n"
+    "            description: Minimal profile installing only the bar "
+    "package.\n"
+    "            rpms:\n"
+    "                - bar\n"
+    "        buildroot:\n"
+    "            rpms:\n"
+    "                - bar-devel\n"
+    "        srpm-buildroot:\n"
+    "            rpms:\n"
+    "                - bar-extras\n"
+    "  buildopts:\n"
+    "        rpms:\n"
+    "            macros: |\n"
+    "                %demomacro 1\n"
+    "                %demomacro2 %{demomacro}23\n"
+    "            whitelist:\n"
+    "                - fooscl-1-bar\n"
+    "                - fooscl-1-baz\n"
+    "                - xxx\n"
+    "                - xyz\n"
+    "        arches: [i686, x86_64]\n"
+    "  components:\n"
+    "        rpms:\n"
+    "            bar:\n"
+    "                rationale: We need this to demonstrate stuff.\n"
+    "                repository: https://pagure.io/bar.git\n"
+    "                cache: https://example.com/cache\n"
+    "                ref: 26ca0c0\n"
+    "            baz:\n"
+    "                rationale: This one is here to demonstrate other stuff.\n"
+    "            xxx:\n"
+    "                rationale: xxx demonstrates arches and multilib.\n"
+    "                arches: [i686, x86_64]\n"
+    "                multilib: [x86_64]\n"
+    "            xyz:\n"
+    "                rationale: xyz is a bundled dependency of xxx.\n"
+    "                buildorder: 10\n"
+    "        modules:\n"
+    "            includedmodule:\n"
+    "                rationale: Included in the stack, just because.\n"
+    "                repository: https://pagure.io/includedmodule.git\n"
+    "                ref: somecoolbranchname\n"
+    "                buildorder: 100\n"
+    "  xmd:\n"
+    "        some_key: some_data\n"
+    "        some_list:\n"
+    "            - a\n"
+    "            - b\n"
+    "        some_dict:\n"
+    "            a: alpha\n"
+    "            b: beta\n"
+    "            some_other_list:\n"
+    "                - c\n"
+    "                - d\n"
+    "            some_other_dict:\n"
+    "                another_key: more_data\n"
+    "                yet_another_key:\n"
+    "                    - this\n"
+    "                    - is\n"
+    "                    - getting\n"
+    "                    - silly\n"
+    "        can_bool: TRUE\n"
+    "...\n",
+    TRUE,
+    NULL,
+    NULL,
+    &error);
+
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  moduleV3 = modulemd_module_stream_upgrade_ext (
+    stream, MD_MODULESTREAM_VERSION_THREE, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (moduleV3);
+
+  allstreams = modulemd_module_get_all_streams (moduleV3);
+
+  g_debug ("Got %d expanded streams", allstreams->len);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  for (guint i = 0; i < allstreams->len; i++)
+    {
+      s = g_ptr_array_index (allstreams, i);
+
+      g_assert_true (MODULEMD_IS_MODULE_STREAM_V3 (s));
+
+      ret = modulemd_module_stream_v3_emit_yaml (
+        MODULEMD_MODULE_STREAM_V3 (s), &emitter, &error);
+      g_assert_no_error (error);
+      g_assert_true (ret);
+    }
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_debug ("YAML dump of StreamV2 upgraded to StreamV3:\n%s",
+           yaml_string->str);
+
+  g_clear_object (&moduleV3);
+
+  /* TODO: update this test to do something useful */
+}
+static void
 module_stream_test_upgrade_v2_to_v3 (void)
 {
-  /* TODO: implement test */
   g_autoptr (ModulemdModuleStream) stream = NULL;
   ModulemdModuleStreamV2 *streamV2 = NULL;
-  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModule) moduleV3 = NULL;
   g_autoptr (GError) error = NULL;
-  g_autofree gchar *yaml_str = NULL;
+  GPtrArray *allstreams;
+  ModulemdModuleStream *s = NULL;
+  gboolean ret;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
 
   stream = modulemd_module_stream_read_string (
     "---\n"
@@ -955,23 +1145,35 @@ module_stream_test_upgrade_v2_to_v3 (void)
 
   streamV2 = MODULEMD_MODULE_STREAM_V2 (stream);
 
-  index = modulemd_module_stream_upgrade_v2_to_v3_ext (streamV2, &error);
+  moduleV3 = modulemd_module_stream_upgrade_v2_to_v3_ext (streamV2, &error);
   g_assert_no_error (error);
-  g_assert_nonnull (index);
+  g_assert_nonnull (moduleV3);
 
-  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  allstreams = modulemd_module_get_all_streams (moduleV3);
 
-  g_assert_no_error (error);
+  g_debug ("Got %d expanded streams", allstreams->len);
 
-  g_assert_nonnull (yaml_str);
-  /* g_assert_cmpstr (yaml_str, ==, ""); */
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  for (guint i = 0; i < allstreams->len; i++)
+    {
+      s = g_ptr_array_index (allstreams, i);
 
-  g_debug ("YAML dump of upgraded module index:\n%s", yaml_str);
+      g_assert_true (MODULEMD_IS_MODULE_STREAM_V3 (s));
 
-  /* TODO: fix this test to do something useful */
+      ret = modulemd_module_stream_v3_emit_yaml (
+        MODULEMD_MODULE_STREAM_V3 (s), &emitter, &error);
+      g_assert_no_error (error);
+      g_assert_true (ret);
+    }
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_debug ("YAML dump of StreamV2 upgraded to StreamV3:\n%s",
+           yaml_string->str);
 
-  g_clear_pointer (&yaml_str, g_free);
+  g_clear_object (&moduleV3);
+
+  /* TODO: update this test to do something useful */
 }
+
 
 static void
 module_stream_test_upgrade_v1_to_v3 (void)
@@ -5240,6 +5442,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade_v2_to_v3",
                    module_stream_test_upgrade_v2_to_v3);
+
+  g_test_add_func ("/modulemd/v2/modulestream/upgrade_v2_to_v3/internal",
+                   module_stream_test_upgrade_v2_to_v3_internal);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade_v1_to_v3",
                    module_stream_test_upgrade_v1_to_v3);

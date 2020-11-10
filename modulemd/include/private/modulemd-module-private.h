@@ -142,10 +142,10 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
  * appropriate error.
  *
  * Returns: The mdversion of the stream that was added. Returns
- * %MD_MODULE_STREAM_VERSION_ERROR and sets @error if the module name didn't
+ * %MD_MODULESTREAM_VERSION_ERROR and sets @error if the module name didn't
  * match, the module and stream names were unset or the stream object couldn't
  * be upgraded successfully to the @index_mdversion. Returns
- * %MD_MODULE_STREAM_VERSION_UNSET if @stream was NULL.
+ * %MD_MODULESTREAM_VERSION_UNSET if @stream was NULL.
  *
  * Since: 2.0
  */

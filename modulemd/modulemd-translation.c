@@ -712,7 +712,7 @@ modulemd_translation_emit_yaml (ModulemdTranslation *self,
 
   if (!mmd_emitter_scalar (emitter,
                            modulemd_translation_get_module_stream (self),
-                           YAML_PLAIN_SCALAR_STYLE,
+                           YAML_DOUBLE_QUOTED_SCALAR_STYLE,
                            error))
     {
       return FALSE;

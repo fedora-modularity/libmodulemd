@@ -13,7 +13,7 @@ data:
     # earlier values. (optional)
     modified: 201812071200
     # Module stream that is the default for the module, optional.
-    stream: x.y
+    stream: "x.y"
     # Module profiles indexed by the stream name, optional
     # This is a dictionary of stream names to a list of default profiles to be
     # installed.
@@ -26,7 +26,7 @@ data:
         desktop:
             # Module stream that is the default for the module, required.
             # Overrides the above values for systems with this intent.
-            stream: y.z
+            stream: "y.z"
             # Module profiles indexed by the stream name, required
             # Overrides the above values for systems with this intent.
             # From the above, foo:x.y has "other" as the value and foo:bar has
@@ -37,7 +37,7 @@ data:
         server:
             # Module stream that is the default for the module, required.
             # Overrides the above values for systems with this intent.
-            stream: x.y
+            stream: "x.y"
             # Module profiles indexed by the stream name, required
             # Overrides the above values for systems with this intent.
             # From the above foo:x.y and foo:bar have no default profile.

@@ -1319,8 +1319,21 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
 
   EMIT_KEY_VALUE_IF_SET (
     emitter, error, "name", modulemd_module_stream_get_module_name (self));
-  EMIT_KEY_VALUE_IF_SET (
-    emitter, error, "stream", modulemd_module_stream_get_stream_name (self));
+
+  /* Always emit the stream quoted, since a purely numeric-looking stream such
+   * as 5.30 might otherwise be interpreted by parsers like pyyaml as a number
+   * and result in being read (and written) as '5.3'.
+   */
+
+  if (modulemd_module_stream_get_stream_name (self) != NULL)
+    {
+      EMIT_KEY_VALUE_FULL (emitter,
+                           error,
+                           "stream",
+                           modulemd_module_stream_get_stream_name (self),
+                           YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+    }
+
   EMIT_KEY_VALUE_IF_SET (emitter, error, "version", version_string);
   EMIT_KEY_VALUE_IF_SET (
     emitter, error, "context", modulemd_module_stream_get_context (self));

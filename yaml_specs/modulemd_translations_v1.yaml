@@ -8,7 +8,7 @@ data:
     # Module name these translations apply to (required)
     module: foo
     # Module stream these translations apply to (required)
-    stream: latest
+    stream: "latest"
     # A 64-bit unsigned integer. Use YYYYMMDDHHMM to easily identify the last
     # modification time. Use UTC for consistency.
     # When merging, entries with a newer 'modified' value will override any

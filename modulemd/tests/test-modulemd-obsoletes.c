@@ -418,7 +418,7 @@ obsoletes_test_emit_yaml (void)
                    "data:\n"
                    "  modified: 2020-01-01T20:20Z\n"
                    "  module: testmodule\n"
-                   "  stream: teststream\n"
+                   "  stream: \"teststream\"\n"
                    "  message: testmessage\n"
                    "...\n");
 
@@ -439,13 +439,13 @@ obsoletes_test_emit_yaml (void)
                    "data:\n"
                    "  modified: 2020-01-01T20:20Z\n"
                    "  module: testmodule\n"
-                   "  stream: teststream\n"
+                   "  stream: \"teststream\"\n"
                    "  context: testcontext\n"
                    "  eol_date: 2020-01-01T00:00Z\n"
                    "  message: testmessage\n"
                    "  obsoleted_by:\n"
                    "    module: nodejs\n"
-                   "    stream: 12\n"
+                   "    stream: \"12\"\n"
                    "...\n");
 }
 

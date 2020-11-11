@@ -119,19 +119,23 @@ data:
           # Type: MANDATORY
           platform: f32
           # buildrequires:
-          # A dictionary of the build-time dependencies on other module streams
+          # A dictionary of the build-time dependencies on other module streams.
           # Each configuration may depend on a single stream of a dependency.
+          # The dictionary key is the name of the module and the dictionary value
+          # is a single-element list containing the name of the stream.
           #
           # Type: Optional
           buildrequires:
-              appframework: v1
+              appframework: [v1]
           # requires:
-          # A dictionary of the run-time dependencies on other module streams
+          # A dictionary of the run-time dependencies on other module streams.
           # Each configuration may depend on a single stream of a dependency.
+          # The dictionary key is the name of the module and the dictionary value
+          # is a single-element list containing the name of the stream.
           #
           # Type: Optional
           requires:
-              appframework: v1
+              appframework: [v1]
           # buildopts:
           # Component build options
           # Additional per component type module-wide build options.

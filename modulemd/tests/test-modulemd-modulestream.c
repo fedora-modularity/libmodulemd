@@ -1040,6 +1040,7 @@ module_packager_v2_sanity (void)
   g_clear_pointer (&specV2Path, g_free);
 }
 
+
 static void
 module_stream_v1_test_rpm_artifacts (void)
 {

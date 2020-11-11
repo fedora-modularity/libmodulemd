@@ -20,6 +20,7 @@ modulemd_get_version (void)
   return LIBMODULEMD_VERSION;
 }
 
+
 static ModulemdModuleIndex *
 verify_load (int ret,
              ModulemdModuleIndex *idx,

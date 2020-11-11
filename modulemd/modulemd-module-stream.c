@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "modulemd.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
@@ -19,6 +20,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -162,6 +164,7 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  g_autoptr (ModulemdPackagerV3) packager_v3 = NULL;
   ModulemdYamlDocumentTypeEnum doctype;
   const GError *gerror = NULL;
 

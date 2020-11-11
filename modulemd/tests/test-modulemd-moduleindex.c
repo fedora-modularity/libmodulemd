@@ -18,6 +18,7 @@
 #include <yaml.h>
 
 #include "config.h"
+#include "modulemd.h"
 #include "modulemd-defaults.h"
 #include "modulemd-obsoletes.h"
 #include "modulemd-module-index.h"

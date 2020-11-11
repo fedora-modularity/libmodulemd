@@ -161,6 +161,7 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/common/get_version",
                    test_modulemd_get_version);
+
   g_test_add_func ("/modulemd/v2/common/load_file", test_modulemd_load_file);
   g_test_add_func ("/modulemd/v2/common/load_string",
                    test_modulemd_load_string);

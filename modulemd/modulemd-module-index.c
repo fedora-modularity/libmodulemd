@@ -21,6 +21,7 @@
 #include <rpm/rpmio.h>
 #endif
 
+#include "modulemd.h"
 #include "modulemd-compression.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-index.h"
@@ -142,6 +143,7 @@ add_subdoc (ModulemdModuleIndex *self,
 {
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdObsoletes) obsoletes = NULL;
@@ -168,9 +170,29 @@ add_subdoc (ModulemdModuleIndex *self,
         {
           packager = modulemd_packager_v3_parse_yaml (subdoc, error);
 
-          /* TODO: Determine which stream version to convert the packager
-           * object into and do so here.
-           */
+          /* Convert the packager object into a ModuleStreamV2 */
+          index =
+            modulemd_packager_v3_to_stream_v2_ext (packager, &nested_error);
+          if (!index)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          if (autogen_module_name)
+            {
+              /* TODO: generate module/stream names if needed for streams in index */
+            }
+
+          /* merge index with override = FALSE and strict_default_streams = TRUE */
+          if (!modulemd_module_index_merge (
+                index, self, FALSE, TRUE, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          g_clear_object (&index);
           break;
         }
 

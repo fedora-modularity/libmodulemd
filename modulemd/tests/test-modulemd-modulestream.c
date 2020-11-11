@@ -1663,6 +1663,27 @@ module_packager_v2_sanity (void)
 
 
 static void
+module_packager_v3_sanity (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (GError) error = NULL;
+
+  g_autofree gchar *packagerV3Path = g_strdup_printf (
+    "%s/yaml_specs/modulemd_packager_v3.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  stream = modulemd_module_stream_read_file (
+    packagerV3Path, TRUE, NULL, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  /* confirm packager v3 document was returned as stream v2 */
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (stream));
+
+  g_clear_object (&stream);
+  g_clear_pointer (&packagerV3Path, g_free);
+}
+
+
+static void
 module_stream_v1_test_rpm_artifacts (void)
 {
   g_autoptr (ModulemdModuleStreamV1) stream = NULL;
@@ -4785,6 +4806,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/packager/v2_sanity",
                    module_packager_v2_sanity);
+
+  g_test_add_func ("/modulemd/v2/packager/v3_sanity",
+                   module_packager_v3_sanity);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade_v1_to_v2",
                    module_stream_test_upgrade_v1_to_v2);

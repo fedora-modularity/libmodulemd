@@ -645,7 +645,7 @@ document: modulemd
 version: 2
 data:
   name: SuperModule
-  stream: latest
+  stream: \"latest\"
   summary: Summary
   description: >-
     Description
@@ -670,7 +670,7 @@ document: modulemd
 version: 2
 data:
   name: modulename
-  stream: streamname
+  stream: \"streamname\"
   version: 1
   context: c0ffe3
   arch: x86_64

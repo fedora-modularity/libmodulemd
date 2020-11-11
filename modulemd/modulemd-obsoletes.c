@@ -1024,7 +1024,7 @@ modulemd_obsoletes_emit_obsoleted_by (ModulemdObsoletes *self,
   if (!mmd_emitter_scalar (emitter,
                            modulemd_obsoletes_get_obsoleted_by_module_stream (
                              MODULEMD_OBSOLETES (self)),
-                           YAML_PLAIN_SCALAR_STYLE,
+                           YAML_DOUBLE_QUOTED_SCALAR_STYLE,
                            error))
     {
       return FALSE;
@@ -1132,7 +1132,7 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
   if (!mmd_emitter_scalar (
         emitter,
         modulemd_obsoletes_get_module_stream (MODULEMD_OBSOLETES (self)),
-        YAML_PLAIN_SCALAR_STYLE,
+        YAML_DOUBLE_QUOTED_SCALAR_STYLE,
         error))
     {
       return FALSE;

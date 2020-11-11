@@ -173,9 +173,15 @@ validate_spec (ModulemdPackagerV3 *packager)
   g_assert_null (strv[2]);
   g_clear_pointer (&strv, g_strfreev);
 
-  g_assert_cmpstr ("http://www.example.com/", ==, modulemd_packager_v3_get_community (packager));
-  g_assert_cmpstr ("http://www.example.com/", ==, modulemd_packager_v3_get_documentation (packager));
-  g_assert_cmpstr ("http://www.example.com/", ==, modulemd_packager_v3_get_tracker (packager));
+  g_assert_cmpstr ("http://www.example.com/",
+                   ==,
+                   modulemd_packager_v3_get_community (packager));
+  g_assert_cmpstr ("http://www.example.com/",
+                   ==,
+                   modulemd_packager_v3_get_documentation (packager));
+  g_assert_cmpstr ("http://www.example.com/",
+                   ==,
+                   modulemd_packager_v3_get_tracker (packager));
 
   strv = modulemd_packager_v3_get_profile_names_as_strv (packager);
   g_assert_nonnull (strv);

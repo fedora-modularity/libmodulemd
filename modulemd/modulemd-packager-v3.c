@@ -153,9 +153,9 @@ modulemd_packager_v3_copy (ModulemdPackagerV3 *self)
   COPY_HASHTABLE_BY_VALUE_ADDER (
     copy, self, profiles, modulemd_packager_v3_add_profile);
 
-  modulemd_packager_v3_replace_rpm_api(copy, self->rpm_api);
+  modulemd_packager_v3_replace_rpm_api (copy, self->rpm_api);
 
-  modulemd_packager_v3_replace_rpm_filters(copy, self->rpm_filters);
+  modulemd_packager_v3_replace_rpm_filters (copy, self->rpm_filters);
 
   COPY_HASHTABLE_BY_VALUE_ADDER (
     copy, self, rpm_components, modulemd_packager_v3_add_component);

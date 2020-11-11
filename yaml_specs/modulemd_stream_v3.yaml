@@ -179,20 +179,22 @@ data:
         # buildrequires:
         # A dictionary of modules and their streams that this stream depends on
         # while building. The dictionary key is the name of the module and the
-        # dictionary value is the name of the stream.
+        # dictionary value is a single-element list containing the name of the
+        # stream.
         #
         # Type: OPTIONAL
         buildrequires:
-            appframework: v1
+            appframework: [v1]
 
         # requires:
         # A dictionary of modules and their streams that this stream depends on
         # at runtime. The dictionary key is the name of the module and the
-        # dictionary value is the name of the stream.
+        # dictionary value is a single-element list containing the name of the
+        # stream.
         #
         # Type: OPTIONAL
         requires:
-            appframework: v1
+            appframework: [v1]
 
     # references:
     # References to external resources, typically upstream

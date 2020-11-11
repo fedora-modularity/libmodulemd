@@ -198,6 +198,7 @@ if meson.version().version_compare('>=0.53')
 
     summary({'Developer Build': get_option('developer_build'),
              'libmagic Support': magic_status,
+             'Default Stream MD Version': default_stream_mdversion,
              'Custom Python': get_option('python_name'),
              'RPMIO Support': rpmio_status,
              'Generate Manpages': manpages_status,

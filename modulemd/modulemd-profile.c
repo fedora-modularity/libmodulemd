@@ -118,6 +118,11 @@ modulemd_profile_copy (ModulemdProfile *self)
   g_hash_table_unref (p->rpms);
   p->rpms = g_hash_table_ref (self->rpms);
 
+  if (modulemd_profile_is_default (self))
+    {
+      modulemd_profile_set_default (p);
+    }
+
   return g_steal_pointer (&p);
 }
 
@@ -517,6 +522,12 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
                                       "Failed to emit profile rpms: ");
           return FALSE;
         }
+    }
+
+  /* Only output default if it's TRUE */
+  if (modulemd_profile_is_default (self))
+    {
+      EMIT_KEY_VALUE (emitter, error, "default", "true");
     }
 
   ret = mmd_emitter_end_mapping (emitter, &nested_error);

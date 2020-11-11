@@ -18,6 +18,7 @@
 #include <yaml.h>
 
 #include "config.h"
+#include "modulemd.h"
 #include "modulemd-defaults.h"
 #include "modulemd-obsoletes.h"
 #include "modulemd-module-index.h"
@@ -389,6 +390,7 @@ module_index_test_stream_upgrade (void)
   g_autoptr (GError) error = NULL;
 
   /* Construct an Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_ONE);
   index = modulemd_module_index_new ();
 
   /* Add some streams */

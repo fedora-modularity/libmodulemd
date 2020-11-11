@@ -21,6 +21,7 @@
 #include <rpm/rpmio.h>
 #endif
 
+#include "modulemd.h"
 #include "modulemd-compression.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-index.h"
@@ -117,6 +118,7 @@ modulemd_module_index_init (ModulemdModuleIndex *self)
 {
   self->modules =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  self->stream_mdversion = modulemd_get_default_stream_mdversion ();
 }
 
 
@@ -142,6 +144,7 @@ add_subdoc (ModulemdModuleIndex *self,
 {
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdObsoletes) obsoletes = NULL;
@@ -168,9 +171,40 @@ add_subdoc (ModulemdModuleIndex *self,
         {
           packager = modulemd_packager_v3_parse_yaml (subdoc, error);
 
-          /* TODO: Determine which stream version to convert the packager
-           * object into and do so here.
+          /* Determine which stream version to convert the packager
+           * object into and do so.
            */
+          if (self->stream_mdversion < MD_MODULESTREAM_VERSION_THREE)
+            {
+              index = modulemd_packager_v3_to_stream_v2_ext (packager,
+                                                             &nested_error);
+            }
+          else
+            {
+              index = modulemd_packager_v3_to_stream_v3_ext (packager,
+                                                             &nested_error);
+            }
+
+          if (!index)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          if (autogen_module_name)
+            {
+              /* TODO: generate module/stream names if needed for streams in index */
+            }
+
+          /* merge index with override = FALSE and strict_default_streams = TRUE */
+          if (!modulemd_module_index_merge (
+                index, self, FALSE, TRUE, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+
+          g_clear_object (&index);
           break;
         }
 
@@ -534,6 +568,15 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
         {
           if (!modulemd_module_stream_v2_emit_yaml (
                 MODULEMD_MODULE_STREAM_V2 (stream), emitter, error))
+            {
+              return FALSE;
+            }
+        }
+      else if (modulemd_module_stream_get_mdversion (stream) ==
+               MD_MODULESTREAM_VERSION_THREE)
+        {
+          if (!modulemd_module_stream_v3_emit_yaml (
+                MODULEMD_MODULE_STREAM_V3 (stream), emitter, error))
             {
               return FALSE;
             }

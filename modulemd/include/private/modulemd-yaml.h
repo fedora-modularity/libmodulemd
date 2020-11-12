@@ -784,6 +784,41 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
 
 
 /**
+ * modulemd_yaml_parse_nested_set:
+ * @parser: (inout): A libyaml parser object positioned at the beginning of a
+ * map containing scalar keys with string set values.
+ * @error: (out): A #GError that will return the reason for a parsing or
+ * validation error.
+ *
+ * Function for retrieving a hash table from a str/string-set map such as
+ * data.dependencies in ModuleStreamV2.
+ *
+ * Returns: (transfer full): A newly-allocated #GHashTable * representing the
+ * parsed values. NULL if a parse error occurred and sets @error appropriately.
+ *
+ * Since: 2.10
+ */
+GHashTable *
+modulemd_yaml_parse_nested_set (yaml_parser_t *parser, GError **error);
+
+/**
+ * modulemd_yaml_emit_nested_set:
+ * @emitter: (inout): A libyaml emitter object that is positioned where a nested
+ * set (a map containing scalar keys with string set values) should occur.
+ * @table: (in): The nested set to emit.
+ * @error: (out): A #GError that will return the reason for failing to emit.
+ *
+ * Returns: TRUE if the nested set emitted successfully. FALSE if an error was
+ * encountered and sets @error appropriately.
+ *
+ * Since: 2.10
+ */
+gboolean
+modulemd_yaml_emit_nested_set (yaml_emitter_t *emitter,
+                               GHashTable *table,
+                               GError **error);
+
+/**
  * modulemd_yaml_parse_document_type:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * yaml subdocument immediately prior to a `YAML_DOCUMENT_START_EVENT`.

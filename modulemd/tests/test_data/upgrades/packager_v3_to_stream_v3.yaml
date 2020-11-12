@@ -25,9 +25,9 @@ data:
   dependencies:
     platform: f32
     buildrequires:
-      appframework: v1
+      appframework: [v1]
     requires:
-      appframework: v1
+      appframework: [v1]
   references:
     community: http://www.example.com/
     documentation: http://www.example.com/

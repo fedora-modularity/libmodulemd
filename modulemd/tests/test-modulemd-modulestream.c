@@ -1261,6 +1261,7 @@ module_stream_test_v3_yaml (void)
 
   g_auto (GStrv) build_deps = NULL;
   g_auto (GStrv) run_deps = NULL;
+  g_auto (GStrv) streams = NULL;
 
   GVariant *tmp_variant = NULL;
   GVariantDict *xmd_dict = NULL;
@@ -1475,6 +1476,23 @@ module_stream_test_v3_yaml (void)
                      streamV3, "extras"),
                    ==,
                    "foo");
+
+  /* spot check alternate interfaces that return stream wrapped in a list */
+  streams =
+    modulemd_module_stream_v3_get_buildtime_requirement_streams_as_strv (
+      streamV3, "buildtools");
+  g_assert_nonnull (streams);
+  g_assert_cmpstr (streams[0], ==, "v1");
+  g_assert_null (streams[1]);
+  g_clear_pointer (&streams, g_strfreev);
+
+  streams = modulemd_module_stream_v3_get_runtime_requirement_streams_as_strv (
+    streamV3, "runtime");
+  g_assert_nonnull (streams);
+  g_assert_cmpstr (streams[0], ==, "a");
+  g_assert_null (streams[1]);
+  g_clear_pointer (&streams, g_strfreev);
+
 
   g_object_get (streamV3, "community", &community_prop, NULL);
   g_object_get (streamV3, "documentation", &documentation_prop, NULL);
@@ -3890,9 +3908,9 @@ module_stream_v3_test_parse_dump (void)
     "  dependencies:\n"
     "    platform: f32\n"
     "    buildrequires:\n"
-    "      appframework: v1\n"
+    "      appframework: [v1]\n"
     "    requires:\n"
-    "      appframework: v1\n"
+    "      appframework: [v1]\n"
     "  references:\n"
     "    community: http://www.example.com/\n"
     "    documentation: http://www.example.com/\n"

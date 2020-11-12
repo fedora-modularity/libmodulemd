@@ -933,6 +933,38 @@ modulemd_module_stream_v3_get_runtime_requirement_stream (
 
 
 /**
+ * modulemd_module_stream_v3_get_buildtime_requirement_streams_as_strv: (rename-to modulemd_module_stream_v3_get_buildtime_requirement_streams)
+ * @self: (in): This #ModulemdModuleStreamV3 object.
+ * @module_name: (in): The name of the module this module depends on.
+ *
+ * Returns: (transfer full): NULL if @module_name is not a build-time dependency
+ * of @self, else a #GStrv list containing a single element that is the name of
+ * the stream matching this module name in the build-time dependencies.
+ *
+ * Since: 2.10
+ */
+GStrv
+modulemd_module_stream_v3_get_buildtime_requirement_streams_as_strv (
+  ModulemdModuleStreamV3 *self, const gchar *module_name);
+
+
+/**
+ * modulemd_module_stream_v3_get_runtime_requirement_streams_as_strv: (rename-to modulemd_module_stream_v3_get_runtime_requirement_streams)
+ * @self: (in): This #ModulemdModuleStreamV3 object.
+ * @module_name: (in): The name of the module this module depends on.
+ *
+ * Returns: (transfer full): NULL if @module_name is not a run-time dependency
+ * of @self, else a #GStrv list containing a single element that is the name of
+ * the stream matching this module name in the run-time dependencies.
+ *
+ * Since: 2.10
+ */
+GStrv
+modulemd_module_stream_v3_get_runtime_requirement_streams_as_strv (
+  ModulemdModuleStreamV3 *self, const gchar *module_name);
+
+
+/**
  * modulemd_module_stream_v3_set_xmd:
  * @self: (in): This #ModulemdModuleStreamV3 object.
  * @xmd: (in) (transfer none): A #GVariant representing arbitrary YAML.

@@ -309,6 +309,20 @@ GStrv
 modulemd_module_stream_v3_get_runtime_modules (ModulemdModuleStreamV3 *self);
 
 /**
+ * modulemd_module_stream_v3_get_buildtime_requirement_streams: (skip)
+ */
+GStrv
+modulemd_module_stream_v3_get_buildtime_requirement_streams (
+  ModulemdModuleStreamV3 *self, const gchar *module_name);
+
+/**
+ * modulemd_module_stream_v3_get_runtime_requirement_streams: (skip)
+ */
+GStrv
+modulemd_module_stream_v3_get_runtime_requirement_streams (
+  ModulemdModuleStreamV3 *self, const gchar *module_name);
+
+/**
  * modulemd_profile_get_rpms: (skip)
  */
 GStrv

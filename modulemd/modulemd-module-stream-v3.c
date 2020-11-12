@@ -1207,6 +1207,46 @@ modulemd_module_stream_v3_get_runtime_requirement_stream (
 }
 
 
+GStrv
+modulemd_module_stream_v3_get_buildtime_requirement_streams_as_strv (
+  ModulemdModuleStreamV3 *self, const gchar *module_name)
+{
+  char *stream;
+  GPtrArray *stream_list;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V3 (self), NULL);
+
+  stream = g_hash_table_lookup (self->buildtime_deps, module_name);
+  g_return_val_if_fail (stream, NULL);
+
+  stream_list = g_ptr_array_new ();
+  g_ptr_array_add (stream_list, g_strdup (stream));
+  g_ptr_array_add (stream_list, NULL);
+
+  return (GStrv)g_ptr_array_free (stream_list, FALSE);
+}
+
+
+GStrv
+modulemd_module_stream_v3_get_runtime_requirement_streams_as_strv (
+  ModulemdModuleStreamV3 *self, const gchar *module_name)
+{
+  char *stream;
+  GPtrArray *stream_list;
+
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V3 (self), NULL);
+
+  stream = g_hash_table_lookup (self->runtime_deps, module_name);
+  g_return_val_if_fail (stream, NULL);
+
+  stream_list = g_ptr_array_new ();
+  g_ptr_array_add (stream_list, g_strdup (stream));
+  g_ptr_array_add (stream_list, NULL);
+
+  return (GStrv)g_ptr_array_free (stream_list, FALSE);
+}
+
+
 void
 modulemd_module_stream_v3_set_xmd (ModulemdModuleStreamV3 *self, GVariant *xmd)
 {
@@ -2113,6 +2153,60 @@ modulemd_module_stream_v3_parse_licenses (yaml_parser_t *parser,
 }
 
 
+static GHashTable *
+modulemd_module_stream_v3_parse_deptable (yaml_parser_t *parser,
+                                          GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) nested_set = NULL;
+  g_autoptr (GHashTable) deptable = NULL;
+  g_auto (GStrv) stream_names = NULL;
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  gchar *module_name;
+
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  nested_set = modulemd_yaml_parse_nested_set (parser, &nested_error);
+  if (!nested_set)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  deptable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  g_hash_table_iter_init (&iter, nested_set);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (gchar *)key;
+      stream_names = modulemd_ordered_str_keys_as_strv (value);
+
+      if (g_strv_length (stream_names) != 1)
+        {
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "ModuleStreamV3 dependency %s must specify a single stream",
+            module_name);
+        }
+
+      g_hash_table_replace (
+        deptable, g_strdup (module_name), g_strdup (stream_names[0]));
+
+      g_clear_pointer (&stream_names, g_strfreev);
+    }
+
+  g_clear_pointer (&nested_set, g_hash_table_unref);
+
+  return g_steal_pointer (&deptable);
+}
+
+
 static gboolean
 modulemd_module_stream_v3_parse_deps (yaml_parser_t *parser,
                                       ModulemdModuleStreamV3 *modulestream,
@@ -2164,8 +2258,8 @@ modulemd_module_stream_v3_parse_deps (yaml_parser_t *parser,
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "buildrequires"))
             {
-              deptable =
-                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+              deptable = modulemd_module_stream_v3_parse_deptable (
+                parser, &nested_error);
               if (!deptable)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -2179,8 +2273,8 @@ modulemd_module_stream_v3_parse_deps (yaml_parser_t *parser,
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "requires"))
             {
-              deptable =
-                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+              deptable = modulemd_module_stream_v3_parse_deptable (
+                parser, &nested_error);
               if (!deptable)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -2842,11 +2936,18 @@ modulemd_module_stream_v3_emit_rpm_map (ModulemdModuleStreamV3 *self,
                                         GError **error);
 
 gboolean
+modulemd_module_stream_v3_emit_deptable (GHashTable *deptable,
+                                         const char *table_key,
+                                         yaml_emitter_t *emitter,
+                                         GError **error);
+
+gboolean
 modulemd_module_stream_v3_emit_yaml (ModulemdModuleStreamV3 *self,
                                      yaml_emitter_t *emitter,
                                      GError **error)
 {
   MODULEMD_INIT_TRACE ();
+  g_autoptr (GError) nested_error = NULL;
 
   if (!modulemd_module_stream_emit_yaml_base (
         MODULEMD_MODULE_STREAM (self), emitter, error))
@@ -2886,10 +2987,18 @@ modulemd_module_stream_v3_emit_yaml (ModulemdModuleStreamV3 *self,
   EMIT_SCALAR (emitter, error, "dependencies");
   EMIT_MAPPING_START (emitter, error);
   EMIT_KEY_VALUE (emitter, error, "platform", self->platform);
-  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
-    emitter, error, "buildrequires", self->buildtime_deps);
-  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
-    emitter, error, "requires", self->runtime_deps);
+  if (!modulemd_module_stream_v3_emit_deptable (
+        self->buildtime_deps, "buildrequires", emitter, error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+  if (!modulemd_module_stream_v3_emit_deptable (
+        self->runtime_deps, "requires", emitter, error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
   EMIT_MAPPING_END (emitter, error);
 
 
@@ -3040,5 +3149,72 @@ modulemd_module_stream_v3_emit_rpm_map (ModulemdModuleStreamV3 *self,
 
   EMIT_MAPPING_END (emitter, error);
 
+  return TRUE;
+}
+
+
+gboolean
+modulemd_module_stream_v3_emit_deptable (GHashTable *deptable,
+                                         const char *table_key,
+                                         yaml_emitter_t *emitter,
+                                         GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) nested_set = NULL;
+  g_autoptr (GHashTable) stream_table = NULL;
+  int ret;
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  gchar *module_name;
+  gchar *stream_name;
+
+  if (deptable == NULL || g_hash_table_size (deptable) == 0)
+    {
+      return TRUE;
+    }
+
+  nested_set = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
+
+  g_hash_table_iter_init (&iter, deptable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (gchar *)key;
+      stream_name = (gchar *)value;
+
+      /* stuff the stream name into a sub-table */
+      stream_table =
+        g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+      g_hash_table_add (stream_table, g_strdup (stream_name));
+
+      g_hash_table_insert (
+        nested_set, g_strdup (module_name), g_steal_pointer (&stream_table));
+    }
+
+  ret = mmd_emitter_scalar (
+    emitter, table_key, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit %s dependencies key: ",
+                                  table_key);
+      return FALSE;
+    }
+
+  ret = modulemd_yaml_emit_nested_set (emitter, nested_set, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit %s dependencies values: ",
+                                  table_key);
+      return FALSE;
+    }
+
+  g_clear_pointer (&nested_set, g_hash_table_unref);
   return TRUE;
 }

@@ -253,6 +253,57 @@ static void
 modulemd_build_config_replace_buildtime_deps (ModulemdBuildConfig *self,
                                               GHashTable *deps);
 
+static GHashTable *
+modulemd_build_config_parse_deptable (yaml_parser_t *parser, GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) nested_set = NULL;
+  g_autoptr (GHashTable) deptable = NULL;
+  g_auto (GStrv) stream_names = NULL;
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  gchar *module_name;
+
+
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  nested_set = modulemd_yaml_parse_nested_set (parser, &nested_error);
+  if (!nested_set)
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  deptable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  g_hash_table_iter_init (&iter, nested_set);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (gchar *)key;
+      stream_names = modulemd_ordered_str_keys_as_strv (value);
+
+      if (g_strv_length (stream_names) != 1)
+        {
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "BuildConfig dependency %s must specify a single stream",
+            module_name);
+        }
+
+      g_hash_table_replace (
+        deptable, g_strdup (module_name), g_strdup (stream_names[0]));
+
+      g_clear_pointer (&stream_names, g_strfreev);
+    }
+
+  g_clear_pointer (&nested_set, g_hash_table_unref);
+
+  return g_steal_pointer (&deptable);
+}
 
 ModulemdBuildConfig *
 modulemd_build_config_parse_yaml (yaml_parser_t *parser,
@@ -293,7 +344,7 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
                                 "buildrequires"))
             {
               deptable =
-                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+                modulemd_build_config_parse_deptable (parser, &nested_error);
               if (!deptable)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -308,7 +359,7 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
                                 "requires"))
             {
               deptable =
-                modulemd_yaml_parse_string_string_map (parser, &nested_error);
+                modulemd_build_config_parse_deptable (parser, &nested_error);
               if (!deptable)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -363,6 +414,11 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
   return g_steal_pointer (&buildconfig);
 }
 
+gboolean
+modulemd_build_config_emit_deptable (GHashTable *deptable,
+                                     const char *table_key,
+                                     yaml_emitter_t *emitter,
+                                     GError **error);
 
 gboolean
 modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
@@ -386,10 +442,20 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "context", self->context);
   EMIT_KEY_VALUE_IF_SET (emitter, error, "platform", self->platform);
-  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
-    emitter, error, "buildrequires", self->buildrequires);
-  EMIT_HASHTABLE_KEY_VALUES_IF_NON_EMPTY (
-    emitter, error, "requires", self->requires);
+
+  if (!modulemd_build_config_emit_deptable (
+        self->buildrequires, "buildrequires", emitter, error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
+
+  if (!modulemd_build_config_emit_deptable (
+        self->requires, "requires", emitter, error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return FALSE;
+    }
 
   if (self->buildopts != NULL)
     {
@@ -418,6 +484,71 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
   return TRUE;
 }
 
+gboolean
+modulemd_build_config_emit_deptable (GHashTable *deptable,
+                                     const char *table_key,
+                                     yaml_emitter_t *emitter,
+                                     GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GError) nested_error = NULL;
+  g_autoptr (GHashTable) nested_set = NULL;
+  g_autoptr (GHashTable) stream_table = NULL;
+  int ret;
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  gchar *module_name;
+  gchar *stream_name;
+
+  if (deptable == NULL || g_hash_table_size (deptable) == 0)
+    {
+      return TRUE;
+    }
+
+  nested_set = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
+
+  g_hash_table_iter_init (&iter, deptable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module_name = (gchar *)key;
+      stream_name = (gchar *)value;
+
+      /* stuff the stream name into a sub-table */
+      stream_table =
+        g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+      g_hash_table_add (stream_table, g_strdup (stream_name));
+
+      g_hash_table_insert (
+        nested_set, g_strdup (module_name), g_steal_pointer (&stream_table));
+    }
+
+  ret = mmd_emitter_scalar (
+    emitter, table_key, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit %s dependencies key: ",
+                                  table_key);
+      return FALSE;
+    }
+
+  ret = modulemd_yaml_emit_nested_set (emitter, nested_set, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to emit %s dependencies values: ",
+                                  table_key);
+      return FALSE;
+    }
+
+  g_clear_pointer (&nested_set, g_hash_table_unref);
+  return TRUE;
+}
 
 static void
 modulemd_build_config_replace_runtime_deps (ModulemdBuildConfig *self,

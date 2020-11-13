@@ -16,6 +16,7 @@
 #include <locale.h>
 #include <signal.h>
 
+#include "modulemd.h"
 #include "private/glib-extensions.h"
 #include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
@@ -271,6 +272,12 @@ packager_test_map_to_stream_v2 (void)
   g_autofree gchar *yaml_str = NULL;
   g_autofree gchar *expected_path = NULL;
   g_autofree gchar *expected_str = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
+
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+  /* set default to stream v2 */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
 
   packager = read_spec ();
 
@@ -306,6 +313,9 @@ packager_test_map_to_stream_v2 (void)
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_path, g_free);
   g_clear_pointer (&expected_str, g_free);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
 }
 
 static void
@@ -318,6 +328,12 @@ packager_test_map_to_stream_v3 (void)
   g_autofree gchar *yaml_str = NULL;
   g_autofree gchar *expected_path = NULL;
   g_autofree gchar *expected_str = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
+
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+  /* set default to stream v3 */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
 
   packager = read_spec ();
 
@@ -352,6 +368,9 @@ packager_test_map_to_stream_v3 (void)
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_path, g_free);
   g_clear_pointer (&expected_str, g_free);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
 }
 
 static void
@@ -365,7 +384,13 @@ packager_test_read_to_index (void)
   g_autofree gchar *yaml_str = NULL;
   g_autofree gchar *expected_path = NULL;
   g_autofree gchar *expected_str = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
 
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+
+  /* create a stream v2 index */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
   index = modulemd_module_index_new ();
 
   /* The modulemd-packager v3 definition */
@@ -405,20 +430,17 @@ packager_test_read_to_index (void)
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_str, g_free);
 
-  /* create new empty index and immediately upgrade it to modulemd v3 */
+  /* createa a stream v3 index */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
   index = modulemd_module_index_new ();
-  ret = modulemd_module_index_upgrade_streams (
-    index, MD_MODULESTREAM_VERSION_THREE, &error);
-  g_assert_true (ret);
-  g_assert_no_error (error);
 
   /* The modulemd-packager v3 definition */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   ret = modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error);
-  g_assert_true (ret);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
@@ -444,6 +466,9 @@ packager_test_read_to_index (void)
   g_clear_object (&index);
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_str, g_free);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
 }
 
 

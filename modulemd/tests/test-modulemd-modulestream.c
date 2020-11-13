@@ -751,8 +751,10 @@ module_stream_test_upgrade_v1_to_v2 (void)
   modulemd_module_stream_v1_add_runtime_requirement (
     streamV1, "ModuleB", "streamY");
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   updated_stream = modulemd_module_stream_upgrade (
     MODULEMD_MODULE_STREAM (streamV1), MD_MODULESTREAM_VERSION_TWO, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   g_assert_no_error (error);
   g_assert_nonnull (updated_stream);

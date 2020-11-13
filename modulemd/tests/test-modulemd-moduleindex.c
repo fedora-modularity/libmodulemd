@@ -385,11 +385,17 @@ module_index_test_read_unknown (void)
 static void
 module_index_test_stream_upgrade (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
   g_autoptr (GError) error = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
 
-  /* Construct an Index with some objects */
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+
+  /* Construct a v1 Index with some objects */
   modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_ONE);
   index = modulemd_module_index_new ();
 
@@ -406,9 +412,9 @@ module_index_test_stream_upgrade (void)
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
     MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
-  g_assert_true (
-    modulemd_module_index_add_module_stream (index, stream, &error));
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV1 object */
@@ -427,6 +433,81 @@ module_index_test_stream_upgrade (void)
   g_clear_object (&stream);
 
 
+  /* Next, attempt to add a v2 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
+    "testmodule1", "teststream2");
+  modulemd_module_stream_set_version (stream, 2);
+  modulemd_module_stream_set_context (stream, "c0ff33");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "A second stream");
+  modulemd_module_stream_v2_set_description (
+    MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
+  modulemd_module_stream_v2_add_module_license (
+    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Next, attempt to add a v3 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v3_new (
+    "testmodule1", "teststream3");
+  modulemd_module_stream_set_version (stream, 3);
+  modulemd_module_stream_set_context (stream, "badfeed");
+  modulemd_module_stream_v3_set_summary (MODULEMD_MODULE_STREAM_V3 (stream),
+                                         "A thired stream");
+  modulemd_module_stream_v3_set_description (
+    MODULEMD_MODULE_STREAM_V3 (stream), "A thired stream's description");
+  modulemd_module_stream_v3_add_module_license (
+    MODULEMD_MODULE_STREAM_V3 (stream), "Beerware");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  g_clear_object (&index);
+
+
+  /* Construct a v2 Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
+  index = modulemd_module_index_new ();
+
+  /* Add some streams */
+
+  /* First, a v1 stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
+    "testmodule1", "teststream1");
+  modulemd_module_stream_set_version (stream, 1);
+  modulemd_module_stream_set_context (stream, "deadbeef");
+  modulemd_module_stream_v1_set_summary (MODULEMD_MODULE_STREAM_V1 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v1_set_description (
+    MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
+  modulemd_module_stream_v1_add_module_license (
+    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was upgraded to StreamV2 */
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
+  g_clear_object (&stream);
+
+
   /* Next, add a v2 Stream */
   stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
     "testmodule1", "teststream2");
@@ -438,9 +519,9 @@ module_index_test_stream_upgrade (void)
     MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
   modulemd_module_stream_v2_add_module_license (
     MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
-  g_assert_true (
-    modulemd_module_index_add_module_stream (index, stream, &error));
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&stream, g_object_unref);
 
   /* Verify that it was added as a StreamV2 object */
@@ -458,7 +539,52 @@ module_index_test_stream_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
-  /* Verify that the first object was upgraded to StreamV2 */
+  /* Next, attempt to add a v3 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v3_new (
+    "testmodule1", "teststream3");
+  modulemd_module_stream_set_version (stream, 3);
+  modulemd_module_stream_set_context (stream, "badfeed");
+  modulemd_module_stream_v3_set_summary (MODULEMD_MODULE_STREAM_V3 (stream),
+                                         "A thired stream");
+  modulemd_module_stream_v3_set_description (
+    MODULEMD_MODULE_STREAM_V3 (stream), "A thired stream's description");
+  modulemd_module_stream_v3_add_module_license (
+    MODULEMD_MODULE_STREAM_V3 (stream), "Beerware");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  g_clear_object (&index);
+
+
+  /* Construct a v3 Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
+  index = modulemd_module_index_new ();
+
+  /* Add some streams */
+
+  /* First, a v1 stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
+    "testmodule1", "teststream1");
+  modulemd_module_stream_set_version (stream, 1);
+  modulemd_module_stream_set_context (stream, "deadbeef");
+  modulemd_module_stream_v1_set_summary (MODULEMD_MODULE_STREAM_V1 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v1_set_description (
+    MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
+  modulemd_module_stream_v1_add_module_license (
+    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+  /* a platform depdendency is mandatory for upgrading to stream v3 */
+  modulemd_module_stream_v1_add_runtime_requirement (
+    MODULEMD_MODULE_STREAM_V1 (stream), "platform", "f29");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was upgraded to StreamV3 */
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
@@ -470,26 +596,66 @@ module_index_test_stream_upgrade (void)
   g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+                   MD_MODULESTREAM_VERSION_THREE);
   g_clear_object (&stream);
 
-  /* Add one more v1 Stream */
-  stream = (ModulemdModuleStream *)modulemd_module_stream_v1_new (
+
+  /* Next, add a v2 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
+    "testmodule1", "teststream2");
+  modulemd_module_stream_set_version (stream, 2);
+  modulemd_module_stream_set_context (stream, "c0ff33");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "A second stream");
+  modulemd_module_stream_v2_set_description (
+    MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
+  modulemd_module_stream_v2_add_module_license (
+    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+  /* a platform depdendency is mandatory for upgrading to stream v3 */
+  dep = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "f29");
+  modulemd_module_stream_v2_add_dependencies (
+    MODULEMD_MODULE_STREAM_V2 (stream), dep);
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  g_clear_pointer (&dep, g_object_unref);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was upgraded to StreamV3 */
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream2",
+    2,
+    "c0ff33",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+  /* Next, add a v3 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v3_new (
     "testmodule1", "teststream3");
   modulemd_module_stream_set_version (stream, 3);
   modulemd_module_stream_set_context (stream, "badfeed");
-  modulemd_module_stream_v1_set_summary (MODULEMD_MODULE_STREAM_V1 (stream),
-                                         "A test stream");
-  modulemd_module_stream_v1_set_description (
-    MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
-  modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
-  g_assert_true (
-    modulemd_module_index_add_module_stream (index, stream, &error));
+  modulemd_module_stream_v3_set_summary (MODULEMD_MODULE_STREAM_V3 (stream),
+                                         "A thired stream");
+  modulemd_module_stream_v3_set_description (
+    MODULEMD_MODULE_STREAM_V3 (stream), "A thired stream's description");
+  modulemd_module_stream_v3_add_module_license (
+    MODULEMD_MODULE_STREAM_V3 (stream), "Beerware");
+  modulemd_module_stream_v3_set_platform (MODULEMD_MODULE_STREAM_V3 (stream),
+                                          "f29");
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&stream, g_object_unref);
 
-  /* Verify that it was added as a StreamV2 object */
+  /* Verify that it was added as a StreamV3 object */
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
@@ -501,20 +667,37 @@ module_index_test_stream_upgrade (void)
   g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+                   MD_MODULESTREAM_VERSION_THREE);
   g_clear_object (&stream);
+
+  g_clear_object (&index);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
 }
 
 
+/* NOTE: modulemd_module_index_upgrade_streams() is deprecated */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
 module_index_test_index_upgrade (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autoptr (GError) error = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
 
-  /* Construct an Index with some objects */
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+
+  /*
+   * Tests starting with a v1 Index
+   */
+
+  /* Construct a v1 Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_ONE);
   index = modulemd_module_index_new ();
 
   /* Add some streams */
@@ -596,12 +779,102 @@ module_index_test_index_upgrade (void)
                    ==,
                    MD_MODULESTREAM_VERSION_ONE);
 
-  /* Verify that upgrades from stream v1 to v2 work */
+  /* Verify that upgrades to the same stream version work. */
   g_assert_true (modulemd_module_index_upgrade_streams (
-    index, MD_MODULESTREAM_VERSION_TWO, NULL));
+    index, MD_MODULESTREAM_VERSION_ONE, NULL));
   g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
                    ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+                   MD_MODULESTREAM_VERSION_ONE);
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+  g_clear_object (&stream);
+
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream3",
+    3,
+    "badfeed",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+  g_clear_object (&stream);
+
+  /* Verify that upgrade from stream v1 to v2 is forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_TWO, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
+  /* confirm index and original v1 object are still stream v1 */
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+  g_clear_object (&stream);
+
+  /* Verify that upgrade from stream v1 to v3 is also forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_THREE, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
+
+  g_clear_object (&index);
+
+  /*
+   * Tests starting with a v2 Index
+   */
+
+  /* Construct a v2 Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
+  index = modulemd_module_index_new ();
+
+  /* Add some streams */
+
+  /* Add a v2 streams */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
+    "testmodule1", "teststream1");
+  modulemd_module_stream_set_version (stream, 1);
+  modulemd_module_stream_set_context (stream, "deadbeef");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v2_set_description (
+    MODULEMD_MODULE_STREAM_V2 (stream), "A test stream's description");
+  modulemd_module_stream_v2_add_module_license (
+    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+  g_assert_true (
+    modulemd_module_index_add_module_stream (index, stream, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was added as a StreamV2 object */
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
@@ -616,6 +889,24 @@ module_index_test_index_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
+
+  /* Add one more v2 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
+    "testmodule1", "teststream3");
+  modulemd_module_stream_set_version (stream, 3);
+  modulemd_module_stream_set_context (stream, "badfeed");
+  modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v2_set_description (
+    MODULEMD_MODULE_STREAM_V2 (stream), "A test stream's description");
+  modulemd_module_stream_v2_add_module_license (
+    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+  g_assert_true (
+    modulemd_module_index_add_module_stream (index, stream, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was added as a StreamV2 object */
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream3",
@@ -630,6 +921,19 @@ module_index_test_index_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
+  /* Add some defaults */
+  defaults = modulemd_defaults_new (1, "testmodule1");
+  g_assert_true (modulemd_module_index_add_defaults (index, defaults, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&defaults, g_object_unref);
+
+  /* Verify that the index is at stream v2 and defaults v1 */
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
 
   /* Verify that upgrades to the same stream version work. */
   g_assert_true (modulemd_module_index_upgrade_streams (
@@ -665,6 +969,194 @@ module_index_test_index_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
+  /* Verify that downgrade from stream v2 to v1 is forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_ONE, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
+  /* confirm index and original v2 object are still stream v2 */
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_TWO);
+  g_clear_object (&stream);
+
+  /* Verify that upgrade from stream v2 to v3 is also forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_THREE, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
+
+  g_clear_object (&index);
+
+  /*
+   * Tests starting with a v3 Index
+   */
+
+  /* Construct a v3 Index with some objects */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
+  index = modulemd_module_index_new ();
+
+  /* Add some streams */
+
+  /* Add a v3 streams */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v3_new (
+    "testmodule1", "teststream1");
+  modulemd_module_stream_set_version (stream, 1);
+  modulemd_module_stream_set_context (stream, "deadbeef");
+  modulemd_module_stream_v3_set_summary (MODULEMD_MODULE_STREAM_V3 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v3_set_description (
+    MODULEMD_MODULE_STREAM_V3 (stream), "A test stream's description");
+  modulemd_module_stream_v3_add_module_license (
+    MODULEMD_MODULE_STREAM_V3 (stream), "Beerware");
+  g_assert_true (
+    modulemd_module_index_add_module_stream (index, stream, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was added as a StreamV3 object */
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+
+  /* Add one more v3 Stream */
+  stream = (ModulemdModuleStream *)modulemd_module_stream_v3_new (
+    "testmodule1", "teststream3");
+  modulemd_module_stream_set_version (stream, 3);
+  modulemd_module_stream_set_context (stream, "badfeed");
+  modulemd_module_stream_v3_set_summary (MODULEMD_MODULE_STREAM_V3 (stream),
+                                         "A test stream");
+  modulemd_module_stream_v3_set_description (
+    MODULEMD_MODULE_STREAM_V3 (stream), "A test stream's description");
+  modulemd_module_stream_v3_add_module_license (
+    MODULEMD_MODULE_STREAM_V3 (stream), "Beerware");
+  g_assert_true (
+    modulemd_module_index_add_module_stream (index, stream, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&stream, g_object_unref);
+
+  /* Verify that it was added as a StreamV3 object */
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream3",
+    3,
+    "badfeed",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+  /* Add some defaults */
+  defaults = modulemd_defaults_new (1, "testmodule1");
+  g_assert_true (modulemd_module_index_add_defaults (index, defaults, &error));
+  g_assert_no_error (error);
+  g_clear_pointer (&defaults, g_object_unref);
+
+  /* Verify that the index is at stream v3 and defaults v1 */
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_ONE);
+
+  /* Verify that upgrades to the same stream version work. */
+  g_assert_true (modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_THREE, NULL));
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream3",
+    3,
+    "badfeed",
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+  /* Verify that downupgrade from stream v3 to v1 is forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_ONE, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
+  /* confirm index and original v3 object are still stream v3 */
+  g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (index, "testmodule1"),
+    "teststream1",
+    1,
+    "deadbeef",
+    NULL,
+    &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+  g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
+                   ==,
+                   MD_MODULESTREAM_VERSION_THREE);
+  g_clear_object (&stream);
+
+  /* Verify that downupgrade from stream v3 to v2 is also forbidden */
+  ret = modulemd_module_index_upgrade_streams (
+    index, MD_MODULESTREAM_VERSION_TWO, &error);
+  g_assert_false (ret);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_clear_error (&error);
+
 
   /* Verify that upgrades to the same defaults version work */
   g_assert_true (modulemd_module_index_upgrade_defaults (
@@ -691,16 +1183,12 @@ module_index_test_index_upgrade (void)
   g_clear_pointer (&error, g_error_free);
 
 
-  /* Verify that upgrades to a lower version fail */
-  g_assert_false (modulemd_module_index_upgrade_streams (
-    index, MD_MODULESTREAM_VERSION_ONE, &error));
-  g_assert_nonnull (error);
-  g_clear_pointer (&error, g_error_free);
+  g_clear_object (&index);
 
-  g_assert_false (modulemd_module_index_upgrade_defaults (index, 0, &error));
-  g_assert_nonnull (error);
-  g_clear_pointer (&error, g_error_free);
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 static void

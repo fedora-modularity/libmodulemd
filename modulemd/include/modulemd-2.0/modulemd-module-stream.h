@@ -272,9 +272,9 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
  * appropriately if the upgrade could not be completed automatically.
  *
  * Since: 2.0
+ * Deprecated: 2.10: Use modulemd_module_stream_upgrade_ext() instead.
  */
-/* TODO: Deprecated: 2.10: Use modulemd_module_stream_upgrade_ext() instead. */
-/* TODO: MMD_DEPRECATED_FOR (modulemd_module_stream_upgrade_ext) */
+MMD_DEPRECATED_FOR (modulemd_module_stream_upgrade_ext)
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,

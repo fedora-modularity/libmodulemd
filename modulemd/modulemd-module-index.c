@@ -1252,22 +1252,23 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
       return FALSE;
     }
 
-  if (mdversion > self->stream_mdversion)
+  if (mdversion != self->stream_mdversion)
     {
-      /* Upgrade any streams we've already seen to this version */
-      g_debug ("Upgrading all streams to version %i", mdversion);
-      if (!modulemd_module_index_upgrade_streams (
-            self, mdversion, &nested_error))
-        {
-          g_propagate_error (error, g_steal_pointer (&nested_error));
-          return FALSE;
-        }
+      g_set_error (
+        error,
+        MODULEMD_ERROR,
+        MMD_ERROR_UPGRADE,
+        "Failed to add module stream with expected mdversion %i, got %i",
+        self->stream_mdversion,
+        mdversion);
+      return FALSE;
     }
 
   return TRUE;
 }
 
 
+/* Deprecated in favor of modulemd_set_default_stream_mdversion() */
 gboolean
 modulemd_module_index_upgrade_streams (
   ModulemdModuleIndex *self,
@@ -1278,42 +1279,49 @@ modulemd_module_index_upgrade_streams (
   gpointer key;
   gpointer value;
   g_autoptr (ModulemdModule) module = NULL;
-  g_autoptr (GError) nested_error = NULL;
+  gboolean streams_present = FALSE;
 
-  if (mdversion < self->stream_mdversion)
+  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+
+  if (mdversion < MD_MODULESTREAM_VERSION_ONE ||
+      mdversion > MD_MODULESTREAM_VERSION_LATEST)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MMD_ERROR_UPGRADE,
-                   "Downgrades not permitted. mdversion %i < current %i",
-                   mdversion,
-                   self->stream_mdversion);
+                   "Invalid mdversion %i",
+                   mdversion);
       return FALSE;
     }
 
+  if (mdversion == self->stream_mdversion)
+    {
+      return TRUE;
+    }
+
   g_hash_table_iter_init (&iter, self->modules);
-  while (g_hash_table_iter_next (&iter, &key, &value))
+  while (!streams_present && g_hash_table_iter_next (&iter, &key, &value))
     {
       module = g_object_ref (MODULEMD_MODULE (value));
 
-      /* Skip any module without streams */
-      if (modulemd_module_get_all_streams (module)->len == 0)
+      if (modulemd_module_get_all_streams (module)->len > 0)
         {
-          g_clear_object (&module);
-          continue;
-        }
-
-      if (!modulemd_module_upgrade_streams (module, mdversion, &nested_error))
-        {
-          g_propagate_prefixed_error (
-            error,
-            g_steal_pointer (&nested_error),
-            "Error upgrading streams for module %s",
-            modulemd_module_get_module_name (module));
-          return FALSE;
+          streams_present = TRUE;
         }
 
       g_clear_object (&module);
+    }
+
+  if (streams_present)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MMD_ERROR_UPGRADE,
+                   "Index mdversion changes not permitted if streams are "
+                   "present. mdversion %i != current %i",
+                   mdversion,
+                   self->stream_mdversion);
+      return FALSE;
     }
 
   self->stream_mdversion = mdversion;

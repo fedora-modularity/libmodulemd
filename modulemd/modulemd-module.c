@@ -378,19 +378,33 @@ modulemd_module_add_stream (ModulemdModule *self,
   obsoletes = modulemd_module_get_newest_active_obsoletes (
     self, stream_name, modulemd_module_stream_get_context (stream));
 
-  // Obsoletes work only with version two (and possibly higher)
   if (obsoletes && index_mdversion < MD_MODULESTREAM_VERSION_TWO)
     {
-      index_mdversion = MD_MODULESTREAM_VERSION_TWO;
+      /* Obsoletes work only with mdversion two and higher */
+      g_set_error_literal (
+        error,
+        MODULEMD_ERROR,
+        MMD_ERROR_UPGRADE,
+        "ModuleStream obsoletes requires mdversion two or greater.");
+      return MD_MODULESTREAM_VERSION_ERROR;
+    }
+
+  if (modulemd_module_stream_get_mdversion (stream) > index_mdversion)
+    {
+      /* If the stream we were passed is of a higher mdversion version than the
+       * index, fail because we don't handle downgrades.
+       */
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "ModuleStream downgrades are not supported.");
+      return MD_MODULESTREAM_VERSION_ERROR;
     }
 
   if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
     {
-      /* If the stream we were passed is of a lower version than the index has
-       * seen before, upgrade it to the index version.
-       *
-       * We only call this if the mdversion is definitely lower, because the
-       * upgrade() routine is not designed to handle downgrades.
+      /* If the stream we were passed is of a lower mdversion version than the
+       * index, upgrade it to the index version.
        */
       newmodule = modulemd_module_stream_upgrade_ext (
         stream, index_mdversion, &nested_error);
@@ -404,7 +418,9 @@ modulemd_module_add_stream (ModulemdModule *self,
     }
   else
     {
-      /* Otherwise, add the current stream to a new temporary module. */
+      /* Otherwise the current stream is already at the desired mdversion, add
+       * it to a new temporary module.
+       */
       newmodule = modulemd_module_new (module_name);
       g_ptr_array_add (newmodule->streams, g_object_ref (stream));
 
@@ -429,15 +445,19 @@ modulemd_module_add_stream (ModulemdModule *self,
 
       if (obsoletes != NULL)
         {
-          if (new_mdversion == MD_MODULESTREAM_VERSION_TWO)
+          switch (new_mdversion)
             {
+            case MD_MODULESTREAM_VERSION_TWO:
               modulemd_module_stream_v2_associate_obsoletes (
                 (ModulemdModuleStreamV2 *)newstream, obsoletes);
-            }
-          else
-            {
+              break;
+
+            case MD_MODULESTREAM_VERSION_THREE:
               modulemd_module_stream_v3_associate_obsoletes (
                 (ModulemdModuleStreamV3 *)newstream, obsoletes);
+              break;
+
+            default: g_return_val_if_reached (MD_MODULESTREAM_VERSION_ERROR);
             }
         }
     }
@@ -884,27 +904,30 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
             }
         }
 
-      /* TODO: this needs work if we are going allow automatic stream upgrades to V3 */
-
-      if (modulemd_module_stream_get_mdversion (stream) <
-          MD_MODULESTREAM_VERSION_TWO)
+      switch (modulemd_module_stream_get_mdversion (stream))
         {
-          /* If the stream we need to associate obsoletes is of a lower version than 2
-           * upgrade it to the version 2, so it can use obsoletes.
-           *
-           * We only call this if the mdversion is definitely lower, because the
-           * upgrade() routine is not designed to handle downgrades.
-           */
-          ModulemdModuleStream *newstream = NULL;
-          newstream = modulemd_module_stream_upgrade (
-            stream, MD_MODULESTREAM_VERSION_TWO, NULL);
-          g_ptr_array_remove (self->streams, stream);
-          g_ptr_array_add (self->streams, newstream);
-          stream = newstream;
+        case MD_MODULESTREAM_VERSION_TWO:
+          current_obsoletes = modulemd_module_stream_v2_get_obsoletes (
+            (ModulemdModuleStreamV2 *)stream);
+          break;
+
+        case MD_MODULESTREAM_VERSION_THREE:
+          current_obsoletes = modulemd_module_stream_v3_get_obsoletes (
+            (ModulemdModuleStreamV3 *)stream);
+          break;
+
+        default:
+          g_info (
+            "ModuleStream obsoletes requires mdversion two or greater: "
+            "module: %s, stream: %s, context: %s, mdversion: %u",
+            modulemd_module_get_module_name (self),
+            stream_str,
+            context_str,
+            (uint)modulemd_module_stream_get_mdversion (stream));
+          g_return_if_reached ();
         }
 
-      current_obsoletes = modulemd_module_stream_v2_get_obsoletes (
-        (ModulemdModuleStreamV2 *)stream);
+
       if (current_obsoletes)
         {
           guint64 cur_obsoletes_mod =
@@ -941,8 +964,29 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
             }
         }
 
-      modulemd_module_stream_v2_associate_obsoletes (
-        (ModulemdModuleStreamV2 *)stream, new_obsoletes);
+      switch (modulemd_module_stream_get_mdversion (stream))
+        {
+        case MD_MODULESTREAM_VERSION_TWO:
+          modulemd_module_stream_v2_associate_obsoletes (
+            (ModulemdModuleStreamV2 *)stream, new_obsoletes);
+          break;
+
+        case MD_MODULESTREAM_VERSION_THREE:
+          modulemd_module_stream_v3_associate_obsoletes (
+            (ModulemdModuleStreamV3 *)stream, new_obsoletes);
+          break;
+
+        default:
+          /* Internal error */
+          g_info (
+            "ModuleStream obsoletes internal error: module: %s, stream: %s, "
+            "context: %s, mdversion: %u",
+            modulemd_module_get_module_name (self),
+            stream_str,
+            context_str,
+            (uint)modulemd_module_stream_get_mdversion (stream));
+          g_return_if_reached ();
+        }
     }
 }
 

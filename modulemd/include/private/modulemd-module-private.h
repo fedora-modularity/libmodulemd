@@ -127,11 +127,12 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
  * #ModulemdModule. A stream added to a #ModulemdModule must have a module
  * name and stream name set on it or it will be rejected. If the module name
  * does not match this module, it will also be rejected.
- * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum of the highest
- * stream version added so far in the #ModulemdModuleIndex. When obsoletes is present
- * for @stream it is set to at least version two. If non-zero,
- * perform an upgrade to this version while adding @stream to @self. If
- * the @stream already has the same or a higher version, just copy it.
+ * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum stream_mdversion
+ * of the #ModulemdModuleIndex to which @stream is being added. If the version
+ * of @stream is less than @index_mdversion, an upgrade to this version will be
+ * performed while adding @stream to @self. If @stream already has the same
+ * version, it is just copied. When obsoletes is present for @stream it must be
+ * set to at least version two.
  * @error: (out): A #GError containing information about why this function
  * failed.
  *
@@ -141,7 +142,8 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
  * safely or the defaults are not for this module, it will return an
  * appropriate error.
  *
- * Returns: The mdversion of the stream that was added. Returns
+ * Returns: The mdversion of the stream that was added, which will be
+ * @index_mdversion unless an error occurred. Returns
  * %MD_MODULESTREAM_VERSION_ERROR and sets @error if the module name didn't
  * match, the module and stream names were unset or the stream object couldn't
  * be upgraded successfully to the @index_mdversion. Returns

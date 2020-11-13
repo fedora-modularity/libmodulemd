@@ -168,40 +168,40 @@ module_test_streams (void)
   modulemd_module_stream_set_context (stream, "context1");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  g_assert_cmpint (modulemd_module_add_stream (
-                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
-                   ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+  g_assert_cmpint (
+    modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL),
+    ==,
+    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 3);
   modulemd_module_stream_set_context (stream, "context2");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  g_assert_cmpint (modulemd_module_add_stream (
-                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
-                   ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+  g_assert_cmpint (
+    modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL),
+    ==,
+    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream1");
   modulemd_module_stream_set_version (stream, 1);
   modulemd_module_stream_set_context (stream, "context2");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 1");
-  g_assert_cmpint (modulemd_module_add_stream (
-                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
-                   ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+  g_assert_cmpint (
+    modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL),
+    ==,
+    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   stream = modulemd_module_stream_new (2, "testmodule", "stream2");
   modulemd_module_stream_set_version (stream, 42);
   modulemd_module_stream_set_context (stream, "context42");
   modulemd_module_stream_v2_set_summary (MODULEMD_MODULE_STREAM_V2 (stream),
                                          "Stream 2");
-  g_assert_cmpint (modulemd_module_add_stream (
-                     m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL),
-                   ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+  g_assert_cmpint (
+    modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL),
+    ==,
+    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
 
   /* Create a translation post-adding streams */
@@ -377,11 +377,13 @@ module_test_get_stream_names (void)
 
   /*Test module with all same stream names*/
   m = modulemd_module_new ("testmodule");
-  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
-  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
 
   list = modulemd_module_get_stream_names_as_strv (m);
@@ -393,14 +395,17 @@ module_test_get_stream_names (void)
 
   /*Test module with all different stream names*/
   m = modulemd_module_new ("testmodule");
-  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
-  stream = modulemd_module_stream_new (2, "testmodule", "stream2");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream2");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
-  stream = modulemd_module_stream_new (2, "testmodule", "stream3");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream3");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
 
   list = modulemd_module_get_stream_names_as_strv (m);
@@ -416,14 +421,17 @@ module_test_get_stream_names (void)
 
   /*Test module with some same/different stream names*/
   m = modulemd_module_new ("testmodule");
-  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
-  stream = modulemd_module_stream_new (2, "testmodule", "stream1");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream1");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
-  stream = modulemd_module_stream_new (2, "testmodule", "stream2");
-  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_UNSET, NULL);
+  stream = modulemd_module_stream_new (
+    MD_MODULESTREAM_VERSION_TWO, "testmodule", "stream2");
+  modulemd_module_add_stream (m, stream, MD_MODULESTREAM_VERSION_TWO, NULL);
   g_clear_object (&stream);
 
   list = modulemd_module_get_stream_names_as_strv (m);

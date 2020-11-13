@@ -1499,7 +1499,7 @@ modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStreamV2 *from,
   /* create a V3 stream for each of the expanded V2 deps */
   for (guint i = 0; i < expanded_deps->len; i++)
     {
-      ex_dep = (ModulemdBuildConfig *)g_ptr_array_index (expanded_deps, i);
+      ex_dep = MODULEMD_BUILD_CONFIG (g_ptr_array_index (expanded_deps, i));
 
       v3_stream = modulemd_module_stream_v3_new (
         modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (from)),

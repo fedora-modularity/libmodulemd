@@ -42,7 +42,7 @@ modulemd_build_config_new (void)
 static void
 modulemd_build_config_finalize (GObject *object)
 {
-  ModulemdBuildConfig *self = (ModulemdBuildConfig *)object;
+  ModulemdBuildConfig *self = MODULEMD_BUILD_CONFIG (object);
 
   g_clear_pointer (&self->context, g_free);
   g_clear_pointer (&self->platform, g_free);

@@ -20,6 +20,10 @@ try:
     import unittest
     import gi
 
+    gi._overridesdir = os.path.join(
+        os.getenv("MESON_SOURCE_ROOT"), "bindings", "python", "gi", "overrides"
+    )
+
     gi.require_version("Modulemd", "2.0")
     from gi.repository import GLib
     from gi.repository import Modulemd

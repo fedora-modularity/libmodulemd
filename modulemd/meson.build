@@ -84,6 +84,7 @@ modulemd_srcs = files(
     'modulemd-subdocument-info.c',
     'modulemd-translation.c',
     'modulemd-translation-entry.c',
+    'modulemd-upgrade-helper.c',
     'modulemd-util.c',
     'modulemd-yaml-util.c',
     'modulemd-obsoletes.c',
@@ -118,6 +119,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-subdocument-info.h',
     'include/modulemd-2.0/modulemd-translation.h',
     'include/modulemd-2.0/modulemd-translation-entry.h',
+    'include/modulemd-2.0/modulemd-upgrade-helper.h',
     'include/modulemd-2.0/modulemd-obsoletes.h',
 )
 
@@ -326,6 +328,7 @@ c_tests = {
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
+'upgrade_helper'      : [ 'tests/test-modulemd-upgrade-helper.c' ],
 'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
 }
 
@@ -369,6 +372,7 @@ python_tests = {
 'servicelevel'     : 'tests/ModulemdTests/servicelevel.py',
 'translation'      : 'tests/ModulemdTests/translation.py',
 'translationentry' : 'tests/ModulemdTests/translationentry.py',
+'upgradehelper'    : 'tests/ModulemdTests/upgradehelper.py',
 }
 
 foreach name, script : python_tests

@@ -586,8 +586,17 @@ class TestModuleStream(TestBase):
         assert stream.get_runtime_requirement_stream("testmodule") == "latest"
 
     def test_xmd(self):
-        if "_overrides_module" in dir(Modulemd):
-            for version in modulestream_versions:
+        for version in modulestream_versions:
+            # We have a chicken-egg problem with overrides, since they can only
+            # be tested if they are already installed. This means they need to
+            # be run in the CI. In order to avoid changes to these tests or the
+            # overrides breaking things, we'll skip them if the appropriate
+            # override is not installed.
+            if "_overrides_module" in dir(Modulemd) and hasattr(
+                gi.overrides.Modulemd,
+                type(Modulemd.ModuleStream.new(version)).__name__,
+            ):
+
                 # The XMD python tests can only be run against the installed lib
                 # because the overrides that translate between python and GVariant
                 # must be installed in /usr/lib/python*/site-packages/gi/overrides
@@ -616,8 +625,8 @@ class TestModuleStream(TestBase):
                 stream.set_summary("foo")
                 stream.set_description("bar")
                 stream.add_module_license("MIT")
-                if hasattr(stream, 'set_platform'):
-                    stream.set_platform('f33')
+                if hasattr(stream, "set_platform"):
+                    stream.set_platform("f33")
 
                 # Verify that we can output the XMD successfully
                 index = Modulemd.ModuleIndex()

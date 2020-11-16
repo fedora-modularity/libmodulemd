@@ -586,6 +586,9 @@ class TestModuleStream(TestBase):
         assert stream.get_runtime_requirement_stream("testmodule") == "latest"
 
     def test_xmd(self):
+        # get and save current default stream mdversion
+        default_mdv = Modulemd.get_default_stream_mdversion()
+
         for version in modulestream_versions:
             # We have a chicken-egg problem with overrides, since they can only
             # be tested if they are already installed. This means they need to
@@ -629,12 +632,16 @@ class TestModuleStream(TestBase):
                     stream.set_platform("f33")
 
                 # Verify that we can output the XMD successfully
+                Modulemd.set_default_stream_mdversion(version)
                 index = Modulemd.ModuleIndex()
                 index.add_module_stream(stream)
 
                 out_yaml = index.dump_to_string()
 
                 self.assertIsNotNone(out_yaml)
+
+        # restore default mdversion to avoid unexpected results from other tests
+        Modulemd.set_default_stream_mdversion(default_mdv)
 
     def test_upgrade_v1_to_v2(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")

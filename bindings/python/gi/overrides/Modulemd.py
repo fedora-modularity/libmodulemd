@@ -98,6 +98,21 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
+    class ModuleStreamV3(Modulemd.ModuleStreamV3):
+        def set_xmd(self, xmd):
+            super(ModuleStreamV3, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd)
+            )
+
+        def get_xmd(self):
+            variant_xmd = super(ModuleStreamV3, self).get_xmd()
+            if variant_xmd is None:
+                return {}
+            return variant_xmd.unpack()
+
+    ModuleStreamV3 = override(ModuleStreamV3)
+    __all__.append(ModuleStreamV3)
+
     class ModuleStreamV2(Modulemd.ModuleStreamV2):
         def set_xmd(self, xmd):
             super(ModuleStreamV2, self).set_xmd(

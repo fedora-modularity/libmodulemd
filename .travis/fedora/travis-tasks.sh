@@ -8,7 +8,13 @@ PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false}"
 RETRY_CMD=/builddir/.travis/retry-command.sh
 
+override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
+
 pushd /builddir/
+
+# Ensure that the python 3 overrides are always in place or else some of those
+# tests may fail if they are modified.
+ln -sf /builddir/bindings/python/gi/Modulemd.py $override_dir/
 
 valgrind_cmd='
     valgrind --error-exitcode=1
@@ -81,7 +87,7 @@ $RETRY_CMD dnf -y install --nogpgcheck \
 
 # Also install the python2-libmodulemd if it was built for this release
 # the ||: at the end instructs bash to consider this a pass either way.
-$RETRY_CMD dnf -y install --nogpgcheck \
+dnf -y install --nogpgcheck \
                --allowerasing \
                --repofrompath libmodulemd-travis,$arch \
                $arch/python2-libmodulemd*.rpm ||:

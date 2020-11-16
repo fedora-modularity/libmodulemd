@@ -587,39 +587,45 @@ class TestModuleStream(TestBase):
 
     def test_xmd(self):
         if "_overrides_module" in dir(Modulemd):
-            # The XMD python tests can only be run against the installed lib
-            # because the overrides that translate between python and GVariant
-            # must be installed in /usr/lib/python*/site-packages/gi/overrides
-            # or they are not included when importing Modulemd
-            stream = Modulemd.ModuleStreamV2.new("foo", "bar")
-            # An empty dictionary should be returned if no xmd value is set
-            assert stream.get_xmd() == {}
+            for version in modulestream_versions:
+                # The XMD python tests can only be run against the installed lib
+                # because the overrides that translate between python and GVariant
+                # must be installed in /usr/lib/python*/site-packages/gi/overrides
+                # or they are not included when importing Modulemd
+                stream = Modulemd.ModuleStream.new(version, "foo", "bar")
+                # An empty dictionary should be returned if no xmd value is set
+                self.assertEqual(stream.get_xmd(), dict())
 
-            xmd = {"outer_key": {"inner_key": ["scalar", "another_scalar"]}}
+                xmd = {
+                    "outer_key": {"inner_key": ["scalar", "another_scalar"]}
+                }
 
-            stream.set_xmd(xmd)
+                stream.set_xmd(xmd)
 
-            xmd_copy = stream.get_xmd()
-            assert xmd_copy
-            assert "outer_key" in xmd_copy
-            assert "inner_key" in xmd_copy["outer_key"]
-            assert "scalar" in xmd_copy["outer_key"]["inner_key"]
-            assert "another_scalar" in xmd_copy["outer_key"]["inner_key"]
+                xmd_copy = stream.get_xmd()
+                assert xmd_copy
+                assert "outer_key" in xmd_copy
+                assert "inner_key" in xmd_copy["outer_key"]
+                assert "scalar" in xmd_copy["outer_key"]["inner_key"]
+                assert "another_scalar" in xmd_copy["outer_key"]["inner_key"]
 
-            # Verify that we can add content and save it back
-            xmd["something"] = ["foo", "bar"]
-            stream.set_xmd(xmd)
+                # Verify that we can add content and save it back
+                xmd["something"] = ["foo", "bar"]
+                stream.set_xmd(xmd)
 
-            stream.set_summary("foo")
-            stream.set_description("bar")
-            stream.add_module_license("MIT")
+                stream.set_summary("foo")
+                stream.set_description("bar")
+                stream.add_module_license("MIT")
+                if hasattr(stream, 'set_platform'):
+                    stream.set_platform('f33')
 
-            # Verify that we can output the XMD successfully
-            index = Modulemd.ModuleIndex()
-            index.add_module_stream(stream)
-            out_yaml = index.dump_to_string()
+                # Verify that we can output the XMD successfully
+                index = Modulemd.ModuleIndex()
+                index.add_module_stream(stream)
 
-            self.assertIsNotNone(out_yaml)
+                out_yaml = index.dump_to_string()
+
+                self.assertIsNotNone(out_yaml)
 
     def test_upgrade_v1_to_v2(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")

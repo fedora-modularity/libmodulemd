@@ -489,3 +489,14 @@ modulemd_guint64_to_iso8601date (guint64 date);
   ObjName, obj_name, OBJ_NAME, attr, ATTR)                                    \
   MODULEMD_SETTER_GETTER_STRING_EXT (                                         \
     static, ObjName, obj_name, OBJ_NAME, attr, ATTR)
+
+/**
+ * modulemd_str_set_new:
+ *
+ * A convenience macro to simplify the common operation of setting up a hash
+ * table in libmodulemd for containing a set() of unique strings.
+ *
+ * Since: 2.10
+ */
+#define modulemd_str_set_new()                                                \
+  g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL)

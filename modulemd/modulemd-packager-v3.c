@@ -815,7 +815,18 @@ modulemd_packager_v3_to_stream_v2 (ModulemdPackagerV3 *self, GError **error)
   modulemd_module_stream_v2_set_description (
     v2_stream, modulemd_packager_v3_get_description (self));
 
-  MODULEMD_REPLACE_SET (v2_stream->module_licenses, self->module_licenses);
+  /* Packager v3 "license" is optional. Stream v2 "license" is required
+   * Fill in the default Packager v3 license if none has been specified.
+   */
+  if (g_hash_table_size (self->module_licenses) == 0)
+    {
+      modulemd_module_stream_v2_add_module_license (
+        v2_stream, MMD_PACKAGER_DEFAULT_MODULE_LICENSE);
+    }
+  else
+    {
+      MODULEMD_REPLACE_SET (v2_stream->module_licenses, self->module_licenses);
+    }
 
   modulemd_module_stream_v2_set_xmd (v2_stream,
                                      modulemd_packager_v3_get_xmd (self));

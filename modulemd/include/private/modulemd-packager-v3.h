@@ -42,6 +42,15 @@ G_DECLARE_FINAL_TYPE (
 
 
 /**
+ * MMD_PACKAGER_DEFAULT_MODULE_LICENSE:
+ *
+ * The ModulePackager v3 default module metadata license.
+ *
+ * Since: 2.10
+ */
+#define MMD_PACKAGER_DEFAULT_MODULE_LICENSE "MIT"
+
+/**
  * ModulemdPackagerVersionEnum:
  * @MD_PACKAGER_VERSION_ERROR: Represents an error handling module stream
  * version.

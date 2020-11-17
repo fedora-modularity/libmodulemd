@@ -247,22 +247,12 @@ add_subdoc (ModulemdModuleIndex *self,
           return FALSE;
         }
 
-      if (autogen_module_name &&
-          !modulemd_module_stream_get_module_name (stream))
+      if (autogen_module_name)
         {
-          name = g_strdup_printf ("__unnamed_module_%d",
-                                  g_hash_table_size (self->modules) + 1);
-          modulemd_module_stream_set_module_name (stream, name);
-          g_clear_pointer (&name, g_free);
-        }
-
-      if (autogen_module_name &&
-          !modulemd_module_stream_get_stream_name (stream))
-        {
-          name = g_strdup_printf ("__unnamed_stream_%d",
-                                  g_hash_table_size (self->modules) + 1);
-          modulemd_module_stream_set_stream_name (stream, name);
-          g_clear_pointer (&name, g_free);
+          modulemd_module_stream_set_autogen_module_name (
+            stream, g_hash_table_size (self->modules) + 1);
+          modulemd_module_stream_set_autogen_stream_name (
+            stream, g_hash_table_size (self->modules) + 1);
         }
 
       if (!modulemd_module_stream_validate (stream, &nested_error))

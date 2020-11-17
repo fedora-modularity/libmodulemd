@@ -437,4 +437,86 @@ ModulemdModule *
 modulemd_module_stream_upgrade_v2_to_v3_ext (ModulemdModuleStreamV2 *from,
                                              GError **error);
 
+/**
+ * modulemd_module_stream_set_autogen_module_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ * @id: (in): An unsigned integer to be used as a unique identifier if a module
+ * name is generated.
+ *
+ * If @self already has a module name set, this function does nothing.
+ * Otherwise, a module name will be generated and set for @self.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_stream_set_autogen_module_name (ModulemdModuleStream *self,
+                                                guint id);
+
+/**
+ * modulemd_module_stream_set_autogen_stream_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ * @id: (in): An unsigned integer to be used as a unique identifier if a stream
+ * name is generated.
+ *
+ * If @self already has a stream name set, this function does nothing.
+ * Otherwise, a stream name will be generated and set for @self.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_stream_set_autogen_stream_name (ModulemdModuleStream *self,
+                                                guint id);
+
+/**
+ * modulemd_module_stream_is_autogen_module_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ *
+ * Returns: TRUE if @self has a module name that matches the format used if
+ * modulemd_module_stream_set_autogen_module_name() created the name.
+ * Otherwise FALSE.
+ *
+ * Since: 2.10
+ */
+gboolean
+modulemd_module_stream_is_autogen_module_name (ModulemdModuleStream *self);
+
+/**
+ * modulemd_module_stream_is_autogen_stream_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ *
+ * Returns: TRUE if @self has a stream name that matches the format used if
+ * modulemd_module_stream_set_autogen_stream_name() created the name.
+ * Otherwise FALSE.
+ *
+ * Since: 2.10
+ */
+gboolean
+modulemd_module_stream_is_autogen_stream_name (ModulemdModuleStream *self);
+
+/**
+ * modulemd_module_stream_clear_autogen_module_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ *
+ * Clears @self's module name if it matches the format used if
+ * modulemd_module_stream_set_autogen_module_name() created the name, else
+ * does nothing.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_stream_clear_autogen_module_name (ModulemdModuleStream *self);
+
+/**
+ * modulemd_module_stream_clear_autogen_stream_name:
+ * @self: (in): A pointer to a #ModulemdModuleStream object
+ *
+ * Clears @self's stream name if it matches the format used if
+ * modulemd_module_stream_set_autogen_stream_name() created the name, else
+ * does nothing.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self);
+
 G_END_DECLS

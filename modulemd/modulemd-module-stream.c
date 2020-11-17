@@ -2419,3 +2419,77 @@ modulemd_module_stream_includes_nevra (ModulemdModuleStream *self,
 
   return FALSE;
 }
+
+void
+modulemd_module_stream_set_autogen_module_name (ModulemdModuleStream *self,
+                                                guint id)
+{
+  g_autofree gchar *name = NULL;
+
+  if (!modulemd_module_stream_get_module_name (self))
+    {
+      name = g_strdup_printf ("__unnamed_module_%u", id);
+      modulemd_module_stream_set_module_name (self, name);
+      g_clear_pointer (&name, g_free);
+    }
+}
+
+void
+modulemd_module_stream_set_autogen_stream_name (ModulemdModuleStream *self,
+                                                guint id)
+{
+  g_autofree gchar *name = NULL;
+
+  if (!modulemd_module_stream_get_stream_name (self))
+    {
+      name = g_strdup_printf ("__unnamed_stream_%u", id);
+      modulemd_module_stream_set_stream_name (self, name);
+      g_clear_pointer (&name, g_free);
+    }
+}
+
+gboolean
+modulemd_module_stream_is_autogen_module_name (ModulemdModuleStream *self)
+{
+  const gchar *name = NULL;
+
+  name = modulemd_module_stream_get_module_name (self);
+  if (name && g_str_has_prefix (name, "__unnamed_module_"))
+    {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+gboolean
+modulemd_module_stream_is_autogen_stream_name (ModulemdModuleStream *self)
+{
+  const gchar *name = NULL;
+
+  name = modulemd_module_stream_get_stream_name (self);
+  if (name && g_str_has_prefix (name, "__unnamed_stream_"))
+    {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+void
+modulemd_module_stream_clear_autogen_module_name (ModulemdModuleStream *self)
+{
+  if (modulemd_module_stream_is_autogen_module_name (self))
+    {
+      modulemd_module_stream_set_module_name (self, NULL);
+    }
+}
+
+void
+modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self)
+{
+  if (modulemd_module_stream_is_autogen_stream_name (self))
+    {
+      modulemd_module_stream_set_stream_name (self, NULL);
+    }
+}

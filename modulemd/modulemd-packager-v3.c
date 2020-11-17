@@ -953,6 +953,13 @@ modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
       return NULL;
     }
 
+  /* autogen module/stream names if necessary for adding to index */
+
+  modulemd_module_stream_set_autogen_module_name (
+    MODULEMD_MODULE_STREAM (v2_stream), 0);
+  modulemd_module_stream_set_autogen_stream_name (
+    MODULEMD_MODULE_STREAM (v2_stream), 0);
+
   index = modulemd_module_index_new ();
   if (!modulemd_module_index_add_module_stream (
         index, MODULEMD_MODULE_STREAM (v2_stream), &nested_error))
@@ -1029,6 +1036,9 @@ modulemd_packager_v3_to_stream_v3 (ModulemdPackagerV3 *self, GError **error)
   stream = g_ptr_array_index (module_streams, 0);
   stream_copy = modulemd_module_stream_copy (stream, NULL, NULL);
 
+  modulemd_module_stream_clear_autogen_module_name (stream_copy);
+  modulemd_module_stream_clear_autogen_stream_name (stream_copy);
+
   g_clear_pointer (&module_names, g_strfreev);
   g_clear_object (&index);
 
@@ -1071,6 +1081,13 @@ modulemd_packager_v3_to_stream_v3_ext (ModulemdPackagerV3 *self,
 
       v3_stream =
         modulemd_module_stream_v3_new (self->module_name, self->stream_name);
+
+      /* autogen module/stream names if necessary for adding to index */
+
+      modulemd_module_stream_set_autogen_module_name (
+        MODULEMD_MODULE_STREAM (v3_stream), 0);
+      modulemd_module_stream_set_autogen_stream_name (
+        MODULEMD_MODULE_STREAM (v3_stream), 0);
 
       /* copy per-BuildConfig properties to the new StreamV3 */
 

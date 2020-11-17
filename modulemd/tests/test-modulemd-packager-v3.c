@@ -319,6 +319,95 @@ packager_test_map_to_stream_v2 (void)
 }
 
 static void
+packager_test_map_to_stream_v2_autoname (void)
+{
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (ModulemdModuleStreamV2) v2_stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_str = NULL;
+  g_auto (GStrv) list = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+  /* set default to stream v2 */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
+
+  /* Construct a minimal PackagerV3 with no module/stream name */
+  packager = modulemd_packager_v3_new ();
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+
+  modulemd_packager_v3_set_summary (packager, "Summary");
+  modulemd_packager_v3_set_description (packager, "Description");
+
+  /* PackagerV3 to StreamV2 conversion should succeed and validate, even without
+   * a module/stream name
+   */
+  v2_stream = modulemd_packager_v3_to_stream_v2 (packager, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (v2_stream);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (v2_stream));
+
+  /* confirm everything comes back that we expect */
+  g_assert_null (modulemd_module_stream_get_module_name (
+    MODULEMD_MODULE_STREAM (v2_stream)));
+  g_assert_null (modulemd_module_stream_get_stream_name (
+    MODULEMD_MODULE_STREAM (v2_stream)));
+
+  g_assert_cmpstr (
+    "Summary", ==, modulemd_module_stream_v2_get_summary (v2_stream, "C"));
+  g_assert_cmpstr ("Description",
+                   ==,
+                   modulemd_module_stream_v2_get_description (v2_stream, "C"));
+
+  /* the default module license is required for StreamV2 and should have been filled in */
+  list = modulemd_module_stream_v2_get_module_licenses_as_strv (v2_stream);
+  g_assert_nonnull (list);
+  g_assert_nonnull (list[0]);
+  g_assert_cmpstr ("MIT", ==, list[0]);
+  g_assert_null (list[1]);
+  g_clear_pointer (&list, g_strfreev);
+
+  /* PackagerV3 to Index conversion should automatically generate a module and
+   * stream name so it can be added to an index
+   */
+  index = modulemd_packager_v3_to_stream_v2_ext (packager, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (index);
+  g_assert_true (MODULEMD_IS_MODULE_INDEX (index));
+
+  /* however, the automatic module/stream names should not appear in an index dump */
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (yaml_str);
+  g_assert_cmpstr (yaml_str,
+                   ==,
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data:\n"
+                   "  summary: Summary\n"
+                   "  description: >-\n"
+                   "    Description\n"
+                   "  license:\n"
+                   "    module:\n"
+                   "    - MIT\n"
+                   "...\n");
+
+  g_clear_pointer (&yaml_str, g_free);
+  g_clear_object (&v2_stream);
+  g_clear_object (&packager);
+  g_clear_object (&index);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
+}
+
+static void
 packager_test_map_to_stream_v3 (void)
 {
   g_autoptr (ModulemdPackagerV3) packager = NULL;
@@ -368,6 +457,104 @@ packager_test_map_to_stream_v3 (void)
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_path, g_free);
   g_clear_pointer (&expected_str, g_free);
+
+  /* restore default mdversion to avoid unexpected results from other tests */
+  modulemd_set_default_stream_mdversion (default_mdv);
+}
+
+static void
+packager_test_map_to_stream_v3_autoname (void)
+{
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (ModulemdModuleStreamV3) v3_stream = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdBuildConfig) bc = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_str = NULL;
+  g_auto (GStrv) list = NULL;
+  ModulemdModuleStreamVersionEnum default_mdv;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  /* get and save current default stream mdversion */
+  default_mdv = modulemd_get_default_stream_mdversion ();
+  /* set default to stream v3 */
+  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
+
+  /* Construct a minimal PackagerV3 with no module/stream name */
+  packager = modulemd_packager_v3_new ();
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+
+  modulemd_packager_v3_set_summary (packager, "Summary");
+  modulemd_packager_v3_set_description (packager, "Description");
+
+  bc = modulemd_build_config_new ();
+  g_assert_nonnull (bc);
+  modulemd_build_config_set_context (bc, "ctx42");
+  modulemd_build_config_set_platform (bc, "f33");
+  modulemd_packager_v3_add_build_config (packager, bc);
+
+  /* PackagerV3 to StreamV3 conversion should succeed and validate without
+   * a module/stream name
+   */
+  v3_stream = modulemd_packager_v3_to_stream_v3 (packager, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (v3_stream);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V3 (v3_stream));
+
+  /* confirm everything comes back that we expect */
+  g_assert_null (modulemd_module_stream_get_module_name (
+    MODULEMD_MODULE_STREAM (v3_stream)));
+  g_assert_null (modulemd_module_stream_get_stream_name (
+    MODULEMD_MODULE_STREAM (v3_stream)));
+
+  g_assert_cmpstr (
+    "Summary", ==, modulemd_module_stream_v3_get_summary (v3_stream, "C"));
+  g_assert_cmpstr ("Description",
+                   ==,
+                   modulemd_module_stream_v3_get_description (v3_stream, "C"));
+  g_assert_cmpstr (
+    "f33", ==, modulemd_module_stream_v3_get_platform (v3_stream));
+
+  /* a module license is not required for StreamV3 as it is for StreamV2, so
+   * the license list should be an empty
+   */
+  list = modulemd_module_stream_v3_get_module_licenses_as_strv (v3_stream);
+  g_assert_nonnull (list);
+  g_assert_null (list[0]);
+  g_clear_pointer (&list, g_strfreev);
+
+  /* PackagerV3 to Index conversion should automatically generate a module and
+   * stream name so it can be added to an index
+   */
+  index = modulemd_packager_v3_to_stream_v3_ext (packager, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (index);
+  g_assert_true (MODULEMD_IS_MODULE_INDEX (index));
+
+  /* however, the automatic module/stream names should not appear in an index dump */
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (yaml_str);
+  g_assert_cmpstr (yaml_str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-stream\n"
+                   "version: 3\n"
+                   "data:\n"
+                   "  context: ctx42\n"
+                   "  summary: Summary\n"
+                   "  description: >-\n"
+                   "    Description\n"
+                   "  dependencies:\n"
+                   "    platform: f33\n"
+                   "...\n");
+
+  g_clear_pointer (&yaml_str, g_free);
+  g_clear_object (&v3_stream);
+  g_clear_object (&packager);
+  g_clear_object (&index);
 
   /* restore default mdversion to avoid unexpected results from other tests */
   modulemd_set_default_stream_mdversion (default_mdv);
@@ -492,8 +679,14 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/packager/to_stream_v2",
                    packager_test_map_to_stream_v2);
 
+  g_test_add_func ("/modulemd/v2/packager/to_stream_v2/autoname",
+                   packager_test_map_to_stream_v2_autoname);
+
   g_test_add_func ("/modulemd/v2/packager/to_stream_v3",
                    packager_test_map_to_stream_v3);
+
+  g_test_add_func ("/modulemd/v2/packager/to_stream_v3/autoname",
+                   packager_test_map_to_stream_v3_autoname);
 
   g_test_add_func ("/modulemd/v2/packager/index/read",
                    packager_test_read_to_index);

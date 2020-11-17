@@ -2333,15 +2333,19 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
   /* Start data: */
   EMIT_MAPPING_START (emitter, error);
 
-  EMIT_KEY_VALUE_IF_SET (
-    emitter, error, "name", modulemd_module_stream_get_module_name (self));
+  if (modulemd_module_stream_get_module_name (self) != NULL &&
+      !modulemd_module_stream_is_autogen_module_name (self))
+    {
+      EMIT_KEY_VALUE (
+        emitter, error, "name", modulemd_module_stream_get_module_name (self));
+    }
 
   /* Always emit the stream quoted, since a purely numeric-looking stream such
    * as 5.30 might otherwise be interpreted by parsers like pyyaml as a number
    * and result in being read (and written) as '5.3'.
    */
-
-  if (modulemd_module_stream_get_stream_name (self) != NULL)
+  if (modulemd_module_stream_get_stream_name (self) != NULL &&
+      !modulemd_module_stream_is_autogen_stream_name (self))
     {
       EMIT_KEY_VALUE_FULL (emitter,
                            error,

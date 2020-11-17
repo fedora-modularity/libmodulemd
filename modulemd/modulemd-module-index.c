@@ -174,15 +174,26 @@ add_subdoc (ModulemdModuleIndex *self,
           /* Determine which stream version to convert the packager
            * object into and do so.
            */
-          if (self->stream_mdversion < MD_MODULESTREAM_VERSION_THREE)
+          switch (self->stream_mdversion)
             {
+            case MD_MODULESTREAM_VERSION_TWO:
               index = modulemd_packager_v3_to_stream_v2_ext (packager,
                                                              &nested_error);
-            }
-          else
-            {
+              break;
+
+            case MD_MODULESTREAM_VERSION_THREE:
               index = modulemd_packager_v3_to_stream_v3_ext (packager,
                                                              &nested_error);
+              break;
+
+            default:
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_VALIDATE,
+                           "Cannot convert packager v3 document to add to "
+                           "index with stream mdversion %d",
+                           self->stream_mdversion);
+              return FALSE;
             }
 
           if (!index)
@@ -193,7 +204,9 @@ add_subdoc (ModulemdModuleIndex *self,
 
           if (autogen_module_name)
             {
-              /* TODO: generate module/stream names if needed for streams in index */
+              /* nothing to do here since module/stream names were already
+               * auto-generated in order to add them to the index
+               */
             }
 
           /* merge index with override = FALSE and strict_default_streams = TRUE */

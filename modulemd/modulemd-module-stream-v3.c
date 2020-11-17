@@ -2960,7 +2960,8 @@ modulemd_module_stream_v3_emit_yaml (ModulemdModuleStreamV3 *self,
                        self->description,
                        YAML_FOLDED_SCALAR_STYLE);
 
-  if (self->module_licenses || self->content_licenses)
+  if (g_hash_table_size (self->module_licenses) > 0 ||
+      g_hash_table_size (self->content_licenses) > 0)
     {
       EMIT_SCALAR (emitter, error, "license");
       EMIT_MAPPING_START (emitter, error);

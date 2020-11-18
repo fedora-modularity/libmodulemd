@@ -504,6 +504,17 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
       yaml_event_delete (&event);
     }
 
+  /* Work around false-positive in clang static analysis which thinks it's
+   * possible for this function to return NULL and not set error.
+   */
+  if (G_UNLIKELY (result == NULL))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_YAML_ERROR_EMIT,
+                   "Somehow got a NULL hash table here.");
+    }
+
   return g_steal_pointer (&result);
 }
 
@@ -550,7 +561,7 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
               set = modulemd_yaml_parse_string_set (parser, &nested_error);
               if (!set)
                 {
-                  g_propagate_error (error, nested_error);
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
                 }
             }

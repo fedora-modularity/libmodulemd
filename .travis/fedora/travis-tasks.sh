@@ -12,10 +12,6 @@ override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
 
 pushd /builddir/
 
-# Ensure that the python 3 overrides are always in place or else some of those
-# tests may fail if they are modified.
-ln -sf /builddir/bindings/python/gi/Modulemd.py $override_dir/
-
 # Build the code under GCC and run standard tests
 meson --buildtype=debugoptimized \
       -Dverbose_tests=false \

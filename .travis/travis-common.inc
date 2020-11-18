@@ -54,7 +54,6 @@ trap common_finalize EXIT
 function mmd_setup_container {
     local os release repository image
     local deps_template deps_image
-    local oci_extra_commands
     local "${@}"
 
     if [ -z $SCRIPT_DIR ]; then
@@ -76,7 +75,6 @@ function mmd_setup_container {
     m4  -D__IMAGE__="$repository/$image" \
         -D__OS__=$os \
         -D__RELEASE__=$release \
-        -D__EXTRACOMMANDS__="$oci_extra_commands" \
         $SCRIPT_DIR/${deps_template} \
         > $SCRIPT_DIR/$MMD_OS/Dockerfile.deps.$MMD_RELEASE
 

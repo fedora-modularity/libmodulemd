@@ -8,16 +8,13 @@ PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false}"
 RETRY_CMD=/builddir/.travis/retry-command.sh
 
+override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
+
 pushd /builddir/
 
-valgrind_cmd='
-    valgrind --error-exitcode=1
-             --errors-for-leak-kinds=definite
-             --leak-check=full
-             --show-leak-kinds=definite
-             --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
-             --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp
-'
+# Ensure that the python 3 overrides are always in place or else some of those
+# tests may fail if they are modified.
+ln -sf /builddir/bindings/python/gi/Modulemd.py $override_dir/
 
 # Build the code under GCC and run standard tests
 meson --buildtype=debug \
@@ -37,7 +34,7 @@ meson test --suite ci \
            -t 5
 
 meson test --suite ci_valgrind \
-           --wrap="$valgrind_cmd" \
+           --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
            -C travis \
            --num-processes=$PROCESSORS \
            --print-errorlogs \

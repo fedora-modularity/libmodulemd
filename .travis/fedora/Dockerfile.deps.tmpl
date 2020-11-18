@@ -36,6 +36,7 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
 	python3-devel \
 	python3-GitPython \
 	python3-gobject-base \
+	python3-koji \
 	python3-pycodestyle \
 	python3-rpm-macros \
 	redhat-rpm-config \
@@ -50,4 +51,4 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
 	wget \
     && dnf -y clean all
 
-__EXTRACOMMANDS__
+RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

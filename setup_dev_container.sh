@@ -20,7 +20,6 @@ mmd_setup_container \
     release=$release \
     repository=quay.io \
     image=$image \
-    oci_extra_commands='RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py' \
     deps_image=libmodulemd-dev-$release
 
 

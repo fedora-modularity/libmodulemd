@@ -252,23 +252,6 @@ always represent the highest-supported version of the
 ModulemdModuleStream metadata format. This may change at any time.
 
 # Getting started with developing
-## Prerequisites
-* A Fedora development environment (physical or virtual)
-
-To install all of the dependencies needed to build libmodulemd, the following
-command will work on Fedora 28+ (run as root or with sudo):
-```
-dnf -y install clang git-core python3-pycodestyle python3-black redhat-rpm-config "dnf-command(builddep)"
-dnf -y builddep libmodulemd
-```
-
-To install the tools needed to run the docker-based tests, you will also need:
-```
-dnf -y install docker
-sudo systemctl enable --now docker.service
-```
-and to make sure that your user has privilege to run `sudo docker` (see the
-documentation for the `/etc/sudoers` file to figure this out).
 
 ## Forking and cloning the sources
 The libmodulemd project follows the
@@ -276,6 +259,28 @@ The libmodulemd project follows the
 development. To get started, create a fork of the upstream libmodulemd sources,
 clone those locally and create branches on your fork to make changes. When they
 are ready for review or feedback, create a pull-request.
+
+## Prerequisites
+* A development system with either [Podman](https://podman.io/) and
+[Buildah](https://buildah.io/) (preferred) or
+[Docker](https://www.docker.com/) installed.
+
+## Preparing a build environment
+Create a container for building the libmodulemd sources. Run the handy setup
+script in the root of the checkout.
+```
+./setup_dev_container.sh [<Fedora Release>]
+```
+If unspecified, it will default to "Fedora Rawhide". To select a different
+Fedora release for the base image, add the release number as an argument to the
+command. For example:
+```
+./setup_dev_container.sh 33
+```
+
+This will automatically pull down a Fedora base image, install all of the
+packages needed for development and testing and then provide you with a shell
+inside this environment.
 
 ## Building the sources
 Projects built with the meson build-system require a separate build directory from
@@ -306,14 +311,24 @@ and won't recognize newly-added pages without deleting and re-creating the
 build directory first.)
 
 
-To run the docker-based tests, you can run (from the source root and with
-`sudo` privilege to run `docker`):
+## Running more advanced test suites
+In addition to the basic `ninja test` set of tests, libmodulemd also has a suite
+of tests performed in a Travis CI environment. These are also containerized and
+can be run locally on the host. (You will not be able to run them from within
+the development container shell, as nested containers are not supported.)
+
+To run the container-based tests, you can run the following from the source
+root:
 ```
 ./.travis/travis-fedora.sh
 ```
 (Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`,
-`Fedora 29`, etc. to switch to building against those releases rather than
-Fedora Rawhide).
+`Fedora 29`, etc. to switch to building and testing against those releases
+rather than Fedora Rawhide).
+
+Support for running the tests on other OSes is ongoing. See the `.travis`
+directory for available suites. All supported OSes and release versions are
+tested as part of each pull request.
 
 
 ## Tips and tricks
@@ -333,10 +348,13 @@ and ignored at runtime.
 Assuming your current working directory is `debugbuild` as described above:
 ```
 meson test --suite=ci_valgrind \
-  --wrap="valgrind \
-          --leak-check=full \
-          --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
-          --suppressions=../contrib/valgrind/libmodulemd-python.supp"
+  --wrap="valgrind
+            --error-exitcode=1
+            --errors-for-leak-kinds=definite
+            --leak-check=full
+            --show-leak-kinds=definite
+            --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
+            --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp"
 ```
 
 If not, you may need to adjust the path to libmodulemd-python.supp.
@@ -349,4 +367,5 @@ is supported.
 
 # Authors:
 * Stephen Gallagher <sgallagh@redhat.com>
+* Merlin Mathesius <mmathesi@redhat.com>
 * Igor Gnatenko <ignatenkobrain@fedoraproject.org>

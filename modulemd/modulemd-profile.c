@@ -353,8 +353,7 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
   YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
   if (event.type != YAML_MAPPING_START_EVENT)
     {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "No map in profile: %s", nested_error->message);
+      MMD_YAML_ERROR_EVENT_EXIT (error, event, "No map in profile");
     }
 
   p = modulemd_profile_new (name);

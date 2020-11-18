@@ -98,7 +98,8 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
-    if hasattr(Modulemd, 'ModuleStreamV3'):
+    if hasattr(Modulemd, "ModuleStreamV3"):
+
         class ModuleStreamV3(Modulemd.ModuleStreamV3):
             def set_xmd(self, xmd):
                 super(ModuleStreamV3, self).set_xmd(
@@ -114,7 +115,8 @@ if float(Modulemd._version) >= 2:
         ModuleStreamV3 = override(ModuleStreamV3)
         __all__.append(ModuleStreamV3)
 
-    if hasattr(Modulemd, 'ModuleStreamV2'):
+    if hasattr(Modulemd, "ModuleStreamV2"):
+
         class ModuleStreamV2(Modulemd.ModuleStreamV2):
             def set_xmd(self, xmd):
                 super(ModuleStreamV2, self).set_xmd(
@@ -130,7 +132,8 @@ if float(Modulemd._version) >= 2:
         ModuleStreamV2 = override(ModuleStreamV2)
         __all__.append(ModuleStreamV2)
 
-    if hasattr(Modulemd, 'ModuleStreamV1'):
+    if hasattr(Modulemd, "ModuleStreamV1"):
+
         class ModuleStreamV1(Modulemd.ModuleStreamV1):
             def set_xmd(self, xmd):
                 super(ModuleStreamV1, self).set_xmd(
@@ -146,7 +149,8 @@ if float(Modulemd._version) >= 2:
         ModuleStreamV1 = override(ModuleStreamV1)
         __all__.append(ModuleStreamV1)
 
-    if hasattr(Modulemd, 'ServiceLevel'):
+    if hasattr(Modulemd, "ServiceLevel"):
+
         class ServiceLevel(Modulemd.ServiceLevel):
             def set_eol(self, eol):
                 if isinstance(eol, datetime.date):
@@ -155,7 +159,8 @@ if float(Modulemd._version) >= 2:
                     )
 
                 raise TypeError(
-                    "Expected datetime.date, but got %s." % (type(eol).__name__)
+                    "Expected datetime.date, but got %s."
+                    % (type(eol).__name__)
                 )
 
             def get_eol(self):
@@ -169,4 +174,3 @@ if float(Modulemd._version) >= 2:
 
         ServiceLevel = override(ServiceLevel)
         __all__.append(ServiceLevel)
-

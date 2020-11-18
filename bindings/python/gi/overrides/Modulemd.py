@@ -98,55 +98,58 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
-    class ModuleStreamV2(Modulemd.ModuleStreamV2):
-        def set_xmd(self, xmd):
-            super(ModuleStreamV2, self).set_xmd(
-                ModulemdUtil.python_to_variant(xmd)
-            )
-
-        def get_xmd(self):
-            variant_xmd = super(ModuleStreamV2, self).get_xmd()
-            if variant_xmd is None:
-                return {}
-            return variant_xmd.unpack()
-
-    ModuleStreamV2 = override(ModuleStreamV2)
-    __all__.append(ModuleStreamV2)
-
-    class ModuleStreamV1(Modulemd.ModuleStreamV1):
-        def set_xmd(self, xmd):
-            super(ModuleStreamV1, self).set_xmd(
-                ModulemdUtil.python_to_variant(xmd)
-            )
-
-        def get_xmd(self):
-            variant_xmd = super(ModuleStreamV1, self).get_xmd()
-            if variant_xmd is None:
-                return {}
-            return variant_xmd.unpack()
-
-    ModuleStreamV1 = override(ModuleStreamV1)
-    __all__.append(ModuleStreamV1)
-
-    class ServiceLevel(Modulemd.ServiceLevel):
-        def set_eol(self, eol):
-            if isinstance(eol, datetime.date):
-                return super(ServiceLevel, self).set_eol_ymd(
-                    eol.year, eol.month, eol.day
+    if hasattr(Modulemd, 'ModuleStreamV2'):
+        class ModuleStreamV2(Modulemd.ModuleStreamV2):
+            def set_xmd(self, xmd):
+                super(ModuleStreamV2, self).set_xmd(
+                    ModulemdUtil.python_to_variant(xmd)
                 )
 
-            raise TypeError(
-                "Expected datetime.date, but got %s." % (type(eol).__name__)
-            )
+            def get_xmd(self):
+                variant_xmd = super(ModuleStreamV2, self).get_xmd()
+                if variant_xmd is None:
+                    return {}
+                return variant_xmd.unpack()
 
-        def get_eol(self):
-            eol = super(ServiceLevel, self).get_eol()
-            if eol is None:
-                return None
+        ModuleStreamV2 = override(ModuleStreamV2)
+        __all__.append(ModuleStreamV2)
 
-            return datetime.date(
-                eol.get_year(), eol.get_month(), eol.get_day()
-            )
+    if hasattr(Modulemd, 'ModuleStreamV1'):
+        class ModuleStreamV1(Modulemd.ModuleStreamV1):
+            def set_xmd(self, xmd):
+                super(ModuleStreamV1, self).set_xmd(
+                    ModulemdUtil.python_to_variant(xmd)
+                )
 
-    ServiceLevel = override(ServiceLevel)
-    __all__.append(ServiceLevel)
+            def get_xmd(self):
+                variant_xmd = super(ModuleStreamV1, self).get_xmd()
+                if variant_xmd is None:
+                    return {}
+                return variant_xmd.unpack()
+
+        ModuleStreamV1 = override(ModuleStreamV1)
+        __all__.append(ModuleStreamV1)
+
+    if hasattr(Modulemd, 'ServiceLevel'):
+        class ServiceLevel(Modulemd.ServiceLevel):
+            def set_eol(self, eol):
+                if isinstance(eol, datetime.date):
+                    return super(ServiceLevel, self).set_eol_ymd(
+                        eol.year, eol.month, eol.day
+                    )
+
+                raise TypeError(
+                    "Expected datetime.date, but got %s." % (type(eol).__name__)
+                )
+
+            def get_eol(self):
+                eol = super(ServiceLevel, self).get_eol()
+                if eol is None:
+                    return None
+
+                return datetime.date(
+                    eol.get_year(), eol.get_month(), eol.get_day()
+                )
+
+        ServiceLevel = override(ServiceLevel)
+        __all__.append(ServiceLevel)

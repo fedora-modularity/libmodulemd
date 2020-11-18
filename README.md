@@ -347,14 +347,7 @@ and ignored at runtime.
 ### Running tests with valgrind
 Assuming your current working directory is `debugbuild` as described above:
 ```
-meson test --suite=ci_valgrind \
-  --wrap="valgrind
-            --error-exitcode=1
-            --errors-for-leak-kinds=definite
-            --leak-check=full
-            --show-leak-kinds=definite
-            --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
-            --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp"
+meson test --suite=ci_valgrind --wrap=../contrib/valgrind/valgrind_wrapper.sh
 ```
 
 If not, you may need to adjust the path to libmodulemd-python.supp.

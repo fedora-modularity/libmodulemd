@@ -16,15 +16,6 @@ pushd /builddir/
 # tests may fail if they are modified.
 ln -sf /builddir/bindings/python/gi/Modulemd.py $override_dir/
 
-valgrind_cmd='
-    valgrind --error-exitcode=1
-             --errors-for-leak-kinds=definite
-             --leak-check=full
-             --show-leak-kinds=definite
-             --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
-             --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp
-'
-
 # Build the code under GCC and run standard tests
 meson --buildtype=debug \
       $MESON_DIRTY_REPO_ARGS \
@@ -43,7 +34,7 @@ meson test --suite ci \
            -t 5
 
 meson test --suite ci_valgrind \
-           --wrap="$valgrind_cmd" \
+           --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
            -C travis \
            --num-processes=$PROCESSORS \
            --print-errorlogs \

@@ -19,6 +19,7 @@
 #include "modulemd-module.h"
 #include "modulemd-translation.h"
 #include "modulemd-obsoletes.h"
+#include "private/modulemd-upgrade-helper.h"
 
 
 G_BEGIN_DECLS
@@ -173,5 +174,23 @@ gboolean
 modulemd_module_upgrade_streams (ModulemdModule *self,
                                  ModulemdModuleStreamVersionEnum mdversion,
                                  GError **error);
+
+/**
+ * modulemd_module_associate_upgrade_helper:
+ * @self: This #ModulemdModule object.
+ * @upgrade_helper: (in)(transfer none): a #ModulemdUpgradeHelper to associate
+ * with this module.
+ *
+ * Associates a #ModulemdUpgradeHelper, usually from a #ModulemdModuleIndex,
+ * with this module to help with upgrades between #ModuleStreamV2 and
+ * #ModuleStreamV3. This function will take a reference on the one passed in,
+ * so modifications to the @upgrade_helper will affect subsequent changes to
+ * this #ModulemdModule.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_associate_upgrade_helper (
+  ModulemdModule *self, ModulemdUpgradeHelper *upgrade_helper);
 
 G_END_DECLS

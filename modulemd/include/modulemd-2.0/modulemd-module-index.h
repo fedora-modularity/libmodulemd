@@ -637,4 +637,34 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
                                         ModulemdDefaultsVersionEnum mdversion,
                                         GError **error);
 
+
+/**
+ * modulemd_module_index_add_known_stream:
+ * @self: This #ModulemdModuleIndex object.
+ * @module_name: (in): The name of the known module being added.
+ * @stream_name: (in): The name of the known module stream being added.
+ *
+ * This function adds a `module:stream` entry to the #ModulemdModuleIndex.
+ * It will be used if and when libmodulemd needs to upgrade a
+ * #ModulemdModuleStreamV2 object to a #ModulemdModuleStreamV3 object if it
+ * encounters a module dependency that is specified as either `[ ]`
+ * (all streams) or `[ -streamname ]` (all but some exclusions).
+ *
+ * When using the python bindings, a simplified way to set these values is to
+ * call:
+ *
+ * |[<!-- language="Python" -->
+ * idx = Modulemd.ModuleIndex.new()
+ * idx.set_known_streams({"module_name": ["stream1", "stream2"]})
+ * ]|
+
+ *
+ * Since: 2.10
+ */
+void
+modulemd_module_index_add_known_stream (ModulemdModuleIndex *self,
+                                        const gchar *module_name,
+                                        const gchar *stream_name);
+
+
 G_END_DECLS

@@ -22,6 +22,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-obsoletes-private.h"
+#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -35,6 +36,8 @@ struct _ModulemdModule
   ModulemdDefaults *defaults;
   GHashTable *translations;
   GPtrArray *obsoletes;
+
+  ModulemdUpgradeHelper *helper;
 };
 
 G_DEFINE_TYPE (ModulemdModule, modulemd_module, G_TYPE_OBJECT)
@@ -102,6 +105,7 @@ modulemd_module_finalize (GObject *object)
   g_clear_pointer (&self->streams, g_ptr_array_unref);
   g_clear_pointer (&self->translations, g_hash_table_unref);
   g_clear_pointer (&self->obsoletes, g_ptr_array_unref);
+  g_clear_object (&self->helper);
 
   G_OBJECT_CLASS (modulemd_module_parent_class)->finalize (object);
 }
@@ -331,6 +335,14 @@ modulemd_module_add_stream (ModulemdModule *self,
                    module_name,
                    modulemd_module_get_module_name (self));
       return MD_MODULESTREAM_VERSION_ERROR;
+    }
+
+  /* Associate the UpgradeHelper here in case we need to perform an upgrade
+   * below
+   */
+  if (self->helper)
+    {
+      modulemd_module_stream_associate_upgrade_helper (stream, self->helper);
     }
 
   old = modulemd_module_get_stream_by_NSVCA (
@@ -1112,4 +1124,25 @@ modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
     }
 
   return newestActiveObsoletes;
+}
+
+
+void
+modulemd_module_associate_upgrade_helper (
+  ModulemdModule *self, ModulemdUpgradeHelper *upgrade_helper)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+  g_return_if_fail (MODULEMD_IS_UPGRADE_HELPER (upgrade_helper));
+
+  uint i = 0;
+
+  g_clear_object (&self->helper);
+  self->helper = g_object_ref (upgrade_helper);
+
+  /* Associate this UpgradeHelper with all attached ModuleStream documents */
+  for (i = 0; i < self->streams->len; i++)
+    {
+      modulemd_module_stream_associate_upgrade_helper (
+        g_ptr_array_index (self->streams, i), upgrade_helper);
+    }
 }

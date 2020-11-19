@@ -139,3 +139,16 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
                                            yaml_parser_t *parser,
                                            gboolean strict,
                                            GError **error);
+
+
+/**
+ * modulemd_subdocument_info_debug_dump_failures:
+ * @failures: (in) (element-type ModulemdSubdocumentInfo): An array containing
+ * any subdocuments from the YAML file that failed to parse.
+ *
+ * Dumps human readable information about @failures to the debug log.
+ *
+ * Since: 2.10
+ */
+void
+modulemd_subdocument_info_debug_dump_failures (GPtrArray *failures);

@@ -31,6 +31,18 @@ except ImportError:
 from base import TestBase
 
 
+def debug_dump_failures(failures):
+    if failures is None or len(failures) == 0:
+        return
+    print("{} YAML subdocuments were invalid".format(len(failures)))
+    for f in failures:
+        print(
+            "Failed subdocument ({}):\n{}\n".format(
+                str(f.get_gerror()), f.get_yaml()
+            )
+        )
+
+
 class TestModuleIndex(TestBase):
     def test_constructors(self):
         # Test that the new() function works
@@ -47,8 +59,9 @@ class TestModuleIndex(TestBase):
             "r",
         ) as v1:
             res, failures = idx.update_from_string(v1.read(), True)
-            self.assertTrue(res)
+            debug_dump_failures(failures)
             self.assertListEqual(failures, [])
+            self.assertTrue(res)
 
         for fname in [
             "yaml_specs/modulemd_stream_v2.yaml",
@@ -58,8 +71,9 @@ class TestModuleIndex(TestBase):
             res, failures = idx.update_from_file(
                 path.join(self.source_root, fname), True
             )
-            self.assertTrue(res)
+            debug_dump_failures(failures)
             self.assertListEqual(failures, [])
+            self.assertTrue(res)
 
         res, failures = idx.update_from_file(
             path.join(self.test_data_path, "te.yaml"), True
@@ -123,10 +137,10 @@ profiles:
         self.assertIsNotNone(default_streams)
 
         self.assertIn("dwm", default_streams.keys())
-        self.assertEquals("6.1", default_streams["dwm"])
+        self.assertEqual("6.1", default_streams["dwm"])
 
         self.assertIn("stratis", default_streams.keys())
-        self.assertEquals("1", default_streams["stratis"])
+        self.assertEqual("1", default_streams["stratis"])
 
         self.assertNotIn("nodejs", default_streams.keys())
 

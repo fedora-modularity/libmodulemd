@@ -12,7 +12,7 @@
  */
 
 
-#include "modulemd-upgrade-helper.h"
+#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 
 struct _ModulemdUpgradeHelper

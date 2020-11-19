@@ -177,7 +177,7 @@ main (int argc, char *argv[])
                   for (gsize j = 0; j < failures->len; j++)
                     {
                       doc = MODULEMD_SUBDOCUMENT_INFO (
-                        g_ptr_array_index (failures, i));
+                        g_ptr_array_index (failures, j));
                       g_printf (
                         "\nFailed subdocument (%s): \n%s\n",
                         modulemd_subdocument_info_get_gerror (doc)->message,

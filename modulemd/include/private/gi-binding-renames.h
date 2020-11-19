@@ -360,17 +360,5 @@ modulemd_module_index_get_default_streams (ModulemdModuleIndex *self,
 gchar *
 modulemd_rpm_map_entry_get_nevra (ModulemdRpmMapEntry *self);
 
-/**
- * modulemd_upgrade_helper_get_known_modules: (skip)
- */
-GStrv
-modulemd_upgrade_helper_get_known_modules (ModulemdUpgradeHelper *self);
-
-/**
- * modulemd_upgrade_helper_get_known_streams: (skip)
- */
-GStrv
-modulemd_upgrade_helper_get_known_streams (ModulemdUpgradeHelper *self,
-                                           const gchar *module_name);
 
 G_END_DECLS

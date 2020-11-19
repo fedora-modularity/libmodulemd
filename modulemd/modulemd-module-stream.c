@@ -28,6 +28,7 @@
 #include "private/modulemd-module-stream-v3-private.h"
 #include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
+#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include <errno.h>
@@ -41,6 +42,7 @@ typedef struct
   gchar *context;
   gchar *arch;
   ModulemdTranslation *translation;
+  ModulemdUpgradeHelper *helper;
 } ModulemdModuleStreamPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ModulemdModuleStream,
@@ -379,7 +381,8 @@ modulemd_module_stream_finalize (GObject *object)
   g_clear_pointer (&priv->stream_name, g_free);
   g_clear_pointer (&priv->context, g_free);
   g_clear_pointer (&priv->arch, g_free);
-  g_clear_pointer (&priv->translation, g_object_unref);
+  g_clear_object (&priv->translation);
+  g_clear_object (&priv->helper);
 
   G_OBJECT_CLASS (modulemd_module_stream_parent_class)->finalize (object);
 }
@@ -882,6 +885,7 @@ modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from)
 
 static gboolean
 stream_expansion_helper (ModulemdDependencies *deps,
+                         ModulemdUpgradeHelper *helper,
                          gboolean is_buildtime,
                          GStrv module_list,
                          GPtrArray **expanded_deps,
@@ -894,9 +898,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
   g_autoptr (GPtrArray) new_expanded_deps = NULL;
   g_autoptr (ModulemdBuildConfig) new_dep = NULL;
   g_auto (GStrv) streams = NULL;
+  g_autoptr (GPtrArray) known_streams = NULL;
   gchar *module;
   gchar *stream;
   const gchar *which;
+  guint i, j;
+  gboolean found;
+  guint idx;
 
   /*
    * Buildtime and runtime dependencies are handled the same, they just have different
@@ -925,7 +933,7 @@ stream_expansion_helper (ModulemdDependencies *deps,
    * Loop through each module in the Stream V2's #ModulemdDependencies
    * buildtime/runtime module list...
    */
-  for (guint i = 0; i < g_strv_length (module_list); i++)
+  for (i = 0; i < g_strv_length (module_list); i++)
     {
       module = module_list[i];
 
@@ -942,12 +950,75 @@ stream_expansion_helper (ModulemdDependencies *deps,
 
       /*
        * If a module is present in the dependency list but has no associated
-       * streams (which corresponds to "modulename: []" in the spec), the
-       * intention is to expand the list to be all active existing streams for
-       * the module. Unfortunately, that is something only the Module Build
-       * Service can do, so we must fail the stream expansion.
+       * streams (which corresponds to "modulename: []" in the spec), or it
+       * contains only negated items (corresponding to
+       * "modulename: [-stream]"), the intention is to expand the list to be
+       * all active existing streams for the module. Check to see if we have a
+       * listing of known streams to use. We can assume if the first item
+       * begins with a '-' that they all do, since that is checked during the
+       * parsing and validation of the YAML.
        */
-      if (g_strv_length (streams) == 0)
+      if (g_strv_length (streams) == 0 || streams[0][0] == '-')
+        {
+          g_debug ("Ambiguous expansion detected for %s", module);
+          if (helper)
+            {
+              known_streams =
+                modulemd_upgrade_helper_get_known_streams_as_array (helper,
+                                                                    module);
+
+              /* Check whether we got back at least one stream */
+              if (known_streams->len > 0)
+                {
+                  /* Iterate through the negations */
+                  for (j = 0; NULL != streams[j]; j++)
+                    {
+                      /* Skip the leading '-' */
+                      stream = streams[j] + 1;
+
+                      /* Remove it if it exists in the list */
+                      found = g_ptr_array_find_with_equal_func (
+                        known_streams, stream, g_str_equal, &idx);
+                      if (found)
+                        {
+                          g_ptr_array_remove_index (known_streams, idx);
+                          g_debug ("Stream %s was found and removed from %s",
+                                   stream,
+                                   module);
+                        }
+                      else
+                        {
+                          g_debug (
+                            "Stream %s was not found in %s", stream, module);
+                        }
+                    }
+
+
+                  /* Add NULL-terminator */
+                  g_ptr_array_add (known_streams, NULL);
+
+                  /* Replace the streams list with the known list */
+                  g_clear_pointer (&streams, g_strfreev);
+                  streams = (GStrv)known_streams->pdata;
+                }
+
+              /* Make sure to free the array, but not the contents */
+              g_ptr_array_free (known_streams, FALSE);
+              known_streams = NULL;
+
+              g_debug (
+                "Expansion: module %s dependency %s now has %d streams after "
+                "helper",
+                which,
+                module,
+                g_strv_length (streams));
+            }
+        }
+
+      /* Unfortunately, without a set of known_streams, we must fail the stream
+       * expansion.
+       */
+      if (g_strv_length (streams) == 0 || streams[0][0] == '-')
         {
           g_set_error (error,
                        MODULEMD_ERROR,
@@ -968,33 +1039,13 @@ stream_expansion_helper (ModulemdDependencies *deps,
        * and the previous iterations of module:stream combinations currently
        * present in expanded_deps.
        */
-      for (guint j = 0; j < g_strv_length (streams); j++)
+      for (j = 0; j < g_strv_length (streams); j++)
         {
           stream = streams[j];
           g_debug ("Expansion: looking at %s stream dependency %s:%s",
                    which,
                    module,
                    stream);
-
-          /*
-           * If a stream name begins with a '-' sign (which corresponds to
-           * "modulename: [-streamname]" in the spec), the intention is to
-           * exclude this stream from the list of all active streams for this
-           * module. Unfortunately, that is something only the Module Build
-           * Service can do, so we must fail the stream expansion.
-           */
-          if (stream[0] == '-')
-            {
-              g_set_error (error,
-                           MODULEMD_ERROR,
-                           MMD_ERROR_UPGRADE,
-                           "Cannot expand module %s dependency %s using "
-                           "stream exclusion (%s).",
-                           which,
-                           module,
-                           stream);
-              return FALSE;
-            }
 
           /*
            * If the expanded_deps list is still empty, create a new
@@ -1315,6 +1366,9 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
   g_autoptr (GError) nested_error = NULL;
   g_auto (GStrv) buildtime_modules = NULL;
   g_auto (GStrv) runtime_modules = NULL;
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (
+      MODULEMD_MODULE_STREAM (v2_stream));
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
@@ -1393,8 +1447,12 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
        * Create the initial partial Cartesian product for the modular buildtime
        * dependencies.
        */
-      if (!stream_expansion_helper (
-            v2_deps, TRUE, buildtime_modules, &expanded_deps, &nested_error))
+      if (!stream_expansion_helper (v2_deps,
+                                    priv->helper,
+                                    TRUE,
+                                    buildtime_modules,
+                                    &expanded_deps,
+                                    &nested_error))
         {
           g_propagate_prefixed_error (
             error,
@@ -1406,8 +1464,12 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
       /*
        * Complete the Cartesian product with the modular runtime dependencies.
        */
-      if (!stream_expansion_helper (
-            v2_deps, FALSE, runtime_modules, &expanded_deps, &nested_error))
+      if (!stream_expansion_helper (v2_deps,
+                                    priv->helper,
+                                    FALSE,
+                                    runtime_modules,
+                                    &expanded_deps,
+                                    &nested_error))
         {
           g_propagate_prefixed_error (
             error,
@@ -2505,4 +2567,19 @@ modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self)
     {
       modulemd_module_stream_set_stream_name (self, NULL);
     }
+}
+
+
+void
+modulemd_module_stream_associate_upgrade_helper (
+  ModulemdModuleStream *self, ModulemdUpgradeHelper *upgrade_helper)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM (self));
+  g_return_if_fail (MODULEMD_IS_UPGRADE_HELPER (upgrade_helper));
+
+  ModulemdModuleStreamPrivate *priv =
+    modulemd_module_stream_get_instance_private (self);
+
+  g_clear_object (&priv->helper);
+  priv->helper = g_object_ref (upgrade_helper);
 }

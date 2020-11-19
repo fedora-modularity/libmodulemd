@@ -1333,6 +1333,60 @@ module_stream_test_stream_deps_expansion_v2_to_v3_exclusions (void)
 }
 
 static void
+module_stream_test_stream_deps_expansion_v2_to_v3_known_streams (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdDependencies) dep = NULL;
+  g_autoptr (GPtrArray) expanded_deps = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdUpgradeHelper) helper = NULL;
+
+  helper = modulemd_upgrade_helper_new ();
+  modulemd_upgrade_helper_add_known_stream (helper, "platform", "f27");
+  modulemd_upgrade_helper_add_known_stream (helper, "platform", "f28");
+  modulemd_upgrade_helper_add_known_stream (helper, "platform", "f29");
+  modulemd_upgrade_helper_add_known_stream (helper, "platform", "eln");
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_buildtime_stream (dep, "platform", "-f27");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+  modulemd_module_stream_associate_upgrade_helper (
+    MODULEMD_MODULE_STREAM (stream), helper);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (expanded_deps);
+  g_assert_cmpint (expanded_deps->len, ==, 3);
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+
+
+  dep = modulemd_dependencies_new ();
+
+  modulemd_dependencies_add_runtime_stream (dep, "platform", "-f26");
+
+  stream = modulemd_module_stream_v2_new (NULL, NULL);
+  modulemd_module_stream_v2_add_dependencies (stream, dep);
+  modulemd_module_stream_associate_upgrade_helper (
+    MODULEMD_MODULE_STREAM (stream), helper);
+
+  expanded_deps = modulemd_module_stream_expand_v2_to_v3_deps (stream, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (expanded_deps);
+  g_assert_cmpint (expanded_deps->len, ==, 4);
+
+  g_clear_error (&error);
+  g_clear_object (&dep);
+  g_clear_object (&stream);
+  g_clear_pointer (&expanded_deps, g_ptr_array_unref);
+}
+
+static void
 module_stream_test_stream_deps_expansion_v2_to_v3_no_platform (void)
 {
   g_autoptr (ModulemdModuleStreamV2) stream = NULL;
@@ -5464,6 +5518,10 @@ main (int argc, char *argv[])
   g_test_add_func (
     "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/exclusions",
     module_stream_test_stream_deps_expansion_v2_to_v3_exclusions);
+
+  g_test_add_func (
+    "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/known_streams",
+    module_stream_test_stream_deps_expansion_v2_to_v3_known_streams);
 
   g_test_add_func (
     "/modulemd/v2/modulestream/stream_expansion_v2_to_v3/bad/no_platform",

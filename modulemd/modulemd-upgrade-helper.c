@@ -103,3 +103,19 @@ modulemd_upgrade_helper_get_known_streams_as_strv (ModulemdUpgradeHelper *self,
 
   return modulemd_ordered_str_keys_as_strv (known_module);
 }
+
+
+GPtrArray *
+modulemd_upgrade_helper_get_known_streams_as_array (
+  ModulemdUpgradeHelper *self, const gchar *module_name)
+{
+  g_return_val_if_fail (MODULEMD_IS_UPGRADE_HELPER (self), NULL);
+
+  GHashTable *known_module =
+    g_hash_table_lookup (self->known_streams, module_name);
+
+  if (NULL == known_module)
+    return g_ptr_array_sized_new (0);
+
+  return modulemd_ordered_str_keys (known_module, modulemd_strcmp_sort);
+}

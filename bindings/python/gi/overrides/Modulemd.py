@@ -98,6 +98,19 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
+    if hasattr(Modulemd.ModuleIndex, "add_known_stream"):
+
+        class ModuleIndex(Modulemd.ModuleIndex):
+            def set_known_streams(self, known_streams):
+                for module, streams in known_streams.items():
+                    for stream in streams:
+                        super(ModuleIndex, self).add_known_stream(
+                            module, stream
+                        )
+
+        ModuleIndex = override(ModuleIndex)
+        __all__.append(ModuleIndex)
+
     if hasattr(Modulemd, "ModuleStreamV3"):
 
         class ModuleStreamV3(Modulemd.ModuleStreamV3):

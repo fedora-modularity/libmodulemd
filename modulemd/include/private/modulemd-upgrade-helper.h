@@ -95,4 +95,20 @@ GStrv
 modulemd_upgrade_helper_get_known_streams_as_strv (ModulemdUpgradeHelper *self,
                                                    const gchar *module_name);
 
+
+/**
+ * modulemd_upgrade_helper_get_known_streams_as_array:
+ * @self: (in): This #ModulemdUpgradeHelper
+ * @module_name: (in): The name of the module to return a list of known streams
+ * for.
+ *
+ * Returns: (transfer container): A list of known streams to provide clues to
+ * the stream upgrade process.
+ *
+ * Since: 2.10
+ */
+GPtrArray *
+modulemd_upgrade_helper_get_known_streams_as_array (
+  ModulemdUpgradeHelper *self, const gchar *module_name);
+
 G_END_DECLS

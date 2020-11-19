@@ -11,7 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include "modulemd-upgrade-helper.h"
+#include "private/modulemd-upgrade-helper.h"
 #include "private/test-utils.h"
 
 

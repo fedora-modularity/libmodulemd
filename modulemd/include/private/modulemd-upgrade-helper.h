@@ -20,7 +20,7 @@ G_BEGIN_DECLS
 /**
  * SECTION: modulemd-upgrade-helper
  * @title: Modulemd.UpgradeHelper
- * @stability: stable
+ * @stability: Private
  * @short_description: Helpers to provide cues to #ModulemdModuleStream
  * upgrades.
  */
@@ -58,12 +58,6 @@ modulemd_upgrade_helper_new (void);
  * encounters a module dependency that is specified as either `[ ]`
  * (all streams) or `[ -streamname ]` (all but some exclusions).
  *
- * When using the python bindings, a simpler way to set these values is to call
- * ```
- * helper = Modulemd.UpgradeHelper.new()
- * helper.set_known_streams({"module_name": ["stream1", "stream2"]}
- * ```
- *
  * Since: 2.10
  */
 void
@@ -73,7 +67,7 @@ modulemd_upgrade_helper_add_known_stream (ModulemdUpgradeHelper *self,
 
 
 /**
- * modulemd_upgrade_helper_get_known_modules_as_strv: (rename-to modulemd_upgrade_helper_get_known_modules)
+ * modulemd_upgrade_helper_get_known_modules_as_strv:
  * @self: (in): This #ModulemdUpgradeHelper
  *
  * Returns: (transfer full): A list of known modules to provide clues to the
@@ -87,7 +81,7 @@ modulemd_upgrade_helper_get_known_modules_as_strv (
 
 
 /**
- * modulemd_upgrade_helper_get_known_streams_as_strv: (rename-to modulemd_upgrade_helper_get_known_streams)
+ * modulemd_upgrade_helper_get_known_streams_as_strv:
  * @self: (in): This #ModulemdUpgradeHelper
  * @module_name: (in): The name of the module to return a list of known streams
  * for.

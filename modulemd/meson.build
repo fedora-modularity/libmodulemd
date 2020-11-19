@@ -119,7 +119,6 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-subdocument-info.h',
     'include/modulemd-2.0/modulemd-translation.h',
     'include/modulemd-2.0/modulemd-translation-entry.h',
-    'include/modulemd-2.0/modulemd-upgrade-helper.h',
     'include/modulemd-2.0/modulemd-obsoletes.h',
 )
 
@@ -146,6 +145,7 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-subdocument-info-private.h',
     'include/private/modulemd-translation-private.h',
     'include/private/modulemd-translation-entry-private.h',
+    'include/private/modulemd-upgrade-helper.h',
     'include/private/modulemd-util.h',
     'include/private/modulemd-yaml.h',
     'include/private/gi-binding-renames.h',
@@ -372,7 +372,6 @@ python_tests = {
 'servicelevel'     : 'tests/ModulemdTests/servicelevel.py',
 'translation'      : 'tests/ModulemdTests/translation.py',
 'translationentry' : 'tests/ModulemdTests/translationentry.py',
-'upgradehelper'    : 'tests/ModulemdTests/upgradehelper.py',
 }
 
 foreach name, script : python_tests

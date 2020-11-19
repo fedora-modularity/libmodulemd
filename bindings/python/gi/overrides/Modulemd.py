@@ -98,19 +98,6 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
-    if hasattr(Modulemd, "UpgradeHelper"):
-
-        class UpgradeHelper(Modulemd.UpgradeHelper):
-            def set_known_streams(self, known_streams):
-                for module, streams in known_streams.items():
-                    for stream in streams:
-                        super(UpgradeHelper, self).add_known_stream(
-                            module, stream
-                        )
-
-        UpgradeHelper = override(UpgradeHelper)
-        __all__.append(UpgradeHelper)
-
     if hasattr(Modulemd, "ModuleStreamV3"):
 
         class ModuleStreamV3(Modulemd.ModuleStreamV3):

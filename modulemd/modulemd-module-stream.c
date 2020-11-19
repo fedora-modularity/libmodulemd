@@ -1320,6 +1320,15 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
 
   g_debug ("Expansion: beginning v2 to v3 stream dependency expansion");
 
+  if (v2_stream->dependencies->len == 0)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_UPGRADE,
+                           "Stream v2 has no dependencies.");
+      return NULL;
+    }
+
   /*
    * Create a #GPtrArray to capture the combined results of the stream
    * expansions for each set of dependencies.
@@ -1355,7 +1364,7 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
           g_set_error_literal (error,
                                MODULEMD_ERROR,
                                MMD_ERROR_UPGRADE,
-                               "Stream v2 has no dependencies.");
+                               "Stream v2 has no module dependencies.");
           return NULL;
         }
 

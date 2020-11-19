@@ -4983,6 +4983,7 @@ module_stream_v1_test_xmd_issue_274 (void)
 static void
 module_stream_v2_test_xmd_issue_290 (void)
 {
+  gboolean ret;
   g_auto (GVariantBuilder) builder;
   g_autoptr (GVariant) xmd = NULL;
   GVariant *xmd_array = NULL;
@@ -5014,9 +5015,10 @@ module_stream_v2_test_xmd_issue_290 (void)
 
   modulemd_module_stream_v2_set_xmd (stream, xmd);
 
-  g_assert_true (modulemd_module_index_add_module_stream (
-    index, MODULEMD_MODULE_STREAM (stream), &error));
+  ret = modulemd_module_index_add_module_stream (
+    index, MODULEMD_MODULE_STREAM (stream), &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
 
   yaml_str = modulemd_module_index_dump_to_string (index, &error);
 
@@ -5048,6 +5050,7 @@ module_stream_v2_test_xmd_issue_290 (void)
 static void
 module_stream_v2_test_xmd_issue_290_with_example (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autofree gchar *path = NULL;
   g_autoptr (GError) error = NULL;
@@ -5065,13 +5068,13 @@ module_stream_v2_test_xmd_issue_290_with_example (void)
     modulemd_module_stream_v1_get_xmd (MODULEMD_MODULE_STREAM_V1 (stream)));
   modulemd_module_stream_v1_set_xmd (MODULEMD_MODULE_STREAM_V1 (stream), xmd);
 
-  g_assert_true (
-    modulemd_module_index_add_module_stream (index, stream, &error));
+  ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
 
   output_yaml = modulemd_module_index_dump_to_string (index, &error);
-  g_assert_nonnull (output_yaml);
   g_assert_no_error (error);
+  g_assert_nonnull (output_yaml);
 }
 
 

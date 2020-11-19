@@ -95,7 +95,6 @@ service_level_test_equals (void)
 {
   g_autoptr (ModulemdServiceLevel) sl_1 = NULL;
   g_autoptr (ModulemdServiceLevel) sl_2 = NULL;
-  g_autofree gchar *eol_string = NULL;
 
   /* Test 2 service levels with same name*/
   sl_1 = modulemd_service_level_new ("foo");
@@ -282,6 +281,7 @@ service_level_test_get_set_eol (void)
 
   /* Test that get_eol() returns NULL at first */
   g_assert_null (modulemd_service_level_get_eol (sl));
+  /* coverity[leaked_storage] */
   g_assert_null (modulemd_service_level_get_eol_as_string (sl));
 
 

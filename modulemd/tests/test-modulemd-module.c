@@ -27,6 +27,7 @@
 #include "private/modulemd-module-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-obsoletes-private.h"
+#include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
@@ -449,15 +450,18 @@ modulemd_test_remove_streams (void)
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autofree gchar *yaml_path = NULL;
+  gboolean ret;
 
   /* Get the f29 and f29-updates indexes. They have multiple streams and
    * versions for the 'dwm' module
    */
   f29 = modulemd_module_index_new ();
   yaml_path = g_strdup_printf ("%s/f29.yaml", g_getenv ("TEST_DATA_PATH"));
-  g_assert_true (modulemd_module_index_update_from_file (
-    f29, yaml_path, TRUE, &failures, &error));
+  ret = modulemd_module_index_update_from_file (
+    f29, yaml_path, TRUE, &failures, &error);
+  modulemd_subdocument_info_debug_dump_failures (failures);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
@@ -465,9 +469,10 @@ modulemd_test_remove_streams (void)
   f29_updates = modulemd_module_index_new ();
   yaml_path =
     g_strdup_printf ("%s/f29-updates.yaml", g_getenv ("TEST_DATA_PATH"));
-  g_assert_true (modulemd_module_index_update_from_file (
-    f29_updates, yaml_path, TRUE, &failures, &error));
+  ret = modulemd_module_index_update_from_file (
+    f29_updates, yaml_path, TRUE, &failures, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
@@ -524,6 +529,7 @@ modulemd_test_remove_streams (void)
 static void
 module_test_search_streams_by_glob (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
@@ -534,9 +540,10 @@ module_test_search_streams_by_glob (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error));
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
 
   module = modulemd_module_index_get_module (index, "nodejs");
   g_assert_nonnull (module);
@@ -600,6 +607,7 @@ module_test_search_streams_by_glob (void)
 static void
 module_test_search_streams_by_nsvca_glob (void)
 {
+  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
@@ -610,9 +618,10 @@ module_test_search_streams_by_nsvca_glob (void)
   yaml_path = g_strdup_printf ("%s/search_streams/search_streams.yaml",
                                g_getenv ("TEST_DATA_PATH"));
 
-  g_assert_true (modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error));
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
   g_assert_no_error (error);
+  g_assert_true (ret);
 
   module = modulemd_module_index_get_module (index, "nodejs");
   g_assert_nonnull (module);

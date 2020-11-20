@@ -1092,7 +1092,7 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
         error,
         MODULEMD_ERROR,
         MMD_ERROR_VALIDATE,
-        "Cannot convert modified date: %lu to iso8601 date.",
+        "Cannot convert modified date: %" PRIu64 " to iso8601 date.",
         modulemd_obsoletes_get_modified (MODULEMD_OBSOLETES (self)));
       return FALSE;
     }
@@ -1166,7 +1166,8 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
           g_set_error (error,
                        MODULEMD_ERROR,
                        MMD_ERROR_VALIDATE,
-                       "Cannot convert eol_date: %lu to iso8601 date.",
+                       "Cannot convert eol_date: %" PRIu64
+                       " to iso8601 date.",
                        eol_date);
           return FALSE;
         }
@@ -1231,7 +1232,7 @@ modulemd_obsoletes_is_active (ModulemdObsoletes *self)
 
   char buf[255];
   strftime (buf, sizeof (buf), "%Y%m%d%H%M", tm);
-  guint64 now = atol (buf);
+  guint64 now = g_ascii_strtoull (buf, NULL, 0);
 
   if (now >= modulemd_obsoletes_get_eol_date (self))
     {

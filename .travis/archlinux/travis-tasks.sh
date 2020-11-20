@@ -8,7 +8,7 @@ set -x
 pushd /builddir/
 
 # Build the code under GCC and run standard tests
-meson --buildtype=debug \
+meson --buildtype=debugoptimized \
       -Dtest_dirty_git=false \
       -Ddeveloper_build=false \
       -Dpython_name=python3 \

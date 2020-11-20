@@ -16,6 +16,7 @@ test_installed_lib = get_option('test_installed_lib')
 skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
 developer_build = get_option('developer_build')
+verbose_tests = get_option('verbose_tests')
 default_stream_mdversion = get_option('default_stream_mdversion')
 
 if not developer_build
@@ -255,7 +256,10 @@ test_release_env.set ('TEST_DATA_PATH', meson.source_root() + '/modulemd/tests/t
 # Test env with fatal warnings and criticals
 test_env = test_release_env
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
-test_env.set('G_MESSAGES_DEBUG', 'all')
+
+if verbose_tests
+    test_env.set('G_MESSAGES_DEBUG', 'all')
+endif
 
 # Python test env with fatal warnings and criticals
 py_test_env = test_env

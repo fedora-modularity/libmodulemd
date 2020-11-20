@@ -521,7 +521,7 @@ modulemd_iso8601date_to_guint64 (const gchar *iso8601)
   char buf[32];
   strftime (buf, sizeof (buf), "%Y%m%d%H%M", &tm);
 
-  return atol (buf);
+  return g_ascii_strtoull (buf, NULL, 0);
 }
 
 

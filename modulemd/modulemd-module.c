@@ -877,8 +877,8 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
           continue;
         }
       g_info (
-        "Overriding existing obsolete because of idenical stream: %s, "
-        "context: %s and modified time: %lu.",
+        "Overriding existing obsolete because of identical stream: %s, "
+        "context: %s and modified time: %" PRIu64 ".",
         modulemd_obsoletes_get_module_stream (obsoletes),
         modulemd_obsoletes_get_module_context (obsoletes),
         modulemd_obsoletes_get_modified (obsoletes));
@@ -967,7 +967,7 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
                   g_info (
                     "Multiple obsoletes for module: %s, stream: %s, context: "
                     "%s "
-                    "with identical modified time: %lu",
+                    "with identical modified time: %" PRIu64,
                     modulemd_module_get_module_name (self),
                     stream_str,
                     context_str,

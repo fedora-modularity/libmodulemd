@@ -14,6 +14,9 @@
 option('developer_build', type : 'boolean', value : true,
        description : 'Enables automatic code formatters and memory leak checks. This option should be set to FALSE for release builds.')
 
+option('verbose_tests', type : 'boolean', value : true,
+       description : 'Tests that are run under the "debug" configuration will print all debug messages. Disable this option for valgrind checks, as it speeds it up substantially.')
+
 option('default_stream_mdversion', type : 'integer', min : 2, max : 3, value : 2,
        description : 'The default module stream metadata version to use.')
 

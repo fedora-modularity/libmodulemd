@@ -17,7 +17,8 @@ pushd /builddir/
 ln -sf /builddir/bindings/python/gi/Modulemd.py $override_dir/
 
 # Build the code under GCC and run standard tests
-meson --buildtype=debug \
+meson --buildtype=debugoptimized \
+      -Dverbose_tests=false \
       $MESON_DIRTY_REPO_ARGS \
       travis
 
@@ -84,7 +85,7 @@ dnf -y install --nogpgcheck \
                $arch/python2-libmodulemd*.rpm ||:
 popd #build_rpm
 
-meson --buildtype=debug \
+meson --buildtype=release \
       -Dtest_installed_lib=true \
       installed_lib_tests
 

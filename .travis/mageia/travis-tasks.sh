@@ -11,7 +11,8 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false} -Ddeveloper_build
 pushd /builddir/
 
 # Build the code under GCC and run standard tests
-meson --buildtype=debug \
+meson --buildtype=debugoptimized \
+      -Dverbose_tests=false \
       $COMMON_MESON_ARGS \
       travis
 

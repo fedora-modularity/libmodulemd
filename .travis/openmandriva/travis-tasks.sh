@@ -4,17 +4,29 @@
 set -e
 set -x
 
+PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dwith_docs=false"
 
 pushd /builddir/
 
 # Build the code under LLVM/clang and run standard tests
-CC=clang CXX=clang++ meson --buildtype=debug \
+CC=clang CXX=clang++ meson --buildtype=debugoptimized \
+      -Dverbose_tests=false \
       $COMMON_MESON_ARGS \
       travis
 
-# (tpg) skip valgrind tests taking too much time
-MMD_SKIP_VALGRIND=True ninja -C travis test
+meson test --suite ci \
+           -C travis \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 5
+
+meson test --suite ci_valgrind \
+           --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
+           -C travis \
+           --num-processes=$PROCESSORS \
+           --print-errorlogs \
+           -t 10
 
 # Test the code with clang-analyzer
 # This requires meson 0.49.0 or later

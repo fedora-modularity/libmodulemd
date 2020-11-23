@@ -1166,8 +1166,7 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
           g_set_error (error,
                        MODULEMD_ERROR,
                        MMD_ERROR_VALIDATE,
-                       "Cannot convert eol_date: %" PRIu64
-                       " to iso8601 date.",
+                       "Cannot convert eol_date: %" PRIu64 " to iso8601 date.",
                        eol_date);
           return FALSE;
         }

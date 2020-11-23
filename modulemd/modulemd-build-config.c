@@ -722,3 +722,67 @@ modulemd_build_config_equals (ModulemdBuildConfig *self_1,
 
   return TRUE;
 }
+
+
+/* return less than zero if first arg is less than second arg,
+ * zero for equal,
+ * greater than zero if first arg is greater than second arg.
+ */
+gint
+modulemd_build_config_compare (ModulemdBuildConfig *self_1,
+                               ModulemdBuildConfig *self_2)
+{
+  gint cmp;
+
+  if (!self_1 && !self_2)
+    {
+      return 0;
+    }
+
+  if (!self_1)
+    {
+      return -1;
+    }
+
+  if (!self_2)
+    {
+      return 1;
+    }
+
+  g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self_1), 1);
+  g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self_2), -1);
+
+  cmp = g_strcmp0 (self_1->context, self_2->context);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  cmp = g_strcmp0 (self_1->platform, self_2->platform);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  cmp = modulemd_hash_table_compare (
+    self_1->buildrequires, self_2->buildrequires, modulemd_strcmp_wrapper);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  cmp = modulemd_hash_table_compare (
+    self_1->requires, self_2->requires, modulemd_strcmp_wrapper);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  cmp = modulemd_buildopts_compare (self_1->buildopts, self_2->buildopts);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  return 0;
+}

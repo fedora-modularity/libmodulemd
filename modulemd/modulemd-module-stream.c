@@ -1226,55 +1226,76 @@ stream_expansion_resolve_platform (GPtrArray **expanded_deps, GError **error)
   return TRUE;
 }
 
+/* #GCompareFunc for sorting a #GPtrArray of #ModulemdBuildConfig objects */
+static gint
+modulemd_module_stream_build_config_sort (gconstpointer a, gconstpointer b)
+{
+  return modulemd_build_config_compare (*(ModulemdBuildConfig **)a,
+                                        *(ModulemdBuildConfig **)b);
+}
+
 /*
- * stream_expansion_dedup:
+ * stream_expansion_sort_dedup:
  * @expanded_deps: (inout): A pointer to a pointer to a #GPtrArray of pointers
  * to #ModulemdBuildConfig objects that is the set of stream expanded
  * dependencies.
  * @error: (out): A #GError that will return the reason for an error.
  *
- * This method goes through the stream expanded dependencies and drops any
- * duplicates.
+ * This method sorts the stream expanded dependencies and drops any duplicates.
  *
- * Returns: TRUE if deduplication succeeded, FALSE otherwise.
+ * Returns: TRUE if sorting and deduplication succeeded, FALSE otherwise.
  */
 static gboolean
-stream_expansion_dedup (GPtrArray **expanded_deps, GError **error)
+stream_expansion_sort_dedup (GPtrArray **expanded_deps, GError **error)
 {
   g_autoptr (GPtrArray) deduped_expanded_deps = NULL;
+  g_autoptr (GPtrArray) sorted_expanded_deps = NULL;
   ModulemdBuildConfig *dep = NULL;
   gboolean duplicate;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_debug ("Expansion: stream_expansion_dedup called with %d deps",
+  g_debug ("Expansion: stream_expansion_sort_dedup called with %d deps",
            (*expanded_deps)->len);
+
+  /* make a copy of the current expanded dependencies array (without
+   * incrementing the reference counts) and sort it
+   */
+  sorted_expanded_deps = g_ptr_array_sized_new ((*expanded_deps)->len);
+  for (guint i = 0; i < (*expanded_deps)->len; i++)
+    {
+      g_ptr_array_add (sorted_expanded_deps,
+                       g_ptr_array_index (*expanded_deps, i));
+    }
+
+  g_debug ("Expansion: sorting %d deps", sorted_expanded_deps->len);
+  g_ptr_array_sort (sorted_expanded_deps,
+                    modulemd_module_stream_build_config_sort);
 
   deduped_expanded_deps = g_ptr_array_new_with_free_func (g_object_unref);
 
-  /*
-   * this is horribly inefficient, but it's the best one can do without a way
-   * to sort the objects
-   */
-
-  /* for every expanded dependency... */
-  for (guint i = 0; i < (*expanded_deps)->len; i++)
+  /* for every sorted expanded dependency... */
+  for (guint i = 0; i < sorted_expanded_deps->len; i++)
     {
-      dep = g_ptr_array_index (*expanded_deps, i);
+      dep = g_ptr_array_index (sorted_expanded_deps, i);
 
       duplicate = FALSE;
 
-      /* for every previously deduplicated dependency... */
-      for (guint j = 0; j < deduped_expanded_deps->len; j++)
+      /* check if this dependency is a duplicate of the previous de-duplicated
+       * dependency
+       */
+      if (deduped_expanded_deps->len > 0)
         {
           if (modulemd_build_config_equals (
-                dep, g_ptr_array_index (deduped_expanded_deps, j)))
+                dep,
+                g_ptr_array_index (deduped_expanded_deps,
+                                   deduped_expanded_deps->len - 1)))
             {
               duplicate = TRUE;
-              break;
             }
         }
 
+      /* if not a duplicate, copy and add to the de-duplicated list */
       if (!duplicate)
         {
           g_ptr_array_add (deduped_expanded_deps,
@@ -1284,6 +1305,7 @@ stream_expansion_dedup (GPtrArray **expanded_deps, GError **error)
 
   if (deduped_expanded_deps->len == 0)
     {
+      /* this should be impossible unless we started with none */
       g_set_error_literal (error,
                            MODULEMD_ERROR,
                            MMD_ERROR_UPGRADE,
@@ -1507,10 +1529,10 @@ modulemd_module_stream_expand_v2_to_v3_deps (ModulemdModuleStreamV2 *v2_stream,
     } /* iterate through all of the V2 stream dependencies */
 
   /*
-   * Eliminate any duplicate entries from the combined expanded dependencies
-   * from all of StreamV2's #ModulemdDependencies.
+   * Sort and eliminate any duplicate entries from the combined expanded
+   * dependencies from all of StreamV2's #ModulemdDependencies.
    */
-  if (!stream_expansion_dedup (&all_expanded_deps, &nested_error))
+  if (!stream_expansion_sort_dedup (&all_expanded_deps, &nested_error))
     {
       g_propagate_prefixed_error (
         error,

@@ -347,6 +347,7 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
 ModulemdBuildConfig *
 modulemd_build_config_copy (ModulemdBuildConfig *self);
 
+
 /**
  * modulemd_build_config_equals:
  * @self_1: A pointer to a #ModulemdBuildConfig object.
@@ -361,5 +362,20 @@ modulemd_build_config_copy (ModulemdBuildConfig *self);
 gboolean
 modulemd_build_config_equals (ModulemdBuildConfig *self_1,
                               ModulemdBuildConfig *self_2);
+
+
+/**
+ * modulemd_build_config_compare:
+ * @self_1: (in): A pointer to a #ModulemdBuildConfig object.
+ * @self_2: (in): A pointer to a #ModulemdBuildConfig object.
+ *
+ * Returns: Less than zero if @self_1 sorts less than @self_2, zero for equal,
+ * greater than zero if @self_1 is greater than @self_2.
+ *
+ * Since: 2.10
+ */
+gint
+modulemd_build_config_compare (ModulemdBuildConfig *self_1,
+                               ModulemdBuildConfig *self_2);
 
 G_END_DECLS

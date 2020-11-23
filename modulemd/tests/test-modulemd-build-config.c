@@ -758,9 +758,8 @@ buildconfig_test_emit_yaml (void)
                    "...\n");
 }
 
-
 static void
-buildconfig_test_equals (void)
+buildconfig_test_comparison (void)
 {
   g_autoptr (ModulemdBuildConfig) bc_1 = NULL;
   g_autoptr (ModulemdBuildConfig) bc_2 = NULL;
@@ -776,6 +775,17 @@ buildconfig_test_equals (void)
   g_assert_true (MODULEMD_IS_BUILD_CONFIG (bc_2));
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
+
+  /* checks when NULL is involved */
+  g_assert_true (modulemd_build_config_equals (NULL, NULL));
+  g_assert_false (modulemd_build_config_equals (NULL, bc_2));
+  g_assert_false (modulemd_build_config_equals (bc_1, NULL));
+  g_assert_cmpint (modulemd_build_config_compare (NULL, NULL), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (NULL, bc_2), <, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, NULL), >, 0);
+
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -791,6 +801,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_context (bc_2, "CTX1");
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -806,6 +818,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_context (bc_2, "CTX2");
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), <, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), >, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -821,6 +835,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_platform (bc_2, "f33");
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -836,6 +852,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_platform (bc_2, "f32");
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), >, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), <, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -857,6 +875,8 @@ buildconfig_test_equals (void)
     bc_2, "buildmod2", "stream2");
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -880,6 +900,8 @@ buildconfig_test_equals (void)
     bc_2, "buildmod3", "stream3");
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), <, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), >, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -897,6 +919,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -915,6 +939,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_add_runtime_requirement (bc_2, "runmod3", "stream5");
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), <, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), >, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -940,6 +966,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -967,6 +995,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_add_runtime_requirement (bc_2, "runmod2", "stream4");
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), >, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), <, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
 
@@ -985,6 +1015,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_buildopts (bc_2, opts);
 
   g_assert_true (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), ==, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), ==, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
   g_clear_object (&opts);
@@ -1008,6 +1040,8 @@ buildconfig_test_equals (void)
   modulemd_build_config_set_buildopts (bc_2, opts);
 
   g_assert_false (modulemd_build_config_equals (bc_1, bc_2));
+  g_assert_cmpint (modulemd_build_config_compare (bc_1, bc_2), <, 0);
+  g_assert_cmpint (modulemd_build_config_compare (bc_2, bc_1), >, 0);
   g_clear_object (&bc_1);
   g_clear_object (&bc_2);
   g_clear_object (&opts);
@@ -1065,7 +1099,8 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/buildconfig/yaml/emit",
                    buildconfig_test_emit_yaml);
 
-  g_test_add_func ("/modulemd/v2/buildconfig/equals", buildconfig_test_equals);
+  g_test_add_func ("/modulemd/v2/buildconfig/comparison",
+                   buildconfig_test_comparison);
 
   return g_test_run ();
 }

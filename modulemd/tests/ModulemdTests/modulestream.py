@@ -649,6 +649,7 @@ class TestModuleStream(TestBase):
 
     def test_upgrade_v1_to_v2(self):
         v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
+        v1_stream.set_context("ctx")
         v1_stream.set_summary("Summary")
         v1_stream.set_description("Description")
         v1_stream.add_module_license("BSD")
@@ -657,6 +658,7 @@ class TestModuleStream(TestBase):
         v1_stream.add_buildtime_requirement("ModuleB", "streamY")
         v1_stream.add_runtime_requirement("ModuleA", "streamZ")
         v1_stream.add_runtime_requirement("ModuleB", "streamY")
+        v1_stream.add_runtime_requirement("platform", "f33")
 
         v2_stream = v1_stream.upgrade(Modulemd.ModuleStreamVersionEnum.TWO)
         self.assertIsNotNone(v2_stream)
@@ -672,6 +674,7 @@ version: 2
 data:
   name: SuperModule
   stream: \"latest\"
+  context: ctx
   summary: Summary
   description: >-
     Description
@@ -685,17 +688,130 @@ data:
     requires:
       ModuleA: [streamZ]
       ModuleB: [streamY]
+      platform: [f33]
 ...
 """,
         )
 
     def test_upgrade_v2_to_v3(self):
-        # TODO: implement test
-        pass
+        v2_stream = Modulemd.ModuleStreamV2.new("SuperModule", "latest")
+        v2_stream.set_context("ctx")
+        v2_stream.set_summary("Summary")
+        v2_stream.set_description("Description")
+        v2_stream.add_module_license("BSD")
+
+        deps = Modulemd.Dependencies()
+        deps.add_buildtime_stream("ModuleA", "streamZ")
+        deps.add_buildtime_stream("ModuleB", "streamY")
+        deps.add_runtime_stream("ModuleA", "streamZ")
+        deps.add_runtime_stream("ModuleB", "streamY")
+        deps.add_runtime_stream("platform", "f33")
+        v2_stream.add_dependencies(deps)
+
+        v3_module = v2_stream.upgrade_ext(
+            Modulemd.ModuleStreamVersionEnum.THREE
+        )
+        self.assertIsNotNone(v3_module)
+
+        # get and save current default stream mdversion
+        default_mdv = Modulemd.get_default_stream_mdversion()
+
+        # create a v3 index and add all module streams to it
+        Modulemd.set_default_stream_mdversion(
+            Modulemd.ModuleStreamVersionEnum.THREE
+        )
+        idx = Modulemd.ModuleIndex.new()
+        for stream in v3_module.get_all_streams():
+            idx.add_module_stream(stream)
+
+        # restore default mdversion to avoid unexpected results from other tests
+        Modulemd.set_default_stream_mdversion(default_mdv)
+
+        self.assertEquals(
+            idx.dump_to_string(),
+            """---
+document: modulemd-stream
+version: 3
+data:
+  name: SuperModule
+  stream: \"latest\"
+  context: ctx
+  summary: Summary
+  description: >-
+    Description
+  license:
+    module:
+    - BSD
+  dependencies:
+    platform: f33
+    buildrequires:
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
+    requires:
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
+...
+""",
+        )
 
     def test_upgrade_v1_to_v3(self):
-        # TODO: implement test
-        pass
+        v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
+        v1_stream.set_context("ctx")
+        v1_stream.set_summary("Summary")
+        v1_stream.set_description("Description")
+        v1_stream.add_module_license("BSD")
+
+        v1_stream.add_buildtime_requirement("ModuleA", "streamZ")
+        v1_stream.add_buildtime_requirement("ModuleB", "streamY")
+        v1_stream.add_runtime_requirement("ModuleA", "streamZ")
+        v1_stream.add_runtime_requirement("ModuleB", "streamY")
+        v1_stream.add_runtime_requirement("platform", "f33")
+
+        v3_module = v1_stream.upgrade_ext(
+            Modulemd.ModuleStreamVersionEnum.THREE
+        )
+        self.assertIsNotNone(v3_module)
+
+        # get and save current default stream mdversion
+        default_mdv = Modulemd.get_default_stream_mdversion()
+
+        # create a v3 index and add all module streams to it
+        Modulemd.set_default_stream_mdversion(
+            Modulemd.ModuleStreamVersionEnum.THREE
+        )
+        idx = Modulemd.ModuleIndex.new()
+        for stream in v3_module.get_all_streams():
+            idx.add_module_stream(stream)
+
+        # restore default mdversion to avoid unexpected results from other tests
+        Modulemd.set_default_stream_mdversion(default_mdv)
+
+        self.assertEquals(
+            idx.dump_to_string(),
+            """---
+document: modulemd-stream
+version: 3
+data:
+  name: SuperModule
+  stream: \"latest\"
+  context: ctx
+  summary: Summary
+  description: >-
+    Description
+  license:
+    module:
+    - BSD
+  dependencies:
+    platform: f33
+    buildrequires:
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
+    requires:
+      ModuleA: [streamZ]
+      ModuleB: [streamY]
+...
+""",
+        )
 
     def test_v2_yaml(self):
         yaml = """

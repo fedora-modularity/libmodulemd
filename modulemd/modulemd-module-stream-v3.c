@@ -2226,7 +2226,7 @@ modulemd_module_stream_v3_parse_deps (yaml_parser_t *parser,
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
         error,
         event,
-        "Got %s instead of SEQUENCE_START in dependencies.",
+        "Got %s instead of YAML_MAPPING_START_EVENT in dependencies.",
         mmd_yaml_get_event_name (event.type));
     }
 

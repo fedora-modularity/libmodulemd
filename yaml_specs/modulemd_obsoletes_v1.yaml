@@ -17,7 +17,7 @@ data:
   module: nodejs
   # A string representing a Stream of a module that is obsoleted
   # MANDATORY
-  stream: "11"
+  stream: 11
   # A string representing a Context of a module that is obsoleted
   # If not specified, all contexts get obsoleted.
   # NOTE: consider specifying a list of contexts
@@ -35,4 +35,4 @@ data:
   # OPTIONAL
   obsoleted_by:
     module: nodejs
-    stream: "12"
+    stream: 12

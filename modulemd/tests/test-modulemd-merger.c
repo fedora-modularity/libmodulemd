@@ -23,7 +23,6 @@
 
 #include "private/modulemd-module-private.h"
 #include "private/modulemd-obsoletes-private.h"
-#include "private/modulemd-subdocument-info-private.h"
 
 
 static void
@@ -46,7 +45,6 @@ merger_test_constructors (void)
 static void
 merger_test_deduplicate (void)
 {
-  gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleIndex) index2 = NULL;
   g_autoptr (ModulemdModuleIndex) merged_index = NULL;
@@ -64,11 +62,8 @@ merger_test_deduplicate (void)
 
   g_assert_nonnull (yaml_path);
 
-  ret = modulemd_module_index_update_from_file (
-    index, yaml_path, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
@@ -82,11 +77,8 @@ merger_test_deduplicate (void)
 
   g_assert_nonnull (yaml_path);
 
-  ret = modulemd_module_index_update_from_file (
-    index2, yaml_path, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    index2, yaml_path, TRUE, &failures, &error));
   g_assert_cmpint (failures->len, ==, 0);
   g_assert_nonnull (index2);
   g_assert_null (error);
@@ -115,7 +107,6 @@ merger_test_deduplicate (void)
 static void
 merger_test_merger (void)
 {
-  gboolean ret;
   g_autoptr (ModulemdModuleIndex) base_index = NULL;
   g_autofree gchar *yaml_path = NULL;
   g_autofree gchar *module_name = NULL;
@@ -138,11 +129,9 @@ merger_test_merger (void)
   yaml_path =
     g_strdup_printf ("%s/merging-base.yaml", g_getenv ("TEST_DATA_PATH"));
   base_index = modulemd_module_index_new ();
-  ret = modulemd_module_index_update_from_file (
-    base_index, yaml_path, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_index, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
-  g_assert_true (ret);
   g_clear_pointer (&yaml_path, g_free);
 
   /* Baseline */
@@ -340,7 +329,6 @@ merger_test_merger (void)
 static void
 merger_test_add_only (void)
 {
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -355,16 +343,10 @@ merger_test_add_only (void)
   g_autofree gchar *add_only_yaml =
     g_strdup_printf ("%s/merger/add_only.yaml", g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    add_only_idx, add_only_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_only_idx, add_only_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (merger, add_only_idx, 0);
@@ -394,7 +376,6 @@ merger_test_add_only (void)
 static void
 merger_test_add_conflicting_stream (void)
 {
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -410,16 +391,10 @@ merger_test_add_conflicting_stream (void)
   g_autofree gchar *add_conflicting_yaml = g_strdup_printf (
     "%s/merger/add_conflicting_stream.yaml", g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (
@@ -444,7 +419,6 @@ merger_test_add_conflicting_stream (void)
 static void
 merger_test_add_conflicting_stream_and_profile_modified (void)
 {
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -461,16 +435,10 @@ merger_test_add_conflicting_stream_and_profile_modified (void)
     "%s/merger/add_conflicting_stream_and_profile_modified.yaml",
     g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_conflicting_idx, add_conflicting_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (
@@ -496,7 +464,6 @@ merger_test_add_conflicting_stream_and_profile_modified (void)
 static void
 merger_test_with_real_world_data (void)
 {
-  gboolean ret;
   g_autoptr (ModulemdModuleIndex) f29 = NULL;
   g_autoptr (ModulemdModuleIndex) f29_updates = NULL;
   g_autoptr (ModulemdModuleIndex) index = NULL;
@@ -507,11 +474,9 @@ merger_test_with_real_world_data (void)
 
   f29 = modulemd_module_index_new ();
   yaml_path = g_strdup_printf ("%s/f29.yaml", g_getenv ("TEST_DATA_PATH"));
-  ret = modulemd_module_index_update_from_file (
-    f29, yaml_path, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
-  g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
@@ -519,11 +484,9 @@ merger_test_with_real_world_data (void)
   f29_updates = modulemd_module_index_new ();
   yaml_path =
     g_strdup_printf ("%s/f29-updates.yaml", g_getenv ("TEST_DATA_PATH"));
-  ret = modulemd_module_index_update_from_file (
-    f29_updates, yaml_path, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_true (modulemd_module_index_update_from_file (
+    f29_updates, yaml_path, TRUE, &failures, &error));
   g_assert_no_error (error);
-  g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
@@ -541,7 +504,6 @@ merger_test_with_real_world_data (void)
 static void
 merger_test_obsoletes_add (void)
 {
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -557,16 +519,10 @@ merger_test_obsoletes_add (void)
   g_autofree gchar *add_yaml = g_strdup_printf ("%s/merger/add_obsoletes.yaml",
                                                 g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    add_idx, add_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    add_idx, add_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (merger, add_idx, 0);
@@ -607,7 +563,6 @@ merger_test_obsoletes_add (void)
 static void
 merger_test_obsoletes_newer (void)
 {
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -623,16 +578,10 @@ merger_test_obsoletes_newer (void)
   g_autofree gchar *newer_yaml = g_strdup_printf (
     "%s/merger/newer_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    newer_idx, newer_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    newer_idx, newer_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (merger, newer_idx, 0);
@@ -670,7 +619,6 @@ static void
 merger_test_obsoletes_priority (void)
 {
   // When priority specified override existing obsolete
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -687,16 +635,10 @@ merger_test_obsoletes_priority (void)
   g_autofree gchar *newer_yaml = g_strdup_printf (
     "%s/merger/conflict_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    conflicting_idx, newer_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    conflicting_idx, newer_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 1);
   modulemd_module_index_merger_associate_index (merger, conflicting_idx, 0);
@@ -734,7 +676,6 @@ merger_test_obsoletes_incompatible (void)
    * undefined, so we will only validate that the merge completes and
    * it only contains a single obsoletes
    */
-  gboolean ret;
   g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdModuleIndex) base_idx = modulemd_module_index_new ();
@@ -750,16 +691,10 @@ merger_test_obsoletes_incompatible (void)
   g_autofree gchar *incompatible_yaml = g_strdup_printf (
     "%s/merger/conflict_obsoletes.yaml", g_getenv ("TEST_DATA_PATH"));
 
-  ret = modulemd_module_index_update_from_file (
-    base_idx, base_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
-  ret = modulemd_module_index_update_from_file (
-    incompatible_idx, incompatible_yaml, TRUE, &failures, &error);
-  modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_no_error (error);
-  g_assert_true (ret);
+  g_assert_true (modulemd_module_index_update_from_file (
+    base_idx, base_yaml, TRUE, &failures, &error));
+  g_assert_true (modulemd_module_index_update_from_file (
+    incompatible_idx, incompatible_yaml, TRUE, &failures, &error));
 
   modulemd_module_index_merger_associate_index (merger, base_idx, 0);
   modulemd_module_index_merger_associate_index (merger, incompatible_idx, 0);

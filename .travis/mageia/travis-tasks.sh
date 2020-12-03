@@ -10,9 +10,17 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false} -Ddeveloper_build
 
 pushd /builddir/
 
+valgrind_cmd='
+    valgrind --error-exitcode=1
+             --errors-for-leak-kinds=definite
+             --leak-check=full
+             --show-leak-kinds=definite
+             --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
+             --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp
+'
+
 # Build the code under GCC and run standard tests
-meson --buildtype=debugoptimized \
-      -Dverbose_tests=false \
+meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 
@@ -23,7 +31,7 @@ meson test --suite ci \
            -t 5
 
 meson test --suite ci_valgrind \
-           --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
+           --wrap="$valgrind_cmd" \
            -C travis \
            --num-processes=$PROCESSORS \
            --print-errorlogs \

@@ -98,92 +98,55 @@ class ModulemdUtil(object):
 
 if float(Modulemd._version) >= 2:
 
-    if hasattr(Modulemd.ModuleIndex, "add_known_stream"):
+    class ModuleStreamV2(Modulemd.ModuleStreamV2):
+        def set_xmd(self, xmd):
+            super(ModuleStreamV2, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd)
+            )
 
-        class ModuleIndex(Modulemd.ModuleIndex):
-            def set_known_streams(self, known_streams):
-                for module, streams in known_streams.items():
-                    for stream in streams:
-                        super(ModuleIndex, self).add_known_stream(
-                            module, stream
-                        )
+        def get_xmd(self):
+            variant_xmd = super(ModuleStreamV2, self).get_xmd()
+            if variant_xmd is None:
+                return {}
+            return variant_xmd.unpack()
 
-        ModuleIndex = override(ModuleIndex)
-        __all__.append(ModuleIndex)
+    ModuleStreamV2 = override(ModuleStreamV2)
+    __all__.append(ModuleStreamV2)
 
-    if hasattr(Modulemd, "ModuleStreamV3"):
+    class ModuleStreamV1(Modulemd.ModuleStreamV1):
+        def set_xmd(self, xmd):
+            super(ModuleStreamV1, self).set_xmd(
+                ModulemdUtil.python_to_variant(xmd)
+            )
 
-        class ModuleStreamV3(Modulemd.ModuleStreamV3):
-            def set_xmd(self, xmd):
-                super(ModuleStreamV3, self).set_xmd(
-                    ModulemdUtil.python_to_variant(xmd)
+        def get_xmd(self):
+            variant_xmd = super(ModuleStreamV1, self).get_xmd()
+            if variant_xmd is None:
+                return {}
+            return variant_xmd.unpack()
+
+    ModuleStreamV1 = override(ModuleStreamV1)
+    __all__.append(ModuleStreamV1)
+
+    class ServiceLevel(Modulemd.ServiceLevel):
+        def set_eol(self, eol):
+            if isinstance(eol, datetime.date):
+                return super(ServiceLevel, self).set_eol_ymd(
+                    eol.year, eol.month, eol.day
                 )
 
-            def get_xmd(self):
-                variant_xmd = super(ModuleStreamV3, self).get_xmd()
-                if variant_xmd is None:
-                    return {}
-                return variant_xmd.unpack()
+            raise TypeError(
+                "Expected datetime.date, but got %s." % (type(eol).__name__)
+            )
 
-        ModuleStreamV3 = override(ModuleStreamV3)
-        __all__.append(ModuleStreamV3)
+        def get_eol(self):
+            eol = super(ServiceLevel, self).get_eol()
+            if eol is None:
+                return None
 
-    if hasattr(Modulemd, "ModuleStreamV2"):
+            return datetime.date(
+                eol.get_year(), eol.get_month(), eol.get_day()
+            )
 
-        class ModuleStreamV2(Modulemd.ModuleStreamV2):
-            def set_xmd(self, xmd):
-                super(ModuleStreamV2, self).set_xmd(
-                    ModulemdUtil.python_to_variant(xmd)
-                )
-
-            def get_xmd(self):
-                variant_xmd = super(ModuleStreamV2, self).get_xmd()
-                if variant_xmd is None:
-                    return {}
-                return variant_xmd.unpack()
-
-        ModuleStreamV2 = override(ModuleStreamV2)
-        __all__.append(ModuleStreamV2)
-
-    if hasattr(Modulemd, "ModuleStreamV1"):
-
-        class ModuleStreamV1(Modulemd.ModuleStreamV1):
-            def set_xmd(self, xmd):
-                super(ModuleStreamV1, self).set_xmd(
-                    ModulemdUtil.python_to_variant(xmd)
-                )
-
-            def get_xmd(self):
-                variant_xmd = super(ModuleStreamV1, self).get_xmd()
-                if variant_xmd is None:
-                    return {}
-                return variant_xmd.unpack()
-
-        ModuleStreamV1 = override(ModuleStreamV1)
-        __all__.append(ModuleStreamV1)
-
-    if hasattr(Modulemd, "ServiceLevel"):
-
-        class ServiceLevel(Modulemd.ServiceLevel):
-            def set_eol(self, eol):
-                if isinstance(eol, datetime.date):
-                    return super(ServiceLevel, self).set_eol_ymd(
-                        eol.year, eol.month, eol.day
-                    )
-
-                raise TypeError(
-                    "Expected datetime.date, but got %s."
-                    % (type(eol).__name__)
-                )
-
-            def get_eol(self):
-                eol = super(ServiceLevel, self).get_eol()
-                if eol is None:
-                    return None
-
-                return datetime.date(
-                    eol.get_year(), eol.get_month(), eol.get_day()
-                )
-
-        ServiceLevel = override(ServiceLevel)
-        __all__.append(ServiceLevel)
+    ServiceLevel = override(ServiceLevel)
+    __all__.append(ServiceLevel)

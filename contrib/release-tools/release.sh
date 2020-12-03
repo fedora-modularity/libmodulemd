@@ -62,7 +62,6 @@ git shortlog $OLDTAG.. >> $TMPDIR/shortlog || error_out code=3 message="Couldn't
 cat $TMPDIR/tag_header $TMPDIR/shortlog > $TMPDIR/tag_message
 
 git tag -s -F $TMPDIR/tag_message $NEWTAG || error_out code=4 message="Couldn't create new signed tag for the release"
-git tag -s -F $TMPDIR/tag_message $NEWVERSION || error_out code=4 message="Couldn't create new signed tag for the release"
 
 # meson 0.50.0 and later can modify the version field programmatically
 if [ $($SCRIPT_DIR/semver compare 0.50.0 $(meson --version)) = -1 ]; then

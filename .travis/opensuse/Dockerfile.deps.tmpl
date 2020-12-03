@@ -35,5 +35,3 @@ RUN zypper install --no-confirm --no-recommends --capability \
 	sudo \
 	valgrind \
 && zypper clean --all
-
-RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

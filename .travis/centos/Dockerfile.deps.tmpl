@@ -41,5 +41,3 @@ ifelse(eval(__RELEASE__ < 8), 1, `dnl
 	rpmdevtools \
 	sudo \
     && yum -y clean all
-
-RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

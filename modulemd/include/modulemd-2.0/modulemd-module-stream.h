@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018-2020 Red Hat, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -30,19 +30,6 @@ G_BEGIN_DECLS
  */
 
 /**
- * MMD_MAXCONTEXTLEN:
- *
- * The ModuleStream v3 specification defines the maximum lenth of the context
- * field.
- *
- * Since: 2.10
- */
-#define MMD_MAXCONTEXTLEN 10
-
-/* Forward declarations */
-typedef struct _ModulemdModule ModulemdModule;
-
-/**
  * ModulemdModuleStreamVersionEnum:
  * @MD_MODULESTREAM_VERSION_ERROR: Represents an error handling module stream
  * version.
@@ -51,8 +38,6 @@ typedef struct _ModulemdModule ModulemdModule;
  * metadata format.
  * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #ModulemdModuleStream
  * metadata format.
- * @MD_MODULESTREAM_VERSION_THREE: Represents v3 of the #ModulemdModuleStream
- * metadata format. Since: 2.10
  * @MD_MODULESTREAM_VERSION_LATEST: Represents the highest-supported version of
  * the #ModulemdModuleStream metadata format.
  *
@@ -65,9 +50,8 @@ typedef enum
 
   MD_MODULESTREAM_VERSION_ONE = 1,
   MD_MODULESTREAM_VERSION_TWO = 2,
-  MD_MODULESTREAM_VERSION_THREE = 3,
 
-  MD_MODULESTREAM_VERSION_LATEST = MD_MODULESTREAM_VERSION_THREE
+  MD_MODULESTREAM_VERSION_LATEST = MD_MODULESTREAM_VERSION_TWO
 } ModulemdModuleStreamVersionEnum;
 
 
@@ -272,34 +256,12 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
  * appropriately if the upgrade could not be completed automatically.
  *
  * Since: 2.0
- * Deprecated: 2.10: Use modulemd_module_stream_upgrade_ext() instead.
  */
-MMD_DEPRECATED_FOR (modulemd_module_stream_upgrade_ext)
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
                                 GError **error);
 
-/**
- * modulemd_module_stream_upgrade_ext:
- * @self: (in): This #ModulemdModuleStream object.
- * @mdversion: (in): The metadata version to upgrade to. If zero, upgrades to
- * the highest-supported version.
- * @error: (out): A #GError that will return the reason for an upgrade error.
- *
- * Does not modify the original #ModulemdModuleStream object, @from.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdModule containing a copy
- * of this object upgraded to the requested version, possibly with multiple
- * streams. Returns NULL and sets @error appropriately if the upgrade could not
- * be completed automatically.
- *
- * Since: 2.10
- */
-ModulemdModule *
-modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
-                                    guint64 mdversion,
-                                    GError **error);
 
 /**
  * modulemd_module_stream_validate:

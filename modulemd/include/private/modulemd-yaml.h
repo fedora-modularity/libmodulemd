@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2017-2020 Stephen Gallagher
+ * Copyright (C) 2017-2018 Stephen Gallagher
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -41,12 +41,9 @@ G_BEGIN_DECLS
  * #ModulemdDefaultsV1) YAML document type.
  * @MODULEMD_YAML_DOC_TRANSLATIONS: Represents a `modulemd-translations` (see
  * #ModulemdTranslation) YAML document type.
- * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document.
- * V2 is a subset of #ModuleStreamV2 containing only the attributes that a
- * package maintainer should modify. V3 (see #ModulemdPackagerV3) is a new YAML
- * document type. Since: 2.9
- * @MODULEMD_YAML_DOC_OBSOLETES: Represents a `modulemd-obsoletes` document (see
- * #ModulemdObsoletes) YAML document type. Since: 2.10
+ * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document,
+ * which is a subset of #ModuleStream containing only the attributes that a
+ * package maintainer should modify. Since: 2.9
  *
  * Since: 2.0
  */
@@ -171,9 +168,9 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
  * Since: 2.0
  */
 #define MMD_INIT_YAML_STRING(_emitter, _string)                               \
-  g_autoptr (modulemd_yaml_string) _string =                                  \
+  g_autoptr (modulemd_yaml_string) yaml_string =                              \
     g_malloc0_n (1, sizeof (modulemd_yaml_string));                           \
-  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)_string)
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
 /**
  * MMD_REINIT_YAML_STRING:
@@ -191,8 +188,8 @@ mmd_yaml_get_event_name (yaml_event_type_t type);
   yaml_emitter_delete (_emitter);                                             \
   yaml_emitter_initialize (_emitter);                                         \
   g_clear_pointer (&_string, modulemd_yaml_string_free);                      \
-  _string = g_malloc0_n (1, sizeof (modulemd_yaml_string));                   \
-  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)_string)
+  yaml_string = g_malloc0_n (1, sizeof (modulemd_yaml_string));               \
+  yaml_emitter_set_output (_emitter, write_yaml_string, (void *)yaml_string)
 
 /**
  * YAML_PARSER_PARSE_WITH_EXIT_FULL:
@@ -784,41 +781,6 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
 
 
 /**
- * modulemd_yaml_parse_nested_set:
- * @parser: (inout): A libyaml parser object positioned at the beginning of a
- * map containing scalar keys with string set values.
- * @error: (out): A #GError that will return the reason for a parsing or
- * validation error.
- *
- * Function for retrieving a hash table from a str/string-set map such as
- * data.dependencies in ModuleStreamV2.
- *
- * Returns: (transfer full): A newly-allocated #GHashTable * representing the
- * parsed values. NULL if a parse error occurred and sets @error appropriately.
- *
- * Since: 2.10
- */
-GHashTable *
-modulemd_yaml_parse_nested_set (yaml_parser_t *parser, GError **error);
-
-/**
- * modulemd_yaml_emit_nested_set:
- * @emitter: (inout): A libyaml emitter object that is positioned where a nested
- * set (a map containing scalar keys with string set values) should occur.
- * @table: (in): The nested set to emit.
- * @error: (out): A #GError that will return the reason for failing to emit.
- *
- * Returns: TRUE if the nested set emitted successfully. FALSE if an error was
- * encountered and sets @error appropriately.
- *
- * Since: 2.10
- */
-gboolean
-modulemd_yaml_emit_nested_set (yaml_emitter_t *emitter,
-                               GHashTable *table,
-                               GError **error);
-
-/**
  * modulemd_yaml_parse_document_type:
  * @parser: (inout): A libyaml parser object positioned at the beginning of a
  * yaml subdocument immediately prior to a `YAML_DOCUMENT_START_EVENT`.
@@ -917,20 +879,6 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
  */
 GVariant *
 mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
-
-
-/**
- * mmd_parse_xmd:
- * @parser: (inout): A YAML parser positioned just after an 'xmd' mapping key.
- * @error: (out): A #GError that will return the reason for failing to parse.
- *
- * Returns: (transfer full): A new, floating #GVariant representing the parsed
- * XMD (eXtensible MetaData).
- *
- * Since: 2.10
- */
-GVariant *
-mmd_parse_xmd (yaml_parser_t *parser, GError **error);
 
 
 /**

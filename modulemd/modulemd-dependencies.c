@@ -388,6 +388,90 @@ modulemd_dependencies_init (ModulemdDependencies *self)
 
 /* === YAML Functions === */
 
+static GHashTable *
+modulemd_dependencies_parse_yaml_nested_set (yaml_parser_t *parser,
+                                             GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  MMD_INIT_YAML_EVENT (event);
+  gboolean done = FALSE;
+  g_autofree gchar *key = NULL;
+  g_autoptr (GHashTable) value = NULL;
+  g_autoptr (GHashTable) t = NULL;
+  g_autoptr (GError) nested_error = NULL;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  t = g_hash_table_new_full (
+    g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
+
+  /* The first event must be a MAPPING_START */
+  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+  if (event.type != YAML_MAPPING_START_EVENT)
+    {
+      MMD_YAML_ERROR_EVENT_EXIT (
+        error, event, "Missing mapping in dependencies table entry");
+    }
+
+  while (!done)
+    {
+      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
+
+      switch (event.type)
+        {
+        case YAML_MAPPING_END_EVENT: done = TRUE; break;
+
+        case YAML_SCALAR_EVENT:
+          key = g_strdup ((const gchar *)event.data.scalar.value);
+          if (g_hash_table_contains (t,
+                                     (const gchar *)event.data.scalar.value))
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Key %s encountered twice in dependencies",
+                (const gchar *)event.data.scalar.value);
+            }
+
+          value = modulemd_yaml_parse_string_set (parser, &nested_error);
+          if (value == NULL)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "Failed to parse dependencies deps: %s",
+                nested_error->message);
+            }
+
+          g_hash_table_insert (
+            t, g_steal_pointer (&key), g_steal_pointer (&value));
+          break;
+
+        default:
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "Unexpected YAML event in dependencies: %d",
+            event.type);
+          break;
+        }
+      yaml_event_delete (&event);
+    }
+
+  /* Work around false-positive in clang static analysis which thinks it's
+   * possible for this function to return NULL and not set error.
+   */
+  if (G_UNLIKELY (t == NULL))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_YAML_ERROR_EMIT,
+                   "Somehow got a NULL hash table here.");
+    }
+
+  return g_steal_pointer (&t);
+}
+
 ModulemdDependencies *
 modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
                                   gboolean strict,
@@ -415,8 +499,8 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
           if (g_str_equal (event.data.scalar.value, "buildrequires"))
             {
               g_hash_table_unref (d->buildtime_deps);
-              d->buildtime_deps =
-                modulemd_yaml_parse_nested_set (parser, &nested_error);
+              d->buildtime_deps = modulemd_dependencies_parse_yaml_nested_set (
+                parser, &nested_error);
               if (d->buildtime_deps == NULL)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT (
@@ -429,8 +513,8 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
           else if (g_str_equal (event.data.scalar.value, "requires"))
             {
               g_hash_table_unref (d->runtime_deps);
-              d->runtime_deps =
-                modulemd_yaml_parse_nested_set (parser, &nested_error);
+              d->runtime_deps = modulemd_dependencies_parse_yaml_nested_set (
+                parser, &nested_error);
               if (d->runtime_deps == NULL)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT (
@@ -462,6 +546,53 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
       yaml_event_delete (&event);
     }
   return g_steal_pointer (&d);
+}
+
+
+static gboolean
+modulemd_dependencies_emit_yaml_nested_set (GHashTable *table,
+                                            yaml_emitter_t *emitter,
+                                            GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  int ret;
+  g_autoptr (GError) nested_error = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (GPtrArray) keys = NULL;
+  GHashTable *dep = NULL;
+  gchar *key = NULL;
+
+  ret = mmd_emitter_start_mapping (
+    emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (
+        error,
+        g_steal_pointer (&nested_error),
+        "Failed to start dependencies nested mapping: ");
+      return FALSE;
+    }
+
+  keys = modulemd_ordered_str_keys (table, modulemd_strcmp_sort);
+  for (gint i = 0; i < keys->len; i++)
+    {
+      key = g_ptr_array_index (keys, i);
+      dep = g_hash_table_lookup (table, key);
+
+      EMIT_STRING_SET_FULL (
+        emitter, error, key, dep, YAML_FLOW_SEQUENCE_STYLE);
+    }
+
+  ret = mmd_emitter_end_mapping (emitter, &nested_error);
+  if (!ret)
+    {
+      g_propagate_prefixed_error (error,
+                                  g_steal_pointer (&nested_error),
+                                  "Failed to end dependencies nested mapping");
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 
@@ -498,8 +629,8 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
           return FALSE;
         }
 
-      ret = modulemd_yaml_emit_nested_set (
-        emitter, self->buildtime_deps, &nested_error);
+      ret = modulemd_dependencies_emit_yaml_nested_set (
+        self->buildtime_deps, emitter, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (
@@ -523,8 +654,8 @@ modulemd_dependencies_emit_yaml (ModulemdDependencies *self,
           return FALSE;
         }
 
-      ret = modulemd_yaml_emit_nested_set (
-        emitter, self->runtime_deps, &nested_error);
+      ret = modulemd_dependencies_emit_yaml_nested_set (
+        self->runtime_deps, emitter, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

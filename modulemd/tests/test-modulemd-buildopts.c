@@ -60,7 +60,7 @@ buildopts_test_construct (void)
 
 
 static void
-buildopts_test_comparison (void)
+buildopts_test_equals (void)
 {
   g_autoptr (ModulemdBuildopts) b_1 = NULL;
   g_autoptr (ModulemdBuildopts) b_2 = NULL;
@@ -75,8 +75,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_true (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), ==, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), ==, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -92,8 +90,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_true (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), ==, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), ==, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -109,8 +105,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_false (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), <, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), >, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -130,8 +124,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_true (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), ==, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), ==, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -149,8 +141,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_false (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), >, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), <, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -171,8 +161,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_false (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), <, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), >, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -193,8 +181,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_false (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), >, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), <, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 
@@ -218,8 +204,6 @@ buildopts_test_comparison (void)
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_2));
 
   g_assert_false (modulemd_buildopts_equals (b_1, b_2));
-  g_assert_cmpint (modulemd_buildopts_compare (b_1, b_2), >, 0);
-  g_assert_cmpint (modulemd_buildopts_compare (b_2, b_1), <, 0);
   g_clear_object (&b_1);
   g_clear_object (&b_2);
 }
@@ -575,8 +559,7 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/buildopts/construct",
                    buildopts_test_construct);
 
-  g_test_add_func ("/modulemd/v2/buildopts/comparison",
-                   buildopts_test_comparison);
+  g_test_add_func ("/modulemd/v2/buildopts/equals", buildopts_test_equals);
 
   g_test_add_func ("/modulemd/v2/buildopts/copy", buildopts_test_copy);
 

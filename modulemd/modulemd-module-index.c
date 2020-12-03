@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018-2020 Red Hat, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -21,7 +21,6 @@
 #include <rpm/rpmio.h>
 #endif
 
-#include "modulemd.h"
 #include "modulemd-compression.h"
 #include "modulemd-errors.h"
 #include "modulemd-module-index.h"
@@ -35,11 +34,9 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-obsoletes-private.h"
-#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -55,8 +52,6 @@ struct _ModulemdModuleIndex
 
   ModulemdDefaultsVersionEnum defaults_mdversion;
   ModulemdModuleStreamVersionEnum stream_mdversion;
-
-  ModulemdUpgradeHelper *helper;
 };
 
 G_DEFINE_TYPE (ModulemdModuleIndex, modulemd_module_index, G_TYPE_OBJECT)
@@ -75,7 +70,6 @@ modulemd_module_index_finalize (GObject *object)
   ModulemdModuleIndex *self = (ModulemdModuleIndex *)object;
 
   g_clear_pointer (&self->modules, g_hash_table_unref);
-  g_clear_object (&self->helper);
 
   G_OBJECT_CLASS (modulemd_module_index_parent_class)->finalize (object);
 }
@@ -122,8 +116,6 @@ modulemd_module_index_init (ModulemdModuleIndex *self)
 {
   self->modules =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  self->stream_mdversion = modulemd_get_default_stream_mdversion ();
-  self->helper = modulemd_upgrade_helper_new ();
 }
 
 
@@ -134,7 +126,6 @@ get_or_create_module (ModulemdModuleIndex *self, const gchar *module_name)
   if (module == NULL)
     {
       module = modulemd_module_new (module_name);
-      modulemd_module_associate_upgrade_helper (module, self->helper);
       g_hash_table_insert (self->modules, g_strdup (module_name), module);
     }
   return module;
@@ -150,8 +141,6 @@ add_subdoc (ModulemdModuleIndex *self,
 {
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
-  g_autoptr (ModulemdModuleIndex) index = NULL;
-  g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdObsoletes) obsoletes = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
@@ -161,77 +150,8 @@ add_subdoc (ModulemdModuleIndex *self,
 
   switch (doctype)
     {
-    case MODULEMD_YAML_DOC_PACKAGER:
-      if (modulemd_subdocument_info_get_mdversion (subdoc) <
-          MD_PACKAGER_VERSION_TWO)
-        {
-          g_set_error (error,
-                       MODULEMD_YAML_ERROR,
-                       MMD_YAML_ERROR_PARSE,
-                       "Invalid mdversion for a packager document");
-          return FALSE;
-        }
-
-      if (modulemd_subdocument_info_get_mdversion (subdoc) ==
-          MD_PACKAGER_VERSION_THREE)
-        {
-          packager = modulemd_packager_v3_parse_yaml (subdoc, error);
-
-          /* Determine which stream version to convert the packager
-           * object into and do so.
-           */
-          switch (self->stream_mdversion)
-            {
-            case MD_MODULESTREAM_VERSION_TWO:
-              index = modulemd_packager_v3_to_stream_v2_ext (packager,
-                                                             &nested_error);
-              break;
-
-            case MD_MODULESTREAM_VERSION_THREE:
-              index = modulemd_packager_v3_to_stream_v3_ext (packager,
-                                                             &nested_error);
-              break;
-
-            default:
-              g_set_error (error,
-                           MODULEMD_ERROR,
-                           MMD_ERROR_VALIDATE,
-                           "Cannot convert packager v3 document to add to "
-                           "index with stream mdversion %d",
-                           self->stream_mdversion);
-              return FALSE;
-            }
-
-          if (!index)
-            {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return FALSE;
-            }
-
-          if (autogen_module_name)
-            {
-              /* nothing to do here since module/stream names were already
-               * auto-generated in order to add them to the index
-               */
-            }
-
-          /* merge index with override = FALSE and strict_default_streams = TRUE */
-          if (!modulemd_module_index_merge (
-                index, self, FALSE, TRUE, &nested_error))
-            {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return FALSE;
-            }
-
-          g_clear_object (&index);
-          break;
-        }
-
-      /* Fall through intentionally
-       * We will handle the v2 packager format below
-       */
-
     case MODULEMD_YAML_DOC_MODULESTREAM:
+    case MODULEMD_YAML_DOC_PACKAGER:
       switch (modulemd_subdocument_info_get_mdversion (subdoc))
         {
         case MD_MODULESTREAM_VERSION_ONE:
@@ -243,14 +163,6 @@ add_subdoc (ModulemdModuleIndex *self,
           stream =
             MODULEMD_MODULE_STREAM (modulemd_module_stream_v2_parse_yaml (
               subdoc, strict, doctype == MODULEMD_YAML_DOC_PACKAGER, error));
-          break;
-
-        case MD_MODULESTREAM_VERSION_THREE:
-          if (doctype == MODULEMD_YAML_DOC_MODULESTREAM)
-            {
-              stream = MODULEMD_MODULE_STREAM (
-                modulemd_module_stream_v3_parse_yaml (subdoc, strict, error));
-            }
           break;
 
         default:
@@ -266,12 +178,22 @@ add_subdoc (ModulemdModuleIndex *self,
           return FALSE;
         }
 
-      if (autogen_module_name)
+      if (autogen_module_name &&
+          !modulemd_module_stream_get_module_name (stream))
         {
-          modulemd_module_stream_set_autogen_module_name (
-            stream, g_hash_table_size (self->modules) + 1);
-          modulemd_module_stream_set_autogen_stream_name (
-            stream, g_hash_table_size (self->modules) + 1);
+          name = g_strdup_printf ("__unnamed_module_%d",
+                                  g_hash_table_size (self->modules) + 1);
+          modulemd_module_stream_set_module_name (stream, name);
+          g_clear_pointer (&name, g_free);
+        }
+
+      if (autogen_module_name &&
+          !modulemd_module_stream_get_stream_name (stream))
+        {
+          name = g_strdup_printf ("__unnamed_stream_%d",
+                                  g_hash_table_size (self->modules) + 1);
+          modulemd_module_stream_set_stream_name (stream, name);
+          g_clear_pointer (&name, g_free);
         }
 
       if (!modulemd_module_stream_validate (stream, &nested_error))
@@ -577,15 +499,6 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
         {
           if (!modulemd_module_stream_v2_emit_yaml (
                 MODULEMD_MODULE_STREAM_V2 (stream), emitter, error))
-            {
-              return FALSE;
-            }
-        }
-      else if (modulemd_module_stream_get_mdversion (stream) ==
-               MD_MODULESTREAM_VERSION_THREE)
-        {
-          if (!modulemd_module_stream_v3_emit_yaml (
-                MODULEMD_MODULE_STREAM_V3 (stream), emitter, error))
             {
               return FALSE;
             }
@@ -1228,16 +1141,6 @@ modulemd_module_index_remove_module (ModulemdModuleIndex *self,
 }
 
 
-void
-modulemd_module_index_add_known_stream (ModulemdModuleIndex *self,
-                                        const gchar *module_name,
-                                        const gchar *stream_name)
-{
-  return modulemd_upgrade_helper_add_known_stream (
-    self->helper, module_name, stream_name);
-}
-
-
 gboolean
 modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
                                          ModulemdModuleStream *stream,
@@ -1271,23 +1174,22 @@ modulemd_module_index_add_module_stream (ModulemdModuleIndex *self,
       return FALSE;
     }
 
-  if (mdversion != self->stream_mdversion)
+  if (mdversion > self->stream_mdversion)
     {
-      g_set_error (
-        error,
-        MODULEMD_ERROR,
-        MMD_ERROR_UPGRADE,
-        "Failed to add module stream with expected mdversion %i, got %i",
-        self->stream_mdversion,
-        mdversion);
-      return FALSE;
+      /* Upgrade any streams we've already seen to this version */
+      g_debug ("Upgrading all streams to version %i", mdversion);
+      if (!modulemd_module_index_upgrade_streams (
+            self, mdversion, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
     }
 
   return TRUE;
 }
 
 
-/* Deprecated in favor of modulemd_set_default_stream_mdversion() */
 gboolean
 modulemd_module_index_upgrade_streams (
   ModulemdModuleIndex *self,
@@ -1298,49 +1200,42 @@ modulemd_module_index_upgrade_streams (
   gpointer key;
   gpointer value;
   g_autoptr (ModulemdModule) module = NULL;
-  gboolean streams_present = FALSE;
+  g_autoptr (GError) nested_error = NULL;
 
-  g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
-
-  if (mdversion < MD_MODULESTREAM_VERSION_ONE ||
-      mdversion > MD_MODULESTREAM_VERSION_LATEST)
+  if (mdversion < self->stream_mdversion)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MMD_ERROR_UPGRADE,
-                   "Invalid mdversion %i",
-                   mdversion);
-      return FALSE;
-    }
-
-  if (mdversion == self->stream_mdversion)
-    {
-      return TRUE;
-    }
-
-  g_hash_table_iter_init (&iter, self->modules);
-  while (!streams_present && g_hash_table_iter_next (&iter, &key, &value))
-    {
-      module = g_object_ref (MODULEMD_MODULE (value));
-
-      if (modulemd_module_get_all_streams (module)->len > 0)
-        {
-          streams_present = TRUE;
-        }
-
-      g_clear_object (&module);
-    }
-
-  if (streams_present)
-    {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MMD_ERROR_UPGRADE,
-                   "Index mdversion changes not permitted if streams are "
-                   "present. mdversion %i != current %i",
+                   "Downgrades not permitted. mdversion %i < current %i",
                    mdversion,
                    self->stream_mdversion);
       return FALSE;
+    }
+
+  g_hash_table_iter_init (&iter, self->modules);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      module = g_object_ref (MODULEMD_MODULE (value));
+
+      /* Skip any module without streams */
+      if (modulemd_module_get_all_streams (module)->len == 0)
+        {
+          g_clear_object (&module);
+          continue;
+        }
+
+      if (!modulemd_module_upgrade_streams (module, mdversion, &nested_error))
+        {
+          g_propagate_prefixed_error (
+            error,
+            g_steal_pointer (&nested_error),
+            "Error upgrading streams for module %s",
+            modulemd_module_get_module_name (module));
+          return FALSE;
+        }
+
+      g_clear_object (&module);
     }
 
   self->stream_mdversion = mdversion;

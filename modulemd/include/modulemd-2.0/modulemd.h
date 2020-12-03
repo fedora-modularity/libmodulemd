@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018-2020 Red Hat, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -27,7 +27,6 @@
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
-#include "modulemd-module-stream-v3.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module.h"
 #include "modulemd-profile.h"
@@ -287,37 +286,6 @@ G_BEGIN_DECLS
 const gchar *
 modulemd_get_version (void);
 
-/**
- * modulemd_set_default_stream_mdversion:
- * @mdversion: (in): The default stream metadata version to set.
- *
- * Used to set the default module stream metadata version to use when creating a
- * new #ModulemdModuleIndex, when reading a modulemd-packager v3 document
- * directly to a #ModulemdModuleStream object, etc.
- *
- * Warning: May not be thread-safe.
- *
- * Since: 2.10
- */
-void
-modulemd_set_default_stream_mdversion (
-  ModulemdModuleStreamVersionEnum mdversion);
-
-/**
- * modulemd_get_default_stream_mdversion:
- *
- * Returns: The default module stream metadata version to use when creating a
- * new #ModulemdModuleIndex, when reading a modulemd-packager v3 document
- * directly to a #ModulemdModuleStream object, etc.
- *
- * If a default stream metadata version has not been explicitly set using
- * modulemd_set_default_stream_mdversion(), the value returned will be a compile-time
- * default.
- *
- * Since: 2.10
- */
-ModulemdModuleStreamVersionEnum
-modulemd_get_default_stream_mdversion (void);
 
 /**
  * modulemd_load_file:

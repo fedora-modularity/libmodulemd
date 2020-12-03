@@ -102,8 +102,8 @@ class TestModuleIndexMerger(TestBase):
         self.assertEqual(
             httpd_defaults.get_default_stream("workstation"), "2.4"
         )
-        httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles(
-            "workstation"
+        httpd_profile_streams = (
+            httpd_defaults.get_streams_with_default_profiles("workstation")
         )
         self.assertEqual(len(httpd_profile_streams), 2)
         self.assertTrue("2.4" in httpd_profile_streams)
@@ -203,8 +203,8 @@ class TestModuleIndexMerger(TestBase):
         self.assertEqual(
             httpd_defaults.get_default_stream("workstation"), "2.8"
         )
-        httpd_profile_streams = httpd_defaults.get_streams_with_default_profiles(
-            "workstation"
+        httpd_profile_streams = (
+            httpd_defaults.get_streams_with_default_profiles("workstation")
         )
         self.assertEqual(len(httpd_profile_streams), 3)
         self.assertTrue("2.4" in httpd_profile_streams)

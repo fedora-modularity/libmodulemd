@@ -974,6 +974,7 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
 {
   MODULEMD_INIT_TRACE ();
   g_autoptr (GError) nested_error = NULL;
+  const gchar *default_stream = NULL;
   guint64 modified;
   g_autofree gchar *modified_string = NULL;
 
@@ -1027,20 +1028,21 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
       EMIT_KEY_VALUE (emitter, error, "modified", modified_string);
     }
 
-  /* The default stream is optional
-   * Always emit the stream quoted, since a purely numeric-looking stream such
-   * as 5.30 might otherwise be interpreted by parsers like pyyaml as a number
-   * and result in being read (and written) as '5.3'.
-   */
-
-  if (modulemd_defaults_v1_get_default_stream (self, NULL) != NULL)
+  /* The default stream is optional */
+  default_stream = modulemd_defaults_v1_get_default_stream (self, NULL);
+  if (default_stream)
     {
-      EMIT_KEY_VALUE_FULL (
-        emitter,
-        error,
-        "stream",
-        modulemd_defaults_v1_get_default_stream (self, NULL),
-        YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+      if (!mmd_emitter_scalar (
+            emitter, "stream", YAML_PLAIN_SCALAR_STYLE, error))
+        {
+          return FALSE;
+        }
+
+      if (!mmd_emitter_scalar (
+            emitter, default_stream, YAML_PLAIN_SCALAR_STYLE, error))
+        {
+          return FALSE;
+        }
     }
 
   /* Profiles are optional */
@@ -1210,25 +1212,27 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
           return FALSE;
         }
 
-      /* The default stream is optional
-       * Always emit the stream quoted, since a purely numeric-looking stream
-       * such as 5.30 might otherwise be interpreted by parsers like pyyaml as
-       * a number and result in being read (and written) as '5.3'.
-       */
       intent_default_stream =
         g_hash_table_lookup (self->intent_default_streams, intent);
-
       if (intent_default_stream)
         {
-          EMIT_KEY_VALUE_FULL (emitter,
-                               error,
-                               "stream",
-                               intent_default_stream,
-                               YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+          if (!mmd_emitter_scalar (
+                emitter, "stream", YAML_PLAIN_SCALAR_STYLE, error))
+            {
+              return FALSE;
+            }
 
-          intent_default_profiles =
-            g_hash_table_lookup (self->intent_default_profiles, intent);
+          if (!mmd_emitter_scalar (emitter,
+                                   intent_default_stream,
+                                   YAML_PLAIN_SCALAR_STYLE,
+                                   error))
+            {
+              return FALSE;
+            }
         }
+
+      intent_default_profiles =
+        g_hash_table_lookup (self->intent_default_profiles, intent);
       if (intent_default_profiles)
         {
           if (!modulemd_defaults_v1_emit_profiles (

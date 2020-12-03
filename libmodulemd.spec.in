@@ -16,8 +16,8 @@
 %define _lto_cflags %{nil}
 
 Name:           %{upstream_name}%{?v2_suffix}
-Version:        0.0.0
-Release:        0
+Version:        @VERSION@
+Release:        @RELEASE@
 Summary:        Module metadata manipulation library
 
 License:        MIT

@@ -63,7 +63,6 @@ test_basic (void)
   g_clear_error (&error);
   nevra = modulemd_rpm_map_entry_get_nevra_as_string (entry);
   g_assert_null (nevra);
-  g_clear_pointer (&nevra, g_free);
   g_clear_object (&entry);
 
   /* Test that object instantiation with attributes works */

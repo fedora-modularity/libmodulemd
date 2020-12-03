@@ -59,7 +59,7 @@ data:
     # Type: AUTOMATIC
     #
     # Mandatory for module metadata in a yum/dnf repository.
-    stream: "latest"
+    stream: latest
 
     # version:
     # Module version, integer, cannot be negative

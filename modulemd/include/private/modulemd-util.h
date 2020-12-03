@@ -205,27 +205,6 @@ modulemd_hash_table_equals (GHashTable *a,
                             GHashTable *b,
                             GEqualFunc compare_func);
 
-/*
- * modulemd_hash_table_compare:
- * @a: (in): A #GHashTable object.
- * @b: (in): A #GHashTable object.
- * @value_compare_func: (in): A #GCompareFunc function that is called to compare
- * pairs of #GHashTable values for sorting. If NULL, only the #GHashTable keys
- * are compared.
- *
- * Using guidance from
- * https://docs.python.org/3/tutorial/datastructures.html#comparing-sequences-and-other-types
- *
- * Returns: Less than zero if @a sorts less than @b, zero for equal, greater than
- * zero if @a is greater than @b.
- *
- * Since: 2.10
- */
-gint
-modulemd_hash_table_compare (GHashTable *a,
-                             GHashTable *b,
-                             GCompareFunc value_compare_func);
-
 /**
  * modulemd_strcmp_sort:
  * @a: A #gconstpointer.
@@ -238,19 +217,6 @@ modulemd_hash_table_compare (GHashTable *a,
  */
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b);
-
-/**
- * modulemd_strcmp_wrapper:
- * @a: (in): A #gconstpointer.
- * @b: (in): A #gconstpointer.
- *
- * Returns: 0 if @a and @b are identical strings, a negative value if @a is less
- * than @b, and a positive value if @a is greater than @b.
- *
- * Since: 2.10
- */
-gint
-modulemd_strcmp_wrapper (gconstpointer a, gconstpointer b);
 
 /**
  * modulemd_ordered_str_keys:
@@ -523,14 +489,3 @@ modulemd_guint64_to_iso8601date (guint64 date);
   ObjName, obj_name, OBJ_NAME, attr, ATTR)                                    \
   MODULEMD_SETTER_GETTER_STRING_EXT (                                         \
     static, ObjName, obj_name, OBJ_NAME, attr, ATTR)
-
-/**
- * modulemd_str_set_new:
- *
- * A convenience macro to simplify the common operation of setting up a hash
- * table in libmodulemd for containing a set() of unique strings.
- *
- * Since: 2.10
- */
-#define modulemd_str_set_new()                                                \
-  g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL)

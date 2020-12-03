@@ -11,7 +11,7 @@ COMMON_MESON_ARGS="-Dtest_dirty_git=false -Ddeveloper_build=false -Dpython_name=
 pushd /builddir/
 
 # Build the code under GCC and run standard tests
-meson --buildtype=debugoptimized \
+meson --buildtype=debug \
       $COMMON_MESON_ARGS \
       travis
 

@@ -32,22 +32,18 @@ G_BEGIN_DECLS
  * This object provides an interface to the complete metadata read from a
  * repository or manually added to this object.
  *
- * NOTE: When adding or updating this object from YAML, all
- * #ModulemdModuleStream will be automatically upgraded to match the stream
- * mdversion set for the index, and all #ModulemdDefaults objects imported will
- * be automatically upgraded to match the highest version of that object that
- * has been previously seen. This means, for example, that if the repository
- * has a mix of #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects,
- * and the index's stream mdversion is set to V2, the index will contain only
- * #ModulemdModuleStreamV2. You can check the versions the index upgraded to
- * with the modulemd_module_index_get_stream_mdversion() and
+ * NOTE: When adding or updating this object from YAML, all objects imported
+ * will be automatically upgraded to match the highest version of that object
+ * that is seen. This means that if the repository has a mix of
+ * #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects, the index will
+ * contain only #ModulemdModuleStreamV2. You can check the versions the index
+ * upgraded to with the modulemd_module_index_get_stream_mdversion() and
  * modulemd_module_index_get_defaults_mdversion(). If your application would
  * prefer to always work with a particular stream or defaults version (such as
- * to avoid extra branching logic), modulemd_set_default_stream_mdversion() can
- * be used before creating the index to force #ModulemdModuleStream objects to
- * be upgraded to the desired stream mdversion and
- * modulemd_module_index_upgrade_defaults() function can be used to force the
- * contents of the index to upgrade #ModulemdDefaults to the specified version.
+ * to avoid extra branching logic), the modulemd_module_index_upgrade_streams()
+ * and modulemd_module_index_upgrade_defaults() functions can be used to force
+ * the contents of the index to upgrade to those versions.
+ *
  * Interacting with #ModulemdModuleIndex is relatively simple. A common Python
  * example for working with Fedora repodata might be (assuming the metadata has
  * already been read into strings):
@@ -610,9 +606,7 @@ modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self);
  * they are not already at that version.
  *
  * Since: 2.0
- * Deprecated: 2.10: Use modulemd_set_default_stream_mdversion() instead.
  */
-MMD_DEPRECATED_FOR (modulemd_set_default_stream_mdversion)
 gboolean
 modulemd_module_index_upgrade_streams (
   ModulemdModuleIndex *self,
@@ -636,35 +630,5 @@ gboolean
 modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
                                         ModulemdDefaultsVersionEnum mdversion,
                                         GError **error);
-
-
-/**
- * modulemd_module_index_add_known_stream:
- * @self: This #ModulemdModuleIndex object.
- * @module_name: (in): The name of the known module being added.
- * @stream_name: (in): The name of the known module stream being added.
- *
- * This function adds a `module:stream` entry to the #ModulemdModuleIndex.
- * It will be used if and when libmodulemd needs to upgrade a
- * #ModulemdModuleStreamV2 object to a #ModulemdModuleStreamV3 object if it
- * encounters a module dependency that is specified as either `[ ]`
- * (all streams) or `[ -streamname ]` (all but some exclusions).
- *
- * When using the python bindings, a simplified way to set these values is to
- * call:
- *
- * |[<!-- language="Python" -->
- * idx = Modulemd.ModuleIndex.new()
- * idx.set_known_streams({"module_name": ["stream1", "stream2"]})
- * ]|
-
- *
- * Since: 2.10
- */
-void
-modulemd_module_index_add_known_stream (ModulemdModuleIndex *self,
-                                        const gchar *module_name,
-                                        const gchar *stream_name);
-
 
 G_END_DECLS

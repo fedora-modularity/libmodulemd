@@ -77,9 +77,3 @@ __pycache__/
 /ppc64le
 /s390*
 /libmodulemd.spec
-/fedora/*.patch
-/fedora/modulemd-*
-/fedora/libmodulemd-*
-*.rpm
-.travis/.home*
-.travis/*/Dockerfile.deps.*

@@ -325,21 +325,3 @@ modulemd_subdocument_info_init (ModulemdSubdocumentInfo *self)
 {
   /* Nothing to init */
 }
-
-void
-modulemd_subdocument_info_debug_dump_failures (GPtrArray *failures)
-{
-  ModulemdSubdocumentInfo *doc = NULL;
-
-  if (failures && failures->len)
-    {
-      g_debug ("%u YAML subdocuments were invalid", failures->len);
-      for (gsize i = 0; i < failures->len; i++)
-        {
-          doc = MODULEMD_SUBDOCUMENT_INFO (g_ptr_array_index (failures, i));
-          g_debug ("\nFailed subdocument (%s): \n%s\n",
-                   modulemd_subdocument_info_get_gerror (doc)->message,
-                   modulemd_subdocument_info_get_yaml (doc));
-        }
-    }
-}

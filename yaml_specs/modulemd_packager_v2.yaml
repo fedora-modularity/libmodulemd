@@ -35,7 +35,8 @@
 
 # Document type identifier
 # `document: modulemd-packager` describes the contents of a packager's input
-# for a module stream.
+# for a module stream. It is always a proper subset of a `document: modulemd`
+# of the same `version`.
 document: modulemd-packager
 
 # Module metadata format version

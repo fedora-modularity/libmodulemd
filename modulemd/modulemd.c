@@ -14,39 +14,16 @@
 #include "modulemd.h"
 #include "config.h"
 
-#include "private/modulemd-subdocument-info-private.h"
-
 const gchar *
 modulemd_get_version (void)
 {
   return LIBMODULEMD_VERSION;
 }
 
-
-static ModulemdModuleStreamVersionEnum default_mdversion =
-  (ModulemdModuleStreamVersionEnum)DEFAULT_STREAM_MDVERSION;
-
-void
-modulemd_set_default_stream_mdversion (
-  ModulemdModuleStreamVersionEnum mdversion)
-{
-  g_return_if_fail (mdversion >= MD_MODULESTREAM_VERSION_ONE &&
-                    mdversion <= MD_MODULESTREAM_VERSION_LATEST);
-
-  default_mdversion = mdversion;
-}
-
-ModulemdModuleStreamVersionEnum
-modulemd_get_default_stream_mdversion (void)
-{
-  return default_mdversion;
-}
-
-
 static ModulemdModuleIndex *
 verify_load (int ret,
              ModulemdModuleIndex *idx,
-             GPtrArray *failures,
+             guint num_failures,
              GError **error,
              GError **nested_error);
 
@@ -66,7 +43,7 @@ modulemd_load_file (const gchar *yaml_file, GError **error)
 
   ret = modulemd_module_index_update_from_file (
     idx, yaml_file, FALSE, &failures, &nested_error);
-  return verify_load (ret, idx, failures, error, &nested_error);
+  return verify_load (ret, idx, failures->len, error, &nested_error);
 }
 
 
@@ -86,14 +63,14 @@ modulemd_load_string (const gchar *yaml_string, GError **error)
 
   ret = modulemd_module_index_update_from_string (
     idx, yaml_string, FALSE, &failures, &nested_error);
-  return verify_load (ret, idx, failures, error, &nested_error);
+  return verify_load (ret, idx, failures->len, error, &nested_error);
 }
 
 
 static ModulemdModuleIndex *
 verify_load (gboolean ret,
              ModulemdModuleIndex *idx,
-             GPtrArray *failures,
+             guint num_failures,
              GError **error,
              GError **nested_error)
 {
@@ -104,9 +81,8 @@ verify_load (gboolean ret,
           g_propagate_error (error, g_steal_pointer (nested_error));
           return NULL;
         }
-      else if (failures && failures->len)
+      else if (num_failures)
         {
-          modulemd_subdocument_info_debug_dump_failures (failures);
           g_set_error (error,
                        MODULEMD_ERROR,
                        MMD_ERROR_VALIDATE,

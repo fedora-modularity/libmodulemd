@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2018-2020 Red Hat, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -247,82 +247,6 @@ modulemd_module_stream_v2_get_servicelevel_names (
   ModulemdModuleStreamV2 *self);
 
 /**
- * modulemd_module_stream_v3_get_module_component_names: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_module_component_names (
-  ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_rpm_component_names: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_rpm_component_names (
-  ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_content_licenses: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_content_licenses (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_module_licenses: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_module_licenses (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_profile_names: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_profile_names (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_rpm_api: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_rpm_api (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_rpm_artifacts: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_rpm_artifacts (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_rpm_filters: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_rpm_filters (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_buildtime_modules: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_buildtime_modules (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_runtime_modules: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_runtime_modules (ModulemdModuleStreamV3 *self);
-
-/**
- * modulemd_module_stream_v3_get_buildtime_requirement_streams: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_buildtime_requirement_streams (
-  ModulemdModuleStreamV3 *self, const gchar *module_name);
-
-/**
- * modulemd_module_stream_v3_get_runtime_requirement_streams: (skip)
- */
-GStrv
-modulemd_module_stream_v3_get_runtime_requirement_streams (
-  ModulemdModuleStreamV3 *self, const gchar *module_name);
-
-/**
  * modulemd_profile_get_rpms: (skip)
  */
 GStrv
@@ -359,6 +283,5 @@ modulemd_module_index_get_default_streams (ModulemdModuleIndex *self,
  */
 gchar *
 modulemd_rpm_map_entry_get_nevra (ModulemdRpmMapEntry *self);
-
 
 G_END_DECLS

@@ -63,18 +63,3 @@ gboolean
 modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
                               yaml_emitter_t *emitter,
                               GError **error);
-
-
-/**
- * modulemd_buildopts_compare:
- * @self_1: (in): A #ModulemdBuildopts object.
- * @self_2: (in): A #ModulemdBuildopts object.
- *
- * Returns: Less than zero if @self_1 sorts less than @self_2, zero for equal,
- * greater than zero if @self_1 is greater than @self_2.
- *
- * Since: 2.10
- */
-gint
-modulemd_buildopts_compare (ModulemdBuildopts *self_1,
-                            ModulemdBuildopts *self_2);

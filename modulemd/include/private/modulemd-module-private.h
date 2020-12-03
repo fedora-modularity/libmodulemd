@@ -19,7 +19,6 @@
 #include "modulemd-module.h"
 #include "modulemd-translation.h"
 #include "modulemd-obsoletes.h"
-#include "private/modulemd-upgrade-helper.h"
 
 
 G_BEGIN_DECLS
@@ -128,12 +127,11 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
  * #ModulemdModule. A stream added to a #ModulemdModule must have a module
  * name and stream name set on it or it will be rejected. If the module name
  * does not match this module, it will also be rejected.
- * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum stream_mdversion
- * of the #ModulemdModuleIndex to which @stream is being added. If the version
- * of @stream is less than @index_mdversion, an upgrade to this version will be
- * performed while adding @stream to @self. If @stream already has the same
- * version, it is just copied. When obsoletes is present for @stream it must be
- * set to at least version two.
+ * @index_mdversion: (in): The #ModulemdModuleStreamVersionEnum of the highest
+ * stream version added so far in the #ModulemdModuleIndex. When obsoletes is present
+ * for @stream it is set to at least version two. If non-zero,
+ * perform an upgrade to this version while adding @stream to @self. If
+ * the @stream already has the same or a higher version, just copy it.
  * @error: (out): A #GError containing information about why this function
  * failed.
  *
@@ -143,12 +141,11 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
  * safely or the defaults are not for this module, it will return an
  * appropriate error.
  *
- * Returns: The mdversion of the stream that was added, which will be
- * @index_mdversion unless an error occurred. Returns
- * %MD_MODULESTREAM_VERSION_ERROR and sets @error if the module name didn't
+ * Returns: The mdversion of the stream that was added. Returns
+ * %MD_MODULE_STREAM_VERSION_ERROR and sets @error if the module name didn't
  * match, the module and stream names were unset or the stream object couldn't
  * be upgraded successfully to the @index_mdversion. Returns
- * %MD_MODULESTREAM_VERSION_UNSET if @stream was NULL.
+ * %MD_MODULE_STREAM_VERSION_UNSET if @stream was NULL.
  *
  * Since: 2.0
  */
@@ -174,23 +171,5 @@ gboolean
 modulemd_module_upgrade_streams (ModulemdModule *self,
                                  ModulemdModuleStreamVersionEnum mdversion,
                                  GError **error);
-
-/**
- * modulemd_module_associate_upgrade_helper:
- * @self: This #ModulemdModule object.
- * @upgrade_helper: (in)(transfer none): a #ModulemdUpgradeHelper to associate
- * with this module.
- *
- * Associates a #ModulemdUpgradeHelper, usually from a #ModulemdModuleIndex,
- * with this module to help with upgrades between #ModuleStreamV2 and
- * #ModuleStreamV3. This function will take a reference on the one passed in,
- * so modifications to the @upgrade_helper will affect subsequent changes to
- * this #ModulemdModule.
- *
- * Since: 2.10
- */
-void
-modulemd_module_associate_upgrade_helper (
-  ModulemdModule *self, ModulemdUpgradeHelper *upgrade_helper);
 
 G_END_DECLS

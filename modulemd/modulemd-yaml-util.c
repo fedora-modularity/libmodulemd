@@ -1,6 +1,6 @@
 /*
  * This file is part of libmodulemd
- * Copyright (C) 2017-2020 Stephen Gallagher
+ * Copyright (C) 2017-2018 Stephen Gallagher
  *
  * Fedora-License-Identifier: MIT
  * SPDX-2.0-License-Identifier: MIT
@@ -504,17 +504,6 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
       yaml_event_delete (&event);
     }
 
-  /* Work around false-positive in clang static analysis which thinks it's
-   * possible for this function to return NULL and not set error.
-   */
-  if (G_UNLIKELY (result == NULL))
-    {
-      g_set_error (error,
-                   MODULEMD_YAML_ERROR,
-                   MMD_YAML_ERROR_EMIT,
-                   "Somehow got a NULL hash table here.");
-    }
-
   return g_steal_pointer (&result);
 }
 
@@ -561,7 +550,7 @@ modulemd_yaml_parse_string_set_from_map (yaml_parser_t *parser,
               set = modulemd_yaml_parse_string_set (parser, &nested_error);
               if (!set)
                 {
-                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  g_propagate_error (error, nested_error);
                   return NULL;
                 }
             }
@@ -639,134 +628,6 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error)
       yaml_event_delete (&event);
     }
   return g_steal_pointer (&table);
-}
-
-
-GHashTable *
-modulemd_yaml_parse_nested_set (yaml_parser_t *parser, GError **error)
-{
-  MODULEMD_INIT_TRACE ();
-  MMD_INIT_YAML_EVENT (event);
-  gboolean done = FALSE;
-  g_autofree gchar *key = NULL;
-  g_autoptr (GHashTable) value = NULL;
-  g_autoptr (GHashTable) t = NULL;
-  g_autoptr (GError) nested_error = NULL;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
-  t = g_hash_table_new_full (
-    g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_hash_table_unref);
-
-  /* The first event must be a MAPPING_START */
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-  if (event.type != YAML_MAPPING_START_EVENT)
-    {
-      MMD_YAML_ERROR_EVENT_EXIT (
-        error, event, "Missing mapping in nested set");
-    }
-
-  while (!done)
-    {
-      YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-
-      switch (event.type)
-        {
-        case YAML_MAPPING_END_EVENT: done = TRUE; break;
-
-        case YAML_SCALAR_EVENT:
-          key = g_strdup ((const gchar *)event.data.scalar.value);
-          if (g_hash_table_contains (t,
-                                     (const gchar *)event.data.scalar.value))
-            {
-              MMD_YAML_ERROR_EVENT_EXIT (
-                error,
-                event,
-                "Key %s encountered twice in nested set",
-                (const gchar *)event.data.scalar.value);
-            }
-
-          value = modulemd_yaml_parse_string_set (parser, &nested_error);
-          if (value == NULL)
-            {
-              MMD_YAML_ERROR_EVENT_EXIT (error,
-                                         event,
-                                         "Failed to parse nested set: %s",
-                                         nested_error->message);
-            }
-
-          g_hash_table_insert (
-            t, g_steal_pointer (&key), g_steal_pointer (&value));
-          break;
-
-        default:
-          MMD_YAML_ERROR_EVENT_EXIT (error,
-                                     event,
-                                     "Unexpected YAML event in nested set: %d",
-                                     event.type);
-          break;
-        }
-      yaml_event_delete (&event);
-    }
-
-  /* Work around false-positive in clang static analysis which thinks it's
-   * possible for this function to return NULL and not set error.
-   */
-  if (G_UNLIKELY (t == NULL))
-    {
-      g_set_error (error,
-                   MODULEMD_YAML_ERROR,
-                   MMD_YAML_ERROR_EMIT,
-                   "Somehow got a NULL hash table here.");
-    }
-
-  return g_steal_pointer (&t);
-}
-
-gboolean
-modulemd_yaml_emit_nested_set (yaml_emitter_t *emitter,
-                               GHashTable *table,
-                               GError **error)
-{
-  MODULEMD_INIT_TRACE ();
-  int ret;
-  g_autoptr (GError) nested_error = NULL;
-  MMD_INIT_YAML_EVENT (event);
-  g_autoptr (GPtrArray) keys = NULL;
-  GHashTable *dep = NULL;
-  gchar *key = NULL;
-
-  ret = mmd_emitter_start_mapping (
-    emitter, YAML_BLOCK_MAPPING_STYLE, &nested_error);
-  if (!ret)
-    {
-      g_propagate_prefixed_error (
-        error,
-        g_steal_pointer (&nested_error),
-        "Failed to start dependencies nested mapping: ");
-      return FALSE;
-    }
-
-  keys = modulemd_ordered_str_keys (table, modulemd_strcmp_sort);
-  for (gint i = 0; i < keys->len; i++)
-    {
-      key = g_ptr_array_index (keys, i);
-      dep = g_hash_table_lookup (table, key);
-
-      EMIT_STRING_SET_FULL (
-        emitter, error, key, dep, YAML_FLOW_SEQUENCE_STYLE);
-    }
-
-  ret = mmd_emitter_end_mapping (emitter, &nested_error);
-  if (!ret)
-    {
-      g_propagate_prefixed_error (error,
-                                  g_steal_pointer (&nested_error),
-                                  "Failed to end nested mapping");
-      return FALSE;
-    }
-
-  return TRUE;
 }
 
 
@@ -877,8 +738,7 @@ modulemd_yaml_parse_document_type_internal (
                   return FALSE;
                 }
 
-              if (g_str_equal (doctype_scalar, "modulemd") ||
-                  g_str_equal (doctype_scalar, "modulemd-stream"))
+              if (g_str_equal (doctype_scalar, "modulemd"))
                 {
                   doctype = MODULEMD_YAML_DOC_MODULESTREAM;
                 }
@@ -1034,25 +894,17 @@ modulemd_yaml_parse_document_type (yaml_parser_t *parser)
 
 
 static const gchar *
-modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype,
-                                  guint64 mdversion)
+modulemd_yaml_get_doctype_string (ModulemdYamlDocumentTypeEnum doctype)
 {
   switch (doctype)
     {
-    case MODULEMD_YAML_DOC_MODULESTREAM:
-      if (mdversion <= 2)
-        {
-          return "modulemd";
-        }
-      return "modulemd-stream";
+    case MODULEMD_YAML_DOC_MODULESTREAM: return "modulemd";
 
     case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
 
     case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
 
     case MODULEMD_YAML_DOC_OBSOLETES: return "modulemd-obsoletes";
-
-    case MODULEMD_YAML_DOC_PACKAGER: return "modulemd-packager";
 
     default: return NULL;
     }
@@ -1066,8 +918,7 @@ modulemd_yaml_emit_document_headers (yaml_emitter_t *emitter,
                                      GError **error)
 {
   MODULEMD_INIT_TRACE ();
-  const gchar *doctype_string =
-    modulemd_yaml_get_doctype_string (doctype, mdversion);
+  const gchar *doctype_string = modulemd_yaml_get_doctype_string (doctype);
   g_autofree gchar *mdversion_string = g_strdup_printf ("%" PRIu64, mdversion);
 
   if (!mmd_emitter_start_document (emitter, error))
@@ -1419,45 +1270,6 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
     }
 
   return result;
-}
-
-
-GVariant *
-mmd_parse_xmd (yaml_parser_t *parser, GError **error)
-{
-  MODULEMD_INIT_TRACE ();
-  MMD_INIT_YAML_EVENT (event);
-  GVariant *variant = NULL;
-  g_autoptr (GError) nested_error = NULL;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  YAML_PARSER_PARSE_WITH_EXIT (parser, &event, error);
-
-  switch (event.type)
-    {
-    case YAML_SCALAR_EVENT:
-      variant =
-        mmd_variant_from_scalar ((const gchar *)event.data.scalar.value);
-      if (!variant)
-        {
-          MMD_YAML_ERROR_EVENT_EXIT (error, event, "Error parsing scalar");
-        }
-      break;
-
-    case YAML_MAPPING_START_EVENT:
-      variant = mmd_variant_from_mapping (parser, &nested_error);
-      break;
-
-    default:
-      MMD_YAML_ERROR_EVENT_EXIT (error,
-                                 event,
-                                 "Unexpected YAML event in raw parsing: %s",
-                                 mmd_yaml_get_event_name (event.type));
-      break;
-    }
-
-  return g_variant_ref_sink (variant);
 }
 
 

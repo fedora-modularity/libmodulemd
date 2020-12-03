@@ -1,5 +1,5 @@
 # This file is part of libmodulemd
-# Copyright (C) 2017-2020 Stephen Gallagher
+# Copyright (C) 2017-2018 Stephen Gallagher
 #
 # Fedora-License-Identifier: MIT
 # SPDX-2.0-License-Identifier: MIT
@@ -16,8 +16,6 @@ test_installed_lib = get_option('test_installed_lib')
 skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
 developer_build = get_option('developer_build')
-verbose_tests = get_option('verbose_tests')
-default_stream_mdversion = get_option('default_stream_mdversion')
 
 if not developer_build
     skip_formatters = true
@@ -61,7 +59,6 @@ endif
 
 modulemd_srcs = files(
     'modulemd.c',
-    'modulemd-build-config.c',
     'modulemd-buildopts.c',
     'modulemd-component.c',
     'modulemd-component-module.c',
@@ -76,15 +73,12 @@ modulemd_srcs = files(
     'modulemd-module-stream.c',
     'modulemd-module-stream-v1.c',
     'modulemd-module-stream-v2.c',
-    'modulemd-module-stream-v3.c',
-    'modulemd-packager-v3.c',
     'modulemd-profile.c',
     'modulemd-rpm-map-entry.c',
     'modulemd-service-level.c',
     'modulemd-subdocument-info.c',
     'modulemd-translation.c',
     'modulemd-translation-entry.c',
-    'modulemd-upgrade-helper.c',
     'modulemd-util.c',
     'modulemd-yaml-util.c',
     'modulemd-obsoletes.c',
@@ -112,7 +106,6 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-module-stream.h',
     'include/modulemd-2.0/modulemd-module-stream-v1.h',
     'include/modulemd-2.0/modulemd-module-stream-v2.h',
-    'include/modulemd-2.0/modulemd-module-stream-v3.h',
     'include/modulemd-2.0/modulemd-profile.h',
     'include/modulemd-2.0/modulemd-rpm-map-entry.h',
     'include/modulemd-2.0/modulemd-service-level.h',
@@ -124,7 +117,6 @@ modulemd_hdrs = files(
 
 modulemd_priv_hdrs = files(
     'include/private/glib-extensions.h',
-    'include/private/modulemd-build-config.h',
     'include/private/modulemd-buildopts-private.h',
     'include/private/modulemd-component-private.h',
     'include/private/modulemd-component-module-private.h',
@@ -139,13 +131,10 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-module-stream-private.h',
     'include/private/modulemd-module-stream-v1-private.h',
     'include/private/modulemd-module-stream-v2-private.h',
-    'include/private/modulemd-module-stream-v3-private.h',
-    'include/private/modulemd-packager-v3.h',
     'include/private/modulemd-service-level-private.h',
     'include/private/modulemd-subdocument-info-private.h',
     'include/private/modulemd-translation-private.h',
     'include/private/modulemd-translation-entry-private.h',
-    'include/private/modulemd-upgrade-helper.h',
     'include/private/modulemd-util.h',
     'include/private/modulemd-yaml.h',
     'include/private/gi-binding-renames.h',
@@ -174,7 +163,6 @@ enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_hdrs)
 
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
-cdata.set('DEFAULT_STREAM_MDVERSION', default_stream_mdversion)
 cdata.set('HAVE_RPMIO', rpm.found())
 cdata.set('HAVE_LIBMAGIC', magic.found())
 cdata.set('HAVE_GDATE_AUTOPTR', has_gdate_autoptr)
@@ -256,10 +244,7 @@ test_release_env.set ('TEST_DATA_PATH', meson.source_root() + '/modulemd/tests/t
 # Test env with fatal warnings and criticals
 test_env = test_release_env
 test_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
-
-if verbose_tests
-    test_env.set('G_MESSAGES_DEBUG', 'all')
-endif
+test_env.set('G_MESSAGES_DEBUG', 'all')
 
 # Python test env with fatal warnings and criticals
 py_test_env = test_env
@@ -309,7 +294,6 @@ test_utils_lib = library(
 )
 
 c_tests = {
-'buildconfig'         : [ 'tests/test-modulemd-build-config.c' ],
 'buildopts'           : [ 'tests/test-modulemd-buildopts.c' ],
 'common'              : [ 'tests/test-modulemd-common.c' ],
 'component_module'    : [ 'tests/test-modulemd-component-module.c' ],
@@ -322,13 +306,11 @@ c_tests = {
 'module_index'        : [ 'tests/test-modulemd-moduleindex.c' ],
 'module_index_merger' : [ 'tests/test-modulemd-merger.c' ],
 'modulestream'        : [ 'tests/test-modulemd-modulestream.c' ],
-'packagerv3'          : [ 'tests/test-modulemd-packager-v3.c' ],
 'profile'             : [ 'tests/test-modulemd-profile.c' ],
 'rpm_map'             : [ 'tests/test-modulemd-rpmmap.c' ],
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
-'upgrade_helper'      : [ 'tests/test-modulemd-upgrade-helper.c' ],
 'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
 }
 
@@ -347,7 +329,7 @@ foreach name, sources : c_tests
     )
     test(name + '_debug', exe,
          env : test_env,
-         timeout : 120,
+         timeout : 60,
          suite : ['ci', 'ci_valgrind', 'c', 'c_debug'])
     test(name + '_release', exe,
          env : test_release_env,

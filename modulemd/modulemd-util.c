@@ -233,78 +233,10 @@ modulemd_hash_table_equals (GHashTable *a,
   return TRUE;
 }
 
-
-gint
-modulemd_hash_table_compare (GHashTable *a,
-                             GHashTable *b,
-                             GCompareFunc value_compare_func)
-{
-  g_autoptr (GPtrArray) set_a = NULL;
-  g_autoptr (GPtrArray) set_b = NULL;
-  int i = 0;
-  gchar *key = NULL;
-  gchar *value_a = NULL;
-  gchar *value_b = NULL;
-  gint cmp;
-
-  /* Get the ordered list of keys from each hashtable. */
-  set_a = modulemd_ordered_str_keys (a, modulemd_strcmp_sort);
-  set_b = modulemd_ordered_str_keys (b, modulemd_strcmp_sort);
-
-  for (i = 0; i < set_a->len; i++)
-    {
-      /* If we ran out of elements in the second set, it is shorter and thus the
-       * lesser one.
-       */
-      if (i >= set_b->len)
-        {
-          return 1;
-        }
-
-      /* Compare the keys. */
-      cmp =
-        g_strcmp0 (g_ptr_array_index (set_a, i), g_ptr_array_index (set_b, i));
-      if (cmp != 0)
-        {
-          return cmp;
-        }
-
-      /* If the keys match, compare the values if needed. */
-      if (value_compare_func)
-        {
-          key = g_ptr_array_index (set_a, i);
-          value_a = g_hash_table_lookup (a, key);
-          value_b = g_hash_table_lookup (b, key);
-          cmp = value_compare_func (value_a, value_b);
-          if (cmp != 0)
-            {
-              return cmp;
-            }
-        }
-    }
-
-  /* If everything has been the same so far but there are more elements in the
-   * second set, it is longer and thus the greater one.
-   */
-  if (set_a->len < set_b->len)
-    {
-      return -1;
-    }
-
-  /* If we made it this far, they are equal. */
-  return 0;
-}
-
 gint
 modulemd_strcmp_sort (gconstpointer a, gconstpointer b)
 {
   return g_strcmp0 (*(const gchar **)a, *(const gchar **)b);
-}
-
-gint
-modulemd_strcmp_wrapper (gconstpointer a, gconstpointer b)
-{
-  return g_strcmp0 ((gchar *)a, (gchar *)b);
 }
 
 GPtrArray *
@@ -589,7 +521,7 @@ modulemd_iso8601date_to_guint64 (const gchar *iso8601)
   char buf[32];
   strftime (buf, sizeof (buf), "%Y%m%d%H%M", &tm);
 
-  return g_ascii_strtoull (buf, NULL, 0);
+  return atol (buf);
 }
 
 

@@ -329,7 +329,7 @@ translation_test_emit_yaml (void)
                    "version: 1\n"
                    "data:\n"
                    "  module: testmodule\n"
-                   "  stream: \"teststream\"\n"
+                   "  stream: teststream\n"
                    "  modified: 42\n"
                    "...\n");
 
@@ -354,7 +354,7 @@ translation_test_emit_yaml (void)
                    "version: 1\n"
                    "data:\n"
                    "  module: testmodule\n"
-                   "  stream: \"teststream\"\n"
+                   "  stream: teststream\n"
                    "  modified: 42\n"
                    "  translations:\n"
                    "    en_US:\n"

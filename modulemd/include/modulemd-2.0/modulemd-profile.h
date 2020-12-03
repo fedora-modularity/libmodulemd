@@ -115,47 +115,6 @@ modulemd_profile_get_description (ModulemdProfile *self, const gchar *locale);
 
 
 /**
- * modulemd_profile_set_default:
- * @self: This #ModulemdProfile object.
- *
- * Calling this function indicates that this profile should be considered one
- * of the default profiles for the associated stream.
- *
- * Since: 2.10
- */
-void
-modulemd_profile_set_default (ModulemdProfile *self);
-
-
-/**
- * modulemd_profile_unset_default:
- * @self: This #ModulemdProfile object.
- *
- * Calling this function indicates that this profile should not be considered
- * one of the default profiles for this stream. This is the normal state of
- * a #ModulemdProfile and thus this function is usually unnecessary. It has no
- * effect if @self is already non-default.
- *
- * Since: 2.10
- */
-void
-modulemd_profile_unset_default (ModulemdProfile *self);
-
-
-/**
- * modulemd_profile_is_default:
- * @self: This #ModulemdProfile object.
- *
- * Returns: TRUE if this profile is a default for the associated stream. FALSE
- * otherwise.
- *
- * Since: 2.10
- */
-gboolean
-modulemd_profile_is_default (ModulemdProfile *self);
-
-
-/**
  * modulemd_profile_add_rpm:
  * @self: This #ModulemdProfile object.
  * @rpm: The name of a binary RPM that should be installed when this profile is

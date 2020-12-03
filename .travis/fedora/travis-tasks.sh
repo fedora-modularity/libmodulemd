@@ -8,13 +8,19 @@ PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false}"
 RETRY_CMD=/builddir/.travis/retry-command.sh
 
-override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
-
 pushd /builddir/
 
+valgrind_cmd='
+    valgrind --error-exitcode=1
+             --errors-for-leak-kinds=definite
+             --leak-check=full
+             --show-leak-kinds=definite
+             --suppressions=/usr/share/glib-2.0/valgrind/glib.supp
+             --suppressions=/builddir/contrib/valgrind/libmodulemd-python.supp
+'
+
 # Build the code under GCC and run standard tests
-meson --buildtype=debugoptimized \
-      -Dverbose_tests=false \
+meson --buildtype=debug \
       $MESON_DIRTY_REPO_ARGS \
       travis
 
@@ -31,7 +37,7 @@ meson test --suite ci \
            -t 5
 
 meson test --suite ci_valgrind \
-           --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
+           --wrap="$valgrind_cmd" \
            -C travis \
            --num-processes=$PROCESSORS \
            --print-errorlogs \
@@ -61,27 +67,32 @@ fi
 # Always install and run the installed RPM tests last so we don't pollute the
 # testing environment above.
 
-arch=$(uname -m)
-mkdir -p rpmbuild/RPMS/
-pushd rpmbuild/RPMS/
-packit local-build ../..
-createrepo_c $arch
+meson --buildtype=debug \
+      $COMMON_MESON_ARGS \
+      build_rpm
+
+pushd build_rpm
+
+ninja
+./make_rpms.sh
+
+createrepo_c rpmbuild/RPMS/
 
 $RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
-               --repofrompath libmodulemd-travis,$arch \
-               $arch/python3-libmodulemd*.rpm \
-               $arch/libmodulemd-devel*.rpm
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python3-libmodulemd \
+               "libmodulemd-devel > 2"
 
 # Also install the python2-libmodulemd if it was built for this release
 # the ||: at the end instructs bash to consider this a pass either way.
-dnf -y install --nogpgcheck \
+$RETRY_CMD dnf -y install --nogpgcheck \
                --allowerasing \
-               --repofrompath libmodulemd-travis,$arch \
-               $arch/python2-libmodulemd*.rpm ||:
+               --repofrompath libmodulemd-travis,rpmbuild/RPMS \
+               python2-libmodulemd ||:
 popd #build_rpm
 
-meson --buildtype=release \
+meson --buildtype=debug \
       -Dtest_installed_lib=true \
       installed_lib_tests
 

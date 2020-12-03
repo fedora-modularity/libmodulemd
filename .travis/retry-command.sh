@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function retry_command {
     local usage="Usage: ${FUNCNAME[0]} [-b backoff-factor] [-d delay] [-n numtries]"

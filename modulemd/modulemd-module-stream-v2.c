@@ -49,6 +49,7 @@ enum
   PROP_COMMUNITY,
   PROP_DOCUMENTATION,
   PROP_TRACKER,
+  PROP_STATIC_CONTEXT,
   N_PROPS
 };
 
@@ -1196,6 +1197,72 @@ modulemd_module_stream_v2_includes_nevra (ModulemdModuleStreamV2 *self,
 }
 
 
+void
+modulemd_module_stream_v2_set_static_context (ModulemdModuleStreamV2 *self)
+{
+  self->static_context = TRUE;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STATIC_CONTEXT]);
+}
+
+
+void
+modulemd_module_stream_v2_unset_static_context (ModulemdModuleStreamV2 *self)
+{
+  self->static_context = FALSE;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STATIC_CONTEXT]);
+}
+
+
+gboolean
+modulemd_module_stream_v2_is_static_context (ModulemdModuleStreamV2 *self)
+{
+  return self->static_context;
+}
+
+
+static gboolean
+modulemd_module_stream_v2_validate_context (const gchar *context,
+                                            GError **error)
+{
+  /* must be string of up to MMD_MAXCONTEXTLEN [a-zA-Z0-9] */
+
+  if (context == NULL || *context == '\0')
+    {
+      g_set_error (
+        error, MODULEMD_ERROR, MMD_ERROR_VALIDATE, "Empty stream context");
+      return FALSE;
+    }
+
+  if (strlen (context) > MMD_MAXCONTEXTLEN)
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MMD_ERROR_VALIDATE,
+                   "Stream context '%s' exceeds maximum length (%d)",
+                   context,
+                   MMD_MAXCONTEXTLEN);
+      return FALSE;
+    }
+
+  for (const gchar *i = context; *i != '\0'; i++)
+    {
+      if (!g_ascii_isalnum (*i))
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MMD_ERROR_VALIDATE,
+                       "Non-alphanumeric character in stream context '%s'",
+                       context);
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
+
 static gboolean
 modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
 {
@@ -1207,6 +1274,7 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
   ModulemdDependencies *deps = NULL;
   g_autoptr (GError) nested_error = NULL;
   g_auto (GStrv) buildopts_arches = NULL;
+  const gchar *context = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), FALSE);
   v2_self = MODULEMD_MODULE_STREAM_V2 (self);
@@ -1215,6 +1283,22 @@ modulemd_module_stream_v2_validate (ModulemdModuleStream *self, GError **error)
          ->validate (self, error))
     {
       return FALSE;
+    }
+
+  /* Validate static context if present */
+  if (v2_self->static_context)
+    {
+      context =
+        modulemd_module_stream_get_context (MODULEMD_MODULE_STREAM (self));
+      if (context)
+        {
+          if (!modulemd_module_stream_v2_validate_context (context,
+                                                           &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+        }
     }
 
   /* Make sure that mandatory fields are present */
@@ -1339,6 +1423,11 @@ modulemd_module_stream_v2_get_property (GObject *object,
       g_value_set_string (value, modulemd_module_stream_v2_get_tracker (self));
       break;
 
+    case PROP_STATIC_CONTEXT:
+      g_value_set_boolean (value,
+                           modulemd_module_stream_v2_is_static_context (self));
+      break;
+
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
@@ -1373,6 +1462,17 @@ modulemd_module_stream_v2_set_property (GObject *object,
 
     case PROP_TRACKER:
       modulemd_module_stream_v2_set_tracker (self, g_value_get_string (value));
+      break;
+
+    case PROP_STATIC_CONTEXT:
+      if (g_value_get_boolean (value))
+        {
+          modulemd_module_stream_v2_set_static_context (self);
+        }
+      else
+        {
+          modulemd_module_stream_v2_unset_static_context (self);
+        }
       break;
 
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -1431,6 +1531,7 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
   STREAM_COPY_IF_SET (v2, copy, v2_self, documentation);
   STREAM_COPY_IF_SET_WITH_LOCALE (v2, copy, v2_self, summary);
   STREAM_COPY_IF_SET (v2, copy, v2_self, tracker);
+  copy->static_context = v2_self->static_context;
 
   /* Internal Data Structures: With replace function */
   STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, content_licenses);
@@ -1577,6 +1678,13 @@ modulemd_module_stream_v2_class_init (ModulemdModuleStreamV2Class *klass)
     NULL,
     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 
+  properties[PROP_STATIC_CONTEXT] =
+    g_param_spec_boolean ("static-context",
+                          "Static Context",
+                          "Whether the context is static",
+                          0,
+                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -1686,6 +1794,7 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   g_autoptr (ModulemdBuildopts) buildopts = NULL;
   g_autoptr (GVariant) xmd = NULL;
   guint64 version;
+  gboolean static_context;
 
   if (!modulemd_subdocument_info_get_data_parser (
         subdoc, &parser, strict, error))
@@ -1766,6 +1875,28 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                 error,
                 modulemd_module_stream_set_context,
                 MODULEMD_MODULE_STREAM (modulestream));
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "static_context"))
+            {
+              static_context =
+                modulemd_yaml_parse_bool (&parser, &nested_error);
+              if (nested_error)
+                {
+                  g_propagate_error (error, g_steal_pointer (&nested_error));
+                  return NULL;
+                }
+
+              if (static_context)
+                {
+                  modulemd_module_stream_v2_set_static_context (modulestream);
+                }
+              else
+                {
+                  modulemd_module_stream_v2_unset_static_context (
+                    modulestream);
+                }
             }
 
           /* Module Artifact Architecture */
@@ -2854,6 +2985,11 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
         MODULEMD_MODULE_STREAM (self), emitter, error))
     {
       return FALSE;
+    }
+
+  if (modulemd_module_stream_v2_is_static_context (self))
+    {
+      EMIT_KEY_VALUE (emitter, error, "static_context", "true");
     }
 
   EMIT_KEY_VALUE_IF_SET (

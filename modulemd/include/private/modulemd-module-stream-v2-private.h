@@ -68,6 +68,8 @@ struct _ModulemdModuleStreamV2
   ModulemdObsoletes *obsoletes;
 
   GVariant *xmd;
+
+  gboolean static_context;
 };
 
 

@@ -904,4 +904,42 @@ GVariant *
 modulemd_module_stream_v2_get_xmd (ModulemdModuleStreamV2 *self);
 
 
+/**
+ * modulemd_module_stream_v2_set_static_context:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Marks this #ModulemdModuleStreamV2 to indicate to dependency solvers that
+ * they must treat the `context` attribute as informative.
+ *
+ * Since: 2.11
+ */
+void
+modulemd_module_stream_v2_set_static_context (ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_unset_static_context:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Marks this #ModulemdModuleStreamV2 to indicate to dependency solvers that
+ * they must ignore the `context` attribute as a uniqueness element.
+ *
+ * Since: 2.11
+ */
+void
+modulemd_module_stream_v2_unset_static_context (ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_is_static_context:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Returns: Whether the `context` attribute should be treated as static.
+ *
+ * Since: 2.11
+ */
+gboolean
+modulemd_module_stream_v2_is_static_context (ModulemdModuleStreamV2 *self);
+
+
 G_END_DECLS

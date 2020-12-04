@@ -1426,6 +1426,108 @@ data:
         self.assertIsInstance(profiles[2], Modulemd.Profile)
         self.assertEqual(profiles[2].get_name(), "thethirdprofile")
 
+    def test_static_context(self):
+        stream = Modulemd.ModuleStreamV2.new("themodule", "thestream")
+
+        # Verify that it defaults to FALSE
+        self.assertFalse(stream.props.static_context)
+        self.assertFalse(stream.is_static_context())
+
+        # Test setting and unsetting it via methods
+        stream.set_static_context()
+        self.assertTrue(stream.props.static_context)
+        self.assertTrue(stream.is_static_context())
+
+        stream.unset_static_context()
+        self.assertFalse(stream.props.static_context)
+        self.assertFalse(stream.is_static_context())
+
+        # Test setting and unsetting it via properties
+        stream.props.static_context = True
+        self.assertTrue(stream.props.static_context)
+        self.assertTrue(stream.is_static_context())
+
+        stream.props.static_context = False
+        self.assertFalse(stream.props.static_context)
+        self.assertFalse(stream.is_static_context())
+
+        # Read in a stream with a static context
+        idx = Modulemd.load_file(
+            "%s/static_context.yaml" % (os.getenv("TEST_DATA_PATH"))
+        )
+        streams = idx.search_streams()
+        self.assertEquals(1, len(streams))
+        stream = streams[0]
+        self.assertTrue(stream.props.static_context)
+        self.assertTrue(stream.is_static_context())
+
+        expected = """---
+document: modulemd
+version: 2
+data:
+  name: nodejs
+  stream: "8"
+  version: 20180816123422
+  context: RealCTX
+  static_context: true
+  arch: x86_64
+  summary: Javascript runtime
+  description: >-
+    Node.js is a platform built on Chrome''s JavaScript runtime for easily building
+    fast, scalable network applications. Node.js uses an event-driven, non-blocking
+    I/O model that makes it lightweight and efficient, perfect for data-intensive
+    real-time applications that run across distributed devices.
+  license:
+    module:
+    - MIT
+    content:
+    - MIT and ASL 2.0 and ISC and BSD
+  dependencies:
+  - buildrequires:
+      platform: [f29]
+    requires:
+      platform: [f29]
+  references:
+    community: http://nodejs.org
+    documentation: http://nodejs.org/en/docs
+    tracker: https://github.com/nodejs/node/issues
+  profiles:
+    default:
+      rpms:
+      - nodejs
+      - npm
+    development:
+      rpms:
+      - nodejs
+      - nodejs-devel
+      - npm
+    minimal:
+      rpms:
+      - nodejs
+  api:
+    rpms:
+    - nodejs
+    - nodejs-devel
+    - npm
+  components:
+    rpms:
+      nodejs:
+        rationale: Javascript runtime and npm package manager.
+        repository: git://pkgs.fedoraproject.org/rpms/nodejs
+        cache: http://pkgs.fedoraproject.org/repo/pkgs/nodejs
+        ref: 8
+        buildorder: 10
+  artifacts:
+    rpms:
+    - nodejs-1:8.11.4-1.module_2030+42747d40.x86_64
+    - nodejs-devel-1:8.11.4-1.module_2030+42747d40.x86_64
+    - nodejs-docs-1:8.11.4-1.module_2030+42747d40.noarch
+    - npm-1:5.6.0-1.8.11.4.1.module_2030+42747d40.x86_64
+...
+"""
+        self.maxDiff = None
+        self.assertEquals(expected, idx.dump_to_string())
+
 
 if __name__ == "__main__":
     unittest.main()

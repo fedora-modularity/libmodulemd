@@ -37,7 +37,6 @@ from base import TestBase
 modulestream_versions = [
     Modulemd.ModuleStreamVersionEnum.ONE,
     Modulemd.ModuleStreamVersionEnum.TWO,
-    Modulemd.ModuleStreamVersionEnum.THREE,
 ]
 
 
@@ -573,22 +572,6 @@ class TestModuleStream(TestBase):
         stream.remove_dependencies(deps)
         self.assertEquals(len(stream.get_dependencies()), 0)
 
-    def test_v3_dependencies(self):
-        stream = Modulemd.ModuleStreamV3.new()
-        stream.add_buildtime_requirement("testmodule", "stable")
-
-        assert len(stream.get_buildtime_modules()) == 1
-        assert "testmodule" in stream.get_buildtime_modules()
-
-        assert (
-            stream.get_buildtime_requirement_stream("testmodule") == "stable"
-        )
-
-        stream.add_runtime_requirement("testmodule", "latest")
-        assert len(stream.get_runtime_modules()) == 1
-        assert "testmodule" in stream.get_runtime_modules()
-        assert stream.get_runtime_requirement_stream("testmodule") == "latest"
-
     def test_xmd(self):
         # get and save current default stream mdversion
         default_mdv = Modulemd.get_default_stream_mdversion()
@@ -689,126 +672,6 @@ data:
       ModuleA: [streamZ]
       ModuleB: [streamY]
       platform: [f33]
-...
-""",
-        )
-
-    def test_upgrade_v2_to_v3(self):
-        v2_stream = Modulemd.ModuleStreamV2.new("SuperModule", "latest")
-        v2_stream.set_context("ctx")
-        v2_stream.set_summary("Summary")
-        v2_stream.set_description("Description")
-        v2_stream.add_module_license("BSD")
-
-        deps = Modulemd.Dependencies()
-        deps.add_buildtime_stream("ModuleA", "streamZ")
-        deps.add_buildtime_stream("ModuleB", "streamY")
-        deps.add_runtime_stream("ModuleA", "streamZ")
-        deps.add_runtime_stream("ModuleB", "streamY")
-        deps.add_runtime_stream("platform", "f33")
-        v2_stream.add_dependencies(deps)
-
-        v3_module = v2_stream.upgrade_ext(
-            Modulemd.ModuleStreamVersionEnum.THREE
-        )
-        self.assertIsNotNone(v3_module)
-
-        # get and save current default stream mdversion
-        default_mdv = Modulemd.get_default_stream_mdversion()
-
-        # create a v3 index and add all module streams to it
-        Modulemd.set_default_stream_mdversion(
-            Modulemd.ModuleStreamVersionEnum.THREE
-        )
-        idx = Modulemd.ModuleIndex.new()
-        for stream in v3_module.get_all_streams():
-            idx.add_module_stream(stream)
-
-        # restore default mdversion to avoid unexpected results from other tests
-        Modulemd.set_default_stream_mdversion(default_mdv)
-
-        self.assertEquals(
-            idx.dump_to_string(),
-            """---
-document: modulemd-stream
-version: 3
-data:
-  name: SuperModule
-  stream: \"latest\"
-  context: ctx
-  summary: Summary
-  description: >-
-    Description
-  license:
-    module:
-    - BSD
-  dependencies:
-    platform: f33
-    buildrequires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
-    requires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
-...
-""",
-        )
-
-    def test_upgrade_v1_to_v3(self):
-        v1_stream = Modulemd.ModuleStreamV1.new("SuperModule", "latest")
-        v1_stream.set_context("ctx")
-        v1_stream.set_summary("Summary")
-        v1_stream.set_description("Description")
-        v1_stream.add_module_license("BSD")
-
-        v1_stream.add_buildtime_requirement("ModuleA", "streamZ")
-        v1_stream.add_buildtime_requirement("ModuleB", "streamY")
-        v1_stream.add_runtime_requirement("ModuleA", "streamZ")
-        v1_stream.add_runtime_requirement("ModuleB", "streamY")
-        v1_stream.add_runtime_requirement("platform", "f33")
-
-        v3_module = v1_stream.upgrade_ext(
-            Modulemd.ModuleStreamVersionEnum.THREE
-        )
-        self.assertIsNotNone(v3_module)
-
-        # get and save current default stream mdversion
-        default_mdv = Modulemd.get_default_stream_mdversion()
-
-        # create a v3 index and add all module streams to it
-        Modulemd.set_default_stream_mdversion(
-            Modulemd.ModuleStreamVersionEnum.THREE
-        )
-        idx = Modulemd.ModuleIndex.new()
-        for stream in v3_module.get_all_streams():
-            idx.add_module_stream(stream)
-
-        # restore default mdversion to avoid unexpected results from other tests
-        Modulemd.set_default_stream_mdversion(default_mdv)
-
-        self.assertEquals(
-            idx.dump_to_string(),
-            """---
-document: modulemd-stream
-version: 3
-data:
-  name: SuperModule
-  stream: \"latest\"
-  context: ctx
-  summary: Summary
-  description: >-
-    Description
-  license:
-    module:
-    - BSD
-  dependencies:
-    platform: f33
-    buildrequires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
-    requires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
 ...
 """,
         )
@@ -1341,9 +1204,6 @@ data:
     def test_depends_on_stream(self):
 
         for version in modulestream_versions:
-            if version >= Modulemd.ModuleStreamVersionEnum.THREE:
-                # see test_depends_on_stream_v3()
-                continue
             stream = Modulemd.ModuleStream.read_file(
                 "%s/dependson_v%d.yaml"
                 % (os.getenv("TEST_DATA_PATH"), version),
@@ -1375,36 +1235,6 @@ data:
                 self.assertEqual(
                     stream.build_depends_on_stream("streamname", "f30"), True
                 )
-
-    def test_depends_on_stream_v3(self):
-
-        for version in modulestream_versions:
-            if version < Modulemd.ModuleStreamVersionEnum.THREE:
-                # see test_depends_on_stream()
-                continue
-            stream = Modulemd.ModuleStream.read_file(
-                "%s/dependson_v%d.yaml"
-                % (os.getenv("TEST_DATA_PATH"), version),
-                True,
-            )
-            self.assertIsNotNone(stream)
-
-            self.assertEqual(stream.depends_on_stream("runtime", "a"), True)
-            self.assertEqual(
-                stream.build_depends_on_stream("buildtools", "v1"), True
-            )
-
-            self.assertEqual(
-                stream.depends_on_stream("buildtools", "v1"), False
-            )
-            self.assertEqual(
-                stream.build_depends_on_stream("runtime", "a"), False
-            )
-
-            self.assertEqual(stream.depends_on_stream("base", "f30"), False)
-            self.assertEqual(
-                stream.build_depends_on_stream("base", "f30"), False
-            )
 
     def test_validate_buildafter(self):
         for version in modulestream_versions:

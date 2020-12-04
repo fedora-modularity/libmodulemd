@@ -19,7 +19,6 @@
 #include "modulemd-translation.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-module-stream-v3-private.h"
 #include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-yaml.h"
 #include <glib-object.h>

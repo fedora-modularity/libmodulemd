@@ -45,12 +45,6 @@ test_modulemd_default_stream_mdversion (void)
   mdv = modulemd_get_default_stream_mdversion ();
   g_assert_cmpint (MD_MODULESTREAM_VERSION_TWO, ==, mdv);
 
-  /* set another known valid version and make sure we get that version back */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_THREE);
-
-  mdv = modulemd_get_default_stream_mdversion ();
-  g_assert_cmpint (MD_MODULESTREAM_VERSION_THREE, ==, mdv);
-
   /* attempt to set a bad version */
   modulemd_test_signal = 0;
   signal (SIGTRAP, modulemd_test_signal_handler);

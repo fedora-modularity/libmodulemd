@@ -27,7 +27,6 @@
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream-v1.h"
 #include "modulemd-module-stream-v2.h"
-#include "modulemd-module-stream-v3.h"
 #include "modulemd-module-stream.h"
 #include "modulemd-module.h"
 #include "modulemd-profile.h"

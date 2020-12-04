@@ -187,11 +187,6 @@ add_subdoc (ModulemdModuleIndex *self,
                                                              &nested_error);
               break;
 
-            case MD_MODULESTREAM_VERSION_THREE:
-              index = modulemd_packager_v3_to_stream_v3_ext (packager,
-                                                             &nested_error);
-              break;
-
             default:
               g_set_error (error,
                            MODULEMD_ERROR,
@@ -243,14 +238,6 @@ add_subdoc (ModulemdModuleIndex *self,
           stream =
             MODULEMD_MODULE_STREAM (modulemd_module_stream_v2_parse_yaml (
               subdoc, strict, doctype == MODULEMD_YAML_DOC_PACKAGER, error));
-          break;
-
-        case MD_MODULESTREAM_VERSION_THREE:
-          if (doctype == MODULEMD_YAML_DOC_MODULESTREAM)
-            {
-              stream = MODULEMD_MODULE_STREAM (
-                modulemd_module_stream_v3_parse_yaml (subdoc, strict, error));
-            }
           break;
 
         default:
@@ -577,15 +564,6 @@ dump_streams (ModulemdModule *module, yaml_emitter_t *emitter, GError **error)
         {
           if (!modulemd_module_stream_v2_emit_yaml (
                 MODULEMD_MODULE_STREAM_V2 (stream), emitter, error))
-            {
-              return FALSE;
-            }
-        }
-      else if (modulemd_module_stream_get_mdversion (stream) ==
-               MD_MODULESTREAM_VERSION_THREE)
-        {
-          if (!modulemd_module_stream_v3_emit_yaml (
-                MODULEMD_MODULE_STREAM_V3 (stream), emitter, error))
             {
               return FALSE;
             }

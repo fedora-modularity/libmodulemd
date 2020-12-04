@@ -21,7 +21,6 @@
 #include "modulemd-2.0/modulemd-subdocument-info.h"
 
 #include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-module-stream-v3-private.h"
 #include "private/modulemd-build-config.h"
 #include "private/modulemd-module-index-private.h"
 
@@ -784,40 +783,6 @@ modulemd_packager_v3_to_stream_v2 (ModulemdPackagerV3 *self, GError **error);
  */
 ModulemdModuleIndex *
 modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
-                                       GError **error);
-
-/**
- * modulemd_packager_v3_to_stream_v3:
- * @self: (in): This #ModulemdPackagerV3 object.
- * @error: (out): A #GError that will return the reason for a conversion error.
- *
- * This will fail if the #ModulemdPackagerV3 object maps to multiple
- * #ModulemdModuleStreamV3 objects.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleStreamV3 object
- * corresponding to the #ModulemdPackagerV3 object @self. NULL if there was an
- * error doing the mapping and sets @error appropriately.
- *
- * Since: 2.10
- */
-ModulemdModuleStreamV3 *
-modulemd_packager_v3_to_stream_v3 (ModulemdPackagerV3 *self, GError **error);
-
-/**
- * modulemd_packager_v3_to_stream_v2_ext:
- * @self: (in): This #ModulemdPackagerV3 object.
- * @error: (out): A #GError that will return the reason for a conversion error.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
- * containing one or more #ModulemdModuleStreamV3 objects and possibly a
- * #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
- * @self. NULL if there was an error doing the mapping and sets @error
- * appropriately.
- *
- * Since: 2.10
- */
-ModulemdModuleIndex *
-modulemd_packager_v3_to_stream_v3_ext (ModulemdPackagerV3 *self,
                                        GError **error);
 
 

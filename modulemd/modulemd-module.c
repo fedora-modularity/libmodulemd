@@ -464,11 +464,6 @@ modulemd_module_add_stream (ModulemdModule *self,
                 (ModulemdModuleStreamV2 *)newstream, obsoletes);
               break;
 
-            case MD_MODULESTREAM_VERSION_THREE:
-              modulemd_module_stream_v3_associate_obsoletes (
-                (ModulemdModuleStreamV3 *)newstream, obsoletes);
-              break;
-
             default: g_return_val_if_reached (MD_MODULESTREAM_VERSION_ERROR);
             }
         }
@@ -923,11 +918,6 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
             (ModulemdModuleStreamV2 *)stream);
           break;
 
-        case MD_MODULESTREAM_VERSION_THREE:
-          current_obsoletes = modulemd_module_stream_v3_get_obsoletes (
-            (ModulemdModuleStreamV3 *)stream);
-          break;
-
         default:
           g_info (
             "ModuleStream obsoletes requires mdversion two or greater: "
@@ -981,11 +971,6 @@ modulemd_module_add_obsoletes (ModulemdModule *self,
         case MD_MODULESTREAM_VERSION_TWO:
           modulemd_module_stream_v2_associate_obsoletes (
             (ModulemdModuleStreamV2 *)stream, new_obsoletes);
-          break;
-
-        case MD_MODULESTREAM_VERSION_THREE:
-          modulemd_module_stream_v3_associate_obsoletes (
-            (ModulemdModuleStreamV3 *)stream, new_obsoletes);
           break;
 
         default:

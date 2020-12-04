@@ -610,9 +610,7 @@ modulemd_module_index_get_stream_mdversion (ModulemdModuleIndex *self);
  * they are not already at that version.
  *
  * Since: 2.0
- * Deprecated: 2.10: Use modulemd_set_default_stream_mdversion() instead.
  */
-MMD_DEPRECATED_FOR (modulemd_set_default_stream_mdversion)
 gboolean
 modulemd_module_index_upgrade_streams (
   ModulemdModuleIndex *self,

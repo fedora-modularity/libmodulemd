@@ -401,18 +401,6 @@ modulemd_module_add_stream (ModulemdModule *self,
       return MD_MODULESTREAM_VERSION_ERROR;
     }
 
-  if (modulemd_module_stream_get_mdversion (stream) > index_mdversion)
-    {
-      /* If the stream we were passed is of a higher mdversion version than the
-       * index, fail because we don't handle downgrades.
-       */
-      g_set_error_literal (error,
-                           MODULEMD_ERROR,
-                           MMD_ERROR_UPGRADE,
-                           "ModuleStream downgrades are not supported.");
-      return MD_MODULESTREAM_VERSION_ERROR;
-    }
-
   if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
     {
       /* If the stream we were passed is of a lower mdversion version than the

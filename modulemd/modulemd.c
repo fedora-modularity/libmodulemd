@@ -23,26 +23,6 @@ modulemd_get_version (void)
 }
 
 
-static ModulemdModuleStreamVersionEnum default_mdversion =
-  (ModulemdModuleStreamVersionEnum)DEFAULT_STREAM_MDVERSION;
-
-void
-modulemd_set_default_stream_mdversion (
-  ModulemdModuleStreamVersionEnum mdversion)
-{
-  g_return_if_fail (mdversion >= MD_MODULESTREAM_VERSION_ONE &&
-                    mdversion <= MD_MODULESTREAM_VERSION_LATEST);
-
-  default_mdversion = mdversion;
-}
-
-ModulemdModuleStreamVersionEnum
-modulemd_get_default_stream_mdversion (void)
-{
-  return default_mdversion;
-}
-
-
 static ModulemdModuleIndex *
 verify_load (int ret,
              ModulemdModuleIndex *idx,

@@ -410,13 +410,8 @@ module_index_test_stream_upgrade (void)
   g_autoptr (ModulemdModuleIndex) index = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (GError) error = NULL;
-  ModulemdModuleStreamVersionEnum default_mdv;
 
-  /* get and save current default stream mdversion */
-  default_mdv = modulemd_get_default_stream_mdversion ();
-
-  /* Construct a v1 Index with some objects */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_ONE);
+  /* Construct an Index with some objects */
   index = modulemd_module_index_new ();
 
   /* Add some streams */
@@ -453,7 +448,7 @@ module_index_test_stream_upgrade (void)
   g_clear_object (&stream);
 
 
-  /* Next, attempt to add a v2 Stream */
+  /* Next, add a v2 Stream */
   stream = (ModulemdModuleStream *)modulemd_module_stream_v2_new (
     "testmodule1", "teststream2");
   modulemd_module_stream_set_version (stream, 2);
@@ -465,15 +460,13 @@ module_index_test_stream_upgrade (void)
   modulemd_module_stream_v2_add_module_license (
     MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
-  g_assert_false (ret);
-  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
-  g_clear_error (&error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&stream, g_object_unref);
   g_clear_object (&index);
 
 
-  /* Construct a v2 Index with some objects */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
+  /* Construct another Index with some objects */
   index = modulemd_module_index_new ();
 
   /* Add some streams */
@@ -494,7 +487,7 @@ module_index_test_stream_upgrade (void)
   g_assert_true (ret);
   g_clear_pointer (&stream, g_object_unref);
 
-  /* Verify that it was upgraded to StreamV2 */
+  /* Verify that it was added as a StreamV1 */
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
@@ -506,7 +499,7 @@ module_index_test_stream_upgrade (void)
   g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
-                   MD_MODULESTREAM_VERSION_TWO);
+                   MD_MODULESTREAM_VERSION_ONE);
   g_clear_object (&stream);
 
 
@@ -541,14 +534,9 @@ module_index_test_stream_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   g_clear_object (&index);
-
-  /* restore default mdversion to avoid unexpected results from other tests */
-  modulemd_set_default_stream_mdversion (default_mdv);
 }
 
 
-/* NOTE: modulemd_module_index_upgrade_streams() is deprecated */
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
 module_index_test_index_upgrade (void)
 {
@@ -557,17 +545,12 @@ module_index_test_index_upgrade (void)
   g_autoptr (ModulemdModuleStream) stream = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
   g_autoptr (GError) error = NULL;
-  ModulemdModuleStreamVersionEnum default_mdv;
-
-  /* get and save current default stream mdversion */
-  default_mdv = modulemd_get_default_stream_mdversion ();
 
   /*
    * Tests starting with a v1 Index
    */
 
-  /* Construct a v1 Index with some objects */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_ONE);
+  /* Construct an Index with some v1 streams */
   index = modulemd_module_index_new ();
 
   /* Add some streams */
@@ -684,17 +667,17 @@ module_index_test_index_upgrade (void)
                    MD_MODULESTREAM_VERSION_ONE);
   g_clear_object (&stream);
 
-  /* Verify that upgrade from stream v1 to v2 is forbidden */
+  /* Verify that upgrade from stream v1 to v2 is allowed */
   ret = modulemd_module_index_upgrade_streams (
     index, MD_MODULESTREAM_VERSION_TWO, &error);
-  g_assert_false (ret);
-  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_UPGRADE);
+  g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_error (&error);
 
-  /* confirm index and original v1 object are still stream v1 */
+  /* confirm index and original v1 object are upgraded to stream v2 */
   g_assert_cmpint (modulemd_module_index_get_stream_mdversion (index),
                    ==,
-                   MD_MODULESTREAM_VERSION_ONE);
+                   MD_MODULESTREAM_VERSION_TWO);
   stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
     modulemd_module_index_get_module (index, "testmodule1"),
     "teststream1",
@@ -706,7 +689,7 @@ module_index_test_index_upgrade (void)
   g_assert_nonnull (stream);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
                    ==,
-                   MD_MODULESTREAM_VERSION_ONE);
+                   MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   g_clear_object (&index);
 
@@ -714,8 +697,7 @@ module_index_test_index_upgrade (void)
    * Tests starting with a v2 Index
    */
 
-  /* Construct a v2 Index with some objects */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
+  /* Construct an Index with some v2 objects */
   index = modulemd_module_index_new ();
 
   /* Add some streams */
@@ -857,11 +839,7 @@ module_index_test_index_upgrade (void)
                    MD_MODULESTREAM_VERSION_TWO);
   g_clear_object (&stream);
   g_clear_object (&index);
-
-  /* restore default mdversion to avoid unexpected results from other tests */
-  modulemd_set_default_stream_mdversion (default_mdv);
 }
-G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 static void

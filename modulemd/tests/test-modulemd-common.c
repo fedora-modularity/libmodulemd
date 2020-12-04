@@ -29,40 +29,6 @@ test_modulemd_get_version (void)
 
 
 static void
-test_modulemd_default_stream_mdversion (void)
-{
-  ModulemdModuleStreamVersionEnum mdv;
-  ModulemdModuleStreamVersionEnum default_mdv;
-
-  /* get the default version */
-  default_mdv = modulemd_get_default_stream_mdversion ();
-  /* make sure we can set it to the default value */
-  modulemd_set_default_stream_mdversion (default_mdv);
-
-  /* set a known valid version and make sure we get that version back */
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_TWO);
-
-  mdv = modulemd_get_default_stream_mdversion ();
-  g_assert_cmpint (MD_MODULESTREAM_VERSION_TWO, ==, mdv);
-
-  /* attempt to set a bad version */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  modulemd_set_default_stream_mdversion (MD_MODULESTREAM_VERSION_UNSET);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-
-  /* attempt to set another bad version */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  modulemd_set_default_stream_mdversion (99);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-
-  /* reset default to avoid unexpected results from other tests */
-  modulemd_set_default_stream_mdversion (default_mdv);
-}
-
-
-static void
 test_modulemd_load_file (void)
 {
   g_autofree gchar *yaml_file = NULL;
@@ -195,9 +161,6 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/common/get_version",
                    test_modulemd_get_version);
-
-  g_test_add_func ("/modulemd/v2/common/default_mdversion",
-                   test_modulemd_default_stream_mdversion);
 
   g_test_add_func ("/modulemd/v2/common/load_file", test_modulemd_load_file);
   g_test_add_func ("/modulemd/v2/common/load_string",

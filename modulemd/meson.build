@@ -83,7 +83,6 @@ modulemd_srcs = files(
     'modulemd-subdocument-info.c',
     'modulemd-translation.c',
     'modulemd-translation-entry.c',
-    'modulemd-upgrade-helper.c',
     'modulemd-util.c',
     'modulemd-yaml-util.c',
     'modulemd-obsoletes.c',
@@ -142,7 +141,6 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-subdocument-info-private.h',
     'include/private/modulemd-translation-private.h',
     'include/private/modulemd-translation-entry-private.h',
-    'include/private/modulemd-upgrade-helper.h',
     'include/private/modulemd-util.h',
     'include/private/modulemd-yaml.h',
     'include/private/gi-binding-renames.h',
@@ -325,7 +323,6 @@ c_tests = {
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
-'upgrade_helper'      : [ 'tests/test-modulemd-upgrade-helper.c' ],
 'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
 }
 

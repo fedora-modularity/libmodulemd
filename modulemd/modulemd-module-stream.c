@@ -26,7 +26,6 @@
 #include "private/modulemd-module-stream-v2-private.h"
 #include "private/modulemd-packager-v3.h"
 #include "private/modulemd-subdocument-info-private.h"
-#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 #include <errno.h>
@@ -40,7 +39,6 @@ typedef struct
   gchar *context;
   gchar *arch;
   ModulemdTranslation *translation;
-  ModulemdUpgradeHelper *helper;
 } ModulemdModuleStreamPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ModulemdModuleStream,
@@ -323,7 +321,6 @@ modulemd_module_stream_finalize (GObject *object)
   g_clear_pointer (&priv->context, g_free);
   g_clear_pointer (&priv->arch, g_free);
   g_clear_object (&priv->translation);
-  g_clear_object (&priv->helper);
 
   G_OBJECT_CLASS (modulemd_module_stream_parent_class)->finalize (object);
 }
@@ -1600,19 +1597,4 @@ modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self)
     {
       modulemd_module_stream_set_stream_name (self, NULL);
     }
-}
-
-
-void
-modulemd_module_stream_associate_upgrade_helper (
-  ModulemdModuleStream *self, ModulemdUpgradeHelper *upgrade_helper)
-{
-  g_return_if_fail (MODULEMD_IS_MODULE_STREAM (self));
-  g_return_if_fail (MODULEMD_IS_UPGRADE_HELPER (upgrade_helper));
-
-  ModulemdModuleStreamPrivate *priv =
-    modulemd_module_stream_get_instance_private (self);
-
-  g_clear_object (&priv->helper);
-  priv->helper = g_object_ref (upgrade_helper);
 }

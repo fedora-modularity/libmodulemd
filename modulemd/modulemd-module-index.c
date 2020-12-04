@@ -39,7 +39,6 @@
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-obsoletes-private.h"
-#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
 
@@ -55,8 +54,6 @@ struct _ModulemdModuleIndex
 
   ModulemdDefaultsVersionEnum defaults_mdversion;
   ModulemdModuleStreamVersionEnum stream_mdversion;
-
-  ModulemdUpgradeHelper *helper;
 };
 
 G_DEFINE_TYPE (ModulemdModuleIndex, modulemd_module_index, G_TYPE_OBJECT)
@@ -75,7 +72,6 @@ modulemd_module_index_finalize (GObject *object)
   ModulemdModuleIndex *self = (ModulemdModuleIndex *)object;
 
   g_clear_pointer (&self->modules, g_hash_table_unref);
-  g_clear_object (&self->helper);
 
   G_OBJECT_CLASS (modulemd_module_index_parent_class)->finalize (object);
 }
@@ -122,7 +118,6 @@ modulemd_module_index_init (ModulemdModuleIndex *self)
 {
   self->modules =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  self->helper = modulemd_upgrade_helper_new ();
 }
 
 
@@ -133,7 +128,6 @@ get_or_create_module (ModulemdModuleIndex *self, const gchar *module_name)
   if (module == NULL)
     {
       module = modulemd_module_new (module_name);
-      modulemd_module_associate_upgrade_helper (module, self->helper);
       g_hash_table_insert (self->modules, g_strdup (module_name), module);
     }
   return module;
@@ -1184,16 +1178,6 @@ modulemd_module_index_remove_module (ModulemdModuleIndex *self,
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 
   return g_hash_table_remove (self->modules, module_name);
-}
-
-
-void
-modulemd_module_index_add_known_stream (ModulemdModuleIndex *self,
-                                        const gchar *module_name,
-                                        const gchar *stream_name)
-{
-  return modulemd_upgrade_helper_add_known_stream (
-    self->helper, module_name, stream_name);
 }
 
 

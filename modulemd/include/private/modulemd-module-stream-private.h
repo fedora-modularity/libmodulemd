@@ -19,7 +19,6 @@
 #include "modulemd-translation.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-upgrade-helper.h"
 #include "private/modulemd-yaml.h"
 #include <glib-object.h>
 
@@ -518,24 +517,5 @@ modulemd_module_stream_clear_autogen_module_name (ModulemdModuleStream *self);
  */
 void
 modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self);
-
-
-/**
- * modulemd_module_stream_associate_upgrade_helper:
- * @self: This #ModulemdModuleStream object.
- * @upgrade_helper: (in)(transfer none): a #ModulemdUpgradeHelper to associate
- * with this module.
- *
- * Associates a #ModulemdUpgradeHelper, usually from a #ModulemdModuleIndex,
- * with this stream to help with upgrades between #ModuleStreamV2 and
- * #ModuleStreamV3. This function will take a reference on the one passed in,
- * so modifications to the @upgrade_helper will affect subsequent changes to
- * this #ModulemdModuleStream.
- *
- * Since: 2.10
- */
-void
-modulemd_module_stream_associate_upgrade_helper (
-  ModulemdModuleStream *self, ModulemdUpgradeHelper *upgrade_helper);
 
 G_END_DECLS

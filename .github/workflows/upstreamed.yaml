@@ -1,0 +1,32 @@
+name: Upstreamed
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  static_analysis:
+    name: Static Analysis
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Coverity Scan
+        env:
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_TOKEN }}
+        run: |
+          ./.ci/ci-coverity.sh
+
+  docs:
+    name: Publish Documentation
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Publish
+        env:
+          DOC_TOKEN: ${{ secrets.DOC_TOKEN }}
+        run: |
+          ./.ci/ci-docs.sh

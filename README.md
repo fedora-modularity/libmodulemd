@@ -1,4 +1,4 @@
-[![Travis](https://img.shields.io/travis/fedora-modularity/libmodulemd.svg?style=plastic)](https://travis-ci.org/fedora-modularity/libmodulemd)
+![Continuous Integration](https://github.com/fedora-modularity/libmodulemd/workflows/Continuous%20Integration/badge.svg)
 [![Travis](https://img.shields.io/coverity/scan/13739.svg?style=plastic)](https://scan.coverity.com/projects/sgallagher-libmodulemd)
 
 # libmodulemd
@@ -312,21 +312,21 @@ build directory first.)
 
 
 ## Running more advanced test suites
-In addition to the basic `ninja test` set of tests, libmodulemd also has a suite
-of tests performed in a Travis CI environment. These are also containerized and
-can be run locally on the host. (You will not be able to run them from within
-the development container shell, as nested containers are not supported.)
+In addition to the basic `ninja test` set of tests, libmodulemd also has a
+suite of tests performed in the Github Actions environment. These are also
+containerized and can be run locally on the host. (You will not be able to run
+them from within the development container shell, as nested containers are not
+supported.)
 
 To run the container-based tests, you can run the following from the source
 root:
 ```
-./.travis/travis-fedora.sh
+./.ci/ci-fedora.sh
 ```
-(Optionally setting the environment variable `TRAVIS_JOB_NAME` to `Fedora 28`,
-`Fedora 29`, etc. to switch to building and testing against those releases
-rather than Fedora Rawhide).
+(Optionally, you can pass the release number as an argument to switch to
+building and testing against that release rather than Fedora Rawhide).
 
-Support for running the tests on other OSes is ongoing. See the `.travis`
+Support for running the tests on other OSes is ongoing. See the `.ci`
 directory for available suites. All supported OSes and release versions are
 tested as part of each pull request.
 

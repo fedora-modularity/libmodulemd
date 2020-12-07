@@ -1,10 +1,10 @@
 #!/bin/bash
 
 SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SCRIPT_DIR="$SOURCE_DIR/.travis"
+SCRIPT_DIR="$SOURCE_DIR/.ci"
 pushd $SCRIPT_DIR
 
-source $SCRIPT_DIR/travis-common.inc
+source $SCRIPT_DIR/ci-common.inc
 
 set -e
 set -x

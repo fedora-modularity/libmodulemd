@@ -15,6 +15,7 @@
 
 #include "modulemd-2.0/modulemd-packager-v3.h"
 #include <glib-object.h>
+#include <yaml.h>
 
 
 G_BEGIN_DECLS
@@ -108,6 +109,25 @@ modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
 ModulemdPackagerV3 *
 modulemd_packager_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                  GError **error);
+
+
+/**
+ * modulemd_packager_v3_emit_yaml:
+ * @self: This #ModulemdModulePackagerV3 object.
+ * @emitter: (inout): A libyaml emitter object positioned where the data
+ * section of a #ModulemdModulePackagerV3 belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an emission or
+ * validation error.
+ *
+ * Returns: TRUE if the modulemd-packager v3 document was emitted successfully.
+ * FALSE and sets @error appropriately if the YAML could not be emitted.
+ *
+ * Since: 2.11
+ */
+gboolean
+modulemd_packager_v3_emit_yaml (ModulemdPackagerV3 *self,
+                                yaml_emitter_t *emitter,
+                                GError **error);
 
 
 G_END_DECLS

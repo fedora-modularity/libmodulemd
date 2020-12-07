@@ -87,6 +87,65 @@ packager_test_construct (void)
 
 
 static ModulemdPackagerV3 *
+parse_yaml (yaml_parser_t *parser)
+{
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+
+  /* First parse to the subdocument */
+  g_assert_true (yaml_parser_parse (parser, &event));
+  g_assert_cmpint (YAML_STREAM_START_EVENT, ==, event.type);
+  yaml_event_delete (&event);
+
+  g_assert_true (yaml_parser_parse (parser, &event));
+  g_assert_cmpint (YAML_DOCUMENT_START_EVENT, ==, event.type);
+  yaml_event_delete (&event);
+
+  subdoc = modulemd_yaml_parse_document_type (parser);
+  g_assert_nonnull (subdoc);
+  g_assert_no_error (modulemd_subdocument_info_get_gerror (subdoc));
+
+  g_assert_cmpint (MODULEMD_YAML_DOC_PACKAGER,
+                   ==,
+                   modulemd_subdocument_info_get_doctype (subdoc));
+  g_assert_cmpint (MD_PACKAGER_VERSION_THREE,
+                   ==,
+                   modulemd_subdocument_info_get_mdversion (subdoc));
+  g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
+
+  packager = modulemd_packager_v3_parse_yaml (subdoc, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+
+  return g_steal_pointer (&packager);
+}
+
+static ModulemdPackagerV3 *
+read_string (const gchar *yaml_string)
+{
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (FILE) yaml_stream = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
+
+  packager = parse_yaml (&parser);
+  g_assert_no_error (error);
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+
+  return g_steal_pointer (&packager);
+}
+
+static ModulemdPackagerV3 *
 read_spec (void)
 {
   MMD_INIT_YAML_EVENT (event);
@@ -107,27 +166,8 @@ read_spec (void)
 
   /* First parse to the subdocument */
   yaml_parser_set_input_file (&parser, yaml_stream);
-  g_assert_true (yaml_parser_parse (&parser, &event));
-  g_assert_cmpint (YAML_STREAM_START_EVENT, ==, event.type);
-  yaml_event_delete (&event);
 
-  g_assert_true (yaml_parser_parse (&parser, &event));
-  g_assert_cmpint (YAML_DOCUMENT_START_EVENT, ==, event.type);
-  yaml_event_delete (&event);
-
-  subdoc = modulemd_yaml_parse_document_type (&parser);
-  g_assert_nonnull (subdoc);
-  g_assert_no_error (modulemd_subdocument_info_get_gerror (subdoc));
-
-  g_assert_cmpint (MODULEMD_YAML_DOC_PACKAGER,
-                   ==,
-                   modulemd_subdocument_info_get_doctype (subdoc));
-  g_assert_cmpint (MD_PACKAGER_VERSION_THREE,
-                   ==,
-                   modulemd_subdocument_info_get_mdversion (subdoc));
-  g_assert_nonnull (modulemd_subdocument_info_get_yaml (subdoc));
-
-  packager = modulemd_packager_v3_parse_yaml (subdoc, &error);
+  packager = parse_yaml (&parser);
   g_assert_no_error (error);
   g_assert_nonnull (packager);
   g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
@@ -238,6 +278,126 @@ validate_spec (ModulemdPackagerV3 *packager)
   g_clear_pointer (&strv, g_strfreev);
 }
 
+static void
+validate_yaml (ModulemdPackagerV3 *packager)
+{
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdPackagerV3) repackaged = NULL;
+  gboolean ret;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  g_debug ("Starting dumping");
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  ret = modulemd_packager_v3_emit_yaml (packager, &emitter, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  ret = mmd_emitter_end_stream (&emitter, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+  g_assert_nonnull (yaml_string->str);
+
+  g_assert_cmpstr (
+    yaml_string->str,
+    ==,
+    "---\n"
+    "document: modulemd-packager\n"
+    "version: 3\n"
+    "data:\n"
+    "  name: foo\n"
+    "  stream: \"latest\"\n"
+    "  summary: An example module\n"
+    "  description: >-\n"
+    "    A module for the demonstration of the metadata format. Also, the "
+    "obligatory lorem\n"
+    "    ipsum dolor sit amet goes right here.\n"
+    "  license:\n"
+    "  - MIT\n"
+    "  xmd:\n"
+    "    some_key: some_data\n"
+    "  configurations:\n"
+    "  - context: CTX1\n"
+    "    platform: f32\n"
+    "    buildrequires:\n"
+    "      appframework: [v1]\n"
+    "    requires:\n"
+    "      appframework: [v1]\n"
+    "    buildopts:\n"
+    "      rpms:\n"
+    "        macros: >\n"
+    "          %demomacro 1\n"
+    "\n"
+    "          %demomacro2 %{demomacro}23\n"
+    "        whitelist:\n"
+    "        - fooscl-1-bar\n"
+    "        - fooscl-1-baz\n"
+    "        - xxx\n"
+    "        - xyz\n"
+    "      arches: [i686, x86_64]\n"
+    "  - context: CTX2\n"
+    "    platform: f33\n"
+    "  references:\n"
+    "    community: http://www.example.com/\n"
+    "    documentation: http://www.example.com/\n"
+    "    tracker: http://www.example.com/\n"
+    "  profiles:\n"
+    "    buildroot:\n"
+    "      rpms:\n"
+    "      - bar-devel\n"
+    "    container:\n"
+    "      rpms:\n"
+    "      - bar\n"
+    "      - bar-devel\n"
+    "    minimal:\n"
+    "      description: Minimal profile installing only the bar package.\n"
+    "      rpms:\n"
+    "      - bar\n"
+    "      default: true\n"
+    "    srpm-buildroot:\n"
+    "      rpms:\n"
+    "      - bar-extras\n"
+    "  api:\n"
+    "    rpms:\n"
+    "    - bar\n"
+    "    - bar-devel\n"
+    "    - bar-extras\n"
+    "    - baz\n"
+    "    - xxx\n"
+    "  filter:\n"
+    "    rpms:\n"
+    "    - baz-nonfoo\n"
+    "  components:\n"
+    "    rpms:\n"
+    "      bar:\n"
+    "        rationale: We need this to demonstrate stuff.\n"
+    "        name: bar-real\n"
+    "        repository: https://pagure.io/bar.git\n"
+    "        cache: https://example.com/cache\n"
+    "        ref: 26ca0c0\n"
+    "        buildafter:\n"
+    "        - baz\n"
+    "      baz:\n"
+    "        rationale: Demonstrate updating the buildroot contents.\n"
+    "        buildroot: true\n"
+    "        srpm-buildroot: true\n"
+    "      xxx:\n"
+    "        rationale: xxx demonstrates arches and multilib.\n"
+    "        buildafter:\n"
+    "        - bar\n"
+    "        arches: [i686, x86_64]\n"
+    "        multilib: [x86_64]\n"
+    "    modules:\n"
+    "      includedmodule:\n"
+    "        rationale: Included in the stack, just because.\n"
+    "        repository: https://pagure.io/includedmodule.git\n"
+    "        ref: somecoolbranchname\n"
+    "...\n");
+
+  /* re-parse the YAML string and verify everything is still there */
+  repackaged = read_string (yaml_string->str);
+  validate_spec (repackaged);
+}
+
 
 static void
 packager_test_parse_spec (void)
@@ -246,6 +406,7 @@ packager_test_parse_spec (void)
 
   packager = read_spec ();
   validate_spec (packager);
+  validate_yaml (packager);
 }
 
 

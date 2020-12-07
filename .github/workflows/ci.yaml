@@ -1,0 +1,49 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  stable_tests:
+    name: Operating Systems (Stable)
+    runs-on: ubuntu-20.04
+    continue-on-error: false
+    strategy:
+      matrix:
+        distro:
+          - Fedora 32
+          - Fedora 33
+          - CentOS 7
+          - CentOS 8
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        env:
+          DISTRO: ${{ matrix.distro }}
+        run: |
+          ./.ci/ci-launcher.sh
+  experimental_tests:
+    name: Operating Systems (Experimental)
+    runs-on: ubuntu-20.04
+    continue-on-error: true
+    strategy:
+      matrix:
+        distro:
+          - Fedora rawhide
+          - Archlinux
+          - Mageia 7
+          # Disabled for now, since it's broken
+          #- OpenMandriva cooker
+          - openSUSE tumbleweed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        env:
+          DISTRO: ${{ matrix.distro }}
+        run: |
+          ./.ci/ci-launcher.sh

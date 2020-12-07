@@ -83,3 +83,5 @@ __pycache__/
 *.rpm
 .travis/.home*
 .travis/*/Dockerfile.deps.*
+.ci/.home*
+.ci/*/Dockerfile.deps.*

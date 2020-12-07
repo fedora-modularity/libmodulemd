@@ -11,13 +11,13 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
-#include "private/modulemd-build-config.h"
+#include "private/modulemd-build-config-private.h"
 #include "private/modulemd-component-private.h"
 #include "private/modulemd-component-module-private.h"
 #include "private/modulemd-component-rpm-private.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-stream-private.h"
-#include "private/modulemd-packager-v3.h"
+#include "private/modulemd-packager-v3-private.h"
 #include "private/modulemd-profile-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
@@ -110,14 +110,6 @@ modulemd_packager_v3_init (ModulemdPackagerV3 *self)
 }
 
 
-/**
- * modulemd_packager_v3_copy:
- *
- * Returns: (transfer full): A newly-allocated deep-copy of this
- * #ModulemdPackagerV3 object. This object must be freed with g_object_unref().
- *
- * Since: 2.10
- */
 ModulemdPackagerV3 *
 modulemd_packager_v3_copy (ModulemdPackagerV3 *self)
 {

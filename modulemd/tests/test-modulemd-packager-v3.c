@@ -18,7 +18,7 @@
 
 #include "modulemd.h"
 #include "private/glib-extensions.h"
-#include "private/modulemd-packager-v3.h"
+#include "private/modulemd-packager-v3-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"

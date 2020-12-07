@@ -285,4 +285,17 @@ gchar *
 modulemd_rpm_map_entry_get_nevra (ModulemdRpmMapEntry *self);
 
 
+/**
+ * modulemd_packager_v3_get_module_component_names: (skip)
+ */
+GStrv
+modulemd_packager_v3_get_module_component_names (ModulemdPackagerV3 *self);
+
+/**
+ * modulemd_packager_v3_get_rpm_component_names: (skip)
+ */
+GStrv
+modulemd_packager_v3_get_rpm_component_names (ModulemdPackagerV3 *self);
+
+
 G_END_DECLS

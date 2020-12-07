@@ -13,16 +13,12 @@
 
 #pragma once
 
+#include "modulemd-build-config.h"
+#include "modulemd-component-module.h"
+#include "modulemd-component-rpm.h"
+#include "modulemd-profile.h"
+#include "modulemd-subdocument-info.h"
 #include <glib-object.h>
-
-#include "modulemd-2.0/modulemd-component-module.h"
-#include "modulemd-2.0/modulemd-component-rpm.h"
-#include "modulemd-2.0/modulemd-profile.h"
-#include "modulemd-2.0/modulemd-subdocument-info.h"
-
-#include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-build-config.h"
-#include "private/modulemd-module-index-private.h"
 
 G_BEGIN_DECLS
 
@@ -45,7 +41,7 @@ G_DECLARE_FINAL_TYPE (
  *
  * The ModulePackager v3 default module metadata license.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 #define MMD_PACKAGER_DEFAULT_MODULE_LICENSE "MIT"
 
@@ -55,13 +51,13 @@ G_DECLARE_FINAL_TYPE (
  * version.
  * @MD_PACKAGER_VERSION_UNSET: Represents an unset module stream version.
  * @MD_PACKAGER_VERSION_TWO: Represents v2 of the #ModulemdPackager
- * metadata format. Since: 2.10
+ * metadata format. Since: 2.11
  * @MD_PACKAGER_VERSION_THREE: Represents v3 of the #ModulemdPackager
- * metadata format. Since: 2.10
+ * metadata format. Since: 2.11
  * @MD_PACKAGER_VERSION_LATEST: Represents the highest-supported version of
  * the #ModulemdPackager metadata format.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 typedef enum
 {
@@ -82,7 +78,7 @@ typedef enum
  * Returns: (transfer full): A newly-allocated #ModulemdPackagerV3 object. This
  * object must be freed with g_object_unref().
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdPackagerV3 *
 modulemd_packager_v3_new (void);
@@ -94,7 +90,7 @@ modulemd_packager_v3_new (void);
  * Returns: (transfer full): A newly-allocated deep-copy of this
  * #ModulemdPackagerV3 object. This object must be freed with g_object_unref().
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdPackagerV3 *
 modulemd_packager_v3_copy (ModulemdPackagerV3 *self);
@@ -107,7 +103,7 @@ modulemd_packager_v3_copy (ModulemdPackagerV3 *self);
  *
  * Sets the module name that this #ModulemdPackagerV3 object references.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_module_name (ModulemdPackagerV3 *self,
@@ -120,7 +116,7 @@ modulemd_packager_v3_set_module_name (ModulemdPackagerV3 *self,
  *
  * Returns: (transfer none): The module name.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_module_name (ModulemdPackagerV3 *self);
@@ -133,7 +129,7 @@ modulemd_packager_v3_get_module_name (ModulemdPackagerV3 *self);
  *
  * Sets the stream name that this #ModulemdPackagerV3 object references.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_stream_name (ModulemdPackagerV3 *self,
@@ -146,7 +142,7 @@ modulemd_packager_v3_set_stream_name (ModulemdPackagerV3 *self,
  *
  * Returns: (transfer none): The module stream name.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_stream_name (ModulemdPackagerV3 *self);
@@ -159,7 +155,7 @@ modulemd_packager_v3_get_stream_name (ModulemdPackagerV3 *self);
  *
  * Sets the module's short description.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_summary (ModulemdPackagerV3 *self,
@@ -172,7 +168,7 @@ modulemd_packager_v3_set_summary (ModulemdPackagerV3 *self,
  *
  * Returns: The short description of the module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_summary (ModulemdPackagerV3 *self);
@@ -185,7 +181,7 @@ modulemd_packager_v3_get_summary (ModulemdPackagerV3 *self);
  *
  * Sets the module's long description.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_description (ModulemdPackagerV3 *self,
@@ -198,7 +194,7 @@ modulemd_packager_v3_set_description (ModulemdPackagerV3 *self,
  *
  * Returns: The long description of the module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_description (ModulemdPackagerV3 *self);
@@ -209,7 +205,7 @@ modulemd_packager_v3_get_description (ModulemdPackagerV3 *self);
  * @self: (in): This #ModulemdPackagerV3 object.
  * @license: (in): A license under which this module stream is distributed.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_module_license (ModulemdPackagerV3 *self,
@@ -222,7 +218,7 @@ modulemd_packager_v3_add_module_license (ModulemdPackagerV3 *self,
  * @license: (in): A license to remove from the list. Has no effect if the
  * license is not present.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_remove_module_license (ModulemdPackagerV3 *self,
@@ -235,20 +231,20 @@ modulemd_packager_v3_remove_module_license (ModulemdPackagerV3 *self,
  *
  * Remove all module licenses from @self
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_module_licenses (ModulemdPackagerV3 *self);
 
 
 /**
- * modulemd_packager_v3_get_module_licenses:
+ * modulemd_packager_v3_get_module_licenses_as_strv:
  * @self: (in): This #ModulemdPackagerV3 object.
  *
  * Returns: (transfer full): A #GStrv of module licenses associated with this
  * module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_module_licenses_as_strv (ModulemdPackagerV3 *self);
@@ -266,7 +262,7 @@ modulemd_packager_v3_get_module_licenses_as_strv (ModulemdPackagerV3 *self);
  * This function assumes ownership of the XMD #GVariant and thus should not be
  * freed by the caller.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_xmd (ModulemdPackagerV3 *self, GVariant *xmd);
@@ -278,7 +274,7 @@ modulemd_packager_v3_set_xmd (ModulemdPackagerV3 *self, GVariant *xmd);
  *
  * Returns: (transfer none): The extensible metadata block as a #GVariant.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GVariant *
 modulemd_packager_v3_get_xmd (ModulemdPackagerV3 *self);
@@ -287,9 +283,9 @@ modulemd_packager_v3_get_xmd (ModulemdPackagerV3 *self);
 /**
  * modulemd_packager_v3_add_build_config:
  * @self: (in): This #ModulemdPackagerV3 object.
- * @buildconfig: (in): A #ModulemdBuildConfig to include
+ * @buildconfig: (in): A #ModulemdBuildConfig to include.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_build_config (ModulemdPackagerV3 *self,
@@ -302,7 +298,7 @@ modulemd_packager_v3_add_build_config (ModulemdPackagerV3 *self,
  *
  * Remove all added #ModulemdBuildConfig objects from @self
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_build_configs (ModulemdPackagerV3 *self);
@@ -315,7 +311,7 @@ modulemd_packager_v3_clear_build_configs (ModulemdPackagerV3 *self);
  * Returns: (transfer full): A list of contexts associated with the build
  * configurations.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_build_config_contexts_as_strv (
@@ -331,7 +327,7 @@ modulemd_packager_v3_get_build_config_contexts_as_strv (
  * Returns: (transfer none): A #ModulemdBuildConfig with the provided @context
  * or NULL if it was not present.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdBuildConfig *
 modulemd_packager_v3_get_build_config (ModulemdPackagerV3 *self,
@@ -345,7 +341,7 @@ modulemd_packager_v3_get_build_config (ModulemdPackagerV3 *self,
  *
  * Set the module community website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_community (ModulemdPackagerV3 *self,
@@ -358,7 +354,7 @@ modulemd_packager_v3_set_community (ModulemdPackagerV3 *self,
  *
  * Returns: (transfer none): The module community website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_community (ModulemdPackagerV3 *self);
@@ -371,7 +367,7 @@ modulemd_packager_v3_get_community (ModulemdPackagerV3 *self);
  *
  * Set the module documentation website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_documentation (ModulemdPackagerV3 *self,
@@ -384,7 +380,7 @@ modulemd_packager_v3_set_documentation (ModulemdPackagerV3 *self,
  *
  * Returns: (transfer none): The module documentation website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_documentation (ModulemdPackagerV3 *self);
@@ -397,7 +393,7 @@ modulemd_packager_v3_get_documentation (ModulemdPackagerV3 *self);
  *
  * Set the module bug tracker website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_set_tracker (ModulemdPackagerV3 *self,
@@ -410,7 +406,7 @@ modulemd_packager_v3_set_tracker (ModulemdPackagerV3 *self,
  *
  * Returns: (transfer none): The module bug tracker website address.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_packager_v3_get_tracker (ModulemdPackagerV3 *self);
@@ -423,7 +419,7 @@ modulemd_packager_v3_get_tracker (ModulemdPackagerV3 *self);
  *
  * Adds a #ModulemdProfile to this #ModulemdPackagerV3 object.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_profile (ModulemdPackagerV3 *self,
@@ -436,7 +432,7 @@ modulemd_packager_v3_add_profile (ModulemdPackagerV3 *self,
  *
  * Removes all #ModulemdProfile objects from this #ModulemdPackagerV3 object.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_profiles (ModulemdPackagerV3 *self);
@@ -449,7 +445,7 @@ modulemd_packager_v3_clear_profiles (ModulemdPackagerV3 *self);
  * Returns: (transfer full): An ordered #GStrv list of profile names associated
  * with this #ModulemdPackagerV3 object.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_profile_names_as_strv (ModulemdPackagerV3 *self);
@@ -463,7 +459,7 @@ modulemd_packager_v3_get_profile_names_as_strv (ModulemdPackagerV3 *self);
  * Returns: (transfer none): The requested profile definition if present in the
  * #ModulemdPackagerV3 object. NULL otherwise.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdProfile *
 modulemd_packager_v3_get_profile (ModulemdPackagerV3 *self,
@@ -476,7 +472,7 @@ modulemd_packager_v3_get_profile (ModulemdPackagerV3 *self,
  * @rpm: (in): The name of a binary RPM present in this module that is
  * considered stable public API.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_rpm_api (ModulemdPackagerV3 *self, const gchar *rpm);
@@ -487,7 +483,7 @@ modulemd_packager_v3_add_rpm_api (ModulemdPackagerV3 *self, const gchar *rpm);
  * @self: (in): This #ModulemdPackagerV3 object.
  * @rpm: (in): A binary RPM name to remove from the list of stable public API.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_remove_rpm_api (ModulemdPackagerV3 *self,
@@ -500,7 +496,7 @@ modulemd_packager_v3_remove_rpm_api (ModulemdPackagerV3 *self,
  *
  * Remove all RPMs from the list of stable public API.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_rpm_api (ModulemdPackagerV3 *self);
@@ -515,7 +511,7 @@ modulemd_packager_v3_clear_rpm_api (ModulemdPackagerV3 *self);
  * Any existing API RPMs associated with module stream @self are removed and
  * replaced by @set.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_replace_rpm_api (ModulemdPackagerV3 *self,
@@ -529,7 +525,7 @@ modulemd_packager_v3_replace_rpm_api (ModulemdPackagerV3 *self,
  * Returns: (transfer full): An ordered #GStrv list of binary RPM names that
  * form the public API of this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_rpm_api_as_strv (ModulemdPackagerV3 *self);
@@ -540,7 +536,7 @@ modulemd_packager_v3_get_rpm_api_as_strv (ModulemdPackagerV3 *self);
  * @self: (in): This #ModulemdPackagerV3 object.
  * @rpm: (in): The name of a binary RPM to filter out of this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_rpm_filter (ModulemdPackagerV3 *self,
@@ -552,7 +548,7 @@ modulemd_packager_v3_add_rpm_filter (ModulemdPackagerV3 *self,
  * @self: (in): This #ModulemdPackagerV3 object.
  * @rpm: (in): A binary RPM name to remove from the filter list.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_remove_rpm_filter (ModulemdPackagerV3 *self,
@@ -565,7 +561,7 @@ modulemd_packager_v3_remove_rpm_filter (ModulemdPackagerV3 *self,
  *
  * Remove all RPMs from the filter list.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_rpm_filters (ModulemdPackagerV3 *self);
@@ -578,7 +574,7 @@ modulemd_packager_v3_clear_rpm_filters (ModulemdPackagerV3 *self);
  * Returns: (transfer full): An ordered #GStrv list of binary RPM names that
  * are filtered out of this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_rpm_filters_as_strv (ModulemdPackagerV3 *self);
@@ -593,7 +589,7 @@ modulemd_packager_v3_get_rpm_filters_as_strv (ModulemdPackagerV3 *self);
  * Any existing filtered binary RPM names associated with module stream @self
  * are removed and replaced by @set.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_replace_rpm_filters (ModulemdPackagerV3 *self,
@@ -608,7 +604,7 @@ modulemd_packager_v3_replace_rpm_filters (ModulemdPackagerV3 *self,
  *
  * Add a component definition to the module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_add_component (ModulemdPackagerV3 *self,
@@ -623,7 +619,7 @@ modulemd_packager_v3_add_component (ModulemdPackagerV3 *self,
  *
  * Remove a component from this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_remove_module_component (ModulemdPackagerV3 *self,
@@ -636,7 +632,7 @@ modulemd_packager_v3_remove_module_component (ModulemdPackagerV3 *self,
  *
  * Remove all module components from this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_module_components (ModulemdPackagerV3 *self);
@@ -650,7 +646,7 @@ modulemd_packager_v3_clear_module_components (ModulemdPackagerV3 *self);
  *
  * Remove a component from this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_remove_rpm_component (ModulemdPackagerV3 *self,
@@ -663,7 +659,7 @@ modulemd_packager_v3_remove_rpm_component (ModulemdPackagerV3 *self,
  *
  * Remove all RPM components from this module stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_packager_v3_clear_rpm_components (ModulemdPackagerV3 *self);
@@ -676,7 +672,7 @@ modulemd_packager_v3_clear_rpm_components (ModulemdPackagerV3 *self);
  * Returns: (transfer full): An ordered #GStrv list of module component names
  * included in this stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_module_component_names_as_strv (
@@ -689,7 +685,7 @@ modulemd_packager_v3_get_module_component_names_as_strv (
  * Returns: (transfer full): An ordered #GStrv list of RPM component names
  * included in this stream.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_packager_v3_get_rpm_component_names_as_strv (
@@ -704,7 +700,7 @@ modulemd_packager_v3_get_rpm_component_names_as_strv (
  * Returns: (transfer none): The module component matching @component_name if
  * it exists, else NULL.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdComponentModule *
 modulemd_packager_v3_get_module_component (ModulemdPackagerV3 *self,
@@ -719,92 +715,10 @@ modulemd_packager_v3_get_module_component (ModulemdPackagerV3 *self,
  * Returns: (transfer none): The RPM component matching @component_name if it
  * exists, else NULL.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdComponentRpm *
 modulemd_packager_v3_get_rpm_component (ModulemdPackagerV3 *self,
                                         const gchar *component_name);
-
-
-/**
- * modulemd_packager_v3_to_defaults:
- * @self: (in): This #ModulemdPackagerV3 object.
- * @defaults_ptr: (out): (transfer-full): A pointer to a pointer to a new
- * #ModulemdDefaults object. Must be a valid pointer to a NULL object when
- * called.
- * @error: (out): A #GError that will return the reason for a conversion error.
- *
- * Sets @defaults_ptr to point to a newly-allocated #ModulemdDefaults object
- * corresponding to the #ModulemdPackagerV3 object @self if @self contains any
- * profiles marked as default. Leaves @defaults_ptr pointing to NULL if @self
- * contained no default profiles.
- *
- * Returns: TRUE if the conversion succeeded, including the case where there
- * @self contains no default profiles. FALSE otherwise and @error will be set.
- *
- * Since: 2.10
- */
-gboolean
-modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self,
-                                  ModulemdDefaults **defaults,
-                                  GError **error);
-
-/**
- * modulemd_packager_v3_to_stream_v2:
- * @self: (in): This #ModulemdPackagerV3 object.
- * @error: (out): A #GError that will return the reason for a conversion error.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleStreamV2 object
- * corresponding to the #ModulemdPackagerV3 object @self. NULL if there was an
- * error doing the mapping and sets @error appropriately.
- *
- * Since: 2.10
- */
-ModulemdModuleStreamV2 *
-modulemd_packager_v3_to_stream_v2 (ModulemdPackagerV3 *self, GError **error);
-
-/**
- * modulemd_packager_v3_to_stream_v2_ext:
- * @self: (in): This #ModulemdPackagerV3 object.
- * @error: (out): A #GError that will return the reason for a conversion error.
- *
- * Note: If buildopts (#ModulemdBuildopts) are in use in one or more build
- * configurations in the #ModulemdPackagerV3 object @self, only the buildopts
- * present in the first listed configuration (if any) will be applied to the
- * #ModulemdModuleStreamV2 object in the returned index.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
- * containing a #ModulemdModuleStreamV2 object and possibly a
- * #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
- * @self. NULL if there was an error doing the mapping and sets @error
- * appropriately.
- *
- * Since: 2.10
- */
-ModulemdModuleIndex *
-modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
-                                       GError **error);
-
-
-/**
- * modulemd_packager_v3_parse_yaml:
- * @subdoc: (in): A #ModulemdSubdocumentInfo representing a packager v3
- * document.
- * @error: (out): A #GError that will return the reason for a parsing or
- * validation error.
- *
- * Parse a #ModulemdPackagerV3 document. This parser always operates in strict
- * mode, since it should only be used as input for a build-system.
- *
- * Returns: (transfer full): A newly-allocated #ModulemdPackagerV3 object
- * read from the YAML. NULL if a parse or validation error occurred and sets
- * @error appropriately.
- *
- * Since: 2.10
- */
-ModulemdPackagerV3 *
-modulemd_packager_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
-                                 GError **error);
-
 
 G_END_DECLS

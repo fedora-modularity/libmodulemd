@@ -13,17 +13,17 @@
 
 #pragma once
 
+#include "modulemd-buildopts.h"
 #include <glib-object.h>
-#include "modulemd-2.0/modulemd-buildopts.h"
-#include "private/modulemd-yaml.h"
 
 G_BEGIN_DECLS
 
 /**
  * SECTION: modulemd-build-config
  * @title: Modulemd.BuildConfig
- * @stability: private
- * @short_description: Internal representation of a module build configuration
+ * @stability: stable
+ * @short_description: The data to represent a configuration for building a
+ * module stream.
  */
 
 #define MODULEMD_TYPE_BUILD_CONFIG (modulemd_build_config_get_type ())
@@ -38,7 +38,7 @@ G_DECLARE_FINAL_TYPE (
  * Initialize a new #ModulemdBuildConfig representing a module build
  * configuration.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdBuildConfig *
 modulemd_build_config_new (void);
@@ -55,7 +55,7 @@ modulemd_build_config_new (void);
  * @context. This validation will be performed as part of the
  * modulemd_build_config_validate() routine where it can be reported cleanly.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_set_context (ModulemdBuildConfig *self,
@@ -75,7 +75,7 @@ modulemd_build_config_set_context (ModulemdBuildConfig *self,
  * Returns: (transfer none): The string representing the context that this
  * build configuration produces.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_build_config_get_context (ModulemdBuildConfig *self);
@@ -88,7 +88,7 @@ modulemd_build_config_get_context (ModulemdBuildConfig *self);
  *
  * Set the platform that this build configuration applies to.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_set_platform (ModulemdBuildConfig *self,
@@ -104,7 +104,7 @@ modulemd_build_config_set_platform (ModulemdBuildConfig *self,
  * Returns: (transfer none): The string representing the platform that this
  * build configuration applies to.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_build_config_get_platform (ModulemdBuildConfig *self);
@@ -118,7 +118,7 @@ modulemd_build_config_get_platform (ModulemdBuildConfig *self);
  *
  * Add a build-time dependency for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_add_runtime_requirement (ModulemdBuildConfig *self,
@@ -133,7 +133,7 @@ modulemd_build_config_add_runtime_requirement (ModulemdBuildConfig *self,
  *
  * Remove a run-time dependency for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_remove_runtime_requirement (ModulemdBuildConfig *self,
@@ -146,7 +146,7 @@ modulemd_build_config_remove_runtime_requirement (ModulemdBuildConfig *self,
  *
  * Remove all run-time dependencies for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_clear_runtime_requirements (ModulemdBuildConfig *self);
@@ -160,7 +160,7 @@ modulemd_build_config_clear_runtime_requirements (ModulemdBuildConfig *self);
  * Returns: (transfer none): The name of the stream matching this module name
  * in the run-time dependencies.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_build_config_get_runtime_requirement_stream (
@@ -174,7 +174,7 @@ modulemd_build_config_get_runtime_requirement_stream (
  * Returns: (transfer full): An ordered #GStrv list of module names that this
  * module depends on at run-time.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_build_config_get_runtime_modules_as_strv (ModulemdBuildConfig *self);
@@ -188,7 +188,7 @@ modulemd_build_config_get_runtime_modules_as_strv (ModulemdBuildConfig *self);
  *
  * Add a build-time dependency for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_add_buildtime_requirement (ModulemdBuildConfig *self,
@@ -203,7 +203,7 @@ modulemd_build_config_add_buildtime_requirement (ModulemdBuildConfig *self,
  *
  * Remove a build-time dependency for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_remove_buildtime_requirement (ModulemdBuildConfig *self,
@@ -216,7 +216,7 @@ modulemd_build_config_remove_buildtime_requirement (ModulemdBuildConfig *self,
  *
  * Remove all build-time dependencies for this module.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_clear_buildtime_requirements (ModulemdBuildConfig *self);
@@ -230,7 +230,7 @@ modulemd_build_config_clear_buildtime_requirements (ModulemdBuildConfig *self);
  * Returns: (transfer none): The name of the stream matching this module name
  * in the build-time dependencies.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 const gchar *
 modulemd_build_config_get_buildtime_requirement_stream (
@@ -244,7 +244,7 @@ modulemd_build_config_get_buildtime_requirement_stream (
  * Returns: (transfer full): An ordered #GStrv list of module names that this
  * module depends on at build-time.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 GStrv
 modulemd_build_config_get_buildtime_modules_as_strv (
@@ -259,7 +259,7 @@ modulemd_build_config_get_buildtime_modules_as_strv (
  *
  * Set build options for this module's components.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 void
 modulemd_build_config_set_buildopts (ModulemdBuildConfig *self,
@@ -272,49 +272,10 @@ modulemd_build_config_set_buildopts (ModulemdBuildConfig *self,
  *
  * Returns: (transfer none): The build options for this module's components.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdBuildopts *
 modulemd_build_config_get_buildopts (ModulemdBuildConfig *self);
-
-
-/**
- * modulemd_build_config_parse_yaml:
- * @parser: A #yaml_parser_t positioned at the start of a configuration
- * entry of a ModulemdPackager v3 YAML document.
- * @strict: Whether to ignore unknown keys in the YAML
- * @error: (out): A #GError explaining any failure to complete the parsing
- *
- * Returns: (transfer full): A newly-constructed #ModulemdBuildConfig object
- * populated from the data in the provided YAML. Returns NULL and sets @error
- * appropriately if the document couldn't be parsed successfully or failed
- * validation.
- *
- * Since: 2.10
- */
-ModulemdBuildConfig *
-modulemd_build_config_parse_yaml (yaml_parser_t *parser,
-                                  gboolean strict,
-                                  GError **error);
-
-
-/**
- * modulemd_build_config_emit_yaml:
- * @self: This #ModulemdBuildConfig object.
- * @emitter: (inout): A libyaml emitter object positioned where a BuidConfig
- * belongs in the YAML document.
- * @error: (out): A #GError that will return the reason for an emission or
- * validation error.
- *
- * Returns: TRUE if the BuildConfig was emitted successfully. FALSE and sets
- * @error appropriately if the YAML could not be emitted.
- *
- * Since: 2.10
- */
-gboolean
-modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
-                                 yaml_emitter_t *emitter,
-                                 GError **error);
 
 
 /**
@@ -328,12 +289,11 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
  * Returns: TRUE if validation passes. Returns FALSE and sets @error
  * appropriately on validation failure.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 
 gboolean
-modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
-                                GError **error);
+modulemd_build_config_validate (ModulemdBuildConfig *self, GError **error);
 
 
 /**
@@ -342,7 +302,7 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
  *
  * Returns: (transfer full): A deep copy of @self
  *
- * Since: 2.10
+ * Since: 2.11
  */
 ModulemdBuildConfig *
 modulemd_build_config_copy (ModulemdBuildConfig *self);
@@ -356,7 +316,7 @@ modulemd_build_config_copy (ModulemdBuildConfig *self);
  * Returns: TRUE, if @self_1 and @self_2 are pointers to #ModulemdBuildConfig
  * objects containing equivalent data. FALSE, otherwise.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 
 gboolean
@@ -372,7 +332,7 @@ modulemd_build_config_equals (ModulemdBuildConfig *self_1,
  * Returns: Less than zero if @self_1 sorts less than @self_2, zero for equal,
  * greater than zero if @self_1 is greater than @self_2.
  *
- * Since: 2.10
+ * Since: 2.11
  */
 gint
 modulemd_build_config_compare (ModulemdBuildConfig *self_1,

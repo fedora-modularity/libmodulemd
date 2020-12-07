@@ -154,6 +154,14 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
       return FALSE;
     }
 
+  /* Test the negations of static_context just in case somehow they are
+   * different non-zero values
+   */
+  if (!v2_self_1->static_context != !v2_self_2->static_context)
+    {
+      return FALSE;
+    }
+
   if (!modulemd_buildopts_equals (v2_self_1->buildopts, v2_self_2->buildopts))
     {
       return FALSE;

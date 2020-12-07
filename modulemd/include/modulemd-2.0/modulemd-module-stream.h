@@ -51,8 +51,6 @@ typedef struct _ModulemdModule ModulemdModule;
  * metadata format.
  * @MD_MODULESTREAM_VERSION_TWO: Represents v2 of the #ModulemdModuleStream
  * metadata format.
- * @MD_MODULESTREAM_VERSION_THREE: Represents v3 of the #ModulemdModuleStream
- * metadata format. Since: 2.10
  * @MD_MODULESTREAM_VERSION_LATEST: Represents the highest-supported version of
  * the #ModulemdModuleStream metadata format.
  *

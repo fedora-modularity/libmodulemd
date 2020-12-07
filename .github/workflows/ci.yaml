@@ -1,0 +1,23 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  Fedora_33:
+    # Name the Job
+    name: Fedora 33
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: setup-docker
+        uses: docker-practice/actions-setup-docker@v1
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        env:
+          DISTRO: Fedora 33
+        run: |
+          ./.travis/travis-fedora.sh

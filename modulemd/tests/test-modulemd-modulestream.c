@@ -2262,6 +2262,42 @@ module_stream_v2_test_equals (void)
   g_clear_object (&stream_1);
   g_clear_object (&stream_2);
   g_clear_object (&entry_1);
+
+  /* Test equality of 2 streams with same NSVC and static_context attributes */
+  stream_1 = modulemd_module_stream_v2_new ("name_1", "stream_1");
+  modulemd_module_stream_set_version (MODULEMD_MODULE_STREAM (stream_1), 11);
+  modulemd_module_stream_set_context (MODULEMD_MODULE_STREAM (stream_1),
+                                      "context_1");
+  modulemd_module_stream_v2_set_static_context (stream_1);
+
+  stream_2 = modulemd_module_stream_v2_new ("name_1", "stream_1");
+  modulemd_module_stream_set_version (MODULEMD_MODULE_STREAM (stream_2), 11);
+  modulemd_module_stream_set_context (MODULEMD_MODULE_STREAM (stream_2),
+                                      "context_1");
+  modulemd_module_stream_v2_set_static_context (stream_2);
+
+  g_assert_true (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
+
+  /* Test equality of 2 streams with same NSVC but different static_context attributes */
+  stream_1 = modulemd_module_stream_v2_new ("name_1", "stream_1");
+  modulemd_module_stream_set_version (MODULEMD_MODULE_STREAM (stream_1), 11);
+  modulemd_module_stream_set_context (MODULEMD_MODULE_STREAM (stream_1),
+                                      "context_1");
+  modulemd_module_stream_v2_set_static_context (stream_1);
+
+  stream_2 = modulemd_module_stream_v2_new ("name_1", "stream_1");
+  modulemd_module_stream_set_version (MODULEMD_MODULE_STREAM (stream_2), 11);
+  modulemd_module_stream_set_context (MODULEMD_MODULE_STREAM (stream_2),
+                                      "context_1");
+  modulemd_module_stream_v2_unset_static_context (stream_2);
+
+  g_assert_false (modulemd_module_stream_equals (
+    (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
+  g_clear_object (&stream_1);
+  g_clear_object (&stream_2);
 }
 
 

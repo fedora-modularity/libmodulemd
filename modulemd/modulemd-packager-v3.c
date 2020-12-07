@@ -1628,3 +1628,144 @@ modulemd_packager_v3_parse_module_components (yaml_parser_t *parser,
 
   return TRUE;
 }
+
+
+gboolean
+modulemd_packager_v3_emit_yaml (ModulemdPackagerV3 *self,
+                                yaml_emitter_t *emitter,
+                                GError **error)
+{
+  MODULEMD_INIT_TRACE ();
+  g_autoptr (GError) nested_error = NULL;
+  gsize i;
+  g_autoptr (GPtrArray) keys = NULL;
+  gboolean ret;
+
+  /* Emit document headers */
+  if (!modulemd_yaml_emit_document_headers (
+        emitter, MODULEMD_YAML_DOC_PACKAGER, MD_PACKAGER_VERSION_THREE, error))
+    {
+      return FALSE;
+    }
+
+  /* Start data: */
+  EMIT_MAPPING_START (emitter, error);
+
+  if (modulemd_packager_v3_get_module_name (self) != NULL)
+    {
+      EMIT_KEY_VALUE (
+        emitter, error, "name", modulemd_packager_v3_get_module_name (self));
+    }
+
+  if (modulemd_packager_v3_get_stream_name (self) != NULL)
+    {
+      EMIT_KEY_VALUE_FULL (emitter,
+                           error,
+                           "stream",
+                           modulemd_packager_v3_get_stream_name (self),
+                           YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+    }
+
+  EMIT_KEY_VALUE (
+    emitter, error, "summary", modulemd_packager_v3_get_summary (self));
+  EMIT_KEY_VALUE_FULL (emitter,
+                       error,
+                       "description",
+                       modulemd_packager_v3_get_description (self),
+                       YAML_FOLDED_SCALAR_STYLE);
+
+  if (NON_EMPTY_TABLE (self->module_licenses))
+    {
+      EMIT_STRING_SET (emitter, error, "license", self->module_licenses);
+    }
+
+  if (self->xmd != NULL)
+    {
+      EMIT_SCALAR (emitter, error, "xmd");
+      if (!modulemd_yaml_emit_variant (emitter, self->xmd, error))
+        {
+          return FALSE;
+        }
+    }
+
+  if (NON_EMPTY_TABLE (self->build_configs))
+    {
+      EMIT_SCALAR (emitter, error, "configurations");
+      EMIT_SEQUENCE_START (emitter, error);
+      keys =
+        modulemd_ordered_str_keys (self->build_configs, modulemd_strcmp_sort);
+      for (i = 0; i < keys->len; i++)
+        {
+          ret = modulemd_build_config_emit_yaml (
+            g_hash_table_lookup (self->build_configs,
+                                 g_ptr_array_index (keys, i)),
+            emitter,
+            error);
+          if (!ret)
+            {
+              return FALSE;
+            }
+        }
+      EMIT_SEQUENCE_END (emitter, error);
+    }
+
+
+  if (self->community || self->documentation || self->tracker)
+    {
+      EMIT_SCALAR (emitter, error, "references");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_KEY_VALUE_IF_SET (emitter, error, "community", self->community);
+      EMIT_KEY_VALUE_IF_SET (
+        emitter, error, "documentation", self->documentation);
+      EMIT_KEY_VALUE_IF_SET (emitter, error, "tracker", self->tracker);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  EMIT_HASHTABLE_VALUES_IF_NON_EMPTY (
+    emitter, error, "profiles", self->profiles, modulemd_profile_emit_yaml);
+
+  if (NON_EMPTY_TABLE (self->rpm_api))
+    {
+      EMIT_SCALAR (emitter, error, "api");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_STRING_SET (emitter, error, "rpms", self->rpm_api);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  if (NON_EMPTY_TABLE (self->rpm_filters))
+    {
+      EMIT_SCALAR (emitter, error, "filter");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_STRING_SET (emitter, error, "rpms", self->rpm_filters);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  if (NON_EMPTY_TABLE (self->rpm_components) ||
+      NON_EMPTY_TABLE (self->module_components))
+    {
+      EMIT_SCALAR (emitter, error, "components");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_HASHTABLE_VALUES_IF_NON_EMPTY (emitter,
+                                          error,
+                                          "rpms",
+                                          self->rpm_components,
+                                          modulemd_component_rpm_emit_yaml);
+      EMIT_HASHTABLE_VALUES_IF_NON_EMPTY (emitter,
+                                          error,
+                                          "modules",
+                                          self->module_components,
+                                          modulemd_component_module_emit_yaml);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  /* The "data" mapping */
+  EMIT_MAPPING_END (emitter, error);
+  /* The overall document mapping */
+  EMIT_MAPPING_END (emitter, error);
+  if (!mmd_emitter_end_document (emitter, error))
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}

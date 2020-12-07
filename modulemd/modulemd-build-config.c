@@ -15,7 +15,7 @@
 #include "modulemd-2.0/modulemd-errors.h"
 #include "modulemd-2.0/modulemd-module-stream.h"
 
-#include "private/modulemd-build-config.h"
+#include "private/modulemd-build-config-private.h"
 #include "private/modulemd-buildopts-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -587,15 +587,14 @@ modulemd_build_config_replace_buildtime_deps (ModulemdBuildConfig *self,
 
 
 gboolean
-modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
-                                GError **error)
+modulemd_build_config_validate (ModulemdBuildConfig *self, GError **error)
 {
   gsize i;
 
   /* Context must be present and be between 1 and MMD_MAXCONTEXTLEN
    * alphanumeric characters
    */
-  if (buildconfig->context == NULL || buildconfig->context[0] == '\0')
+  if (self->context == NULL || self->context[0] == '\0')
     {
       g_set_error (error,
                    MODULEMD_ERROR,
@@ -606,10 +605,10 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
 
   for (i = 0; i < MMD_MAXCONTEXTLEN; i++)
     {
-      if (buildconfig->context[i] == '\0')
+      if (self->context[i] == '\0')
         break;
 
-      if (!(g_ascii_isalnum (buildconfig->context[i])))
+      if (!(g_ascii_isalnum (self->context[i])))
         {
           g_set_error (error,
                        MODULEMD_ERROR,
@@ -619,7 +618,7 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
         }
     }
 
-  if (buildconfig->context[i] != '\0')
+  if (self->context[i] != '\0')
     {
       /* We passed the maximum length without encountering a
        * NULL-terminator
@@ -636,7 +635,7 @@ modulemd_build_config_validate (ModulemdBuildConfig *buildconfig,
    * not currently defined in the specification.
    */
 
-  if (!buildconfig->platform)
+  if (!self->platform)
     {
       g_set_error (error,
                    MODULEMD_ERROR,

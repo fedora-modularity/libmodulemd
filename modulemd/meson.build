@@ -93,6 +93,7 @@ modulemd_validator_srcs = files (
 
 modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd.h',
+    'include/modulemd-2.0/modulemd-build-config.h',
     'include/modulemd-2.0/modulemd-buildopts.h',
     'include/modulemd-2.0/modulemd-component.h',
     'include/modulemd-2.0/modulemd-component-module.h',
@@ -109,6 +110,7 @@ modulemd_hdrs = files(
     'include/modulemd-2.0/modulemd-module-stream.h',
     'include/modulemd-2.0/modulemd-module-stream-v1.h',
     'include/modulemd-2.0/modulemd-module-stream-v2.h',
+    'include/modulemd-2.0/modulemd-packager-v3.h',
     'include/modulemd-2.0/modulemd-profile.h',
     'include/modulemd-2.0/modulemd-rpm-map-entry.h',
     'include/modulemd-2.0/modulemd-service-level.h',
@@ -120,7 +122,7 @@ modulemd_hdrs = files(
 
 modulemd_priv_hdrs = files(
     'include/private/glib-extensions.h',
-    'include/private/modulemd-build-config.h',
+    'include/private/modulemd-build-config-private.h',
     'include/private/modulemd-buildopts-private.h',
     'include/private/modulemd-component-private.h',
     'include/private/modulemd-component-module-private.h',
@@ -135,7 +137,7 @@ modulemd_priv_hdrs = files(
     'include/private/modulemd-module-stream-private.h',
     'include/private/modulemd-module-stream-v1-private.h',
     'include/private/modulemd-module-stream-v2-private.h',
-    'include/private/modulemd-packager-v3.h',
+    'include/private/modulemd-packager-v3-private.h',
     'include/private/modulemd-service-level-private.h',
     'include/private/modulemd-subdocument-info-private.h',
     'include/private/modulemd-translation-private.h',

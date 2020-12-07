@@ -17,7 +17,7 @@
 #include <signal.h>
 
 #include "private/glib-extensions.h"
-#include "private/modulemd-build-config.h"
+#include "private/modulemd-build-config-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
 

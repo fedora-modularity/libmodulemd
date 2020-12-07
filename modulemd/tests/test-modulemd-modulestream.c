@@ -20,7 +20,7 @@
 #include "modulemd-module-index.h"
 #include "modulemd-module-stream.h"
 #include "private/glib-extensions.h"
-#include "private/modulemd-build-config.h"
+#include "private/modulemd-build-config-private.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"

@@ -35,7 +35,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
-#include "private/modulemd-packager-v3.h"
+#include "private/modulemd-packager-v3-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-obsoletes-private.h"

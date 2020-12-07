@@ -17,7 +17,6 @@ skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
 developer_build = get_option('developer_build')
 verbose_tests = get_option('verbose_tests')
-default_stream_mdversion = get_option('default_stream_mdversion')
 
 if not developer_build
     skip_formatters = true
@@ -169,7 +168,6 @@ enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_hdrs)
 
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
-cdata.set('DEFAULT_STREAM_MDVERSION', default_stream_mdversion)
 cdata.set('HAVE_RPMIO', rpm.found())
 cdata.set('HAVE_LIBMAGIC', magic.found())
 cdata.set('HAVE_GDATE_AUTOPTR', has_gdate_autoptr)

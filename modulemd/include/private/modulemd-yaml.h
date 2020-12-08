@@ -42,7 +42,7 @@ G_BEGIN_DECLS
  * @MODULEMD_YAML_DOC_TRANSLATIONS: Represents a `modulemd-translations` (see
  * #ModulemdTranslation) YAML document type.
  * @MODULEMD_YAML_DOC_PACKAGER: Represents a `modulemd-packager` document.
- * V2 is a subset of #ModuleStreamV2 containing only the attributes that a
+ * V2 is a subset of #ModulemdModuleStreamV2 containing only the attributes that a
  * package maintainer should modify. V3 (see #ModulemdPackagerV3) is a new YAML
  * document type. Since: 2.9
  * @MODULEMD_YAML_DOC_OBSOLETES: Represents a `modulemd-obsoletes` document (see
@@ -791,7 +791,7 @@ modulemd_yaml_parse_string_string_map (yaml_parser_t *parser, GError **error);
  * validation error.
  *
  * Function for retrieving a hash table from a str/string-set map such as
- * data.dependencies in ModuleStreamV2.
+ * data.dependencies in #ModulemdModuleStreamV2.
  *
  * Returns: (transfer full): A newly-allocated #GHashTable * representing the
  * parsed values. NULL if a parse error occurred and sets @error appropriately.

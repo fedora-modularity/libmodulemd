@@ -137,16 +137,14 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 /* Some macros used for copy operations */
 /**
  * STREAM_UPGRADE_IF_SET_FULL:
- * @oldversion: The stream version of @src. Must be literal "v1", "v2", or "v3"
+ * @oldversion: The stream version of @src. Must be literal "v1" or "v2"
  * without the quotes.
- * @newversion: The stream version of @dest. Must be literal "v1", "v2", or "v3"
+ * @newversion: The stream version of @dest. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the property to copy. Must be the literal property
  * name, in lower case, without quotes.
  * @locale...: (in): An optional locale that can be provided when @property has
@@ -158,8 +156,8 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
  * which should be used instead.
  *
  * This is a helper macro to simplify the coding when copying/upgrading
- * properties between #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects.
+ * properties between #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2
+ * objects.
  *
  * Does nothing if the @src @property is NULL.
  *
@@ -180,14 +178,12 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * STREAM_COPY_IF_SET:
- * @version: The stream version being copied. Must be literal "v1", "v2", or "v3"
+ * @version: The stream version being copied. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the property to copy. Must be the literal property
  * name, in lower case, without quotes.
  *
@@ -204,22 +200,20 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * STREAM_UPGRADE_IF_SET:
- * @oldversion: The stream version of @src. Must be literal "v1", "v2", or "v3"
+ * @oldversion: The stream version of @src. Must be literal "v1" or "v2"
  * without the quotes.
- * @newversion: The stream version of @dest. Must be literal "v1", "v2", or "v3"
+ * @newversion: The stream version of @dest. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the property to copy. Must be the literal property
  * name, in lower case, without quotes.
  *
  * This is a convenience macro to simplify the coding when copying properties
- * between #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects when @src and @dest are different versions.
+ * between #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects when
+ * @src and @dest are different versions.
  *
  * Does nothing if the @src @property is NULL.
  *
@@ -230,22 +224,20 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * STREAM_COPY_IF_SET_WITH_LOCALE:
- * @version: The stream version being copied. Must be literal "v1", "v2", or "v3"
+ * @version: The stream version being copied. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the property to copy. Must be the literal property
  * name, in lower case, without quotes.
  *
  * This is a convenience macro to simplify the coding when copying properties
- * between #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects when both @src and @dest are the same version
- * and @property has possible translations. Only the untranslated (`"C"` locale)
- * version of @property will be copied.
+ * between #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects when
+ * both @src and @dest are the same version and @property has possible
+ * translations. Only the untranslated (`"C"` locale) version of @property will
+ * be copied.
  *
  * Does nothing if the @src @property is NULL.
  *
@@ -256,24 +248,22 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * STREAM_UPGRADE_IF_SET_WITH_LOCALE:
- * @oldversion: The stream version of @src. Must be literal "v1", "v2", or "v3"
+ * @oldversion: The stream version of @src. Must be literal "v1" or "v2"
  * without the quotes.
- * @newversion: The stream version of @dest. Must be literal "v1", "v2", or "v3"
+ * @newversion: The stream version of @dest. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the property to copy. Must be the literal property
  * name, in lower case, without quotes.
  *
  * This is a convenience macro to simply the coding when copying properties
- * between #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects when @src and @dest are different versions
- * and @property has possible translations. Only the untranslated (`"C"` locale)
- * version of @property will be copied.
+ * between #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects when
+ * @src and @dest are different versions and @property has possible
+ * translations. Only the untranslated (`"C"` locale) version of @property will
+ * be copied.
  *
  * Does nothing if the @src @property is NULL.
  *
@@ -285,21 +275,18 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * STREAM_REPLACE_HASHTABLE:
- * @version: The stream version being replaced. Must be literal "v1", "v2", or "v3"
+ * @version: The stream version being replaced. Must be literal "v1" or "v2"
  * without the quotes.
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination at which @property is
- * being replaced.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is
- * being replaced.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination at which @property is being replaced.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is being replaced.
  * @property: The name of the #GHashTable property to replace. Must be the
  * literal property name, in lower case, without quotes.
  *
  * This is a convenience macro to simply the coding when replacing #GHashTable
- * properties of #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects when both @src and @dest are the same
- * version.
+ * properties of #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects
+ * when both @src and @dest are the same version.
  *
  * Since: 2.0
  */
@@ -313,21 +300,18 @@ modulemd_module_stream_validate_component_rpm_arches (GHashTable *components,
 
 /**
  * COPY_HASHTABLE_BY_VALUE_ADDER:
- * @dest: (out): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the destination to which @property is
- * to be copied.
- * @src: (in): A #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, or
- * #ModulemdModuleStreamV3 object that is the source from which @property is to
- * be copied.
+ * @dest: (out): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object
+ * that is the destination to which @property is to be copied.
+ * @src: (in): A #ModulemdModuleStreamV1 or #ModulemdModuleStreamV2 object that
+ * is the source from which @property is to be copied.
  * @property: The name of the #GHashTable property to copy. Must be the literal
  * property name, in lower case, without quotes.
  * @adder: (in): A pointer to a method of @dest that supports add-on property
  * values.
  *
  * This is a convenience macro to simply the coding when copying #GHashTable
- * properties between #ModulemdModuleStreamV1, #ModulemdModuleStreamV2, and
- * #ModulemdModuleStreamV3 objects when the property is set by using add-on
- * values.
+ * properties between #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2
+ * objects when the property is set by using add-on values.
  *
  * Since: 2.0
  */

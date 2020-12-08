@@ -39,7 +39,7 @@ G_DECLARE_FINAL_TYPE (
 /**
  * MMD_PACKAGER_DEFAULT_MODULE_LICENSE:
  *
- * The ModulePackager v3 default module metadata license.
+ * The #ModulemdPackagerV3 default module metadata license.
  *
  * Since: 2.11
  */
@@ -50,12 +50,12 @@ G_DECLARE_FINAL_TYPE (
  * @MD_PACKAGER_VERSION_ERROR: Represents an error handling module stream
  * version.
  * @MD_PACKAGER_VERSION_UNSET: Represents an unset module stream version.
- * @MD_PACKAGER_VERSION_TWO: Represents v2 of the #ModulemdPackager
+ * @MD_PACKAGER_VERSION_TWO: Represents v2 of the ModulePackager
  * metadata format. Since: 2.11
- * @MD_PACKAGER_VERSION_THREE: Represents v3 of the #ModulemdPackager
+ * @MD_PACKAGER_VERSION_THREE: Represents v3 of the ModulePackager
  * metadata format. Since: 2.11
  * @MD_PACKAGER_VERSION_LATEST: Represents the highest-supported version of
- * the #ModulemdPackager metadata format.
+ * the ModulePackager metadata format.
  *
  * Since: 2.11
  */
@@ -86,6 +86,7 @@ modulemd_packager_v3_new (void);
 
 /**
  * modulemd_packager_v3_copy:
+ * @self: This #ModulemdPackagerV3 object.
  *
  * Returns: (transfer full): A newly-allocated deep-copy of this
  * #ModulemdPackagerV3 object. This object must be freed with g_object_unref().

@@ -32,22 +32,18 @@ G_BEGIN_DECLS
  * This object provides an interface to the complete metadata read from a
  * repository or manually added to this object.
  *
- * NOTE: When adding or updating this object from YAML, all
- * #ModulemdModuleStream will be automatically upgraded to match the stream
- * mdversion set for the index, and all #ModulemdDefaults objects imported will
- * be automatically upgraded to match the highest version of that object that
- * has been previously seen. This means, for example, that if the repository
- * has a mix of #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects,
- * and the index's stream mdversion is set to V2, the index will contain only
- * #ModulemdModuleStreamV2. You can check the versions the index upgraded to
- * with the modulemd_module_index_get_stream_mdversion() and
+ * NOTE: When adding or updating this object from YAML, all objects imported
+ * will be automatically upgraded to match the highest version of that object
+ * that is seen. This means that if the repository has a mix of
+ * #ModulemdModuleStreamV1 and #ModulemdModuleStreamV2 objects, the index will
+ * contain only #ModulemdModuleStreamV2. You can check the versions the index
+ * upgraded to with the modulemd_module_index_get_stream_mdversion() and
  * modulemd_module_index_get_defaults_mdversion(). If your application would
  * prefer to always work with a particular stream or defaults version (such as
- * to avoid extra branching logic), modulemd_set_default_stream_mdversion() can
- * be used before creating the index to force #ModulemdModuleStream objects to
- * be upgraded to the desired stream mdversion and
- * modulemd_module_index_upgrade_defaults() function can be used to force the
- * contents of the index to upgrade #ModulemdDefaults to the specified version.
+ * to avoid extra branching logic), the modulemd_module_index_upgrade_streams()
+ * and modulemd_module_index_upgrade_defaults() functions can be used to force
+ * the contents of the index to upgrade to those versions.
+ *
  * Interacting with #ModulemdModuleIndex is relatively simple. A common Python
  * example for working with Fedora repodata might be (assuming the metadata has
  * already been read into strings):

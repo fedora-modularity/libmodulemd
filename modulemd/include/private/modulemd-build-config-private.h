@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 /**
  * modulemd_build_config_parse_yaml:
  * @parser: A #yaml_parser_t positioned at the start of a configuration
- * entry of a ModulemdPackager v3 YAML document.
+ * entry of a #ModulemdPackagerV3 YAML document.
  * @strict: Whether to ignore unknown keys in the YAML
  * @error: (out): A #GError explaining any failure to complete the parsing
  *

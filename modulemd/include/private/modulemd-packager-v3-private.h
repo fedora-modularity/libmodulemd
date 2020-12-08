@@ -113,9 +113,9 @@ modulemd_packager_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
 /**
  * modulemd_packager_v3_emit_yaml:
- * @self: This #ModulemdModulePackagerV3 object.
+ * @self: This #ModulemdPackagerV3 object.
  * @emitter: (inout): A libyaml emitter object positioned where the data
- * section of a #ModulemdModulePackagerV3 belongs in the YAML document.
+ * section of a #ModulemdPackagerV3 belongs in the YAML document.
  * @error: (out): A #GError that will return the reason for an emission or
  * validation error.
  *

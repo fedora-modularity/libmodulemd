@@ -334,12 +334,50 @@ modulemd_load_file (const gchar *yaml_file, GError **error);
  * functions.
  *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
- * initialized with the content from @yaml_file. Returns NULL and sets @error
+ * initialized with the content from @yaml_string. Returns NULL and sets @error
  * if the metadata is not completely valid.
  *
  * Since: 2.10
  */
 ModulemdModuleIndex *
 modulemd_load_string (const gchar *yaml_string, GError **error);
+
+/**
+ * modulemd_read_packager_file:
+ * @yaml_path: (in): A path to a YAML file containing a packager document.
+ * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
+ * #ModulemdPackagerV3 object initialized with the content from @yaml_path.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: @MODULEMD_TYPE_MODULE_STREAM_V2, @MODULEMD_TYPE_PACKAGER_V3, or
+ * @G_TYPE_INVALID. Returns the matching GObject through the @object parameter.
+ * If the return value is @G_TYPE_INVALID, returns the reason as @error.
+ *
+ * Since: 2.11
+ */
+GType
+modulemd_read_packager_file (const gchar *yaml_path,
+                             GObject **object,
+                             GError **error);
+
+/**
+ * modulemd_read_packager_string:
+ * @yaml_string: (in): A YAML string containing a packager document.
+ * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
+ * #ModulemdPackagerV3 object initialized with the content from @yaml_string.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: @MODULEMD_TYPE_MODULE_STREAM_V2, @MODULEMD_TYPE_PACKAGER_V3, or
+ * @G_TYPE_INVALID. Returns the matching GObject through the @object parameter.
+ * If the return value is @G_TYPE_INVALID, returns the reason as @error.
+ *
+ * Since: 2.11
+ */
+GType
+modulemd_read_packager_string (const gchar *yaml_string,
+                               GObject **object,
+                               GError **error);
 
 G_END_DECLS

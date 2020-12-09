@@ -24,6 +24,7 @@
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-packager-v3-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
@@ -254,6 +255,38 @@ modulemd_module_stream_read_yaml (yaml_parser_t *parser,
       if (!stream)
         {
           g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+      break;
+
+    case MD_PACKAGER_VERSION_THREE:
+      if (doctype == MODULEMD_YAML_DOC_PACKAGER)
+        {
+          packager_v3 =
+            modulemd_packager_v3_parse_yaml (subdoc, &nested_error);
+          if (!packager_v3)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+
+          stream = MODULEMD_MODULE_STREAM (
+            modulemd_packager_v3_to_stream_v2 (packager_v3, &nested_error));
+          if (!stream)
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return NULL;
+            }
+
+          g_clear_object (&packager_v3);
+        }
+      else
+        {
+          g_set_error (error,
+                       MODULEMD_YAML_ERROR,
+                       MMD_YAML_ERROR_PARSE,
+                       "Invalid ModuleStream version: %" PRIu64,
+                       modulemd_subdocument_info_get_mdversion (subdoc));
           return NULL;
         }
       break;

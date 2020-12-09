@@ -307,7 +307,10 @@ modulemd_module_stream_v2_set_buildopts (ModulemdModuleStreamV2 *self,
   g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
 
   g_clear_object (&self->buildopts);
-  self->buildopts = modulemd_buildopts_copy (buildopts);
+  if (buildopts)
+    {
+      self->buildopts = modulemd_buildopts_copy (buildopts);
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILDOPTS]);
 }

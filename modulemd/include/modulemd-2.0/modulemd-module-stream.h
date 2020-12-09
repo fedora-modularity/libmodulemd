@@ -138,6 +138,13 @@ modulemd_module_stream_new (guint64 mdversion,
  *
  * Create a #ModulemdModuleStream object from a YAML file.
  *
+ * Note: This function also reads modulemd-packager v2 and v3 documents, which
+ * are transparently returned as #ModulemdModuleStream (V2) objects. However,
+ * if a modulemd-packager v3 document (#ModulemdPackagerV3) is encountered and
+ * it uses buildopts (#ModulemdBuildopts) in one or more build configurations,
+ * only the buildopts present in the first listed configuration (if any) will be
+ * applied to the returned #ModulemdModuleStreamV2 object.
+ *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleStream object if
  * the YAML file was valid and contained exactly one `document: modulemd`
  * subdocument. NULL if the document fails validation or multiple documents are
@@ -145,7 +152,9 @@ modulemd_module_stream_new (guint64 mdversion,
  * functions to read in multiple-subdocument YAML.
  *
  * Since: 2.0
+ * Deprecated: 2.11: Use modulemd_read_packager_file() instead.
  */
+MMD_DEPRECATED_FOR (modulemd_read_packager_file)
 ModulemdModuleStream *
 modulemd_module_stream_read_file (const gchar *path,
                                   gboolean strict,
@@ -170,6 +179,13 @@ modulemd_module_stream_read_file (const gchar *path,
  *
  * Create a #ModulemdModuleStream object from a YAML string.
  *
+ * Note: This function also reads modulemd-packager v2 and v3 documents, which
+ * are transparently returned as #ModulemdModuleStream (V2) objects. However,
+ * if a modulemd-packager v3 document (#ModulemdPackagerV3) is encountered and
+ * it uses buildopts (#ModulemdBuildopts) in one or more build configurations,
+ * only the buildopts present in the first listed configuration (if any) will be
+ * applied to the returned #ModulemdModuleStreamV2 object.
+ *
  * Returns: (transfer full): A newly-allocated #ModulemdModuleStream object if
  * the YAML string was valid and contained exactly one `document: modulemd`
  * subdocument. NULL if the document fails validation or multiple documents are
@@ -177,7 +193,9 @@ modulemd_module_stream_read_file (const gchar *path,
  * functions to read in multiple-subdocument YAML.
  *
  * Since: 2.0
+ * Deprecated: 2.11: Use modulemd_read_packager_string() instead.
  */
+MMD_DEPRECATED_FOR (modulemd_read_packager_string)
 ModulemdModuleStream *
 modulemd_module_stream_read_string (const gchar *yaml_string,
                                     gboolean strict,

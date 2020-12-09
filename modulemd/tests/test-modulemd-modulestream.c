@@ -652,6 +652,7 @@ module_stream_test_v2_yaml (void)
 
   GPtrArray *dependencies = NULL;
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_string (
     "---\n"
     "document: modulemd\n"
@@ -794,6 +795,7 @@ module_stream_test_v2_yaml (void)
     NULL,
     NULL,
     &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   g_assert_no_error (error);
 
@@ -1007,6 +1009,7 @@ module_stream_test_v2_yaml (void)
 
 
   // Validate a trivial modulemd
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_string (
     "---\n"
     "document: modulemd\n"
@@ -1022,6 +1025,7 @@ module_stream_test_v2_yaml (void)
     NULL,
     NULL,
     &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   g_assert_no_error (error);
   g_assert_nonnull (stream);
@@ -1032,8 +1036,10 @@ module_stream_test_v2_yaml (void)
   // Sanity check spec.v2.yaml
   gchar *specV2Path = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
                                        g_getenv ("MESON_SOURCE_ROOT"));
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream =
     modulemd_module_stream_read_file (specV2Path, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   g_assert_no_error (error);
   g_assert_nonnull (stream);
@@ -1051,13 +1057,38 @@ module_packager_v2_sanity (void)
 
   g_autofree gchar *specV2Path = g_strdup_printf (
     "%s/yaml_specs/modulemd_packager_v2.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream =
     modulemd_module_stream_read_file (specV2Path, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_no_error (error);
   g_assert_nonnull (stream);
 
   g_clear_object (&stream);
   g_clear_pointer (&specV2Path, g_free);
+}
+
+
+static void
+module_packager_v3_sanity (void)
+{
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  g_autoptr (GError) error = NULL;
+
+  g_autofree gchar *packagerV3Path = g_strdup_printf (
+    "%s/yaml_specs/modulemd_packager_v3.yaml", g_getenv ("MESON_SOURCE_ROOT"));
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+  stream = modulemd_module_stream_read_file (
+    packagerV3Path, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
+  g_assert_no_error (error);
+  g_assert_nonnull (stream);
+
+  /* confirm packager v3 document was returned as stream v2 */
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (stream));
+
+  g_clear_object (&stream);
+  g_clear_pointer (&packagerV3Path, g_free);
 }
 
 
@@ -2753,8 +2784,10 @@ module_stream_v1_test_depends_on_stream (void)
 
   path = g_strdup_printf ("%s/dependson_v1.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_file (
     path, TRUE, module_name, module_stream, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_nonnull (stream);
 
   g_assert_true (
@@ -2785,8 +2818,10 @@ module_stream_v2_test_depends_on_stream (void)
 
   path = g_strdup_printf ("%s/dependson_v2.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_file (
     path, TRUE, module_name, module_stream, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_nonnull (stream);
 
   g_assert_true (
@@ -2826,8 +2861,10 @@ module_stream_test_validate_buildafter (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_null (error);
       g_clear_pointer (&path, g_free);
@@ -2841,8 +2878,10 @@ module_stream_test_validate_buildafter (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
       g_assert_null (stream);
       g_clear_error (&error);
@@ -2856,8 +2895,10 @@ module_stream_test_validate_buildafter (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
       g_assert_null (stream);
       g_clear_error (&error);
@@ -2870,8 +2911,10 @@ module_stream_test_validate_buildafter (void)
                               g_getenv ("TEST_DATA_PATH"),
                               version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
       g_assert_null (stream);
       g_clear_error (&error);
@@ -2901,8 +2944,10 @@ module_stream_test_validate_buildarches (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_null (error);
       g_clear_pointer (&path, g_free);
@@ -2916,8 +2961,10 @@ module_stream_test_validate_buildarches (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_null (error);
       g_clear_pointer (&path, g_free);
@@ -2931,8 +2978,10 @@ module_stream_test_validate_buildarches (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_null (error);
       g_clear_pointer (&path, g_free);
@@ -2946,8 +2995,10 @@ module_stream_test_validate_buildarches (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_null (error);
       g_clear_pointer (&path, g_free);
@@ -2961,8 +3012,10 @@ module_stream_test_validate_buildarches (void)
                          g_getenv ("TEST_DATA_PATH"),
                          version);
       g_assert_nonnull (path);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
       g_assert_null (stream);
       g_clear_error (&error);
@@ -3014,8 +3067,10 @@ module_stream_test_unicode_desc (void)
                               version);
       g_assert_nonnull (path);
 
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
       stream =
         modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+      G_GNUC_END_IGNORE_DEPRECATIONS
       g_assert_nonnull (stream);
       g_assert_no_error (error);
       g_clear_object (&stream);
@@ -3038,7 +3093,9 @@ module_stream_v1_test_xmd_issue_274 (void)
     g_strdup_printf ("%s/stream_unicode_v1.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_nonnull (stream);
   g_assert_no_error (error);
   g_assert_cmpint (modulemd_module_stream_get_mdversion (stream),
@@ -3134,7 +3191,9 @@ module_stream_v2_test_xmd_issue_290_with_example (void)
 
   path = g_strdup_printf ("%s/290.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (path);
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_file (path, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_nonnull (stream);
   g_assert_no_error (error);
 
@@ -3279,8 +3338,10 @@ module_stream_v1_regression_content_license (void)
     "    - bar\n"
     "...\n";
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   stream = modulemd_module_stream_read_string (
     content_first, TRUE, NULL, NULL, &error);
+  G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_no_error (error);
   g_assert_nonnull (stream);
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V1 (stream));
@@ -3395,6 +3456,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/packager/v2_sanity",
                    module_packager_v2_sanity);
+
+  g_test_add_func ("/modulemd/v2/packager/v3_sanity",
+                   module_packager_v3_sanity);
 
   g_test_add_func ("/modulemd/v2/modulestream/upgrade_v1_to_v2",
                    module_stream_test_upgrade_v1_to_v2);

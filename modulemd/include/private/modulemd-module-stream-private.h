@@ -449,4 +449,21 @@ modulemd_module_stream_clear_autogen_module_name (ModulemdModuleStream *self);
 void
 modulemd_module_stream_clear_autogen_stream_name (ModulemdModuleStream *self);
 
+/**
+ * modulemd_module_stream_upgrade_v1_to_v2:
+ * @from (in): A #ModulemdModuleStreamV1 object.
+ * @error: (out): A #GError that will return the reason for an upgrade error.
+ *
+ * Return an upgraded copy of this object. Does not modify the original.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleStreamV2 copy of
+ * @from upgraded to V2. Returns NULL and sets @error appropriately if the
+ * upgrade could not be completed automatically.
+ *
+ * Since: 2.11
+ */
+ModulemdModuleStream *
+modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from);
+
+
 G_END_DECLS

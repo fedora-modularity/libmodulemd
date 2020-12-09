@@ -461,9 +461,6 @@ modulemd_module_stream_copy (ModulemdModuleStream *self,
 }
 
 
-static ModulemdModuleStream *
-modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from);
-
 ModulemdModuleStream *
 modulemd_module_stream_upgrade (ModulemdModuleStream *self,
                                 guint64 mdversion,
@@ -651,7 +648,7 @@ modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
 }
 
 
-static ModulemdModuleStream *
+ModulemdModuleStream *
 modulemd_module_stream_upgrade_v1_to_v2 (ModulemdModuleStream *from)
 {
   ModulemdModuleStreamV1 *v1_stream = NULL;

@@ -470,6 +470,48 @@ packager_test_map_to_stream_v2 (void)
   g_clear_pointer (&expected_str, g_free);
 }
 
+
+static void
+packager_test_convert_to_index (void)
+{
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *yaml_str = NULL;
+  g_autofree gchar *expected_path = NULL;
+  g_autofree gchar *expected_str = NULL;
+
+  packager = read_spec ();
+
+  index = modulemd_packager_v3_convert_to_index (packager, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (index);
+  g_assert_true (MODULEMD_IS_MODULE_INDEX (index));
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (yaml_str);
+
+  g_debug ("YAML dump of index from PackageV3 to Index mapping:\n%s",
+           yaml_str);
+
+  expected_path = g_strdup_printf ("%s/upgrades/packager_v3_to_index.yaml",
+                                   g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (expected_path);
+  g_assert_true (
+    g_file_get_contents (expected_path, &expected_str, NULL, &error));
+  g_assert_no_error (error);
+  g_assert_nonnull (expected_str);
+
+  g_assert_cmpstr (expected_str, ==, yaml_str);
+
+  g_clear_object (&index);
+  g_clear_pointer (&yaml_str, g_free);
+  g_clear_pointer (&expected_path, g_free);
+  g_clear_pointer (&expected_str, g_free);
+}
+
+
 static void
 packager_test_map_to_stream_v2_autoname (void)
 {
@@ -632,6 +674,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/packager/index/read",
                    packager_test_read_to_index);
+
+  g_test_add_func ("/modulemd/v2/packager/to_index",
+                   packager_test_convert_to_index);
 
   return g_test_run ();
 }

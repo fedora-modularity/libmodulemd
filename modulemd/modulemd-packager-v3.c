@@ -983,6 +983,198 @@ modulemd_packager_v3_to_stream_v2_ext (ModulemdPackagerV3 *self,
 }
 
 
+ModulemdModuleIndex *
+modulemd_packager_v3_convert_to_index (ModulemdPackagerV3 *self,
+                                       GError **error)
+{
+  g_auto (GStrv) contexts = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdModuleStreamV2) v2_stream = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+  g_autoptr (ModulemdDependencies) deps = NULL;
+  g_autoptr (ModulemdDefaults) defaults = NULL;
+  g_auto (GStrv) modules = NULL;
+  g_autoptr (GError) nested_error = NULL;
+  ModulemdBuildConfig *bc;
+  GHashTableIter iter;
+  gpointer value;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (MODULEMD_IS_PACKAGER_V3 (self), NULL);
+
+  /* get the list of packager build configuration contexts */
+  contexts = modulemd_packager_v3_get_build_config_contexts_as_strv (self);
+
+  if (g_strv_length (contexts) == 0)
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_VALIDATE,
+                           "Packager document with no build configurations "
+                           "cannot be converted to stream");
+      return NULL;
+    }
+
+  /* create a ModuleIndex to contain the results */
+  index = modulemd_module_index_new ();
+
+  /* create a StreamV2 object for each BuildConfig object */
+  for (guint i = 0; i < g_strv_length (contexts); i++)
+    {
+      bc = modulemd_packager_v3_get_build_config (self, contexts[i]);
+
+      v2_stream = modulemd_module_stream_v2_new (
+        modulemd_packager_v3_get_module_name (self),
+        modulemd_packager_v3_get_stream_name (self));
+
+      modulemd_module_stream_set_context (MODULEMD_MODULE_STREAM (v2_stream),
+                                          contexts[i]);
+
+      /* set attributes that are the same for all streams */
+
+      modulemd_module_stream_v2_set_summary (
+        v2_stream, modulemd_packager_v3_get_summary (self));
+
+      modulemd_module_stream_v2_set_description (
+        v2_stream, modulemd_packager_v3_get_description (self));
+
+      /* Packager v3 "license" is optional. Stream v2 "license" is required
+       * Fill in the default Packager v3 license if none has been specified.
+       */
+      if (g_hash_table_size (self->module_licenses) == 0)
+        {
+          modulemd_module_stream_v2_add_module_license (
+            v2_stream, MMD_PACKAGER_DEFAULT_MODULE_LICENSE);
+        }
+      else
+        {
+          MODULEMD_REPLACE_SET (v2_stream->module_licenses,
+                                self->module_licenses);
+        }
+
+      modulemd_module_stream_v2_set_xmd (v2_stream,
+                                         modulemd_packager_v3_get_xmd (self));
+
+      modulemd_module_stream_v2_set_community (
+        v2_stream, modulemd_packager_v3_get_community (self));
+
+      modulemd_module_stream_v2_set_documentation (
+        v2_stream, modulemd_packager_v3_get_documentation (self));
+
+      modulemd_module_stream_v2_set_tracker (
+        v2_stream, modulemd_packager_v3_get_tracker (self));
+
+      g_hash_table_iter_init (&iter, self->profiles);
+      while (g_hash_table_iter_next (&iter, NULL, &value))
+        {
+          profile = modulemd_profile_copy (MODULEMD_PROFILE (value));
+          modulemd_profile_unset_default (profile);
+          modulemd_module_stream_v2_add_profile (v2_stream, profile);
+          g_clear_object (&profile);
+        }
+
+      modulemd_module_stream_v2_replace_rpm_api (v2_stream, self->rpm_api);
+
+      modulemd_module_stream_v2_replace_rpm_filters (v2_stream,
+                                                     self->rpm_filters);
+
+      COPY_HASHTABLE_BY_VALUE_ADDER (v2_stream,
+                                     self,
+                                     rpm_components,
+                                     modulemd_module_stream_v2_add_component);
+
+      COPY_HASHTABLE_BY_VALUE_ADDER (v2_stream,
+                                     self,
+                                     module_components,
+                                     modulemd_module_stream_v2_add_component);
+
+
+      /* set attributes that are the unique per build configuration */
+
+      if (modulemd_build_config_get_buildopts (bc))
+        {
+          modulemd_module_stream_v2_set_buildopts (
+            v2_stream, modulemd_build_config_get_buildopts (bc));
+        }
+
+      deps = modulemd_dependencies_new ();
+
+      modulemd_dependencies_add_buildtime_stream (
+        deps, "platform", modulemd_build_config_get_platform (bc));
+      modulemd_dependencies_add_runtime_stream (
+        deps, "platform", modulemd_build_config_get_platform (bc));
+
+      modules = modulemd_build_config_get_buildtime_modules_as_strv (bc);
+      for (guint j = 0; j < g_strv_length (modules); j++)
+        {
+          modulemd_dependencies_add_buildtime_stream (
+            deps,
+            modules[j],
+            modulemd_build_config_get_buildtime_requirement_stream (
+              bc, modules[j]));
+        }
+      g_clear_pointer (&modules, g_strfreev);
+
+      modules = modulemd_build_config_get_runtime_modules_as_strv (bc);
+      for (guint j = 0; j < g_strv_length (modules); j++)
+        {
+          modulemd_dependencies_add_runtime_stream (
+            deps,
+            modules[j],
+            modulemd_build_config_get_runtime_requirement_stream (bc,
+                                                                  modules[j]));
+        }
+      g_clear_pointer (&modules, g_strfreev);
+
+      modulemd_module_stream_v2_add_dependencies (v2_stream, deps);
+      g_clear_object (&deps);
+
+      if (!modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (v2_stream),
+                                            &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+
+      /* autogen module/stream names if necessary for adding to index */
+
+      modulemd_module_stream_set_autogen_module_name (
+        MODULEMD_MODULE_STREAM (v2_stream), 0);
+      modulemd_module_stream_set_autogen_stream_name (
+        MODULEMD_MODULE_STREAM (v2_stream), 0);
+
+      if (!modulemd_module_index_add_module_stream (
+            index, MODULEMD_MODULE_STREAM (v2_stream), &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+
+      g_clear_object (&v2_stream);
+    }
+  g_clear_pointer (&contexts, g_strfreev);
+
+  if (!modulemd_packager_v3_to_defaults (self, &defaults, &nested_error))
+    {
+      g_propagate_error (error, g_steal_pointer (&nested_error));
+      return NULL;
+    }
+
+  if (defaults)
+    {
+      if (!modulemd_module_index_add_defaults (index, defaults, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
+
+      g_clear_object (&defaults);
+    }
+
+  return g_steal_pointer (&index);
+}
+
+
 static gboolean
 modulemd_packager_v3_parse_build_configs (yaml_parser_t *parser,
                                           ModulemdPackagerV3 *packager,

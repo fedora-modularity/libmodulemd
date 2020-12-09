@@ -16,6 +16,7 @@
 #include "modulemd-build-config.h"
 #include "modulemd-component-module.h"
 #include "modulemd-component-rpm.h"
+#include "modulemd-module-index.h"
 #include "modulemd-profile.h"
 #include "modulemd-subdocument-info.h"
 #include <glib-object.h>
@@ -721,5 +722,24 @@ modulemd_packager_v3_get_module_component (ModulemdPackagerV3 *self,
 ModulemdComponentRpm *
 modulemd_packager_v3_get_rpm_component (ModulemdPackagerV3 *self,
                                         const gchar *component_name);
+
+
+/**
+ * modulemd_packager_v3_convert_to_index:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ * @error: (out): A #GError that will return the reason for a conversion error.
+ *
+ * Returns: (transfer full): A newly-allocated #ModulemdModuleIndex object
+ * containing a set of one or more #ModulemdModuleStreamV2 objects and possibly
+ * a #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
+ * @self. NULL if there was an error doing the mapping and sets @error
+ * appropriately.
+ *
+ * Since: 2.11
+ */
+ModulemdModuleIndex *
+modulemd_packager_v3_convert_to_index (ModulemdPackagerV3 *self,
+                                       GError **error);
+
 
 G_END_DECLS

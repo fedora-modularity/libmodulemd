@@ -1,0 +1,174 @@
+---
+document: modulemd-defaults
+version: 1
+data:
+  module: foo
+  profiles:
+    latest: [minimal]
+...
+---
+document: modulemd
+version: 2
+data:
+  name: foo
+  stream: "latest"
+  context: CTX1
+  summary: An example module
+  description: >-
+    A module for the demonstration of the metadata format. Also, the obligatory lorem
+    ipsum dolor sit amet goes right here.
+  license:
+    module:
+    - MIT
+  xmd:
+    some_key: some_data
+  dependencies:
+  - buildrequires:
+      appframework: [v1]
+      platform: [f32]
+    requires:
+      appframework: [v1]
+      platform: [f32]
+  references:
+    community: http://www.example.com/
+    documentation: http://www.example.com/
+    tracker: http://www.example.com/
+  profiles:
+    buildroot:
+      rpms:
+      - bar-devel
+    container:
+      rpms:
+      - bar
+      - bar-devel
+    minimal:
+      description: Minimal profile installing only the bar package.
+      rpms:
+      - bar
+    srpm-buildroot:
+      rpms:
+      - bar-extras
+  api:
+    rpms:
+    - bar
+    - bar-devel
+    - bar-extras
+    - baz
+    - xxx
+  filter:
+    rpms:
+    - baz-nonfoo
+  buildopts:
+    rpms:
+      macros: >
+        %demomacro 1
+
+        %demomacro2 %{demomacro}23
+      whitelist:
+      - fooscl-1-bar
+      - fooscl-1-baz
+      - xxx
+      - xyz
+    arches: [i686, x86_64]
+  components:
+    rpms:
+      bar:
+        rationale: We need this to demonstrate stuff.
+        name: bar-real
+        repository: https://pagure.io/bar.git
+        cache: https://example.com/cache
+        ref: 26ca0c0
+        buildafter:
+        - baz
+      baz:
+        rationale: Demonstrate updating the buildroot contents.
+        buildroot: true
+        srpm-buildroot: true
+      xxx:
+        rationale: xxx demonstrates arches and multilib.
+        buildafter:
+        - bar
+        arches: [i686, x86_64]
+        multilib: [x86_64]
+    modules:
+      includedmodule:
+        rationale: Included in the stack, just because.
+        repository: https://pagure.io/includedmodule.git
+        ref: somecoolbranchname
+...
+---
+document: modulemd
+version: 2
+data:
+  name: foo
+  stream: "latest"
+  context: CTX2
+  summary: An example module
+  description: >-
+    A module for the demonstration of the metadata format. Also, the obligatory lorem
+    ipsum dolor sit amet goes right here.
+  license:
+    module:
+    - MIT
+  xmd:
+    some_key: some_data
+  dependencies:
+  - buildrequires:
+      platform: [f33]
+    requires:
+      platform: [f33]
+  references:
+    community: http://www.example.com/
+    documentation: http://www.example.com/
+    tracker: http://www.example.com/
+  profiles:
+    buildroot:
+      rpms:
+      - bar-devel
+    container:
+      rpms:
+      - bar
+      - bar-devel
+    minimal:
+      description: Minimal profile installing only the bar package.
+      rpms:
+      - bar
+    srpm-buildroot:
+      rpms:
+      - bar-extras
+  api:
+    rpms:
+    - bar
+    - bar-devel
+    - bar-extras
+    - baz
+    - xxx
+  filter:
+    rpms:
+    - baz-nonfoo
+  components:
+    rpms:
+      bar:
+        rationale: We need this to demonstrate stuff.
+        name: bar-real
+        repository: https://pagure.io/bar.git
+        cache: https://example.com/cache
+        ref: 26ca0c0
+        buildafter:
+        - baz
+      baz:
+        rationale: Demonstrate updating the buildroot contents.
+        buildroot: true
+        srpm-buildroot: true
+      xxx:
+        rationale: xxx demonstrates arches and multilib.
+        buildafter:
+        - bar
+        arches: [i686, x86_64]
+        multilib: [x86_64]
+    modules:
+      includedmodule:
+        rationale: Included in the stack, just because.
+        repository: https://pagure.io/includedmodule.git
+        ref: somecoolbranchname
+...

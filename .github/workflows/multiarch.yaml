@@ -1,0 +1,40 @@
+name: Other Architectures
+on: [push, pull_request]
+
+jobs:
+  multiarch:
+    runs-on: ubuntu-20.04
+    name: ${{ matrix.distro }} on ${{ matrix.arch }}
+    continue-on-error: true
+
+    # Run steps on a matrix of 3 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: ppc64le
+            distro: fedora_latest
+          - arch: s390x
+            distro: fedora_latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: uraimo/run-on-arch-action@v2.0.7
+        name: Perform upstream tests
+
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Work-around ldd bug in rawhide CIs
+          run: |
+            $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
+            sed -i -e 's/test -r/test -f/g' -e 's/test -x/test -f/g' /bin/ldd
+            meson setup --buildtype=debugoptimized -Dverbose_tests=false /tmp/ci $GITHUB_WORKSPACE
+            meson test --suite formatters -C /tmp/ci --print-errorlogs -t 5
+            meson test --suite ci -C /tmp/ci --print-errorlogs -t 5
+

@@ -7,6 +7,7 @@ set -x
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false}"
 RETRY_CMD=/builddir/.ci/retry-command.sh
+WITH_RPM_TESTS=${WITH_RPM_TESTS:-true}
 
 override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
 
@@ -58,6 +59,10 @@ else
     pushd ci_scanbuild
     /builddir/.ci/scanbuild.sh
     popd #ci_scanbuild
+fi
+
+if [ $WITH_RPM_TESTS != true ]; then
+    exit 0
 fi
 
 

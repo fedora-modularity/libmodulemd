@@ -2,53 +2,7 @@ FROM __IMAGE__
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
-RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
-           --nogpgcheck --skip-broken install \
-	python3-black \
-	clang \
-	clang-analyzer \
-	clang-tools-extra \
-	createrepo_c \
-	"libmodulemd >= 2.3" \
-	curl \
-	elinks \
-	file-devel \
-	gcc \
-	gcc-c++ \
-	git-core \
-	glib2-devel \
-	glib2-doc \
-	gobject-introspection-devel \
-	gtk-doc \
-	help2man \
-	jq \
-	libyaml-devel \
-	meson \
-	ninja-build \
-	openssl \
-	packit \
-	pkgconf \
-	popt-devel \
-	python2-devel \
-	python2-six \
-	python2-gobject-base \
-	python3-autopep8 \
-	python3-devel \
-	python3-GitPython \
-	python3-gobject-base \
-	python3-koji \
-	python3-pycodestyle \
-	python3-rpm-macros \
-	redhat-rpm-config \
-	rpm-build \
-	rpm-devel \
-	rpmdevtools \
-	ruby \
-	"rubygem(json)" \
-	rubygems \
-	sudo \
-	valgrind \
-	wget \
-    && dnf -y clean all
+COPY ./fedora/get_fedora_deps.sh /root
 
-RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py
+RUN /root/get_fedora_deps.sh
+

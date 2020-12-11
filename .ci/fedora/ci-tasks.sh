@@ -12,6 +12,9 @@ override_dir=`python3 -c 'import gi; print(gi._overridesdir)'`
 
 pushd /builddir/
 
+# Work-around ldd bug in rawhide CIs
+sed -i -e 's/test -r/test -f/g' -e 's/test -x/test -f/g' /bin/ldd
+
 # Build the code under GCC and run standard tests
 meson --buildtype=debugoptimized \
       -Dverbose_tests=false \

@@ -196,6 +196,7 @@ module_index_test_read (void)
   g_autoptr (GPtrArray) failures = NULL;
   ModulemdSubdocumentInfo *subdoc = NULL;
   g_autofree gchar *yaml_path = NULL;
+  g_auto (GStrv) module_names = NULL;
 
   /* Read the specification files all in */
   index = modulemd_module_index_new ();
@@ -223,24 +224,31 @@ module_index_test_read (void)
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
-  /* The modulemd-packager definition
-   * This should fail to be read into a ModuleIndex because it provides no
-   * NSVCA information. It should only be importable via
-   * ModuleStream.read_file()
+  /* The modulemd-packager v2 definition
+   * Reading a packager document into an index can only be done by calling
+   * modulemd_read_packager_file(). Attempting to read it directly
+   * using modulemd_module_index_update_from_file() should ignore the document
+   * and report it as a failure.
    */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v2.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   ret = modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error);
+  modulemd_subdocument_info_debug_dump_failures (failures);
   g_assert_no_error (error);
   g_assert_cmpint (failures->len, ==, 1);
   g_assert_false (ret);
   g_assert_error (
     modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
-    MODULEMD_ERROR,
-    MMD_ERROR_MISSING_REQUIRED);
+    MODULEMD_YAML_ERROR,
+    MMD_YAML_ERROR_PARSE);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
+  /* the index must still contain only the "foo" module */
+  module_names = modulemd_module_index_get_module_names_as_strv (index);
+  g_assert_cmpint (g_strv_length (module_names), ==, 1);
+  g_assert_true (g_strv_contains ((const gchar *const *)module_names, "foo"));
+  g_clear_pointer (&module_names, g_strfreev);
 
   /* The translation definitions */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_translations_v1.yaml",
@@ -364,6 +372,58 @@ module_index_test_read_mixed (void)
   g_assert_no_error (error);
   g_assert_true (ret);
   g_assert_cmpint (failures->len, ==, 0);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+
+  /* Verify that we can output it cleanly */
+  output = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_nonnull (output);
+  g_assert_null (error);
+}
+
+
+static void
+module_index_test_read_mixed_packager (void)
+{
+  gboolean ret;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autofree gchar *yaml_path = NULL;
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree gchar *output = NULL;
+  g_auto (GStrv) module_names = NULL;
+
+  index = modulemd_module_index_new ();
+
+  /* Reading a packager document into an index can only be done by calling
+   * modulemd_read_packager_file(). Attempting to directly read a file
+   * containing a mix of stream and packager documents using
+   * modulemd_module_index_update_from_file() should trigger errors and
+   * ignore the packager documents while successfully loading the streams.
+   */
+  yaml_path = g_strdup_printf ("%s/stream_packager_mix.yaml",
+                               g_getenv ("TEST_DATA_PATH"));
+  g_assert_nonnull (yaml_path);
+
+  ret = modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, &error);
+  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_no_error (error);
+  g_assert_cmpint (failures->len, ==, 2);
+  g_assert_false (ret);
+  g_assert_error (
+    modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
+    MODULEMD_YAML_ERROR,
+    MMD_YAML_ERROR_PARSE);
+  g_assert_error (
+    modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 1)),
+    MODULEMD_YAML_ERROR,
+    MMD_YAML_ERROR_PARSE);
+  /* Make sure the streams were successfully loaded into the index */
+  module_names = modulemd_module_index_get_module_names_as_strv (index);
+  g_assert_cmpint (g_strv_length (module_names), ==, 2);
+  g_assert_true (g_strv_contains ((const gchar *const *)module_names, "foo"));
+  g_assert_true (g_strv_contains ((const gchar *const *)module_names, "qux"));
+  g_clear_pointer (&module_names, g_strfreev);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
   /* Verify that we can output it cleanly */
@@ -1809,6 +1869,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/read/mixed",
                    module_index_test_read_mixed);
+
+  g_test_add_func ("/modulemd/v2/module/index/read/mixed_packager",
+                   module_index_test_read_mixed_packager);
 
   g_test_add_func ("/modulemd/v2/module/index/read/unknown",
                    module_index_test_read_unknown);

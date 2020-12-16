@@ -155,51 +155,12 @@ add_subdoc (ModulemdModuleIndex *self,
   switch (doctype)
     {
     case MODULEMD_YAML_DOC_PACKAGER:
-      if (modulemd_subdocument_info_get_mdversion (subdoc) <
-          MD_PACKAGER_VERSION_TWO)
-        {
-          g_set_error (error,
-                       MODULEMD_YAML_ERROR,
-                       MMD_YAML_ERROR_PARSE,
-                       "Invalid mdversion for a packager document");
-          return FALSE;
-        }
-
-      if (modulemd_subdocument_info_get_mdversion (subdoc) ==
-          MD_PACKAGER_VERSION_THREE)
-        {
-          packager = modulemd_packager_v3_parse_yaml (subdoc, error);
-
-          index =
-            modulemd_packager_v3_to_stream_v2_ext (packager, &nested_error);
-          if (!index)
-            {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return FALSE;
-            }
-
-          if (autogen_module_name)
-            {
-              /* nothing to do here since module/stream names were already
-               * auto-generated in order to add them to the index
-               */
-            }
-
-          /* merge index with override = FALSE and strict_default_streams = TRUE */
-          if (!modulemd_module_index_merge (
-                index, self, FALSE, TRUE, &nested_error))
-            {
-              g_propagate_error (error, g_steal_pointer (&nested_error));
-              return FALSE;
-            }
-
-          g_clear_object (&index);
-          break;
-        }
-
-      /* Fall through intentionally
-       * We will handle the v2 packager format below
-       */
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_YAML_ERROR_PARSE,
+                   "modulemd-packager document ignored while reading into a "
+                   "module index");
+      return FALSE;
 
     case MODULEMD_YAML_DOC_MODULESTREAM:
       switch (modulemd_subdocument_info_get_mdversion (subdoc))
@@ -212,7 +173,7 @@ add_subdoc (ModulemdModuleIndex *self,
         case MD_MODULESTREAM_VERSION_TWO:
           stream =
             MODULEMD_MODULE_STREAM (modulemd_module_stream_v2_parse_yaml (
-              subdoc, strict, doctype == MODULEMD_YAML_DOC_PACKAGER, error));
+              subdoc, strict, FALSE, error));
           break;
 
         default:

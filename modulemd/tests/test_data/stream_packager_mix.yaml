@@ -1,0 +1,43 @@
+---
+document: modulemd
+version: 1
+data:
+  name: foo
+  stream: a
+  summary: Example 1
+  description: Description 1
+  license:
+    module:
+    - MIT
+...
+---
+document: modulemd-packager
+version: 2
+data:
+  summary: Example 2
+  description: Description 2
+  license:
+    module:
+    - MIT
+...
+---
+document: modulemd-packager
+version: 3
+data:
+  name: baz
+  stream: c
+  summary: Example 3
+  description: Description 3
+...
+---
+document: modulemd
+version: 2
+data:
+  name: qux
+  stream: d
+  summary: Example 4
+  description: Description 4
+  license:
+    module:
+    - MIT
+...

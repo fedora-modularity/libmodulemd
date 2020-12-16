@@ -602,50 +602,40 @@ packager_test_read_to_index (void)
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autofree gchar *yaml_path = NULL;
-  g_autofree gchar *yaml_str = NULL;
-  g_autofree gchar *expected_path = NULL;
-  g_autofree gchar *expected_str = NULL;
+  g_auto (GStrv) module_names = NULL;
 
   /* create an index */
   index = modulemd_module_index_new ();
 
-  /* The modulemd-packager v3 definition */
+  /* The modulemd-packager v3 definition
+   * Reading a packager v3 document into an index can only be done by calling
+   * modulemd_read_packager_file() and then calling
+   * modulemd_packager_v3_convert_to_index(), or internally by calling
+   * modulemd_packager_v3_to_stream_v2_ext(). Attempting to read it directly
+   * using modulemd_module_index_update_from_file() should trigger a warning
+   * and ignore the document.
+   */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
                                g_getenv ("MESON_SOURCE_ROOT"));
   ret = modulemd_module_index_update_from_file (
     index, yaml_path, TRUE, &failures, &error);
   g_assert_no_error (error);
   modulemd_subdocument_info_debug_dump_failures (failures);
-  g_assert_true (ret);
-  g_assert_cmpint (failures->len, ==, 0);
+  g_assert_cmpint (failures->len, ==, 1);
+  g_assert_false (ret);
+   g_assert_error (
+     modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
+    MODULEMD_YAML_ERROR,
+    MMD_YAML_ERROR_PARSE);
   g_clear_pointer (&yaml_path, g_free);
   g_clear_pointer (&failures, g_ptr_array_unref);
 
-  g_assert_cmpint (MD_MODULESTREAM_VERSION_TWO,
-                   ==,
-                   modulemd_module_index_get_stream_mdversion (index));
-
-  yaml_str = modulemd_module_index_dump_to_string (index, &error);
-  g_assert_no_error (error);
-  g_assert_nonnull (yaml_str);
-
-  g_debug ("packager_test_read_to_index() dump of v2 index:\n%s", yaml_str);
-
-  /* the index should contain the packager v2 document converted to stream v2 */
-  expected_path = g_strdup_printf ("%s/upgrades/packager_v3_to_stream_v2.yaml",
-                                   g_getenv ("TEST_DATA_PATH"));
-  g_assert_nonnull (expected_path);
-  g_assert_true (
-    g_file_get_contents (expected_path, &expected_str, NULL, &error));
-  g_assert_no_error (error);
-  g_assert_nonnull (expected_str);
-  g_clear_pointer (&expected_path, g_free);
-
-  g_assert_cmpstr (expected_str, ==, yaml_str);
+  /* the index must still be empty */
+  module_names = modulemd_module_index_get_module_names_as_strv (index);
+  g_assert_cmpint (g_strv_length (module_names), ==, 0);
+  g_clear_pointer (&module_names, g_strfreev);
 
   g_clear_object (&index);
-  g_clear_pointer (&yaml_str, g_free);
-  g_clear_pointer (&expected_str, g_free);
 }
 
 

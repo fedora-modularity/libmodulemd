@@ -327,6 +327,13 @@ modulemd_packager_v3_get_xmd (ModulemdPackagerV3 *self)
 }
 
 
+guint64
+modulemd_packager_v3_get_mdversion (ModulemdPackagerV3 *self)
+{
+  return MD_PACKAGER_VERSION_THREE;
+}
+
+
 void
 modulemd_packager_v3_add_build_config (ModulemdPackagerV3 *self,
                                        ModulemdBuildConfig *buildconfig)

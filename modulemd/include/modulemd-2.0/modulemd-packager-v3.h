@@ -283,6 +283,18 @@ modulemd_packager_v3_get_xmd (ModulemdPackagerV3 *self);
 
 
 /**
+ * modulemd_packager_v3_get_mdversion:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ *
+ * Returns: The metadata version of this #ModulemdPackagerV3.
+ *
+ * Since: 2.11
+ */
+guint64
+modulemd_packager_v3_get_mdversion (ModulemdPackagerV3 *self);
+
+
+/**
  * modulemd_packager_v3_add_build_config:
  * @self: (in): This #ModulemdPackagerV3 object.
  * @buildconfig: (in): A #ModulemdBuildConfig to include.

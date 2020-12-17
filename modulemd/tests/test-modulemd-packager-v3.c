@@ -36,6 +36,9 @@ packager_test_construct (void)
   g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
 
   /* == Verify that it was constructed properly empty == */
+  g_assert_cmpuint (modulemd_packager_v3_get_mdversion (packager),
+                    ==,
+                    MD_PACKAGER_VERSION_THREE);
 
   g_assert_null (modulemd_packager_v3_get_module_name (packager));
   g_assert_null (modulemd_packager_v3_get_stream_name (packager));
@@ -623,8 +626,8 @@ packager_test_read_to_index (void)
   modulemd_subdocument_info_debug_dump_failures (failures);
   g_assert_cmpint (failures->len, ==, 1);
   g_assert_false (ret);
-   g_assert_error (
-     modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
+  g_assert_error (
+    modulemd_subdocument_info_get_gerror (g_ptr_array_index (failures, 0)),
     MODULEMD_YAML_ERROR,
     MMD_YAML_ERROR_PARSE);
   g_clear_pointer (&yaml_path, g_free);

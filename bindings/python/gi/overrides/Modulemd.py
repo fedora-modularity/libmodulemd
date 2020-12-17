@@ -111,22 +111,22 @@ if float(Modulemd._version) >= 2:
         ModuleIndex = override(ModuleIndex)
         __all__.append(ModuleIndex)
 
-    if hasattr(Modulemd, "ModuleStreamV3"):
+    if hasattr(Modulemd, "PackagerV3"):
 
-        class ModuleStreamV3(Modulemd.ModuleStreamV3):
+        class PackagerV3(Modulemd.PackagerV3):
             def set_xmd(self, xmd):
-                super(ModuleStreamV3, self).set_xmd(
+                super(PackagerV3, self).set_xmd(
                     ModulemdUtil.python_to_variant(xmd)
                 )
 
             def get_xmd(self):
-                variant_xmd = super(ModuleStreamV3, self).get_xmd()
+                variant_xmd = super(PackagerV3, self).get_xmd()
                 if variant_xmd is None:
                     return {}
                 return variant_xmd.unpack()
 
-        ModuleStreamV3 = override(ModuleStreamV3)
-        __all__.append(ModuleStreamV3)
+        PackagerV3 = override(PackagerV3)
+        __all__.append(PackagerV3)
 
     if hasattr(Modulemd, "ModuleStreamV2"):
 

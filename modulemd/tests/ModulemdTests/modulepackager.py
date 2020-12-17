@@ -186,6 +186,49 @@ data:
             )
         )
 
+    def test_v3_xmd(self):
+
+        # We have a chicken-egg problem with overrides, since they can only
+        # be tested if they are already installed. This means they need to
+        # be run in the CI. In order to avoid changes to these tests or the
+        # overrides breaking things, we'll skip them if the appropriate
+        # override is not installed.
+        if "_overrides_module" in dir(Modulemd) and hasattr(
+            gi.overrides.Modulemd, "PackagerV3"
+        ):
+
+            # The XMD python tests can only be run against the installed lib
+            # because the overrides that translate between python and GVariant
+            # must be installed in /usr/lib/python*/site-packages/gi/overrides
+            # or they are not included when importing Modulemd
+            packager = Modulemd.PackagerV3.new()
+            # An empty dictionary should be returned if no xmd value is set
+            self.assertEqual(packager.get_xmd(), dict())
+
+            xmd = {"outer_key": {"inner_key": ["scalar", "another_scalar"]}}
+
+            packager.set_xmd(xmd)
+
+            xmd_copy = packager.get_xmd()
+            assert xmd_copy
+            assert "outer_key" in xmd_copy
+            assert "inner_key" in xmd_copy["outer_key"]
+            assert "scalar" in xmd_copy["outer_key"]["inner_key"]
+            assert "another_scalar" in xmd_copy["outer_key"]["inner_key"]
+
+            # Verify that we can add content and save it back
+            xmd["something"] = ["foo", "bar"]
+            packager.set_xmd(xmd)
+
+            xmd_copy = packager.get_xmd()
+            assert xmd_copy
+            assert "outer_key" in xmd_copy
+            assert "inner_key" in xmd_copy["outer_key"]
+            assert "scalar" in xmd_copy["outer_key"]["inner_key"]
+            assert "another_scalar" in xmd_copy["outer_key"]["inner_key"]
+            assert "something" in xmd_copy
+            assert xmd_copy["something"] == ["foo", "bar"]
+
 
 if __name__ == "__main__":
     unittest.main()

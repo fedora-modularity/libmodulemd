@@ -14,6 +14,8 @@
 from ..module import get_introspection_module
 from ..overrides import override
 
+import functools
+
 from six import text_type
 from gi.repository import GLib
 
@@ -26,6 +28,17 @@ __all__ = []
 
 
 class ModulemdUtil(object):
+    def strip_gtype(method):
+        @functools.wraps(method)
+        def wrapped(*args, **kwargs):
+            ret = method(*args, **kwargs)
+            if len(ret) == 2:
+                return ret[1]
+            else:
+                return ret[1:]
+
+        return wrapped
+
     @staticmethod
     def variant_str(s):
         """Converts a string to a GLib.Variant"""
@@ -97,6 +110,18 @@ class ModulemdUtil(object):
 
 
 if float(Modulemd._version) >= 2:
+
+    if hasattr(Modulemd, "read_packager_file"):
+        read_packager_file = ModulemdUtil.strip_gtype(
+            Modulemd.read_packager_file
+        )
+        __all__.append("read_packager_file")
+
+    if hasattr(Modulemd, "read_packager_string"):
+        read_packager_string = ModulemdUtil.strip_gtype(
+            Modulemd.read_packager_string
+        )
+        __all__.append("read_packager_string")
 
     if hasattr(Modulemd.ModuleIndex, "add_known_stream"):
 

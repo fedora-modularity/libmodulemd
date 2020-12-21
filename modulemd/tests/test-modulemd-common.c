@@ -176,6 +176,28 @@ test_packager_read_file (void)
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
 
 
+  /* Valid packager v2 file with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  g_clear_pointer (&yaml_file, g_free);
+  yaml_file = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  otype = modulemd_read_packager_file_ext (
+    yaml_file, &object, "modulename-override", "streamname-override", &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
+
+
   /* Valid packager v3 file */
   g_clear_error (&error);
   g_clear_object (&object);
@@ -187,6 +209,28 @@ test_packager_read_file (void)
   g_assert_true (otype == MODULEMD_TYPE_PACKAGER_V3);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_PACKAGER_V3 (object));
+
+
+  /* Valid packager v3 file with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  g_clear_pointer (&yaml_file, g_free);
+  yaml_file = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  otype = modulemd_read_packager_file_ext (
+    yaml_file, &object, "modulename-override", "streamname-override", &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_PACKAGER_V3);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (object));
+  g_assert_cmpstr (
+    modulemd_packager_v3_get_module_name (MODULEMD_PACKAGER_V3 (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_packager_v3_get_stream_name (MODULEMD_PACKAGER_V3 (object)),
+    ==,
+    "streamname-override");
 
 
   /* Valid stream v2 file */
@@ -202,6 +246,28 @@ test_packager_read_file (void)
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
 
 
+  /* Valid stream v2 file with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  g_clear_pointer (&yaml_file, g_free);
+  yaml_file = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v2.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  otype = modulemd_read_packager_file_ext (
+    yaml_file, &object, "modulename-override", "streamname-override", &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
+
+
   /* Valid stream v1 file, should get upgraded to v2 */
   g_clear_error (&error);
   g_clear_object (&object);
@@ -213,6 +279,30 @@ test_packager_read_file (void)
   g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+
+
+  /* Valid stream v1 file, should get upgraded to v2,
+   * with module/stream name overrides
+   */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  g_clear_pointer (&yaml_file, g_free);
+  yaml_file = g_strdup_printf ("%s/yaml_specs/modulemd_stream_v1.yaml",
+                               g_getenv ("MESON_SOURCE_ROOT"));
+  otype = modulemd_read_packager_file_ext (
+    yaml_file, &object, "modulename-override", "streamname-override", &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
 
 
   /* Nonexistent file */
@@ -295,7 +385,26 @@ test_packager_read_string (void)
   g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
-
+  /* with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  otype = modulemd_read_packager_string_ext (yaml_string,
+                                             &object,
+                                             "modulename-override",
+                                             "streamname-override",
+                                             &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
 
   /* Trivial modulemd packager v3 */
   g_clear_error (&error);
@@ -317,6 +426,26 @@ test_packager_read_string (void)
   g_assert_true (otype == MODULEMD_TYPE_PACKAGER_V3);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_PACKAGER_V3 (object));
+  /* with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  otype = modulemd_read_packager_string_ext (yaml_string,
+                                             &object,
+                                             "modulename-override",
+                                             "streamname-override",
+                                             &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_PACKAGER_V3);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (object));
+  g_assert_cmpstr (
+    modulemd_packager_v3_get_module_name (MODULEMD_PACKAGER_V3 (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_packager_v3_get_stream_name (MODULEMD_PACKAGER_V3 (object)),
+    ==,
+    "streamname-override");
 
   /* Trivial modulemd stream v2 */
   g_clear_error (&error);
@@ -339,6 +468,26 @@ test_packager_read_string (void)
   g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  /* with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  otype = modulemd_read_packager_string_ext (yaml_string,
+                                             &object,
+                                             "modulename-override",
+                                             "streamname-override",
+                                             &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
 
   /* Trivial modulemd stream v1, should get upgraded to v2 */
   g_clear_error (&error);
@@ -361,6 +510,26 @@ test_packager_read_string (void)
   g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
   g_assert_nonnull (object);
   g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  /* with module/stream name overrides */
+  g_clear_error (&error);
+  g_clear_object (&object);
+  otype = modulemd_read_packager_string_ext (yaml_string,
+                                             &object,
+                                             "modulename-override",
+                                             "streamname-override",
+                                             &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (object);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (object));
+  g_assert_cmpstr (
+    modulemd_module_stream_get_module_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "modulename-override");
+  g_assert_cmpstr (
+    modulemd_module_stream_get_stream_name (MODULEMD_MODULE_STREAM (object)),
+    ==,
+    "streamname-override");
 
   /* NULL string should raise an exception */
   g_clear_error (&error);

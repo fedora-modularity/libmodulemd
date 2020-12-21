@@ -362,6 +362,33 @@ modulemd_read_packager_file (const gchar *yaml_path,
                              GError **error);
 
 /**
+ * modulemd_read_packager_file_ext:
+ * @yaml_path: (in): A path to a YAML file containing a packager document.
+ * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
+ * #ModulemdPackagerV3 object initialized with the content from @yaml_path.
+ * @module_name: (in) (nullable): An optional module name to override the
+ * document on disk. Mostly useful in cases where the name is being
+ * auto-detected from git.
+ * @module_stream: (in) (nullable): An optional module stream name to override
+ * the document on disk. Mostly useful in cases where the name is being
+ * auto-detected from git.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: @MODULEMD_TYPE_MODULE_STREAM_V2, @MODULEMD_TYPE_PACKAGER_V3, or
+ * @G_TYPE_INVALID. Returns the matching GObject through the @object parameter.
+ * If the return value is @G_TYPE_INVALID, returns the reason as @error.
+ *
+ * Since: 2.11
+ */
+GType
+modulemd_read_packager_file_ext (const gchar *yaml_path,
+                                 GObject **object,
+                                 const gchar *module_name,
+                                 const gchar *module_stream,
+                                 GError **error);
+
+/**
  * modulemd_read_packager_string:
  * @yaml_string: (in): A YAML string containing a packager document.
  * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
@@ -379,5 +406,32 @@ GType
 modulemd_read_packager_string (const gchar *yaml_string,
                                GObject **object,
                                GError **error);
+
+/**
+ * modulemd_read_packager_string_ext:
+ * @yaml_string: (in): A YAML string containing a packager document.
+ * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
+ * #ModulemdPackagerV3 object initialized with the content from @yaml_string.
+ * @module_name: (in) (nullable): An optional module name to override the
+ * document on disk. Mostly useful in cases where the name is being
+ * auto-detected from git.
+ * @module_stream: (in) (nullable): An optional module stream name to override
+ * the document on disk. Mostly useful in cases where the name is being
+ * auto-detected from git.
+ * @error: (out): A #GError containing additional information if this function
+ * fails in a way that prevents program continuation.
+ *
+ * Returns: @MODULEMD_TYPE_MODULE_STREAM_V2, @MODULEMD_TYPE_PACKAGER_V3, or
+ * @G_TYPE_INVALID. Returns the matching GObject through the @object parameter.
+ * If the return value is @G_TYPE_INVALID, returns the reason as @error.
+ *
+ * Since: 2.11
+ */
+GType
+modulemd_read_packager_string_ext (const gchar *yaml_string,
+                                   GObject **object,
+                                   const gchar *module_name,
+                                   const gchar *module_stream,
+                                   GError **error);
 
 G_END_DECLS

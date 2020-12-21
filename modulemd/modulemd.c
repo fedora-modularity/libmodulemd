@@ -111,12 +111,25 @@ verify_load (gboolean ret,
 static GType
 modulemd_read_packager_from_parser (yaml_parser_t *parser,
                                     GObject **object,
+                                    const gchar *module_name,
+                                    const gchar *module_stream,
                                     GError **error);
 
 GType
 modulemd_read_packager_file (const gchar *yaml_path,
                              GObject **object,
                              GError **error)
+{
+  return modulemd_read_packager_file_ext (
+    yaml_path, object, NULL, NULL, error);
+}
+
+GType
+modulemd_read_packager_file_ext (const gchar *yaml_path,
+                                 GObject **object,
+                                 const gchar *module_name,
+                                 const gchar *module_stream,
+                                 GError **error)
 {
   MMD_INIT_YAML_PARSER (parser);
   g_autoptr (FILE) yaml_stream = NULL;
@@ -142,13 +155,25 @@ modulemd_read_packager_file (const gchar *yaml_path,
 
   yaml_parser_set_input_file (&parser, yaml_stream);
 
-  return modulemd_read_packager_from_parser (&parser, object, error);
+  return modulemd_read_packager_from_parser (
+    &parser, object, module_name, module_stream, error);
 }
 
 GType
 modulemd_read_packager_string (const gchar *yaml_string,
                                GObject **object,
                                GError **error)
+{
+  return modulemd_read_packager_string_ext (
+    yaml_string, object, NULL, NULL, error);
+}
+
+GType
+modulemd_read_packager_string_ext (const gchar *yaml_string,
+                                   GObject **object,
+                                   const gchar *module_name,
+                                   const gchar *module_stream,
+                                   GError **error)
 {
   MMD_INIT_YAML_PARSER (parser);
 
@@ -159,12 +184,15 @@ modulemd_read_packager_string (const gchar *yaml_string,
   yaml_parser_set_input_string (
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
 
-  return modulemd_read_packager_from_parser (&parser, object, error);
+  return modulemd_read_packager_from_parser (
+    &parser, object, module_name, module_stream, error);
 }
 
 static GType
 modulemd_read_packager_from_parser (yaml_parser_t *parser,
                                     GObject **object,
+                                    const gchar *module_name,
+                                    const gchar *module_stream,
                                     GError **error)
 {
   MMD_INIT_YAML_EVENT (event);
@@ -252,6 +280,17 @@ modulemd_read_packager_from_parser (yaml_parser_t *parser,
               return G_TYPE_INVALID;
             }
 
+          if (module_name)
+            {
+              modulemd_packager_v3_set_module_name (packager_v3, module_name);
+            }
+
+          if (module_stream)
+            {
+              modulemd_packager_v3_set_stream_name (packager_v3,
+                                                    module_stream);
+            }
+
           return_object = (GObject *)g_steal_pointer (&packager_v3);
           return_type = MODULEMD_TYPE_PACKAGER_V3;
           break;
@@ -285,6 +324,18 @@ modulemd_read_packager_from_parser (yaml_parser_t *parser,
               return G_TYPE_INVALID;
             }
 
+          if (module_name)
+            {
+              modulemd_module_stream_set_module_name (
+                MODULEMD_MODULE_STREAM (stream_v2), module_name);
+            }
+
+          if (module_stream)
+            {
+              modulemd_module_stream_set_stream_name (
+                MODULEMD_MODULE_STREAM (stream_v2), module_stream);
+            }
+
           return_object = (GObject *)g_steal_pointer (&stream_v2);
           return_type = MODULEMD_TYPE_MODULE_STREAM_V2;
           break;
@@ -295,6 +346,18 @@ modulemd_read_packager_from_parser (yaml_parser_t *parser,
           if (!stream_v2)
             {
               return G_TYPE_INVALID;
+            }
+
+          if (module_name)
+            {
+              modulemd_module_stream_set_module_name (
+                MODULEMD_MODULE_STREAM (stream_v2), module_name);
+            }
+
+          if (module_stream)
+            {
+              modulemd_module_stream_set_stream_name (
+                MODULEMD_MODULE_STREAM (stream_v2), module_stream);
             }
 
           return_object = (GObject *)g_steal_pointer (&stream_v2);

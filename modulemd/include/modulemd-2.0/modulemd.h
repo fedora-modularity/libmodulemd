@@ -343,7 +343,7 @@ ModulemdModuleIndex *
 modulemd_load_string (const gchar *yaml_string, GError **error);
 
 /**
- * modulemd_read_packager_file:
+ * modulemd_read_packager_file: (skip)
  * @yaml_path: (in): A path to a YAML file containing a packager document.
  * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
  * #ModulemdPackagerV3 object initialized with the content from @yaml_path.
@@ -362,7 +362,7 @@ modulemd_read_packager_file (const gchar *yaml_path,
                              GError **error);
 
 /**
- * modulemd_read_packager_file_ext:
+ * modulemd_read_packager_file_ext: (rename-to modulemd_read_packager_file)
  * @yaml_path: (in): A path to a YAML file containing a packager document.
  * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
  * #ModulemdPackagerV3 object initialized with the content from @yaml_path.
@@ -389,7 +389,7 @@ modulemd_read_packager_file_ext (const gchar *yaml_path,
                                  GError **error);
 
 /**
- * modulemd_read_packager_string:
+ * modulemd_read_packager_string: (skip)
  * @yaml_string: (in): A YAML string containing a packager document.
  * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
  * #ModulemdPackagerV3 object initialized with the content from @yaml_string.
@@ -408,7 +408,7 @@ modulemd_read_packager_string (const gchar *yaml_string,
                                GError **error);
 
 /**
- * modulemd_read_packager_string_ext:
+ * modulemd_read_packager_string_ext: (rename-to modulemd_read_packager_string)
  * @yaml_string: (in): A YAML string containing a packager document.
  * @object: (out): (transfer full): A newly allocated #ModulemdModuleStreamV2 or
  * #ModulemdPackagerV3 object initialized with the content from @yaml_string.

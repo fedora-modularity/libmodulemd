@@ -352,6 +352,7 @@ endforeach
 
 python_tests = {
 'buildopts'        : 'tests/ModulemdTests/buildopts.py',
+'common'           : 'tests/ModulemdTests/common.py',
 'componentrpm'     : 'tests/ModulemdTests/componentrpm.py',
 'defaults'         : 'tests/ModulemdTests/defaults.py',
 'defaultsv1'       : 'tests/ModulemdTests/defaultsv1.py',

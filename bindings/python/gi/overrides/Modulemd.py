@@ -28,6 +28,7 @@ __all__ = []
 
 
 class ModulemdUtil(object):
+    @staticmethod
     def strip_gtype(method):
         @functools.wraps(method)
         def wrapped(*args, **kwargs):

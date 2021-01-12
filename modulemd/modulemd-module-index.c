@@ -1602,6 +1602,17 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
             }
         }
 
+      if (obsoletes_array->len > 0)
+        {
+          /* Obsoletes need at least MD_MODULESTREAM_VERSION_TWO */
+          if (!modulemd_module_index_upgrade_streams (
+                into, MD_MODULESTREAM_VERSION_TWO, &nested_error))
+            {
+              g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+        }
+
       g_debug ("Prioritizer: all documents merged for %s", module_name);
       g_clear_pointer (&translations, g_ptr_array_unref);
     }

@@ -776,6 +776,86 @@ merger_test_obsoletes_incompatible (void)
   g_assert_cmpint (obsoletes->len, ==, 1);
 }
 
+static void
+merger_test_obsoletes_lone_obsolete (void)
+{
+  // clang-format off
+  g_autofree gchar *obsolete_str = g_strdup(
+"---\n"
+"document: modulemd-obsoletes\n"
+"version: 1\n"
+"data:\n"
+"    modified: 2020-05-01T00:00Z\n"
+"    module: nodejs\n"
+"    context: 6c81f848\n"
+"    stream: 5\n"
+"    message: \"obsoleting obsoletes\"\n"
+"    obsoleted_by:\n"
+"      module: nodejs\n"
+"      stream: 10\n"
+"...\n");
+  // clang-format on
+
+  // clang-format off
+  g_autofree gchar *stream_str = g_strdup(
+"---\n"
+"document: modulemd\n"
+"version: 2\n"
+"data:\n"
+"  name: nodejs\n"
+"  stream: 5\n"
+"  version: 99\n"
+"  context: 6c81f848\n"
+"  arch: x86_64\n"
+"  summary: Javascript runtime\n"
+"  description: >-\n"
+"    Node.js is a platform built on Chrome''s JavaScript runtime.\n"
+"  license:\n"
+"    module:\n"
+"    - MIT\n"
+"...\n");
+  // clang-format on
+
+  g_autoptr (GPtrArray) failures = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) obsolete_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) stream_idx = modulemd_module_index_new ();
+  g_autoptr (ModulemdModuleIndex) merged_idx = NULL;
+  g_autoptr (ModulemdModuleIndexMerger) merger =
+    modulemd_module_index_merger_new ();
+  gboolean ret;
+
+  ret = modulemd_module_index_update_from_string (
+    obsolete_idx, obsolete_str, TRUE, &failures, &error);
+  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  ret = modulemd_module_index_update_from_string (
+    stream_idx, stream_str, TRUE, &failures, &error);
+  modulemd_subdocument_info_debug_dump_failures (failures);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  modulemd_module_index_merger_associate_index (merger, obsolete_idx, 0);
+  modulemd_module_index_merger_associate_index (merger, stream_idx, 0);
+  merged_idx = modulemd_module_index_merger_resolve (merger, &error);
+
+  g_assert_nonnull (merged_idx);
+  g_assert_no_error (error);
+
+  g_autoptr (ModulemdModuleStream) stream = NULL;
+  stream = g_object_ref (modulemd_module_get_stream_by_NSVCA (
+    modulemd_module_index_get_module (merged_idx, "nodejs"),
+    "5",
+    99,
+    NULL,
+    NULL,
+    &error));
+  g_assert_nonnull (stream);
+  g_assert_no_error (error);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -820,6 +900,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/module/index/merger/obsoletes/incompatibility",
                    merger_test_obsoletes_incompatible);
+
+  g_test_add_func ("/modulemd/module/index/merger/obsoletes/lone_obsolete",
+                   merger_test_obsoletes_lone_obsolete);
 
   return g_test_run ();
 }

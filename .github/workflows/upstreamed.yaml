@@ -30,3 +30,19 @@ jobs:
           DOC_TOKEN: ${{ secrets.DOC_TOKEN }}
         run: |
           ./.ci/ci-docs.sh
+
+  autoformat:
+    name: Auto-format code
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Format code
+        run: |
+          ./.ci/ci-autoformat.sh
+
+      - name: Push any formatting changes
+        run: |
+            git add -u
+            $GITHUB_WORKSPACE/.ci/git_push_if_changes.sh -m "Code auto-formatting"

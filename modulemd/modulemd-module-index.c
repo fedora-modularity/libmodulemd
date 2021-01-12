@@ -1290,11 +1290,24 @@ modulemd_module_index_add_obsoletes (ModulemdModuleIndex *self,
   g_autoptr (GError) nested_error = NULL;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_OBSOLETES (obsoletes), FALSE);
 
   modulemd_module_add_obsoletes (
     get_or_create_module (self,
                           modulemd_obsoletes_get_module_name (obsoletes)),
     obsoletes);
+
+  /* Obsoletes need at least MD_MODULESTREAM_VERSION_TWO */
+  if (self->stream_mdversion < MD_MODULESTREAM_VERSION_TWO)
+    {
+      if (!modulemd_module_index_upgrade_streams (
+            self, MD_MODULESTREAM_VERSION_TWO, &nested_error))
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return FALSE;
+        }
+    }
+
   return TRUE;
 }
 

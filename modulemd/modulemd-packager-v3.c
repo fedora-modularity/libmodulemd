@@ -1663,7 +1663,6 @@ modulemd_packager_v3_parse_rpm_components (yaml_parser_t *parser,
             parser,
             (const gchar *)event.data.scalar.value,
             strict,
-            FALSE,
             &nested_error);
           if (!component)
             {

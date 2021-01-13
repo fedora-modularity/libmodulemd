@@ -78,16 +78,13 @@ data:
         repository: https://pagure.io/bar.git
         cache: https://example.com/cache
         ref: 26ca0c0
-        buildafter:
-        - baz
       baz:
         rationale: Demonstrate updating the buildroot contents.
         buildroot: true
         srpm-buildroot: true
       xxx:
         rationale: xxx demonstrates arches and multilib.
-        buildafter:
-        - bar
+        buildorder: 10
         arches: [i686, x86_64]
         multilib: [x86_64]
     modules:
@@ -95,6 +92,7 @@ data:
         rationale: Included in the stack, just because.
         repository: https://pagure.io/includedmodule.git
         ref: somecoolbranchname
+        buildorder: 100
 ...
 ---
 document: modulemd
@@ -154,16 +152,13 @@ data:
         repository: https://pagure.io/bar.git
         cache: https://example.com/cache
         ref: 26ca0c0
-        buildafter:
-        - baz
       baz:
         rationale: Demonstrate updating the buildroot contents.
         buildroot: true
         srpm-buildroot: true
       xxx:
         rationale: xxx demonstrates arches and multilib.
-        buildafter:
-        - bar
+        buildorder: 10
         arches: [i686, x86_64]
         multilib: [x86_64]
     modules:
@@ -171,4 +166,5 @@ data:
         rationale: Included in the stack, just because.
         repository: https://pagure.io/includedmodule.git
         ref: somecoolbranchname
+        buildorder: 100
 ...

@@ -419,7 +419,7 @@ component_rpm_test_parse_yaml (void)
   g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
   yaml_event_delete (&event);
 
-  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, FALSE, &error);
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, &error);
   g_assert_nonnull (r);
   g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
   g_assert_cmpstr (
@@ -479,7 +479,7 @@ component_rpm_test_parse_packager_yaml (void)
   g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
   yaml_event_delete (&event);
 
-  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, TRUE, &error);
+  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, &error);
   g_assert_no_error (error);
   g_assert_nonnull (r);
   g_assert_true (MODULEMD_IS_COMPONENT_RPM (r));
@@ -513,39 +513,6 @@ component_rpm_test_parse_packager_yaml (void)
   g_assert_cmpint (g_strv_length (list), ==, 1);
   g_assert_cmpstr (list[0], ==, "x86_64");
   g_clear_pointer (&list, g_strfreev);
-}
-
-
-static void
-component_rpm_test_parse_buildorder_packager_yaml (void)
-{
-  g_autoptr (ModulemdComponentRpm) r = NULL;
-  g_autoptr (GError) error = NULL;
-  int result;
-  MMD_INIT_YAML_EVENT (event);
-  MMD_INIT_YAML_PARSER (parser);
-  g_autofree gchar *yaml_path = NULL;
-  g_autoptr (FILE) yaml_stream = NULL;
-
-  /* First test a valid component RPM */
-  yaml_path =
-    g_strdup_printf ("%s/component-rpm/cr.yaml", g_getenv ("TEST_DATA_PATH"));
-  g_assert_nonnull (yaml_path);
-
-  yaml_stream = g_fopen (yaml_path, "rbe");
-  g_assert_nonnull (yaml_stream);
-
-  yaml_parser_set_input_file (&parser, yaml_stream);
-
-  parser_skip_headers (&parser);
-  result = yaml_parser_parse (&parser, &event);
-  g_assert_cmpint (result, ==, 1);
-  g_assert_cmpint (event.type, ==, YAML_SCALAR_EVENT);
-  yaml_event_delete (&event);
-
-  r = modulemd_component_rpm_parse_yaml (&parser, "bar", TRUE, TRUE, &error);
-  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_UNKNOWN_ATTR);
-  g_assert_null (r);
 }
 
 
@@ -615,9 +582,6 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse/packager",
                    component_rpm_test_parse_packager_yaml);
-
-  g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse/packager/buildorder",
-                   component_rpm_test_parse_buildorder_packager_yaml);
 
   g_test_add_func ("/modulemd/v2/component/rpm/override_name",
                    component_rpm_test_override_name);

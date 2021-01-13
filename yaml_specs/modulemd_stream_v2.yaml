@@ -492,6 +492,9 @@ data:
                 # Use of both buildafter and buildorder in the same document is
                 # prohibited, as they will conflict.
                 #
+                # Note: The use of buildafter is not currently supported by the
+                # Fedora module build system.
+                #
                 # Type: AUTOMATIC
                 #
                 # buildafter:
@@ -543,7 +546,7 @@ data:
                 # Type: OPTIONAL
                 srpm-buildroot: true
 
-                # See component zyx for a complete description of buildorder
+                # See component xyz for a complete description of buildorder
                 #
                 # build this component before any others so that the macros it
                 # creates are available to all of them.

@@ -393,13 +393,18 @@ data:
                 # must be be ordered later than some other entries in this map.
                 # The values of this array come from the keys of this map and
                 # not the real component name to enable bootstrapping.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
                 #
                 # In this example, 'baz' makes some changes to the default
                 # buildroot that 'bar' must use.
                 #
+                # Note: The use of buildafter is not currently supported by the
+                # Fedora module build system.
+                #
                 # Type: AUTOMATIC
-                buildafter:
-                    - baz
+                # buildafter:
+                #     - baz
 
                 # buildonly:
                 # Use the "buildonly" value to indicate that all artifacts
@@ -478,8 +483,26 @@ data:
                 # present in order to build correctly, so we inform the build
                 # system not to build this until 'bar' has completed
                 # successfully.
-                buildafter:
-                    - bar
+                # buildafter:
+                #     - bar
+
+                # buildorder:
+                # Build order group
+                # When building, components are sorted by build order tag
+                # and built in batches grouped by their buildorder value.
+                # Built batches are then re-tagged into the buildroot.
+                # Multiple components can have the same buildorder index
+                # to map them into build groups.
+                # Defaults to zero.
+                # Integer, negative values are allowed.
+                # In this example, bar and baz are built first in no particular
+                # order, then tagged into the buildroot, then, finally, xxx is
+                # built.
+                # Use of both buildafter and buildorder in the same document is
+                # prohibited, as they will conflict.
+                #
+                # Type: OPTIONAL
+                buildorder: 10
 
         # modules:
         # Module content of this module
@@ -513,3 +536,9 @@ data:
                 #
                 # Type: AUTOMATIC
                 ref: somecoolbranchname
+
+                # buildorder:
+                # See the rpms buildorder.
+                #
+                # Type: AUTOMATIC
+                buildorder: 100

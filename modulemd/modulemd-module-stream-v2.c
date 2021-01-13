@@ -1778,7 +1778,6 @@ modulemd_module_stream_v2_parse_components (
   yaml_parser_t *parser,
   ModulemdModuleStreamV2 *modulestream,
   gboolean strict,
-  gboolean only_packager,
   GError **error);
 
 static gboolean
@@ -2064,11 +2063,8 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "components"))
             {
-              if (!modulemd_module_stream_v2_parse_components (&parser,
-                                                               modulestream,
-                                                               strict,
-                                                               only_packager,
-                                                               &nested_error))
+              if (!modulemd_module_stream_v2_parse_components (
+                    &parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;
@@ -2527,7 +2523,6 @@ modulemd_module_stream_v2_parse_rpm_components (
   yaml_parser_t *parser,
   ModulemdModuleStreamV2 *modulestream,
   gboolean strict,
-  gboolean only_packager,
   GError **error);
 static gboolean
 modulemd_module_stream_v2_parse_module_components (
@@ -2542,7 +2537,6 @@ modulemd_module_stream_v2_parse_components (
   yaml_parser_t *parser,
   ModulemdModuleStreamV2 *modulestream,
   gboolean strict,
-  gboolean only_packager,
   GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -2576,11 +2570,7 @@ modulemd_module_stream_v2_parse_components (
           if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
             {
               if (!modulemd_module_stream_v2_parse_rpm_components (
-                    parser,
-                    modulestream,
-                    strict,
-                    only_packager,
-                    &nested_error))
+                    parser, modulestream, strict, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return FALSE;
@@ -2629,7 +2619,6 @@ modulemd_module_stream_v2_parse_rpm_components (
   yaml_parser_t *parser,
   ModulemdModuleStreamV2 *modulestream,
   gboolean strict,
-  gboolean only_packager,
   GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -2664,7 +2653,6 @@ modulemd_module_stream_v2_parse_rpm_components (
             parser,
             (const gchar *)event.data.scalar.value,
             strict,
-            only_packager,
             &nested_error);
           if (!component)
             {

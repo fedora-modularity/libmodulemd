@@ -377,16 +377,13 @@ validate_yaml (ModulemdPackagerV3 *packager)
     "        repository: https://pagure.io/bar.git\n"
     "        cache: https://example.com/cache\n"
     "        ref: 26ca0c0\n"
-    "        buildafter:\n"
-    "        - baz\n"
     "      baz:\n"
     "        rationale: Demonstrate updating the buildroot contents.\n"
     "        buildroot: true\n"
     "        srpm-buildroot: true\n"
     "      xxx:\n"
     "        rationale: xxx demonstrates arches and multilib.\n"
-    "        buildafter:\n"
-    "        - bar\n"
+    "        buildorder: 10\n"
     "        arches: [i686, x86_64]\n"
     "        multilib: [x86_64]\n"
     "    modules:\n"
@@ -394,6 +391,7 @@ validate_yaml (ModulemdPackagerV3 *packager)
     "        rationale: Included in the stack, just because.\n"
     "        repository: https://pagure.io/includedmodule.git\n"
     "        ref: somecoolbranchname\n"
+    "        buildorder: 100\n"
     "...\n");
 
   /* re-parse the YAML string and verify everything is still there */

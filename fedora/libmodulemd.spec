@@ -99,8 +99,7 @@ Development files for libmodulemd.
 
 
 %build
-%meson -Ddeveloper_build=false \
-       %{meson_python_flags}
+%meson %{meson_python_flags}
 
 %meson_build
 

@@ -10,7 +10,6 @@ pushd /builddir/
 
 # Build the code under GCC and run documentation generation
 meson --buildtype=debug \
-      $COMMON_MESON_ARGS \
       doc-generation
 
 set +e

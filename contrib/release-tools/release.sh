@@ -41,7 +41,7 @@ hub api "https://api.github.com/user" || error_out code=1 message="Invalid crede
 OLDTAG=$(git describe --first-parent --abbrev=0)
 
 # Configure the build directory
-meson --buildtype=release -Dskip_formatters=true -Ddeveloper_build=false $TMPDIR
+meson --buildtype=release $TMPDIR
 MMD_SKIP_VALGRIND=True ninja -C $TMPDIR dist
 
 # Get the version that will be tagged

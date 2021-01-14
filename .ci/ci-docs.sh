@@ -8,6 +8,7 @@ source $SCRIPT_DIR/ci-common.inc
 set -e
 set -x
 
+modulemd_version=${1:-latest}
 os=fedora
 release=32
 repository=quay.io
@@ -22,8 +23,8 @@ mmd_run_docker_tests \
     test_template="docs/Dockerfile.tmpl" \
     test_image="libmodulemd-docs-$os:$release" \
     oci_extra_args="
-        -e GITHUB_SHA=$GITHUB_SHA
-        -e DOC_TOKEN='$DOC_TOKEN'
+        --env MODULEMD_VERSION=$modulemd_version
+        --volume=$GITHUB_WORKSPACE:/builddir
     "
 
-popd # $SCRIPT_DIR
+popd # $SCRIPT_DIR 

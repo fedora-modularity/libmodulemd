@@ -40,7 +40,7 @@ class TestCommon(TestBase):
         doc = Modulemd.read_packager_file(
             os.path.join(
                 self.source_root, "yaml_specs/modulemd_packager_v2.yaml"
-            ),
+            )
         )
         self.assertIsNotNone(doc)
         # Once read in, a modulemd-packager v2 document is a ModuleStream of the
@@ -68,7 +68,7 @@ class TestCommon(TestBase):
         doc = Modulemd.read_packager_file(
             os.path.join(
                 self.source_root, "yaml_specs/modulemd_packager_v3.yaml"
-            ),
+            )
         )
         self.assertIsNotNone(doc)
         self.assertIs(type(doc), Modulemd.PackagerV3)
@@ -91,7 +91,7 @@ class TestCommon(TestBase):
         doc = Modulemd.read_packager_file(
             os.path.join(
                 self.source_root, "yaml_specs/modulemd_stream_v2.yaml"
-            ),
+            )
         )
         self.assertIsNotNone(doc)
         self.assertIs(type(doc), Modulemd.ModuleStreamV2)
@@ -151,7 +151,7 @@ data:
 
         # Read again with module/stream name overrides
         doc = Modulemd.read_packager_string(
-            minimal_valid, "modulename-override", "streamname-override",
+            minimal_valid, "modulename-override", "streamname-override"
         )
         self.assertIsNotNone(doc)
         self.assertIs(type(doc), Modulemd.ModuleStreamV2)
@@ -179,7 +179,7 @@ data:
 
         # Read again with module/stream name overrides
         doc = Modulemd.read_packager_string(
-            minimal_valid, "modulename-override", "streamname-override",
+            minimal_valid, "modulename-override", "streamname-override"
         )
         self.assertIsNotNone(doc)
         self.assertIs(type(doc), Modulemd.PackagerV3)
@@ -208,7 +208,7 @@ data:
 
         # Read again with module/stream name overrides
         doc = Modulemd.read_packager_string(
-            minimal_valid, "modulename-override", "streamname-override",
+            minimal_valid, "modulename-override", "streamname-override"
         )
         self.assertIsNotNone(doc)
         self.assertIs(type(doc), Modulemd.ModuleStreamV2)

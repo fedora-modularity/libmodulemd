@@ -5,7 +5,6 @@ set -e
 set -x
 
 PROCESSORS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-MESON_DIRTY_REPO_ARGS="-Dtest_dirty_git=${DIRTY_REPO_CHECK:-false}"
 RETRY_CMD=/builddir/.ci/retry-command.sh
 WITH_RPM_TESTS=${WITH_RPM_TESTS:-true}
 
@@ -18,8 +17,6 @@ sed -i -e 's/test -r/test -f/g' -e 's/test -x/test -f/g' /bin/ldd
 
 # Build the code under GCC and run standard tests
 meson --buildtype=debugoptimized \
-      -Dverbose_tests=false \
-      $MESON_DIRTY_REPO_ARGS \
       ci
 
 meson test --suite formatters \
@@ -34,9 +31,14 @@ meson test --suite ci \
            --print-errorlogs \
            -t 5
 
+# Disable the verbose tests and run the supported tests through valgrind
+meson --buildtype=debugoptimized \
+      -Dverbose_tests=false \
+      ci-valgrind
+
 meson test --suite ci_valgrind \
            --wrap=/builddir/contrib/valgrind/valgrind_wrapper.sh \
-           -C ci \
+           -C ci-valgrind \
            --num-processes=$PROCESSORS \
            --print-errorlogs \
            -t 10
@@ -53,7 +55,6 @@ else
     set -e
     meson --buildtype=debug \
           -Dskip_introspection=true \
-          $COMMON_MESON_ARGS \
           ci_scanbuild
 
     pushd ci_scanbuild

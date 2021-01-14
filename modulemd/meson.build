@@ -11,40 +11,10 @@
 
 # -- Configuration Options -- #
 
-test_dirty_git = get_option('test_dirty_git')
 test_installed_lib = get_option('test_installed_lib')
-skip_formatters = get_option('skip_formatters')
 skip_introspection = get_option('skip_introspection')
-developer_build = get_option('developer_build')
 verbose_tests = get_option('verbose_tests')
-
-if not developer_build
-    skip_formatters = true
-endif
-
 clang_simple_version_script = find_program ('clang_simple_version.sh')
-
-if skip_formatters
-    clang_format = disabler()
-    python_formatter = disabler()
-    pycodestyle = disabler()
-else
-    clang_format = find_program('clang-format', required: developer_build)
-    if not clang_format.found()
-        clang_format = disabler()
-    endif
-
-    python_formatter = find_program('black', required : developer_build)
-    if not python_formatter.found()
-        python_formatter = disabler()
-    endif
-
-    pycodestyle = find_program('pycodestyle-3', 'pycodestyle',
-                               required : developer_build)
-    if not pycodestyle.found()
-        pycodestyle = disabler()
-    endif
-endif
 
 
 # -- Library -- #
@@ -280,15 +250,6 @@ py_test_release_env = py_test_env
 py_test_release_env.set('G_DEBUG', 'fatal-warnings,fatal-criticals')
 
 
-# Make sure we remembered to bump the version number since the last release
-version_test = find_program('tests/test-version.sh')
-if developer_build
-    test('version',
-         version_test,
-         env : test_env,
-         suite : ['smoketest', 'ci'])
-endif
-
 # --- Test utility library --- #
 test_utils_lib = library(
     'modulemd_tests',
@@ -395,53 +356,6 @@ foreach name, script : python_tests
               suite : ['ci', 'py2', 'py2_release'])
     endif #with_py2
 endforeach
-
-
-# --- Formatting Helpers -- #
-# Run these after the functional tests so we get those results more quickly
-
-
-# Fake test to ensure that all sources and headers are formatted properly
-clang_files = modulemd_srcs + modulemd_hdrs + modulemd_priv_hdrs + modulemd_validator_srcs + test_srcs + test_priv_hdrs
-
-clang_args = [ '-i' ]
-test('clang_format', clang_format,
-     args : clang_args + clang_files,
-     suite : 'formatters')
-
-
-# Fake test to ensure that the python tests are formatted according to PEP8
-python_formatter_args = [ '--verbose', '--line-length', '79' ]
-test('python_formatter', python_formatter,
-     args : python_formatter_args + [ meson.source_root() ],
-     suite : 'formatters')
-
-
-# Test all python files for compliance with pycodestyle
-# Ignore line-length as there are a number of places where this is unavoidable
-python_scripts = [ files('tests/test-dirty.py',
-                         '../bindings/python/gi/overrides/Modulemd.py') +
-                   test_python_scripts ]
-
-pycodestyle_args = [
-    '--show-pep8',
-    '--ignore=E121,E123,E126,E226,E24,E501,E704,W503,W504'
-]
-test('pycodestyle', pycodestyle,
-     args : pycodestyle_args + python_scripts,
-     suite : 'formatters')
-
-
-# Fake test to ensure that the autoformatters didn't end up making changes
-# when run in CI (such as during a pull-request). This test is only run if
-# meson was configured with `-Dtest_dirty_git=true`
-
-if test_dirty_git
-    dirty_repo_scripts = [ files('tests/test-dirty.py') ]
-    test('test_dirty_repo', python3,
-         args : dirty_repo_scripts,
-         suite : ['ci', 'dirty'])
-endif
 
 
 # -- C/C++ Header test -- #

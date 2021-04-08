@@ -146,9 +146,7 @@ test_modulemd_detect_compression (void)
       fd = fileno (filestream);
       result = modulemd_detect_compression (filename, fd, &error);
       g_assert_no_error (error);
-      g_assert_cmpint (result,
-                       ==,
-                       expected_magic[j].type);
+      g_assert_cmpint (result, ==, expected_magic[j].type);
       g_clear_error (&error);
       g_clear_pointer (&filestream, fclose);
       g_clear_pointer (&filename, g_free);

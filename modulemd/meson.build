@@ -271,6 +271,7 @@ c_tests = {
 'component_module'    : [ 'tests/test-modulemd-component-module.c' ],
 'component_rpm'       : [ 'tests/test-modulemd-component-rpm.c' ],
 'compression'         : [ 'tests/test-modulemd-compression.c' ],
+'context'             : [ 'tests/test-modulemd-context.c' ],
 'defaults'            : [ 'tests/test-modulemd-defaults.c' ],
 'defaultsv1'          : [ 'tests/test-modulemd-defaults-v1.c' ],
 'dependencies'        : [ 'tests/test-modulemd-dependencies.c' ],

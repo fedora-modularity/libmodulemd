@@ -88,7 +88,7 @@ data:
     #   Mandatory for module metadata in a yum/dnf repository.
     #
     # If 'static_context' is set to True:
-    #   The context flag is a string of up to ten [a-zA-Z0-9] characters
+    #   The context flag is a string of up to thirteen [a-zA-Z0-9_] characters
     #   representing a build and runtime configuration for this stream. This
     #   string is arbitrary but must be unique in this module stream.
     #

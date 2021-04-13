@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "modulemd-module-stream.h"
 #include "modulemd-module-stream-v2.h"
 #include "modulemd-subdocument-info.h"
 #include <glib-object.h>
@@ -20,6 +21,17 @@
 
 
 G_BEGIN_DECLS
+
+
+/**
+ * MODULEMD_MODULE_STREAM_V2_MAXCONTEXTLEN:
+ *
+ * The ModuleStream v3 specification defines the maximum lenth of the context
+ * field. Just before building, the v3 format is converted to v2 format.  But
+ * if a scratch build was requested, an underscore with a decimal number (e.g.
+ * "_1") is appended to the v2 context. Allow up to 99 scratch builds here.
+ */
+#define MODULEMD_MODULE_STREAM_V2_MAXCONTEXTLEN (MMD_MAXCONTEXTLEN + 3)
 
 
 /**

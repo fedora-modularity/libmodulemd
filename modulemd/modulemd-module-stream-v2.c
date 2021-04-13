@@ -1237,7 +1237,7 @@ static gboolean
 modulemd_module_stream_v2_validate_context (const gchar *context,
                                             GError **error)
 {
-  /* must be string of up to MMD_MAXCONTEXTLEN [a-zA-Z0-9] */
+  /* must be string of up to MODULEMD_MODULE_STREAM_V2_MAXCONTEXTLEN [a-zA-Z0-9_] */
 
   if (context == NULL || *context == '\0')
     {
@@ -1246,25 +1246,25 @@ modulemd_module_stream_v2_validate_context (const gchar *context,
       return FALSE;
     }
 
-  if (strlen (context) > MMD_MAXCONTEXTLEN)
+  if (strlen (context) > MODULEMD_MODULE_STREAM_V2_MAXCONTEXTLEN)
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MMD_ERROR_VALIDATE,
                    "Stream context '%s' exceeds maximum length (%d)",
                    context,
-                   MMD_MAXCONTEXTLEN);
+                   MODULEMD_MODULE_STREAM_V2_MAXCONTEXTLEN);
       return FALSE;
     }
 
   for (const gchar *i = context; *i != '\0'; i++)
     {
-      if (!g_ascii_isalnum (*i))
+      if (!g_ascii_isalnum (*i) && *i != '_')
         {
           g_set_error (error,
                        MODULEMD_ERROR,
                        MMD_ERROR_VALIDATE,
-                       "Non-alphanumeric character in stream context '%s'",
+                       "Stream context '%s' can only contain [a-zA-Z0-9_] characters",
                        context);
           return FALSE;
         }

@@ -3,47 +3,221 @@ name: Continuous Integration
 on: [push, pull_request]
 
 jobs:
-  stable_tests:
-    name: Operating Systems (Stable)
-    runs-on: ubuntu-20.04
+  get_fedora_releases:
+    name: Get Fedora Releases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Fedora
+        id: releases
+        uses: sgallagher/get-fedora-releases-action@v1
+    outputs:
+      stable: ${{ steps.releases.outputs.stable }}
+      development: ${{ steps.releases.outputs.development }}
+
+  unit_tests_fedora_stable:
+    name: Unit Tests (Stable Fedora)
+    needs: get_fedora_releases
+    runs-on: ubuntu-latest
     continue-on-error: false
     strategy:
       matrix:
-        distro:
-          - Fedora 32
-          - Fedora 33
-          - CentOS 7
-          - CentOS 8
+        release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
+    container:
+      image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+
+    outputs:
+        meson_version: ${{ steps.scanbuild.outputs.available }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run tests
-        env:
-          DISTRO: ${{ matrix.distro }}
+      - name: Install dependencies
+        run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
+
+      - name: Determine if we can run scan-build
+        id: scanbuild
+        run: echo "::set-output name=available::echo $(rpmdev-vercmp $(meson --version) 0.49.0 > /dev/null; if [ $? == 12 ];then echo false; else echo true; fi )"
+
+
+      - name: Set up the build directory
+        run: meson setup --buildtype=debugoptimized ci $GITHUB_WORKSPACE
+
+      - name: Compile the code
+        run: ninja -C ci
+
+      - name: Run CI tests
+        run: meson test -C ci --suite ci --print-errorlogs -t 5
+
+      - name: Run valgrind tests
+        run:
+          meson test -C ci --suite ci_valgrind --print-errorlogs -t 10
+            --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh
+
+      - name: Run clang static analysis tests
+        if: ${{ steps.scanbuild.outputs.available }}
         run: |
-          ./.ci/ci-launcher.sh
-  experimental_tests:
-    name: Operating Systems (Experimental)
-    runs-on: ubuntu-20.04
+          meson setup --buildtype=debug -Dskip_introspection=true ci_scanbuild
+          ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
+
+
+  rpm_tests:
+    name: Installed RPM Tests (Stable Fedora)
+    needs: get_fedora_releases
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+        release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
+    container:
+      image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+
+    steps:
+      - name: Install git
+        run: dnf -y install git-core
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
+
+      - name: Set up the RPM output directory
+        run: mkdir -p $GITHUB_WORKSPACE/rpmbuild/RPMS
+
+      - name: Build the RPM repository
+        working-directory: ${{github.workspace}}/rpmbuild/RPMS
+        run: |
+          packit --debug local-build ../..
+          createrepo_c x86_64
+
+      - name: Install the packages
+        working-directory: ${{github.workspace}}/rpmbuild/RPMS
+        run:
+          $GITHUB_WORKSPACE/.ci/retry-command.sh
+          dnf -y install --nogpgcheck
+                         --allowerasing
+                         --repofrompath libmodulemd-ci,x86_64
+                         x86_64/python3-libmodulemd*.rpm
+                         x86_64/libmodulemd-devel*.rpm
+
+      - name: Set up the build directory
+        run:
+          meson --buildtype=release -Dtest_installed_lib=true
+                installed_lib_tests $GITHUB_WORKSPACE
+
+      - name: Compile the code
+        run: ninja -C installed_lib_tests
+
+      - name: Run tests on the installed RPMs
+        run:
+          meson test --suite ci
+                     -C installed_lib_tests
+                     --print-errorlogs
+                     -t 5
+
+  unit_tests_fedora_devel:
+    name: Unit Tests (Devel Fedora)
+    needs: get_fedora_releases
+    runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       matrix:
-        distro:
-          - Fedora rawhide
-          - Archlinux
-          - Mageia 7
-          # Disabled for now, since it's broken
-          #- OpenMandriva cooker
-          - openSUSE tumbleweed
+        release: ${{ fromJson(needs.get_fedora_releases.outputs.development) }}
+    container:
+      image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+
+    outputs:
+        meson_version: ${{ steps.scanbuild.outputs.available }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run tests
-        env:
-          DISTRO: ${{ matrix.distro }}
+      - name: Install dependencies
+        run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
+
+      - name: Determine if we can run scan-build
+        id: scanbuild
+        run: echo "::set-output name=available::echo $(rpmdev-vercmp $(meson --version) 0.49.0 > /dev/null; if [ $? == 12 ];then echo false; else echo true; fi )"
+
+
+      - name: Set up the build directory
+        run: meson setup --buildtype=debugoptimized ci $GITHUB_WORKSPACE
+
+      - name: Compile the code
+        run: ninja -C ci
+
+      - name: Run CI tests
+        run: meson test -C ci --suite ci --print-errorlogs -t 5
+
+      - name: Run valgrind tests
+        run:
+          meson test -C ci --suite ci_valgrind --print-errorlogs -t 10
+            --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh
+
+      - name: Run clang static analysis tests
+        if: ${{ steps.scanbuild.outputs.available }}
         run: |
-          ./.ci/ci-launcher.sh
+          meson setup --buildtype=debug -Dskip_introspection=true ci_scanbuild
+          ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
+
+
+  rpm_tests_devel:
+    name: Installed RPM Tests (Devel Fedora)
+    needs: get_fedora_releases
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+        release: ${{ fromJson(needs.get_fedora_releases.outputs.development) }}
+    container:
+      image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+
+    steps:
+      - name: Install git
+        run: dnf -y install git-core
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
+
+      - name: Set up the RPM output directory
+        run: mkdir -p $GITHUB_WORKSPACE/rpmbuild/RPMS
+
+      - name: Build the RPM repository
+        working-directory: ${{github.workspace}}/rpmbuild/RPMS
+        run: |
+          packit --debug local-build ../..
+          createrepo_c x86_64
+
+      - name: Install the packages
+        working-directory: ${{github.workspace}}/rpmbuild/RPMS
+        run:
+          $GITHUB_WORKSPACE/.ci/retry-command.sh
+          dnf -y install --nogpgcheck
+                         --allowerasing
+                         --repofrompath libmodulemd-ci,x86_64
+                         x86_64/python3-libmodulemd*.rpm
+                         x86_64/libmodulemd-devel*.rpm
+
+      - name: Set up the build directory
+        run:
+          meson --buildtype=release -Dtest_installed_lib=true
+                installed_lib_tests $GITHUB_WORKSPACE
+
+      - name: Compile the code
+        run: ninja -C installed_lib_tests
+
+      - name: Run tests on the installed RPMs
+        run:
+          meson test --suite ci
+                     -C installed_lib_tests
+                     --print-errorlogs
+                     -t 5

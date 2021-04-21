@@ -130,7 +130,8 @@ test_modulemd_v2_context_valid (void)
   g_assert_true (type == MODULEMD_TYPE_MODULE_STREAM_V2);
   g_assert_no_error (error);
   /* Reading v2 document does not validate it; validating explictly */
-  g_assert_true (modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
+  g_assert_true (
+    modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
 }
 
 
@@ -164,7 +165,8 @@ test_modulemd_v2_context_overlong (void)
     {
       g_test_incomplete ("Reading v2 document does not validate it");
       /* Validating explicitly */
-      g_assert_false (modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
+      g_assert_false (modulemd_module_stream_validate (
+        MODULEMD_MODULE_STREAM (object), &error));
     }
 }
 
@@ -199,7 +201,8 @@ test_modulemd_v2_context_bad_character (void)
     {
       g_test_incomplete ("Reading v2 document does not validate it");
       /* Validating explicitly */
-      g_assert_false (modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
+      g_assert_false (modulemd_module_stream_validate (
+        MODULEMD_MODULE_STREAM (object), &error));
     }
 }
 
@@ -213,13 +216,19 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://github.com/fedora-modularity/libmodulemd/issues/");
   g_test_bug ("549");
 
-  g_test_add_func ("/modulemd/v3/context/valid", test_modulemd_v3_context_valid);
-  g_test_add_func ("/modulemd/v3/context/overlong", test_modulemd_v3_context_overlong);
-  g_test_add_func ("/modulemd/v3/context/bad_underscore", test_modulemd_v3_context_bad_underscore);
+  g_test_add_func ("/modulemd/v3/context/valid",
+                   test_modulemd_v3_context_valid);
+  g_test_add_func ("/modulemd/v3/context/overlong",
+                   test_modulemd_v3_context_overlong);
+  g_test_add_func ("/modulemd/v3/context/bad_underscore",
+                   test_modulemd_v3_context_bad_underscore);
 
-  g_test_add_func ("/modulemd/v2/context/valid", test_modulemd_v2_context_valid);
-  g_test_add_func ("/modulemd/v2/context/overlong", test_modulemd_v2_context_overlong);
-  g_test_add_func ("/modulemd/v2/context/bad_character", test_modulemd_v2_context_bad_character);
+  g_test_add_func ("/modulemd/v2/context/valid",
+                   test_modulemd_v2_context_valid);
+  g_test_add_func ("/modulemd/v2/context/overlong",
+                   test_modulemd_v2_context_overlong);
+  g_test_add_func ("/modulemd/v2/context/bad_character",
+                   test_modulemd_v2_context_bad_character);
 
   return g_test_run ();
 }

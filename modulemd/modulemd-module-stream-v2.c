@@ -1261,11 +1261,12 @@ modulemd_module_stream_v2_validate_context (const gchar *context,
     {
       if (!g_ascii_isalnum (*i) && *i != '_')
         {
-          g_set_error (error,
-                       MODULEMD_ERROR,
-                       MMD_ERROR_VALIDATE,
-                       "Stream context '%s' can only contain [a-zA-Z0-9_] characters",
-                       context);
+          g_set_error (
+            error,
+            MODULEMD_ERROR,
+            MMD_ERROR_VALIDATE,
+            "Stream context '%s' can only contain [a-zA-Z0-9_] characters",
+            context);
           return FALSE;
         }
     }

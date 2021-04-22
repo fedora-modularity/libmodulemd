@@ -159,15 +159,11 @@ test_modulemd_v2_context_overlong (void)
     "  context: a234567890_234\n"
     "...\n";
   type = modulemd_read_packager_string (yaml_string, &object, &error);
-  g_assert_true (type == G_TYPE_INVALID);
-  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
-  if (type != G_TYPE_INVALID)
-    {
-      g_test_incomplete ("Reading v2 document does not validate it");
-      /* Validating explicitly */
-      g_assert_false (modulemd_module_stream_validate (
-        MODULEMD_MODULE_STREAM (object), &error));
-    }
+  g_assert_true (type == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_no_error (error);
+  /* Reading v2 document does not validate it; validating explictly */
+  g_assert_false (
+    modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
 }
 
 
@@ -195,15 +191,11 @@ test_modulemd_v2_context_bad_character (void)
     "  context: '-'\n"
     "...\n";
   type = modulemd_read_packager_string (yaml_string, &object, &error);
-  g_assert_true (type == G_TYPE_INVALID);
-  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
-  if (type != G_TYPE_INVALID)
-    {
-      g_test_incomplete ("Reading v2 document does not validate it");
-      /* Validating explicitly */
-      g_assert_false (modulemd_module_stream_validate (
-        MODULEMD_MODULE_STREAM (object), &error));
-    }
+  g_assert_true (type == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_no_error (error);
+  /* Reading v2 document does not validate it; validating explictly */
+  g_assert_false (
+    modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), &error));
 }
 
 

@@ -3,7 +3,8 @@ upstream_package_name: libmodulemd
 upstream_project_url: https://github.com/fedora-modularity/libmodulemd
 downstream_package_name: libmodulemd
 
-current_version_command: [ ./get_version.sh ]
+actions:
+  get-current-version: ./get_version.sh
 
 synced_files:
   - fedora/

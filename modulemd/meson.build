@@ -187,19 +187,24 @@ else
     )
 endif
 
-modulemd_validator = executable(
-    'modulemd-validator',
-    sources : modulemd_validator_srcs,
-    include_directories : include_dirs,
-    dependencies : [
-        gobject,
-        magic,
-        rpm,
-        yaml,
-        modulemd_dep
-    ],
-    install : true
-)
+if test_installed_lib
+    # Run tests against an installed tool of in-tree
+    modulemd_validator = find_program('modulemd-validator').full_path()
+else
+    modulemd_validator = executable(
+        'modulemd-validator',
+        sources : modulemd_validator_srcs,
+        include_directories : include_dirs,
+        dependencies : [
+            gobject,
+            magic,
+            rpm,
+            yaml,
+            modulemd_dep
+        ],
+        install : true
+    )
+endif
 
 header_path = 'modulemd-2.0'
 
@@ -432,6 +437,31 @@ foreach name, script : python_tests
               depends : girs,
               suite : ['ci', 'py2', 'py2_release'])
     endif #with_py2
+endforeach
+
+
+# Tests for modulemd-validator tool
+modulemd_validator_tests = {
+'help'        : [['--code', '0'], ['--help']],
+'version'     : [['--code', '1'], ['--version']],
+'valid'       : [['--code', '0'],
+                 [files('tests/test_data/static_context.yaml')]],
+'invalid'     : [['--code', '1', '--stdout', 'No data section provided'],
+                 [files('tests/test_data/good_and_bad.yaml')]],
+}
+test_modulemd_validator = executable(
+    'test-modulemd-validator',
+    files('tests/test-modulemd-validator.c'),
+    dependencies : [ glib ],
+    install : false,
+)
+
+foreach name, arguments : modulemd_validator_tests
+    test(name, test_modulemd_validator,
+         args : [arguments[0], '--', modulemd_validator, arguments[1]],
+         env : test_env,
+         timeout : 60,
+         suite : ['ci', 'modulemd_validator'])
 endforeach
 
 

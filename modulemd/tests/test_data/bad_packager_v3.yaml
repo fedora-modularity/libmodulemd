@@ -1,0 +1,14 @@
+---
+document: modulemd-packager
+version: 3
+data:
+  name: trivialname
+  stream: trivialstream
+  summary: Trivial Summary
+  description: >-
+    Trivial Description
+  license: [MIT]
+  configurations:
+    - context: a2345678901
+      platform: foo
+...

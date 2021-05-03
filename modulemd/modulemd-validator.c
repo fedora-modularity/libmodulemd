@@ -32,10 +32,11 @@ enum mmd_verbosity
 struct validator_options
 {
   enum mmd_verbosity verbosity;
+  GType type;
   gchar **filenames;
 };
 
-struct validator_options options = { 0, NULL };
+struct validator_options options = { 0 };
 
 static gboolean
 print_version (const gchar *option_name,
@@ -106,9 +107,34 @@ set_verbosity (const gchar *option_name,
   return TRUE;
 }
 
+static gboolean
+set_type (const gchar *option_name,
+          const gchar *value,
+          gpointer data,
+          GError **error)
+{
+    if (!g_strcmp0 (value, "index"))
+        options.type = MODULEMD_TYPE_MODULE_INDEX;
+    else if (!g_strcmp0 (value, "modulemd-v2"))
+        options.type = MODULEMD_TYPE_MODULE_STREAM_V2;
+    else if (!g_strcmp0 (value, "modulemd-packager-v3"))
+        options.type = MODULEMD_TYPE_PACKAGER_V3;
+    else
+      {
+        g_set_error (error,
+                    G_OPTION_ERROR,
+                    G_OPTION_ERROR_FAILED,
+                    "Unknown document type: %s",
+                    value);
+        return FALSE;
+      }
+    return TRUE;
+}
+
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
+  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-packager-v3; default is index)", NULL },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
@@ -120,16 +146,69 @@ static GOptionEntry entries[] = {
 static gboolean
 parse_file (const gchar *filename, GPtrArray **failures, GError **error)
 {
-  g_autoptr (ModulemdModuleIndex) index = NULL;
-
   if (options.verbosity >= MMD_VERBOSE)
     {
       g_fprintf (stdout, "Validating %s\n", filename);
     }
 
-  index = modulemd_module_index_new ();
-  return modulemd_module_index_update_from_file_ext (
-    index, filename, TRUE, TRUE, failures, error);
+  if (options.type == MODULEMD_TYPE_MODULE_INDEX)
+    {
+      g_autoptr (ModulemdModuleIndex) index = NULL;
+      index = modulemd_module_index_new ();
+      return modulemd_module_index_update_from_file_ext (
+        index, filename, TRUE, TRUE, failures, error);
+    }
+  else if (options.type == MODULEMD_TYPE_MODULE_STREAM_V2)
+    {
+      GType type;
+      g_autoptr (GObject) object = NULL;
+      type = modulemd_read_packager_file (filename, &object, error);
+      if (type == G_TYPE_INVALID)
+        return FALSE;
+      if (type != MODULEMD_TYPE_MODULE_STREAM_V2)
+        {
+          g_set_error(
+            error,
+            MODULEMD_ERROR,
+            0,
+            "Not a modulemd-v2 document; it is %s",
+            g_type_name(type)
+          );
+          return FALSE;
+        }
+      return modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), error);
+    }
+  else if (options.type == MODULEMD_TYPE_PACKAGER_V3)
+    {
+      GType type;
+      g_autoptr (GObject) object = NULL;
+      type = modulemd_read_packager_file (filename, &object, error);
+      if (type == G_TYPE_INVALID)
+        return FALSE;
+      if (type != MODULEMD_TYPE_PACKAGER_V3)
+        {
+          g_set_error(
+            error,
+            MODULEMD_ERROR,
+            0,
+            "Not a modulemd-packager-v3 document; it is %s",
+            g_type_name(type)
+          );
+          return FALSE;
+        }
+      /* modulemd_packager_v3 is validated implicitly by
+       * modulemd_read_packager_file (). */
+      return TRUE;
+    }
+  else
+    {
+      g_fprintf (
+        stderr,
+        "Internal error: unsupported document type: %s\n",
+        g_type_name(options.type)
+      );
+      exit (EXIT_FAILURE);
+    }
 }
 
 
@@ -146,6 +225,7 @@ main (int argc, char *argv[])
 
   setlocale (LC_ALL, "");
 
+  options.type = MODULEMD_TYPE_MODULE_INDEX;
   context = g_option_context_new ("FILES - Simple modulemd YAML validator");
   g_option_context_add_main_entries (context, entries, "modulemd-validator");
   if (!g_option_context_parse (context, &argc, &argv, &error))

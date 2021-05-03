@@ -76,7 +76,14 @@ set_verbosity (const gchar *option_name,
             {
               debugging_env = g_strdup (G_LOG_DOMAIN);
             }
-          g_setenv ("G_MESSAGES_DEBUG", debugging_env, TRUE);
+          if (!g_setenv ("G_MESSAGES_DEBUG", debugging_env, TRUE))
+            {
+              g_set_error (error,
+                           G_OPTION_ERROR,
+                           G_OPTION_ERROR_FAILED,
+                           "Could not set G_MESSAGES_DEBUG environment variable");
+              return FALSE;
+            }
         }
     }
   else if (g_strcmp0 ("-q", option_name) == 0 ||

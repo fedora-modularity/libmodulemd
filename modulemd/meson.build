@@ -445,9 +445,30 @@ modulemd_validator_tests = {
 'help'        : [['--code', '0'], ['--help']],
 'version'     : [['--code', '0'], ['--version']],
 'valid'       : [['--code', '0'],
-                 [files('tests/test_data/static_context.yaml')]],
+                [files('tests/test_data/static_context.yaml')]],
 'invalid'     : [['--code', '1', '--stdout', 'No data section provided'],
-                 [files('tests/test_data/good_and_bad.yaml')]],
+                [files('tests/test_data/good_and_bad.yaml')]],
+'stream_packagerv3_invalid_mix_as_index':
+    [['--code', '1'],
+    [files('tests/test_data/stream_packager_mix.yaml')]],
+'valid_packagerv3':
+    [['--code', '0'],
+    ['--type', 'modulemd-packager-v3', files('../yaml_specs/modulemd_packager_v3.yaml')]],
+'invalid_packagerv3':
+    [['--code', '1', '--stderr', 'context exceeds'],
+    ['--type', 'modulemd-packager-v3', files('tests/test_data/bad_packager_v3.yaml')]],
+'valid_modulemdv2_as_packagerv3':
+    [['--code', '1'],
+    ['--type', 'modulemd-packager-v3', files('../yaml_specs/modulemd_stream_v2.yaml')]],
+'valid_modulemdv2':
+    [['--code', '0'],
+    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_stream_v2.yaml')]],
+'invalid_modulemdv2':
+    [['--code', '1', '--stderr', 'Stream context'],
+    ['--type', 'modulemd-v2', files('tests/test_data/bad_stream_v2.yaml')]],
+'valid_packagerv3_as_modulemdv2':
+    [['--code', '1'],
+    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_packager_v3.yaml')]],
 }
 test_modulemd_validator = executable(
     'test-modulemd-validator',

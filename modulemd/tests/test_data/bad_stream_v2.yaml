@@ -1,0 +1,14 @@
+---
+document: modulemd
+version: 2
+data:
+  name: trivialname
+  stream: trivialstream
+  summary: Trivial Summary
+  description: >-
+    Trivial Description
+  license:
+    module: [MIT]
+  static_context: true
+  context: '-'
+...

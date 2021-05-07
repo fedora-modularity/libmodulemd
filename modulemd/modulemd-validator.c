@@ -78,10 +78,11 @@ set_verbosity (const gchar *option_name,
             }
           if (!g_setenv ("G_MESSAGES_DEBUG", debugging_env, TRUE))
             {
-              g_set_error (error,
-                           G_OPTION_ERROR,
-                           G_OPTION_ERROR_FAILED,
-                           "Could not set G_MESSAGES_DEBUG environment variable");
+              g_set_error (
+                error,
+                G_OPTION_ERROR,
+                G_OPTION_ERROR_FAILED,
+                "Could not set G_MESSAGES_DEBUG environment variable");
               return FALSE;
             }
         }

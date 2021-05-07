@@ -244,7 +244,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     container:
-      image: docker.io/archlinux/base
+      image: docker.io/library/archlinux:base
 
     steps:
       - name: Install dependencies

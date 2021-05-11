@@ -329,17 +329,50 @@ modulemd_subdocument_info_init (ModulemdSubdocumentInfo *self)
 void
 modulemd_subdocument_info_debug_dump_failures (GPtrArray *failures)
 {
-  ModulemdSubdocumentInfo *doc = NULL;
-
   if (failures && failures->len)
     {
-      g_debug ("%u YAML subdocuments were invalid", failures->len);
-      for (gsize i = 0; i < failures->len; i++)
+      if (failures->len == 1)
         {
+          g_debug ("%u YAML subdocument was invalid:", failures->len);
+        }
+      else
+        {
+          g_debug ("%u YAML subdocuments were invalid:", failures->len);
+        }
+      for (guint i = 0; i < failures->len; i++)
+        {
+          ModulemdSubdocumentInfo *doc = NULL;
+          const GError *error = NULL;
+          const gchar *message = NULL;
+          const gchar *yaml = NULL;
+
           doc = MODULEMD_SUBDOCUMENT_INFO (g_ptr_array_index (failures, i));
-          g_debug ("\nFailed subdocument (%s): \n%s\n",
-                   modulemd_subdocument_info_get_gerror (doc)->message,
-                   modulemd_subdocument_info_get_yaml (doc));
+          if (doc)
+            {
+              error = modulemd_subdocument_info_get_gerror (doc);
+              if (error && error->message)
+                {
+                  message = error->message;
+                }
+              else
+                {
+                  message = "unknown reason";
+                }
+              yaml = modulemd_subdocument_info_get_yaml (doc);
+            }
+          else
+            {
+              message = "undefined document";
+            }
+
+          if (yaml)
+            {
+              g_debug ("Failed subdocument #%u (%s):\n%s", i + 1, message, yaml);
+            }
+          else
+            {
+              g_debug ("Failed subdocument #%u (%s).", i + 1, message);
+            }
         }
     }
 }

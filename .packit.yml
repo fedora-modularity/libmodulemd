@@ -20,3 +20,4 @@ jobs:
     targets:
     - fedora-all
     - epel-7
+    - epel-8

@@ -538,6 +538,7 @@ test_packager_read_string (void)
   signal (SIGTRAP, modulemd_test_signal_handler);
   otype = modulemd_read_packager_string (NULL, &object, &error);
   g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
+  g_assert_cmpint (otype, ==, G_TYPE_INVALID);
   g_assert_null (object);
 
   /* An empty string is not a valid packager format */

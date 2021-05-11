@@ -367,7 +367,8 @@ modulemd_subdocument_info_debug_dump_failures (GPtrArray *failures)
 
           if (yaml)
             {
-              g_debug ("Failed subdocument #%u (%s):\n%s", i + 1, message, yaml);
+              g_debug (
+                "Failed subdocument #%u (%s):\n%s", i + 1, message, yaml);
             }
           else
             {

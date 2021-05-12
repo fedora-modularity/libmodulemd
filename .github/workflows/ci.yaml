@@ -247,6 +247,9 @@ jobs:
       image: docker.io/library/archlinux:base
 
     steps:
+      - name: Install the standard pacman config
+        run: cp /etc/pacman.conf.pacnew /etc/pacman.conf
+
       - name: Install dependencies
         run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-docs gobject-introspection gtk-doc help2man jq libyaml meson python-gobject python2-six valgrind
 

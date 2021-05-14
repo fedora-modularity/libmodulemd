@@ -275,6 +275,26 @@ data:
         rpms:
             - baz-nonfoo
 
+    # demodularized:
+    # Artifacts which became non-modular
+    # Defaults to no demodularization.
+    # Type: OPTIONAL
+    demodularized:
+        # rpms:
+        # A list of binary RPM package names which where removed from
+        # a module. This list explains to a package mananger that the packages
+        # are not part of the module anymore and up-to-now same-named masked
+        # non-modular packages should become available again. This enables
+        # moving a package from a module to a set of non-modular packages. The
+        # exact implementation of the demodularization (e.g. whether it
+        # applies to all modules or only to this stream) is defined by the
+        # package manager.
+        # Defaults to an empty list.
+        #
+        # Type: OPTIONAL
+        rpms:
+            - bar-old
+
     # components:
     # Functional components of the module
     #

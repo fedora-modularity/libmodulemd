@@ -611,6 +611,74 @@ modulemd_packager_v3_replace_rpm_filters (ModulemdPackagerV3 *self,
 
 
 /**
+ * modulemd_packager_v3_add_demodularized_rpm:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ * @rpm: (in): A name of a binary RPM package to become non-modular.
+ *
+ * Add a binary package name to a list of demodularized packages.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_packager_v3_add_demodularized_rpm (ModulemdPackagerV3 *self,
+                                            const gchar *rpm);
+
+
+/**
+ * modulemd_packager_v3_remove_demodularized_rpm:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ * @rpm: (in): A binary RPM package name to remove from a demodularized list.
+ *
+ * Remove a binary package name from a list of demodularized packages.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_packager_v3_remove_demodularized_rpm (ModulemdPackagerV3 *self,
+                                               const gchar *rpm);
+
+
+/**
+ * modulemd_packager_v3_clear_demodularized_rpms:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ *
+ * Remove all RPM packages from a demodularized list of the object.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_packager_v3_clear_demodularized_rpms (ModulemdPackagerV3 *self);
+
+
+/**
+ * modulemd_packager_v3_get_demodularized_rpms:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ *
+ * Returns: (transfer full): An ordered #GStrv list of binary RPM package names
+ * that became non-modular.
+ *
+ * Since: 2.13
+ */
+GStrv
+modulemd_packager_v3_get_demodularized_rpms (ModulemdPackagerV3 *self);
+
+
+/**
+ * modulemd_packager_v3_replace_demodularized_rpms:
+ * @self: (in): This #ModulemdPackagerV3 object.
+ * @set: (in): A #GHashTable set of names of binary RPM packages to demodularize.
+ *
+ * Any existing demodularized binary RPM package names associated with module
+ * stream @self are removed and replaced by @set.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_packager_v3_replace_demodularized_rpms (ModulemdPackagerV3 *self,
+                                                 GHashTable *set);
+
+
+/**
  * modulemd_packager_v3_add_component:
  * @self: (in): This #ModulemdPackagerV3 object.
  * @component: (in) (transfer none): A #ModulemdComponent to be added to this

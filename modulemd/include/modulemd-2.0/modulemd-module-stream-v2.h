@@ -764,6 +764,61 @@ modulemd_module_stream_v2_get_rpm_filters_as_strv (
 
 
 /**
+ * modulemd_module_stream_v2_add_demodularized_rpm:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @rpm: (in): A name of a binary RPM package to become non-modular.
+ *
+ * Add a binary package name to a list of demodularized packages.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_module_stream_v2_add_demodularized_rpm (ModulemdModuleStreamV2 *self,
+                                                 const gchar *rpm);
+
+
+/**
+ * modulemd_module_stream_v2_remove_demodularized_rpm:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @rpm: (in): A binary RPM name to remove from a demodularized list.
+ *
+ * Remove a binary package name from a list of demodularized packages.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_module_stream_v2_remove_demodularized_rpm (
+  ModulemdModuleStreamV2 *self, const gchar *rpm);
+
+
+/**
+ * modulemd_module_stream_v2_clear_demodularized_rpms:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Remove all RPM packages from a demodularized list of the object.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_module_stream_v2_clear_demodularized_rpms (
+  ModulemdModuleStreamV2 *self);
+
+
+/**
+ * modulemd_module_stream_v2_get_demodularized_rpms:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Returns: (transfer full): An ordered #GStrv list of binary RPM package names
+ * that became non-modular.
+ *
+ * Since: 2.13
+ */
+GStrv
+modulemd_module_stream_v2_get_demodularized_rpms (
+  ModulemdModuleStreamV2 *self);
+
+
+/**
  * modulemd_module_stream_v2_add_servicelevel:
  * @self: (in): This #ModulemdModuleStreamV2 object.
  * @servicelevel: (in) (transfer none): A #ModulemdServiceLevel for this module stream.

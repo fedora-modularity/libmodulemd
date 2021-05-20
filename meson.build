@@ -105,14 +105,19 @@ has_extend_and_steal = cc.has_function(
     'g_ptr_array_extend_and_steal',
     dependencies : [ glib ])
 
-python_name = get_option('python_name')
+with_py3 = get_option('with_py3')
+if with_py3
+    python_name = get_option('python_name')
 
-if python_name != ''
-    # If we've been instructed to use a specific python version
-    python3 = pymod.find_installation(python_name)
+    if python_name != ''
+        # If we've been instructed to use a specific python version
+        python3 = pymod.find_installation(python_name)
+    else
+        # Use the python installation that is running meson
+        python3 = pymod.find_installation()
+    endif
 else
-    # Use the python installation that is running meson
-    python3 = pymod.find_installation()
+    python3 = disabler()
 endif
 
 with_py2 = get_option('with_py2')
@@ -193,7 +198,7 @@ if meson.version().version_compare('>=0.53')
              'libdir': get_option('libdir'),
              'datadir': get_option('datadir'),
              'Python 2 GObject Overrides': gobject_overrides_dir_py2,
-             'Python 3 GObject Overrides': gobject_overrides_dir_py3
+             'Python 3 GObject Overrides': gobject_overrides_dir_py3,
             }, section: 'Directories')
 
     summary({'libmagic Support': magic_status,
@@ -202,6 +207,7 @@ if meson.version().version_compare('>=0.53')
              'Generate Manpages': manpages_status,
              'Generate HTML Documentation': get_option('with_docs'),
              'Python 2 Support': get_option('with_py2'),
+             'Python 3 Support': get_option('with_py3'),
              'Skip Introspection': get_option('skip_introspection'),
              'Test Installed Library': get_option('test_installed_lib'),
             }, section: 'Build Configuration')

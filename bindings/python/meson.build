@@ -2,17 +2,19 @@ gobject_overrides_dir_py3 = get_option('gobject_overrides_dir_py3')
 gobject_overrides_dir_py2 = get_option('gobject_overrides_dir_py2')
 
 # Python 3
-if gobject_overrides_dir_py3 == ''
-  ret = run_command([python3, '-c', 'import gi; print(gi._overridesdir)'])
+if with_py3
+  if gobject_overrides_dir_py3 == ''
+    ret = run_command([python3, '-c', 'import gi; print(gi._overridesdir)'])
 
-  if ret.returncode() != 0
-    error('Failed to determine Python 3 pygobject overridedir')
-  else
-    gobject_overrides_dir_py3 = ret.stdout().strip()
+    if ret.returncode() != 0
+      error('Failed to determine Python 3 pygobject overridedir')
+    else
+      gobject_overrides_dir_py3 = ret.stdout().strip()
+    endif
   endif
-endif
 
-install_data('gi/overrides/Modulemd.py', install_dir: gobject_overrides_dir_py3)
+  install_data('gi/overrides/Modulemd.py', install_dir: gobject_overrides_dir_py3)
+endif
 
 # Python 2
 if with_py2

@@ -76,6 +76,11 @@ packager_test_construct (void)
   g_assert_null (list[0]);
   g_clear_pointer (&list, g_strfreev);
 
+  list = modulemd_packager_v3_get_demodularized_rpms (packager);
+  g_assert_nonnull (list);
+  g_assert_null (list[0]);
+  g_clear_pointer (&list, g_strfreev);
+
 
   list = modulemd_packager_v3_get_rpm_component_names_as_strv (packager);
   g_assert_nonnull (list);
@@ -262,6 +267,13 @@ validate_spec (ModulemdPackagerV3 *packager)
   g_assert_null (strv[1]);
   g_clear_pointer (&strv, g_strfreev);
 
+  strv = modulemd_packager_v3_get_demodularized_rpms (packager);
+  g_assert_nonnull (strv);
+  g_assert_nonnull (strv[0]);
+  g_assert_cmpstr ("bar-old", ==, strv[0]);
+  g_assert_null (strv[1]);
+  g_clear_pointer (&strv, g_strfreev);
+
   strv = modulemd_packager_v3_get_rpm_component_names_as_strv (packager);
   g_assert_nonnull (strv);
   g_assert_nonnull (strv[0]);
@@ -369,6 +381,9 @@ validate_yaml (ModulemdPackagerV3 *packager)
     "  filter:\n"
     "    rpms:\n"
     "    - baz-nonfoo\n"
+    "  demodularized:\n"
+    "    rpms:\n"
+    "    - bar-old\n"
     "  components:\n"
     "    rpms:\n"
     "      bar:\n"

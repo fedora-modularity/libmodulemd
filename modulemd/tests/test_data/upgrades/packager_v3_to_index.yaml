@@ -58,6 +58,9 @@ data:
   filter:
     rpms:
     - baz-nonfoo
+  demodularized:
+    rpms:
+    - bar-old
   buildopts:
     rpms:
       macros: >
@@ -144,6 +147,9 @@ data:
   filter:
     rpms:
     - baz-nonfoo
+  demodularized:
+    rpms:
+    - bar-old
   components:
     rpms:
       bar:

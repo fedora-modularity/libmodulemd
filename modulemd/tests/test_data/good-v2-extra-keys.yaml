@@ -178,6 +178,19 @@ data:
         unknown_sequence:
         - foo
         - bar
+    demodularized:
+        rpms:
+            - bar-old
+
+        unknown_key: foo
+        unknown_map:
+            stuff: [ a, b ]
+            junk: [ b, c ]
+            morestuff:
+                yay: [ d, e ]
+        unknown_sequence:
+        - foo
+        - bar
 
     buildopts:
         rpms:

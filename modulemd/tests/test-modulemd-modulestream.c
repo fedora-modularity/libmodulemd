@@ -536,6 +536,42 @@ module_stream_v2_test_rpm_filters (void)
 
 
 static void
+module_stream_v2_test_demodularized_rpms (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_auto (GStrv) demodularized = NULL;
+
+  stream = modulemd_module_stream_v2_new ("sssd", NULL);
+
+  // Test add_demodularized_rpm
+  modulemd_module_stream_v2_add_demodularized_rpm (stream, "foo");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream, "bar");
+  demodularized = modulemd_module_stream_v2_get_demodularized_rpms (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)demodularized, "foo"));
+  g_assert_true (g_strv_contains ((const gchar *const *)demodularized, "bar"));
+  g_assert_cmpint (g_strv_length (demodularized), ==, 2);
+  g_clear_pointer (&demodularized, g_strfreev);
+
+  // Test remove_demodularized_rpm
+  modulemd_module_stream_v2_remove_demodularized_rpm (stream, "foo");
+  demodularized = modulemd_module_stream_v2_get_demodularized_rpms (stream);
+
+  g_assert_true (g_strv_contains ((const gchar *const *)demodularized, "bar"));
+  g_assert_cmpint (g_strv_length (demodularized), ==, 1);
+  g_clear_pointer (&demodularized, g_strfreev);
+
+  // Test clear_demodularized_rpms
+  modulemd_module_stream_v2_clear_demodularized_rpms (stream);
+  demodularized = modulemd_module_stream_v2_get_demodularized_rpms (stream);
+  g_assert_cmpint (g_strv_length (demodularized), ==, 0);
+
+  g_clear_pointer (&demodularized, g_strfreev);
+  g_clear_object (&stream);
+}
+
+
+static void
 module_stream_test_upgrade_v1_to_v2 (void)
 {
   gboolean ret;
@@ -623,6 +659,7 @@ module_stream_test_v2_yaml (void)
 
   g_auto (GStrv) rpm_apis = NULL;
   g_auto (GStrv) rpm_filters = NULL;
+  g_auto (GStrv) demodularized_rpms = NULL;
   g_auto (GStrv) rpm_artifacts = NULL;
   g_auto (GStrv) servicelevel_names = NULL;
 
@@ -672,6 +709,10 @@ module_stream_test_v2_yaml (void)
     "      - rpm_b\n"
     "  filter:\n"
     "    rpms: rpm_c\n"
+
+    "  demodularized:\n"
+    "    rpms:\n"
+    "      - rpm_d\n"
 
     "  artifacts:\n"
     "    rpms:\n"
@@ -822,6 +863,8 @@ module_stream_test_v2_yaml (void)
 
   rpm_apis = modulemd_module_stream_v2_get_rpm_api_as_strv (streamV2);
   rpm_filters = modulemd_module_stream_v2_get_rpm_filters_as_strv (streamV2);
+  demodularized_rpms =
+    modulemd_module_stream_v2_get_demodularized_rpms (streamV2);
   rpm_artifacts =
     modulemd_module_stream_v2_get_rpm_artifacts_as_strv (streamV2);
   servicelevel_names =
@@ -831,6 +874,9 @@ module_stream_test_v2_yaml (void)
   g_assert_true (g_strv_contains ((const gchar *const *)rpm_apis, "rpm_b"));
 
   g_assert_true (g_strv_contains ((const gchar *const *)rpm_filters, "rpm_c"));
+
+  g_assert_true (
+    g_strv_contains ((const gchar *const *)demodularized_rpms, "rpm_d"));
 
   g_assert_true (g_strv_contains ((const gchar *const *)rpm_artifacts,
                                   "bar-0:1.23-1.module_deadbeef.x86_64"));
@@ -988,6 +1034,7 @@ module_stream_test_v2_yaml (void)
 
   g_clear_pointer (&rpm_apis, g_strfreev);
   g_clear_pointer (&rpm_filters, g_strfreev);
+  g_clear_pointer (&demodularized_rpms, g_strfreev);
   g_clear_pointer (&rpm_artifacts, g_strfreev);
   g_clear_pointer (&servicelevel_names, g_strfreev);
 
@@ -2127,6 +2174,8 @@ module_stream_v2_test_equals (void)
   modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_b");
   modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_a");
   modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_b");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_1, "rpm_3");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_1, "rpm_4");
 
   stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
   modulemd_module_stream_v2_add_rpm_api (stream_2, "rpm_1");
@@ -2139,6 +2188,8 @@ module_stream_v2_test_equals (void)
   modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_b");
   modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_a");
   modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_b");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_2, "rpm_3");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_2, "rpm_4");
 
   g_assert_true (modulemd_module_stream_equals (
     (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
@@ -2158,6 +2209,8 @@ module_stream_v2_test_equals (void)
   modulemd_module_stream_v2_add_rpm_artifact (stream_1, "artifact_c");
   modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_a");
   modulemd_module_stream_v2_add_rpm_filter (stream_1, "filter_b");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_1, "rpm_3");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_1, "rpm_4");
 
   stream_2 = modulemd_module_stream_v2_new (NULL, NULL);
   modulemd_module_stream_v2_add_rpm_api (stream_2, "rpm_1");
@@ -2169,6 +2222,8 @@ module_stream_v2_test_equals (void)
   modulemd_module_stream_v2_add_rpm_artifact (stream_2, "artifact_b");
   modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_a");
   modulemd_module_stream_v2_add_rpm_filter (stream_2, "filter_b");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_2, "rpm_3");
+  modulemd_module_stream_v2_add_demodularized_rpm (stream_2, "rpm_4");
 
   g_assert_false (modulemd_module_stream_equals (
     (ModulemdModuleStream *)stream_1, (ModulemdModuleStream *)stream_2));
@@ -2712,6 +2767,9 @@ module_stream_v2_test_parse_dump (void)
     "  filter:\n"
     "    rpms:\n"
     "    - baz-nonfoo\n"
+    "  demodularized:\n"
+    "    rpms:\n"
+    "    - bar-old\n"
     "  buildopts:\n"
     "    rpms:\n"
     "      macros: >\n"
@@ -3450,6 +3508,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_filters",
                    module_stream_v2_test_rpm_filters);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/demodularized_rpms",
+                   module_stream_v2_test_demodularized_rpms);
 
   g_test_add_func ("/modulemd/v2/modulestream/v2_yaml",
                    module_stream_test_v2_yaml);

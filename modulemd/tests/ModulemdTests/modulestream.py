@@ -495,6 +495,25 @@ class TestModuleStream(TestBase):
             stream.clear_rpm_filters()
             assert len(stream.get_rpm_filters()) == 0
 
+    def test_demodularized_rpms(self):
+        for version in modulestream_versions:
+            stream = Modulemd.ModuleStream.new(version)
+            # demodularized_rpms are supported since v2
+            if version < Modulemd.ModuleStreamVersionEnum.TWO:
+                continue
+            stream.add_demodularized_rpm("foo")
+            stream.add_demodularized_rpm("bar")
+            assert "foo" in stream.get_demodularized_rpms()
+            assert "bar" in stream.get_demodularized_rpms()
+            assert len(stream.get_demodularized_rpms()) == 2
+
+            stream.remove_demodularized_rpm("bar")
+            assert "foo" in stream.get_demodularized_rpms()
+            assert len(stream.get_demodularized_rpms()) == 1
+
+            stream.clear_demodularized_rpms()
+            assert len(stream.get_demodularized_rpms()) == 0
+
     def test_servicelevels(self):
         for version in modulestream_versions:
             # servicelevels are not supported after v2
@@ -690,6 +709,10 @@ data:
   filter:
     rpms: rpm_c
 
+  demodularized:
+    rpms:
+      - rpm_d
+
   artifacts:
     rpms:
       - bar-0:1.23-1.module_deadbeef.x86_64
@@ -823,6 +846,8 @@ data:
         assert "rpm_b" in stream.get_rpm_api()
 
         assert "rpm_c" in stream.get_rpm_filters()
+
+        assert "rpm_d" in stream.get_demodularized_rpms()
 
         assert (
             "bar-0:1.23-1.module_deadbeef.x86_64" in stream.get_rpm_artifacts()

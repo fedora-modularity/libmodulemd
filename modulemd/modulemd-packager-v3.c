@@ -40,6 +40,7 @@ struct _ModulemdPackagerV3
   GHashTable *profiles; /* <string, Modulemd.Profile> */
   GHashTable *rpm_api; /* string set */
   GHashTable *rpm_filters; /* string set */
+  GHashTable *demodularized_rpms; /* string set */
   GHashTable *rpm_components; /* <string, Modulemd.ComponentRpm> */
   GHashTable *module_components; /* <string, Modulemd.ComponentModule */
 };
@@ -70,6 +71,7 @@ modulemd_packager_v3_finalize (GObject *object)
   g_clear_pointer (&self->profiles, g_hash_table_unref);
   g_clear_pointer (&self->rpm_api, g_hash_table_unref);
   g_clear_pointer (&self->rpm_filters, g_hash_table_unref);
+  g_clear_pointer (&self->demodularized_rpms, g_hash_table_unref);
   g_clear_pointer (&self->rpm_components, g_hash_table_unref);
   g_clear_pointer (&self->module_components, g_hash_table_unref);
 
@@ -100,6 +102,9 @@ modulemd_packager_v3_init (ModulemdPackagerV3 *self)
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   self->rpm_filters =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  self->demodularized_rpms =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   self->rpm_components =
@@ -149,6 +154,9 @@ modulemd_packager_v3_copy (ModulemdPackagerV3 *self)
   modulemd_packager_v3_replace_rpm_api (copy, self->rpm_api);
 
   modulemd_packager_v3_replace_rpm_filters (copy, self->rpm_filters);
+
+  modulemd_packager_v3_replace_demodularized_rpms (copy,
+                                                   self->demodularized_rpms);
 
   COPY_HASHTABLE_BY_VALUE_ADDER (
     copy, self, rpm_components, modulemd_packager_v3_add_component);
@@ -612,6 +620,64 @@ modulemd_packager_v3_get_rpm_filters_as_strv (ModulemdPackagerV3 *self)
 
 
 void
+modulemd_packager_v3_add_demodularized_rpm (ModulemdPackagerV3 *self,
+                                            const gchar *rpm)
+{
+  if (!rpm)
+    {
+      return;
+    }
+
+  g_return_if_fail (MODULEMD_IS_PACKAGER_V3 (self));
+
+  g_hash_table_add (self->demodularized_rpms, g_strdup (rpm));
+}
+
+
+void
+modulemd_packager_v3_replace_demodularized_rpms (ModulemdPackagerV3 *self,
+                                                 GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_PACKAGER_V3 (self));
+
+  MODULEMD_REPLACE_SET (self->demodularized_rpms, set);
+}
+
+
+void
+modulemd_packager_v3_remove_demodularized_rpm (ModulemdPackagerV3 *self,
+                                               const gchar *rpm)
+{
+  if (!rpm)
+    {
+      return;
+    }
+
+  g_return_if_fail (MODULEMD_IS_PACKAGER_V3 (self));
+
+  g_hash_table_remove (self->demodularized_rpms, rpm);
+}
+
+
+void
+modulemd_packager_v3_clear_demodularized_rpms (ModulemdPackagerV3 *self)
+{
+  g_return_if_fail (MODULEMD_IS_PACKAGER_V3 (self));
+
+  g_hash_table_remove_all (self->demodularized_rpms);
+}
+
+
+GStrv
+modulemd_packager_v3_get_demodularized_rpms (ModulemdPackagerV3 *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_PACKAGER_V3 (self), NULL);
+
+  return modulemd_ordered_str_keys_as_strv (self->demodularized_rpms);
+}
+
+
+void
 modulemd_packager_v3_add_component (ModulemdPackagerV3 *self,
                                     ModulemdComponent *component)
 {
@@ -841,6 +907,9 @@ copy_packager_v3_common_to_stream_v2 (ModulemdModuleStreamV2 *stream_v2,
 
   modulemd_module_stream_v2_replace_rpm_filters (stream_v2,
                                                  packager_v3->rpm_filters);
+
+  modulemd_module_stream_v2_replace_demodularized_rpms (
+    stream_v2, packager_v3->demodularized_rpms);
 
   COPY_HASHTABLE_BY_VALUE_ADDER (stream_v2,
                                  packager_v3,
@@ -1275,6 +1344,15 @@ modulemd_packager_v3_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               set = modulemd_yaml_parse_string_set_from_map (
                 &parser, "rpms", strict, &nested_error);
               modulemd_packager_v3_replace_rpm_filters (packager, set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "demodularized"))
+            {
+              set = modulemd_yaml_parse_string_set_from_map (
+                &parser, "rpms", strict, &nested_error);
+              modulemd_packager_v3_replace_demodularized_rpms (packager, set);
               g_clear_pointer (&set, g_hash_table_unref);
             }
 
@@ -1860,6 +1938,14 @@ modulemd_packager_v3_emit_yaml (ModulemdPackagerV3 *self,
       EMIT_SCALAR (emitter, error, "filter");
       EMIT_MAPPING_START (emitter, error);
       EMIT_STRING_SET (emitter, error, "rpms", self->rpm_filters);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  if (NON_EMPTY_TABLE (self->demodularized_rpms))
+    {
+      EMIT_SCALAR (emitter, error, "demodularized");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_STRING_SET (emitter, error, "rpms", self->demodularized_rpms);
       EMIT_MAPPING_END (emitter, error);
     }
 

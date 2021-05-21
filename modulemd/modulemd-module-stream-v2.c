@@ -98,6 +98,8 @@ modulemd_module_stream_v2_finalize (GObject *object)
 
   g_clear_pointer (&self->rpm_filters, g_hash_table_unref);
 
+  g_clear_pointer (&self->demodularized_rpms, g_hash_table_unref);
+
   g_clear_pointer (&self->servicelevels, g_hash_table_unref);
 
   g_clear_pointer (&self->dependencies, g_ptr_array_unref);
@@ -214,6 +216,12 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
   if (!modulemd_hash_table_sets_are_equal (v2_self_1->rpm_filters,
                                            v2_self_2->rpm_filters))
+    {
+      return FALSE;
+    }
+
+  if (!modulemd_hash_table_sets_are_equal (v2_self_1->demodularized_rpms,
+                                           v2_self_2->demodularized_rpms))
     {
       return FALSE;
     }
@@ -1061,6 +1069,65 @@ modulemd_module_stream_v2_get_rpm_filters_as_strv (
 
 
 void
+modulemd_module_stream_v2_add_demodularized_rpm (ModulemdModuleStreamV2 *self,
+                                                 const gchar *rpm)
+{
+  if (!rpm)
+    {
+      return;
+    }
+
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_hash_table_add (self->demodularized_rpms, g_strdup (rpm));
+}
+
+
+void
+modulemd_module_stream_v2_replace_demodularized_rpms (
+  ModulemdModuleStreamV2 *self, GHashTable *set)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  MODULEMD_REPLACE_SET (self->demodularized_rpms, set);
+}
+
+
+void
+modulemd_module_stream_v2_remove_demodularized_rpm (
+  ModulemdModuleStreamV2 *self, const gchar *rpm)
+{
+  if (!rpm)
+    {
+      return;
+    }
+
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_hash_table_remove (self->demodularized_rpms, rpm);
+}
+
+
+void
+modulemd_module_stream_v2_clear_demodularized_rpms (
+  ModulemdModuleStreamV2 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_hash_table_remove_all (self->demodularized_rpms);
+}
+
+
+GStrv
+modulemd_module_stream_v2_get_demodularized_rpms (ModulemdModuleStreamV2 *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self), NULL);
+
+  return modulemd_ordered_str_keys_as_strv (self->demodularized_rpms);
+}
+
+
+void
 modulemd_module_stream_v2_add_servicelevel (ModulemdModuleStreamV2 *self,
                                             ModulemdServiceLevel *servicelevel)
 {
@@ -1551,6 +1618,7 @@ modulemd_module_stream_v2_copy (ModulemdModuleStream *self,
   STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_api);
   STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_artifacts);
   STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, rpm_filters);
+  STREAM_REPLACE_HASHTABLE (v2, copy, v2_self, demodularized_rpms);
 
   /* Internal Data Structures: With add on value */
   COPY_HASHTABLE_BY_VALUE_ADDER (
@@ -1730,6 +1798,9 @@ modulemd_module_stream_v2_init (ModulemdModuleStreamV2 *self)
     g_str_hash, g_str_equal, g_free, modulemd_hash_table_unref);
 
   self->rpm_filters =
+    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  self->demodularized_rpms =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   self->servicelevels =
@@ -2039,6 +2110,17 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                 &parser, "rpms", strict, &nested_error);
               modulemd_module_stream_v2_replace_rpm_filters (modulestream,
                                                              set);
+              g_clear_pointer (&set, g_hash_table_unref);
+            }
+
+          /* Demodularized Packages */
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "demodularized"))
+            {
+              set = modulemd_yaml_parse_string_set_from_map (
+                &parser, "rpms", strict, &nested_error);
+              modulemd_module_stream_v2_replace_demodularized_rpms (
+                modulestream, set);
               g_clear_pointer (&set, g_hash_table_unref);
             }
 
@@ -3065,6 +3147,14 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
       EMIT_SCALAR (emitter, error, "filter");
       EMIT_MAPPING_START (emitter, error);
       EMIT_STRING_SET (emitter, error, "rpms", self->rpm_filters);
+      EMIT_MAPPING_END (emitter, error);
+    }
+
+  if (NON_EMPTY_TABLE (self->demodularized_rpms))
+    {
+      EMIT_SCALAR (emitter, error, "demodularized");
+      EMIT_MAPPING_START (emitter, error);
+      EMIT_STRING_SET (emitter, error, "rpms", self->demodularized_rpms);
       EMIT_MAPPING_END (emitter, error);
     }
 

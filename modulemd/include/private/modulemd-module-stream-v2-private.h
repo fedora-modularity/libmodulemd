@@ -73,6 +73,8 @@ struct _ModulemdModuleStreamV2
 
   GHashTable *rpm_filters; /* string set */
 
+  GHashTable *demodularized_rpms; /* string set */
+
   GHashTable *servicelevels; /* <string, Modulemd.ServiceLevel */
 
   GPtrArray *dependencies; /* <Modulemd.Dependencies> */
@@ -201,6 +203,20 @@ modulemd_module_stream_v2_replace_rpm_artifacts (ModulemdModuleStreamV2 *self,
 void
 modulemd_module_stream_v2_replace_rpm_filters (ModulemdModuleStreamV2 *self,
                                                GHashTable *set);
+
+/**
+ * modulemd_module_stream_v2_replace_demodularized_rpms:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ * @set: (in): A #GHashTable set of names of binary RPM packages to demodularize.
+ *
+ * Any existing demodularized binary RPM package names associated with module
+ * stream @self are removed and replaced by @set.
+ *
+ * Since: 2.13
+ */
+void
+modulemd_module_stream_v2_replace_demodularized_rpms (
+  ModulemdModuleStreamV2 *self, GHashTable *set);
 
 /**
  * modulemd_module_stream_v2_replace_dependencies:

@@ -107,8 +107,11 @@ has_extend_and_steal = cc.has_function(
 
 with_py3 = get_option('with_py3')
 if with_py3
-    python_name = get_option('python_name')
+    if get_option('skip_introspection')
+        error('A Python3 binding requires a GObject introspection.')
+    endif
 
+    python_name = get_option('python_name')
     if python_name != ''
         # If we've been instructed to use a specific python version
         python3 = pymod.find_installation(python_name)
@@ -122,6 +125,9 @@ endif
 
 with_py2 = get_option('with_py2')
 if with_py2
+    if get_option('skip_introspection')
+        error('A Python2 binding requires a GObject introspection.')
+    endif
     python2 = pymod.find_installation('python2')
 else
     python2 = disabler()

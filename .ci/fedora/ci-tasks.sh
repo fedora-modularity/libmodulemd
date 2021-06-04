@@ -55,6 +55,7 @@ else
     set -e
     meson --buildtype=debug \
           -Dskip_introspection=true \
+          -Dwith_py3=false \
           ci_scanbuild
 
     pushd ci_scanbuild

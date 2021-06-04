@@ -209,6 +209,76 @@ install_headers(
 )
 
 
+# --- GOBject Introspection -- #
+
+if skip_introspection
+else
+girs = gnome.generate_gir(
+        modulemd_lib,
+        sources : modulemd_srcs + modulemd_hdrs + ['include/private/gi-binding-renames.h'],
+        nsversion : '2.0',
+        namespace : 'Modulemd',
+        symbol_prefix : 'modulemd_',
+        identifier_prefix : 'Modulemd',
+        includes : [
+            'GObject-2.0',
+        ],
+        extra_args : [ '--accept-unprefixed' ],
+        install : true,
+        fatal_warnings : true,
+    )
+endif
+
+pkg.generate(
+    libraries : modulemd_lib,
+    subdirs : header_path,
+    version : libmodulemd_version,
+    name : 'modulemd-2.0',
+    filebase : 'modulemd-2.0',
+    description : 'Module metadata manipulation library',
+    requires: [ 'glib-2.0', 'gobject-2.0' ],
+)
+
+xcdata = configuration_data()
+xcdata.set('VERSION', meson.project_version())
+configure_file(
+  input : 'version.xml.in',
+  output : 'version.xml',
+  configuration : xcdata
+)
+
+if with_docs
+    gnome.gtkdoc(
+        'modulemd-2.0',
+        install_dir: 'modulemd-2.0',
+        src_dir : './modulemd',
+        main_xml : 'modulemd-docs.xml',
+        gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
+        dependencies : [
+            modulemd_dep,
+        ],
+        fixxref_args: [
+                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
+                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
+                   ],
+        install : true,
+    )
+endif
+
+help2man_opts = [
+  '--no-info',
+  '--section=1',
+]
+custom_target(
+    'modulemd-validator.1',
+    output: 'modulemd-validator.1',
+    command: [
+      help2man, help2man_opts, '--output=@OUTPUT@', modulemd_validator,
+    ],
+    install: true,
+    install_dir: join_paths(get_option('mandir'), 'man1'))
+
+
 # --- TESTS --- #
 
 # Test env with release values
@@ -332,28 +402,34 @@ python_tests = {
 }
 
 foreach name, script : python_tests
-    test_python_scripts += files(script)
-    test (name + '_python3_debug', python3,
-          env : py_test_env,
-          timeout : 60,
-          args : files(script),
-          suite : ['ci', 'py3', 'py3_debug'])
-    test (name + '_python3_release', python3,
-          env : py_test_release_env,
-          timeout : 60,
-          args : files(script),
-          suite : ['ci', 'py3', 'py3_release'])
+    if with_py3
+      test_python_scripts += files(script)
+      test (name + '_python3_debug', python3,
+            env : py_test_env,
+            timeout : 60,
+            args : files(script),
+            depends : girs,
+            suite : ['ci', 'py3', 'py3_debug'])
+      test (name + '_python3_release', python3,
+            env : py_test_release_env,
+            timeout : 60,
+            args : files(script),
+            depends : girs,
+            suite : ['ci', 'py3', 'py3_release'])
+    endif
 
     if with_py2
         test (name + '_python2_debug', python2,
               env : py_test_env,
               timeout : 60,
               args : files(script),
+              depends : girs,
               suite : ['ci', 'py2', 'py2_debug'])
         test (name + '_python2_release', python2,
               env : py_test_release_env,
               timeout : 60,
               args : files(script),
+              depends : girs,
               suite : ['ci', 'py2', 'py2_release'])
     endif #with_py2
 endforeach
@@ -371,71 +447,3 @@ test('test_import_headers', import_header_script,
       suite : ['smoketest', 'ci'])
 
 
-# --- GOBject Introspection -- #
-
-if skip_introspection
-else
-    gnome.generate_gir(
-        modulemd_lib,
-        sources : modulemd_srcs + modulemd_hdrs + ['include/private/gi-binding-renames.h'],
-        nsversion : '2.0',
-        namespace : 'Modulemd',
-        symbol_prefix : 'modulemd_',
-        identifier_prefix : 'Modulemd',
-        includes : [
-            'GObject-2.0',
-        ],
-        extra_args : [ '--accept-unprefixed' ],
-        install : true,
-        fatal_warnings : true,
-    )
-endif
-
-pkg.generate(
-    libraries : modulemd_lib,
-    subdirs : header_path,
-    version : libmodulemd_version,
-    name : 'modulemd-2.0',
-    filebase : 'modulemd-2.0',
-    description : 'Module metadata manipulation library',
-    requires: [ 'glib-2.0', 'gobject-2.0' ],
-)
-
-xcdata = configuration_data()
-xcdata.set('VERSION', meson.project_version())
-configure_file(
-  input : 'version.xml.in',
-  output : 'version.xml',
-  configuration : xcdata
-)
-
-if with_docs
-    gnome.gtkdoc(
-        'modulemd-2.0',
-        install_dir: 'modulemd-2.0',
-        src_dir : './modulemd',
-        main_xml : 'modulemd-docs.xml',
-        gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
-        dependencies : [
-            modulemd_dep,
-        ],
-        fixxref_args: [
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
-                   ],
-        install : true,
-    )
-endif
-
-help2man_opts = [
-  '--no-info',
-  '--section=1',
-]
-custom_target(
-    'modulemd-validator.1',
-    output: 'modulemd-validator.1',
-    command: [
-      help2man, help2man_opts, '--output=@OUTPUT@', modulemd_validator,
-    ],
-    install: true,
-    install_dir: join_paths(get_option('mandir'), 'man1'))

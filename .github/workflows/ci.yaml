@@ -66,7 +66,7 @@ jobs:
       - name: Run clang static analysis tests
         if: ${{ steps.scanbuild.outputs.available }}
         run: |
-          meson setup --buildtype=debug -Dskip_introspection=true ci_scanbuild
+          meson setup --buildtype=debug -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
 
 
@@ -178,7 +178,7 @@ jobs:
       - name: Run clang static analysis tests
         if: ${{ steps.scanbuild.outputs.available }}
         run: |
-          meson setup --buildtype=debug -Dskip_introspection=true ci_scanbuild
+          meson setup --buildtype=debug -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
 
 
@@ -484,5 +484,5 @@ jobs:
       - name: Run clang static analysis tests
         if: ${{ steps.scanbuild.outputs.available }}
         run: |
-          meson setup --buildtype=debug -Dwith_docs=false -Dlibmagic=disabled -Dskip_introspection=true ci_scanbuild
+          meson setup --buildtype=debug -Dwith_docs=false -Dlibmagic=disabled -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi

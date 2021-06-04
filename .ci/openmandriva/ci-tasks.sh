@@ -45,6 +45,7 @@ else
     set -e
 CC=clang CXX=clang++ meson --buildtype=debug \
           -Dskip_introspection=true \
+          -Dwith_py3=false \
           $COMMON_MESON_ARGS \
           ci_scanbuild
 

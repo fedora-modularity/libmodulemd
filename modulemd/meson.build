@@ -443,7 +443,7 @@ endforeach
 # Tests for modulemd-validator tool
 modulemd_validator_tests = {
 'help'        : [['--code', '0'], ['--help']],
-'version'     : [['--code', '1'], ['--version']],
+'version'     : [['--code', '0'], ['--version']],
 'valid'       : [['--code', '0'],
                  [files('tests/test_data/static_context.yaml')]],
 'invalid'     : [['--code', '1', '--stdout', 'No data section provided'],

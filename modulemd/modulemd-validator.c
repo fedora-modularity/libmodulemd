@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <glib.h>
 #include <locale.h>
+#include <stdlib.h>
 
 enum mmd_verbosity
 {
@@ -43,7 +44,7 @@ print_version (const gchar *option_name,
                GError **error)
 {
   g_fprintf (stdout, "modulemd-validator %s\n", modulemd_get_version ());
-  exit (1);
+  exit (EXIT_SUCCESS);
 }
 
 static gboolean
@@ -150,14 +151,14 @@ main (int argc, char *argv[])
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       g_print ("option parsing failed: %s\n", error->message);
-      exit (1);
+      exit (EXIT_FAILURE);
     }
 
   if (!(options.filenames && options.filenames[0]))
     {
       g_fprintf (stderr,
                  "At least one file must be specified on the command-line\n");
-      return EXIT_FAILURE;
+      exit (EXIT_FAILURE);
     }
 
   for (gsize i = 0; options.filenames[i]; i++)

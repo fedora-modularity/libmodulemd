@@ -469,6 +469,21 @@ modulemd_validator_tests = {
 'valid_packagerv3_as_modulemdv2':
     [['--code', '1'],
     ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_packager_v3.yaml')]],
+'valid_defaultsv1.yaml':
+    [['--code', '0'],
+    [files('../yaml_specs/modulemd_defaults_v1.yaml')]],
+'invalid_defaultsv1.yaml':
+    [['--code', '1'],
+    [files('tests/test_data/invalid_defaults.yaml')]],
+'valid_defaultsv1_as_defaultsv1':
+    [['--code', '0'],
+    ['--type', 'modulemd-defaults-v1', files('../yaml_specs/modulemd_defaults_v1.yaml')]],
+'invalid_defaultsv1_as_defaultsv1':
+    [['--code', '1'],
+    ['--type', 'modulemd-defaults-v1', files('tests/test_data/invalid_defaults.yaml')]],
+'modulemdv2_as_defaultsv1':
+    [['--code', '1'],
+    ['--type', 'defaults-v1', files('../yaml_specs/modulemd_stream_v2.yaml')]],
 }
 test_modulemd_validator = executable(
     'test-modulemd-validator',

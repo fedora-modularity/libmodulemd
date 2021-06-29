@@ -15,6 +15,7 @@
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
 #include "private/modulemd-yaml.h"
+#include <errno.h>
 #include <glib.h>
 #include <inttypes.h>
 #include <yaml.h>
@@ -440,6 +441,8 @@ modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
 guint64
 modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
 {
+  guint64 value;
+  gchar *endptr;
   MMD_INIT_YAML_EVENT (event);
 
   YAML_PARSER_PARSE_WITH_EXIT_INT (parser, &event, error);
@@ -450,7 +453,41 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
 
   g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
 
-  return g_ascii_strtoull ((const gchar *)event.data.scalar.value, NULL, 10);
+  value = g_ascii_strtoull ((const gchar *)event.data.scalar.value, &endptr, 10);
+
+  if (value == G_MAXUINT64 && errno == ERANGE)
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "%s: The integer value is larger than %" G_GUINT64_FORMAT,
+                   (const gchar *)event.data.scalar.value,
+                   G_MAXUINT64);
+      return 0u;
+    }
+
+  if (value == 0u && errno == EINVAL)
+    {
+      g_set_error_literal (
+        error,
+        MODULEMD_YAML_ERROR,
+        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        "Your GLib library does not support parsing integers in 10 base");
+      return 0u;
+    }
+
+  if ((value == 0u && endptr == (gchar *)event.data.scalar.value) ||
+          *endptr != '\0')
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_ERROR_VALIDATE,
+                   "%s: The string is not a valid integer",
+                   (const gchar *)event.data.scalar.value);
+      return 0u;
+    }
+
+  return value;
 }
 
 

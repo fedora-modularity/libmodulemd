@@ -1,0 +1,5 @@
+document: modulemd-defaults
+version: 1
+data:
+    module: foo
+    modified: 42invalid

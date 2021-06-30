@@ -209,49 +209,37 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
       yaml_parser_set_input_file (&parser, file);
       if (!yaml_parser_parse (&parser, &event))
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_OPEN,
+            event,
             "Invalid YAML"
           );
-          /* Detailed error? */
-          return FALSE;
         }
       if (event.type != YAML_STREAM_START_EVENT) {
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_OPEN,
+            event,
             "YAML parser could not find a start of a YAML stream"
           );
-          /* Detailed error? */
-          return FALSE;
         }
       }
       yaml_event_delete (&event);
       if (!yaml_parser_parse (&parser, &event))
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_OPEN,
+            event,
             "Invalid YAML"
           );
-          /* Detailed error? */
-          return FALSE;
         }
       if (event.type != YAML_DOCUMENT_START_EVENT) {
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_OPEN,
+            event,
             "YAML parser could not find a start of a YAML document"
           );
-          /* Detailed error? */
-          return FALSE;
         }
       }
       yaml_event_delete (&event);
@@ -290,24 +278,19 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
       /* Check for a garbage past the first document */
       if (!yaml_parser_parse (&parser, &event))
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_UNPARSEABLE,
+            event,
             "Invalid YAML after first document"
           );
-          /* Detailed error? */
-          return FALSE;
         }
       if (event.type != YAML_STREAM_END_EVENT) {
         {
-          g_set_error_literal (
+          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
             error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_PARSE,
+            event,
             "Another YAML document after the first one"
           );
-          /* Detailed error? */
           return FALSE;
         }
       }

@@ -138,6 +138,21 @@ set_type (const gchar *option_name,
     return TRUE;
 }
 
+static const gchar *
+gtype2astring (const GType type)
+{
+    if (type == MODULEMD_TYPE_MODULE_INDEX)
+        return "an index";
+    else if (type == MODULEMD_TYPE_MODULE_STREAM_V2)
+        return "a modulemd-v2";
+    else if (type == MODULEMD_TYPE_DEFAULTS_V1)
+        return "a modulemd-defaults-v1";
+    else if (type == MODULEMD_TYPE_PACKAGER_V3)
+        return "a modulemd-packager-v3";
+    else
+        return "an unknown document GType";
+}
+
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
@@ -257,8 +272,9 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
             error,
             MODULEMD_ERROR,
             0,
-            "Not a modulemd-defaults-v1 document; it is %s",
-            ModulemdYamlDocumentTypeEnum2string(type)
+            "Not %s document; it is %s",
+            gtype2astring (options.type),
+            ModulemdYamlDocumentTypeEnum2string (type)
           );
           return FALSE;
         }
@@ -269,7 +285,8 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
             error,
             MODULEMD_ERROR,
             0,
-            "Not a modulemd-defaults-v1 document; it is %" G_GUINT64_FORMAT " version",
+            "Not %s document; it is %" G_GUINT64_FORMAT " version",
+            gtype2astring (options.type),
             version
           );
           return FALSE;
@@ -295,7 +312,7 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         }
       }
       yaml_event_delete (&event);
-      /* Already validated by modulemd_yaml_parse_document_type (). */
+      /* Already validated by modulemd_defaults_v1_parse_yaml (). */
       return (NULL != object);
     }
   else if (options.type == MODULEMD_TYPE_MODULE_STREAM_V2)

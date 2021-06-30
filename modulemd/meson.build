@@ -487,6 +487,18 @@ modulemd_validator_tests = {
 'valid_defaultsv1_with_unexpected_document_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'modulemd-defaults-v1', files('tests/test_data/valid_defaults_with_unexpected_document.yaml')]],
+'valid_obsoletesv1.yaml':
+    [['--code', '0'],
+    [files('../yaml_specs/modulemd_obsoletes_v1.yaml')]],
+'invalid_obsoletesv1.yaml':
+    [['--code', '1'],
+    [files('tests/test_data/invalid_obsoletes_v1.yaml')]],
+'valid_obsoletesv1_as_obsoletesv1.yaml':
+    [['--code', '0'],
+    ['--type', 'modulemd-obsoletes-v1', files('../yaml_specs/modulemd_obsoletes_v1.yaml')]],
+'invalid_obsoletesv1_as_obseletesv1.yaml':
+    [['--code', '1'],
+    ['--type', 'modulemd-obsoletes-v1', files('tests/test_data/invalid_obsoletes_v1.yaml')]],
 'modulemdv2_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'defaults-v1', files('../yaml_specs/modulemd_stream_v2.yaml')]],

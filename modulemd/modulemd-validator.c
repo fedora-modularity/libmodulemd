@@ -16,6 +16,7 @@
 #include "modulemd-errors.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-index-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-yaml.h"
 
@@ -124,6 +125,8 @@ set_type (const gchar *option_name,
         options.type = MODULEMD_TYPE_MODULE_STREAM_V2;
     else if (!g_strcmp0 (value, "modulemd-defaults-v1"))
         options.type = MODULEMD_TYPE_DEFAULTS_V1;
+    else if (!g_strcmp0 (value, "modulemd-obsoletes-v1"))
+        options.type = MODULEMD_TYPE_OBSOLETES;
     else if (!g_strcmp0 (value, "modulemd-packager-v3"))
         options.type = MODULEMD_TYPE_PACKAGER_V3;
     else
@@ -147,6 +150,8 @@ gtype2astring (const GType type)
         return "a modulemd-v2";
     else if (type == MODULEMD_TYPE_DEFAULTS_V1)
         return "a modulemd-defaults-v1";
+    else if (type == MODULEMD_TYPE_OBSOLETES)
+        return "a modulemd-obsoletes-v1";
     else if (type == MODULEMD_TYPE_PACKAGER_V3)
         return "a modulemd-packager-v3";
     else
@@ -156,7 +161,7 @@ gtype2astring (const GType type)
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
-  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-defaults-v1, modulemd-packager-v3; default is index which only accepts multi-document YAML files)", NULL },
+  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v3; default is index only which one accepts multi-document YAML files)", NULL },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
@@ -179,6 +184,149 @@ ModulemdYamlDocumentTypeEnum2string (ModulemdYamlDocumentTypeEnum type)
    }
 }
 
+/* We cannot load by index as it converts from old versions before
+ * a return and as it does not provide enumeration functions for
+ * subdocuments. We will use private modulemd_defaults_v1_parse_yaml() etc.
+ * parsers. */
+static gboolean
+parse_file_as_subdoc (const gchar *filename,
+                      GType gtype,
+                      ModulemdYamlDocumentTypeEnum expected_type,
+                      guint64 expected_version,
+                      GError **error)
+{
+  g_autoptr (FILE) file = NULL;
+  MMD_INIT_YAML_PARSER (parser);
+  MMD_INIT_YAML_EVENT (event);
+  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
+  const GError *subdoc_error;
+  ModulemdYamlDocumentTypeEnum type;
+  guint64 version;
+  /*g_autoptr (ModulemdDefaultsV1) defaults_object = NULL;
+  g_autoptr (ModulemdDefaultsV1) defaults_object = NULL;*/
+  g_autoptr (GObject) object = NULL;
+
+  file = fopen(filename, "r");
+  if (!file)
+    {
+      g_set_error (
+        error,
+        MODULEMD_YAML_ERROR,
+        MMD_YAML_ERROR_OPEN,
+        "Could not open %s file: %s",
+        filename,
+        strerror(errno)
+      );
+      return FALSE;
+    }
+  yaml_parser_set_input_file (&parser, file);
+  if (!yaml_parser_parse (&parser, &event))
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Invalid YAML"
+      );
+    }
+  if (event.type != YAML_STREAM_START_EVENT) {
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "YAML parser could not find a start of a YAML stream"
+      );
+    }
+  }
+  yaml_event_delete (&event);
+  if (!yaml_parser_parse (&parser, &event))
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Invalid YAML"
+      );
+    }
+  if (event.type != YAML_DOCUMENT_START_EVENT) {
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "YAML parser could not find a start of a YAML document"
+      );
+    }
+  }
+  yaml_event_delete (&event);
+  subdoc = modulemd_yaml_parse_document_type (&parser);
+  subdoc_error = modulemd_subdocument_info_get_gerror (subdoc);
+  if (subdoc_error)
+    {
+      *error = g_error_copy (subdoc_error);
+      return FALSE;
+    }
+  type = modulemd_subdocument_info_get_doctype (subdoc);
+  if (type != expected_type)
+    {
+      g_set_error(
+        error,
+        MODULEMD_ERROR,
+        0,
+        "Not %s document; it is %s",
+        gtype2astring (gtype),
+        ModulemdYamlDocumentTypeEnum2string (type)
+      );
+      return FALSE;
+    }
+  version = modulemd_subdocument_info_get_mdversion (subdoc);
+  if (version != expected_version)
+    {
+      g_set_error(
+        error,
+        MODULEMD_ERROR,
+        0,
+        "Not %s document; it is %" G_GUINT64_FORMAT " version",
+        gtype2astring (gtype),
+        version
+      );
+      return FALSE;
+    }
+  if (type == MODULEMD_YAML_DOC_DEFAULTS)
+      object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error));
+  else if (type == MODULEMD_YAML_DOC_OBSOLETES)
+      object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
+  else {
+      g_set_error(
+        error,
+        MODULEMD_ERROR,
+        0,
+        "Internal error: %s type is not supported",
+        gtype2astring (gtype)
+      );
+      return FALSE;
+  }
+  /* Check for a garbage past the first document */
+  if (!yaml_parser_parse (&parser, &event))
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Invalid YAML after first document"
+      );
+    }
+  if (event.type != YAML_STREAM_END_EVENT) {
+    {
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+        error,
+        event,
+        "Another YAML document after the first one"
+      );
+      return FALSE;
+    }
+  }
+  yaml_event_delete (&event);
+  /* Already validated by modulemd_defaults_v1_parse_yaml() etc. call. */
+  return (NULL != object);
+}
+
 static gboolean
 parse_file (const gchar *filename, GPtrArray **failures, GError **error)
 {
@@ -196,124 +344,19 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
     }
   else if (options.type == MODULEMD_TYPE_DEFAULTS_V1)
     {
-      /* We cannot load by index as it converts from old versions before
-       * a return and as it does not provide enumeration functions for
-       * subdocuments. We will use private modulemd_defaults_v1_parse_yaml().
-       * */
-      g_autoptr (FILE) file = NULL;
-      MMD_INIT_YAML_PARSER (parser);
-      MMD_INIT_YAML_EVENT (event);
-      g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
-      const GError *subdoc_error;
-      ModulemdYamlDocumentTypeEnum type;
-      guint64 version;
-      g_autoptr (ModulemdDefaultsV1) object = NULL;
-      file = fopen(filename, "r");
-      if (!file)
-        {
-          g_set_error (
-            error,
-            MODULEMD_YAML_ERROR,
-            MMD_YAML_ERROR_OPEN,
-            "Could not open %s file: %s",
-            filename,
-            strerror(errno)
-          );
-          return FALSE;
-        }
-      yaml_parser_set_input_file (&parser, file);
-      if (!yaml_parser_parse (&parser, &event))
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "Invalid YAML"
-          );
-        }
-      if (event.type != YAML_STREAM_START_EVENT) {
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "YAML parser could not find a start of a YAML stream"
-          );
-        }
-      }
-      yaml_event_delete (&event);
-      if (!yaml_parser_parse (&parser, &event))
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "Invalid YAML"
-          );
-        }
-      if (event.type != YAML_DOCUMENT_START_EVENT) {
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "YAML parser could not find a start of a YAML document"
-          );
-        }
-      }
-      yaml_event_delete (&event);
-      subdoc = modulemd_yaml_parse_document_type (&parser);
-      subdoc_error = modulemd_subdocument_info_get_gerror (subdoc);
-      if (subdoc_error)
-        {
-          *error = g_error_copy (subdoc_error);
-          return FALSE;
-        }
-      type = modulemd_subdocument_info_get_doctype (subdoc);
-      if (type != MODULEMD_YAML_DOC_DEFAULTS)
-        {
-          g_set_error(
-            error,
-            MODULEMD_ERROR,
-            0,
-            "Not %s document; it is %s",
-            gtype2astring (options.type),
-            ModulemdYamlDocumentTypeEnum2string (type)
-          );
-          return FALSE;
-        }
-      version = modulemd_subdocument_info_get_mdversion (subdoc);
-      if (version != 1u)
-        {
-          g_set_error(
-            error,
-            MODULEMD_ERROR,
-            0,
-            "Not %s document; it is %" G_GUINT64_FORMAT " version",
-            gtype2astring (options.type),
-            version
-          );
-          return FALSE;
-        }
-      object = modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error);
-      /* Check for a garbage past the first document */
-      if (!yaml_parser_parse (&parser, &event))
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "Invalid YAML after first document"
-          );
-        }
-      if (event.type != YAML_STREAM_END_EVENT) {
-        {
-          MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-            error,
-            event,
-            "Another YAML document after the first one"
-          );
-          return FALSE;
-        }
-      }
-      yaml_event_delete (&event);
-      /* Already validated by modulemd_defaults_v1_parse_yaml (). */
-      return (NULL != object);
+      return parse_file_as_subdoc (filename,
+                                   options.type,
+                                   MODULEMD_YAML_DOC_DEFAULTS,
+                                   1u,
+                                   error);
+    }
+  else if (options.type == MODULEMD_TYPE_OBSOLETES)
+    {
+      return parse_file_as_subdoc (filename,
+                                   options.type,
+                                   MODULEMD_YAML_DOC_OBSOLETES,
+                                   1u,
+                                   error);
     }
   else if (options.type == MODULEMD_TYPE_MODULE_STREAM_V2)
     {

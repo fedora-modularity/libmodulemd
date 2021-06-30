@@ -1,0 +1,8 @@
+---
+document: modulemd-obsoletes
+version: 1
+data:
+    module: foo
+    stream: '42'
+    modified: 1970-01-01T00:00Z
+    # message: a missing message breaks validity

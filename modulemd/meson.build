@@ -481,6 +481,12 @@ modulemd_validator_tests = {
 'invalid_defaultsv1_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'modulemd-defaults-v1', files('tests/test_data/invalid_defaults.yaml')]],
+'valid_defaultsv1_with_garbage_as_defaultsv1':
+    [['--code', '1'],
+    ['--type', 'modulemd-defaults-v1', files('tests/test_data/valid_defaults_with_garbage.yaml')]],
+'valid_defaultsv1_with_unexpected_document_as_defaultsv1':
+    [['--code', '1'],
+    ['--type', 'modulemd-defaults-v1', files('tests/test_data/valid_defaults_with_unexpected_document.yaml')]],
 'modulemdv2_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'defaults-v1', files('../yaml_specs/modulemd_stream_v2.yaml')]],

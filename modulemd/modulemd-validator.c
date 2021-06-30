@@ -141,7 +141,7 @@ set_type (const gchar *option_name,
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
-  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-defaults-v1, modulemd-packager-v3; default is index)", NULL },
+  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-defaults-v1, modulemd-packager-v3; default is index which only accepts multi-document YAML files)", NULL },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
@@ -287,7 +287,31 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           return FALSE;
         }
       object = modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error);
-      /* Check for a garbage past the first document ? */
+      /* Check for a garbage past the first document */
+      if (!yaml_parser_parse (&parser, &event))
+        {
+          g_set_error_literal (
+            error,
+            MODULEMD_YAML_ERROR,
+            MMD_YAML_ERROR_UNPARSEABLE,
+            "Invalid YAML after first document"
+          );
+          /* Detailed error? */
+          return FALSE;
+        }
+      if (event.type != YAML_STREAM_END_EVENT) {
+        {
+          g_set_error_literal (
+            error,
+            MODULEMD_YAML_ERROR,
+            MMD_YAML_ERROR_PARSE,
+            "Another YAML document after the first one"
+          );
+          /* Detailed error? */
+          return FALSE;
+        }
+      }
+      yaml_event_delete (&event);
       /* Already validated by modulemd_yaml_parse_document_type (). */
       return (NULL != object);
     }

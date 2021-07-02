@@ -1,0 +1,12 @@
+---
+document: modulemd
+version: 1
+data:
+  name: trivialname
+  stream: trivialstream
+  summary: Trivial Summary
+  description: >-
+    Trivial Description
+  license:
+    invalid: [MIT]
+...

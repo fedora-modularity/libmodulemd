@@ -451,15 +451,6 @@ modulemd_validator_tests = {
 'stream_packagerv3_invalid_mix_as_index':
     [['--code', '1'],
     [files('tests/test_data/stream_packager_mix.yaml')]],
-'valid_modulemdv2_as_modulemdv2':
-    [['--code', '0'],
-    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_stream_v2.yaml')]],
-'invalid_modulemdv2_as_modulemdv2':
-    [['--code', '1', '--stderr', 'Stream context'],
-    ['--type', 'modulemd-v2', files('tests/test_data/bad_stream_v2.yaml')]],
-'valid_packagerv3_as_modulemdv2':
-    [['--code', '1'],
-    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_packager_v3.yaml')]],
 'valid_defaultsv1.yaml':
     [['--code', '0'],
     [files('../yaml_specs/modulemd_defaults_v1.yaml')]],
@@ -478,6 +469,15 @@ modulemd_validator_tests = {
 'valid_defaultsv1_with_unexpected_document_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'modulemd-defaults-v1', files('tests/test_data/valid_defaults_with_unexpected_document.yaml')]],
+'valid_modulemdv2_as_modulemdv2':
+    [['--code', '0'],
+    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_stream_v2.yaml')]],
+'invalid_modulemdv2_as_modulemdv2':
+    [['--code', '1', '--stderr', 'Stream context'],
+    ['--type', 'modulemd-v2', files('tests/test_data/bad_stream_v2.yaml')]],
+'valid_packagerv3_as_modulemdv2':
+    [['--code', '1'],
+    ['--type', 'modulemd-v2', files('../yaml_specs/modulemd_packager_v3.yaml')]],
 'valid_obsoletesv1.yaml':
     [['--code', '0'],
     [files('../yaml_specs/modulemd_obsoletes_v1.yaml')]],

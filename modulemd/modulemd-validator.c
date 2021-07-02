@@ -35,6 +35,20 @@ enum mmd_verbosity
   MMD_DEBUG
 };
 
+/* Identifiers for modulemd type-version documents.
+ * We cannot use GTypes, e.g. MODULEMD_TYPE_PACKAGER_V3, because
+ * modulemd-packager-v2 GType does not exist (the format is parsed into
+ * a modulemd-v2 data structure). Also GTypes are not constants. They are
+ * a run-time computed value and hence cannot be used in switch-cases. */
+enum mmd_type
+{
+    MMD_TYPE_INDEX, /* Untyped validation by loading into an index */
+    MMD_TYPE_MODULEMD_V2,
+    MMD_TYPE_MODULEMD_DEFAULTS_V1,
+    MMD_TYPE_MODULEMD_OBSOLETES_V1,
+    MMD_TYPE_MODULEMD_PACKAGER_V3
+};
+
 struct validator_options
 {
   enum mmd_verbosity verbosity;
@@ -120,15 +134,15 @@ set_type (const gchar *option_name,
           GError **error)
 {
     if (!g_strcmp0 (value, "index"))
-        options.type = MODULEMD_TYPE_MODULE_INDEX;
+        options.type = MMD_TYPE_INDEX;
     else if (!g_strcmp0 (value, "modulemd-v2"))
-        options.type = MODULEMD_TYPE_MODULE_STREAM_V2;
+        options.type = MMD_TYPE_MODULEMD_V2;
     else if (!g_strcmp0 (value, "modulemd-defaults-v1"))
-        options.type = MODULEMD_TYPE_DEFAULTS_V1;
+        options.type = MMD_TYPE_MODULEMD_DEFAULTS_V1;
     else if (!g_strcmp0 (value, "modulemd-obsoletes-v1"))
-        options.type = MODULEMD_TYPE_OBSOLETES;
+        options.type = MMD_TYPE_MODULEMD_OBSOLETES_V1;
     else if (!g_strcmp0 (value, "modulemd-packager-v3"))
-        options.type = MODULEMD_TYPE_PACKAGER_V3;
+        options.type = MMD_TYPE_MODULEMD_PACKAGER_V3;
     else
       {
         g_set_error (error,
@@ -142,20 +156,17 @@ set_type (const gchar *option_name,
 }
 
 static const gchar *
-gtype2astring (const GType type)
+mmd_type2astring (enum mmd_type type)
 {
-    if (type == MODULEMD_TYPE_MODULE_INDEX)
-        return "an index";
-    else if (type == MODULEMD_TYPE_MODULE_STREAM_V2)
-        return "a modulemd-v2";
-    else if (type == MODULEMD_TYPE_DEFAULTS_V1)
-        return "a modulemd-defaults-v1";
-    else if (type == MODULEMD_TYPE_OBSOLETES)
-        return "a modulemd-obsoletes-v1";
-    else if (type == MODULEMD_TYPE_PACKAGER_V3)
-        return "a modulemd-packager-v3";
-    else
-        return "an unknown document GType";
+    switch (type)
+      {
+        case MMD_TYPE_INDEX: return "an index";
+        case MMD_TYPE_MODULEMD_V2: return "a modulemd-v2";
+        case MMD_TYPE_MODULEMD_DEFAULTS_V1: return "a modulemd-defaults-v1";
+        case MMD_TYPE_MODULEMD_OBSOLETES_V1: return "a modulemd-obsoletes-v1";
+        case MMD_TYPE_MODULEMD_PACKAGER_V3: return "a modulemd-packager-v3";
+      }
+    return "an unknown document type";
 }
 
 // clang-format off
@@ -190,7 +201,7 @@ ModulemdYamlDocumentTypeEnum2string (ModulemdYamlDocumentTypeEnum type)
  * parsers. */
 static gboolean
 parse_file_as_subdoc (const gchar *filename,
-                      GType gtype,
+                      enum mmd_type validation_type,
                       ModulemdYamlDocumentTypeEnum expected_type,
                       guint64 expected_version,
                       GError **error)
@@ -271,7 +282,7 @@ parse_file_as_subdoc (const gchar *filename,
         MODULEMD_ERROR,
         0,
         "Not %s document; it is %s",
-        gtype2astring (gtype),
+        mmd_type2astring (validation_type),
         ModulemdYamlDocumentTypeEnum2string (type)
       );
       return FALSE;
@@ -284,7 +295,7 @@ parse_file_as_subdoc (const gchar *filename,
         MODULEMD_ERROR,
         0,
         "Not %s document; it is %" G_GUINT64_FORMAT " version",
-        gtype2astring (gtype),
+        mmd_type2astring (validation_type),
         version
       );
       return FALSE;
@@ -299,7 +310,7 @@ parse_file_as_subdoc (const gchar *filename,
         MODULEMD_ERROR,
         0,
         "Internal error: %s type is not supported",
-        gtype2astring (gtype)
+        mmd_type2astring (validation_type)
       );
       return FALSE;
   }
@@ -335,80 +346,77 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
       g_fprintf (stdout, "Validating %s\n", filename);
     }
 
-  if (options.type == MODULEMD_TYPE_MODULE_INDEX)
+  switch (options.type)
     {
-      g_autoptr (ModulemdModuleIndex) index = NULL;
-      index = modulemd_module_index_new ();
-      return modulemd_module_index_update_from_file_ext (
-        index, filename, TRUE, TRUE, failures, error);
-    }
-  else if (options.type == MODULEMD_TYPE_DEFAULTS_V1)
-    {
-      return parse_file_as_subdoc (filename,
-                                   options.type,
-                                   MODULEMD_YAML_DOC_DEFAULTS,
-                                   1u,
-                                   error);
-    }
-  else if (options.type == MODULEMD_TYPE_OBSOLETES)
-    {
-      return parse_file_as_subdoc (filename,
-                                   options.type,
-                                   MODULEMD_YAML_DOC_OBSOLETES,
-                                   1u,
-                                   error);
-    }
-  else if (options.type == MODULEMD_TYPE_MODULE_STREAM_V2)
-    {
-      GType type;
-      g_autoptr (GObject) object = NULL;
-      type = modulemd_read_packager_file (filename, &object, error);
-      if (type == G_TYPE_INVALID)
-        return FALSE;
-      if (type != MODULEMD_TYPE_MODULE_STREAM_V2)
-        {
-          g_set_error(
-            error,
-            MODULEMD_ERROR,
-            0,
-            "Not a modulemd-v2 document; it is %s",
-            g_type_name(type)
-          );
+    case MMD_TYPE_INDEX:
+      {
+        g_autoptr (ModulemdModuleIndex) index = NULL;
+        index = modulemd_module_index_new ();
+        return modulemd_module_index_update_from_file_ext (
+          index, filename, TRUE, TRUE, failures, error);
+      }
+    case MMD_TYPE_MODULEMD_DEFAULTS_V1:
+        return parse_file_as_subdoc (filename,
+                                     options.type,
+                                     MODULEMD_YAML_DOC_DEFAULTS,
+                                     1u,
+                                     error);
+    case MMD_TYPE_MODULEMD_OBSOLETES_V1:
+        return parse_file_as_subdoc (filename,
+                                     options.type,
+                                     MODULEMD_YAML_DOC_OBSOLETES,
+                                     1u,
+                                     error);
+    case MMD_TYPE_MODULEMD_V2:
+      {
+        GType type;
+        g_autoptr (GObject) object = NULL;
+        type = modulemd_read_packager_file (filename, &object, error);
+        if (type == G_TYPE_INVALID)
           return FALSE;
-        }
-      return modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object), error);
-    }
-  else if (options.type == MODULEMD_TYPE_PACKAGER_V3)
-    {
-      GType type;
-      g_autoptr (GObject) object = NULL;
-      type = modulemd_read_packager_file (filename, &object, error);
-      if (type == G_TYPE_INVALID)
-        return FALSE;
-      if (type != MODULEMD_TYPE_PACKAGER_V3)
-        {
-          g_set_error(
-            error,
-            MODULEMD_ERROR,
-            0,
-            "Not a modulemd-packager-v3 document; it is %s",
-            g_type_name(type)
-          );
+        if (type != MODULEMD_TYPE_MODULE_STREAM_V2)
+          {
+            g_set_error(
+              error,
+              MODULEMD_ERROR,
+              0,
+              "Not a modulemd-v2 document; it is %s",
+              g_type_name(type)
+            );
+            return FALSE;
+          }
+        return modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object),
+          error);
+      }
+    case MMD_TYPE_MODULEMD_PACKAGER_V3:
+      {
+        GType type;
+        g_autoptr (GObject) object = NULL;
+        type = modulemd_read_packager_file (filename, &object, error);
+        if (type == G_TYPE_INVALID)
           return FALSE;
-        }
-      /* modulemd_packager_v3 is validated implicitly by
-       * modulemd_read_packager_file (). */
-      return TRUE;
+        if (type != MODULEMD_TYPE_PACKAGER_V3)
+          {
+            g_set_error(
+              error,
+              MODULEMD_ERROR,
+              0,
+              "Not a modulemd-packager-v3 document; it is %s",
+              g_type_name(type)
+            );
+            return FALSE;
+          }
+        /* modulemd_packager_v3 is validated implicitly by
+         * modulemd_read_packager_file (). */
+        return TRUE;
+      }
     }
-  else
-    {
-      g_fprintf (
-        stderr,
-        "Internal error: unsupported document type: %s\n",
-        g_type_name(options.type)
-      );
-      exit (EXIT_FAILURE);
-    }
+  g_fprintf (
+    stderr,
+    "Internal error: unsupported document type: %s\n",
+    mmd_type2astring(options.type)
+  );
+  exit (EXIT_FAILURE);
 }
 
 
@@ -425,7 +433,7 @@ main (int argc, char *argv[])
 
   setlocale (LC_ALL, "");
 
-  options.type = MODULEMD_TYPE_MODULE_INDEX;
+  options.type = MMD_TYPE_INDEX;
   context = g_option_context_new ("FILES - Simple modulemd YAML validator");
   g_option_context_add_main_entries (context, entries, "modulemd-validator");
   if (!g_option_context_parse (context, &argc, &argv, &error))

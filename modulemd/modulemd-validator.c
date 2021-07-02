@@ -139,9 +139,7 @@ set_type (const gchar *option_name,
           gpointer data,
           GError **error)
 {
-    if (!g_strcmp0 (value, "index"))
-        options.type = MMD_TYPE_INDEX;
-    else if (!g_strcmp0 (value, "modulemd-v1"))
+    if (!g_strcmp0 (value, "modulemd-v1"))
         options.type = MMD_TYPE_MODULEMD_V1;
     else if (!g_strcmp0 (value, "modulemd-v2"))
         options.type = MMD_TYPE_MODULEMD_V2;
@@ -187,7 +185,7 @@ mmd_type2astring (enum mmd_type type)
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
-  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v1, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v2, modulemd-packager-v3, modulemd-translations-v1; default is index only which one accepts multi-document YAML files)", NULL },
+  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Constrain a document type (modulemd-v1, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v2, modulemd-packager-v3, modulemd-translations-v1); by default any document type loadable into a modulemd index is acceptable; this option only supports single-document files", "TYPE" },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },

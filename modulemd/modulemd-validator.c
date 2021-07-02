@@ -228,6 +228,7 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
   guint64 version;
   g_autoptr (GObject) object = NULL;
 
+  /* Open the file and determine a document type */
   file = fopen(filename, "r");
   if (!file)
     {
@@ -311,42 +312,51 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
       );
       return FALSE;
     }
-  if (type == MODULEMD_YAML_DOC_DEFAULTS)
-      /* validates implicitly */
-      object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error));
-  else if (type == MODULEMD_YAML_DOC_MODULESTREAM)
+
+  /* Parse and validate the document body */
+  switch (validation_type)
     {
-      object = G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc, TRUE, error));
-      if (!object)
-          return FALSE;
-      if (!modulemd_module_stream_validate( MODULEMD_MODULE_STREAM (object), error))
-          return FALSE;
+    case MMD_TYPE_MODULEMD_V1:
+        object = G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc,
+          TRUE, error));
+        if (object && !modulemd_module_stream_validate(
+          MODULEMD_MODULE_STREAM (object), error))
+            g_clear_object (&object);
+        break;
+    case MMD_TYPE_MODULEMD_DEFAULTS_V1:
+        object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc,
+          TRUE, error));
+        /* validated implicitly */
+        break;
+    case MMD_TYPE_MODULEMD_OBSOLETES_V1:
+        object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
+        /* validated implicitly */
+        break;
+    case MMD_TYPE_MODULEMD_PACKAGER_V2:
+        object = G_OBJECT (modulemd_module_stream_v2_parse_yaml (subdoc,
+          TRUE, TRUE, error));
+        if (object && !modulemd_module_stream_validate(
+          MODULEMD_MODULE_STREAM (object), error))
+            g_clear_object (&object);
+        break;
+    case MMD_TYPE_MODULEMD_TRANSLATIONS_V1:
+        object = G_OBJECT (modulemd_translation_parse_yaml (subdoc,
+          TRUE, error));
+        /* validated implicitly */
+        break;
+    default:
+        g_set_error(
+          error,
+          MODULEMD_ERROR,
+          0,
+          "Internal error: %s type is not supported",
+          mmd_type2astring (validation_type)
+        );
+        return FALSE;
     }
-  else if (type == MODULEMD_YAML_DOC_OBSOLETES)
-      /* validates implicitly */
-      object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
-  else if (type == MODULEMD_YAML_DOC_PACKAGER)
-    {
-      object = G_OBJECT (modulemd_module_stream_v2_parse_yaml (subdoc,
-        TRUE, TRUE, error));
-      if (!object)
-          return FALSE;
-      if (!modulemd_module_stream_validate( MODULEMD_MODULE_STREAM (object), error))
-          return FALSE;
-    }
-  else if (type == MODULEMD_YAML_DOC_TRANSLATIONS)
-      /* validates implicitly */
-      object = G_OBJECT (modulemd_translation_parse_yaml (subdoc, TRUE, error));
-  else {
-      g_set_error(
-        error,
-        MODULEMD_ERROR,
-        0,
-        "Internal error: %s type is not supported",
-        mmd_type2astring (validation_type)
-      );
+  if (!object)
       return FALSE;
-  }
+
   /* Check for a garbage past the first document */
   if (!yaml_parser_parse (&parser, &event))
     {
@@ -367,8 +377,7 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
     }
   }
   yaml_event_delete (&event);
-  /* Already validated by modulemd_defaults_v1_parse_yaml() etc. call. */
-  return (NULL != object);
+  return TRUE;
 }
 
 static gboolean
@@ -388,18 +397,6 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         return modulemd_module_index_update_from_file_ext (
           index, filename, TRUE, TRUE, failures, error);
       }
-    case MMD_TYPE_MODULEMD_DEFAULTS_V1:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_DEFAULTS,
-                                                  1u,
-                                                  error);
-    case MMD_TYPE_MODULEMD_OBSOLETES_V1:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_OBSOLETES,
-                                                  1u,
-                                                  error);
     case MMD_TYPE_MODULEMD_V1:
         return parse_file_as_subdoc_and_validate (filename,
                                                   options.type,
@@ -427,6 +424,18 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         return modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object),
           error);
       }
+    case MMD_TYPE_MODULEMD_DEFAULTS_V1:
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_DEFAULTS,
+                                                  1u,
+                                                  error);
+    case MMD_TYPE_MODULEMD_OBSOLETES_V1:
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_OBSOLETES,
+                                                  1u,
+                                                  error);
     case MMD_TYPE_MODULEMD_PACKAGER_V2:
         return parse_file_as_subdoc_and_validate (filename,
                                                   options.type,

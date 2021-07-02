@@ -473,7 +473,7 @@ modulemd_validator_tests = {
     [['--code', '0'],
     ['--type', 'modulemd-v1', files('../yaml_specs/modulemd_stream_v1.yaml')]],
 'invalid_modulemdv1_as_modulemdv1':
-    [['--code', '1', '--stderr', 'Unexpected key in licenses'],
+    [['--code', '1', '--stderr', 'not in valid N-E:V-R.A format'],
     ['--type', 'modulemd-v1', files('tests/test_data/bad_stream_v1.yaml')]],
 'valid_modulemdv2_as_modulemdv1':
     [['--code', '1'],
@@ -506,7 +506,7 @@ modulemd_validator_tests = {
     [['--code', '0'],
     ['--type', 'modulemd-packager-v2', files('../yaml_specs/modulemd_packager_v2.yaml')]],
 'invalid_packagerv2_as_packagerv2':
-    [['--code', '1', '--stderr', 'Unexpected key in licenses'],
+    [['--code', '1', '--stderr', 'license is missing'],
     ['--type', 'modulemd-packager-v2', files('tests/test_data/bad_packager_v2.yaml')]],
 'valid_modulemdv2_as_packagerv2':
     [['--code', '1'],

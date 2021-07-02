@@ -5,6 +5,5 @@ data:
   summary: Trivial Summary
   description: >-
     Trivial Description
-  license:
-    invalid: [MIT]
+  #license: a missing license breaks validity
 ...

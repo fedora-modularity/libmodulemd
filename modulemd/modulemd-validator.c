@@ -226,8 +226,6 @@ parse_file_as_subdoc (const gchar *filename,
   const GError *subdoc_error;
   ModulemdYamlDocumentTypeEnum type;
   guint64 version;
-  /*g_autoptr (ModulemdDefaultsV1) defaults_object = NULL;
-  g_autoptr (ModulemdDefaultsV1) defaults_object = NULL;*/
   g_autoptr (GObject) object = NULL;
 
   file = fopen(filename, "r");

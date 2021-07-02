@@ -16,8 +16,9 @@
 #include "modulemd-errors.h"
 #include "private/modulemd-defaults-v1-private.h"
 #include "private/modulemd-module-index-private.h"
-#include "private/modulemd-obsoletes-private.h"
+#include "private/modulemd-module-stream-v1-private.h"
 #include "private/modulemd-module-stream-v2-private.h"
+#include "private/modulemd-obsoletes-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-yaml.h"
 
@@ -44,6 +45,7 @@ enum mmd_verbosity
 enum mmd_type
 {
     MMD_TYPE_INDEX, /* Untyped validation by loading into an index */
+    MMD_TYPE_MODULEMD_V1,
     MMD_TYPE_MODULEMD_V2,
     MMD_TYPE_MODULEMD_DEFAULTS_V1,
     MMD_TYPE_MODULEMD_OBSOLETES_V1,
@@ -137,6 +139,8 @@ set_type (const gchar *option_name,
 {
     if (!g_strcmp0 (value, "index"))
         options.type = MMD_TYPE_INDEX;
+    else if (!g_strcmp0 (value, "modulemd-v1"))
+        options.type = MMD_TYPE_MODULEMD_V1;
     else if (!g_strcmp0 (value, "modulemd-v2"))
         options.type = MMD_TYPE_MODULEMD_V2;
     else if (!g_strcmp0 (value, "modulemd-defaults-v1"))
@@ -165,6 +169,7 @@ mmd_type2astring (enum mmd_type type)
     switch (type)
       {
         case MMD_TYPE_INDEX: return "an index";
+        case MMD_TYPE_MODULEMD_V1: return "a modulemd-v1";
         case MMD_TYPE_MODULEMD_V2: return "a modulemd-v2";
         case MMD_TYPE_MODULEMD_DEFAULTS_V1: return "a modulemd-defaults-v1";
         case MMD_TYPE_MODULEMD_OBSOLETES_V1: return "a modulemd-obsoletes-v1";
@@ -177,7 +182,7 @@ mmd_type2astring (enum mmd_type type)
 // clang-format off
 static GOptionEntry entries[] = {
   { "debug", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Output debugging messages", NULL },
-  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v2, modulemd-packager-v3; default is index only which one accepts multi-document YAML files)", NULL },
+  { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Document type (index, modulemd-v1, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v2, modulemd-packager-v3; default is index only which one accepts multi-document YAML files)", NULL },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
@@ -307,6 +312,8 @@ parse_file_as_subdoc (const gchar *filename,
     }
   if (type == MODULEMD_YAML_DOC_DEFAULTS)
       object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error));
+  else if (type == MODULEMD_YAML_DOC_MODULESTREAM)
+      object = G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc, TRUE, error));
   else if (type == MODULEMD_YAML_DOC_OBSOLETES)
       object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
   else if (type == MODULEMD_YAML_DOC_PACKAGER)
@@ -373,6 +380,12 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         return parse_file_as_subdoc (filename,
                                      options.type,
                                      MODULEMD_YAML_DOC_OBSOLETES,
+                                     1u,
+                                     error);
+    case MMD_TYPE_MODULEMD_V1:
+        return parse_file_as_subdoc (filename,
+                                     options.type,
+                                     MODULEMD_YAML_DOC_MODULESTREAM,
                                      1u,
                                      error);
     case MMD_TYPE_MODULEMD_V2:

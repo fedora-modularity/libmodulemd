@@ -213,7 +213,7 @@ ModulemdYamlDocumentTypeEnum2string (ModulemdYamlDocumentTypeEnum type)
  * subdocuments. We will use private modulemd_defaults_v1_parse_yaml() etc.
  * parsers. */
 static gboolean
-parse_file_as_subdoc (const gchar *filename,
+parse_file_as_subdoc_and_validate (const gchar *filename,
                       enum mmd_type validation_type,
                       ModulemdYamlDocumentTypeEnum expected_type,
                       guint64 expected_version,
@@ -312,15 +312,30 @@ parse_file_as_subdoc (const gchar *filename,
       return FALSE;
     }
   if (type == MODULEMD_YAML_DOC_DEFAULTS)
+      /* validates implicitly */
       object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error));
   else if (type == MODULEMD_YAML_DOC_MODULESTREAM)
+    {
       object = G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc, TRUE, error));
+      if (!object)
+          return FALSE;
+      if (!modulemd_module_stream_validate( MODULEMD_MODULE_STREAM (object), error))
+          return FALSE;
+    }
   else if (type == MODULEMD_YAML_DOC_OBSOLETES)
+      /* validates implicitly */
       object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
   else if (type == MODULEMD_YAML_DOC_PACKAGER)
+    {
       object = G_OBJECT (modulemd_module_stream_v2_parse_yaml (subdoc,
         TRUE, TRUE, error));
+      if (!object)
+          return FALSE;
+      if (!modulemd_module_stream_validate( MODULEMD_MODULE_STREAM (object), error))
+          return FALSE;
+    }
   else if (type == MODULEMD_YAML_DOC_TRANSLATIONS)
+      /* validates implicitly */
       object = G_OBJECT (modulemd_translation_parse_yaml (subdoc, TRUE, error));
   else {
       g_set_error(
@@ -374,23 +389,23 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           index, filename, TRUE, TRUE, failures, error);
       }
     case MMD_TYPE_MODULEMD_DEFAULTS_V1:
-        return parse_file_as_subdoc (filename,
-                                     options.type,
-                                     MODULEMD_YAML_DOC_DEFAULTS,
-                                     1u,
-                                     error);
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_DEFAULTS,
+                                                  1u,
+                                                  error);
     case MMD_TYPE_MODULEMD_OBSOLETES_V1:
-        return parse_file_as_subdoc (filename,
-                                     options.type,
-                                     MODULEMD_YAML_DOC_OBSOLETES,
-                                     1u,
-                                     error);
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_OBSOLETES,
+                                                  1u,
+                                                  error);
     case MMD_TYPE_MODULEMD_V1:
-        return parse_file_as_subdoc (filename,
-                                     options.type,
-                                     MODULEMD_YAML_DOC_MODULESTREAM,
-                                     1u,
-                                     error);
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_MODULESTREAM,
+                                                  1u,
+                                                  error);
     case MMD_TYPE_MODULEMD_V2:
       {
         GType type;
@@ -413,11 +428,11 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           error);
       }
     case MMD_TYPE_MODULEMD_PACKAGER_V2:
-        return parse_file_as_subdoc (filename,
-                                     options.type,
-                                     MODULEMD_YAML_DOC_PACKAGER,
-                                     2u,
-                                     error);
+        return parse_file_as_subdoc_and_validate (filename,
+                                                  options.type,
+                                                  MODULEMD_YAML_DOC_PACKAGER,
+                                                  2u,
+                                                  error);
     case MMD_TYPE_MODULEMD_PACKAGER_V3:
       {
         GType type;
@@ -441,11 +456,12 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         return TRUE;
       }
     case MMD_TYPE_MODULEMD_TRANSLATIONS_V1:
-        return parse_file_as_subdoc (filename,
-                                     options.type,
-                                     MODULEMD_YAML_DOC_TRANSLATIONS,
-                                     1u,
-                                     error);
+        return parse_file_as_subdoc_and_validate (
+          filename,
+          options.type,
+          MODULEMD_YAML_DOC_TRANSLATIONS,
+          1u,
+          error);
     }
   g_fprintf (
     stderr,

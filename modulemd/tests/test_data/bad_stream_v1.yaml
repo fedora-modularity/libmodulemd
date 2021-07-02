@@ -8,5 +8,8 @@ data:
   description: >-
     Trivial Description
   license:
-    invalid: [MIT]
+    module: [MIT]
+  artifacts:
+    rpms:
+    - "MissingEpoch-0-0.src"
 ...

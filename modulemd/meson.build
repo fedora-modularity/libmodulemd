@@ -493,6 +493,15 @@ modulemd_validator_tests = {
 'modulemdv2_as_defaultsv1':
     [['--code', '1'],
     ['--type', 'defaults-v1', files('../yaml_specs/modulemd_stream_v2.yaml')]],
+'valid_packagerv2_as_packagerv2':
+    [['--code', '0'],
+    ['--type', 'modulemd-packager-v2', files('../yaml_specs/modulemd_packager_v2.yaml')]],
+'invalid_packagerv2_as_packagerv2':
+    [['--code', '1', '--stderr', 'Unexpected key in licenses'],
+    ['--type', 'modulemd-packager-v2', files('tests/test_data/bad_packager_v2.yaml')]],
+'valid_modulemdv2_as_packagerv2':
+    [['--code', '1'],
+    ['--type', 'modulemd-packager-v2', files('../yaml_specs/modulemd_stream_v2.yaml')]],
 'valid_packagerv3_as_packagerv3':
     [['--code', '0'],
     ['--type', 'modulemd-packager-v3', files('../yaml_specs/modulemd_packager_v3.yaml')]],

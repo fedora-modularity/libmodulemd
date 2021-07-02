@@ -520,6 +520,15 @@ modulemd_validator_tests = {
 'valid_modulemdv2_as_packagerv3':
     [['--code', '1'],
     ['--type', 'modulemd-packager-v3', files('../yaml_specs/modulemd_stream_v2.yaml')]],
+'valid_translationsv1_as_translationsv1':
+    [['--code', '0'],
+    ['--type', 'modulemd-translations-v1', files('../yaml_specs/modulemd_translations_v1.yaml')]],
+'invalid_translationsv1_as_translationsv1':
+    [['--code', '1', '--stderr', 'not a valid integer'],
+    ['--type', 'modulemd-translations-v1', files('tests/test_data/bad_translations_v1.yaml')]],
+'valid_modulemdv2_as_translationsv1':
+    [['--code', '1'],
+    ['--type', 'modulemd-translations-v1', files('../yaml_specs/modulemd_stream_v2.yaml')]],
 }
 test_modulemd_validator = executable(
     'test-modulemd-validator',

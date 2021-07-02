@@ -1,0 +1,7 @@
+document: modulemd-translations
+version: 1
+data:
+    module: foo
+    stream: bar
+    modified: 42invalid
+    translations:

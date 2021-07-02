@@ -45,14 +45,14 @@ enum mmd_verbosity
  * a run-time computed value and hence cannot be used in switch-cases. */
 enum mmd_type
 {
-    MMD_TYPE_INDEX, /* Untyped validation by loading into an index */
-    MMD_TYPE_MODULEMD_V1,
-    MMD_TYPE_MODULEMD_V2,
-    MMD_TYPE_MODULEMD_DEFAULTS_V1,
-    MMD_TYPE_MODULEMD_OBSOLETES_V1,
-    MMD_TYPE_MODULEMD_PACKAGER_V2,
-    MMD_TYPE_MODULEMD_PACKAGER_V3,
-    MMD_TYPE_MODULEMD_TRANSLATIONS_V1
+  MMD_TYPE_INDEX, /* Untyped validation by loading into an index */
+  MMD_TYPE_MODULEMD_V1,
+  MMD_TYPE_MODULEMD_V2,
+  MMD_TYPE_MODULEMD_DEFAULTS_V1,
+  MMD_TYPE_MODULEMD_OBSOLETES_V1,
+  MMD_TYPE_MODULEMD_PACKAGER_V2,
+  MMD_TYPE_MODULEMD_PACKAGER_V3,
+  MMD_TYPE_MODULEMD_TRANSLATIONS_V1
 };
 
 struct validator_options
@@ -139,47 +139,48 @@ set_type (const gchar *option_name,
           gpointer data,
           GError **error)
 {
-    if (!g_strcmp0 (value, "modulemd-v1"))
-        options.type = MMD_TYPE_MODULEMD_V1;
-    else if (!g_strcmp0 (value, "modulemd-v2"))
-        options.type = MMD_TYPE_MODULEMD_V2;
-    else if (!g_strcmp0 (value, "modulemd-defaults-v1"))
-        options.type = MMD_TYPE_MODULEMD_DEFAULTS_V1;
-    else if (!g_strcmp0 (value, "modulemd-obsoletes-v1"))
-        options.type = MMD_TYPE_MODULEMD_OBSOLETES_V1;
-    else if (!g_strcmp0 (value, "modulemd-packager-v2"))
-        options.type = MMD_TYPE_MODULEMD_PACKAGER_V2;
-    else if (!g_strcmp0 (value, "modulemd-packager-v3"))
-        options.type = MMD_TYPE_MODULEMD_PACKAGER_V3;
-    else if (!g_strcmp0 (value, "modulemd-translations-v1"))
-        options.type = MMD_TYPE_MODULEMD_TRANSLATIONS_V1;
-    else
-      {
-        g_set_error (error,
-                    G_OPTION_ERROR,
-                    G_OPTION_ERROR_FAILED,
-                    "Unknown document type: %s",
-                    value);
-        return FALSE;
-      }
-    return TRUE;
+  if (!g_strcmp0 (value, "modulemd-v1"))
+    options.type = MMD_TYPE_MODULEMD_V1;
+  else if (!g_strcmp0 (value, "modulemd-v2"))
+    options.type = MMD_TYPE_MODULEMD_V2;
+  else if (!g_strcmp0 (value, "modulemd-defaults-v1"))
+    options.type = MMD_TYPE_MODULEMD_DEFAULTS_V1;
+  else if (!g_strcmp0 (value, "modulemd-obsoletes-v1"))
+    options.type = MMD_TYPE_MODULEMD_OBSOLETES_V1;
+  else if (!g_strcmp0 (value, "modulemd-packager-v2"))
+    options.type = MMD_TYPE_MODULEMD_PACKAGER_V2;
+  else if (!g_strcmp0 (value, "modulemd-packager-v3"))
+    options.type = MMD_TYPE_MODULEMD_PACKAGER_V3;
+  else if (!g_strcmp0 (value, "modulemd-translations-v1"))
+    options.type = MMD_TYPE_MODULEMD_TRANSLATIONS_V1;
+  else
+    {
+      g_set_error (error,
+                   G_OPTION_ERROR,
+                   G_OPTION_ERROR_FAILED,
+                   "Unknown document type: %s",
+                   value);
+      return FALSE;
+    }
+  return TRUE;
 }
 
 static const gchar *
 mmd_type2astring (enum mmd_type type)
 {
-    switch (type)
-      {
-        case MMD_TYPE_INDEX: return "an index";
-        case MMD_TYPE_MODULEMD_V1: return "a modulemd-v1";
-        case MMD_TYPE_MODULEMD_V2: return "a modulemd-v2";
-        case MMD_TYPE_MODULEMD_DEFAULTS_V1: return "a modulemd-defaults-v1";
-        case MMD_TYPE_MODULEMD_OBSOLETES_V1: return "a modulemd-obsoletes-v1";
-        case MMD_TYPE_MODULEMD_PACKAGER_V2: return "a modulemd-packager-v2";
-        case MMD_TYPE_MODULEMD_PACKAGER_V3: return "a modulemd-packager-v3";
-        case MMD_TYPE_MODULEMD_TRANSLATIONS_V1: return "a modulemd-translations-v1";
-      }
-    return "an unknown document type";
+  switch (type)
+    {
+    case MMD_TYPE_INDEX: return "an index";
+    case MMD_TYPE_MODULEMD_V1: return "a modulemd-v1";
+    case MMD_TYPE_MODULEMD_V2: return "a modulemd-v2";
+    case MMD_TYPE_MODULEMD_DEFAULTS_V1: return "a modulemd-defaults-v1";
+    case MMD_TYPE_MODULEMD_OBSOLETES_V1: return "a modulemd-obsoletes-v1";
+    case MMD_TYPE_MODULEMD_PACKAGER_V2: return "a modulemd-packager-v2";
+    case MMD_TYPE_MODULEMD_PACKAGER_V3: return "a modulemd-packager-v3";
+    case MMD_TYPE_MODULEMD_TRANSLATIONS_V1:
+      return "a modulemd-translations-v1";
+    }
+  return "an unknown document type";
 }
 
 // clang-format off
@@ -197,15 +198,15 @@ static const gchar *
 ModulemdYamlDocumentTypeEnum2string (ModulemdYamlDocumentTypeEnum type)
 {
   switch (type)
-   {
-     case MODULEMD_YAML_DOC_MODULESTREAM: return "modulemd";
-     case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
-     case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
-     case MODULEMD_YAML_DOC_PACKAGER: return "modulemd-packager";
-     case MODULEMD_YAML_DOC_OBSOLETES: return "modulemd-obsoletes";
-     case MODULEMD_YAML_DOC_UNKNOWN: /* fall through */
-     default: return "unknown type";
-   }
+    {
+    case MODULEMD_YAML_DOC_MODULESTREAM: return "modulemd";
+    case MODULEMD_YAML_DOC_DEFAULTS: return "modulemd-defaults";
+    case MODULEMD_YAML_DOC_TRANSLATIONS: return "modulemd-translations";
+    case MODULEMD_YAML_DOC_PACKAGER: return "modulemd-packager";
+    case MODULEMD_YAML_DOC_OBSOLETES: return "modulemd-obsoletes";
+    case MODULEMD_YAML_DOC_UNKNOWN: /* fall through */
+    default: return "unknown type";
+    }
 }
 
 /* We cannot load by index as it converts from old versions before
@@ -214,10 +215,10 @@ ModulemdYamlDocumentTypeEnum2string (ModulemdYamlDocumentTypeEnum type)
  * parsers. */
 static gboolean
 parse_file_as_subdoc_and_validate (const gchar *filename,
-                      enum mmd_type validation_type,
-                      ModulemdYamlDocumentTypeEnum expected_type,
-                      guint64 expected_version,
-                      GError **error)
+                                   enum mmd_type validation_type,
+                                   ModulemdYamlDocumentTypeEnum expected_type,
+                                   guint64 expected_version,
+                                   GError **error)
 {
   g_autoptr (FILE) file = NULL;
   MMD_INIT_YAML_PARSER (parser);
@@ -229,55 +230,43 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
   g_autoptr (GObject) object = NULL;
 
   /* Open the file and determine a document type */
-  file = fopen(filename, "r");
+  file = fopen (filename, "r");
   if (!file)
     {
-      g_set_error (
-        error,
-        MODULEMD_YAML_ERROR,
-        MMD_YAML_ERROR_OPEN,
-        "Could not open %s file: %s",
-        filename,
-        strerror(errno)
-      );
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_YAML_ERROR_OPEN,
+                   "Could not open %s file: %s",
+                   filename,
+                   strerror (errno));
       return FALSE;
     }
   yaml_parser_set_input_file (&parser, file);
   if (!yaml_parser_parse (&parser, &event))
     {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "Invalid YAML"
-      );
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (error, event, "Invalid YAML");
     }
-  if (event.type != YAML_STREAM_START_EVENT) {
+  if (event.type != YAML_STREAM_START_EVENT)
     {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "YAML parser could not find a start of a YAML stream"
-      );
+      {
+        MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+          error, event, "YAML parser could not find a start of a YAML stream");
+      }
     }
-  }
   yaml_event_delete (&event);
   if (!yaml_parser_parse (&parser, &event))
     {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "Invalid YAML"
-      );
+      MMD_YAML_ERROR_EVENT_EXIT_BOOL (error, event, "Invalid YAML");
     }
-  if (event.type != YAML_DOCUMENT_START_EVENT) {
+  if (event.type != YAML_DOCUMENT_START_EVENT)
     {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "YAML parser could not find a start of a YAML document"
-      );
+      {
+        MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+          error,
+          event,
+          "YAML parser could not find a start of a YAML document");
+      }
     }
-  }
   yaml_event_delete (&event);
   subdoc = modulemd_yaml_parse_document_type (&parser);
   subdoc_error = modulemd_subdocument_info_get_gerror (subdoc);
@@ -289,27 +278,23 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
   type = modulemd_subdocument_info_get_doctype (subdoc);
   if (type != expected_type)
     {
-      g_set_error(
-        error,
-        MODULEMD_ERROR,
-        0,
-        "Not %s document; it is %s",
-        mmd_type2astring (validation_type),
-        ModulemdYamlDocumentTypeEnum2string (type)
-      );
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   0,
+                   "Not %s document; it is %s",
+                   mmd_type2astring (validation_type),
+                   ModulemdYamlDocumentTypeEnum2string (type));
       return FALSE;
     }
   version = modulemd_subdocument_info_get_mdversion (subdoc);
   if (version != expected_version)
     {
-      g_set_error(
-        error,
-        MODULEMD_ERROR,
-        0,
-        "Not %s document; it is %" G_GUINT64_FORMAT " version",
-        mmd_type2astring (validation_type),
-        version
-      );
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   0,
+                   "Not %s document; it is %" G_GUINT64_FORMAT " version",
+                   mmd_type2astring (validation_type),
+                   version);
       return FALSE;
     }
 
@@ -317,65 +302,58 @@ parse_file_as_subdoc_and_validate (const gchar *filename,
   switch (validation_type)
     {
     case MMD_TYPE_MODULEMD_V1:
-        object = G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc,
-          TRUE, error));
-        if (object && !modulemd_module_stream_validate(
-          MODULEMD_MODULE_STREAM (object), error))
-            g_clear_object (&object);
-        break;
+      object =
+        G_OBJECT (modulemd_module_stream_v1_parse_yaml (subdoc, TRUE, error));
+      if (object && !modulemd_module_stream_validate (
+                      MODULEMD_MODULE_STREAM (object), error))
+        g_clear_object (&object);
+      break;
     case MMD_TYPE_MODULEMD_DEFAULTS_V1:
-        object = G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc,
-          TRUE, error));
-        /* validated implicitly */
-        break;
+      object =
+        G_OBJECT (modulemd_defaults_v1_parse_yaml (subdoc, TRUE, error));
+      /* validated implicitly */
+      break;
     case MMD_TYPE_MODULEMD_OBSOLETES_V1:
-        object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
-        /* validated implicitly */
-        break;
+      object = G_OBJECT (modulemd_obsoletes_parse_yaml (subdoc, TRUE, error));
+      /* validated implicitly */
+      break;
     case MMD_TYPE_MODULEMD_PACKAGER_V2:
-        object = G_OBJECT (modulemd_module_stream_v2_parse_yaml (subdoc,
-          TRUE, TRUE, error));
-        if (object && !modulemd_module_stream_validate(
-          MODULEMD_MODULE_STREAM (object), error))
-            g_clear_object (&object);
-        break;
+      object = G_OBJECT (
+        modulemd_module_stream_v2_parse_yaml (subdoc, TRUE, TRUE, error));
+      if (object && !modulemd_module_stream_validate (
+                      MODULEMD_MODULE_STREAM (object), error))
+        g_clear_object (&object);
+      break;
     case MMD_TYPE_MODULEMD_TRANSLATIONS_V1:
-        object = G_OBJECT (modulemd_translation_parse_yaml (subdoc,
-          TRUE, error));
-        /* validated implicitly */
-        break;
+      object =
+        G_OBJECT (modulemd_translation_parse_yaml (subdoc, TRUE, error));
+      /* validated implicitly */
+      break;
     default:
-        g_set_error(
-          error,
-          MODULEMD_ERROR,
-          0,
-          "Internal error: %s type is not supported",
-          mmd_type2astring (validation_type)
-        );
-        return FALSE;
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   0,
+                   "Internal error: %s type is not supported",
+                   mmd_type2astring (validation_type));
+      return FALSE;
     }
   if (!object)
-      return FALSE;
+    return FALSE;
 
   /* Check for a garbage past the first document */
   if (!yaml_parser_parse (&parser, &event))
     {
       MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "Invalid YAML after first document"
-      );
+        error, event, "Invalid YAML after first document");
     }
-  if (event.type != YAML_STREAM_END_EVENT) {
+  if (event.type != YAML_STREAM_END_EVENT)
     {
-      MMD_YAML_ERROR_EVENT_EXIT_BOOL (
-        error,
-        event,
-        "Another YAML document after the first one"
-      );
-      return FALSE;
+      {
+        MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+          error, event, "Another YAML document after the first one");
+        return FALSE;
+      }
     }
-  }
   yaml_event_delete (&event);
   return TRUE;
 }
@@ -398,11 +376,8 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           index, filename, TRUE, TRUE, failures, error);
       }
     case MMD_TYPE_MODULEMD_V1:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_MODULESTREAM,
-                                                  1u,
-                                                  error);
+      return parse_file_as_subdoc_and_validate (
+        filename, options.type, MODULEMD_YAML_DOC_MODULESTREAM, 1u, error);
     case MMD_TYPE_MODULEMD_V2:
       {
         GType type;
@@ -412,36 +387,25 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           return FALSE;
         if (type != MODULEMD_TYPE_MODULE_STREAM_V2)
           {
-            g_set_error(
-              error,
-              MODULEMD_ERROR,
-              0,
-              "Not a modulemd-v2 document; it is %s",
-              g_type_name(type)
-            );
+            g_set_error (error,
+                         MODULEMD_ERROR,
+                         0,
+                         "Not a modulemd-v2 document; it is %s",
+                         g_type_name (type));
             return FALSE;
           }
-        return modulemd_module_stream_validate (MODULEMD_MODULE_STREAM (object),
-          error);
+        return modulemd_module_stream_validate (
+          MODULEMD_MODULE_STREAM (object), error);
       }
     case MMD_TYPE_MODULEMD_DEFAULTS_V1:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_DEFAULTS,
-                                                  1u,
-                                                  error);
+      return parse_file_as_subdoc_and_validate (
+        filename, options.type, MODULEMD_YAML_DOC_DEFAULTS, 1u, error);
     case MMD_TYPE_MODULEMD_OBSOLETES_V1:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_OBSOLETES,
-                                                  1u,
-                                                  error);
+      return parse_file_as_subdoc_and_validate (
+        filename, options.type, MODULEMD_YAML_DOC_OBSOLETES, 1u, error);
     case MMD_TYPE_MODULEMD_PACKAGER_V2:
-        return parse_file_as_subdoc_and_validate (filename,
-                                                  options.type,
-                                                  MODULEMD_YAML_DOC_PACKAGER,
-                                                  2u,
-                                                  error);
+      return parse_file_as_subdoc_and_validate (
+        filename, options.type, MODULEMD_YAML_DOC_PACKAGER, 2u, error);
     case MMD_TYPE_MODULEMD_PACKAGER_V3:
       {
         GType type;
@@ -451,13 +415,11 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
           return FALSE;
         if (type != MODULEMD_TYPE_PACKAGER_V3)
           {
-            g_set_error(
-              error,
-              MODULEMD_ERROR,
-              0,
-              "Not a modulemd-packager-v3 document; it is %s",
-              g_type_name(type)
-            );
+            g_set_error (error,
+                         MODULEMD_ERROR,
+                         0,
+                         "Not a modulemd-packager-v3 document; it is %s",
+                         g_type_name (type));
             return FALSE;
           }
         /* modulemd_packager_v3 is validated implicitly by
@@ -465,18 +427,12 @@ parse_file (const gchar *filename, GPtrArray **failures, GError **error)
         return TRUE;
       }
     case MMD_TYPE_MODULEMD_TRANSLATIONS_V1:
-        return parse_file_as_subdoc_and_validate (
-          filename,
-          options.type,
-          MODULEMD_YAML_DOC_TRANSLATIONS,
-          1u,
-          error);
+      return parse_file_as_subdoc_and_validate (
+        filename, options.type, MODULEMD_YAML_DOC_TRANSLATIONS, 1u, error);
     }
-  g_fprintf (
-    stderr,
-    "Internal error: unsupported document type: %s\n",
-    mmd_type2astring(options.type)
-  );
+  g_fprintf (stderr,
+             "Internal error: unsupported document type: %s\n",
+             mmd_type2astring (options.type));
   exit (EXIT_FAILURE);
 }
 

@@ -453,7 +453,8 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
 
   g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
 
-  value = g_ascii_strtoull ((const gchar *)event.data.scalar.value, &endptr, 10);
+  value =
+    g_ascii_strtoull ((const gchar *)event.data.scalar.value, &endptr, 10);
 
   if (value == G_MAXUINT64 && errno == ERANGE)
     {
@@ -477,7 +478,7 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
     }
 
   if ((value == 0u && endptr == (gchar *)event.data.scalar.value) ||
-          *endptr != '\0')
+      *endptr != '\0')
     {
       g_set_error (error,
                    MODULEMD_YAML_ERROR,

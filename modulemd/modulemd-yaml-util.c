@@ -453,6 +453,17 @@ modulemd_yaml_parse_uint64 (yaml_parser_t *parser, GError **error)
 
   g_debug ("Parsing scalar: %s", (const gchar *)event.data.scalar.value);
 
+  /* g_ascii_strtoull() accepts negative values by definition. */
+  if (event.data.scalar.value[0] == '-')
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "%s: The integer value is negative",
+                   (const gchar *)event.data.scalar.value);
+      return 0u;
+    }
+
   value =
     g_ascii_strtoull ((const gchar *)event.data.scalar.value, &endptr, 10);
 

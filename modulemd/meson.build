@@ -355,6 +355,7 @@ c_tests = {
 'module_index_merger' : [ 'tests/test-modulemd-merger.c' ],
 'modulestream'        : [ 'tests/test-modulemd-modulestream.c' ],
 'packagerv3'          : [ 'tests/test-modulemd-packager-v3.c' ],
+'parse_int64'         : [ 'tests/test-modulemd-parse_int64.c' ],
 'profile'             : [ 'tests/test-modulemd-profile.c' ],
 'rpm_map'             : [ 'tests/test-modulemd-rpmmap.c' ],
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],

@@ -20,6 +20,62 @@
 #include <yaml.h>
 
 static void
+test (const char *input, gint64 expected_value, gboolean expected_error)
+{
+  gint64 parsed;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)input, strlen (input));
+  parser_skip_document_start (&parser);
+
+  parsed = modulemd_yaml_parse_int64 (&parser, &error);
+  if (expected_error)
+    g_assert_nonnull (error);
+  else
+    g_assert_null (error);
+  g_assert_cmpuint (parsed, ==, expected_value);
+}
+
+static void
+test_int64_valid (void)
+{
+  test ("42", 42, FALSE);
+}
+
+static void
+test_int64_invalid_no_digit (void)
+{
+  test ("foo", 0, TRUE);
+}
+
+static void
+test_int64_invalid_incomplete (void)
+{
+  test ("42foo", 0, TRUE);
+}
+
+static void
+test_int64_valid_negative (void)
+{
+  test ("-42", -42, FALSE);
+}
+
+static void
+test_int64_invalid_too_big (void)
+{
+  test ("9223372036854775808", 0, TRUE);
+}
+
+static void
+test_int64_invalid_too_small (void)
+{
+  test ("-9223372036854775809", 0, TRUE);
+}
+
+static void
 utest (const char *input, guint64 expected_value, gboolean expected_error)
 {
   guint64 parsed;
@@ -75,6 +131,18 @@ main (int argc, char *argv[])
 {
   setlocale (LC_ALL, "");
   g_test_init (&argc, &argv, NULL);
+
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/valid", test_int64_valid);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_no_digit",
+                   test_int64_invalid_no_digit);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_incomplete",
+                   test_int64_invalid_incomplete);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/valid_negative",
+                   test_int64_valid_negative);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_too_big",
+                   test_int64_invalid_too_big);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_too_small",
+                   test_int64_invalid_too_small);
 
   g_test_add_func ("/modulemd/v2/uint64/yaml/parse/valid", test_uint64_valid);
   g_test_add_func ("/modulemd/v2/uint64/yaml/parse/invalid_no_digit",

@@ -426,6 +426,8 @@ modulemd_yaml_parse_bool (yaml_parser_t *parser, GError **error)
 gint64
 modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
 {
+  gint64 value;
+  gchar *endptr;
   MMD_INIT_YAML_EVENT (event);
 
   YAML_PARSER_PARSE_WITH_EXIT_INT (parser, &event, error);
@@ -434,7 +436,53 @@ modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
       MMD_YAML_ERROR_EVENT_EXIT_INT (error, event, "String was not a scalar");
     }
 
-  return g_ascii_strtoll ((const gchar *)event.data.scalar.value, NULL, 10);
+  value =
+    g_ascii_strtoll ((const gchar *)event.data.scalar.value, &endptr, 10);
+
+  if ((value == G_MAXINT64 && errno == ERANGE))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "%s: The integer value is larger than %" G_GINT64_FORMAT,
+                   (const gchar *)event.data.scalar.value,
+                   G_MAXINT64);
+      return 0;
+    }
+
+  if ((value == G_MININT64 && errno == ERANGE))
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MODULEMD_ERROR_VALIDATE,
+                   "%s: The integer value is samller than %" G_GINT64_FORMAT,
+                   (const gchar *)event.data.scalar.value,
+                   G_MININT64);
+      return 0;
+    }
+
+  if (value == 0 && errno == EINVAL)
+    {
+      g_set_error_literal (
+        error,
+        MODULEMD_YAML_ERROR,
+        MODULEMD_ERROR_NOT_IMPLEMENTED,
+        "Your GLib library does not support parsing integers in 10 base");
+      return 0;
+    }
+
+  if ((value == 0 && endptr == (gchar *)event.data.scalar.value) ||
+      *endptr != '\0')
+    {
+      g_set_error (error,
+                   MODULEMD_YAML_ERROR,
+                   MMD_ERROR_VALIDATE,
+                   "%s: The string is not a valid integer",
+                   (const gchar *)event.data.scalar.value);
+      return 0;
+    }
+
+  return value;
 }
 
 

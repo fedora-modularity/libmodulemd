@@ -8,7 +8,7 @@ source $SCRIPT_DIR/ci-common.inc
 set -e
 set -x
 
-release=${1:-7}
+release=${1:-8}
 
 mmd_run_docker_tests \
     os=mageia \

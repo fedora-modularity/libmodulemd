@@ -281,12 +281,12 @@ jobs:
           meson test -C ci_valgrind --suite ci_valgrind --print-errorlogs -t 10
             --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh
 
-  mageia_7:
-    name: Mageia 7
+  mageia_8:
+    name: Mageia 8
     runs-on: ubuntu-latest
     continue-on-error: true
     container:
-      image: docker.io/mageia:7
+      image: docker.io/library/mageia:8
 
     steps:
       - name: Install dependencies
@@ -313,7 +313,7 @@ jobs:
               openssl
               pkgconf
               popt-devel
-              python2-six
+              python3-six
               python3-autopep8
               python3-devel
               python3-gitpython

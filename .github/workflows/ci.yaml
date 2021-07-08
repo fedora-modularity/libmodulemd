@@ -29,19 +29,12 @@ jobs:
       # <https://github.com/actions/virtual-environments/issues/3812>.
       options: --security-opt seccomp=unconfined
 
-    outputs:
-        meson_version: ${{ steps.scanbuild.outputs.available }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
-
-      - name: Determine if we can run scan-build
-        id: scanbuild
-        run: echo "::set-output name=available::echo $(rpmdev-vercmp $(meson --version) 0.49.0 > /dev/null; if [ $? == 12 ];then echo false; else echo true; fi )"
 
 
       - name: Set up the build directory
@@ -68,7 +61,6 @@ jobs:
             --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh
 
       - name: Run clang static analysis tests
-        if: ${{ steps.scanbuild.outputs.available }}
         run: |
           meson setup --buildtype=debug -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
@@ -151,19 +143,12 @@ jobs:
       # <https://github.com/actions/virtual-environments/issues/3812>.
       options: --security-opt seccomp=unconfined
 
-    outputs:
-        meson_version: ${{ steps.scanbuild.outputs.available }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
-
-      - name: Determine if we can run scan-build
-        id: scanbuild
-        run: echo "::set-output name=available::echo $(rpmdev-vercmp $(meson --version) 0.49.0 > /dev/null; if [ $? == 12 ];then echo false; else echo true; fi )"
 
 
       - name: Set up the build directory
@@ -189,7 +174,6 @@ jobs:
             --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh
 
       - name: Run clang static analysis tests
-        if: ${{ steps.scanbuild.outputs.available }}
         run: |
           meson setup --buildtype=debug -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi
@@ -497,10 +481,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Determine if we can run scan-build
-        id: scanbuild
-        run: echo "::set-output name=available::echo $(rpmdev-vercmp $(meson --version) 0.49.0 > /dev/null; if [ $? == 12 ];then echo false; else echo true; fi )"
-
       - name: Set up the build directory
         env:
           CC: clang
@@ -517,7 +497,6 @@ jobs:
         run: meson test -C ci --suite ci --print-errorlogs -t 5
 
       - name: Run clang static analysis tests
-        if: ${{ steps.scanbuild.outputs.available }}
         run: |
           meson setup --buildtype=debug -Dwith_docs=false -Dlibmagic=disabled -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi

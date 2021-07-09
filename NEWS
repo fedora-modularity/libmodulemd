@@ -1,0 +1,59 @@
+Release history for libmodulemd
+
+2.13.0      2021-07-09
+
+This release is fully compatible with the previous 2.12.1 version.
+
+Enhancements:
+- Add /data/demodularized/rpms list to modulemd and modulemd-packager formats.
+  The listed binary RPM package names will be handled by a package manager as
+  removed from all previous module versions. This enables moving a package from
+  a module to a non-modular package set.
+- modulemd-validator tool enables you to constrain a document type with a new
+  "--type" option. Without this option, all document types recognized by
+  a modulemd index are accepted. To validate version 3 of modulemd-packager
+  format, use "modulemd-validator --type modulemd-packager-v3 foo.yaml"
+  command.
+- Allow disabling Python 3. You can pass -Dwith_py3=false to a meson setup
+  command to disable building a binding for Python 3. The binding is enabled
+  by default.
+
+Fixes:
+- Reject invalid integers. Purely non-numeric values and negative numbers where
+  an unsigned type is mandated by a specification raise a parser error now.
+- Handle a failed g_setenv() call in modulemd-validator.
+- Prevent from dereferencing a NULL pointer when reporting invalid
+  subdocuments.
+- A build script now refuses to disable Glib introspection
+  (-Dskip_introspection=true) while a Python binding is requested
+  (-Dwith_py3=true).
+- "modulemd-validator --version" command returns 0 exit code now.
+
+
+2.12.1      2021-05-03
+
+This is a bug-fix release fully compatible with the previous 2.12.0
+version. Notable changes:
+
+Enhancements:
+- Improve diagnostic messages for compression tests.
+- Tests performed in a GitHub continues integration are faster.
+- Use GitHub actions to perform CI tests also on ArchLinux, Mageia,
+  Mandriva, and OpenSUSE.
+
+Fixes:
+- Relax context value up to 13 characters including an underscore
+  character in modulemd v2 format. This reenables scratch-builds in MBS.
+- Migrate Packit tests from a deprecated current_version_command to
+  a newer actions/get-current-version.
+
+
+2.12.0      2021-01-15
+
+Enhancements:
+- Enable component 'buildorder' for modulemd-packager v2 and v3 documents.
+
+Fixes:
+- When adding obsoletes ensure index has stream mdversion at least 2.
+- Add missing @staticmethod for python2.
+

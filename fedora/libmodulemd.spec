@@ -135,7 +135,7 @@ mv %{buildroot}%{_mandir}/man1/modulemd-validator.1 \
 
 %files
 %license COPYING
-%doc README.md
+%doc NEWS README.md
 %{_bindir}/modulemd-validator%{?v2_suffix}
 %{_mandir}/man1/modulemd-validator%{?v2_suffix}.1*
 %{_libdir}/%{upstream_name}.so.2*

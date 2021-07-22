@@ -105,6 +105,11 @@ has_extend_and_steal = cc.has_function(
     'g_ptr_array_extend_and_steal',
     dependencies : [ glib ])
 
+# Check whether we can use a new g_spawn_check_wait_status() from glib2.
+has_g_spawn_check_wait_status = cc.has_function(
+    'g_spawn_check_wait_status',
+    dependencies : [ glib ])
+
 with_py3 = get_option('with_py3')
 if with_py3
     if get_option('skip_introspection')

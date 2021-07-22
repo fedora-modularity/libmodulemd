@@ -144,6 +144,7 @@ cdata.set('HAVE_RPMIO', rpm.found())
 cdata.set('HAVE_LIBMAGIC', magic.found())
 cdata.set('HAVE_GDATE_AUTOPTR', has_gdate_autoptr)
 cdata.set('HAVE_EXTEND_AND_STEAL', has_extend_and_steal)
+cdata.set('HAVE_G_SPAWN_CHECK_WAIT_STATUS', has_g_spawn_check_wait_status)
 configure_file(
   output : 'config.h',
   configuration : cdata

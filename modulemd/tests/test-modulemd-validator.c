@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "config.h"
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <stdlib.h>
@@ -133,7 +134,11 @@ test_exit_code (void)
 {
   g_autoptr (GError) error = NULL;
   g_autofree gchar *message = NULL;
+#ifdef HAVE_G_SPAWN_CHECK_WAIT_STATUS
+  g_spawn_check_wait_status (validator_exit_status, &error);
+#else
   g_spawn_check_exit_status (validator_exit_status, &error);
+#endif
   message = g_strdup_printf ("exit code was %d", expected_exit_code);
   if (0 == expected_exit_code)
     ok (!error, message);

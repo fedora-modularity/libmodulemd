@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "config.h"
 #include "modulemd-errors.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-util.h"
@@ -441,6 +442,16 @@ modulemd_yaml_parse_int64 (yaml_parser_t *parser, GError **error)
 
   if ((value == G_MAXINT64 && errno == ERANGE))
     {
+#ifdef HAVE_OVERFLOWED_BUILDORDER
+      /* A temporary hack. Remove when RHEL 8 goes end of life. */
+      if (g_str_equal ((const gchar *)event.data.scalar.value,
+                       "18446744073709551615"))
+        {
+          g_debug ("Coercing an invalid signed 64-bit integer to -1: %s",
+                   (const gchar *)event.data.scalar.value);
+          return -1;
+        }
+#endif
       g_set_error (error,
                    MODULEMD_YAML_ERROR,
                    MODULEMD_ERROR_VALIDATE,

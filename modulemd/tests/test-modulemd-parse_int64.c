@@ -11,6 +11,7 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "config.h"
 #include <glib.h>
 #include <locale.h>
 #include <string.h>
@@ -36,7 +37,7 @@ test (const char *input, gint64 expected_value, gboolean expected_error)
     g_assert_nonnull (error);
   else
     g_assert_null (error);
-  g_assert_cmpuint (parsed, ==, expected_value);
+  g_assert_cmpint (parsed, ==, expected_value);
 }
 
 static void
@@ -67,6 +68,16 @@ static void
 test_int64_invalid_too_big (void)
 {
   test ("9223372036854775808", 0, TRUE);
+}
+
+static void
+test_int64_invalid_overflowed (void)
+{
+#ifdef HAVE_OVERFLOWED_BUILDORDER
+  test ("18446744073709551615", -1, FALSE);
+#else
+  test ("18446744073709551615", 0, TRUE);
+#endif
 }
 
 static void
@@ -143,6 +154,8 @@ main (int argc, char *argv[])
                    test_int64_invalid_too_big);
   g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_too_small",
                    test_int64_invalid_too_small);
+  g_test_add_func ("/modulemd/v2/int64/yaml/parse/invalid_overflowed",
+                   test_int64_invalid_overflowed);
 
   g_test_add_func ("/modulemd/v2/uint64/yaml/parse/valid", test_uint64_valid);
   g_test_add_func ("/modulemd/v2/uint64/yaml/parse/invalid_no_digit",

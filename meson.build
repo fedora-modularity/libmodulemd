@@ -220,6 +220,7 @@ if meson.version().version_compare('>=0.53')
              'Python 2 Support': get_option('with_py2'),
              'Python 3 Support': get_option('with_py3'),
              'Skip Introspection': get_option('skip_introspection'),
+             'Accept overflowed buildorder': get_option('accept_overflowed_buildorder'),
              'Test Installed Library': get_option('test_installed_lib'),
             }, section: 'Build Configuration')
 endif

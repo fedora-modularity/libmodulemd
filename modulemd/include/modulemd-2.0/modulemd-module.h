@@ -285,7 +285,7 @@ modulemd_module_remove_streams_by_NSVCA (ModulemdModule *self,
  * modulemd_module_get_defaults:
  * @self: This #ModulemdModule object.
  *
- * Returns: (transfer none): The defaults of this module.
+ * Returns: (transfer none): The defaults of this module or NULL if none.
  *
  * Since: 2.0
  */

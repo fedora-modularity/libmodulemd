@@ -103,9 +103,12 @@ specification for a full list of information that can be retrieved.
 ModulemdModule *module =
   modulemd_module_index_get_module (merged_index, "modulename");
 ModulemdDefaults *defaults = modulemd_module_get_defaults (module);
-printf ("Default stream for modulename is %s\n",
-        modulemd_defaults_v1_get_default_stream (
-          MODULEMD_DEFAULTS_V1 (defaults), NULL));
+if (defaults)
+  {
+    printf ("Default stream for modulename is %s\n",
+            modulemd_defaults_v1_get_default_stream (
+              MODULEMD_DEFAULTS_V1 (defaults), NULL));
+  }
 ```
 
 ## Python

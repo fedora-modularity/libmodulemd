@@ -305,6 +305,29 @@ module_index_test_read (void)
   g_clear_pointer (&failures, g_ptr_array_unref);
   g_clear_pointer (&error, g_error_free);
 
+  /* A stream that has nonsense in "data" with NULL error parameter.
+   * It makes sure that subdocument errors are reported independently
+   * from the global error. It used to crash. */
+  yaml_path =
+    g_strdup_printf ("%s/broken_stream.yaml", g_getenv ("TEST_DATA_PATH"));
+  g_assert_false (modulemd_module_index_update_from_file (
+    index, yaml_path, TRUE, &failures, NULL));
+  g_assert_cmpint (failures->len, ==, 1);
+  subdoc = g_ptr_array_index (failures, 0);
+  g_assert_error (modulemd_subdocument_info_get_gerror (subdoc),
+                  MODULEMD_YAML_ERROR,
+                  MMD_YAML_ERROR_PARSE);
+  g_assert_cmpstr (modulemd_subdocument_info_get_yaml (subdoc),
+                   ==,
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data: foobar\n"
+                   "...\n");
+  g_clear_pointer (&yaml_path, g_free);
+  g_clear_pointer (&failures, g_ptr_array_unref);
+  g_clear_pointer (&error, g_error_free);
+
   /* A non-existing file */
   yaml_path =
     g_strdup_printf ("%s/nothinghere.yaml", g_getenv ("TEST_DATA_PATH"));

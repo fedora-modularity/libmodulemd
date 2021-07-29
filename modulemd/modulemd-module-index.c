@@ -335,11 +335,11 @@ modulemd_module_index_update_from_parser (ModulemdModuleIndex *self,
           else
             {
               /* Initial parsing worked, parse further */
+              g_autoptr (GError) subdoc_error = NULL;
               if (!add_subdoc (
-                    self, subdoc, strict, autogen_module_name, error))
+                    self, subdoc, strict, autogen_module_name, &subdoc_error))
                 {
-                  modulemd_subdocument_info_set_gerror (subdoc, *error);
-                  g_clear_pointer (error, g_error_free);
+                  modulemd_subdocument_info_set_gerror (subdoc, subdoc_error);
                   /* Add to failures and ignore */
                   g_ptr_array_add (*failures, g_steal_pointer (&subdoc));
                   all_passed = FALSE;

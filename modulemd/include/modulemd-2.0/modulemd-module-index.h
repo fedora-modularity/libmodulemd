@@ -142,19 +142,26 @@ modulemd_module_index_new (void);
 /**
  * modulemd_module_index_update_from_file:
  * @self: This #ModulemdModuleIndex object.
- * @yaml_file: (in): A YAML file containing the module metadata and other
- * related information such as default streams.
+ * @yaml_file: (in): A name of a YAML file containing the module metadata and
+ * other related information such as default streams.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
- * An array containing any subdocuments from the YAML file that failed to parse.
- * See #ModulemdSubdocumentInfo for more details.
+ * On output, an array containing any subdocuments (pointers to
+ * #ModulemdSubdocumentInfo) from the YAML file that failed to parse. On
+ * input, it must be a non-%NULL pointer. If that pointer points to %NULL, this
+ * call will allocate a new array (regardless of any failures) with an element
+ * destructor set to g_object_unref(). Otherwise, the pointed array is reused
+ * without emptying before adding the failed subdocuments. The caller is
+ * responsible for freeing the array.
  * @error: (out): A #GError containing additional information if this function
- * fails in a way that prevents program continuation.
+ * fails in a way that prevents program continuation. On input, it must be
+ * %NULL (if you don't care) or a pointer to %NULL (if you want to know the
+ * error). On output, it will become allocated only if an error occured.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * appropriately if any of the YAML subdocuments were invalid or sets @error if
- * there was a fatal parse error.
+ * Returns: %TRUE if the update was successful. Returns %FALSE and sets
+ * @failures appropriately if any of the YAML subdocuments were invalid or
+ * sets @error if there was a fatal parse error.
  *
  * Since: 2.0
  */
@@ -174,14 +181,21 @@ modulemd_module_index_update_from_file (ModulemdModuleIndex *self,
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
- * An array containing any subdocuments from the YAML file that failed to parse.
- * See #ModulemdSubdocumentInfo for more details.
+ * On output, an array containing any subdocuments (pointers to
+ * #ModulemdSubdocumentInfo) from the YAML file that failed to parse. On
+ * input, it must be a non-%NULL pointer. If that pointer points to %NULL, this
+ * call will allocate a new array (regardless of any failures) with an element
+ * destructor set to g_object_unref(). Otherwise, the pointed array is reused
+ * without emptying before adding the failed subdocuments. The caller is
+ * responsible for freeing the array.
  * @error: (out): A #GError containing additional information if this function
- * fails in a way that prevents program continuation.
+ * fails in a way that prevents program continuation. On input, it must be
+ * %NULL (if you don't care) or a pointer to %NULL (if you want to know the
+ * error). On output, it will become allocated only if an error occured.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * appropriately if any of the YAML subdocuments were invalid or sets @error if
- * there was a fatal parse error.
+ * Returns: %TRUE if the update was successful. Returns %FALSE and sets
+ * @failures appropriately if any of the YAML subdocuments were invalid or
+ * sets @error if there was a fatal parse error.
  *
  * Since: 2.0
  */
@@ -201,14 +215,21 @@ modulemd_module_index_update_from_string (ModulemdModuleIndex *self,
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
- * An array containing any subdocuments from the YAML file that failed to parse.
- * See #ModulemdSubdocumentInfo for more details.
+ * On output, an array containing any subdocuments (pointers to
+ * #ModulemdSubdocumentInfo) from the YAML file that failed to parse. On
+ * input, it must be a non-%NULL pointer. If that pointer points to %NULL, this
+ * call will allocate a new array (regardless of any failures) with an element
+ * destructor set to g_object_unref(). Otherwise, the pointed array is reused
+ * without emptying before adding the failed subdocuments. The caller is
+ * responsible for freeing the array.
  * @error: (out): A #GError containing additional information if this function
- * fails in a way that prevents program continuation.
+ * fails in a way that prevents program continuation. On input, it must be
+ * %NULL (if you don't care) or a pointer to %NULL (if you want to know the
+ * error). On output, it will become allocated only if an error occured.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * appropriately if any of the YAML subdocuments were invalid or sets @error if
- * there was a fatal parse error.
+ * Returns: %TRUE if the update was successful. Returns %FALSE and sets
+ * @failures appropriately if any of the YAML subdocuments were invalid or
+ * sets @error if there was a fatal parse error.
  *
  * Since: 2.0
  */
@@ -228,14 +249,21 @@ modulemd_module_index_update_from_stream (ModulemdModuleIndex *self,
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or if it should ignore it.
  * @failures: (out) (element-type ModulemdSubdocumentInfo) (transfer container):
- * An array containing any subdocuments from the YAML file that failed to parse.
- * See #ModulemdSubdocumentInfo for more details.
+ * On output, an array containing any subdocuments (pointers to
+ * #ModulemdSubdocumentInfo) from the YAML file that failed to parse. On
+ * input, it must be a non-%NULL pointer. If that pointer points to %NULL, this
+ * call will allocate a new array (regardless of any failures) with an element
+ * destructor set to g_object_unref(). Otherwise, the pointed array is reused
+ * without emptying before adding the failed subdocuments. The caller is
+ * responsible for freeing the array.
  * @error: (out): A #GError containing additional information if this function
- * fails in a way that prevents program continuation.
+ * fails in a way that prevents program continuation. On input, it must be
+ * %NULL (if you don't care) or a pointer to %NULL (if you want to know the
+ * error). On output, it will become allocated only if an error occured.
  *
- * Returns: TRUE if the update was successful. Returns FALSE and sets @failures
- * appropriately if any of the YAML subdocuments were invalid or sets @error if
- * there was a fatal parse error.
+ * Returns: %TRUE if the update was successful. Returns %FALSE and sets
+ * @failures appropriately if any of the YAML subdocuments were invalid or
+ * sets @error if there was a fatal parse error.
  *
  * Since: 2.3
  */
@@ -254,13 +282,16 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
  * @path: (in): The path to a directory containing defaults documents.
  * @strict: (in): Whether the parser should return failure if it encounters an
  * unknown mapping key or a conflict in module default streams.
- * @overrides_path: (in) (nullable): If non-NULL, the path to a directory
+ * @overrides_path: (in) (nullable): If non-%NULL, the path to a directory
  * containing defaults documents that should override those in @path.
- * @error: (out): A #GError indicating why this function failed.
+ * @error: (out): A #GError indicating why this function failed. On input, it
+ * must be %NULL (if you don't care) or a pointer to %NULL (if you want to
+ * know the error). On output, it will become allocated only if an error
+ * occured.
  *
  * This function will open the directory at @path and iterate through it,
  * adding any files with the suffix ".yaml" to @self. If @overrides_path is
- * non-NULL, it will also open any files with the suffix ".yaml" in that
+ * non-%NULL, it will also open any files with the suffix ".yaml" in that
  * location and import them, overriding any conflicts with the existing
  * defaults.
  *
@@ -269,8 +300,8 @@ modulemd_module_index_update_from_custom (ModulemdModuleIndex *self,
  * modulemd_module_index_update_from_file() function, as it will return the
  * failures information.
  *
- * Returns: TRUE if all ".yaml" files in the directory were imported
- * successfully (this includes if no ".yaml" files were present). FALSE if one
+ * Returns: %TRUE if all ".yaml" files in the directory were imported
+ * successfully (this includes if no ".yaml" files were present). %FALSE if one
  * or more files could not be read successfully and sets @error appropriately.
  *
  * Since: 2.8

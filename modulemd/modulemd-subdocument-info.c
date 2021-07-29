@@ -105,14 +105,10 @@ modulemd_subdocument_info_set_gerror (ModulemdSubdocumentInfo *self,
 {
   g_return_if_fail (MODULEMD_IS_SUBDOCUMENT_INFO (self));
 
-  g_clear_pointer (&self->error, g_error_free);
+  g_clear_pointer (&self->error, g_error_free); /* Sets NULL. */
   if (error)
     {
       self->error = g_error_copy (error);
-    }
-  else
-    {
-      self->error = NULL;
     }
 }
 

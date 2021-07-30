@@ -1370,7 +1370,6 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
   gpointer value;
   g_autoptr (ModulemdModule) module = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
-  ModulemdDefaultsVersionEnum returned_mdversion = MD_DEFAULTS_VERSION_UNSET;
   g_autoptr (GError) nested_error = NULL;
 
   if (mdversion < self->defaults_mdversion)
@@ -1409,9 +1408,9 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
 
       g_object_ref (defaults);
 
-      returned_mdversion = modulemd_module_set_defaults (
-        module, defaults, self->defaults_mdversion, &nested_error);
-      if (returned_mdversion != mdversion)
+      if (mdversion !=
+          modulemd_module_set_defaults (
+            module, defaults, self->defaults_mdversion, &nested_error))
         {
           g_propagate_prefixed_error (
             error,

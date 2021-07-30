@@ -47,26 +47,27 @@ modulemd_module_new (const gchar *module_name);
 /**
  * modulemd_module_set_defaults:
  * @self: (in): This #ModulemdModule object.
- * @defaults: (in): A #ModulemdDefaults object to associate with this
- * #ModulemdModule. If the module_name in the #ModulemdDefaults object does not
- * match this module, it will be rejected.
- * @index_mdversion: (in): The #ModulemdDefaultsVersionEnum of the highest
- * defaults version added so far in the #ModulemdModuleIndex. If non-zero,
- * perform an upgrade to this version while adding @defaults to @self. If
- * the @defaults already has a higher version, just copy it.
+ * @defaults: (in) (nullable): A #ModulemdDefaults object whose copy to
+ * associate with this #ModulemdModule. A module name in @defaults should
+ * match a name in the @self module. Pass %NULL to unset the defaults.
+ * @index_mdversion: (in): A minimal #ModulemdDefaultsVersionEnum version to
+ * upgrade @defaults before adding them.
  * @error: (out): A #GError containing information about why this function
  * failed.
  *
- * This function takes a defaults object, upgrades it to @index_mdversion if it
- * is lower and adds it to the #ModulemdModule. If it cannot upgrade it safely
- * or the defaults are not for this module, it will return an appropriate
- * error.
+ * This function takes a #ModulemdDefaults object, upgrades it to
+ * @index_mdversion if its version is lower and adds it to the #ModulemdModule
+ * object. If @defaults cannot be upgraded safely or the @defaults are not for @self
+ * module, it will return an appropriate error.
  *
- * Returns: The mdversion of the defaults that were added. Returns
- * %MD_DEFAULTS_VERSION_ERROR and sets @error if the default name didn't match
- * or the Defaults object couldn't be upgraded successfully to
- * the @index_mdversion. Returns %MD_DEFAULTS_VERSION_UNSET if @defaults was
- * NULL.
+ * (A use case is upgrading defaults of modules in a #ModulemdModuleIndex to
+ * the highest defaults version added so far in the #ModulemdModuleIndex.)
+ *
+ * Returns: The upgraded version of the defaults that were added. Or
+ * %MD_DEFAULTS_VERSION_UNSET if @defaults was %NULL. Returns
+ * %MD_DEFAULTS_VERSION_ERROR and sets @error if the defaults name didn't
+ * match or the defaults object couldn't be upgraded successfully to
+ * the @index_mdversion.
  *
  * Since: 2.0
  */

@@ -206,12 +206,12 @@ modulemd_module_set_defaults (ModulemdModule *self,
   g_autoptr (GError) nested_error = NULL;
   g_return_val_if_fail (MODULEMD_IS_MODULE (self), MD_DEFAULTS_VERSION_ERROR);
 
-  g_clear_object (&self->defaults);
   if (defaults == NULL)
     {
-      /* If we are empty here, return MD_DEFAULTS_VERSION_UNSET so the
-       * function reports success and does not influence further upgrades.
+      /* If we are empty here, return MD_DEFAULTS_VERSION_UNSET to report
+       * a successful unsetting.
        */
+      g_clear_object (&self->defaults);
       return MD_DEFAULTS_VERSION_UNSET;
     }
 
@@ -259,6 +259,7 @@ modulemd_module_set_defaults (ModulemdModule *self,
   /* Return the mdversion we saved so that the Index can check to see if we
    * need to upgrade other modules to match.
    */
+  g_clear_object (&self->defaults);
   self->defaults = g_steal_pointer (&upgraded_defaults);
   return modulemd_defaults_get_mdversion (self->defaults);
 }

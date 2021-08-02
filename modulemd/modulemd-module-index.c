@@ -1408,9 +1408,8 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
 
       g_object_ref (defaults);
 
-      if (mdversion !=
-          modulemd_module_set_defaults (
-            module, defaults, self->defaults_mdversion, &nested_error))
+      if (mdversion != modulemd_module_set_defaults (
+                         module, defaults, mdversion, &nested_error))
         {
           g_propagate_prefixed_error (
             error,

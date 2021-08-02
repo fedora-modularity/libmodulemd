@@ -112,6 +112,7 @@ module_test_defaults (void)
   g_assert_nonnull (d_got);
   g_assert_cmpstr (
     modulemd_defaults_get_module_name (d_got), ==, "testmodule");
+  g_clear_object (&d);
 
   /* Setting defaults that don't match this module name fails,
    * returns an error, and does not clobber the module. */

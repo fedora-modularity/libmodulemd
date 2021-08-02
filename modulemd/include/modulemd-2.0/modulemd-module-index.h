@@ -649,11 +649,15 @@ modulemd_module_index_upgrade_streams (
  * modulemd_module_index_upgrade_defaults:
  * @self: This #ModulemdModuleIndex object.
  * @mdversion: The #ModulemdDefaults metadata version to upgrade to.
- * @error: (out): A #GError that contains information on why the index could
- * not be upgraded in the event of an error.
+ * @error: (out) (optional): A #GError that contains information on why the
+ * index could not be upgraded in the event of an error.
  *
  * Upgrades all #ModulemdDefaults objects in this index to @mdversion if they
- * are not already at that version.
+ * are not already at that version. An attempt to downgrade or an attempt to
+ * upgrade beyond the latest supported version will report an error. In the
+ * case of a failure to upgrade a particular #ModulemdDefaults object of the
+ * index, an error will be reported and the index will be left in an undefined
+ * state.
  *
  * Since: 2.0
  */

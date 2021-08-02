@@ -487,6 +487,81 @@ module_index_test_read_unknown (void)
 
 
 static void
+module_index_test_defaults_upgrade (void)
+{
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdDefaults) defaults = NULL;
+  gboolean retval;
+  g_autoptr (GError) error = NULL;
+
+  /* An index without any defaults starts with MD_DEFAULTS_VERSION_UNSET
+   * defaults version. */
+  index = modulemd_module_index_new ();
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_DEFAULTS_VERSION_UNSET);
+
+  /* Adding a modulemd-defaults-v1 sets defaults version of index to 1. */
+  defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "foo");
+  modulemd_module_index_add_defaults (index, defaults, NULL);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_DEFAULTS_VERSION_ONE);
+
+  /* Upgrading defaults of an index upgrades a version of the index and
+   * the versions of the particular defaults. */
+  retval = modulemd_module_index_upgrade_defaults (
+    index, MD_DEFAULTS_VERSION_LATEST, &error);
+  g_assert_true (retval);
+  g_assert_null (error);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_DEFAULTS_VERSION_LATEST);
+  g_assert_cmpint (
+    modulemd_defaults_get_mdversion (modulemd_module_get_defaults (
+      modulemd_module_index_get_module (index, "foo"))),
+    ==,
+    MD_DEFAULTS_VERSION_LATEST);
+
+  /* Downgrading defaults of an index is forbidden. It returns an error and
+   * does not clobber the index. */
+  retval = modulemd_module_index_upgrade_defaults (
+    index, MD_DEFAULTS_VERSION_LATEST - 1, &error);
+  g_assert_false (retval);
+  g_assert_nonnull (error);
+  g_clear_error (&error);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_DEFAULTS_VERSION_LATEST);
+  g_assert_cmpint (
+    modulemd_defaults_get_mdversion (modulemd_module_get_defaults (
+      modulemd_module_index_get_module (index, "foo"))),
+    ==,
+    MD_DEFAULTS_VERSION_LATEST);
+
+  /* Upgrading defaults of an index to an unsupported version fails. It returns
+   * an error and does not clobber the index. */
+  retval = modulemd_module_index_upgrade_defaults (
+    index, MD_DEFAULTS_VERSION_LATEST + 1, &error);
+  g_assert_false (retval);
+  g_assert_nonnull (error);
+  g_clear_error (&error);
+  g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
+                   ==,
+                   MD_DEFAULTS_VERSION_LATEST);
+  g_assert_cmpint (
+    modulemd_defaults_get_mdversion (modulemd_module_get_defaults (
+      modulemd_module_index_get_module (index, "foo"))),
+    ==,
+    MD_DEFAULTS_VERSION_LATEST);
+
+  /* A failure of upgrading a particular default in a range which is
+   * accaptable by the index should return an error. But there is now way of
+   * testing it. */
+}
+
+
+static void
 module_index_test_stream_upgrade (void)
 {
   gboolean ret;
@@ -1898,6 +1973,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/read/unknown",
                    module_index_test_read_unknown);
+
+  g_test_add_func ("/modulemd/v2/module/index/upgrade/defaults",
+                   module_index_test_defaults_upgrade);
 
   g_test_add_func ("/modulemd/v2/module/index/upgrade/stream",
                    module_index_test_stream_upgrade);

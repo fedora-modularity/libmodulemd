@@ -503,7 +503,8 @@ module_index_test_defaults_upgrade (void)
 
   /* Adding a modulemd-defaults-v1 sets defaults version of index to 1. */
   defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, "foo");
-  modulemd_module_index_add_defaults (index, defaults, NULL);
+  retval = modulemd_module_index_add_defaults (index, defaults, NULL);
+  g_assert_true (retval);
   g_assert_cmpint (modulemd_module_index_get_defaults_mdversion (index),
                    ==,
                    MD_DEFAULTS_VERSION_ONE);

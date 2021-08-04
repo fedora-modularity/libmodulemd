@@ -280,7 +280,8 @@ data:
     # Optional
     artifacts:
         # RPM artifacts shipped with this module
-        # A set of NEVRAs associated with this module.
+        # A set of NEVRAs associated with this module. An epoch number in the
+        # NEVRA string is mandatory.
         # Optional
         rpms:
             - bar-0:1.23-1.module_deadbeef.x86_64

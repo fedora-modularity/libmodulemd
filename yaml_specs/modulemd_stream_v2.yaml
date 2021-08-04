@@ -670,7 +670,8 @@ data:
 
         # rpms:
         # RPM artifacts shipped with this module
-        # A set of NEVRAs associated with this module.
+        # A set of NEVRAs associated with this module. An epoch number in the
+        # NEVRA string is mandatory.
         #
         # Type: AUTOMATIC
         rpms:

@@ -1403,6 +1403,7 @@ modulemd_packager_v3_parse_build_configs (yaml_parser_t *parser,
   gboolean done = FALSE;
   g_autoptr (ModulemdBuildConfig) buildconfig = NULL;
   g_autoptr (GError) nested_error = NULL;
+  const gchar *context;
 
   YAML_PARSER_PARSE_WITH_EXIT_BOOL (parser, &event, error);
   if (event.type != YAML_SEQUENCE_START_EVENT)
@@ -1425,6 +1426,18 @@ modulemd_packager_v3_parse_build_configs (yaml_parser_t *parser,
           if (!buildconfig)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
+              return FALSE;
+            }
+          /* A context must be unique. We check explicitly here because glib2
+           * < 2.40 does not distinguish a replacement from an addition. */
+          context = modulemd_build_config_get_context (buildconfig);
+          if (g_hash_table_contains (packager->build_configs, context))
+            {
+              g_set_error (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_VALIDATE,
+                           "Duplicate context: %s",
+                           context);
               return FALSE;
             }
           modulemd_packager_v3_add_build_config (packager, buildconfig);

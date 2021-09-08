@@ -104,6 +104,34 @@ test_modulemd_v3_context_bad_underscore (void)
 
 
 static void
+test_modulemd_v3_context_duplicate (void)
+{
+  const gchar *yaml_string = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GObject) object = NULL;
+  GType type = G_TYPE_INVALID;
+
+  yaml_string =
+    "---\n"
+    "document: modulemd-packager\n"
+    "version: 3\n"
+    "data:\n"
+    "  name: foo\n"
+    "  stream: bar\n"
+    "  license: [MIT]\n"
+    "  configurations:\n"
+    "    - context: A\n"
+    "      platform: 1\n"
+    "    - context: A\n"
+    "      platform: 2\n"
+    "...\n";
+  type = modulemd_read_packager_string (yaml_string, &object, &error);
+  g_assert_true (type == G_TYPE_INVALID);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
+}
+
+
+static void
 test_modulemd_v2_context_valid (void)
 {
   const gchar *yaml_string = NULL;
@@ -214,6 +242,8 @@ main (int argc, char *argv[])
                    test_modulemd_v3_context_overlong);
   g_test_add_func ("/modulemd/v3/context/bad_underscore",
                    test_modulemd_v3_context_bad_underscore);
+  g_test_add_func ("/modulemd/v3/context/duplicate",
+                   test_modulemd_v3_context_duplicate);
 
   g_test_add_func ("/modulemd/v2/context/valid",
                    test_modulemd_v2_context_valid);

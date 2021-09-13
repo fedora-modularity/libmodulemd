@@ -461,7 +461,7 @@ modulemd_defaults_v1_get_default_profiles_for_stream_as_strv (
 static void
 modulemd_defaults_v1_get_property (GObject *object,
                                    guint prop_id,
-                                   GValue *value,
+                                   GValue *UNUSED (value),
                                    GParamSpec *pspec)
 {
   switch (prop_id)
@@ -473,7 +473,7 @@ modulemd_defaults_v1_get_property (GObject *object,
 static void
 modulemd_defaults_v1_set_property (GObject *object,
                                    guint prop_id,
-                                   const GValue *value,
+                                   const GValue *UNUSED (value),
                                    GParamSpec *pspec)
 {
   switch (prop_id)

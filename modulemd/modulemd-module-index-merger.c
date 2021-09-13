@@ -61,7 +61,7 @@ modulemd_module_index_merger_finalize (GObject *object)
 static void
 modulemd_module_index_merger_get_property (GObject *object,
                                            guint prop_id,
-                                           GValue *value,
+                                           GValue *UNUSED (value),
                                            GParamSpec *pspec)
 {
   switch (prop_id)
@@ -73,7 +73,7 @@ modulemd_module_index_merger_get_property (GObject *object,
 static void
 modulemd_module_index_merger_set_property (GObject *object,
                                            guint prop_id,
-                                           const GValue *value,
+                                           const GValue *UNUSED (value),
                                            GParamSpec *pspec)
 {
   switch (prop_id)

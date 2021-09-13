@@ -336,7 +336,7 @@ modulemd_packager_v3_get_xmd (ModulemdPackagerV3 *self)
 
 
 guint64
-modulemd_packager_v3_get_mdversion (ModulemdPackagerV3 *self)
+modulemd_packager_v3_get_mdversion (ModulemdPackagerV3 *UNUSED (self))
 {
   return MD_PACKAGER_VERSION_THREE;
 }

@@ -281,7 +281,7 @@ modulemd_module_stream_v2_equals (ModulemdModuleStream *self_1,
 
 
 static guint64
-modulemd_module_stream_v2_get_mdversion (ModulemdModuleStream *self)
+modulemd_module_stream_v2_get_mdversion (ModulemdModuleStream *UNUSED (self))
 {
   return MD_MODULESTREAM_VERSION_TWO;
 }

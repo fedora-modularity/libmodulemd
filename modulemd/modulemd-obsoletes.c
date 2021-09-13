@@ -627,7 +627,7 @@ modulemd_obsoletes_class_init (ModulemdObsoletesClass *klass)
 }
 
 static void
-modulemd_obsoletes_init (ModulemdObsoletes *self)
+modulemd_obsoletes_init (ModulemdObsoletes *UNUSED (self))
 {
 }
 
@@ -635,7 +635,6 @@ modulemd_obsoletes_init (ModulemdObsoletes *self)
 static gboolean
 modulemd_obsoletes_parse_obsoleted_by (yaml_parser_t *parser,
                                        ModulemdObsoletes *o,
-                                       gboolean strict,
                                        GError **error)
 {
   MODULEMD_INIT_TRACE ();
@@ -944,7 +943,7 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
           else if (g_str_equal (event.data.scalar.value, "obsoleted_by"))
             {
               if (!modulemd_obsoletes_parse_obsoleted_by (
-                    &parser, o, strict, &nested_error))
+                    &parser, o, &nested_error))
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
                   return NULL;

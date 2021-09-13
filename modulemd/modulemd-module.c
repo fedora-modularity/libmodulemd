@@ -85,7 +85,8 @@ modulemd_module_copy (ModulemdModule *self)
 
 
 gboolean
-modulemd_module_validate (ModulemdModule *self, GError **error)
+modulemd_module_validate (ModulemdModule *UNUSED (self),
+                          GError **UNUSED (error))
 {
   /* No validation yet */
   return TRUE;

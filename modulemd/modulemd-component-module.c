@@ -235,7 +235,7 @@ modulemd_component_module_class_init (ModulemdComponentModuleClass *klass)
 
 
 static void
-modulemd_component_module_init (ModulemdComponentModule *self)
+modulemd_component_module_init (ModulemdComponentModule *UNUSED (self))
 {
   /* Nothing to init */
 }

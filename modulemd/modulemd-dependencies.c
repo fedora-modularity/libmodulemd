@@ -343,7 +343,7 @@ modulemd_dependencies_validate (ModulemdDependencies *self, GError **error)
 static void
 modulemd_dependencies_get_property (GObject *object,
                                     guint prop_id,
-                                    GValue *value,
+                                    GValue *UNUSED (value),
                                     GParamSpec *pspec)
 {
   switch (prop_id)
@@ -356,7 +356,7 @@ modulemd_dependencies_get_property (GObject *object,
 static void
 modulemd_dependencies_set_property (GObject *object,
                                     guint prop_id,
-                                    const GValue *value,
+                                    const GValue *UNUSED (value),
                                     GParamSpec *pspec)
 {
   switch (prop_id)

@@ -76,8 +76,8 @@ print_version (const gchar *option_name,
 
 static gboolean
 set_verbosity (const gchar *option_name,
-               const gchar *value,
-               gpointer data,
+               const gchar *UNUSED (value),
+               gpointer UNUSED (data),
                GError **error)
 {
   g_autofree gchar *debugging_env = NULL;
@@ -134,9 +134,9 @@ set_verbosity (const gchar *option_name,
 }
 
 static gboolean
-set_type (const gchar *option_name,
+set_type (const gchar *UNUSED (option_name),
           const gchar *value,
-          gpointer data,
+          gpointer UNUSED (data),
           GError **error)
 {
   if (!g_strcmp0 (value, "modulemd-v1"))

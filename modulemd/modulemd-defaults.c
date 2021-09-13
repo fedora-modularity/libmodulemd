@@ -398,7 +398,7 @@ modulemd_defaults_class_init (ModulemdDefaultsClass *klass)
 }
 
 static void
-modulemd_defaults_init (ModulemdDefaults *self)
+modulemd_defaults_init (ModulemdDefaults *UNUSED (self))
 {
 }
 

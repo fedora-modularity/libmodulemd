@@ -29,7 +29,7 @@ typedef struct _ServiceLevelFixture
 gboolean signaled = FALSE;
 
 static void
-sigtrap_handler (int sig_num)
+sigtrap_handler (int UNUSED (sig_num))
 {
   signaled = TRUE;
 }

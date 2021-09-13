@@ -108,7 +108,7 @@ modulemd_module_stream_v1_finalize (GObject *object)
 
 
 static guint64
-modulemd_module_stream_v1_get_mdversion (ModulemdModuleStream *self)
+modulemd_module_stream_v1_get_mdversion (ModulemdModuleStream *UNUSED (self))
 {
   return MD_MODULESTREAM_VERSION_ONE;
 }

@@ -79,7 +79,7 @@ modulemd_module_index_finalize (GObject *object)
 static void
 modulemd_module_index_get_property (GObject *object,
                                     guint prop_id,
-                                    GValue *value,
+                                    GValue *UNUSED (value),
                                     GParamSpec *pspec)
 {
   switch (prop_id)
@@ -92,7 +92,7 @@ modulemd_module_index_get_property (GObject *object,
 static void
 modulemd_module_index_set_property (GObject *object,
                                     guint prop_id,
-                                    const GValue *value,
+                                    const GValue *UNUSED (value),
                                     GParamSpec *pspec)
 {
   switch (prop_id)
@@ -1430,7 +1430,7 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_add_translation (ModulemdModuleIndex *self,
                                        ModulemdTranslation *translation,
-                                       GError **error)
+                                       GError **UNUSED (error))
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
 

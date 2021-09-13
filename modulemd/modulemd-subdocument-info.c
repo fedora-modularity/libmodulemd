@@ -278,7 +278,7 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
 static void
 modulemd_subdocument_info_get_property (GObject *object,
                                         guint prop_id,
-                                        GValue *value,
+                                        GValue *UNUSED (value),
                                         GParamSpec *pspec)
 {
   // ModulemdSubdocumentInfo *self = MODULEMD_SUBDOCUMENT_INFO (object);
@@ -293,7 +293,7 @@ modulemd_subdocument_info_get_property (GObject *object,
 static void
 modulemd_subdocument_info_set_property (GObject *object,
                                         guint prop_id,
-                                        const GValue *value,
+                                        const GValue *UNUSED (value),
                                         GParamSpec *pspec)
 {
   // ModulemdSubdocumentInfo *self = MODULEMD_SUBDOCUMENT_INFO (object);
@@ -317,7 +317,7 @@ modulemd_subdocument_info_class_init (ModulemdSubdocumentInfoClass *klass)
 
 
 static void
-modulemd_subdocument_info_init (ModulemdSubdocumentInfo *self)
+modulemd_subdocument_info_init (ModulemdSubdocumentInfo *UNUSED (self))
 {
   /* Nothing to init */
 }

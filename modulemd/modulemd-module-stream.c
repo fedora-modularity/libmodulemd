@@ -1375,7 +1375,7 @@ modulemd_module_stream_class_init (ModulemdModuleStreamClass *klass)
 
 
 static void
-modulemd_module_stream_init (ModulemdModuleStream *self)
+modulemd_module_stream_init (ModulemdModuleStream *UNUSED (self))
 {
 }
 

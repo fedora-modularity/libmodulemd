@@ -354,7 +354,7 @@ modulemd_rpm_map_entry_class_init (ModulemdRpmMapEntryClass *klass)
 }
 
 static void
-modulemd_rpm_map_entry_init (ModulemdRpmMapEntry *self)
+modulemd_rpm_map_entry_init (ModulemdRpmMapEntry *UNUSED (self))
 {
 }
 

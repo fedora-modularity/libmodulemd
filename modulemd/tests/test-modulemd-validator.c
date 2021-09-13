@@ -174,7 +174,7 @@ main (int argc, char *argv[])
       &expected_stderr,
       "Check error output for a substring (default is no check)",
       NULL },
-    { NULL }
+    { 0 }
   };
   GOptionContext *context;
   g_autoptr (GError) error = NULL;

@@ -193,7 +193,7 @@ static GOptionEntry entries[] = {
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
   { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_report_version, "Print version number, then exit", NULL },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, "Files to be validated", NULL },
-  { NULL } };
+  { 0 } };
 // clang-format on
 
 static const gchar *

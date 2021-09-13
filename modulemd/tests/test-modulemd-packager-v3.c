@@ -99,7 +99,6 @@ parse_yaml (yaml_parser_t *parser)
 {
   MMD_INIT_YAML_EVENT (event);
   g_autoptr (ModulemdPackagerV3) packager = NULL;
-  g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
@@ -138,9 +137,7 @@ read_string (const gchar *yaml_string)
   MMD_INIT_YAML_EVENT (event);
   MMD_INIT_YAML_PARSER (parser);
   g_autoptr (ModulemdPackagerV3) packager = NULL;
-  g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
-  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
   yaml_parser_set_input_string (
     &parser, (const unsigned char *)yaml_string, strlen (yaml_string));
@@ -162,7 +159,6 @@ read_spec (void)
   g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   g_autoptr (GError) error = NULL;
-  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
 
   /* Verify a valid YAML file */
   yaml_path = g_strdup_printf ("%s/yaml_specs/modulemd_packager_v3.yaml",
@@ -614,7 +610,6 @@ packager_test_read_to_index (void)
 {
   gboolean ret;
   g_autoptr (ModulemdModuleIndex) index = NULL;
-  g_autoptr (ModulemdSubdocumentInfo) subdoc = NULL;
   g_autoptr (GError) error = NULL;
   g_autoptr (GPtrArray) failures = NULL;
   g_autofree gchar *yaml_path = NULL;

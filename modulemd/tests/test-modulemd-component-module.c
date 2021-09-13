@@ -343,7 +343,6 @@ component_module_test_parse_yaml (void)
   MMD_INIT_YAML_EVENT (event);
   MMD_INIT_YAML_PARSER (parser);
   g_autofree gchar *yaml_path = NULL;
-  g_auto (GStrv) rpms = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   yaml_path = g_strdup_printf ("%s/cm.yaml", g_getenv ("TEST_DATA_PATH"));
   g_assert_nonnull (yaml_path);

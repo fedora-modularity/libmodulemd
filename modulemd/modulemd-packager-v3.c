@@ -1850,7 +1850,6 @@ modulemd_packager_v3_emit_yaml (ModulemdPackagerV3 *self,
                                 GError **error)
 {
   MODULEMD_INIT_TRACE ();
-  g_autoptr (GError) nested_error = NULL;
   gsize i;
   g_autoptr (GPtrArray) keys = NULL;
   gboolean ret;

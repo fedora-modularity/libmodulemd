@@ -1551,7 +1551,6 @@ test_module_index_read_def_dir (void)
 {
   gboolean ret;
   g_autoptr (ModulemdModuleIndex) idx = modulemd_module_index_new ();
-  g_autoptr (GPtrArray) failures = NULL;
   g_autoptr (GError) error = NULL;
   g_autofree gchar *path =
     g_build_path ("/", g_getenv ("TEST_DATA_PATH"), "defaults", NULL);

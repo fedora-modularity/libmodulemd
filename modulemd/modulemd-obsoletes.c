@@ -737,8 +737,6 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
   gboolean done = FALSE;
 
   g_autofree gchar *value = NULL;
-  g_autofree gchar *obs_by_mod_name = NULL;
-  g_autofree gchar *obs_by_mod_stream = NULL;
   guint64 modified;
   guint64 eol_date;
   gboolean reset;

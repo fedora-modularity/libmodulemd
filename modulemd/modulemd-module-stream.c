@@ -501,7 +501,6 @@ modulemd_module_stream_upgrade (ModulemdModuleStream *self,
 {
   g_autoptr (ModulemdModuleStream) current_stream = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
-  g_autoptr (GError) nested_error = NULL;
   guint64 current_mdversion;
 
   g_return_val_if_fail (MODULEMD_IS_MODULE_STREAM (self), NULL);
@@ -580,7 +579,6 @@ modulemd_module_stream_upgrade_ext (ModulemdModuleStream *self,
   g_autoptr (ModulemdModuleStream) current_stream = NULL;
   g_autoptr (ModulemdModuleStream) updated_stream = NULL;
   g_autoptr (ModulemdModule) current_module = NULL;
-  g_autoptr (ModulemdModule) updated_module = NULL;
   g_autoptr (GError) nested_error = NULL;
   guint64 current_mdversion;
 

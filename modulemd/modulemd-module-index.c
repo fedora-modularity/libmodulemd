@@ -143,12 +143,9 @@ add_subdoc (ModulemdModuleIndex *self,
 {
   g_autoptr (GError) nested_error = NULL;
   g_autoptr (ModulemdModuleStream) stream = NULL;
-  g_autoptr (ModulemdModuleIndex) index = NULL;
-  g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdTranslation) translation = NULL;
   g_autoptr (ModulemdObsoletes) obsoletes = NULL;
   g_autoptr (ModulemdDefaults) defaults = NULL;
-  g_autofree gchar *name = NULL;
   ModulemdYamlDocumentTypeEnum doctype =
     modulemd_subdocument_info_get_doctype (subdoc);
 

@@ -118,7 +118,6 @@ merger_test_merger (void)
   gboolean ret;
   g_autoptr (ModulemdModuleIndex) base_index = NULL;
   g_autofree gchar *yaml_path = NULL;
-  g_autofree gchar *module_name = NULL;
   ModulemdModule *httpd = NULL;
   ModulemdDefaultsV1 *httpd_defaults = NULL;
   GStrv httpd_profile_streams = NULL;

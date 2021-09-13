@@ -238,7 +238,7 @@ modulemd_module_set_defaults (ModulemdModule *self,
    * We only call this if the mdversion is definitely lower, because the
    * upgrade() routine is not designed to handle downgrades.
    */
-  if (modulemd_defaults_get_mdversion (defaults) < index_mdversion)
+  if (modulemd_defaults_get_mdversion (defaults) < (guint64)index_mdversion)
     {
       upgraded_defaults =
         modulemd_defaults_upgrade (defaults, index_mdversion, &nested_error);
@@ -391,7 +391,7 @@ modulemd_module_add_stream (ModulemdModule *self,
       return MD_MODULESTREAM_VERSION_ERROR;
     }
 
-  if (modulemd_module_stream_get_mdversion (stream) < index_mdversion)
+  if (modulemd_module_stream_get_mdversion (stream) < (guint64)index_mdversion)
     {
       /* If the stream we were passed is of a lower mdversion version than the
        * index, upgrade it to the index version.

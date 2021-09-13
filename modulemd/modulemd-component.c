@@ -694,7 +694,7 @@ modulemd_component_emit_yaml_build_common (ModulemdComponent *self,
 
       EMIT_SEQUENCE_START (emitter, error);
 
-      for (gint i = 0; i < buildafter->len; i++)
+      for (guint i = 0; i < buildafter->len; i++)
         {
           EMIT_SCALAR (emitter, error, g_ptr_array_index (buildafter, i));
         }

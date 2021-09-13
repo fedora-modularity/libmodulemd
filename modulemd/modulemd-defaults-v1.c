@@ -1090,7 +1090,6 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
   g_auto (GStrv) streams = NULL;
   gchar *stream_name = NULL;
   GHashTable *profile_set = NULL;
-  int i = 0;
 
   /* Start the "profiles:" section */
   if (!mmd_emitter_scalar (
@@ -1108,7 +1107,7 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
 
   stream_names =
     modulemd_ordered_str_keys (profile_table, modulemd_strcmp_sort);
-  for (i = 0; i < stream_names->len; i++)
+  for (guint i = 0; i < stream_names->len; i++)
     {
       stream_name = g_ptr_array_index (stream_names, i);
       profile_set = g_hash_table_lookup (profile_table, stream_name);
@@ -1192,7 +1191,7 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
   intents = modulemd_ordered_str_keys (intent_names, modulemd_strcmp_sort);
   g_clear_pointer (&intent_names, g_hash_table_unref);
 
-  for (int i = 0; i < intents->len; i++)
+  for (guint i = 0; i < intents->len; i++)
     {
       intent = g_ptr_array_index (intents, i);
 

@@ -1652,7 +1652,7 @@ depends_on_stream (ModulemdModuleStreamV2 *self,
   ModulemdDependencies *dep = NULL;
 
   /* Iterate through all of the dependency objects */
-  for (gint i = 0; i < self->dependencies->len; i++)
+  for (guint i = 0; i < self->dependencies->len; i++)
     {
       dep = g_ptr_array_index (self->dependencies, i);
       if (is_builddep)

@@ -193,7 +193,7 @@ modulemd_hash_table_equals (GHashTable *a,
 {
   g_autoptr (GPtrArray) set_a = NULL;
   g_autoptr (GPtrArray) set_b = NULL;
-  int i = 0;
+  guint i = 0;
   gchar *key = NULL;
   gchar *value_a = NULL;
   gchar *value_b = NULL;
@@ -241,7 +241,7 @@ modulemd_hash_table_compare (GHashTable *a,
 {
   g_autoptr (GPtrArray) set_a = NULL;
   g_autoptr (GPtrArray) set_b = NULL;
-  int i = 0;
+  guint i = 0;
   gchar *key = NULL;
   gchar *value_a = NULL;
   gchar *value_b = NULL;

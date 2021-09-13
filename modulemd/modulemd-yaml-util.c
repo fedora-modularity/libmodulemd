@@ -856,7 +856,7 @@ modulemd_yaml_emit_nested_set (yaml_emitter_t *emitter,
     }
 
   keys = modulemd_ordered_str_keys (table, modulemd_strcmp_sort);
-  for (gint i = 0; i < keys->len; i++)
+  for (guint i = 0; i < keys->len; i++)
     {
       key = g_ptr_array_index (keys, i);
       dep = g_hash_table_lookup (table, key);

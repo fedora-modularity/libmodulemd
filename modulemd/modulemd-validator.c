@@ -22,6 +22,7 @@
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-translation-private.h"
 #include "private/modulemd-yaml.h"
+#include "private/modulemd-util.h"
 
 #include <errno.h>
 #include <glib.h>
@@ -60,18 +61,19 @@ struct validator_options
   enum mmd_verbosity verbosity;
   GType type;
   gchar **filenames;
+  gboolean report_version;
 };
 
 struct validator_options options = { 0 };
 
 static gboolean
-print_version (const gchar *option_name,
-               const gchar *value,
-               gpointer data,
-               GError **error)
+set_report_version (const gchar *UNUSED (option_name),
+                    const gchar *UNUSED (value),
+                    gpointer UNUSED (data),
+                    GError **UNUSED (error))
 {
-  g_fprintf (stdout, "modulemd-validator %s\n", modulemd_get_version ());
-  exit (EXIT_SUCCESS);
+  options.report_version = TRUE;
+  return TRUE;
 }
 
 static gboolean
@@ -189,7 +191,7 @@ static GOptionEntry entries[] = {
   { "type", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, set_type, "Constrain a document type (modulemd-v1, modulemd-v2, modulemd-defaults-v1, modulemd-obsoletes-v1, modulemd-packager-v2, modulemd-packager-v3, modulemd-translations-v1); by default any document type loadable into a modulemd index is acceptable; this option only supports single-document files", "TYPE" },
   { "quiet", 'q', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Print no output", NULL },
   { "verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_verbosity, "Be verbose", NULL },
-  { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, print_version, "Print version number, then exit", NULL },
+  { "version", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, set_report_version, "Print version number, then exit", NULL },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, "Files to be validated", NULL },
   { NULL } };
 // clang-format on
@@ -455,8 +457,14 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, entries, "modulemd-validator");
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
-      g_print ("option parsing failed: %s\n", error->message);
+      g_fprintf (stderr, "option parsing failed: %s\n", error->message);
       exit (EXIT_FAILURE);
+    }
+
+  if (options.report_version)
+    {
+      g_fprintf (stdout, "modulemd-validator %s\n", modulemd_get_version ());
+      exit (EXIT_SUCCESS);
     }
 
   if (!(options.filenames && options.filenames[0]))

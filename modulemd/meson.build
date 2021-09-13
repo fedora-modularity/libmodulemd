@@ -448,6 +448,9 @@ endforeach
 modulemd_validator_tests = {
 'help'        : [['--code', '0'], ['--help']],
 'version'     : [['--code', '0'], ['--version']],
+'version_with_uknown_option':
+                [['--code', '1', '--stderr', '--does-not-exist'],
+                ['--version', '--does-not-exist']],
 'valid'       : [['--code', '0'],
                 [files('tests/test_data/static_context.yaml')]],
 'invalid'     : [['--code', '1', '--stdout', 'No data section provided'],

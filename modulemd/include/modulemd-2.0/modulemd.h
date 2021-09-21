@@ -56,6 +56,10 @@ G_BEGIN_DECLS
  * repositories have been loaded into string variables `fedora_yaml` and
  * `updates_yaml`, respectively.
  *
+ * Tools such as DNF that are consuming data from a repository should always
+ * set `strict=False`, so that it can safely handle minor,
+ * backwards-compatible changes to the modulemd format.
+ *
  * First step is to load the metadata from these two repositories into
  * #ModulemdModuleIndex objects. This is done as follows:
  *
@@ -63,20 +67,20 @@ G_BEGIN_DECLS
  * |[<!-- language="C" -->
  * ModulemdModuleIndex *fedora_index = modulemd_module_index_new ();
  * gboolean ret = modulemd_module_index_update_from_string (
- *   fedora_index, fedora_yaml, TRUE, &failures, &error);
+ *   fedora_index, fedora_yaml, FALSE, &failures, &error);
  *
  * ModulemdModuleIndex *updates_index = modulemd_module_index_new ();
  * gboolean ret2 = modulemd_module_index_update_from_string (
- *   updates_index, updates_yaml, TRUE, &failures, &error);
+ *   updates_index, updates_yaml, FALSE, &failures, &error);
  * ]|
  *
  * In Python:
  * |[<!-- language="Python" -->
  * fedora_index = Modulemd.ModuleIndex.new()
- * ret, failures = fedora_index.update_from_string(fedora_yaml, True)
+ * ret, failures = fedora_index.update_from_string(fedora_yaml, False)
  *
  * updates_index = Modulemd.ModuleIndex.new()
- * ret, failures = updates_index.update_from_string(updates_yaml, True)
+ * ret, failures = updates_index.update_from_string(updates_yaml, False)
  * ]|
  *
  * The @failures are a list of subdocuments in the YAML that failed parsing,

@@ -62,7 +62,7 @@ data:
     stream: "latest"
 
     # version:
-    # Module version, integer, cannot be negative
+    # Module version, 64-bit unsigned integer
     # If this value is unset (or set to zero), it will be filled in by the
     # buildsystem, using the VCS commit timestamp.  Module version defines the
     # upgrade path for the particular update stream.
@@ -610,7 +610,7 @@ data:
                 # Multiple components can have the same buildorder index
                 # to map them into build groups.
                 # Defaults to zero.
-                # Integer, negative values are allowed.
+                # Integer, from an interval [-(2^63), +2^63-1].
                 # In this example, bar, baz and xxx are built first in
                 # no particular order, then tagged into the buildroot,
                 # then, finally, xyz is built.
@@ -709,6 +709,7 @@ data:
 
               # epoch:
               # The RPM epoch.
+              # A 32-bit unsigned integer.
               #
               # Type: OPTIONAL
               epoch: 0

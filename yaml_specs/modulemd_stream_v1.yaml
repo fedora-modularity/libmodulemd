@@ -12,7 +12,7 @@ data:
     # Typically filled in by the buildsystem, using the VCS branch name
     # as the name of the stream.
     stream: "stream-name"
-    # Module version, integer, optional, cannot be negative
+    # Module version, a 64-bit unsigned integer, optional,
     # Typically filled in by the buildsystem, using the VCS commit
     # timestamp.  Module version defines upgrade path for the particular
     # update stream.
@@ -246,7 +246,7 @@ data:
                 # Multiple components can have the same buildorder index
                 # to map them into build groups.
                 # Optional, defaults to zero.
-                # Integer, negative values are allowed.
+                # Integer, from an interval [-(2^63), +2^63-1].
                 # In this example, bar, baz and xxx are built first in
                 # no particular order, then tagged into the buildroot,
                 # then, finally, xyz is built.

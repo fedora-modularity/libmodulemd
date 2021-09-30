@@ -514,7 +514,7 @@ data:
                 # Multiple components can have the same buildorder index
                 # to map them into build groups.
                 # Defaults to zero.
-                # Integer, negative values are allowed.
+                # Integer, from an interval [-(2^63), +2^63-1].
                 # In this example, bar and baz are built first in no particular
                 # order, then tagged into the buildroot, then, finally, xxx is
                 # built.

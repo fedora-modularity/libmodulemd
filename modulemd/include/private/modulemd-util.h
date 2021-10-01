@@ -31,6 +31,11 @@ G_BEGIN_DECLS
 #define UNUSED(x) UNUSED_##x
 #endif
 
+#ifdef __GNUC__
+#define FALLTHROUGH __attribute__ ((fallthrough));
+#else
+#define FALLTHROUGH
+#endif
 
 /**
  * modulemd_tracer:

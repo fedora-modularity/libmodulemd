@@ -254,7 +254,7 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
         case YAML_SEQUENCE_END_EVENT:
         case YAML_MAPPING_END_EVENT:
           depth--;
-          /* Fall through intentional */
+          FALLTHROUGH;
 
         default:
           if (depth == 0)

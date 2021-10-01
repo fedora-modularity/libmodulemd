@@ -14,6 +14,7 @@
 #include "modulemd.h"
 #include "config.h"
 
+#include "private/modulemd-util.h"
 #include "private/modulemd-module-stream-private.h"
 #include "private/modulemd-subdocument-info-private.h"
 #include "private/modulemd-packager-v3-private.h"
@@ -296,7 +297,7 @@ modulemd_read_packager_from_parser (yaml_parser_t *parser,
           break;
         }
 
-      /* Falling through intentionally: packager V2 format is handled below */
+      FALLTHROUGH; /* Packager V2 format is handled below. */
 
     case MODULEMD_YAML_DOC_MODULESTREAM:
       switch (modulemd_subdocument_info_get_mdversion (subdoc))

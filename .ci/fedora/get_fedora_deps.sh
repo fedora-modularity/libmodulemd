@@ -24,7 +24,6 @@ dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
     glib2-doc \
     gobject-introspection-devel \
     gtk-doc \
-    help2man \
     jq \
     libyaml-devel \
     meson \

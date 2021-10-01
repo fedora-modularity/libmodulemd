@@ -255,6 +255,9 @@ configure_file(
   configuration : xcdata
 )
 
+
+# --- Documenatation --- #
+
 if with_docs
     gnome.gtkdoc(
         'modulemd-2.0',
@@ -273,18 +276,9 @@ if with_docs
     )
 endif
 
-help2man_opts = [
-  '--no-info',
-  '--section=1',
-]
-custom_target(
-    'modulemd-validator.1',
-    output: 'modulemd-validator.1',
-    command: [
-      help2man, help2man_opts, '--output=@OUTPUT@', modulemd_validator,
-    ],
-    install: true,
-    install_dir: join_paths(get_option('mandir'), 'man1'))
+if with_manpages
+    install_man('modulemd-validator.1')
+endif
 
 
 # --- TESTS --- #

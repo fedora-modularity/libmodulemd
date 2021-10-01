@@ -1,0 +1,90 @@
+.TH MODULEMD-VALIDATOR "1" "" "libmodulemd" "User Commands"
+.SH NAME
+modulemd-validator \- validate modulemd documents
+.SH SYNOPSIS
+.SY modulemd\-validator
+[\fB\-\-quiet\fP|\fB\-\-verbose\fP|\fB\-\-debug\fP]
+\fIFILE\fP\&.\|.\|.\&
+.SY modulemd\-validator
+[\fB\-\-quiet\fP|\fB\-\-verbose\fP|\fB\-\-debug\fP]
+\fB\-\-type\fP=\fITYPE\fP
+.I FILE
+.SY modulemd\-validator
+{\fB\-\-version\fP|\fB\-\-help\fP}
+.YS
+.SH DESCRIPTION
+This tool validates modulemd documents specified with the positional arguments
+using a libmodulemd parser.
+.P
+Without a \fB--type\fP option, all document types which can be found in a\~YUM
+repository will be recognized. In this case each \fIFILE\fP can contain
+multiple modulemd documents.
+.P
+Otherwise, exactly one \fIFILE\fP containing exactly one modulemd document must be
+provided and the document will be validated against the given \fITYPE\fP.
+.SH OPTIONS
+.TP
+\fB\-\-type\fP=\fI\,TYPE\/\fP
+Constrain a document type. The recognized types are:
+.RS
+.TP
+.B modulemd\-v1
+An obsolete format used for building and installing modules.
+.TP
+.B modulemd\-v2
+A deprecated format for building modules and a contemporary format for built
+modules which can be placed into a\~YUM repository and installed by a package
+manager.
+.TP
+.B modulemd\-defaults\-v1
+A format for defining default streams and default profiles of a module. Found
+in YUM repositories.
+.TP
+.B modulemd\-obsoletes\-v1
+A format for defining streams which reach or will reach its end of
+life. It can also recommend a new stream which obsoleted the old one. Found in
+YUM repositories.
+.TP
+.B modulemd\-packager\-v2
+An obsolete format for building modules.
+.TP
+.B modulemd\-packager\-v3
+A contemporary format for building modules.
+.TP
+.B modulemd\-translations\-v1
+A contemporary format for delivering localized human-oriented texts (e.\|g.\&
+a description or a summary) associated with a module. Found in YUM
+repositories.
+.RE
+.IP
+Only single\-document files are supported.
+For compatibility, if this options is not provided, any document type loadable
+into a modulemd index (i.\|e.\& those intended for YUM repositories) is
+acceptable.
+.TP
+\fB\-\-debug\fP
+Output debugging messages.
+.TP
+\fB\-q\fP, \fB\-\-quiet\fP
+Print no output.
+.TP
+\fB\-v\fP, \fB\-\-verbose\fP
+Be verbose.
+.TP
+\fB\-h\fP, \fB\-\-help\fP
+Print a usage text and then exit.
+.TP
+\fB\-V\fP, \fB\-\-version\fP
+Print a version number and then exit.
+.SH EXIT CODE
+If the supplied documents are valid (and satisfy the \fB--type\fP constrain),
+zero exit code will be returned.  Otherwise a non-zero code will be emitted.
+.SH REPORTING BUGS
+Bugs and feature requests can be reported at the
+.UR https\://github.com/fedora-modularity/libmodulemd
+libmodulemd home page
+.UE .
+.SH SEE ALSO
+Specification of the modulemd documents is available in a \fByaml_spec\fP directory at the
+libmodulemd home page.
+

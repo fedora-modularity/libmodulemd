@@ -259,7 +259,7 @@ jobs:
         run: cp /etc/pacman.conf.pacnew /etc/pacman.conf
 
       - name: Install dependencies
-        run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-docs gobject-introspection gtk-doc help2man jq libyaml meson python-gobject python2-six valgrind
+        run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-docs gobject-introspection gtk-doc jq libyaml meson python-gobject python2-six valgrind
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -313,7 +313,6 @@ jobs:
               /usr/share/gtk-doc/html/glib/index.html
               gobject-introspection-devel
               gtk-doc
-              help2man
               jq
               libyaml-devel
               meson
@@ -394,7 +393,6 @@ jobs:
                  glib2-devel
                  gobject-introspection-devel
                  gtk-doc
-                 help2man
                  jq
                  libyaml-devel
                  meson
@@ -456,7 +454,6 @@ jobs:
               clang
               clang-analyzer
               cmake
-              help2man
               jq
               meson
               ninja

@@ -80,10 +80,11 @@ if with_docs
   endif
 endif
 
-with_manpages = get_option('with_manpages')
-help2man = find_program('help2man', required: with_manpages)
-if not help2man.found()
-    help2man = disabler()
+# Keep with_manpages option a tristate feature for backward compatibility.
+if get_option('with_manpages').disabled()
+  with_manpages = false
+else
+  with_manpages = true
 endif
 
 # Check whether this version of glib has the GDate autoptr defined
@@ -186,22 +187,10 @@ if meson.version().version_compare('>=0.53')
         endif
     endif
 
-    if help2man.found()
-        if with_manpages.enabled()
-            manpages_status = 'Enabled'
-        elif with_manpages.auto()
-            manpages_status = 'Enabled (autodetected)'
-        else
-            error('manpages state is unknown')
-        endif
+    if with_manpages
+        manpages_status = 'Enabled'
     else
-        if with_manpages.disabled()
-            manpages_status = 'Disabled'
-        elif with_rpmio.auto()
-            manpages_status = 'Disabled (autodetection could not locate help2man)'
-        else
-            error('manpages state is unknown')
-        endif
+        manpages_status = 'Disabled'
     endif
 
     summary({'prefix': get_option('prefix'),
@@ -215,7 +204,7 @@ if meson.version().version_compare('>=0.53')
     summary({'libmagic Support': magic_status,
              'Custom Python': get_option('python_name'),
              'RPMIO Support': rpmio_status,
-             'Generate Manpages': manpages_status,
+             'Generate Manual Pages': manpages_status,
              'Generate HTML Documentation': get_option('with_docs'),
              'Python 2 Support': get_option('with_py2'),
              'Python 3 Support': get_option('with_py3'),

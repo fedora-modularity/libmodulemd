@@ -41,7 +41,6 @@ BuildRequires:  python-gobject-base
 %endif
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-gobject-base
-BuildRequires:  help2man
 
 
 # Patches

@@ -370,6 +370,10 @@ jobs:
     continue-on-error: true
     container:
       image: registry.opensuse.org/opensuse/tumbleweed
+      # Disable seccomp until a container manager in GitHub recognizes
+      # clone3() syscall,
+      # <https://github.com/actions/virtual-environments/issues/3812>.
+      options: --security-opt seccomp=unconfined
     steps:
       - name: Enable docs in container
         run:

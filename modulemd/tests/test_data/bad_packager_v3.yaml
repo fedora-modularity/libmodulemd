@@ -7,7 +7,7 @@ data:
   summary: Trivial Summary
   description: >-
     Trivial Description
-  license: [MIT]
+  license: [DUMMY]
   configurations:
     - context: a2345678901
       platform: foo

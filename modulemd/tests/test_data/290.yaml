@@ -10,7 +10,7 @@ data:
     be used for testing the build and release pipeline. ’
   license:
     module:
-    - MIT
+    - DUMMY
   dependencies:
     buildrequires:
       platform: f28

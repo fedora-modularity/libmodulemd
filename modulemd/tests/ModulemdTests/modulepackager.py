@@ -45,7 +45,7 @@ data:
   description: A minimalistic module description
   license:
     module:
-      - MIT
+      - DUMMY
 ...
 """
         stream = Modulemd.ModuleStream.read_string(minimal_valid, True)
@@ -62,7 +62,7 @@ data:
             "data": {
                 "summary": "A minimal valid module",
                 "description": "A minimalistic module description",
-                "license": {"module": ["GPL", "MIT"]},
+                "license": {"module": ["DUMMY1", "DUMMY2"]},
             },
         }
 
@@ -135,7 +135,7 @@ data:
             "data": {
                 "summary": "A minimal valid module",
                 "description": "A minimalistic module description",
-                "license": {"module": ["GPL", "MIT"]},
+                "license": {"module": ["DUMMY1", "DUMMY2"]},
             },
         }
 

@@ -174,9 +174,8 @@ data:
         #
         # Mandatory for module metadata in a yum/dnf repository.
         content:
-            - Beerware
-            - GPLv2+
-            - zlib
+            - ASL 2.0
+            - GPL+ or Artistic
 
     # xmd:
     # Extensible metadata block

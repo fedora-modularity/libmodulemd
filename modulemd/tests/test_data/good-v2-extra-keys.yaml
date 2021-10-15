@@ -37,11 +37,9 @@ data:
             eol: 2077-10-23
     license:
         module:
-            - MIT
+            - DUMMY
         content:
-            - Beerware
-            - GPLv2+
-            - zlib
+            - DUMMY
         unknown_key: foo
         unknown_map:
             stuff: [ a, b ]

@@ -157,27 +157,27 @@ module_stream_v1_test_licenses (void)
 
   stream = modulemd_module_stream_v1_new (NULL, NULL);
 
-  modulemd_module_stream_v1_add_content_license (stream, "GPLv2+");
+  modulemd_module_stream_v1_add_content_license (stream, "DUMMY1");
   licenses = modulemd_module_stream_v1_get_content_licenses_as_strv (stream);
-  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "GPLv2+"));
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "DUMMY1"));
   g_assert_cmpint (g_strv_length (licenses), ==, 1);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v1_add_module_license (stream, "MIT");
+  modulemd_module_stream_v1_add_module_license (stream, "DUMMY2");
   licenses = modulemd_module_stream_v1_get_module_licenses_as_strv (stream);
-  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "MIT"));
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "DUMMY2"));
   g_assert_cmpint (g_strv_length (licenses), ==, 1);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v1_remove_content_license (stream, "GPLv2+");
+  modulemd_module_stream_v1_remove_content_license (stream, "DUMMY1");
   licenses = modulemd_module_stream_v1_get_content_licenses_as_strv (stream);
   g_assert_cmpint (g_strv_length (licenses), ==, 0);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v1_remove_module_license (stream, "MIT");
+  modulemd_module_stream_v1_remove_module_license (stream, "DUMMY2");
   licenses = modulemd_module_stream_v1_get_module_licenses_as_strv (stream);
   g_assert_cmpint (g_strv_length (licenses), ==, 0);
 
@@ -193,27 +193,27 @@ module_stream_v2_test_licenses (void)
 
   stream = modulemd_module_stream_v2_new (NULL, NULL);
 
-  modulemd_module_stream_v2_add_content_license (stream, "GPLv2+");
+  modulemd_module_stream_v2_add_content_license (stream, "DUMMY1");
   licenses = modulemd_module_stream_v2_get_content_licenses_as_strv (stream);
-  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "GPLv2+"));
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "DUMMY1"));
   g_assert_cmpint (g_strv_length (licenses), ==, 1);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v2_add_module_license (stream, "MIT");
+  modulemd_module_stream_v2_add_module_license (stream, "DUMMY2");
   licenses = modulemd_module_stream_v2_get_module_licenses_as_strv (stream);
-  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "MIT"));
+  g_assert_true (g_strv_contains ((const gchar *const *)licenses, "DUMMY2"));
   g_assert_cmpint (g_strv_length (licenses), ==, 1);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v2_remove_content_license (stream, "GPLv2+");
+  modulemd_module_stream_v2_remove_content_license (stream, "DUMMY1");
   licenses = modulemd_module_stream_v2_get_content_licenses_as_strv (stream);
   g_assert_cmpint (g_strv_length (licenses), ==, 0);
 
   g_clear_pointer (&licenses, g_strfreev);
 
-  modulemd_module_stream_v2_remove_module_license (stream, "MIT");
+  modulemd_module_stream_v2_remove_module_license (stream, "DUMMY2");
   licenses = modulemd_module_stream_v2_get_module_licenses_as_strv (stream);
   g_assert_cmpint (g_strv_length (licenses), ==, 0);
 
@@ -585,7 +585,7 @@ module_stream_test_upgrade_v1_to_v2 (void)
 
   modulemd_module_stream_v1_set_summary (streamV1, "Summary");
   modulemd_module_stream_v1_set_description (streamV1, "Description");
-  modulemd_module_stream_v1_add_module_license (streamV1, "BSD");
+  modulemd_module_stream_v1_add_module_license (streamV1, "DUMMY");
 
   modulemd_module_stream_v1_add_buildtime_requirement (
     streamV1, "ModuleA", "streamZ");
@@ -627,7 +627,7 @@ module_stream_test_upgrade_v1_to_v2 (void)
                    "    Description\n"
                    "  license:\n"
                    "    module:\n"
-                   "    - BSD\n"
+                   "    - DUMMY\n"
                    "  dependencies:\n"
                    "  - buildrequires:\n"
                    "      ModuleA: [streamZ]\n"
@@ -725,9 +725,9 @@ module_stream_test_v2_yaml (void)
 
     "  license:\n"
     "    content:\n"
-    "      - BSD\n"
-    "      - GPLv2+\n"
-    "    module: MIT\n"
+    "      - DUMMY1\n"
+    "      - DUMMY2\n"
+    "    module: DUMMY3\n"
 
     "  dependencies:\n"
     "    - buildrequires:\n"
@@ -911,11 +911,11 @@ module_stream_test_v2_yaml (void)
     modulemd_module_stream_v2_get_module_licenses_as_strv (streamV2);
 
   g_assert_true (
-    g_strv_contains ((const gchar *const *)content_licenses, "BSD"));
+    g_strv_contains ((const gchar *const *)content_licenses, "DUMMY1"));
   g_assert_true (
-    g_strv_contains ((const gchar *const *)content_licenses, "GPLv2+"));
+    g_strv_contains ((const gchar *const *)content_licenses, "DUMMY2"));
   g_assert_true (
-    g_strv_contains ((const gchar *const *)module_licenses, "MIT"));
+    g_strv_contains ((const gchar *const *)module_licenses, "DUMMY3"));
 
   dependencies = modulemd_module_stream_v2_get_dependencies (streamV2);
   g_assert_cmpint (dependencies->len, ==, 4);
@@ -1066,7 +1066,7 @@ module_stream_test_v2_yaml (void)
     "  description: >-\n"
     "    Trivial Description\n"
     "  license:\n"
-    "    module: MIT\n"
+    "    module: DUMMY\n"
     "...\n",
     TRUE,
     NULL,
@@ -2539,9 +2539,8 @@ module_stream_v1_test_parse_dump (void)
     "    module:\n"
     "    - MIT\n"
     "    content:\n"
-    "    - Beerware\n"
-    "    - GPLv2+\n"
-    "    - zlib\n"
+    "    - ASL 2.0\n"
+    "    - GPL+ or Artistic\n"
     "  xmd:\n"
     "    some_key: some_data\n"
     "  dependencies:\n"
@@ -2708,9 +2707,8 @@ module_stream_v2_test_parse_dump (void)
     "    module:\n"
     "    - MIT\n"
     "    content:\n"
-    "    - Beerware\n"
-    "    - GPLv2+\n"
-    "    - zlib\n"
+    "    - ASL 2.0\n"
+    "    - GPL+ or Artistic\n"
     "  xmd:\n"
     "    some_key: some_data\n"
     "  dependencies:\n"
@@ -3186,7 +3184,7 @@ module_stream_v2_test_xmd_issue_290 (void)
 
   modulemd_module_stream_v2_set_summary (stream, "summary");
   modulemd_module_stream_v2_set_description (stream, "desc");
-  modulemd_module_stream_v2_add_module_license (stream, "MIT");
+  modulemd_module_stream_v2_add_module_license (stream, "DUMMY");
 
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
@@ -3224,7 +3222,7 @@ module_stream_v2_test_xmd_issue_290 (void)
 "    desc\n"
 "  license:\n"
 "    module:\n"
-"    - MIT\n"
+"    - DUMMY\n"
 "  xmd:\n"
 "    something:\n"
 "    - foo\n"
@@ -3387,9 +3385,9 @@ module_stream_v1_regression_content_license (void)
     "    desc\n"
     "  license:\n"
     "    content:\n"
-    "    - BSD\n"
+    "    - DUMMY\n"
     "    module:\n"
-    "    - MIT\n"
+    "    - DUMMY\n"
     "  xmd:\n"
     "    something:\n"
     "    - foo\n"

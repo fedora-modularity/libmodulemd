@@ -15,7 +15,6 @@ data:
     module:
     - MIT
     content:
-    - GPL+ or Artistic
     - MIT
   xmd:
     mbs:
@@ -96,7 +95,7 @@ data:
     module:
     - MIT
     content:
-    - MPLv2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -162,9 +161,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
     - MIT
-    - MPLv2.0
   xmd:
     mbs:
       mse: TRUE
@@ -1412,9 +1409,7 @@ data:
     module:
     - MIT
     content:
-    - CC-BY-SA or GFDL
-    - GPLv2+
-    - Public Domain
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -1497,9 +1492,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
-    - ASL 2.0 and EPL and BSD
-    - BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -1660,7 +1653,7 @@ data:
     module:
     - MIT
     content:
-    - Unlicense or MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -1721,7 +1714,7 @@ data:
     module:
     - MIT
     content:
-    - Unlicense or MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -2801,12 +2794,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - LGPLv3
     - MIT
-    - MIT and (MIT or GPLv2)
-    - MIT and BSD
-    - MIT and MPLv2.0
   xmd:
     mbs:
       mse: TRUE
@@ -2997,10 +2985,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - LGPLv3
     - MIT
-    - MIT and (MIT or GPLv2)
   xmd:
     mbs:
       mse: TRUE
@@ -3128,7 +3113,7 @@ data:
     module:
     - MIT
     content:
-    - PostgreSQL
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -3210,9 +3195,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 and LGPLv2
-    - LGPLv2+
-    - MPLv1.1 or GPLv2+ or LGPLv2+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -3313,32 +3296,7 @@ data:
     module:
     - MIT
     content:
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and BSD and Public Domain and UCD
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Artistic
-    - (GPL+ or Artistic) and Artistic 2.0
-    - (GPL+ or Artistic) and Artistic 2.0 and UCD
-    - (GPL+ or Artistic) and BSD
-    - (GPL+ or Artistic) and CC0 and Public Domain
-    - (GPL+ or Artistic) and FSFAP
-    - (GPL+ or Artistic) and HSRL and MIT and UCD
-    - (GPL+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Public Domain
-    - (GPL+ or Artistic) and UCD
-    - (GPL+ or Artistic) and Unicode
-    - (GPL+ or Artistic) and zlib
-    - (LGPLv2 or Artistic 2.0) and (GPL+ or Artistic)
-    - ASL 2.0
-    - Artistic 2.0
-    - BSD
-    - GPL+
-    - GPL+ or Artistic
-    - GPLv2+ or Artistic
-    - GPLv2+ or Artistic 2.0
-    - GPLv3+
-    - LGPLv2+
     - MIT
-    - TTWL
   xmd:
     mbs:
       mse: TRUE
@@ -5216,33 +5174,7 @@ data:
     module:
     - MIT
     content:
-    - (Copyright only) and (Artistic or GPL+)
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic)
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and BSD and Public Domain and UCD
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Artistic 2.0
-    - (GPL+ or Artistic) and Artistic 2.0 and UCD
-    - (GPL+ or Artistic) and BSD
-    - (GPL+ or Artistic) and CC0 and Public Domain
-    - (GPL+ or Artistic) and HSLR and MIT and UCD
-    - (GPL+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Public Domain
-    - (GPL+ or Artistic) and UCD
-    - (GPL+ or Artistic) and Unicode
-    - (GPL+ or Artistic) and zlib
-    - (LGPLv2 or Artistic 2.0) and (GPL+ or Artistic)
-    - ASL 2.0
-    - Artistic 2.0
-    - BSD
-    - BSD and MIT
-    - GPL+
-    - GPL+ or Artistic
-    - GPLv2+ or Artistic
-    - GPLv2+ or Artistic 2.0
-    - GPLv3+
-    - LGPLv2+
     - MIT
-    - TTWL
   xmd:
     mbs:
       mse: TRUE
@@ -7212,24 +7144,7 @@ data:
     module:
     - MIT
     content:
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and BSD and Public Domain and UCD
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Artistic 2.0 and UCD
-    - (GPL+ or Artistic) and BSD
-    - (GPL+ or Artistic) and CC0 and Public Domain
-    - (GPL+ or Artistic) and HSLR and MIT and UCD
-    - (GPL+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Public Domain
-    - (GPL+ or Artistic) and UCD
-    - (GPL+ or Artistic) and Unicode
-    - (GPL+ or Artistic) and zlib
-    - ASL 2.0
-    - GPL+
-    - GPL+ or Artistic
-    - GPLv2+ or Artistic
-    - GPLv3+
     - MIT
-    - TTWL
   xmd:
     mbs:
       mse: TRUE
@@ -8323,25 +8238,7 @@ data:
     module:
     - MIT
     content:
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic)
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and BSD and Public Domain and UCD
-    - (GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Artistic 2.0 and UCD
-    - (GPL+ or Artistic) and BSD
-    - (GPL+ or Artistic) and CC0 and Public Domain
-    - (GPL+ or Artistic) and HSLR and MIT and UCD
-    - (GPL+ or Artistic) and MIT
-    - (GPL+ or Artistic) and Public Domain
-    - (GPL+ or Artistic) and UCD
-    - (GPL+ or Artistic) and Unicode
-    - (GPL+ or Artistic) and zlib
-    - ASL 2.0
-    - GPL+
-    - GPL+ or Artistic
-    - GPLv2+ or Artistic
-    - GPLv3+
     - MIT
-    - TTWL
   xmd:
     mbs:
       mse: TRUE
@@ -9455,7 +9352,7 @@ data:
     module:
     - MIT
     content:
-    - MIT and ASL 2.0 and ISC and BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -9533,8 +9430,6 @@ data:
     - MIT
     content:
     - MIT
-    - MIT and ASL 2.0 and ISC and BSD
-    - MIT and BSD and ISC
   xmd:
     mbs:
       mse: TRUE
@@ -9632,8 +9527,6 @@ data:
     - MIT
     content:
     - MIT
-    - MIT and ASL 2.0 and ISC and BSD
-    - MIT and BSD and ISC
   xmd:
     mbs:
       mse: TRUE
@@ -9730,7 +9623,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -9792,7 +9685,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 with exceptions and LGPLv2 and BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -9880,9 +9773,7 @@ data:
     module:
     - MIT
     content:
-    - AGPLv3 and zlib and ASL 2.0
-    - ASL 2.0
-    - ASL 2.0 and MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10013,8 +9904,7 @@ data:
     module:
     - MIT
     content:
-    - AGPLv3 and zlib and ASL 2.0
-    - ASL 2.0 and MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10106,7 +9996,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10168,18 +10058,7 @@ data:
     module:
     - MIT
     content:
-    - (CDDL or GPLv2 with exceptions) and ASL 2.0
-    - ASL 1.1 and ASL 2.0 and xpp and BSD and Public Domain
-    - ASL 2.0
-    - ASL 2.0 and ASL 1.1 and MIT
-    - ASL 2.0 and EPL and BSD
-    - ASL 2.0 and MIT
-    - ASL 2.0 and Plexus
-    - CDDL or GPLv2 with exceptions
-    - EPL
     - MIT
-    - MIT and ASL 2.0
-    - Public Domain
   xmd:
     mbs:
       mse: TRUE
@@ -10691,7 +10570,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 with exceptions and LGPLv2 and BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10770,7 +10649,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 with exceptions and LGPLv2 and BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10859,7 +10738,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv3 and ASL 2.0 and Boost
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10914,8 +10793,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 with exceptions
-    - GPLv2 with linking exception
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -10981,8 +10859,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2 with exceptions
-    - GPLv2 with linking exception
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11053,7 +10930,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11148,7 +11025,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11288,8 +11165,6 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - GPLv3+
     - MIT
   xmd:
     mbs:
@@ -11394,8 +11269,6 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - GPLv3+
     - MIT
   xmd:
     mbs:
@@ -11498,7 +11371,7 @@ data:
     module:
     - MIT
     content:
-    - BSD and Public Domain
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11575,8 +11448,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv3+ and GPLv3
-    - LGPLv3+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11645,8 +11517,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - BSD and HaskellReport
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -11776,8 +11647,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - BSD and HaskellReport
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -14806,10 +14676,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - GPLv2+ and GFDL
-    - GPLv2+ and LGPLv2+
-    - LGPLv2+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15113,9 +14980,6 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
-    - GPLv2
-    - LGPLv3
     - MIT
   xmd:
     mbs:
@@ -15218,7 +15082,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15281,7 +15145,7 @@ data:
     module:
     - ASL 2.0
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15366,7 +15230,7 @@ data:
     module:
     - ASL 2.0
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15441,7 +15305,7 @@ data:
     module:
     - ASL 2.0
     content:
-    - ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15513,10 +15377,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
-    - GPLv2
-    - GPLv3+
-    - LGPLv2+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15739,10 +15600,7 @@ data:
     module:
     - MIT
     content:
-    - ASL 2.0
-    - GPLv2
-    - GPLv3+
-    - LGPLv2+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -15933,8 +15791,7 @@ data:
     module:
     - MIT
     content:
-    - BSD
-    - LGPLv2+
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -16014,7 +15871,7 @@ data:
     module:
     - MIT
     content:
-    - MIT or ASL 2.0
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -17560,8 +17417,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2
-    - GPLv2 and MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -17640,8 +17496,7 @@ data:
     module:
     - MIT
     content:
-    - GPLv2
-    - GPLv2 and MIT
+    - MIT
   xmd:
     mbs:
       mse: TRUE
@@ -17769,16 +17624,7 @@ data:
     module:
     - MIT
     content:
-    - ANTLR-PD
-    - ASL 1.1
-    - ASL 2.0
-    - ASL 2.0 and W3C
-    - ASL 2.0 and W3C and Public Domain
-    - BSD
-    - CDDL-1.0 or GPLv2 with exceptions
-    - EPL-1.0
-    - EPL-2.0 and ASL 2.0
-    - Public Domain
+    - MIT
   xmd:
     mbs:
       mse: TRUE

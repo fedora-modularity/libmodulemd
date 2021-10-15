@@ -108,7 +108,7 @@ test_modulemd_load_string (void)
     "  description: >-\n"
     "    Trivial Description\n"
     "  license:\n"
-    "    module: MIT\n"
+    "    module: DUMMY\n"
     "...\n";
   idx = modulemd_load_string (yaml_string, &error);
   g_assert_no_error (error);
@@ -378,7 +378,7 @@ test_packager_read_string (void)
     "  description: >-\n"
     "    Trivial Description\n"
     "  license:\n"
-    "    module: MIT\n"
+    "    module: DUMMY\n"
     "...\n";
   otype = modulemd_read_packager_string (yaml_string, &object, &error);
   g_assert_no_error (error);
@@ -419,7 +419,7 @@ test_packager_read_string (void)
     "  summary: Trivial Summary\n"
     "  description: >-\n"
     "    Trivial Description\n"
-    "  license: MIT\n"
+    "  license: DUMMY\n"
     "...\n";
   otype = modulemd_read_packager_string (yaml_string, &object, &error);
   g_assert_no_error (error);
@@ -461,7 +461,7 @@ test_packager_read_string (void)
     "  description: >-\n"
     "    Trivial Description\n"
     "  license:\n"
-    "    module: MIT\n"
+    "    module: DUMMY\n"
     "...\n";
   otype = modulemd_read_packager_string (yaml_string, &object, &error);
   g_assert_no_error (error);
@@ -503,7 +503,7 @@ test_packager_read_string (void)
     "  description: >-\n"
     "    Trivial Description\n"
     "  license:\n"
-    "    module: MIT\n"
+    "    module: DUMMY\n"
     "...\n";
   otype = modulemd_read_packager_string (yaml_string, &object, &error);
   g_assert_no_error (error);

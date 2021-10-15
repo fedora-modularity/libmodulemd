@@ -74,9 +74,8 @@ data:
         # A list of licenses used by the packages in the module.
         # This should be populated by build tools, not the module author.
         content:
-            - Beerware
-            - GPLv2+
-            - zlib
+            - ASL 2.0
+            - GPL+ or Artistic
     # Extensible metadata block
     # A dictionary of user-defined keys and values.
     # Optional.  Defaults to an empty dictionary.

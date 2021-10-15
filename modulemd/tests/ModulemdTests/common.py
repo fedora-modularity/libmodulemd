@@ -137,7 +137,7 @@ data:
   description: A minimalistic module description
   license:
     module:
-      - MIT
+      - DUMMY
 ...
 """
         doc = Modulemd.read_packager_string(minimal_valid)
@@ -167,7 +167,7 @@ data:
   summary: A minimal valid module
   description: A minimalistic module description
   license:
-    - MIT
+    - DUMMY
 ...
 """
         doc = Modulemd.read_packager_string(minimal_valid)
@@ -196,7 +196,7 @@ data:
   description: A minimalistic module description
   license:
     module:
-      - MIT
+      - DUMMY
 ...
 """
         doc = Modulemd.read_packager_string(minimal_valid)

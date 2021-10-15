@@ -8,7 +8,7 @@ data:
   description: >-
     Trivial Description
   license:
-    module: [MIT]
+    module: [DUMMY]
   static_context: true
   context: '-'
 ...

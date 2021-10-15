@@ -96,7 +96,7 @@ module_index_test_dump (void)
   modulemd_module_stream_v1_set_description (
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V1 (stream), "DUMMY1");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -110,7 +110,7 @@ module_index_test_dump (void)
   modulemd_module_stream_v2_set_description (
     MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
   modulemd_module_stream_v2_add_module_license (
-    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V2 (stream), "DUMMY2");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -167,7 +167,7 @@ module_index_test_dump (void)
                    "    A test stream's description\n"
                    "  license:\n"
                    "    module:\n"
-                   "    - Beerware\n"
+                   "    - DUMMY1\n"
                    "...\n"
                    "---\n"
                    "document: modulemd\n"
@@ -182,7 +182,7 @@ module_index_test_dump (void)
                    "    A second stream's description\n"
                    "  license:\n"
                    "    module:\n"
-                   "    - Beerware\n"
+                   "    - DUMMY2\n"
                    "...\n");
 }
 
@@ -585,7 +585,7 @@ module_index_test_stream_upgrade (void)
   modulemd_module_stream_v1_set_description (
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V1 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -617,7 +617,7 @@ module_index_test_stream_upgrade (void)
   modulemd_module_stream_v2_set_description (
     MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
   modulemd_module_stream_v2_add_module_license (
-    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V2 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -640,7 +640,7 @@ module_index_test_stream_upgrade (void)
   modulemd_module_stream_v1_set_description (
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V1 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -672,7 +672,7 @@ module_index_test_stream_upgrade (void)
   modulemd_module_stream_v2_set_description (
     MODULEMD_MODULE_STREAM_V2 (stream), "A second stream's description");
   modulemd_module_stream_v2_add_module_license (
-    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V2 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -724,7 +724,7 @@ module_index_test_index_upgrade (void)
   modulemd_module_stream_v1_set_description (
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V1 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -756,7 +756,7 @@ module_index_test_index_upgrade (void)
   modulemd_module_stream_v1_set_description (
     MODULEMD_MODULE_STREAM_V1 (stream), "A test stream's description");
   modulemd_module_stream_v1_add_module_license (
-    MODULEMD_MODULE_STREAM_V1 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V1 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -871,7 +871,7 @@ module_index_test_index_upgrade (void)
   modulemd_module_stream_v2_set_description (
     MODULEMD_MODULE_STREAM_V2 (stream), "A test stream's description");
   modulemd_module_stream_v2_add_module_license (
-    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V2 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -903,7 +903,7 @@ module_index_test_index_upgrade (void)
   modulemd_module_stream_v2_set_description (
     MODULEMD_MODULE_STREAM_V2 (stream), "A test stream's description");
   modulemd_module_stream_v2_add_module_license (
-    MODULEMD_MODULE_STREAM_V2 (stream), "Beerware");
+    MODULEMD_MODULE_STREAM_V2 (stream), "DUMMY");
   ret = modulemd_module_index_add_module_stream (index, stream, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
@@ -1099,10 +1099,9 @@ module_index_test_custom_read (void)
 "    testing the build and release pipeline.\n"
 "  license:\n"
 "    module:\n"
-"    - MIT\n"
+"    - DUMMY\n"
 "    content:\n"
-"    - GPL+ or Artistic\n"
-"    - MIT\n"
+"    - DUMMY\n"
 "  xmd:\n"
 "    mbs:\n"
 "      scmurl: https://src.fedoraproject.org/modules/testmodule.git?#0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"
@@ -1216,10 +1215,9 @@ module_index_test_custom_write (void)
 "    testing the build and release pipeline.\n"
 "  license:\n"
 "    module:\n"
-"    - MIT\n"
+"    - DUMMY\n"
 "    content:\n"
-"    - GPL+ or Artistic\n"
-"    - MIT\n"
+"    - DUMMY\n"
 "  xmd:\n"
 "    mbs:\n"
 "      scmurl: https://src.fedoraproject.org/modules/testmodule.git?#0d33e028e4561f82ea43f670ee6366675cd6a6fe\n"

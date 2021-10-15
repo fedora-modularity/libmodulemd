@@ -18,7 +18,7 @@ data:
     module:
     - MIT
     content:
-    - MIT and ASL 2.0 and ISC and BSD
+    - DUMMY
   dependencies:
   - buildrequires:
       platform: [f29]

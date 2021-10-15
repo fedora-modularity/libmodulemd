@@ -8,7 +8,7 @@ data:
   description: Description 1
   license:
     module:
-    - MIT
+    - DUMMY
 ...
 ---
 document: modulemd-packager
@@ -18,7 +18,7 @@ data:
   description: Description 2
   license:
     module:
-    - MIT
+    - DUMMY
 ...
 ---
 document: modulemd-packager
@@ -39,5 +39,5 @@ data:
   description: Description 4
   license:
     module:
-    - MIT
+    - DUMMY
 ...

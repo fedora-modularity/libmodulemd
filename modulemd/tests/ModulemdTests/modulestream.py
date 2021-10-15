@@ -436,14 +436,14 @@ class TestModuleStream(TestBase):
         for version in modulestream_versions:
             stream = Modulemd.ModuleStream.new(version)
 
-            stream.add_content_license("GPLv2+")
-            assert "GPLv2+" in stream.get_content_licenses()
+            stream.add_content_license("DUMMY1")
+            assert "DUMMY1" in stream.get_content_licenses()
 
-            stream.add_module_license("MIT")
-            assert "MIT" in stream.get_module_licenses()
+            stream.add_module_license("DUMMY2")
+            assert "DUMMY2" in stream.get_module_licenses()
 
-            stream.remove_content_license("GPLv2+")
-            stream.remove_module_license("MIT")
+            stream.remove_content_license("DUMMY1")
+            stream.remove_module_license("DUMMY2")
 
     def test_profiles(self):
         for version in modulestream_versions:
@@ -636,7 +636,7 @@ class TestModuleStream(TestBase):
 
                 stream.set_summary("foo")
                 stream.set_description("bar")
-                stream.add_module_license("MIT")
+                stream.add_module_license("DUMMY")
                 if hasattr(stream, "set_platform"):
                     stream.set_platform("f33")
 
@@ -652,7 +652,7 @@ class TestModuleStream(TestBase):
         v1_stream.set_context("ctx")
         v1_stream.set_summary("Summary")
         v1_stream.set_description("Description")
-        v1_stream.add_module_license("BSD")
+        v1_stream.add_module_license("DUMMY")
 
         v1_stream.add_buildtime_requirement("ModuleA", "streamZ")
         v1_stream.add_buildtime_requirement("ModuleB", "streamY")
@@ -680,7 +680,7 @@ data:
     Description
   license:
     module:
-    - BSD
+    - DUMMY
   dependencies:
   - buildrequires:
       ModuleA: [streamZ]
@@ -729,9 +729,9 @@ data:
 
   license:
     content:
-      - BSD
-      - GPLv2+
-    module: MIT
+      - DUMMY1
+      - DUMMY2
+    module: DUMMY3
 
   dependencies:
     - buildrequires:
@@ -872,9 +872,8 @@ data:
         assert sl.get_eol() is not None
         assert sl.get_eol_as_string() == "2099-12-31"
 
-        assert "BSD" in stream.get_content_licenses()
-        assert "GPLv2+" in stream.get_content_licenses()
-        assert "MIT" in stream.get_module_licenses()
+        assert "DUMMY1" in stream.get_content_licenses()
+        assert "DUMMY2" in stream.get_content_licenses()
 
         assert len(stream.get_dependencies()) == 4
 
@@ -939,7 +938,7 @@ data:
     description: >-
       Trivial Description
     license:
-        module: MIT
+        module: DUMMY
 ...
 """
 
@@ -989,9 +988,9 @@ data:
 
   license:
     content:
-      - BSD
-      - GPLv2+
-    module: MIT
+      - DUMMY1
+      - DUMMY2
+    module: DUMMY3
 
   dependencies:
         buildrequires:
@@ -1117,9 +1116,8 @@ data:
             assert sl.get_eol() is not None
             assert sl.get_eol_as_string() == "2099-12-31"
 
-            assert "BSD" in stream.get_content_licenses()
-            assert "GPLv2+" in stream.get_content_licenses()
-            assert "MIT" in stream.get_module_licenses()
+            assert "DUMMY1" in stream.get_content_licenses()
+            assert "DUMMY2" in stream.get_content_licenses()
 
             buildrequires = stream.get_buildtime_modules()
             assert len(buildrequires) == 2
@@ -1201,7 +1199,7 @@ data:
   description: >-
     Trivial Description
   license:
-    module: MIT
+    module: DUMMY
 ...
 """
 
@@ -1511,7 +1509,7 @@ data:
     module:
     - MIT
     content:
-    - MIT and ASL 2.0 and ISC and BSD
+    - DUMMY
   dependencies:
   - buildrequires:
       platform: [f29]

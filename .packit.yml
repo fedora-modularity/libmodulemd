@@ -21,4 +21,4 @@ jobs:
     - fedora-all
     - epel-7
     - epel-8
-    - centos-stream-9-x86_64
+    - centos-stream-9

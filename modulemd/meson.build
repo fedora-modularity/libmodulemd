@@ -397,6 +397,7 @@ python_tests = {
 'moduleindex'      : 'tests/ModulemdTests/moduleindex.py',
 'modulepackager'   : 'tests/ModulemdTests/modulepackager.py',
 'modulestream'     : 'tests/ModulemdTests/modulestream.py',
+'obsoletes'        : 'tests/ModulemdTests/obsoletes.py',
 'profile'          : 'tests/ModulemdTests/profile.py',
 'rpmmap'           : 'tests/ModulemdTests/rpmmap.py',
 'servicelevel'     : 'tests/ModulemdTests/servicelevel.py',

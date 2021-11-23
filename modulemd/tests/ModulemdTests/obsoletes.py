@@ -34,15 +34,15 @@ class TestObsoletes(TestBase):
         # Test that the new() function works
         o = Modulemd.Obsoletes.new(1, 2, "testmodule", "teststream", "testmsg")
         assert o
-        assert o.version == 1
-        assert o.modified == 2
-        assert o.module_name == "testmodule"
-        assert o.module_stream == "teststream"
-        assert o.message == "testmsg"
+        assert o.props.mdversion == 1
+        assert o.props.modified == 2
+        assert o.props.module_name == "testmodule"
+        assert o.props.module_stream == "teststream"
+        assert o.props.message == "testmsg"
 
         # Test that keywords are accepted
         o = Modulemd.Obsoletes(
-            version=1,
+            mdversion=1,
             modified=42,
             module_name="testmodule2",
             module_stream="teststream2",
@@ -50,22 +50,22 @@ class TestObsoletes(TestBase):
         )
         assert o
         assert o.validate()
-        assert o.version == 1
-        assert o.modified == 42
-        assert o.module_name == "testmodule2"
-        assert o.module_stream == "teststream2"
-        assert o.message == "testmsg2"
+        assert o.props.mdversion == 1
+        assert o.props.modified == 42
+        assert o.props.module_name == "testmodule2"
+        assert o.props.module_stream == "teststream2"
+        assert o.props.message == "testmessage2"
 
     def test_copy(self):
         o = Modulemd.Obsoletes.new(1, 2, "testmodule", "teststream", "testmsg")
         o_copy = o.copy()
         assert o_copy
         assert o_copy.validate()
-        assert o_copy.version == 1
-        assert o_copy.modified == 2
-        assert o_copy.module_name == "testmodule"
-        assert o_copy.module_stream == "teststream"
-        assert o_copy.message == "testmsg"
+        assert o_copy.props.mdversion == 1
+        assert o_copy.props.modified == 2
+        assert o_copy.props.module_name == "testmodule"
+        assert o_copy.props.module_stream == "teststream"
+        assert o_copy.props.message == "testmsg"
 
 
 if __name__ == "__main__":

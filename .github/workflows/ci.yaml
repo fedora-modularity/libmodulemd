@@ -24,6 +24,10 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+      # Disable seccomp until a container manager in GitHub recognizes
+      # clone3() syscall,
+      # <https://github.com/actions/virtual-environments/issues/3812>.
+      options: --security-opt seccomp=unconfined
 
     outputs:
         meson_version: ${{ steps.scanbuild.outputs.available }}
@@ -82,6 +86,10 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
+      # Disable seccomp until a container manager in GitHub recognizes
+      # clone3() syscall,
+      # <https://github.com/actions/virtual-environments/issues/3812>.
+      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Install git

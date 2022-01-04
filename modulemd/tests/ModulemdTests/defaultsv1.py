@@ -47,7 +47,7 @@ class TestDefaults(TestBase):
         assert defs.get_module_name() == "foo"
 
         # Test with no name
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, "does not allow None as a value"
         ):
             defs = Modulemd.DefaultsV1.new(None)

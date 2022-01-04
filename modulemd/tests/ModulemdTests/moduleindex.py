@@ -99,7 +99,7 @@ profiles:
         mod_foo = idx.get_module("foo")
         self.assertTrue(mod_foo.validate())
         self.assertEqual(mod_foo.get_module_name(), "foo")
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "No streams matched"
         ):
             mod_foo.get_stream_by_NSVCA("a", 5, "c")
@@ -147,7 +147,7 @@ profiles:
     def test_dump_empty_index(self):
         idx = Modulemd.ModuleIndex.new()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "Index contains no modules."
         ):
             yaml = idx.dump_to_string()
@@ -208,7 +208,7 @@ profiles:
         self.assertIn("teststream", defs["testmodule"])
 
         # Nonexistent defaults dir
-        with self.assertRaisesRegexp(GLib.Error, "No such file or directory"):
+        with self.assertRaisesRegex(GLib.Error, "No such file or directory"):
             ret = idx.update_from_defaults_directory(
                 path=path.join(self.test_data_path, "defaults_nonexistent"),
                 strict=True,
@@ -216,7 +216,7 @@ profiles:
             self.assertFalse(ret)
 
         # Nonexistent override dir
-        with self.assertRaisesRegexp(GLib.Error, "No such file or directory"):
+        with self.assertRaisesRegex(GLib.Error, "No such file or directory"):
             ret = idx.update_from_defaults_directory(
                 path=path.join(self.test_data_path, "defaults"),
                 overrides_path="overrides_nonexistent",

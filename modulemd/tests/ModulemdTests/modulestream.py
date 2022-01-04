@@ -98,18 +98,18 @@ class TestModuleStream(TestBase):
             assert stream.get_stream_name() is None
 
         # Test that we cannot instantiate directly
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, "cannot create instance of abstract"
         ):
             Modulemd.ModuleStream()
 
         # Test with a zero mdversion
-        with self.assertRaisesRegexp(TypeError, "constructor returned NULL"):
+        with self.assertRaisesRegex(TypeError, "constructor returned NULL"):
             with self.expect_signal():
                 defs = Modulemd.ModuleStream.new(0)
 
         # Test with an unknown mdversion
-        with self.assertRaisesRegexp(TypeError, "constructor returned NULL"):
+        with self.assertRaisesRegex(TypeError, "constructor returned NULL"):
             with self.expect_signal():
                 defs = Modulemd.ModuleStream.new(
                     Modulemd.ModuleStreamVersionEnum.LATEST + 1
@@ -1273,7 +1273,7 @@ data:
 
             # Should fail validation if both buildorder and buildafter are set for
             # the same component.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 gi.repository.GLib.GError,
                 "Cannot mix buildorder and buildafter",
             ):
@@ -1285,7 +1285,7 @@ data:
 
             # Should fail validation if both buildorder and buildafter are set in
             # different components of the same stream.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 gi.repository.GLib.GError,
                 "Cannot mix buildorder and buildafter",
             ):
@@ -1297,7 +1297,7 @@ data:
 
             # Should fail if a key specified in a buildafter set does not exist
             # for this module stream.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 gi.repository.GLib.GError, "not found in components list"
             ):
                 stream = Modulemd.ModuleStream.read_file(

@@ -64,7 +64,7 @@ class TestRpmMapEntry(TestBase):
 
         # Remove name
         entry2.props.name = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "Missing name attribute"
         ):
             entry2.validate()
@@ -73,7 +73,7 @@ class TestRpmMapEntry(TestBase):
 
         # Remove the version
         entry2.props.version = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "Missing version attribute"
         ):
             entry2.validate()
@@ -82,7 +82,7 @@ class TestRpmMapEntry(TestBase):
 
         # Remove the release
         entry2.props.release = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "Missing release attribute"
         ):
             entry2.validate()
@@ -91,7 +91,7 @@ class TestRpmMapEntry(TestBase):
 
         # Remove the arch
         entry2.props.arch = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError, "Missing arch attribute"
         ):
             entry2.validate()

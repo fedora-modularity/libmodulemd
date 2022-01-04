@@ -276,7 +276,7 @@ data:
             index.update_from_string(default, strict=True)
             merger.associate_index(index, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             gi.repository.GLib.GError,
             "Default stream mismatch in module python",
         ):

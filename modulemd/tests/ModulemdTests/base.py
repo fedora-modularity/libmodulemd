@@ -56,3 +56,14 @@ class TestBase(unittest.TestCase):
     def warnings_fatal(self):
         gdebug = os.getenv("G_DEBUG", "").split(",")
         return "fatal-warnings" in gdebug
+
+    def assertRaisesRegex(self, *args, **kwargs):
+        """Asserts that the message in a raised exception matches a regex.
+
+        Args:
+            The same as unittest.TestCase.assertRaisesRegex().
+        """
+        try:
+            return super(TestBase, self).assertRaisesRegex(*args, **kwargs)
+        except AttributeError:
+            return self.assertRaisesRegexp(*args, **kwargs)

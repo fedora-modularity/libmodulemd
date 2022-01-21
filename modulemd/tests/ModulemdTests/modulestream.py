@@ -587,14 +587,14 @@ class TestModuleStream(TestBase):
 
         retrieved_deps = stream.get_dependencies()
         stream.clear_dependencies()
-        self.assertEquals(len(retrieved_deps), 1)
-        self.assertEquals(len(stream.get_dependencies()), 0)
+        self.assertEqual(len(retrieved_deps), 1)
+        self.assertEqual(len(stream.get_dependencies()), 0)
 
         stream.add_dependencies(deps)
-        self.assertEquals(len(stream.get_dependencies()), 1)
+        self.assertEqual(len(stream.get_dependencies()), 1)
 
         stream.remove_dependencies(deps)
-        self.assertEquals(len(stream.get_dependencies()), 0)
+        self.assertEqual(len(stream.get_dependencies()), 0)
 
     def test_xmd(self):
 
@@ -666,7 +666,7 @@ class TestModuleStream(TestBase):
         idx = Modulemd.ModuleIndex.new()
         idx.add_module_stream(v2_stream)
 
-        self.assertEquals(
+        self.assertEqual(
             idx.dump_to_string(),
             """---
 document: modulemd
@@ -1484,7 +1484,7 @@ data:
             "%s/static_context.yaml" % (os.getenv("TEST_DATA_PATH"))
         )
         streams = idx.search_streams()
-        self.assertEquals(1, len(streams))
+        self.assertEqual(1, len(streams))
         stream = streams[0]
         self.assertTrue(stream.props.static_context)
         self.assertTrue(stream.is_static_context())
@@ -1554,7 +1554,7 @@ data:
 ...
 """
         self.maxDiff = None
-        self.assertEquals(expected, idx.dump_to_string())
+        self.assertEqual(expected, idx.dump_to_string())
 
 
 if __name__ == "__main__":

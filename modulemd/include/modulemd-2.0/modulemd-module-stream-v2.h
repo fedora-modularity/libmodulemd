@@ -960,6 +960,16 @@ modulemd_module_stream_v2_get_xmd (ModulemdModuleStreamV2 *self);
 
 
 /**
+ * modulemd_module_stream_v2_clear_xmd:
+ * @self: (in): This #ModulemdModuleStreamV2 object.
+ *
+ * Removes all XMD data from this #ModulemdModuleStreamV2
+ */
+void
+modulemd_module_stream_v2_clear_xmd (ModulemdModuleStreamV2 *self);
+
+
+/**
  * modulemd_module_stream_v2_set_static_context:
  * @self: (in): This #ModulemdModuleStreamV2 object.
  *

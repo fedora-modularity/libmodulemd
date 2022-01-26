@@ -1263,6 +1263,15 @@ modulemd_module_stream_v2_get_xmd (ModulemdModuleStreamV2 *self)
 }
 
 
+void
+modulemd_module_stream_v2_clear_xmd (ModulemdModuleStreamV2 *self)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (self));
+
+  g_clear_pointer (&self->xmd, g_variant_unref);
+}
+
+
 gboolean
 modulemd_module_stream_v2_includes_nevra (ModulemdModuleStreamV2 *self,
                                           const gchar *nevra_pattern)

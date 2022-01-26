@@ -1088,3 +1088,23 @@ modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
 
   return newestActiveObsoletes;
 }
+
+
+static void
+clear_xmds (gpointer data, gpointer user_data)
+{
+  g_return_if_fail (MODULEMD_IS_MODULE_STREAM_V2 (data));
+
+  modulemd_module_stream_v2_clear_xmd (MODULEMD_MODULE_STREAM_V2 (data));
+}
+
+
+void
+modulemd_module_clear_xmds (ModulemdModule *self)
+{
+  MODULEMD_INIT_TRACE ();
+
+  g_return_if_fail (MODULEMD_IS_MODULE (self));
+
+  g_ptr_array_foreach (self->streams, clear_xmds, NULL);
+}

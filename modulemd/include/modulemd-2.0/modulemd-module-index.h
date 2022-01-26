@@ -667,4 +667,19 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
                                         GError **error);
 
 
+/**
+ * modulemd_module_index_clear_xmds:
+ * @self: This #ModulemdModuleIndex object.
+ *
+ * Iterates through all #ModulemdModuleStream entries in this
+ * #ModulemdModuleIndex and removes any XMD sections that are present. This is
+ * generally done to trim down the metadata to only the portions that are
+ * useful to the package manager.
+ *
+ * Since: 2.14.0
+ */
+void
+modulemd_module_index_clear_xmds (ModulemdModuleIndex *self);
+
+
 G_END_DECLS

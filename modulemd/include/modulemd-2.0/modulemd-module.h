@@ -336,4 +336,20 @@ modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
                                              const gchar *stream,
                                              const gchar *context);
 
+
+/**
+ * modulemd_module_clear_xmds:
+ * @self: (in): This #ModulemdModule object.
+ *
+ * Iterates through all #ModulemdModuleStream entries in this
+ * #ModulemdModule and removes any XMD sections that are present. This is
+ * generally done to trim down the metadata to only the portions that are
+ * useful to the package manager.
+ *
+ * Since: 2.14.0
+ */
+void
+modulemd_module_clear_xmds (ModulemdModule *self);
+
+
 G_END_DECLS

@@ -224,6 +224,86 @@ profiles:
             )
             self.assertFalse(ret)
 
+    def test_clear_xmds(self):
+        if "_overrides_module" in dir(Modulemd) and hasattr(
+            gi.overrides.Modulemd, "ModuleStreamV2"
+        ):
+            idx = Modulemd.ModuleIndex.new()
+            self.assertIsNotNone(idx)
+
+            ret, failures = idx.update_from_string(
+                """
+---
+document: modulemd
+version: 2
+data:
+    name: foo
+    stream: latest
+    version: 1
+    static_context: true
+    context: c0ffee43
+    arch: s390x
+    summary: An example module
+    description: A longer description
+    license:
+        module: MIT
+    xmd:
+        a_key: a_value
+        another_key: another_value
+        an_array:
+          - a
+          - b
+...
+---
+document: modulemd
+version: 2
+data:
+    name: foo
+    stream: latest
+    version: 2
+    static_context: true
+    context: c0ffee43
+    arch: s390x
+    summary: An example module
+    description: A longer description
+    license:
+        module: MIT
+    xmd:
+        a_key: a_value
+        another_key: another_value
+        an_array:
+          - a
+          - b
+...
+""",
+                strict=True,
+            )
+            self.assertEqual(len(failures), 0)
+
+            module_names = idx.get_module_names()
+            self.assertEqual(len(module_names), 1)
+            self.assertEqual(module_names[0], "foo")
+
+            module = idx.get_module(module_names[0])
+            self.assertEqual(len(module.get_all_streams()), 2)
+
+            ref_xmd = {
+                "a_key": "a_value",
+                "another_key": "another_value",
+                "an_array": ["a", "b"],
+            }
+
+            for stream in module.get_all_streams():
+                # Verify that the XMD data is present.
+                xmd = stream.get_xmd()
+                self.assertEqual(xmd, ref_xmd)
+
+            idx.clear_xmds()
+
+            for stream in module.get_all_streams():
+                # Verify that the XMD data is gone now.
+                self.assertEqual(stream.get_xmd(), {})
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1439,6 +1439,26 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
 }
 
 
+static void
+clear_xmds (gpointer key, gpointer value, gpointer user_data)
+{
+  MODULEMD_INIT_TRACE ();
+
+  g_return_if_fail (MODULEMD_IS_MODULE (value));
+
+  modulemd_module_clear_xmds (MODULEMD_MODULE (value));
+}
+
+
+void
+modulemd_module_index_clear_xmds (ModulemdModuleIndex *self)
+{
+  MODULEMD_INIT_TRACE ();
+
+  g_hash_table_foreach (self->modules, clear_xmds, NULL);
+}
+
+
 gboolean
 modulemd_module_index_merge (ModulemdModuleIndex *from,
                              ModulemdModuleIndex *into,

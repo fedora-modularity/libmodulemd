@@ -12,7 +12,7 @@
 project(
   'modulemd',
   'c',
-version : '2.13.1',
+version : '2.14.0',
 default_options : ['buildtype=debugoptimized', 'c_std=c11', 'warning_level=1', 'b_asneeded=true'],
 license : 'MIT',
 meson_version : '>=0.47.0'

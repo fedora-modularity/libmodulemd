@@ -346,7 +346,7 @@ modulemd_module_get_newest_active_obsoletes (ModulemdModule *self,
  * generally done to trim down the metadata to only the portions that are
  * useful to the package manager.
  *
- * Since: 2.14.0
+ * Since: 2.14
  */
 void
 modulemd_module_clear_xmds (ModulemdModule *self);

@@ -676,7 +676,7 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
  * generally done to trim down the metadata to only the portions that are
  * useful to the package manager.
  *
- * Since: 2.14.0
+ * Since: 2.14
  */
 void
 modulemd_module_index_clear_xmds (ModulemdModuleIndex *self);

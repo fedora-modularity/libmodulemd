@@ -9,8 +9,8 @@ set -e
 set -x
 
 os=centos
-release=8
-repository=docker.io
+release=stream8
+repository=quay.io/centos
 
 # Override the standard tests with the Coverity scan
 mmd_run_docker_tests \

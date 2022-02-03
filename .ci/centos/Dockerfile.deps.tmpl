@@ -1,9 +1,11 @@
+dnl Coerce CentOS Stream image tags (streamN) to CentOS tags (N)
+define(`cosrelease', patsubst(__RELEASE__, `stream', `'))dnl
 FROM __IMAGE__
 
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 RUN yum -y install epel-release \
-ifelse(eval(__RELEASE__ >= 8), 1, `dnl
+ifelse(eval(cosrelease >= 8), 1, `dnl
     && yum -y install dnf-plugins-core \
     && yum config-manager --enable powertools \
 ')dnl
@@ -26,7 +28,7 @@ ifelse(eval(__RELEASE__ >= 8), 1, `dnl
 	pkgconfig \
 	python2-devel \
 	python2-six \
-ifelse(eval(__RELEASE__ < 8), 1, `dnl
+ifelse(eval(cosrelease < 8), 1, `dnl
 	python-gobject-base \
 	python36-gobject-base \
 ',`dnl

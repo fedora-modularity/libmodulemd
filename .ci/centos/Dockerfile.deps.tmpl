@@ -11,36 +11,36 @@ ifelse(eval(cosrelease >= 8), 1, `dnl
 ')dnl
     && yum -y --setopt=tsflags='' install \
         clang \
-	createrepo_c \
-	elinks \
-	file-devel \
-	gcc \
-	gcc-c++ \
-	git-core \
-	glib2-devel \
-	glib2-doc \
-	gobject-introspection-devel \
-	gtk-doc \
-	jq \
-	libyaml-devel \
-	meson \
-	ninja-build \
-	pkgconfig \
-	python2-devel \
-	python2-six \
+        createrepo_c \
+        elinks \
+        file-devel \
+        gcc \
+        gcc-c++ \
+        git-core \
+        glib2-devel \
+        glib2-doc \
+        gobject-introspection-devel \
+        gtk-doc \
+        jq \
+        libyaml-devel \
+        meson \
+        ninja-build \
+        pkgconfig \
+        python2-devel \
+        python2-six \
 ifelse(eval(cosrelease < 8), 1, `dnl
-	python-gobject-base \
-	python36-gobject-base \
+        python-gobject-base \
+        python36-gobject-base \
 ',`dnl
-	python3-gobject-base \
+        python3-gobject-base \
 ')dnl
-	python36-devel \
-	python3-rpm-macros \
-	redhat-rpm-config \
-	rpm-build \
-	rpm-devel \
-	rpmdevtools \
-	sudo \
-    && yum -y clean all
+        python36-devel \
+        python3-rpm-macros \
+        redhat-rpm-config \
+        rpm-build \
+        rpm-devel \
+        rpmdevtools \
+        sudo \
+        && yum -y clean all
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

@@ -3,26 +3,26 @@ FROM __IMAGE__
 MAINTAINER Tomasz Paweł Gajc <tpgxyz@gmail.com>
 
 RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
-	clang \
-	clang-analyzer \
-	cmake \
-	jq \
-	meson \
-	ninja \
-	rpmdevtools \
-	sudo \
-	valgrind \
-	wget \
-	task-devel \
-	'pkgconfig(zlib)' \
-	'pkgconfig(gobject-introspection-1.0)' \
-	'python3dist(autopep8)' \
-	'python3dist(pygobject)' \
-	'pkgconfig(yaml-0.1)' \
-	'pkgconfig(rpm)' \
-	magic-devel \
-	git-core \
-	elinks \
+    clang \
+    clang-analyzer \
+    cmake \
+    jq \
+    meson \
+    ninja \
+    rpmdevtools \
+    sudo \
+    valgrind \
+    wget \
+    task-devel \
+    'pkgconfig(zlib)' \
+    'pkgconfig(gobject-introspection-1.0)' \
+    'python3dist(autopep8)' \
+    'python3dist(pygobject)' \
+    'pkgconfig(yaml-0.1)' \
+    'pkgconfig(rpm)' \
+    magic-devel \
+    git-core \
+    elinks \
     && dnf -y clean all
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

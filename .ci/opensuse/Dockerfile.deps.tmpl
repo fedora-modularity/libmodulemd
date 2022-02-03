@@ -6,33 +6,33 @@ RUN sed -i /etc/zypp/zypp.conf \
         -e "s/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/"
 
 RUN zypper install --no-confirm --no-recommends --capability \
-	clang \
-	clang-tools \
-	createrepo_c \
-	elinks \
-	file-devel \
-	gcc \
-	gcc-c++ \
-	git-core \
-	glib2-devel \
-	gobject-introspection-devel \
-	gtk-doc \
-	jq \
-	libyaml-devel \
-	meson \
-	ninja \
-	pkgconf \
-	python3-autopep8 \
-	python3-devel \
-	python3-GitPython \
-	python3-gobject \
-	python3-pycodestyle \
-	python-rpm-macros \
-	rpm-build \
-	rpm-devel \
-	rpmdevtools \
-	sudo \
-	valgrind \
+    clang \
+    clang-tools \
+    createrepo_c \
+    elinks \
+    file-devel \
+    gcc \
+    gcc-c++ \
+    git-core \
+    glib2-devel \
+    gobject-introspection-devel \
+    gtk-doc \
+    jq \
+    libyaml-devel \
+    meson \
+    ninja \
+    pkgconf \
+    python3-autopep8 \
+    python3-devel \
+    python3-GitPython \
+    python3-gobject \
+    python3-pycodestyle \
+    python-rpm-macros \
+    rpm-build \
+    rpm-devel \
+    rpmdevtools \
+    sudo \
+    valgrind \
 && zypper clean --all
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

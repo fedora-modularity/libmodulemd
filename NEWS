@@ -1,5 +1,43 @@
 Release history for libmodulemd
 
+2.14.0      2022-02-04
+
+This release is fully compatible with the previous version 2.13.0 except
+behaviour changes described in Fixes section.
+
+Enhancements:
+- New functions for stripping XMD from an index
+  (modulemd_module_index_clear_xmds()), from a module
+  (modulemd_module_clear_xmds()), and from a version 2 module stream
+  (modulemd_module_stream_v2_clear_xmd()). This enables you to prevent from leaking
+  private build options to output modulemd-v2 documents.
+- Interpret an invalid buildorder 18446744073709551615 as -1 if the library
+  is built with a new build boolean accept_overflowed_buildorder set to true.
+- Document module version, buildorder, and epoch limits in the specifications.
+  Also clarify that an epoch number at RPM artifacts is mandatory.
+- Document that modulemd_module_get_defaults can return NULL
+- Improve a documentation for modulemd_module_set_defaults() and
+  modulemd_module_index_upgrade_defaults() functions.
+- Improve modulemd-validator(1) manual page.
+- Drop a build dependency on help2man tool.
+
+Fixes:
+- Fix a crash when updating an index with an invalid subdocument and a NULL
+  error parameter.
+- Fix clobbering module defaults on a modulemd_module_set_defaults() error.
+- Fix modulemd_module_index_upgrade_defaults() to actually use the requested
+  version.
+- Reject duplicate contexts in modulemd-packager-v3 documents.
+- Report an error if modulemd-validator tool is invoked with both --version
+  option and an unknown option.
+- Fix an undefined behaviour when comparing integers of different signs.
+- Fix DNF examples in a documentation.
+- Actually execute modulemd-obsoletes Python tests.
+- Fix deprecation warnings in tests with glib2-2.69.0.
+- Fix deprecation warnings in Python tests and make the test compatible with
+  Python 3.11.
+
+
 2.13.0      2021-07-09
 
 This release is fully compatible with the previous 2.12.1 version.

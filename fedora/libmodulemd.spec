@@ -48,7 +48,7 @@ BuildRequires:  python%{python3_pkgversion}-gobject-base
 
 %description
 C Library for manipulating module metadata files.
-See https://github.com/fedora-modularity/libmodulemd/blob/master/README.md for
+See https://github.com/fedora-modularity/libmodulemd/blob/main/README.md for
 more details.
 
 

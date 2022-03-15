@@ -1430,7 +1430,8 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         modulemd_ordered_str_keys (table, modulemd_strcmp_sort);              \
       for (i = 0; i < keys->len; i++)                                         \
         {                                                                     \
-          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));          \
+          EMIT_SCALAR_FULL (emitter, error, g_ptr_array_index (keys, i),      \
+                            YAML_DOUBLE_QUOTED_SCALAR_STYLE);	              \
         }                                                                     \
       EMIT_SEQUENCE_END (emitter, error);                                     \
     }                                                                         \

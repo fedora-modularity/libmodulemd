@@ -4,7 +4,7 @@ version: 1
 data:
   module: foo
   profiles:
-    latest: [minimal]
+    "latest": [minimal]
 ...
 ---
 document: modulemd
@@ -19,16 +19,16 @@ data:
     ipsum dolor sit amet goes right here.
   license:
     module:
-    - MIT
+    - "MIT"
   xmd:
     some_key: some_data
   dependencies:
   - buildrequires:
-      appframework: [v1]
-      platform: [f32]
+      appframework: ["v1"]
+      platform: ["f32"]
     requires:
-      appframework: [v1]
-      platform: [f32]
+      appframework: ["v1"]
+      platform: ["f32"]
   references:
     community: http://www.example.com/
     documentation: http://www.example.com/
@@ -50,17 +50,17 @@ data:
       - bar-extras
   api:
     rpms:
-    - bar
-    - bar-devel
-    - bar-extras
-    - baz
-    - xxx
+    - "bar"
+    - "bar-devel"
+    - "bar-extras"
+    - "baz"
+    - "xxx"
   filter:
     rpms:
-    - baz-nonfoo
+    - "baz-nonfoo"
   demodularized:
     rpms:
-    - bar-old
+    - "bar-old"
   buildopts:
     rpms:
       macros: >
@@ -110,14 +110,14 @@ data:
     ipsum dolor sit amet goes right here.
   license:
     module:
-    - MIT
+    - "MIT"
   xmd:
     some_key: some_data
   dependencies:
   - buildrequires:
-      platform: [f33]
+      platform: ["f33"]
     requires:
-      platform: [f33]
+      platform: ["f33"]
   references:
     community: http://www.example.com/
     documentation: http://www.example.com/
@@ -139,17 +139,17 @@ data:
       - bar-extras
   api:
     rpms:
-    - bar
-    - bar-devel
-    - bar-extras
-    - baz
-    - xxx
+    - "bar"
+    - "bar-devel"
+    - "bar-extras"
+    - "baz"
+    - "xxx"
   filter:
     rpms:
-    - baz-nonfoo
+    - "baz-nonfoo"
   demodularized:
     rpms:
-    - bar-old
+    - "bar-old"
   components:
     rpms:
       bar:

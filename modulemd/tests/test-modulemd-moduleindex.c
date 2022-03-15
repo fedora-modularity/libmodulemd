@@ -167,7 +167,7 @@ module_index_test_dump (void)
                    "    A test stream's description\n"
                    "  license:\n"
                    "    module:\n"
-                   "    - DUMMY1\n"
+                   "    - \"DUMMY1\"\n"
                    "...\n"
                    "---\n"
                    "document: modulemd\n"
@@ -182,7 +182,7 @@ module_index_test_dump (void)
                    "    A second stream's description\n"
                    "  license:\n"
                    "    module:\n"
-                   "    - DUMMY2\n"
+                   "    - \"DUMMY2\"\n"
                    "...\n");
 }
 

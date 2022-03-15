@@ -1120,7 +1120,7 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
         }
 
       if (!mmd_emitter_scalar (
-            emitter, stream_name, YAML_PLAIN_SCALAR_STYLE, error))
+            emitter, stream_name, YAML_DOUBLE_QUOTED_SCALAR_STYLE, error))
         {
           return FALSE;
         }

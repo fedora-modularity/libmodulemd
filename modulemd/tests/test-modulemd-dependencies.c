@@ -511,10 +511,10 @@ dependencies_test_emit_yaml (void)
                    "---\n"
                    "- buildrequires:\n"
                    "    builddef: []\n"
-                   "    buildmod1: [stream1, stream2]\n"
+                   "    buildmod1: [\"stream1\", \"stream2\"]\n"
                    "  requires:\n"
                    "    rundef: []\n"
-                   "    runmod1: [stream3, stream4]\n"
+                   "    runmod1: [\"stream3\", \"stream4\"]\n"
                    "...\n");
 
 
@@ -546,7 +546,7 @@ dependencies_test_emit_yaml (void)
                    "---\n"
                    "- buildrequires:\n"
                    "    builddef: []\n"
-                   "    buildmod1: [stream1, stream2]\n"
+                   "    buildmod1: [\"stream1\", \"stream2\"]\n"
                    "...\n");
 
   /* Test with only adding a runtime requires */
@@ -578,7 +578,7 @@ dependencies_test_emit_yaml (void)
                    "---\n"
                    "- requires:\n"
                    "    rundef: []\n"
-                   "    runmod1: [stream3, stream4]\n"
+                   "    runmod1: [\"stream3\", \"stream4\"]\n"
                    "...\n");
 }
 

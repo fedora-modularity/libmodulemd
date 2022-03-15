@@ -680,15 +680,15 @@ data:
     Description
   license:
     module:
-    - DUMMY
+    - "DUMMY"
   dependencies:
   - buildrequires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
+      ModuleA: ["streamZ"]
+      ModuleB: ["streamY"]
     requires:
-      ModuleA: [streamZ]
-      ModuleB: [streamY]
-      platform: [f33]
+      ModuleA: ["streamZ"]
+      ModuleB: ["streamY"]
+      platform: ["f33"]
 ...
 """,
         )
@@ -1507,14 +1507,14 @@ data:
     real-time applications that run across distributed devices.
   license:
     module:
-    - MIT
+    - "MIT"
     content:
-    - DUMMY
+    - "DUMMY"
   dependencies:
   - buildrequires:
-      platform: [f29]
+      platform: ["f29"]
     requires:
-      platform: [f29]
+      platform: ["f29"]
   references:
     community: http://nodejs.org
     documentation: http://nodejs.org/en/docs
@@ -1534,9 +1534,9 @@ data:
       - nodejs
   api:
     rpms:
-    - nodejs
-    - nodejs-devel
-    - npm
+    - "nodejs"
+    - "nodejs-devel"
+    - "npm"
   components:
     rpms:
       nodejs:
@@ -1547,10 +1547,10 @@ data:
         buildorder: 10
   artifacts:
     rpms:
-    - nodejs-1:8.11.4-1.module_2030+42747d40.x86_64
-    - nodejs-devel-1:8.11.4-1.module_2030+42747d40.x86_64
-    - nodejs-docs-1:8.11.4-1.module_2030+42747d40.noarch
-    - npm-1:5.6.0-1.8.11.4.1.module_2030+42747d40.x86_64
+    - "nodejs-1:8.11.4-1.module_2030+42747d40.x86_64"
+    - "nodejs-devel-1:8.11.4-1.module_2030+42747d40.x86_64"
+    - "nodejs-docs-1:8.11.4-1.module_2030+42747d40.noarch"
+    - "npm-1:5.6.0-1.8.11.4.1.module_2030+42747d40.x86_64"
 ...
 """
         self.maxDiff = None

@@ -15,6 +15,7 @@ RUN zypper install --no-confirm --no-recommends --capability \
     gcc-c++ \
     git-core \
     glib2-devel \
+    glib2-doc \
     gobject-introspection-devel \
     gtk-doc \
     jq \
@@ -32,7 +33,10 @@ RUN zypper install --no-confirm --no-recommends --capability \
     rpm-devel \
     rpmdevtools \
     sudo \
-    valgrind \
+    valgrind
+
+# Install glib2-doc by a package name (glib2-devel erroneously provides glib2-doc)
+RUN zypper install --no-confirm --no-recommends glib2-doc \
 && zypper clean --all
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

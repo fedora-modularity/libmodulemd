@@ -399,6 +399,7 @@ jobs:
                  gcc-c++
                  git-core
                  glib2-devel
+                 glib2-doc
                  gobject-introspection-devel
                  gtk-doc
                  jq
@@ -417,6 +418,10 @@ jobs:
                  rpmdevtools
                  sudo
                  valgrind
+
+      - name: Install glib2-doc by a package name (glib2-devel erroneously provides glib2-doc)
+        run:
+            zypper install --no-confirm --no-recommends glib2-doc
 
       - name: Checkout code
         uses: actions/checkout@v2

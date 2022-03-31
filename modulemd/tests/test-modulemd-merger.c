@@ -210,8 +210,10 @@ merger_test_merger (void)
   yaml_path =
     g_strdup_printf ("%s/overriding-nodejs.yaml", g_getenv ("TEST_DATA_PATH"));
   override_nodejs_index = modulemd_module_index_new ();
-  modulemd_module_index_update_from_file (
+  ret = modulemd_module_index_update_from_file (
     override_nodejs_index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&yaml_path, g_free);
 
   /*
@@ -240,8 +242,10 @@ merger_test_merger (void)
   yaml_path =
     g_strdup_printf ("%s/overriding.yaml", g_getenv ("TEST_DATA_PATH"));
   override_index = modulemd_module_index_new ();
-  modulemd_module_index_update_from_file (
+  ret = modulemd_module_index_update_from_file (
     override_index, yaml_path, TRUE, &failures, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
   g_clear_pointer (&yaml_path, g_free);
 
   /*

@@ -813,7 +813,8 @@ modulemd_packager_v3_get_rpm_component (ModulemdPackagerV3 *self,
  * containing a set of one or more #ModulemdModuleStreamV2 objects and possibly
  * a #ModulemdDefaults object corresponding to the #ModulemdPackagerV3 object
  * @self. NULL if there was an error doing the mapping and sets @error
- * appropriately.
+ * appropriately. One of the errors is missing a module name or a stream name
+ * if a default profile is present.
  *
  * Since: 2.11
  */

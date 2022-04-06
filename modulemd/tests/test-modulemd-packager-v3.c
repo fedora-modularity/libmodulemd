@@ -483,8 +483,12 @@ packager_test_map_to_stream_v2 (void)
 }
 
 
+/*
+ * Converting modulemd-packager-v3 with module a name and a stream and
+ * a default profile should succeed.
+ */
 static void
-packager_test_convert_to_index (void)
+packager_test_convert_to_index_with_name_stream_default_profile (void)
 {
   g_autoptr (ModulemdPackagerV3) packager = NULL;
   g_autoptr (ModulemdModuleIndex) index = NULL;
@@ -521,6 +525,78 @@ packager_test_convert_to_index (void)
   g_clear_pointer (&yaml_str, g_free);
   g_clear_pointer (&expected_path, g_free);
   g_clear_pointer (&expected_str, g_free);
+}
+
+
+/*
+ * Converting modulemd-packager-v3 without a module name but with a default
+ * profile should fail. Because modulemd-default-v1 needs a name and a stream.
+ */
+static void
+packager_test_convert_to_index_without_name_with_default_profile (void)
+{
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdBuildConfig) config = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+  g_autoptr (GError) error = NULL;
+
+  packager = modulemd_packager_v3_new ();
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+  /* Keep module name unset */
+  modulemd_packager_v3_set_stream_name (packager, "Stream");
+  modulemd_packager_v3_set_summary (packager, "Summary");
+  modulemd_packager_v3_set_description (packager, "Description");
+  config = modulemd_build_config_new ();
+  g_assert_nonnull (config);
+  modulemd_build_config_set_context (config, "Context");
+  modulemd_build_config_set_platform (config, "Platform");
+  modulemd_packager_v3_add_build_config (packager, config);
+  profile = modulemd_profile_new ("Profile");
+  g_assert_nonnull (profile);
+  modulemd_profile_set_default (profile); /* This triggers the failure. */
+  modulemd_packager_v3_add_profile (packager, profile);
+
+  index = modulemd_packager_v3_convert_to_index (packager, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_MISSING_REQUIRED);
+  g_assert_null (index);
+}
+
+
+/*
+ * Converting modulemd-packager-v3 without a stream name but with a default
+ * profile should fail. Because modulemd-default-v1 needs a name and a stream.
+ */
+static void
+packager_test_convert_to_index_without_stream_with_default_profile (void)
+{
+  g_autoptr (ModulemdPackagerV3) packager = NULL;
+  g_autoptr (ModulemdModuleIndex) index = NULL;
+  g_autoptr (ModulemdBuildConfig) config = NULL;
+  g_autoptr (ModulemdProfile) profile = NULL;
+  g_autoptr (GError) error = NULL;
+
+  packager = modulemd_packager_v3_new ();
+  g_assert_nonnull (packager);
+  g_assert_true (MODULEMD_IS_PACKAGER_V3 (packager));
+  modulemd_packager_v3_set_module_name (packager, "Module");
+  /* Keep stream name unset */
+  modulemd_packager_v3_set_summary (packager, "Summary");
+  modulemd_packager_v3_set_description (packager, "Description");
+  config = modulemd_build_config_new ();
+  g_assert_nonnull (config);
+  modulemd_build_config_set_context (config, "Context");
+  modulemd_build_config_set_platform (config, "Platform");
+  modulemd_packager_v3_add_build_config (packager, config);
+  profile = modulemd_profile_new ("Profile");
+  g_assert_nonnull (profile);
+  modulemd_profile_set_default (profile); /* This triggers the failure. */
+  modulemd_packager_v3_add_profile (packager, profile);
+
+  index = modulemd_packager_v3_convert_to_index (packager, &error);
+  g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_MISSING_REQUIRED);
+  g_assert_null (index);
 }
 
 
@@ -676,8 +752,17 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/packager/index/read",
                    packager_test_read_to_index);
 
-  g_test_add_func ("/modulemd/v2/packager/to_index",
-                   packager_test_convert_to_index);
+  g_test_add_func (
+    "/modulemd/v2/packager/to_index_with_name_stream_default_profile",
+    packager_test_convert_to_index_with_name_stream_default_profile);
+
+  g_test_add_func (
+    "/modulemd/v2/packager/to_index_without_name_with_default_profile",
+    packager_test_convert_to_index_without_name_with_default_profile);
+
+  g_test_add_func (
+    "/modulemd/v2/packager/to_index_without_stream_with_default_profile",
+    packager_test_convert_to_index_without_stream_with_default_profile);
 
   return g_test_run ();
 }

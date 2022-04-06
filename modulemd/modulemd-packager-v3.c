@@ -825,6 +825,28 @@ modulemd_packager_v3_to_defaults (ModulemdPackagerV3 *self,
       profile = MODULEMD_PROFILE (value);
       if (modulemd_profile_is_default (profile))
         {
+          if (!self->module_name)
+            {
+              g_set_error (
+                error,
+                MODULEMD_ERROR,
+                MMD_ERROR_MISSING_REQUIRED,
+                "A module name is required when generating "
+                "a modulemd-defaults document for a default profile %s",
+                modulemd_profile_get_name (profile));
+              return FALSE;
+            }
+          if (!self->stream_name)
+            {
+              g_set_error (
+                error,
+                MODULEMD_ERROR,
+                MMD_ERROR_MISSING_REQUIRED,
+                "A module stream is required when generating "
+                "a modulemd-defaults document for a default profile %s",
+                modulemd_profile_get_name (profile));
+              return FALSE;
+            }
           if (!defaults)
             {
               defaults = modulemd_defaults_v1_new (self->module_name);

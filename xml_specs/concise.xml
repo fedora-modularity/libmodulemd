@@ -1,0 +1,26 @@
+<index version="">
+    <module name="">
+        <stream name="" version="" arch="" summary="" description=""> <!-- The latest version.
+                                                    DNF ignores older. Can we move @arch up? -->
+            <contexts>
+                <context value="" static="">
+                    <dependency module="" stream=""/> <!-- only supported by modulemd-packager-v3 -->
+                </context>
+            </contexts>
+            <servicelevel name="" year="" month="" day=""/>
+            <license>
+                <module></module>
+                <content></content>
+            </license>
+            <references comunity="" documentation="" tracker=""/>
+            <profile name="" descripton="">
+                <package></package>
+            </profile>
+            <api></api>
+            <demodularized></demodularized>
+            <nevra name="" epoch="" version="" release="" arch="">
+                <checksum type="" value=""/>    <!-- Why does it exist at all? -->
+            </nevra>
+        </stream>
+    </module>
+</index>

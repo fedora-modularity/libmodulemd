@@ -1,0 +1,49 @@
+<index version=""> <!-- @version could be a namespace or a DTD ID, or completely left out -->
+    <module name="" stream="" version="" context="" static=""
+             arch="" summary="" description="">
+        <servicelevels>     <!-- Never seen in the wild. The data live in PDC.  -->
+            <servicelevel name="" eol=""/> <!-- @eol date could be structured -->
+        </servicelevels>
+        <license>
+            <module></module>
+            <content></content>
+        </license>
+        <!-- xmd section left out as a build-only thing -->
+        <dependencies-or>   <!-- This level not supported by modulemd-packager-v3
+                                 Never seen in the wild. -->
+            <!-- buildrequiers section left out as a build-only thing -->
+            <dependencies-and>
+                <dependency name="">
+                    <requires></requires> <!-- Only one for modulemd-packager-v3 -->
+                    <conflicts></conflicts> <!-- Not supported by modulemd-packager-v3 -->
+                </dependency>
+            </dependencies-and>
+            <dependencies-and>
+                <dependency name=""/> <!-- Not supported by modulemd-packager-v3 -->
+            </dependencies-and>
+        </dependencies-or>
+        <references comunity="" documentation="" tracker=""/>
+        <profiles>
+            <profile name="" descripton="">
+                <package></package>
+            </profile>
+        </profiles>
+        <api>
+            <package></package>
+        </api>
+        <!-- filter section left out as a build-only thing -->
+        <demodularized>
+            <package></package>
+        </demodularized>
+        <!-- buildopts section left out as a build-only thing -->
+        <!-- components section left out as a build-only thing -->
+        <artifacts>
+            <nevra name="" epoch="" version="" release="" arch="">
+                <checksum type="" value=""/>    <!-- moved from rpm-map section.
+                                                Why the checksum is a primary key there?
+                                                Why nevra string is repeated there?
+                                                Why does it exist at all? -->
+            </nevra>
+        </artifacts>
+    </module>
+</index>

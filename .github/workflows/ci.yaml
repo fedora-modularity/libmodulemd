@@ -419,10 +419,6 @@ jobs:
                  sudo
                  valgrind
 
-      - name: Install glib2-doc by a package name (glib2-devel erroneously provides glib2-doc)
-        run:
-            zypper install --no-confirm --no-recommends glib2-doc
-
       - name: Checkout code
         uses: actions/checkout@v2
 

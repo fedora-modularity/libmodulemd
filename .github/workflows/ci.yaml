@@ -257,6 +257,9 @@ jobs:
 
   archlinux:
     name: Arch Linux
+    # Disabled because glib2-2.70 built with capabilities breaks g_spawn_sync()
+    # used in modulemd_validator tests <https://bugs.archlinux.org/task/74037>.
+    if: false
     runs-on: ubuntu-latest
     continue-on-error: true
     container:
@@ -446,6 +449,10 @@ jobs:
 
   mandriva:
     name: OpenMandriva Cooker
+    # Disabled because of broken glib2 (gmodule-no-export-2.0.pc lists -pthread
+    # linker flag, but glibc does not package a standalone pthread library)
+    # <https://github.com/OpenMandrivaAssociation/distribution/issues/2698>.
+    if: false
     runs-on: ubuntu-latest
     continue-on-error: true
     container:

@@ -23,4 +23,17 @@
             </nevra>
         </stream>
     </module>
+
+    <default module="" modified=""> <!-- @modified could be renamed to version -->
+        <stream name="" default=""> <!-- @default="1" means settting a default,
+                            "0" unsetting, missing or empty no change -->
+            <profile></profile> <!-- With a value replaces, empty unsets,
+                                     missing no change.  -->
+        </stream>
+        <intent name="">    <!-- For a scope of the @name-d intent -->
+            <stream name="" default="">
+                <profile></profile>
+            </stream>
+        </intent>
+    </default>
 </index>

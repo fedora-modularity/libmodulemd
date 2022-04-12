@@ -46,4 +46,17 @@
             </nevra>
         </artifacts>
     </module>
+
+    <default module="" modified="" stream=""> <!-- version is common with /index. -->
+        <profiles stream="">
+            <profile></profile>
+        </profiles>
+        <intents>
+            <intent name="" stream="">
+                <profiles stream="">
+                    <profile></profile>
+                </profiles>
+            </intent>
+        </intents>
+    </default>
 </index>

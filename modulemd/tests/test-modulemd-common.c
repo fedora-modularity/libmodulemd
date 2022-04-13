@@ -559,6 +559,52 @@ test_packager_read_string (void)
 }
 
 
+/*
+ * Empty profiles are legal. Parser misinterpreted them as a list of one
+ * package with an empty package name.
+ */
+static void
+test_empty_profile (void)
+{
+  const gchar *yaml_string = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GObject) module = NULL;
+  ModulemdProfile *profile;
+  g_auto (GStrv) rpms = NULL;
+  GType otype = G_TYPE_INVALID;
+
+  /* A document with an empty rpms list. */
+  yaml_string =
+    "document: modulemd\n"
+    "version: 2\n"
+    "data:\n"
+    "  name: test\n"
+    "  stream: A\n"
+    "  summary: Test.\n"
+    "  description: >\n"
+    "    Test.\n"
+    "  license:\n"
+    "    module: [ MIT ]\n"
+    "  profiles:\n"
+    "    profileA:\n"
+    "      rpms:\n";
+
+  otype = modulemd_read_packager_string (yaml_string, &module, &error);
+  g_assert_no_error (error);
+  g_assert_true (otype == MODULEMD_TYPE_MODULE_STREAM_V2);
+  g_assert_nonnull (module);
+  g_assert_true (MODULEMD_IS_MODULE_STREAM_V2 (module));
+
+  profile = modulemd_module_stream_v2_get_profile (
+    MODULEMD_MODULE_STREAM_V2 (module), "profileA");
+  g_assert_nonnull (profile);
+
+  rpms = modulemd_profile_get_rpms_as_strv (profile);
+  g_assert_nonnull (rpms);
+  g_assert_cmpint (g_strv_length (rpms), ==, 0);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -578,6 +624,8 @@ main (int argc, char *argv[])
                    test_packager_read_file);
   g_test_add_func ("/modulemd/v2/common/packager/read_string",
                    test_packager_read_string);
+
+  g_test_add_func ("/modulemd/v2/common/empty_profile", test_empty_profile);
 
   return g_test_run ();
 }

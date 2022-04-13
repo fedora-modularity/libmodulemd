@@ -592,15 +592,32 @@ modulemd_yaml_parse_string_set (yaml_parser_t *parser, GError **error)
         case YAML_SCALAR_EVENT:
           g_debug ("Parsing scalar: %s",
                    (const gchar *)event.data.scalar.value);
-          g_hash_table_add (result,
-                            g_strdup ((const gchar *)event.data.scalar.value));
 
-          if (!in_list)
+          if (in_list)
             {
-              /* We got a scalar instead of a sequence. Treat it as a list with
-               * a single entry
-               */
-              done = TRUE;
+              g_hash_table_add (
+                result, g_strdup ((const gchar *)event.data.scalar.value));
+            }
+          else
+            {
+              /* We got a scalar instead of a sequence. */
+              if (event.data.scalar.value && event.data.scalar.value[0])
+                {
+                  /* Treat it as a list with a single entry
+                   * if it's nonempty. */
+                  g_hash_table_add (
+                    result, g_strdup ((const gchar *)event.data.scalar.value));
+                  done = TRUE;
+                }
+              else
+                {
+                  /* Otherwise, it's an empty value node ("foo:") or an empty
+                   * string value node ("foo:''"), both which libyaml reports
+                   * as an empty string. Then keep the result hash table empty
+                   * as it's more helpful than a list with an empty string
+                   * which would be nevertheless invalid. */
+                  done = TRUE;
+                }
             }
           break;
 

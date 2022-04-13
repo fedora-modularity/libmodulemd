@@ -16,7 +16,6 @@ from ..overrides import override
 
 import functools
 
-from six import text_type
 from gi.repository import GLib
 
 import datetime
@@ -93,9 +92,6 @@ class ModulemdUtil(object):
 
         if isinstance(obj, str):
             return ModulemdUtil.variant_str(obj)
-
-        elif isinstance(obj, text_type):
-            return ModulemdUtil.variant_str(obj.encode("utf-8"))
 
         elif isinstance(obj, bool):
             return ModulemdUtil.variant_bool(obj)

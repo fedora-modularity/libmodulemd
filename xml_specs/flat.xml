@@ -47,7 +47,7 @@
         </artifacts>
     </module>
 
-    <default module="" modified="" stream=""> <!-- version is common with /index. -->
+    <default modified="" module="" stream=""> <!-- version is common with /index. -->
         <profiles stream="">
             <profile></profile>
         </profiles>
@@ -59,4 +59,15 @@
             </intent>
         </intents>
     </default>
+
+    <obsolete modified="" module="" stream="" context="" reset="" eol="" message="">
+        <!-- version is common with /index -->
+        <replacement module="" stream=""/>
+    </obsolete>
+
+    <translation modified="" module="" stream=""> <!-- version is common with /index -->
+        <locale name="" summary="" description="">
+            <profile name="" description=""/>
+        </locale>
+    </translation>
 </index>

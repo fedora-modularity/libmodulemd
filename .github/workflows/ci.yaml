@@ -299,6 +299,9 @@ jobs:
         run: ninja -C ci_valgrind
 
       - name: Run valgrind tests
+        # Run profile scripts to set debuginfo environment variable,
+        # <https://bugs.archlinux.org/task/74755>
+        shell: bash --login -eo pipefail {0}
         run:
           meson test -C ci_valgrind --suite ci_valgrind --print-errorlogs -t 10
             --wrap=$GITHUB_WORKSPACE/contrib/valgrind/valgrind_wrapper.sh

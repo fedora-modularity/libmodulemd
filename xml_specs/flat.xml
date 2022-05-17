@@ -39,10 +39,8 @@
         <!-- components section left out as a build-only thing -->
         <artifacts>
             <nevra name="" epoch="" version="" release="" arch="">
-                <checksum type="" value=""/>    <!-- moved from rpm-map section.
-                                                Why the checksum is a primary key there?
-                                                Why nevra string is repeated there?
-                                                Why does it exist at all? -->
+                <checksum type="" value=""/>    <!-- Moved from rpm-map section.
+                                                Unused now. -->
             </nevra>
         </artifacts>
     </module>

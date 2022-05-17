@@ -27,7 +27,7 @@
                 <api></api>
                 <demodularized></demodularized>
                 <nevra name="" epoch="" version="" release="" arch="">
-                    <checksum type="" value=""/>    <!-- Why does it exist at all? -->
+                    <checksum type="" value=""/>    <!-- Unused now. -->
                 </nevra>
             </build>
         </stream>

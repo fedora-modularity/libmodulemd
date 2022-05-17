@@ -107,6 +107,7 @@ jobs:
       - name: Build the RPM repository
         working-directory: ${{github.workspace}}/rpmbuild/RPMS
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           packit --debug local-build ../..
           createrepo_c x86_64
 
@@ -227,6 +228,7 @@ jobs:
       - name: Build the RPM repository
         working-directory: ${{github.workspace}}/rpmbuild/RPMS
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           packit --debug local-build ../..
           createrepo_c x86_64
 

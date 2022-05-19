@@ -245,9 +245,9 @@
             </build>
         </stream>
     </module>
-	<default modified="202205040810" module="perl">
-		<intent> <!-- no @name means all variants -->
-			<stream name="5.26"> <!-- no @default means no default stream -->
+    <default modified="202205040810" module="perl">
+        <intent> <!-- no @name means all variants -->
+            <stream name="5.26"> <!-- no @default means no default stream -->
                 <profile>default</profile>
             </stream>
             <stream name="5.28">
@@ -262,8 +262,8 @@
             <stream name="5.34">
                 <profile>common</profile>
             </stream>
-		</intent>
-	</default>
+        </intent>
+    </default>
     <obsolete modified="2022-01-24T08:54Z" module="perl" stream="5.30" eol="2021-06-01T00:00Z" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no @reset means cumulatate -->
         <replacement module="perl" stream="5.32"/>
     </obsolete>

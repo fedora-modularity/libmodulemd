@@ -52,6 +52,7 @@
     <translation modified="" module="" stream=""> <!-- @modified could be renamed to version -->
         <locale name="" summary="" description="">
             <profile name="" description=""/>
+            <obsolete context="" message=""/>   <!-- @context is optional, unsupported in YAML -->
         </locale>
     </translation>
 </index>

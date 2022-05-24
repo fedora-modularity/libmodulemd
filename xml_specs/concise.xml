@@ -44,10 +44,12 @@
     </default>
 
     <obsolete modified="" module="" stream="" context="" reset="" eol="" message="">
+            <!-- @modified and @eol in seconds since the epoch
+                 @reset="1" for unset -->
          <replacement module="" stream=""/>
     </obsolete>
 
-    <translation modified="" module="" stream=""> <!-- version is common with /index -->
+    <translation modified="" module="" stream=""> <!-- @modified could be renamed to version -->
         <locale name="" summary="" description="">
             <profile name="" description=""/>
         </locale>

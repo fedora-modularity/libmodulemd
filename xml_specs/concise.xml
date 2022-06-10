@@ -30,29 +30,32 @@
                     <checksum type="" value=""/>    <!-- Unused now. -->
                 </nevra>
             </build>
+
+            <default-profile modified=""> <!-- @modified could be renamed to version -->
+                <intent name="">    <!-- Missing @name means intentless global default -->
+                    <profile></profile> <!-- With a value replaces, missing or empty unsets. -->
+                </intent>
+            </default-profile>
+
+            <obsolete modified="" context="" reset="" eol="" message="">
+                    <!-- @modified and @eol in seconds since the epoch
+                         @reset="1" for unset -->
+                 <replacement module="" stream=""/>
+            </obsolete>
+
+            <translation modified=""> <!-- @modified could be renamed to version -->
+                <locale name="" summary="" description="">
+                    <profile name="" description=""/>
+                    <obsolete context="" message=""/>   <!-- @context is optional, unsupported in YAML -->
+                </locale>
+            </translation>
         </stream>
+
+        <default-stream modified=""> <!-- @modified could be renamed to version -->
+            <intent name="" stream=""/> <!-- Missing @name means intentless global default -->
+                                        <!-- Existing @stream sets a default,
+                                             missing unsets. -->
+        </default-stream>
     </module>
 
-    <default modified="" module=""> <!-- @modified could be renamed to version -->
-        <intent name="">    <!-- Missing @name means intentless global default -->
-            <stream name="" default=""> <!-- @default="1" means settting a default,
-                                "0" unsetting, missing or empty no change -->
-                <profile></profile> <!-- With a value replaces, empty unsets,
-                                         missing no change.  -->
-            </stream>
-        </intent>
-    </default>
-
-    <obsolete modified="" module="" stream="" context="" reset="" eol="" message="">
-            <!-- @modified and @eol in seconds since the epoch
-                 @reset="1" for unset -->
-         <replacement module="" stream=""/>
-    </obsolete>
-
-    <translation modified="" module="" stream=""> <!-- @modified could be renamed to version -->
-        <locale name="" summary="" description="">
-            <profile name="" description=""/>
-            <obsolete context="" message=""/>   <!-- @context is optional, unsupported in YAML -->
-        </locale>
-    </translation>
 </index>

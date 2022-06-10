@@ -1,5 +1,41 @@
 <index version="1">
     <module name="perl">
+        <stream name="5.26">
+            <default-profile modified="202205040810">
+                <intent> <!-- no @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+        </stream>
+        <stream name="5.28">
+            <default-profile modified="202205040810">
+                <intent> <!-- no @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+        </stream>
+        <stream name="5.30">
+            <default-profile modified="202205040810">
+                <intent> <!-- no @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+            <obsolete modified="1643014440" eol="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no @reset means cumulatate -->
+                <replacement module="perl" stream="5.32"/>
+            </obsolete>
+            <translation modified="1640998860">
+                <locale name="cs_CZ">
+                    <obsolete message="Proud modulů perl:5.30 již není podporován. Prosím, přepněte na perl:5.32"/>
+                </locale>
+            </translation>
+        </stream>
+        <stream name="5.32">
+            <default-profile modified="202205040810">
+                <intent> <!-- no @name means all variants -->
+                    <profile>common</profile>
+                </intent>
+            </default-profile>
+        </stream>
         <stream name="5.34">
             <build version="3720220503131308" context="f37" static="1" arch="x86_64" summary="Practical Extraction and Report Language" description="Perl is a high-level programming language with roots in C, sed, awk and shell&#10;scripting. Perl is good at handling processes and files, and is especially good&#10;at handling text. Perl's hallmarks are practicality and efficiency. While it is&#10;used to do a lot of different things, Perl's most common applications are system&#10;administration utilities and web programming.&#10;">
                 <dependencies-or>
@@ -243,51 +279,36 @@
                 </nevra>
                 <!-- and other nevras would follow !-->
             </build>
+            <default-profile modified="202205040810">
+                <intent> <!-- no @name means all variants -->
+                    <profile>common</profile>
+                </intent>
+            </default-profile>
+            <translation modified="1640998860">
+                <locale name="cs_CZ" summary="Praktický jazyk pro výtahy a zprávy" description="Perl je vysokoúrovňový jazyk s kořeny v C a skriptovování v sedu,&#10;awku a shellu. Perl je dobrý ve zacházení s procesy a soubory&#10;a obzvláště dobrý ve zpracování textu. Perl vyniká&#10;v praktičnosti a účinnosti. Ačkoliv se používá ke mnoha účelům,&#10;nejčastější použití Perlu jsou nástroje pro správu systému a programování&#10;webu.">
+                    <profile name="common" description="Interepretr a všechny perlové moduly přibalené k upstreamovému Perlu."/>
+                    <profile name="minimal" description="Pouze interpretr jakožo samostaně spustitelný program."/>
+                </locale>
+            </translation>
+        </stream>
+        <default-stream modified="202205040810">
+            <intent stream="5.34"/> <!-- no @name means all variants -->
+        </default-stream>
+    </module>
+    <module name="perl-IO-Socket-SSL">
+        <stream name="2.068">
+            <obsolete modified="1646321280" eol="1654041600" message="Module stream perl-IO-Socket-SSL:2.068 is no longer supported. Please switch to perl-IO-Socket-SSL:2.074"> <!-- no @context means all contexts -->
+                <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+            </obsolete>
+            <obsolete modified="1646323140" context="7b91f26c" message="Module stream perl-IO-Socket-SSL:2.068 does not work with OpenSSL 3. Please switch to perl-IO-Socket-SSL:2.074."> <!-- no @eol means now -->
+                <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+            </obsolete>
+            <translation modified="1640998860">
+                <locale name="cs_CZ">
+                    <obsolete message="Proud modulů perl-IO-Socket-SSL:2.068 již není podporován. Prosím, přepněte na perl-IO-Socket-SSL:2.074"/>
+                    <obsolete context="7b91f26c" message="Proud modulů perl-IO-Socket-SSL:2.068 nefunguje s OpenSSL 3. Prosím, přepněte na perl-IO-Socket-SSL:2.074."/>
+                </locale>
+            </translation>
         </stream>
     </module>
-    <default modified="202205040810" module="perl">
-        <intent> <!-- no @name means all variants -->
-            <stream name="5.26"> <!-- no @default means no default stream -->
-                <profile>default</profile>
-            </stream>
-            <stream name="5.28">
-                <profile>default</profile>
-            </stream>
-            <stream name="5.30">
-                <profile>default</profile>
-            </stream>
-            <stream name="5.32">
-                <profile>common</profile>
-            </stream>
-            <stream name="5.34">
-                <profile>common</profile>
-            </stream>
-        </intent>
-    </default>
-    <obsolete modified="1643014440" module="perl" stream="5.30" eol="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no @reset means cumulatate -->
-        <replacement module="perl" stream="5.32"/>
-    </obsolete>
-    <obsolete modified="1646321280" module="perl-IO-Socket-SSL" stream="2.068" eol="1654041600" message="Module stream perl-IO-Socket-SSL:2.068 is no longer supported. Please switch to perl-IO-Socket-SSL:2.074"> <!-- no @context means all contexts -->
-        <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
-    </obsolete>
-    <obsolete modified="1646323140" module="perl-IO-Socket-SSL" stream="2.068" context="7b91f26c" message="Module stream perl-IO-Socket-SSL:2.068 does not work with OpenSSL 3. Please switch to perl-IO-Socket-SSL:2.074."> <!-- no @eol means now -->
-        <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
-    </obsolete>
-    <translation modified="1640998860" module="perl" stream="5.34">
-        <locale name="cs_CZ" summary="Praktický jazyk pro výtahy a zprávy" description="Perl je vysokoúrovňový jazyk s kořeny v C a skriptovování v sedu,&#10;awku a shellu. Perl je dobrý ve zacházení s procesy a soubory&#10;a obzvláště dobrý ve zpracování textu. Perl vyniká&#10;v praktičnosti a účinnosti. Ačkoliv se používá ke mnoha účelům,&#10;nejčastější použití Perlu jsou nástroje pro správu systému a programování&#10;webu.">
-            <profile name="common" description="Interepretr a všechny perlové moduly přibalené k upstreamovému Perlu."/>
-            <profile name="minimal" description="Pouze interpretr jakožo samostaně spustitelný program."/>
-        </locale>
-    </translation>
-    <translation modified="1640998860" module="perl" stream="5.30">
-        <locale name="cs_CZ">
-            <obsolete message="Proud modulů perl:5.30 již není podporován. Prosím, přepněte na perl:5.32"/>
-        </locale>
-    </translation>
-    <translation modified="1640998860" module="perl-IO-Socket-SSL" stream="2.068">
-        <locale name="cs_CZ">
-            <obsolete message="Proud modulů perl-IO-Socket-SSL:2.068 již není podporován. Prosím, přepněte na perl-IO-Socket-SSL:2.074"/>
-            <obsolete context="7b91f26c" message="Proud modulů perl-IO-Socket-SSL:2.068 nefunguje s OpenSSL 3. Prosím, přepněte na perl-IO-Socket-SSL:2.074."/>
-        </locale>
-    </translation>
 </index>

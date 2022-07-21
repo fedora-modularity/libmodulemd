@@ -1,4 +1,4 @@
-<index version="">
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="">
     <module name="">
         <stream name=""> <!-- DNF wants versions and contexts to differ in @summary etc. -->
             <build version="" context="" static="" arch="" summary="" description="">
@@ -33,20 +33,23 @@
 
             <default-profile modified=""> <!-- @modified could be renamed to version -->
                 <intent name="">    <!-- Missing @name means intentless global default -->
-                    <profile></profile> <!-- With a value replaces, missing or empty unsets. -->
+                    <profile></profile> <!-- With a value replaces, missing unsets. -->
                 </intent>
             </default-profile>
 
-            <obsolete modified="" context="" reset="" eol="" message="">
-                    <!-- @modified and @eol in seconds since the epoch
-                         @reset="1" for unset -->
-                 <replacement module="" stream=""/>
+            <obsolete modified="" context=""> <!-- @modified in seconds since the epoch. -->
+                <eol when="" message=""> <!-- Missing means unsetting. -->
+                        <!-- @when in seconds since the epoch, missing means now. -->
+                    <replacement module="" stream=""/>
+                </eol>
             </obsolete>
 
             <translation modified=""> <!-- @modified could be renamed to version -->
-                <locale name="" summary="" description="">
-                    <profile name="" description=""/>
-                    <obsolete context="" message=""/>   <!-- @context is optional, unsupported in YAML -->
+                <locale name="">
+                    <build summary="" description=""/>  <!-- missing @summary, @description unsets -->
+                    <profile name="" description=""/>   <!-- missing @description unsets -->
+                    <obsolete context="" message=""/>   <!-- @context is optional, missing @message
+                            unsets, unsupported in YAML. -->
                 </locale>
             </translation>
         </stream>

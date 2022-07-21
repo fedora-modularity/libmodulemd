@@ -1,0 +1,863 @@
+<schema 
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mi="http://fedoraproject.org/metadata/moduleindex"
+        targetNamespace="http://fedoraproject.org/metadata/moduleindex"
+        elementFormDefault="qualified">
+    <annotation>
+        <documentation xml:lang="en">
+            XML serialization for modular metadata
+            &lt;https://docs.fedoraproject.org/en-US/modularity/&gt; stored in
+            YUM repositories and interpreted by RPM package managers.
+        </documentation>
+    </annotation>
+
+    <simpleType name="identifier">
+        <annotation>
+            <documentation xml:lang="en">
+                A user-visible, non-empty string used as name for a module and
+                a stream.
+            </documentation>
+        </annotation>
+        <!-- FIXME: Maximal length, alphabet. -->
+        <restriction base="NMTOKEN"/>
+    </simpleType>
+
+    <simpleType name="license">
+        <annotation>
+            <documentation xml:lang="en">
+                A non-empty license expression conforming to
+                &lt;https://fedoraproject.org/wiki/Licensing&gt;.
+            </documentation>
+        </annotation>
+        <restriction base="normalizedString">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="packageName">
+        <annotation>
+            <documentation xml:lang="en">
+                An RPM package name. A non-empty string accepted by rpm tool
+                as a package name.
+            </documentation>
+        </annotation>
+        <!-- FIXME: Maximal length, alphabet. "+" is a legal character. -->
+        <restriction base="string">
+            <pattern value="\S{1,}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="rpmVersion">
+        <annotation>
+            <documentation xml:lang="en">
+                An RPM version string. A non-empty string accepted by rpm tool
+                as a package version or a package release.
+            </documentation>
+        </annotation>
+        <!-- FIXME: Maximal length, alphabet. -->
+        <restriction base="string">
+            <pattern value="[^-\s]{1,}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="rpmArch">
+        <annotation>
+            <documentation xml:lang="en">
+                An RPM architecture string. A non-empty string accepted by rpm tool
+                as an architecture.
+            </documentation>
+        </annotation>
+        <!-- FIXME: Maximal length, alphabet. -->
+        <restriction base="NMTOKEN"/>
+    </simpleType>
+
+    <simpleType name="hashAlgorithm">
+        <annotation>
+            <documentation xml:lang="en">
+                A name of a hash algorihm.
+            </documentation>
+        </annotation>
+        <restriction base="NMTOKEN">
+            <enumeration value="sha256"/>
+            <enumeration value="sha512"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="contextType">
+        <annotation>
+            <documentation xml:lang="en">
+                A context identifier of a module. A context distinguishes
+                flavours of stream. The flavours usually differ by module
+                dependencies. It can be used for building the same piece of
+                software against different versions of a library or a
+                programming language. Or simply for different releases of a
+                distribution.
+            </documentation>
+        </annotation>
+        <restriction base="NMTOKEN">
+            <maxLength value="13"/>
+            <pattern value="[a-zA-Z0-9_]{1,13}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="timestamp">
+        <annotation>
+            <documentation xml:lang="en">
+                A timestamp expressed as a number of seconds since the
+                beginning of Unix epoch.
+            </documentation>
+        </annotation>
+        <restriction base="unsignedLong"/>
+    </simpleType>
+
+    <simpleType name="intentName">
+        <annotation>
+            <documentation xml:lang="en">
+                An identifier of an intent.
+            </documentation>
+        </annotation>
+        <!-- TODO: Should this be a NMTOKEN? -->
+        <restriction base="string">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="multiLine">
+        <annotation>
+            <documentation xml:lang="en">
+                A nonempty, possibly long, multi-line text. End of lines are
+                encoded as line-feeds (U+000A).
+            </documentation>
+        </annotation>
+        <!-- FIXME: Really enforce nonemptyness? -->
+        <restriction base="string">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="dependencyType">
+        <annotation>
+            <documentation xml:lang="en">
+                A dependency on another module.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="requires" type="mi:identifier" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A stream of the module which also must be enabled by
+                        the package manager. If this element exists multiple
+                        times, any of these streams satisfy. It this element
+                        does not exist, any stream satisify.
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="conflicts" type="mi:identifier" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A stream of the module which must not be enabled by
+                        the package manager. If this element exists multiple
+                        times, none of these streams must be enabled. It this
+                        element does not exist, no stream of the module must
+                        be enabled.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+        <attribute name="name" type="mi:identifier" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A name of the module this build depends on.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="dependencies-andType">
+        <annotation>
+            <documentation xml:lang="en">
+                A module build must satisfy all dependencies listed here.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="dependency" type="mi:dependencyType" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="dependencies-orType">
+        <annotation>
+            <documentation xml:lang="en">
+                A module build must satisfy at least one dependencies-and set
+                of dependencies.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="dependencies-and" type="mi:dependencies-andType" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="servicelevelType">
+        <annotation>
+            <documentation xml:lang="en">
+                When (date) this particular support level ends for for this stream.
+            </documentation>
+        </annotation>
+        <!-- TODO: Indeed the same type as module identifier? I think underscores are allowed here. -->
+        <attribute name="name" type="mi:identifier" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier for this service level.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="year" type="integer" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    Year of the date. This must form a valid date.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="month" type="positiveInteger" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    Month of the date. This must form a valid date.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="day" type="positiveInteger" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    Month of the date. This must form a valid date.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="licenseType">
+        <annotation>
+            <documentation xml:lang="en">
+                Licenses pertaining this stream.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="module" type="mi:license" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A license of the modular metadata. Multiple elements
+                        imply a logical AND.
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="content" type="mi:license" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A license of the RPM packages. Multiple elements
+                        imply a logical AND.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="referencesType">
+        <annotation>
+            <documentation xml:lang="en">
+                Links to (usually upstream) places pertaining the packaged software.
+            </documentation>
+        </annotation>
+        <attribute name="comunity" type="anyURI">
+            <annotation>
+                <documentation xml:lang="en">A home page.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="documentation" type="anyURI">
+            <annotation>
+                <documentation xml:lang="en">A documentation.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="tracker" type="anyURI">
+            <annotation>
+                <documentation xml:lang="en">A feature and bug tracking system.</documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="profileType">
+        <annotation>
+            <documentation xml:lang="en">
+                A profile of the stream is a group of packages which can be
+                installed by passing the profile name to a package manager.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="package" type="mi:packageName" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <!-- TODO: Uniqueness. -->
+        <attribute name="name" type="mi:identifier" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier of the profile. It must be unique in the stream.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO: One-line, or multi-line? -->
+        <attribute name="description" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    An explanation of the profile.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="checksumType">
+        <annotation>
+            <documentation xml:lang="en">
+                A digest of a content of a RPM package file.
+            </documentation>
+        </annotation>
+        <attribute name="type" type="mi:hashAlgorithm" use="required"/>
+        <!-- TODO: pair a value length to a type -->
+        <attribute name="value" type="hexBinary" use="required"/>
+    </complexType>
+
+    <complexType name="nevraType">
+        <annotation>
+            <documentation xml:lang="en">
+                An RPM package which belongs to this stream.
+            </documentation>
+        </annotation>
+        <sequence>
+            <!-- TODO: Uniqueness -->
+            <element name="checksum" type="mi:checksumType" minOccurs="0">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A digest of a content of the RPM package file. There
+                        can be multiple elements for different checksum types.
+                        But there must be at most one for each type.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+        <attribute name="name" type="mi:packageName" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A name of the RPM package.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="epoch" type="unsignedInt" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An epoch number of the RPM package. If the
+                    package seems having no epoch, it's implicit 0.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="version" type="mi:rpmVersion" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A version of the RPM package.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="release" type="mi:rpmVersion" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A release of the RPM package.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="arch" type="mi:rpmArch" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An architecture of the RPM package. Source packages
+                    have a distinct value.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="buildType">
+        <annotation>
+            <documentation xml:lang="en">
+                A set of RPM packages which were built together as a
+                functional unit and metadata about them.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="dependencies-or" type="mi:dependencies-orType" minOccurs="0"/>
+            <element name="servicelevel" type="mi:servicelevelType" minOccurs="0"/>
+            <element name="license" type="mi:licenseType"/>
+            <element name="references" type="mi:referencesType" minOccurs="0"/>
+            <element name="profile" type="mi:profileType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="api" type="mi:packageName" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A binary package name which is intended for a use and
+                        its interface (name, file names, API, etc.) is
+                        guaranteed to remain stable and compatible for the
+                        whole life of this stream.
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="demodularized" type="mi:packageName" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A binary package name which used to be part of this
+                        stream (in the older versions) but not anymore and
+                        a package manager should stop hiding the same named
+                        nonmodular packages. That is make the same-name
+                        nonmodular packages available again.
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="nevra" type="mi:nevraType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="version" type="unsignedLong" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A version of a build of stream. A package manager uses a
+                    build with the highest version in a particular context and
+                    architecture with satisfied dependencies to obtain
+                    user-visible data, like a stream description or profiles.
+                    The only exception are RPM packages (nevra elements) which
+                    are gathered over all versions of the given stream,
+                    context, and architecture.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="context" type="mi:contextType" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A context of a build of a a stream. A context distinguishes
+                    flavours of stream. The flavours usually differ by modular
+                    dependencies. It can be used for building the same piece of
+                    software against different versions of a library or a
+                    programming language. Or simply for different releases of a
+                    distribution.
+                    If "static" attribute is true, the context value identifies
+                    an upgrade path (sorted by a version) which a package
+                    manager follows to upgrade from one module build to
+                    another.
+                    If "static" attribute is false, the upgrade path is build
+                    from module builds whose dependencies are the same.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO: Set a default value -->
+        <attribute name="static" type="boolean" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    If this attribute is true, the context value identifies
+                    an upgrade path (sorted by a version) which a package
+                    manager follows to upgrade from one module build to
+                    another.
+                    If this attribute is false, the upgrade path is build
+                    from module builds whose dependencies are the same
+                    regardless of the context.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="arch" type="mi:rpmArch" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An architecture of the module build.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="summary" type="normalizedString" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A short, one-line, description of the stream.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="description" type="mi:multiLine" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A long, multi-line description of the stream.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="profileIntentType">
+        <annotation>
+            <documentation xml:lang="en">
+                A set of default profiles for this particular intent.
+                When merging default-profiles, the latest tree replaces all
+                previous definitions atomically.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="profile" type="mi:identifier" minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation xml:lang="en">
+                        Each occurrence sets this profile as a default one.
+                        Multiple occurrences creates a list of default profiles.
+                        No occurrence empties the list of the default profiles.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+        <!-- TODO uniqueness -->
+        <attribute name="name" type="mi:intentName">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier of the intent. A missing attribute means a
+                    global default applying to all intents.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="default-profileType">
+        <annotation>
+            <documentation xml:lang="en">
+                Specify a list of profiles to be installed by a package
+                manager when a stream is requested to be installed without
+                specifying a particular profile. The default profiles can
+                differ by a variant of a distribution, called intent here.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="intent" type="mi:profileIntentType" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="modified" type="mi:timestamp" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    When merging default-profiles from multiple indices, all
+                    default-profiles apply cumulatively in the ascending order
+                    of this attribute.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="replacementType">
+        <annotation>
+            <documentation xml:lang="en">
+                A module stream identification.
+            </documentation>
+        </annotation>
+        <attribute name="module" type="mi:identifier"/>
+        <attribute name="stream" type="mi:identifier"/>
+    </complexType>
+
+    <complexType name="eolType">
+        <annotation>
+            <documentation xml:lang="en">
+                And end of life of a stream.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="replacement" type="mi:replacementType" minOccurs="0">
+                <annotation>
+                    <documentation xml:lang="en">
+                        If this element exists, it defines a new stream which
+                        replaces the obsoleted one. A package manager should
+                        offer a user to upgrade to that new stream.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+        <!-- FIXME: Inclusive or exclusive, i.e. obsolete since, or obsolete after? The later is akin to X509 certificates. -->
+        <attribute name="when" type="mi:timestamp">
+            <annotation>
+                <documentation xml:lang="en">
+                    If the attribute exists, time when the stream/context is
+                    not supported any longer and a package manager should warn
+                    a user about it.
+                    If the attribute doesn't exist, it means the obsolete
+                    takes effect right now.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO: Realy multiline? -->
+        <attribute name="message" type="mi:multiLine" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A user visible explanation to the user. It can carry a
+                    reason or instructions for the upgrade.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="obsoleteType">
+        <annotation>
+            <documentation xml:lang="en">
+                Define an end of life of a stream or an end of life of a
+                specific context of the stream. It optionally can point to a
+                replacement.
+            </documentation>
+        </annotation>
+        <sequence>
+            <!-- FIXME: Resetting a context after nonspecific obsolete: Should it punch a hole? Or should it void only previous specific definition? The latter is simpler. -->
+            <element name="eol" type="mi:eolType" minOccurs="0">
+                <annotation>
+                    <documentation xml:lang="en">
+                        If this element exists, it defines an end of life of the
+                        (context of the) stream. Otherwise, all the previous
+                        obsoletes (of the context) are canceled. I.e.:
+                        If this is a context-nonspecific reset, it only cancels
+                        nonspecific obsoletes.
+                        If this is a context-specific reset, it only cancels
+                        specific obsoletes.
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+        <attribute name="modified" type="mi:timestamp" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    When merging context-nonspecific obsoletes from multiple
+                    indices, the latest obsolete definition according to this
+                    attribute redefines older definitions. When merging
+                    context-specific obsoletes, the same rule applies to
+                    obsoletes of that context.
+                    Having a context-specific obsolete not older than a
+                    nonspecific one retains the nonspecific one and in
+                    addition overrides the specified context. Contrary, having
+                    a context-nonspecific obsolete newer makes the previous
+                    specific obsolete void.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="context" type="mi:contextType">
+            <annotation>
+                <documentation xml:lang="en">
+                    If this attribute exists, the obsolete pertains only
+                    module builds of that context. Otherwise, it pertains all
+                    contexts of this stream.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="buildTranslation">
+        <annotation>
+            <documentation xml:lang="en">
+                A translatation of a module stream.
+            </documentation>
+        </annotation>
+        <attribute name="summary" type="normalizedString">
+            <annotation>
+                <documentation xml:lang="en">
+                    A translation for a /index/module/stream/build/@summary.
+                    If missing, unsets.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="description" type="mi:multiLine">
+            <annotation>
+                <documentation xml:lang="en">
+                    A translation for a /index/module/stream/build/@description.
+                    If missing, unsets.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="profileTranslation">
+        <annotation>
+            <documentation xml:lang="en">
+                A translation of a profile description.
+            </documentation>
+        </annotation>
+        <!-- TODO: Uniqueness. -->
+        <attribute name="name" type="mi:identifier" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier of the profile. It must be unique in the stream.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO: One-line, or multi-line? -->
+        <attribute name="description" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    A translation for /index/module/stream/build/profile/@description.
+                    If missing, unsets.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="obsoleteTranslation">
+        <annotation>
+            <documentation xml:lang="en">
+                A translation of an obsolete message.
+            </documentation>
+        </annotation>
+        <attribute name="context" type="mi:contextType">
+            <annotation>
+                <documentation xml:lang="en">
+                    If this attribute exists, this translation pertains
+                    obsoletes of only that context. Otherwise, it pertains
+                    obsoletes nonspecific to a context.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO: Realy multiline? -->
+        <attribute name="message" type="mi:multiLine">
+            <annotation>
+                <documentation xml:lang="en">
+                    A translation for /index/module/stream/obsolete/@message.
+                    If missing, unsets.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="localeType">
+        <annotation>
+            <documentation xml:lang="en">
+                The translatated strings into a particular language.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="build" type="mi:buildTranslation" minOccurs="0"/>
+            <element name="profile" type="mi:profileTranslation" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="name" type="NMTOKEN" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    A locale identifier according to RFC 1766. I.e. a 2-letter
+                    language code, optionally followed by a hyphen and a
+                    2-letter country code. E.g. "en" or "en-US".
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="translationType">
+        <annotation>
+            <documentation xml:lang="en">
+                Translated user-visible messages and descriptions pertaining a
+                stream.
+            </documentation>
+        </annotation>
+        <sequence>
+            <!-- TODO: Uniqueness -->
+            <element name="locale" type="mi:localeType" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="modified" type="mi:timestamp" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    When merging translations from multiple indices,
+                    translations accumulate and newer, according to this
+                    attribute, translated builds, profiles, and obsoletes replace
+                    older ones, independently.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="streamType">
+        <annotation>
+            <documentation xml:lang="en">
+                A stream is a version, a release, a variant of a software. It
+                is identified by an in-module unique, short, identifier-like
+                name. A module-stream pair is globally unique. Streams of a single
+                module are mutually exclusive for an installation.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="default-profile" type="mi:default-profileType" minOccurs="0"/>
+            <element name="obsolete" type="mi:obsoleteType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="translation" type="mi:translationType" minOccurs="0"/>
+        </sequence>
+        <!-- TODO: uniqueness -->
+        <attribute name="name" type="mi:identifier" use="required"/>
+    </complexType>
+
+    <complexType name="streamIntentType">
+        <annotation>
+            <documentation xml:lang="en">
+                A default stream for this particular intent.
+                When merging default-streams, the latest tree replaces all
+                previous definitions atomically.
+            </documentation>
+        </annotation>
+        <!-- TODO uniqueness -->
+        <attribute name="name" type="mi:intentName">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier of the intent. A missing attribute means a
+                    global default applying to all intents.
+                </documentation>
+            </annotation>
+        </attribute>
+        <!-- TODO uniqueness -->
+        <attribute name="stream" type="mi:identifier">
+            <annotation>
+                <documentation xml:lang="en">
+                    An identifier of the default stream. A missing attribute
+                    means unsetting the, possibly previously defined, default
+                    stream.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="default-streamType">
+        <annotation>
+            <documentation xml:lang="en">
+                A stream of the module a package manager prefers when a user
+                request to install a module without specifying a particular
+                stream. The default stream can vary according to a variant of
+                a distribution the user has installed. The variant is called
+                an intent here.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="intent" type="mi:streamIntentType" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="modified" type="mi:timestamp" use="required">
+            <annotation>
+                <documentation xml:lang="en">
+                    When merging default-streams from multiple indices, all
+                    default-streams apply cumulatively in the ascending order
+                    of this attribute.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="moduleType">
+        <annotation>
+            <documentation xml:lang="en">
+                A module is a collection of RPM packages constituting a particular
+                software. It is identified by a unique, short, identifier-like
+                name.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="stream" type="mi:streamType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="default-stream" type="mi:default-streamType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <!-- TODO: uniqueness -->
+        <attribute name="name" type="mi:identifier" use="required"/>
+    </complexType>
+
+    <element name="index">
+        <annotation>
+            <documentation xml:lang="en">
+                A root element for all modular metadata.
+            </documentation>
+        </annotation>
+
+        <complexType>
+            <sequence>
+                <element name="module" type="mi:moduleType" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <!-- TODO: Use namespace as a minimal-required and @version as compatible revision. -->
+            <attribute name="version" type="nonNegativeInteger" use="required" fixed="1"/>
+        </complexType>
+    </element>
+
+</schema>

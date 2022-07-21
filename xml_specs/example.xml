@@ -1,4 +1,4 @@
-<index version="1">
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
     <module name="perl">
         <stream name="5.26">
             <default-profile modified="202205040810">
@@ -20,8 +20,10 @@
                     <profile>default</profile>
                 </intent>
             </default-profile>
-            <obsolete modified="1643014440" eol="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no @reset means cumulatate -->
-                <replacement module="perl" stream="5.32"/>
+            <obsolete modified="1643014440">
+                <eol when="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no eol would remove the obsolete -->
+                    <replacement module="perl" stream="5.32"/>
+                </eol>
             </obsolete>
             <translation modified="1640998860">
                 <locale name="cs_CZ">
@@ -285,7 +287,8 @@
                 </intent>
             </default-profile>
             <translation modified="1640998860">
-                <locale name="cs_CZ" summary="Praktický jazyk pro výtahy a zprávy" description="Perl je vysokoúrovňový jazyk s kořeny v C a skriptovování v sedu,&#10;awku a shellu. Perl je dobrý ve zacházení s procesy a soubory&#10;a obzvláště dobrý ve zpracování textu. Perl vyniká&#10;v praktičnosti a účinnosti. Ačkoliv se používá ke mnoha účelům,&#10;nejčastější použití Perlu jsou nástroje pro správu systému a programování&#10;webu.">
+                <locale name="cs_CZ">
+                    <build summary="Praktický jazyk pro výtahy a zprávy" description="Perl je vysokoúrovňový jazyk s kořeny v C a skriptovování v sedu,&#10;awku a shellu. Perl je dobrý ve zacházení s procesy a soubory&#10;a obzvláště dobrý ve zpracování textu. Perl vyniká&#10;v praktičnosti a účinnosti. Ačkoliv se používá ke mnoha účelům,&#10;nejčastější použití Perlu jsou nástroje pro správu systému a programování&#10;webu."/>
                     <profile name="common" description="Interepretr a všechny perlové moduly přibalené k upstreamovému Perlu."/>
                     <profile name="minimal" description="Pouze interpretr jakožo samostaně spustitelný program."/>
                 </locale>
@@ -297,11 +300,15 @@
     </module>
     <module name="perl-IO-Socket-SSL">
         <stream name="2.068">
-            <obsolete modified="1646321280" eol="1654041600" message="Module stream perl-IO-Socket-SSL:2.068 is no longer supported. Please switch to perl-IO-Socket-SSL:2.074"> <!-- no @context means all contexts -->
-                <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+            <obsolete modified="1646321280">
+                <eol when="1654041600" message="Module stream perl-IO-Socket-SSL:2.068 is no longer supported. Please switch to perl-IO-Socket-SSL:2.074"> <!-- no @context means all contexts -->
+                    <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+                </eol>
             </obsolete>
-            <obsolete modified="1646323140" context="7b91f26c" message="Module stream perl-IO-Socket-SSL:2.068 does not work with OpenSSL 3. Please switch to perl-IO-Socket-SSL:2.074."> <!-- no @eol means now -->
-                <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+            <obsolete modified="1646323140" context="7b91f26c">
+                <eol message="Module stream perl-IO-Socket-SSL:2.068 does not work with OpenSSL 3. Please switch to perl-IO-Socket-SSL:2.074."> <!-- no @when means now -->
+                    <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+                </eol>
             </obsolete>
             <translation modified="1640998860">
                 <locale name="cs_CZ">

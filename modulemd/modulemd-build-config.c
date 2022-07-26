@@ -474,9 +474,13 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
   EMIT_KEY_VALUE_IF_SET (emitter, error, "platform", self->platform);
 
   if (self->stream)
-  {
-    EMIT_KEY_VALUE_FULL (emitter, error, "stream", self->stream, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
-  }
+    {
+      EMIT_KEY_VALUE_FULL (emitter,
+                           error,
+                           "stream",
+                           self->stream,
+                           YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+    }
 
   if (!modulemd_build_config_emit_deptable (
         self->buildrequires, "buildrequires", emitter, error))

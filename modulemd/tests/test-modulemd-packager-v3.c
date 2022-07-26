@@ -520,8 +520,7 @@ packager_test_convert_to_index_with_name_stream_default_profile (void)
   g_assert_no_error (error);
   g_assert_nonnull (expected_str);
 
-  g_debug ("YAML dump of the expected string:\n%s",
-           expected_str);
+  g_debug ("YAML dump of the expected string:\n%s", expected_str);
 
   g_assert_cmpstr (expected_str, ==, yaml_str);
 

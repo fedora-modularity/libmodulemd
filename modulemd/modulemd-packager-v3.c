@@ -955,7 +955,8 @@ copy_packager_v3_buildconfig_to_stream_v2 (ModulemdModuleStreamV2 *stream_v2,
   stream_override = modulemd_build_config_get_stream (bc);
   if (stream_override)
     {
-      modulemd_module_stream_set_stream_name (MODULEMD_MODULE_STREAM (stream_v2), stream_override);
+      modulemd_module_stream_set_stream_name (
+        MODULEMD_MODULE_STREAM (stream_v2), stream_override);
     }
 
   modulemd_module_stream_v2_set_buildopts (

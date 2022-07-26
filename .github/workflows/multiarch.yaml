@@ -15,11 +15,13 @@ jobs:
             distro: fedora_latest
           - arch: s390x
             distro: fedora_latest
+          - arch: aarch64
+            distro: fedora_latest
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: uraimo/run-on-arch-action@v2.0.7
+      - uses: uraimo/run-on-arch-action@v2
         name: Perform upstream tests
 
         with:

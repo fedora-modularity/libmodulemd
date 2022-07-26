@@ -26,6 +26,7 @@ struct _ModulemdBuildConfig
 
   gchar *context;
   gchar *platform;
+  gchar *stream;
   GHashTable *requires; /* hashtable<string, string> */
   GHashTable *buildrequires; /* hashtable<string, string> */
   ModulemdBuildopts *buildopts;
@@ -46,6 +47,7 @@ modulemd_build_config_finalize (GObject *object)
 
   g_clear_pointer (&self->context, g_free);
   g_clear_pointer (&self->platform, g_free);
+  g_clear_pointer (&self->stream, g_free);
   g_clear_pointer (&self->requires, g_hash_table_unref);
   g_clear_pointer (&self->buildrequires, g_hash_table_unref);
   g_clear_object (&self->buildopts);
@@ -116,6 +118,30 @@ modulemd_build_config_get_platform (ModulemdBuildConfig *self)
   g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self), NULL);
 
   return self->platform;
+}
+
+
+void
+modulemd_build_config_set_stream (ModulemdBuildConfig *self,
+                                  const gchar *stream)
+{
+  g_return_if_fail (MODULEMD_IS_BUILD_CONFIG (self));
+
+  g_clear_pointer (&self->stream, g_free);
+
+  if (stream)
+    {
+      self->stream = g_strdup (stream);
+    }
+}
+
+
+const gchar *
+modulemd_build_config_get_stream (ModulemdBuildConfig *self)
+{
+  g_return_val_if_fail (MODULEMD_IS_BUILD_CONFIG (self), NULL);
+
+  return self->stream;
 }
 
 
@@ -340,6 +366,10 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
             MMD_SET_PARSED_YAML_STRING (
               parser, error, modulemd_build_config_set_platform, buildconfig);
 
+          else if (g_str_equal (event.data.scalar.value, "stream"))
+            MMD_SET_PARSED_YAML_STRING (
+              parser, error, modulemd_build_config_set_stream, buildconfig);
+
           else if (g_str_equal ((const gchar *)event.data.scalar.value,
                                 "buildrequires"))
             {
@@ -442,6 +472,11 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "context", self->context);
   EMIT_KEY_VALUE_IF_SET (emitter, error, "platform", self->platform);
+
+  if (self->stream)
+  {
+    EMIT_KEY_VALUE_FULL (emitter, error, "stream", self->stream, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+  }
 
   if (!modulemd_build_config_emit_deptable (
         self->buildrequires, "buildrequires", emitter, error))
@@ -658,6 +693,9 @@ modulemd_build_config_copy (ModulemdBuildConfig *self)
   modulemd_build_config_set_platform (
     copy, modulemd_build_config_get_platform (self));
 
+  modulemd_build_config_set_stream (copy,
+                                    modulemd_build_config_get_stream (self));
+
   if (self->requires)
     {
       modulemd_build_config_replace_runtime_deps (copy, self->requires);
@@ -758,6 +796,12 @@ modulemd_build_config_compare (ModulemdBuildConfig *self_1,
     }
 
   cmp = g_strcmp0 (self_1->platform, self_2->platform);
+  if (cmp != 0)
+    {
+      return cmp;
+    }
+
+  cmp = g_strcmp0 (self_1->stream, self_2->stream);
   if (cmp != 0)
     {
       return cmp;

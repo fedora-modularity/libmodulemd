@@ -11,7 +11,7 @@ document: modulemd
 version: 2
 data:
   name: foo
-  stream: "latest"
+  stream: "older"
   summary: An example module
   description: >-
     A module for the demonstration of the metadata format. Also, the obligatory lorem

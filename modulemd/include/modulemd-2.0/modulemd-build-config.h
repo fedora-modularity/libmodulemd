@@ -111,6 +111,35 @@ modulemd_build_config_get_platform (ModulemdBuildConfig *self);
 
 
 /**
+ * modulemd_build_config_set_stream:
+ * @self: This #ModulemdBuildConfig object.
+ * @stream: A stream name to use as an override for this configuration.
+ *
+ * Set the stream name override for this build configuration.
+ *
+ * Since: 2.15
+ */
+void
+modulemd_build_config_set_stream (ModulemdBuildConfig *self,
+                                  const gchar *stream);
+
+
+/**
+ * modulemd_build_config_get_stream:
+ * @self: This #ModulemdBuildConfig object.
+ *
+ * Get the stream override for this build configuration.
+ *
+ * Returns: (transfer none): The string representing the overridden stream
+ * name.
+ *
+ * Since name: 2.15
+ */
+const gchar *
+modulemd_build_config_get_stream (ModulemdBuildConfig *self);
+
+
+/**
  * modulemd_build_config_add_runtime_requirement:
  * @self: (in): This #ModulemdBuildConfig object.
  * @module_name: (in): The name of the module to depend on.

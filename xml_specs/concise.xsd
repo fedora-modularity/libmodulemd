@@ -38,12 +38,11 @@
         <annotation>
             <documentation xml:lang="en">
                 An RPM package name. A non-empty string accepted by rpm tool
-                as a package name.
+                as a package name. A value with ".." substring is forbiden.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length, alphabet. "+" is a legal character. -->
         <restriction base="string">
-            <pattern value="\S{1,}"/>
+            <pattern value="[a-zA-Z0-9_%][a-zA-Z0-9._+%{}-]*"/>
         </restriction>
     </simpleType>
 
@@ -51,12 +50,12 @@
         <annotation>
             <documentation xml:lang="en">
                 An RPM version string. A non-empty string accepted by rpm tool
-                as a package version or a package release.
+                as a package version or a package release. A value with ".."
+                substring is forbiden.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length, alphabet. -->
         <restriction base="string">
-            <pattern value="[^-\s]{1,}"/>
+            <pattern value="[a-zA-Z0-9._+%{}~^]{1,}"/>
         </restriction>
     </simpleType>
 

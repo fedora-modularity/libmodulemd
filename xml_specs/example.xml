@@ -27,7 +27,7 @@
             </obsolete>
             <translation modified="1640998860">
                 <locale name="cs_CZ">
-                    <obsolete message="Proud modulů perl:5.30 již není podporován. Prosím, přepněte na perl:5.32"/>
+                    <obsolete context="" message="Proud modulů perl:5.30 již není podporován. Prosím, přepněte na perl:5.32"/>
                 </locale>
             </translation>
         </stream>
@@ -312,7 +312,7 @@
             </obsolete>
             <translation modified="1640998860">
                 <locale name="cs_CZ">
-                    <obsolete message="Proud modulů perl-IO-Socket-SSL:2.068 již není podporován. Prosím, přepněte na perl-IO-Socket-SSL:2.074"/>
+                    <obsolete context="" message="Proud modulů perl-IO-Socket-SSL:2.068 již není podporován. Prosím, přepněte na perl-IO-Socket-SSL:2.074"/>
                     <obsolete context="7b91f26c" message="Proud modulů perl-IO-Socket-SSL:2.068 nefunguje s OpenSSL 3. Prosím, přepněte na perl-IO-Socket-SSL:2.074."/>
                 </locale>
             </translation>

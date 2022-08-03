@@ -82,6 +82,25 @@
         </restriction>
     </simpleType>
 
+    <simpleType name="contextOrEmptyType">
+        <annotation>
+            <documentation xml:lang="en">
+                A context identifier of a module. A context distinguishes
+                flavours of stream. The flavours usually differ by module
+                dependencies. It can be used for building the same piece of
+                software against different versions of a library or a
+                programming language. Or simply for different releases of a
+                distribution.
+                An empty value means no context, not specific to a context.
+            </documentation>
+        </annotation>
+        <restriction base="string">
+            <minLength value="0"/>
+            <maxLength value="13"/>
+            <pattern value="[a-zA-Z0-9_]*"/>
+        </restriction>
+    </simpleType>
+
     <simpleType name="contextType">
         <annotation>
             <documentation xml:lang="en">
@@ -93,9 +112,8 @@
                 distribution.
             </documentation>
         </annotation>
-        <restriction base="NMTOKEN">
-            <maxLength value="13"/>
-            <pattern value="[a-zA-Z0-9_]{1,13}"/>
+        <restriction base="mi:contextOrEmptyType">
+            <minLength value="1"/>
         </restriction>
     </simpleType>
 
@@ -674,7 +692,6 @@
                 A translation of a profile description.
             </documentation>
         </annotation>
-        <!-- TODO: Uniqueness. -->
         <attribute name="name" type="mi:identifier" use="required">
             <annotation>
                 <documentation xml:lang="en">
@@ -699,10 +716,10 @@
                 A translation of an obsolete message.
             </documentation>
         </annotation>
-        <attribute name="context" type="mi:contextType">
+        <attribute name="context" type="mi:contextOrEmptyType" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    If this attribute exists, this translation pertains
+                    If this attribute is nonempty, this translation pertains
                     obsoletes of only that context. Otherwise, it pertains
                     obsoletes nonspecific to a context.
                 </documentation>
@@ -725,11 +742,13 @@
                 The translatated strings into a particular language.
             </documentation>
         </annotation>
+        <!-- TODO: Empty sequence? -->
         <sequence>
             <element name="build" type="mi:buildTranslation" minOccurs="0"/>
             <element name="profile" type="mi:profileTranslation" minOccurs="0" maxOccurs="unbounded"/>
             <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
+        <!-- TODO: Formalize content. -->
         <attribute name="name" type="NMTOKEN" use="required">
             <annotation>
                 <documentation xml:lang="en">
@@ -749,8 +768,16 @@
             </documentation>
         </annotation>
         <sequence>
-            <!-- TODO: Uniqueness -->
-            <element name="locale" type="mi:localeType" maxOccurs="unbounded"/>
+            <element name="locale" type="mi:localeType" maxOccurs="unbounded">
+                <unique name="localeProfile">
+                    <selector xpath="mi:profile"/>
+                    <field xpath="@name"/>
+                </unique>
+                <unique name="localeObsolete">
+                    <selector xpath="mi:obsolete"/>
+                    <field xpath="@context"/>
+                </unique>
+            </element>
         </sequence>
         <attribute name="modified" type="mi:timestamp" use="required">
             <annotation>
@@ -787,7 +814,12 @@
                 </unique>
             </element>
             <element name="obsolete" type="mi:obsoleteType" minOccurs="0" maxOccurs="unbounded"/>
-            <element name="translation" type="mi:translationType" minOccurs="0"/>
+            <element name="translation" type="mi:translationType" minOccurs="0">
+                <unique name="translationLocale">
+                    <selector xpath="mi:locale"/>
+                    <field xpath="@name"/>
+                </unique>
+            </element>
         </sequence>
         <!-- TODO: uniqueness -->
         <attribute name="name" type="mi:identifier" use="required"/>

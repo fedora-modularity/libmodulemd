@@ -112,12 +112,12 @@
     <simpleType name="intentName">
         <annotation>
             <documentation xml:lang="en">
-                An identifier of an intent.
+                An identifier of an intent. An empty string denotes other intents.
             </documentation>
         </annotation>
         <!-- TODO: Should this be a NMTOKEN? -->
         <restriction base="string">
-            <minLength value="1"/>
+            <minLength value="0"/>
         </restriction>
     </simpleType>
 
@@ -485,8 +485,8 @@
         <annotation>
             <documentation xml:lang="en">
                 A set of default profiles for this particular intent.
-                When merging default-profiles, the latest tree replaces all
-                previous definitions atomically.
+                When merging default-profile intents, the latest tree replaces
+                all previous definitions atomically.
             </documentation>
         </annotation>
         <sequence>
@@ -500,12 +500,11 @@
                 </annotation>
             </element>
         </sequence>
-        <!-- TODO uniqueness -->
-        <attribute name="name" type="mi:intentName">
+        <attribute name="name" type="mi:intentName" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the intent. A missing attribute means a
-                    global default applying to all intents.
+                    An identifier of the intent. An empty attribute means a
+                    global default applying to other unspecified intents.
                 </documentation>
             </annotation>
         </attribute>
@@ -521,7 +520,12 @@
             </documentation>
         </annotation>
         <sequence>
-            <element name="intent" type="mi:profileIntentType" maxOccurs="unbounded"/>
+            <element name="intent" type="mi:profileIntentType" maxOccurs="unbounded">
+                <unique name="defaultProfileList">
+                    <selector xpath="mi:profile"/>
+                    <field xpath="."/>
+                </unique>
+            </element>
         </sequence>
         <attribute name="modified" type="mi:timestamp" use="required">
             <annotation>
@@ -766,7 +770,12 @@
         </annotation>
         <sequence>
             <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded"/>
-            <element name="default-profile" type="mi:default-profileType" minOccurs="0"/>
+            <element name="default-profile" type="mi:default-profileType" minOccurs="0">
+                <unique name="profileIntent">
+                    <selector xpath="mi:intent"/>
+                    <field xpath="@name"/>
+                </unique>
+            </element>
             <element name="obsolete" type="mi:obsoleteType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="translation" type="mi:translationType" minOccurs="0"/>
         </sequence>
@@ -783,11 +792,11 @@
             </documentation>
         </annotation>
         <!-- TODO uniqueness -->
-        <attribute name="name" type="mi:intentName">
+        <attribute name="name" type="mi:intentName" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the intent. A missing attribute means a
-                    global default applying to all intents.
+                    An identifier of the intent. An empty attribute means a
+                    global default applying to other unspecified intents.
                 </documentation>
             </annotation>
         </attribute>
@@ -839,7 +848,6 @@
             <element name="stream" type="mi:streamType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="default-stream" type="mi:default-streamType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <!-- TODO: uniqueness -->
         <attribute name="name" type="mi:identifier" use="required"/>
     </complexType>
 
@@ -849,14 +857,21 @@
                 A root element for all modular metadata.
             </documentation>
         </annotation>
-
         <complexType>
             <sequence>
-                <element name="module" type="mi:moduleType" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="module" type="mi:moduleType" minOccurs="0" maxOccurs="unbounded">
+                    <unique name="streamName">
+                        <selector xpath="mi:stream"/>
+                        <field xpath="@name"/>
+                    </unique>
+                </element>
             </sequence>
             <!-- TODO: Use namespace as a minimal-required and @version as compatible revision. -->
             <attribute name="version" type="nonNegativeInteger" use="required" fixed="1"/>
         </complexType>
+        <unique name="moduleName">
+            <selector xpath="mi:module"/>
+            <field xpath="@name"/>
+        </unique>
     </element>
-
 </schema>

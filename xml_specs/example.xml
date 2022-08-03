@@ -2,21 +2,21 @@
     <module name="perl">
         <stream name="5.26">
             <default-profile modified="202205040810">
-                <intent> <!-- no @name means all variants -->
+                <intent name=""> <!-- empty @name means all variants -->
                     <profile>default</profile>
                 </intent>
             </default-profile>
         </stream>
         <stream name="5.28">
             <default-profile modified="202205040810">
-                <intent> <!-- no @name means all variants -->
+                <intent name=""> <!-- empty @name means all variants -->
                     <profile>default</profile>
                 </intent>
             </default-profile>
         </stream>
         <stream name="5.30">
             <default-profile modified="202205040810">
-                <intent> <!-- no @name means all variants -->
+                <intent name=""> <!-- empty @name means all variants -->
                     <profile>default</profile>
                 </intent>
             </default-profile>
@@ -33,7 +33,7 @@
         </stream>
         <stream name="5.32">
             <default-profile modified="202205040810">
-                <intent> <!-- no @name means all variants -->
+                <intent name=""> <!-- empty @name means all variants -->
                     <profile>common</profile>
                 </intent>
             </default-profile>
@@ -282,7 +282,7 @@
                 <!-- and other nevras would follow !-->
             </build>
             <default-profile modified="202205040810">
-                <intent> <!-- no @name means all variants -->
+                <intent name=""> <!-- empty @name means all variants -->
                     <profile>common</profile>
                 </intent>
             </default-profile>
@@ -295,7 +295,7 @@
             </translation>
         </stream>
         <default-stream modified="202205040810">
-            <intent stream="5.34"/> <!-- no @name means all variants -->
+            <intent name="" stream="5.34"/> <!-- empty @name means all variants -->
         </default-stream>
     </module>
     <module name="perl-IO-Socket-SSL">

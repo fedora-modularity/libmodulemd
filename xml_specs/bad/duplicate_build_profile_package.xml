@@ -1,0 +1,15 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+    <module name="perl">
+        <stream name="5.26">
+            <build context="1" version="1" static="1" arch="x86_64" summary="b" description="b">
+                <license>
+                    <module>MIT</module>
+                </license>
+                <profile name="b">
+                    <package>a</package>
+                    <package>a</package>
+                </profile>
+            </build>
+        </stream>
+    </module>
+</index>

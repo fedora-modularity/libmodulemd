@@ -291,11 +291,11 @@
         <sequence>
             <element name="package" type="mi:packageName" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <!-- TODO: Uniqueness. -->
         <attribute name="name" type="mi:identifier" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the profile. It must be unique in the stream.
+                    An identifier of the profile. It must be unique in the
+                    build. It's scope is a stream of the build.
                 </documentation>
             </annotation>
         </attribute>
@@ -389,7 +389,12 @@
             <element name="servicelevel" type="mi:servicelevelType" minOccurs="0"/>
             <element name="license" type="mi:licenseType"/>
             <element name="references" type="mi:referencesType" minOccurs="0"/>
-            <element name="profile" type="mi:profileType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="profile" type="mi:profileType" minOccurs="0" maxOccurs="unbounded">
+                <unique name="profilePackage">
+                    <selector xpath="mi:package"/>
+                    <field xpath="."/>
+                </unique>
+            </element>
             <element name="api" type="mi:packageName" minOccurs="0" maxOccurs="unbounded">
                 <annotation>
                     <documentation xml:lang="en">
@@ -769,7 +774,12 @@
             </documentation>
         </annotation>
         <sequence>
-            <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded">
+                <unique name="buildProfile">
+                    <selector xpath="mi:profile"/>
+                    <field xpath="@name"/>
+                </unique>
+            </element>
             <element name="default-profile" type="mi:default-profileType" minOccurs="0">
                 <unique name="profileIntent">
                     <selector xpath="mi:intent"/>

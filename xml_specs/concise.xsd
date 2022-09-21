@@ -345,8 +345,7 @@
             </documentation>
         </annotation>
         <sequence>
-            <!-- TODO: Uniqueness -->
-            <element name="checksum" type="mi:checksumType" minOccurs="0">
+            <element name="checksum" type="mi:checksumType" minOccurs="0" maxOccurs="unbounded">
                 <annotation>
                     <documentation xml:lang="en">
                         A digest of a content of the RPM package file. There
@@ -434,7 +433,12 @@
                     </documentation>
                 </annotation>
             </element>
-            <element name="nevra" type="mi:nevraType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="nevra" type="mi:nevraType" minOccurs="0" maxOccurs="unbounded">
+                <unique name="nevraChecksumType">
+                    <selector xpath="mi:checksum"/>
+                    <field xpath="@type"/>
+                </unique>
+            </element>
         </sequence>
         <attribute name="version" type="unsignedLong" use="required">
             <annotation>

@@ -1,0 +1,15 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+    <module name="perl">
+        <stream name="5.26">
+            <build context="1" version="1" static="1" arch="x86_64" summary="b" description="b">
+                <license>
+                    <module>MIT</module>
+                </license>
+                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="src">
+                    <checksum type="sha256" value="829b584aa0f27e6242bed7228cd2f662520193fc8e4a0d8f65552948ec1cd183"/>
+                    <checksum type="sha512" value="2d838a980ffe207e2cc8069b77695e8aea0a24d3e9604a7cf3008eb76b9a25c8c6f8fc76e7a435c44eab79ea2539f08cb1dddd9757a19fa7324a38c992b5ba34"/>
+                </nevra>
+            </build>
+        </stream>
+    </module>
+</index>

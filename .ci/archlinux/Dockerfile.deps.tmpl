@@ -13,7 +13,7 @@ RUN pacman -Syu --needed --noconfirm \
     libyaml \
     meson \
     python-gobject \
-    python2-six \
+    python-six \
 && pacman -Scc --noconfirm
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py

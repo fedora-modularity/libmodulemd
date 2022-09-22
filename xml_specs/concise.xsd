@@ -825,7 +825,6 @@
                 </unique>
             </element>
         </sequence>
-        <!-- TODO: uniqueness -->
         <attribute name="name" type="mi:identifier" use="required"/>
     </complexType>
 

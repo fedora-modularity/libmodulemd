@@ -55,9 +55,10 @@
         </stream>
 
         <default-stream modified=""> <!-- @modified could be renamed to version -->
-            <intent name="" stream=""/> <!-- Missing @name means intentless global default -->
+            <intent name="" stream=""/> <!-- Missing or empty @name means an intentless
+                                             global default. -->
                                         <!-- Existing @stream sets a default,
-                                             missing unsets. -->
+                                             missing or empty unsets. -->
         </default-stream>
     </module>
 

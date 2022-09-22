@@ -1,0 +1,8 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+    <module name="perl">
+        <default-stream modified="0">
+            <intent stream="5.32"/>
+            <intent stream="5.32"/>
+        </default-stream>
+    </module>
+</index>

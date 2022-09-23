@@ -735,7 +735,7 @@
                 A translation of an obsolete message.
             </documentation>
         </annotation>
-        <attribute name="context" type="mi:contextOrEmptyType" use="required">
+        <attribute name="context" type="mi:contextOrEmptyType" default="">
             <annotation>
                 <documentation xml:lang="en">
                     If this attribute is nonempty, this translation pertains

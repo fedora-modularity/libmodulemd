@@ -48,7 +48,8 @@
                 <locale name="">
                     <build summary="" description=""/>  <!-- missing @summary, @description unsets -->
                     <profile name="" description=""/>   <!-- missing @description unsets -->
-                    <obsolete context="" message=""/>   <!-- empty @context means all contexts,
+                    <obsolete context="" message=""/>   <!-- missing or empty @context means
+                            all contexts,
                             missing @message unsets, unsupported in YAML. -->
                 </locale>
             </translation>

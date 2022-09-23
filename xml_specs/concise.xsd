@@ -542,11 +542,12 @@
                 </annotation>
             </element>
         </sequence>
-        <attribute name="name" type="mi:intentName" use="required">
+        <attribute name="name" type="mi:intentName" default="">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the intent. An empty attribute means a
-                    global default applying to other unspecified intents.
+                    An identifier of the intent. A missin or empty attribute
+                    means a global default applying to other unspecified
+                    intents.
                 </documentation>
             </annotation>
         </attribute>
@@ -851,7 +852,7 @@
                 previous definitions atomically.
             </documentation>
         </annotation>
-        <attribute name="name" type="mi:intentName" default="" use="optional">
+        <attribute name="name" type="mi:intentName" default="">
             <annotation>
                 <documentation xml:lang="en">
                     An identifier of the intent. An empty or missing attribute
@@ -860,7 +861,7 @@
                 </documentation>
             </annotation>
         </attribute>
-        <attribute name="stream" type="mi:identifierOrEmpty" default="" use="optional">
+        <attribute name="stream" type="mi:identifierOrEmpty" default="">
             <annotation>
                 <documentation xml:lang="en">
                     An identifier of the default stream. An empty or missing

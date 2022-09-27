@@ -79,12 +79,12 @@
     <simpleType name="rpmArch">
         <annotation>
             <documentation xml:lang="en">
-                An RPM architecture string. A non-empty string accepted by rpm tool
-                as an architecture.
+                An RPM and module architecture string. A non-empty string
+                accepted by rpm as an architecture.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length, alphabet. -->
-        <restriction base="NMTOKEN"/>
+        <!-- FIXME: Maximal length. -->
+        <restriction base="mi:identifier"/>
     </simpleType>
 
     <simpleType name="hashAlgorithm">

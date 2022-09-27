@@ -1,0 +1,40 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+    <module name="perl">
+        <stream name="5.26">
+            <build context="1" version="1" arch="x86_64" summary="" description="">
+                <license>
+                    <module>MIT</module>
+                </license>
+                <profile name="a" description=""/>
+            </build>
+            <build context="1" version="1" arch="x86_64">
+                <license>
+                    <module>MIT</module>
+                </license>
+                <profile name="a"/>
+            </build>
+            <obsolete modified="0">
+                <eol message=""/>
+            </obsolete>
+            <translation modified="0">
+                <locale name="cs-CZ">
+                    <build summary="" description=""/>
+                    <profile name="a" description=""/>
+                    <obsolete message=""/>
+                </locale>
+            </translation>
+        </stream>
+        <stream name="5.32">
+            <obsolete modified="0">
+                <eol/>
+            </obsolete>
+            <translation modified="0">
+                <locale name="cs-CZ">
+                    <build/>
+                    <profile name="a"/>
+                    <obsolete/>
+                </locale>
+            </translation>
+        </stream>
+    </module>
+</index>

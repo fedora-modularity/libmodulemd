@@ -159,14 +159,11 @@
     <simpleType name="multiLine">
         <annotation>
             <documentation xml:lang="en">
-                A nonempty, possibly long, multi-line text. End of lines are
-                encoded as line-feeds (U+000A).
+                A possibly long, multi-line text. End of lines are
+                encoded as line-feeds (U+000A). Empty value is possible.
             </documentation>
         </annotation>
-        <!-- FIXME: Really enforce nonemptyness? -->
-        <restriction base="string">
-            <minLength value="1"/>
-        </restriction>
+        <restriction base="string"/>
     </simpleType>
 
     <complexType name="dependencyType">
@@ -508,14 +505,14 @@
                 </documentation>
             </annotation>
         </attribute>
-        <attribute name="summary" type="normalizedString" use="required">
+        <attribute name="summary" type="normalizedString" default="">
             <annotation>
                 <documentation xml:lang="en">
                     A short, one-line, description of the stream.
                 </documentation>
             </annotation>
         </attribute>
-        <attribute name="description" type="mi:multiLine" use="required">
+        <attribute name="description" type="mi:multiLine" default="">
             <annotation>
                 <documentation xml:lang="en">
                     A long, multi-line description of the stream.
@@ -622,7 +619,7 @@
             </annotation>
         </attribute>
         <!-- TODO: Realy multiline? -->
-        <attribute name="message" type="mi:multiLine" use="required">
+        <attribute name="message" type="mi:multiLine" default="">
             <annotation>
                 <documentation xml:lang="en">
                     A user visible explanation to the user. It can carry a

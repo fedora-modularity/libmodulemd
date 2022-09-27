@@ -14,14 +14,16 @@
     <simpleType name="identifierOrEmpty">
         <annotation>
             <documentation xml:lang="en">
-                A user-visible, non-empty string used as name for a module and
-                a stream.
+                A user-visible, non-empty string used as a name for a module,
+                a stream, a profile.
                 An empty value means unsetting that relation (e.g. unsetting a
                 default stream).
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length, alphabet. -->
-        <restriction base="string"/>
+        <!-- FIXME: Maximal length. -->
+        <restriction base="string">
+            <pattern value="[a-zA-Z0-9+._-]*"/>
+        </restriction>
     </simpleType>
 
     <simpleType name="identifier">
@@ -31,7 +33,7 @@
                 a stream.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length, alphabet. -->
+        <!-- FIXME: Maximal length. -->
         <restriction base="mi:identifierOrEmpty">
             <minLength value="1"/>
         </restriction>

@@ -488,8 +488,7 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: Set a default value -->
-        <attribute name="static" type="boolean" use="required">
+        <attribute name="static" type="boolean" default="false">
             <annotation>
                 <documentation xml:lang="en">
                     If this attribute is true, the context value identifies

@@ -38,8 +38,9 @@
                 </intent>
             </default-profile>
 
-            <obsolete modified="" context=""> <!-- @modified in seconds since the epoch. -->
-                <eol when="" message=""> <!-- Missing means unsetting. -->
+            <obsolete modified="" context=""> <!-- @modified in seconds since the epoch.
+                        Missing or empty @context means all contexts. -->
+                <eol when="" message=""> <!-- Missing element means unsetting. -->
                         <!-- @when in seconds since the epoch, missing means now. -->
                     <replacement module="" stream=""/>
                 </eol>

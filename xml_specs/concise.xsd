@@ -592,7 +592,7 @@
     <complexType name="eolType">
         <annotation>
             <documentation xml:lang="en">
-                And end of life of a stream.
+                An end of life of a stream.
             </documentation>
         </annotation>
         <sequence>
@@ -669,12 +669,12 @@
                 </documentation>
             </annotation>
         </attribute>
-        <attribute name="context" type="mi:contextType">
+        <attribute name="context" type="mi:contextOrEmptyType" default="">
             <annotation>
                 <documentation xml:lang="en">
-                    If this attribute exists, the obsolete pertains only
-                    module builds of that context. Otherwise, it pertains all
-                    contexts of this stream.
+                    If this attribute exists and is nonempty, the obsolete
+                    pertains only module builds of that context of this stream.
+                    Otherwise, it pertains all contexts of this stream.
                 </documentation>
             </annotation>
         </attribute>
@@ -903,7 +903,12 @@
             </documentation>
         </annotation>
         <sequence>
-            <element name="stream" type="mi:streamType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="stream" type="mi:streamType" minOccurs="0" maxOccurs="unbounded">
+                <unique name="obsoleteContext">
+                    <selector xpath="mi:obsolete"/>
+                    <field xpath="@context"/>
+                </unique>
+            </element>
             <element name="default-stream" type="mi:default-streamType" minOccurs="0" maxOccurs="unbounded">
                 <unique name="default-streamIntent">
                     <selector xpath="mi:intent"/>

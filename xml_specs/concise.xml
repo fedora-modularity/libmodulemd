@@ -47,7 +47,8 @@
             </obsolete>
 
             <translation modified=""> <!-- @modified could be renamed to version -->
-                <locale name="">
+                <locale name=""> <!-- Each of the child is optional, but there
+                                      must be at least one. -->
                     <build summary="" description=""/>  <!-- missing @summary, @description unsets -->
                     <profile name="" description=""/>   <!-- missing @description unsets -->
                     <obsolete context="" message=""/>   <!-- missing or empty @context means

@@ -764,15 +764,35 @@
     <complexType name="localeType">
         <annotation>
             <documentation xml:lang="en">
-                The translatated strings into a particular language.
+                The translated strings into a particular language.
+                It's a sequence of translations for a build, profiles, and
+                obsoletes. Each of them is optional, but at at least one must
+                be specified.
+                A translation of a build applies to all builds of that stream.
+                Hence the sequence can contain at most one build translation.
+                A translation of a profile applies to the named profile. Hence
+                the sequence can contain multiple profile translations.
+                A translation without naming a context applies to the
+                context-nonspecific obsolete.
+                A translation naming a context applies to the context-specific
+                obsolete. Hence the sequence can contain multiple obsolete
+                translatations.
             </documentation>
         </annotation>
-        <!-- TODO: Empty sequence? -->
-        <sequence>
-            <element name="build" type="mi:buildTranslation" minOccurs="0"/>
-            <element name="profile" type="mi:profileTranslation" minOccurs="0" maxOccurs="unbounded"/>
-            <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
+        <choice>
+            <sequence>
+                <element name="build" type="mi:buildTranslation" minOccurs="1"/>
+                <element name="profile" type="mi:profileTranslation" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <sequence>
+                <element name="profile" type="mi:profileTranslation" minOccurs="1" maxOccurs="unbounded"/>
+                <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <sequence>
+                <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+        </choice>
         <!-- TODO: Formalize content. -->
         <attribute name="name" type="NMTOKEN" use="required">
             <annotation>

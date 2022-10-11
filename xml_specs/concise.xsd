@@ -622,8 +622,8 @@
         <attribute name="message" type="mi:multiLine" default="">
             <annotation>
                 <documentation xml:lang="en">
-                    A user visible explanation to the user. It can carry a
-                    reason or instructions for the upgrade.
+                    A user visible explanation. It can carry a reason or
+                    instructions for the upgrade.
                 </documentation>
             </annotation>
         </attribute>
@@ -638,17 +638,16 @@
             </documentation>
         </annotation>
         <sequence>
-            <!-- FIXME: Resetting a context after nonspecific obsolete: Should it punch a hole? Or should it void only previous specific definition? The latter is simpler. -->
             <element name="eol" type="mi:eolType" minOccurs="0">
                 <annotation>
                     <documentation xml:lang="en">
                         If this element exists, it defines an end of life of the
-                        (context of the) stream. Otherwise, all the previous
-                        obsoletes (of the context) are canceled. I.e.:
-                        If this is a context-nonspecific reset, it only cancels
-                        nonspecific obsoletes.
+                        (context of the) stream. Otherwise, the (context of
+                        the) stream will be unobsoleted. I.e.:
+                        If this is a context-nonspecific reset, it cancels
+                        obsoleteness for all contexts.
                         If this is a context-specific reset, it only cancels
-                        specific obsoletes.
+                        obsoleteness of the specific context.
                     </documentation>
                 </annotation>
             </element>
@@ -658,14 +657,22 @@
                 <documentation xml:lang="en">
                     When merging context-nonspecific obsoletes from multiple
                     indices, the latest obsolete definition according to this
-                    attribute redefines older definitions. When merging
-                    context-specific obsoletes, the same rule applies to
-                    obsoletes of that context.
-                    Having a context-specific obsolete not older than a
+                    attribute overrides older definitions, including resets,
+                    including context-specific definitions.
+                    When merging context-specific obsoletes, the same rule
+                    applies to obsoletes of that context. Later
+                    context-specific obsolete overrides former context-specific
+                    definitions, and overrides context-nonspecific definition
+                    for that context.
+                    I.e., having a context-specific obsolete not older than a
                     nonspecific one retains the nonspecific one and in
                     addition overrides the specified context. Contrary, having
                     a context-nonspecific obsolete newer makes the previous
-                    specific obsolete void.
+                    context-specific obsolete void.
+                    If there are both context-nonspecific and
+                    context-specific obsoletes with the same modified
+                    timestamp, first the nonspecific one is applied and then
+                    the specific one is applied.
                 </documentation>
             </annotation>
         </attribute>

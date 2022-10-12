@@ -701,8 +701,9 @@
             <annotation>
                 <documentation xml:lang="en">
                     If this attribute exists and is nonempty, the obsolete
-                    pertains only module builds of that context of this stream.
-                    Otherwise, it pertains all contexts of this stream.
+                    pertains only module builds of that static context of this
+                    stream. It cannot apply to builds with a nonstatic context.
+                    Otherwise, the obsolete pertains all contexts of this stream.
                 </documentation>
             </annotation>
         </attribute>

@@ -255,7 +255,6 @@
                 When (date) this particular support level ends for for this stream.
             </documentation>
         </annotation>
-        <!-- TODO: Indeed the same type as module identifier? I think underscores are allowed here. -->
         <attribute name="name" type="mi:identifier" use="required">
             <annotation>
                 <documentation xml:lang="en">

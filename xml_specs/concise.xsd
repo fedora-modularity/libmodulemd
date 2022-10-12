@@ -156,6 +156,28 @@
         </restriction>
     </simpleType>
 
+    <simpleType name="localeName">
+        <annotation>
+            <documentation xml:lang="en">
+                An identifier of a locale according to GNU libc.
+                I.e. a 2-letter (or 3-letter if 2-letter code is not
+                available) ISO 639 language code, optionally followed by
+                an underscore and a 2-letter ISO 3166 country code, optionally
+                followed by a commercial at and a modifier (variant) code.
+                E.g. "sr", "sr_RS", "sr@latin", or "sr_RS@latin".
+                (A codeset character set is not used here because it's
+                implicit from the XML character set.) See setlocale(3)
+                manual and gettexts info pages.
+                To ensure a canonical form, here the language code must be
+                lower-cased, the country code upper-cased and the modifier
+                code lower-cased.
+            </documentation>
+        </annotation>
+        <restriction base="string">
+            <pattern value="[a-z]{2,3}(_[A-Z]{2})?(@[a-z]+)?"/>
+        </restriction>
+    </simpleType>
+
     <simpleType name="multiLine">
         <annotation>
             <documentation xml:lang="en">
@@ -793,13 +815,11 @@
                 <element name="obsolete" type="mi:obsoleteTranslation" minOccurs="1" maxOccurs="unbounded"/>
             </sequence>
         </choice>
-        <!-- TODO: Formalize content. -->
-        <attribute name="name" type="NMTOKEN" use="required">
+        <attribute name="name" type="mi:localeName" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    A locale identifier according to RFC 1766. I.e. a 2-letter
-                    language code, optionally followed by a hyphen and a
-                    2-letter country code. E.g. "en" or "en-US".
+                    A locale identifier according to GNU libc. Without
+                    a codeset part.
                 </documentation>
             </annotation>
         </attribute>

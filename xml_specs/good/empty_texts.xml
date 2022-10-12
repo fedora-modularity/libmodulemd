@@ -17,7 +17,7 @@
                 <eol message=""/>
             </obsolete>
             <translation modified="0">
-                <locale name="cs-CZ">
+                <locale name="cs">
                     <build summary="" description=""/>
                     <profile name="a" description=""/>
                     <obsolete message=""/>
@@ -29,7 +29,7 @@
                 <eol/>
             </obsolete>
             <translation modified="0">
-                <locale name="cs-CZ">
+                <locale name="cs">
                     <build/>
                     <profile name="a"/>
                     <obsolete/>

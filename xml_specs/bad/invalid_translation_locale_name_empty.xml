@@ -1,10 +1,9 @@
 <index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
-    <module name="perl">
-        <stream name="5.26">
+    <module name="b">
+        <stream name="a">
             <translation modified="0">
-                <locale name="cs">
-                    <obsolete context="a" message="A"/>
-                    <obsolete context="a" message="B"/>
+                <locale name="">
+                    <build/>
                 </locale>
             </translation>
         </stream>

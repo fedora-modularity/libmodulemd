@@ -8,7 +8,7 @@
                 <eol message="b"/>
             </obsolete>
             <translation modified="0">
-                <locale name="cs-CZ">
+                <locale name="cs">
                     <obsolete message="A"/>
                     <obsolete context="b" message="B"/>
                 </locale>

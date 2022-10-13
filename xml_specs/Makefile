@@ -20,10 +20,14 @@ good/%.out: $(SCHEMA) good/%.xml
 .ONESHELL:
 bad/%.out: $(SCHEMA) bad/%.xml
 	@xmllint --noout --schema "$(SCHEMA)" bad/$*.xml 2>/dev/null
-	if [ "$$?" == 3 ]; then
+	RETVAL=$$?
+	if [ "$$RETVAL" == 3 ]; then
 		echo "bad/$*.xml fails to validate as expected"
-		exit 0;
-	else
-		echo "bad/$*.xml unexpectedly validated"
-		exit 1
+		exit 0
 	fi
+	if [ "$$RETVAL" == 0 ]; then
+		echo "bad/$*.xml unexpectedly validated"
+	else
+		echo "bad/$*.xml failed to be processed"
+	fi
+	exit 1

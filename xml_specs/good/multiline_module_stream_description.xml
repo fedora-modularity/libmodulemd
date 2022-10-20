@@ -1,0 +1,16 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+    <module name="perl">
+        <stream name="5.26">
+            <build context="1" version="1" static="1" arch="x86_64" summary="b" description="b&#x0a;">
+                <license>
+                    <module>MIT</module>
+                </license>
+            </build>
+            <translation modified="0">
+                <locale name="en">
+                    <build summary="c" description="c&#x0a;"/>
+                </locale>
+            </translation>
+        </stream>
+    </module>
+</index>

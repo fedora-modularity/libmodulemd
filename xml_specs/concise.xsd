@@ -39,6 +39,28 @@
         </restriction>
     </simpleType>
 
+    <simpleType name="singleLine">
+        <annotation>
+            <documentation xml:lang="en">
+                A string without line-feed, carriage-return, and tab characters.
+                Intended for short, user visible texts. Empty value is possible.
+            </documentation>
+        </annotation>
+        <restriction base="string">
+            <pattern value="[^\t\r\n]*"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="multiLine">
+        <annotation>
+            <documentation xml:lang="en">
+                A possibly long, multi-line text. End of lines are
+                encoded as line-feeds (U+000A). Empty value is possible.
+            </documentation>
+        </annotation>
+        <restriction base="string"/>
+    </simpleType>
+
     <simpleType name="license">
         <annotation>
             <documentation xml:lang="en">
@@ -46,7 +68,7 @@
                 &lt;https://fedoraproject.org/wiki/Licensing&gt;.
             </documentation>
         </annotation>
-        <restriction base="normalizedString">
+        <restriction base="mi:singleLine">
             <minLength value="1"/>
         </restriction>
     </simpleType>
@@ -176,16 +198,6 @@
         <restriction base="string">
             <pattern value="[a-z]{2,3}(_[A-Z]{2})?(@[a-z]+)?"/>
         </restriction>
-    </simpleType>
-
-    <simpleType name="multiLine">
-        <annotation>
-            <documentation xml:lang="en">
-                A possibly long, multi-line text. End of lines are
-                encoded as line-feeds (U+000A). Empty value is possible.
-            </documentation>
-        </annotation>
-        <restriction base="string"/>
     </simpleType>
 
     <complexType name="dependencyType">
@@ -352,8 +364,7 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: One-line, or multi-line? -->
-        <attribute name="description" type="string">
+        <attribute name="description" type="mi:multiLine">
             <annotation>
                 <documentation xml:lang="en">
                     An explanation of the profile.
@@ -526,7 +537,7 @@
                 </documentation>
             </annotation>
         </attribute>
-        <attribute name="summary" type="normalizedString" default="">
+        <attribute name="summary" type="mi:singleLine" default="">
             <annotation>
                 <documentation xml:lang="en">
                     A short, one-line, description of the stream.
@@ -639,7 +650,6 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: Realy multiline? -->
         <attribute name="message" type="mi:multiLine" default="">
             <annotation>
                 <documentation xml:lang="en">
@@ -715,7 +725,7 @@
                 A translatation of a module stream.
             </documentation>
         </annotation>
-        <attribute name="summary" type="normalizedString">
+        <attribute name="summary" type="mi:singleLine">
             <annotation>
                 <documentation xml:lang="en">
                     A translation for a /index/module/stream/build/@summary.
@@ -746,8 +756,7 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: One-line, or multi-line? -->
-        <attribute name="description" type="string">
+        <attribute name="description" type="mi:multiLine">
             <annotation>
                 <documentation xml:lang="en">
                     A translation for /index/module/stream/build/profile/@description.
@@ -772,7 +781,6 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: Realy multiline? -->
         <attribute name="message" type="mi:multiLine">
             <annotation>
                 <documentation xml:lang="en">

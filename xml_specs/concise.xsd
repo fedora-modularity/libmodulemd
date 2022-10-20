@@ -264,7 +264,9 @@
     <complexType name="servicelevelType">
         <annotation>
             <documentation xml:lang="en">
-                When (date) this particular support level ends for for this stream.
+                When (date) this particular support level ends for for this
+                stream. The support includes that date, it becomes void the
+                next day.
             </documentation>
         </annotation>
         <attribute name="name" type="mi:identifier" use="required">
@@ -274,6 +276,8 @@
                 </documentation>
             </annotation>
         </attribute>
+        <!-- TODO: change into number of seconds since epoch in UTC to be similar
+             to obsoletes. -->
         <attribute name="year" type="integer" use="required">
             <annotation>
                 <documentation xml:lang="en">
@@ -638,15 +642,15 @@
                 </annotation>
             </element>
         </sequence>
-        <!-- FIXME: Inclusive or exclusive, i.e. obsolete since, or obsolete after? The later is akin to X509 certificates. -->
         <attribute name="when" type="mi:timestamp">
             <annotation>
                 <documentation xml:lang="en">
-                    If the attribute exists, time when the stream/context is
-                    not supported any longer and a package manager should warn
-                    a user about it.
-                    If the attribute doesn't exist, it means the obsolete
-                    takes effect right now.
+                    If the attribute exists, it's the furthest time when the
+                    stream/context is supported. After that time the
+                    stream/context becomes obsolete and a package manager
+                    should warn about it.
+                    If the attribute doesn't exist, it means it's obsolete
+                    right now.
                 </documentation>
             </annotation>
         </attribute>

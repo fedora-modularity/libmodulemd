@@ -172,7 +172,6 @@
                 An identifier of an intent. An empty string denotes other intents.
             </documentation>
         </annotation>
-        <!-- TODO: Should this be a NMTOKEN? -->
         <restriction base="string">
             <minLength value="0"/>
         </restriction>
@@ -579,7 +578,7 @@
         <attribute name="name" type="mi:intentName" default="">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the intent. A missin or empty attribute
+                    An identifier of the intent. A missing or empty attribute
                     means a global default applying to other unspecified
                     intents.
                 </documentation>

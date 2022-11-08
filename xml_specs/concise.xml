@@ -27,9 +27,8 @@
                 </profile>
                 <api></api>
                 <demodularized></demodularized>
-                <nevra name="" epoch="" version="" release="" arch="">
-                    <checksum type="" value=""/>    <!-- Unused now. -->
-                </nevra>
+                <nevra name="" epoch="" version="" release="" arch="" sha256=""/>
+                    <!-- @sha256 is unused now. -->
             </build>
 
             <default-profile modified=""> <!-- @modified could be renamed to version -->

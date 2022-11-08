@@ -109,15 +109,25 @@
         <restriction base="mi:identifier"/>
     </simpleType>
 
-    <simpleType name="hashAlgorithm">
+    <simpleType name="sha256Type">
         <annotation>
             <documentation xml:lang="en">
-                A name of a hash algorihm.
+                An SHA-256 digest.
             </documentation>
         </annotation>
-        <restriction base="NMTOKEN">
-            <enumeration value="sha256"/>
-            <enumeration value="sha512"/>
+        <restriction base="hexBinary">
+            <length value="32"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="sha512Type">
+        <annotation>
+            <documentation xml:lang="en">
+                An SHA-512 digest.
+            </documentation>
+        </annotation>
+        <restriction base="hexBinary">
+            <length value="64"/>
         </restriction>
     </simpleType>
 
@@ -376,34 +386,12 @@
         </attribute>
     </complexType>
 
-    <complexType name="checksumType">
-        <annotation>
-            <documentation xml:lang="en">
-                A digest of a content of a RPM package file.
-            </documentation>
-        </annotation>
-        <attribute name="type" type="mi:hashAlgorithm" use="required"/>
-        <!-- TODO: pair a value length to a type -->
-        <attribute name="value" type="hexBinary" use="required"/>
-    </complexType>
-
     <complexType name="nevraType">
         <annotation>
             <documentation xml:lang="en">
                 An RPM package which belongs to this stream.
             </documentation>
         </annotation>
-        <sequence>
-            <element name="checksum" type="mi:checksumType" minOccurs="0" maxOccurs="unbounded">
-                <annotation>
-                    <documentation xml:lang="en">
-                        A digest of a content of the RPM package file. There
-                        can be multiple elements for different checksum types.
-                        But there must be at most one for each type.
-                    </documentation>
-                </annotation>
-            </element>
-        </sequence>
         <attribute name="name" type="mi:packageName" use="required">
             <annotation>
                 <documentation xml:lang="en">
@@ -438,6 +426,22 @@
                 <documentation xml:lang="en">
                     An architecture of the RPM package. Source packages
                     have a distinct value.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="sha256" type="mi:sha256Type">
+            <annotation>
+                <documentation xml:lang="en">
+                    An optional SHA-256 digest of a content of the RPM package
+                    file.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="sha512" type="mi:sha512Type">
+            <annotation>
+                <documentation xml:lang="en">
+                    An optional SHA-512 digest of a content of the RPM package
+                    file.
                 </documentation>
             </annotation>
         </attribute>
@@ -482,12 +486,7 @@
                     </documentation>
                 </annotation>
             </element>
-            <element name="nevra" type="mi:nevraType" minOccurs="0" maxOccurs="unbounded">
-                <unique name="nevraChecksumType">
-                    <selector xpath="mi:checksum"/>
-                    <field xpath="@type"/>
-                </unique>
-            </element>
+            <element name="nevra" type="mi:nevraType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="version" type="unsignedLong" use="required">
             <annotation>

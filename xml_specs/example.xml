@@ -272,13 +272,9 @@
                 <api>perl-version</api>
                 <api>perl-vmsish</api>
                 <!-- demodularized is empty -->
-                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="src">
-                    <!-- checksums are optional -->
-                    <checksum type="sha256" value="829b584aa0f27e6242bed7228cd2f662520193fc8e4a0d8f65552948ec1cd183"/>
-                </nevra>
-                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="x86_64">
-                    <checksum type="sha256" value="53d274c495a87c560fb50728eb340516ab1a627a8b5662e1e21419269c2341c0"/>
-                </nevra>
+                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="src" sha256="829b584aa0f27e6242bed7228cd2f662520193fc8e4a0d8f65552948ec1cd183"/>
+                    <!-- (e.g. sha256) checksums are optional -->
+                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="x86_64" sha256="53d274c495a87c560fb50728eb340516ab1a627a8b5662e1e21419269c2341c0"/>
                 <!-- and other nevras would follow !-->
             </build>
             <default-profile modified="202205040810">

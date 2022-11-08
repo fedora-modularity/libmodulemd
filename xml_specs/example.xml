@@ -47,7 +47,7 @@
                         </dependency>
                     </dependencies-and>
                 </dependencies-or>
-                <servicelevel name="bug_fixes" year="2023" month="6" day="1"/>
+                <servicelevel name="bug_fixes" end="1685656799"/>
                 <license>
                     <module>MIT</module>
                     <content>(Copyright only) and (Artistic or GPL+)</content>

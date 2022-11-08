@@ -1,8 +1,8 @@
 <index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
     <module name="a">
         <stream name="b">
-            <build version="1" context="c" static="true" arch="x86_64" summary="" description="">
-                <servicelevel name="" year="1970" month="1" day="1"/>
+            <build version="1" context="c" static="true" arch="x86_64">
+                <servicelevel name="" end="0"/>
                 <license>
                     <module>MIT</module>
                 </license>

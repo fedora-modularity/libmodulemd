@@ -16,7 +16,7 @@
                                                    Not supported by modulemd-packager-v3. -->
                     </dependencies-and>
                 </dependencies-or>
-                <servicelevel name="" year="" month="" day=""/>
+                <servicelevel name="" end=""/>
                 <license>
                     <module></module>
                     <content></content>

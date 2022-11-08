@@ -273,7 +273,7 @@
     <complexType name="servicelevelType">
         <annotation>
             <documentation xml:lang="en">
-                When (date) this particular support level ends for for this
+                When this particular support level ends for for this
                 stream. The support includes that date, it becomes void the
                 next day.
             </documentation>
@@ -285,26 +285,10 @@
                 </documentation>
             </annotation>
         </attribute>
-        <!-- TODO: change into number of seconds since epoch in UTC to be similar
-             to obsoletes. -->
-        <attribute name="year" type="integer" use="required">
+        <attribute name="end" type="mi:timestamp" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    Year of the date. This must form a valid date.
-                </documentation>
-            </annotation>
-        </attribute>
-        <attribute name="month" type="positiveInteger" use="required">
-            <annotation>
-                <documentation xml:lang="en">
-                    Month of the date. This must form a valid date.
-                </documentation>
-            </annotation>
-        </attribute>
-        <attribute name="day" type="positiveInteger" use="required">
-            <annotation>
-                <documentation xml:lang="en">
-                    Month of the date. This must form a valid date.
+                    A time after which the support level does not exist.
                 </documentation>
             </annotation>
         </attribute>

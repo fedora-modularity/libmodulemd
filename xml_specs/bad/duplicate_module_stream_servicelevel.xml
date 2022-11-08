@@ -3,7 +3,7 @@
         <stream name="b">
             <build version="1" context="c" static="true" arch="x86_64">
                 <servicelevel name="bug_fixes" end="0"/>
-                <servicelevel name="security_fixes" end="0"/>
+                <servicelevel name="bug_fixes" end="1"/>
                 <license>
                     <module>MIT</module>
                 </license>

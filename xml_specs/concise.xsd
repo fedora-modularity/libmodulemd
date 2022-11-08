@@ -440,7 +440,7 @@
         </annotation>
         <sequence>
             <element name="dependencies-or" type="mi:dependencies-orType" minOccurs="0"/>
-            <element name="servicelevel" type="mi:servicelevelType" minOccurs="0"/>
+            <element name="servicelevel" type="mi:servicelevelType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="license" type="mi:licenseType">
                 <unique name="licenseModule">
                     <selector xpath="mi:module"/>
@@ -870,6 +870,10 @@
         </annotation>
         <sequence>
             <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded">
+                <unique name="servicelevelName">
+                    <selector xpath="mi:servicelevel"/>
+                    <field xpath="@name"/>
+                </unique>
                 <unique name="buildProfile">
                     <selector xpath="mi:profile"/>
                     <field xpath="@name"/>

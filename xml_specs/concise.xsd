@@ -457,7 +457,16 @@
         <sequence>
             <element name="dependencies-or" type="mi:dependencies-orType" minOccurs="0"/>
             <element name="servicelevel" type="mi:servicelevelType" minOccurs="0"/>
-            <element name="license" type="mi:licenseType"/>
+            <element name="license" type="mi:licenseType">
+                <unique name="licenseModule">
+                    <selector xpath="mi:module"/>
+                    <field xpath="."/>
+                </unique>
+                <unique name="licenseContent">
+                    <selector xpath="mi:content"/>
+                    <field xpath="."/>
+                </unique>
+            </element>
             <element name="references" type="mi:referencesType" minOccurs="0"/>
             <element name="profile" type="mi:profileType" minOccurs="0" maxOccurs="unbounded">
                 <unique name="profilePackage">

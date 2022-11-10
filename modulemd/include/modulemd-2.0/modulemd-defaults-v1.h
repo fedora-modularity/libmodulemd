@@ -51,8 +51,10 @@ modulemd_defaults_v1_new (const gchar *module_name);
  * @self: (in): This #ModulemdDefaultsV1 object.
  * @default_stream: (in) (nullable): The name of the default stream for this
  * module. If NULL, it will remove the default stream.
- * @intent: (in) (nullable): If non-NULL, this indicates the system-intent to
+ * @intent: (in) (nullable): If non-NULL, this indicates the system intent to
  * apply this default stream. If NULL, it will be added as common defaults.
+ * System intents are deprecated and calls with this non-NULL argument will
+ * become void in the future.
  *
  * Set the default stream for this module.
  *
@@ -70,6 +72,8 @@ modulemd_defaults_v1_set_default_stream (ModulemdDefaultsV1 *self,
  * @intent: (in) (nullable): The name of the system intent whose default stream
  * will be retrieved. If left NULL or the specified intent has no different
  * default, it will return the generic default stream for this module.
+ * System intents are deprecated and this argument will be ignored in the
+ * future.
  *
  * Returns: (transfer none): The name of the default stream for this module.
  *
@@ -86,7 +90,8 @@ modulemd_defaults_v1_get_default_stream (ModulemdDefaultsV1 *self,
  * @intent: (in) (nullable): The name of the system intent whose stream
  * profiles will be retrieved. If left NULL or the specified intent has no
  * separate defaults for this module, it will return the generic stream
- * profiles.
+ * profiles. System intents are deprecated and this argument will be ignored
+ * in the future.
  *
  * Returns: (transfer full): A sorted #GStrv list of unique stream names for
  * which default profiles have been assigned.
@@ -106,7 +111,8 @@ modulemd_defaults_v1_get_streams_with_default_profiles_as_strv (
  * @profile_name: (in): The name of the default profile to add.
  * @intent: (in) (nullable): The name of the system intent to add profile
  * defaults to. If NULL, this sets the generic fallback profiles for the
- * stream.
+ * stream. System intents are deprecated and calls with this non-NULL argument
+ * will become void in the future.
  *
  * Add a profile that will be installed for this stream if none are explicitly
  * specified by the user. This function may be called any number of times for
@@ -127,7 +133,8 @@ modulemd_defaults_v1_add_default_profile_for_stream (ModulemdDefaultsV1 *self,
  * @stream_name: (in): The name of the module stream for which to empty
  * default profiles.
  * @intent: (in) (nullable): The name of the system intent from which to clear
- * the profile defaults for this stream.
+ * the profile defaults for this stream. System intents are deprecated and
+ * calls with this non-NULL argument will become void in the future.
  *
  * Sets the default profiles for @stream_name to the empty set. When output to
  * a file, it will appear as `stream_name: []`.
@@ -144,7 +151,8 @@ modulemd_defaults_v1_set_empty_default_profiles_for_stream (
  * @stream_name: (in): The name of the module stream from which to remove
  * default profiles.
  * @intent: (in) (nullable): The name of the system intent from which to remove
- * the profile defaults for this stream.
+ * the profile defaults for this stream. System intents are deprecated and
+ * calls with this non-NULL arugment will become void in the future.
  *
  * Removes this stream from the list of profiles entirely. It will not appear
  * in the output document.
@@ -161,8 +169,9 @@ modulemd_defaults_v1_remove_default_profiles_for_stream (
  * @self: (in): This #ModulemdDefaultsV1 object.
  * @stream_name: (in): The name of the string to retrieve the default profiles
  * for.
- * @intent: (in) (nullable): The name of the system intent from which to
- * retrieve the profile defaults for this stream.
+ * @intent: (in) (nullable): The name of the system intent for which to
+ * retrieve the profile defaults for this stream. System intents are
+ * deprecated and this argument will be ignored in the future.
  *
  * Returns: (transfer full): A sorted #GStrv list of unique profiles to be
  * installed by default for this stream. NULL, if this stream_name is not

@@ -566,6 +566,8 @@ modulemd_module_index_add_obsoletes (ModulemdModuleIndex *self,
  * @intent: (in) (nullable): The name of the system intent whose default stream
  * will be retrieved. If left NULL or the specified intent has no separate
  * default, it will return the generic default stream for this module.
+ * System intents are deprecated and this argument will be ignored in the
+ * future.
  *
  * Get a dictionary of all modules in the index that have a default stream.
  *

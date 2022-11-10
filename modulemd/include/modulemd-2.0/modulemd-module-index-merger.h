@@ -93,7 +93,8 @@ G_BEGIN_DECLS
  *     value is the same, this is an unresolvable merge conflict and the merge
  *     resolution will fail and return an error.
  *   - Intents behave in exactly the same manner as described for the top-level
- *     defaults, except that they merge beneath each intent name.
+ *     defaults, except that they merge beneath each intent name. Intents are
+ *     deprecated.
  *
  * Merging #ModulemdTranslations entries behaves as follows:
  *

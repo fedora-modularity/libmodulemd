@@ -69,12 +69,14 @@ if with_docs
   gtkdoc = dependency('gtk-doc')
   glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
 
-  ret = run_command ([test, '-e', join_paths(glib_docpath, 'glib/index.html')])
+  ret = run_command ([test, '-e', join_paths(glib_docpath, 'glib/index.html')],
+    check: false)
   if ret.returncode() != 0
     error('Missing documentation for GLib.')
   endif
 
-  ret = run_command ([test, '-e', join_paths(glib_docpath, 'gobject/index.html')])
+  ret = run_command ([test, '-e', join_paths(glib_docpath, 'gobject/index.html')],
+    check: false)
   if ret.returncode() != 0
     error('Missing documentation for GObject.')
   endif

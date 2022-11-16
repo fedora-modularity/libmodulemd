@@ -4,7 +4,8 @@ gobject_overrides_dir_py2 = get_option('gobject_overrides_dir_py2')
 # Python 3
 if with_py3
   if gobject_overrides_dir_py3 == ''
-    ret = run_command([python3, '-c', 'import gi; print(gi._overridesdir)'])
+    ret = run_command([python3, '-c', 'import gi; print(gi._overridesdir)'],
+      check: false)
 
     if ret.returncode() != 0
       error('Failed to determine Python 3 pygobject overridedir')
@@ -19,7 +20,8 @@ endif
 # Python 2
 if with_py2
   if gobject_overrides_dir_py2 == ''
-    ret2 = run_command([python2, '-c', 'import gi; print(gi._overridesdir)'])
+    ret2 = run_command([python2, '-c', 'import gi; print(gi._overridesdir)'],
+      check: false)
 
     if ret2.returncode() != 0
       error('Failed to determine Python 2 pygobject overridedir')

@@ -129,6 +129,12 @@ if with_py3
         # Use the python installation that is running meson
         python3 = pymod.find_installation()
     endif
+
+    # Verify Python version <https://github.com/mesonbuild/meson/issues/11057>.
+    python3_version = python3.language_version()
+    if not python3_version.startswith('3.')
+      error('Python3 interpreter has an unexpected version:', python3_version)
+    endif
 else
     python3 = disabler()
 endif
@@ -139,6 +145,12 @@ if with_py2
         error('A Python2 binding requires a GObject introspection.')
     endif
     python2 = pymod.find_installation('python2')
+
+    # Verify Python version <https://github.com/mesonbuild/meson/issues/11057>.
+    python2_version = python2.language_version()
+    if not python2_version.startswith('2.')
+      error('Python2 interpreter has an unexpected version:', python2_version)
+    endif
 else
     python2 = disabler()
 endif

@@ -20,20 +20,19 @@
                 default stream).
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length. -->
         <restriction base="string">
             <pattern value="[a-zA-Z0-9+._-]*"/>
+            <maxLength value="255"/>
         </restriction>
     </simpleType>
 
     <simpleType name="identifier">
         <annotation>
             <documentation xml:lang="en">
-                A user-visible, non-empty string used as a name for a module
-                and a stream.
+                A user-visible, non-empty string used as a name for a module,
+                a stream, and an architecture.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length. -->
         <restriction base="mi:identifierOrEmpty">
             <minLength value="1"/>
         </restriction>
@@ -84,6 +83,7 @@
         </annotation>
         <restriction base="string">
             <pattern value="[a-zA-Z0-9_%][a-zA-Z0-9._+%{}-]*"/>
+            <maxLength value="255"/>
         </restriction>
     </simpleType>
 
@@ -97,6 +97,7 @@
         </annotation>
         <restriction base="string">
             <pattern value="[a-zA-Z0-9._+%{}~^]{1,}"/>
+            <maxLength value="255"/>
         </restriction>
     </simpleType>
 
@@ -107,7 +108,6 @@
                 accepted by rpm as an architecture.
             </documentation>
         </annotation>
-        <!-- FIXME: Maximal length. -->
         <restriction base="mi:identifier"/>
     </simpleType>
 
@@ -186,6 +186,7 @@
         </annotation>
         <restriction base="string">
             <minLength value="0"/>
+            <maxLength value="255"/>
         </restriction>
     </simpleType>
 

@@ -15,7 +15,7 @@
         <annotation>
             <documentation xml:lang="en">
                 A user-visible, non-empty string used as a name for a module,
-                a stream, a profile.
+                a stream, or a profile.
                 An empty value means unsetting that relation (e.g. unsetting a
                 default stream).
             </documentation>
@@ -29,8 +29,8 @@
     <simpleType name="identifier">
         <annotation>
             <documentation xml:lang="en">
-                A user-visible, non-empty string used as name for a module and
-                a stream.
+                A user-visible, non-empty string used as a name for a module
+                and a stream.
             </documentation>
         </annotation>
         <!-- FIXME: Maximal length. -->
@@ -64,8 +64,10 @@
     <simpleType name="license">
         <annotation>
             <documentation xml:lang="en">
-                A non-empty license expression conforming to
-                &lt;https://fedoraproject.org/wiki/Licensing&gt;.
+                A non-empty license expression. An exact syntax and semantics
+                depends on the targetted distribution. E.g. Fedora and derived
+                distributions follow
+                &lt;https://docs.fedoraproject.org/en-US/legal/license-field/&gt;.
             </documentation>
         </annotation>
         <restriction base="mi:singleLine">

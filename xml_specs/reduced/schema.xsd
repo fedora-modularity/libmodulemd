@@ -225,18 +225,19 @@
                         A stream of the module which also must be enabled by
                         the package manager. If this element exists multiple
                         times, any of these streams satisfy. It this element
-                        does not exist, any stream satisify.
+                        does not exist, any stream satisfies.
                     </documentation>
                 </annotation>
             </element>
-            <element name="conflicts" type="mi:identifier" minOccurs="0" maxOccurs="unbounded">
+            <element name="conflicts" type="mi:identifierOrEmpty" minOccurs="0" maxOccurs="unbounded">
                 <annotation>
                     <documentation xml:lang="en">
                         A stream of the module which must not be enabled by
                         the package manager. If this element exists multiple
                         times, none of these streams must be enabled. It this
-                        element does not exist, no stream of the module must
-                        be enabled.
+                        element is empty, no stream of the module must be
+                        enabled. If a stream is defined to conflict and to be
+                        required at the same time, the stream will conflict.
                     </documentation>
                 </annotation>
             </element>

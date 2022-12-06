@@ -1,0 +1,19 @@
+Service levels are defined in Fedora in Product Definition Center which only uses
+it to lock a dist-git branch and a build in tag in Koji. An exact enumeration
+of semantics of service level names was never defined.
+
+Service levels in Red Hat Enterprise Linux are definined on Application
+Stream Life Cycle page of Customar Portal. There is only one type of service
+level and that is end of life.
+
+YAML has the service levels as an automatic field filled by MBS. MBS never
+populated this field.
+
+A newer feature called modularity obsoletes effectively replaces the
+end-of-life service level.
+
+
+DECISION
+========
+
+Remove service levels in favor of stream obsoletes.

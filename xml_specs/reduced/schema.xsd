@@ -251,30 +251,6 @@
         </attribute>
     </complexType>
 
-    <complexType name="servicelevelType">
-        <annotation>
-            <documentation xml:lang="en">
-                When this particular support level ends for for this
-                stream. The support includes that date, it becomes void the
-                next day.
-            </documentation>
-        </annotation>
-        <attribute name="name" type="mi:identifier" use="required">
-            <annotation>
-                <documentation xml:lang="en">
-                    An identifier for this service level.
-                </documentation>
-            </annotation>
-        </attribute>
-        <attribute name="end" type="mi:timestamp" use="required">
-            <annotation>
-                <documentation xml:lang="en">
-                    A time after which the support level does not exist.
-                </documentation>
-            </annotation>
-        </attribute>
-    </complexType>
-
     <complexType name="licenseType">
         <annotation>
             <documentation xml:lang="en">
@@ -421,7 +397,6 @@
         </annotation>
         <sequence>
             <element name="dependency" type="mi:dependencyType" minOccurs="0" maxOccurs="unbounded"/>
-            <element name="servicelevel" type="mi:servicelevelType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="license" type="mi:licenseType">
                 <unique name="licenseModule">
                     <selector xpath="mi:module"/>
@@ -853,10 +828,6 @@
         </annotation>
         <sequence>
             <element name="build" type="mi:buildType" minOccurs="0" maxOccurs="unbounded">
-                <unique name="servicelevelName">
-                    <selector xpath="mi:servicelevel"/>
-                    <field xpath="@name"/>
-                </unique>
                 <unique name="buildProfile">
                     <selector xpath="mi:profile"/>
                     <field xpath="@name"/>

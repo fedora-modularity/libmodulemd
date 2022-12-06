@@ -9,7 +9,6 @@
                 </dependency>
                 <dependency name=""/>   <!-- An unspecified stream.
                                              Not supported by modulemd-packager-v3. -->
-                <servicelevel name="" end=""/>
                 <license>
                     <module></module>
                     <content></content>

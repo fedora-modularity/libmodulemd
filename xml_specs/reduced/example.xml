@@ -43,7 +43,6 @@
                 <dependency name="platform">
                     <requires>f37</requires>
                 </dependency>
-                <servicelevel name="bug_fixes" end="1685656799"/>
                 <license>
                     <module>MIT</module>
                     <content>(Copyright only) and (Artistic or GPL+)</content>

@@ -1,4 +1,4 @@
-<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="">
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="" revision="">
     <module name="">
         <stream name=""> <!-- DNF wants versions and contexts to differ in @summary etc. -->
             <build version="" context="" static="" arch="" summary="" description="">

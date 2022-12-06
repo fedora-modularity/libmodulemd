@@ -991,8 +991,34 @@
                     </unique>
                 </element>
             </sequence>
-            <!-- TODO: Use namespace as a minimal-required and @version as compatible revision. -->
-            <attribute name="version" type="nonNegativeInteger" use="required" fixed="1"/>
+            <attribute name="version" type="nonNegativeInteger" use="required" fixed="1">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A major version of this index format. Future
+                        incompatible versions of the format will have a
+                        distinct version number.
+                        Implementations which do not support this version are
+                        advised to reject documents of this version.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="revision" type="nonNegativeInteger" use="required" fixed="0">
+                <annotation>
+                    <documentation xml:lang="en">
+                        A minor revision of this index format version. Future
+                        compatible revisions of the format will have
+                        a distinct revsion number, but retain unchanged major
+                        version number.
+                        Implementations which do not support this revision,
+                        but support the major version are advised to process
+                        the document.
+                        Consuming implementations are not advised to validate
+                        the input documents against this XML schema because
+                        this schema only fits to this revision and performs
+                        a strict validation.
+                    </documentation>
+                </annotation>
+            </attribute>
         </complexType>
         <unique name="moduleName">
             <selector xpath="mi:module"/>

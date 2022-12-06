@@ -1,4 +1,4 @@
-<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1">
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
     <module name="a">
         <stream name="b">
             <build context="aaaaaaaaaaaaaa" version="1" static="1" arch="x86_64">

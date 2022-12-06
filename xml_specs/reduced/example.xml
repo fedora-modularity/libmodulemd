@@ -2,23 +2,17 @@
     <module name="perl">
         <stream name="5.26">
             <default-profile modified="202205040810">
-                <intent> <!-- empty or missing @name means all variants -->
-                    <profile>default</profile>
-                </intent>
+                <profile>default</profile>
             </default-profile>
         </stream>
         <stream name="5.28">
             <default-profile modified="202205040810">
-                <intent> <!-- empty or missing @name means all variants -->
-                    <profile>default</profile>
-                </intent>
+                <profile>default</profile>
             </default-profile>
         </stream>
         <stream name="5.30">
             <default-profile modified="202205040810">
-                <intent> <!-- empty or missing @name means all variants -->
-                    <profile>default</profile>
-                </intent>
+                <profile>default</profile>
             </default-profile>
             <obsolete modified="1643014440">
                 <eol when="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no eol would remove the obsolete -->
@@ -33,9 +27,7 @@
         </stream>
         <stream name="5.32">
             <default-profile modified="202205040810">
-                <intent> <!-- empty or missing @name means all variants -->
-                    <profile>common</profile>
-                </intent>
+                <profile>common</profile>
             </default-profile>
         </stream>
         <stream name="5.34">
@@ -272,9 +264,7 @@
                 <!-- and other nevras would follow !-->
             </build>
             <default-profile modified="202205040810">
-                <intent> <!-- empty or missing @name means all variants -->
-                    <profile>common</profile>
-                </intent>
+                <profile>common</profile>
             </default-profile>
             <translation modified="1640998860">
                 <locale name="cs_CZ">
@@ -284,9 +274,7 @@
                 </locale>
             </translation>
         </stream>
-        <default-stream modified="202205040810">
-            <intent name="" stream="5.34"/> <!-- empty @name means all variants -->
-        </default-stream>
+        <default-stream modified="202205040810" stream="5.34"/> <!-- empty @name means all variants -->
     </module>
     <module name="perl-IO-Socket-SSL">
         <stream name="2.068">

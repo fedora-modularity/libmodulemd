@@ -1,8 +1,7 @@
 <index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
     <module name="perl">
-        <default-stream modified="0"/>
-    </module>
-    <module name="python">
-        <default-stream modified="0" stream=""/>
+        <stream name="5.32">
+            <default-profile modified="1"/>
+        </stream>
     </module>
 </index>

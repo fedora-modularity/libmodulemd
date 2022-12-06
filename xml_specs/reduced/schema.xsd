@@ -156,18 +156,6 @@
         <restriction base="unsignedLong"/>
     </simpleType>
 
-    <simpleType name="intentName">
-        <annotation>
-            <documentation xml:lang="en">
-                An identifier of an intent. An empty string denotes other intents.
-            </documentation>
-        </annotation>
-        <restriction base="string">
-            <minLength value="0"/>
-            <maxLength value="255"/>
-        </restriction>
-    </simpleType>
-
     <simpleType name="localeName">
         <annotation>
             <documentation xml:lang="en">
@@ -468,12 +456,12 @@
         </attribute>
     </complexType>
 
-    <complexType name="profileIntentType">
+    <complexType name="default-profileType">
         <annotation>
             <documentation xml:lang="en">
-                A set of default profiles for this particular intent.
-                When merging default-profile intents, the latest tree replaces
-                all previous definitions atomically.
+                Specify a list of profiles to be installed by a package
+                manager when a stream is requested to be installed without
+                specifying a particular profile.
             </documentation>
         </annotation>
         <sequence>
@@ -487,40 +475,11 @@
                 </annotation>
             </element>
         </sequence>
-        <attribute name="name" type="mi:intentName" default="">
-            <annotation>
-                <documentation xml:lang="en">
-                    An identifier of the intent. A missing or empty attribute
-                    means a global default applying to other unspecified
-                    intents.
-                </documentation>
-            </annotation>
-        </attribute>
-    </complexType>
-
-    <complexType name="default-profileType">
-        <annotation>
-            <documentation xml:lang="en">
-                Specify a list of profiles to be installed by a package
-                manager when a stream is requested to be installed without
-                specifying a particular profile. The default profiles can
-                differ by a variant of a distribution, called intent here.
-            </documentation>
-        </annotation>
-        <sequence>
-            <element name="intent" type="mi:profileIntentType" maxOccurs="unbounded">
-                <unique name="defaultProfileList">
-                    <selector xpath="mi:profile"/>
-                    <field xpath="."/>
-                </unique>
-            </element>
-        </sequence>
         <attribute name="modified" type="mi:timestamp" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    When merging default-profiles from multiple indices, all
-                    default-profiles apply cumulatively in the ascending order
-                    of this attribute.
+                    When merging default-profiles from multiple indices,
+                    the latest tree replaces all previous definitions.
                 </documentation>
             </annotation>
         </attribute>
@@ -796,9 +755,9 @@
                 </unique>
             </element>
             <element name="default-profile" type="mi:default-profileType" minOccurs="0">
-                <unique name="profileIntent">
-                    <selector xpath="mi:intent"/>
-                    <field xpath="@name"/>
+                <unique name="defaultProfileList">
+                    <selector xpath="mi:profile"/>
+                    <field xpath="."/>
                 </unique>
             </element>
             <element name="obsolete" type="mi:obsoleteType" minOccurs="0" maxOccurs="unbounded"/>
@@ -812,20 +771,19 @@
         <attribute name="name" type="mi:identifier" use="required"/>
     </complexType>
 
-    <complexType name="streamIntentType">
+    <complexType name="default-streamType">
         <annotation>
             <documentation xml:lang="en">
-                A default stream for this particular intent.
-                When merging default-streams, the latest tree replaces all
-                previous definitions atomically.
+                A stream of the module a package manager prefers when a user
+                request to install a module without specifying a particular
+                stream.
             </documentation>
         </annotation>
-        <attribute name="name" type="mi:intentName" default="">
+        <attribute name="modified" type="mi:timestamp" use="required">
             <annotation>
                 <documentation xml:lang="en">
-                    An identifier of the intent. An empty or missing attribute
-                    means a global default applying to other unspecified
-                    intents. The value must be unique.
+                    When merging default-streams from multiple indices, the
+                    latest one replaces all previous definitions.
                 </documentation>
             </annotation>
         </attribute>
@@ -835,30 +793,6 @@
                     An identifier of the default stream. An empty or missing
                     attribute means unsetting the, possibly previously
                     defined, default stream.
-                </documentation>
-            </annotation>
-        </attribute>
-    </complexType>
-
-    <complexType name="default-streamType">
-        <annotation>
-            <documentation xml:lang="en">
-                A stream of the module a package manager prefers when a user
-                request to install a module without specifying a particular
-                stream. The default stream can vary according to a variant of
-                a distribution the user has installed. The variant is called
-                an intent here.
-            </documentation>
-        </annotation>
-        <sequence>
-            <element name="intent" type="mi:streamIntentType" maxOccurs="unbounded"/>
-        </sequence>
-        <attribute name="modified" type="mi:timestamp" use="required">
-            <annotation>
-                <documentation xml:lang="en">
-                    When merging default-streams from multiple indices, all
-                    default-streams apply cumulatively in the ascending order
-                    of this attribute.
                 </documentation>
             </annotation>
         </attribute>
@@ -879,12 +813,7 @@
                     <field xpath="@context"/>
                 </unique>
             </element>
-            <element name="default-stream" type="mi:default-streamType" minOccurs="0" maxOccurs="unbounded">
-                <unique name="default-streamIntent">
-                    <selector xpath="mi:intent"/>
-                    <field xpath="@name"/>
-                </unique>
-            </element>
+            <element name="default-stream" type="mi:default-streamType" minOccurs="0"/>
         </sequence>
         <attribute name="name" type="mi:identifier" use="required"/>
     </complexType>

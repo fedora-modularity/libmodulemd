@@ -1,9 +1,9 @@
 <index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
     <module name="perl">
-        <stream name="5.26">
+        <stream name="5.32">
             <default-profile modified="1">
-                <intent/>
-                <intent name=""/>
+                <profile>foo</profile>
+                <profile>bar</profile>
             </default-profile>
         </stream>
     </module>

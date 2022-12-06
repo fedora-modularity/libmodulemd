@@ -23,9 +23,7 @@
             </build>
 
             <default-profile modified=""> <!-- @modified could be renamed to version -->
-                <intent name="">    <!-- Missing @name means intentless global default -->
-                    <profile></profile> <!-- With a value replaces, missing unsets. -->
-                </intent>
+                <profile></profile> <!-- With a value replaces, missing unsets. -->
             </default-profile>
 
             <obsolete modified="" context=""> <!-- @modified in seconds since the epoch.
@@ -48,12 +46,9 @@
             </translation>
         </stream>
 
-        <default-stream modified=""> <!-- @modified could be renamed to version -->
-            <intent name="" stream=""/> <!-- Missing or empty @name means an intentless
-                                             global default. -->
+        <default-stream modified="" stream=""/> <!-- @modified could be renamed to version -->
                                         <!-- Existing @stream sets a default,
                                              missing or empty unsets. -->
-        </default-stream>
     </module>
 
 </index>

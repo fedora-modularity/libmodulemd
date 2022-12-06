@@ -8,7 +8,12 @@ Anaconda: Anaconda/subscription manager allows setting a system purpose as an
 arbitrary string. Currently the value is also a display string. Without
 localization. Some values are in /etc/rhsm/syspurpose/valid_fields.json.
 
+Intents were deprecated
+<https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/RXDP2WMPR3HHBRTQAKPSTRU6KABTJSMA/#JDN2FHCDR6BNPCL4EQKRN3UK54UZOGNN>.
+Nobody used them and DNF did not implement them. There is no
+distribution-agnostic way of delivering intents to DNF.
+
 DECISION
 ========
 - Allow an arbitrary string. An empty string equals to undefined value.
-
+- Removed without a replacement.

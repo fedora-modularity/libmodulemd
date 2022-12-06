@@ -2,12 +2,7 @@
     <module name="perl">
         <stream name="5.32">
             <default-profile modified="1">
-                <intent name=""/>
-            </default-profile>
-        </stream>
-        <stream name="5.26">
-            <default-profile modified="1">
-                <intent/>
+                <profile>foo</profile>
             </default-profile>
         </stream>
     </module>

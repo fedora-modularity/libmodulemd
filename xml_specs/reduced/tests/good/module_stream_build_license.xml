@@ -1,0 +1,30 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="a">
+        <stream name="b">
+            <build version="3" context="c" static="true" arch="x86_64">
+                <license>
+                    <module>MIT</module>
+                </license>
+            </build>
+            <build version="2" context="c" static="true" arch="x86_64">
+                <license>
+                    <module>MIT</module>
+                    <module>GPL-3.0-or-later</module>
+                </license>
+            </build>
+            <build version="1" context="c" static="true" arch="x86_64">
+                <license>
+                    <module>MIT</module>
+                    <content>GPL-3.0-or-later</content>
+                </license>
+            </build>
+            <build version="0" context="c" static="true" arch="x86_64">
+                <license>
+                    <module>MIT</module>
+                    <content>MIT</content>
+                    <content>GPL-3.0-or-later</content>
+                </license>
+            </build>
+        </stream>
+    </module>
+</index>

@@ -1,0 +1,317 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="perl">
+        <stream name="5.26">
+            <default-profile modified="202205040810">
+                <intent> <!-- empty or missing @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+        </stream>
+        <stream name="5.28">
+            <default-profile modified="202205040810">
+                <intent> <!-- empty or missing @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+        </stream>
+        <stream name="5.30">
+            <default-profile modified="202205040810">
+                <intent> <!-- empty or missing @name means all variants -->
+                    <profile>default</profile>
+                </intent>
+            </default-profile>
+            <obsolete modified="1643014440">
+                <eol when="1622505600" message="Module stream perl:5.30 is no longer supported. Please switch to perl:5.32"> <!-- no eol would remove the obsolete -->
+                    <replacement module="perl" stream="5.32"/>
+                </eol>
+            </obsolete>
+            <translation modified="1640998860">
+                <locale name="cs_CZ">
+                    <obsolete context="" message="Proud modulů perl:5.30 již není podporován. Prosím, přepněte na perl:5.32"/>
+                </locale>
+            </translation>
+        </stream>
+        <stream name="5.32">
+            <default-profile modified="202205040810">
+                <intent> <!-- empty or missing @name means all variants -->
+                    <profile>common</profile>
+                </intent>
+            </default-profile>
+        </stream>
+        <stream name="5.34">
+            <build version="3720220503131308" context="f37" static="1" arch="x86_64" summary="Practical Extraction and Report Language" description="Perl is a high-level programming language with roots in C, sed, awk and shell&#10;scripting. Perl is good at handling processes and files, and is especially good&#10;at handling text. Perl's hallmarks are practicality and efficiency. While it is&#10;used to do a lot of different things, Perl's most common applications are system&#10;administration utilities and web programming.&#10;">
+                <dependencies-or>
+                    <dependencies-and>
+                        <dependency name="platform">
+                            <requires>f37</requires>
+                        </dependency>
+                    </dependencies-and>
+                </dependencies-or>
+                <servicelevel name="bug_fixes" end="1685656799"/>
+                <license>
+                    <module>MIT</module>
+                    <content>(Copyright only) and (Artistic or GPL+)</content>
+                    <content>(GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT</content>
+                    <content>(GPL+ or Artistic) and Artistic 2.0 and UCD</content>
+                    <content>(GPL+ or Artistic) and BSD</content>
+                    <content>(GPL+ or Artistic) and BSD and HSRL and MIT and UCD and Public domain</content>
+                    <content>(GPL+ or Artistic) and CC0 and Public Domain</content>
+                    <content>(GPL+ or Artistic) and FSFAP</content>
+                    <content>(GPL+ or Artistic) and MIT</content>
+                    <content>(GPL+ or Artistic) and Public Domain</content>
+                    <content>(GPL+ or Artistic) and RSA</content>
+                    <content>(GPL+ or Artistic) and UCD</content>
+                    <content>(GPL+ or Artistic) and UCD and Public Domain</content>
+                    <content>(GPL+ or Artistic) and Unicode</content>
+                    <content>(GPL+ or Artistic) and zlib</content>
+                    <content>ASL 2.0</content>
+                    <content>CC0</content>
+                    <content>GPL+</content>
+                    <content>GPL+ or Artistic</content>
+                    <content>GPLv2+ or Artistic</content>
+                    <content>GPLv3+</content>
+                    <content>MIT</content>
+                    <content>TTWL</content>
+                </license>
+                <references comunity="https://www.perl.org/" documentation="https://www.perl.org/docs.html" tracker="https://bugzilla.redhat.com/buglist.cgi?classification=Fedora&amp;product=Fedora%20Modules&amp;component=perl"/>
+                <profile name="common" description="Interpreter and all Perl modules bundled within upstream Perl.">
+                    <package>perl</package>
+                </profile>
+                <profile name="minimal" description="Only the interpreter as a standalone executable.">
+                    <package>perl-interpreter</package>
+                </profile>
+                <api>perl</api>
+                <api>perl-Archive-Tar</api>
+                <api>perl-Attribute-Handlers</api>
+                <api>perl-AutoLoader</api>
+                <api>perl-AutoSplit</api>
+                <api>perl-B</api>
+                <api>perl-Benchmark</api>
+                <api>perl-CPAN</api>
+                <api>perl-CPAN-Meta</api>
+                <api>perl-CPAN-Meta-Requirements</api>
+                <api>perl-CPAN-Meta-YAML</api>
+                <api>perl-Carp</api>
+                <api>perl-Class-Struct</api>
+                <api>perl-Compress-Raw-Bzip2</api>
+                <api>perl-Compress-Raw-Zlib</api>
+                <api>perl-Config-Extensions</api>
+                <api>perl-Config-Perl-V</api>
+                <api>perl-DBM_Filter</api>
+                <api>perl-DB_File</api>
+                <api>perl-Data-Dumper</api>
+                <api>perl-Devel-PPPort</api>
+                <api>perl-Devel-Peek</api>
+                <api>perl-Devel-SelfStubber</api>
+                <api>perl-Digest</api>
+                <api>perl-Digest-MD5</api>
+                <api>perl-Digest-SHA</api>
+                <api>perl-Digest-SHA1</api>
+                <api>perl-DirHandle</api>
+                <api>perl-Dumpvalue</api>
+                <api>perl-DynaLoader</api>
+                <api>perl-Encode</api>
+                <api>perl-Encode-devel</api>
+                <api>perl-English</api>
+                <api>perl-Env</api>
+                <api>perl-Errno</api>
+                <api>perl-Exporter</api>
+                <api>perl-ExtUtils-CBuilder</api>
+                <api>perl-ExtUtils-Command</api>
+                <api>perl-ExtUtils-Constant</api>
+                <api>perl-ExtUtils-Embed</api>
+                <api>perl-ExtUtils-Install</api>
+                <api>perl-ExtUtils-MM-Utils</api>
+                <api>perl-ExtUtils-MakeMaker</api>
+                <api>perl-ExtUtils-Manifest</api>
+                <api>perl-ExtUtils-Miniperl</api>
+                <api>perl-ExtUtils-ParseXS</api>
+                <api>perl-Fcntl</api>
+                <api>perl-File-Basename</api>
+                <api>perl-File-Compare</api>
+                <api>perl-File-Copy</api>
+                <api>perl-File-DosGlob</api>
+                <api>perl-File-Fetch</api>
+                <api>perl-File-Find</api>
+                <api>perl-File-Path</api>
+                <api>perl-File-Temp</api>
+                <api>perl-File-stat</api>
+                <api>perl-FileCache</api>
+                <api>perl-FileHandle</api>
+                <api>perl-Filter</api>
+                <api>perl-Filter-Simple</api>
+                <api>perl-FindBin</api>
+                <api>perl-GDBM_File</api>
+                <api>perl-Getopt-Long</api>
+                <api>perl-Getopt-Std</api>
+                <api>perl-HTTP-Tiny</api>
+                <api>perl-Hash-Util</api>
+                <api>perl-Hash-Util-FieldHash</api>
+                <api>perl-I18N-Collate</api>
+                <api>perl-I18N-LangTags</api>
+                <api>perl-I18N-Langinfo</api>
+                <api>perl-IO</api>
+                <api>perl-IO-Compress</api>
+                <api>perl-IO-Socket-IP</api>
+                <api>perl-IO-Zlib</api>
+                <api>perl-IPC-Cmd</api>
+                <api>perl-IPC-Open3</api>
+                <api>perl-IPC-SysV</api>
+                <api>perl-JSON-PP</api>
+                <api>perl-Locale-Maketext</api>
+                <api>perl-Locale-Maketext-Simple</api>
+                <api>perl-MIME-Base64</api>
+                <api>perl-Math-BigInt</api>
+                <api>perl-Math-BigInt-FastCalc</api>
+                <api>perl-Math-BigRat</api>
+                <api>perl-Math-Complex</api>
+                <api>perl-Memoize</api>
+                <api>perl-Module-CoreList</api>
+                <api>perl-Module-CoreList-tools</api>
+                <api>perl-Module-Load</api>
+                <api>perl-Module-Load-Conditional</api>
+                <api>perl-Module-Loaded</api>
+                <api>perl-Module-Metadata</api>
+                <api>perl-Module-Signature</api>
+                <api>perl-NDBM_File</api>
+                <api>perl-NEXT</api>
+                <api>perl-Net</api>
+                <api>perl-Net-Ping</api>
+                <api>perl-ODBM_File</api>
+                <api>perl-Opcode</api>
+                <api>perl-POSIX</api>
+                <api>perl-Params-Check</api>
+                <api>perl-PathTools</api>
+                <api>perl-Perl-OSType</api>
+                <api>perl-PerlIO-via-QuotedPrint</api>
+                <api>perl-Pod-Checker</api>
+                <api>perl-Pod-Escapes</api>
+                <api>perl-Pod-Functions</api>
+                <api>perl-Pod-Html</api>
+                <api>perl-Pod-Perldoc</api>
+                <api>perl-Pod-Simple</api>
+                <api>perl-Pod-Usage</api>
+                <api>perl-Safe</api>
+                <api>perl-Scalar-List-Utils</api>
+                <api>perl-Search-Dict</api>
+                <api>perl-SelectSaver</api>
+                <api>perl-SelfLoader</api>
+                <api>perl-Socket</api>
+                <api>perl-Storable</api>
+                <api>perl-Symbol</api>
+                <api>perl-Sys-Hostname</api>
+                <api>perl-Sys-Syslog</api>
+                <api>perl-Term-ANSIColor</api>
+                <api>perl-Term-Cap</api>
+                <api>perl-Term-Complete</api>
+                <api>perl-Term-ReadLine</api>
+                <api>perl-Test</api>
+                <api>perl-Test-Harness</api>
+                <api>perl-Test-Simple</api>
+                <api>perl-Text-Abbrev</api>
+                <api>perl-Text-Balanced</api>
+                <api>perl-Text-ParseWords</api>
+                <api>perl-Text-Tabs+Wrap</api>
+                <api>perl-Thread</api>
+                <api>perl-Thread-Queue</api>
+                <api>perl-Thread-Semaphore</api>
+                <api>perl-Tie</api>
+                <api>perl-Tie-File</api>
+                <api>perl-Tie-Memoize</api>
+                <api>perl-Tie-RefHash</api>
+                <api>perl-Time</api>
+                <api>perl-Time-HiRes</api>
+                <api>perl-Time-Local</api>
+                <api>perl-Time-Piece</api>
+                <api>perl-Unicode-Collate</api>
+                <api>perl-Unicode-Normalize</api>
+                <api>perl-Unicode-UCD</api>
+                <api>perl-User-pwent</api>
+                <api>perl-autodie</api>
+                <api>perl-autouse</api>
+                <api>perl-base</api>
+                <api>perl-bignum</api>
+                <api>perl-blib</api>
+                <api>perl-constant</api>
+                <api>perl-debugger</api>
+                <api>perl-deprecate</api>
+                <api>perl-devel</api>
+                <api>perl-diagnostics</api>
+                <api>perl-doc</api>
+                <api>perl-encoding</api>
+                <api>perl-encoding-warnings</api>
+                <api>perl-experimental</api>
+                <api>perl-fields</api>
+                <api>perl-filetest</api>
+                <api>perl-generators</api>
+                <api>perl-if</api>
+                <api>perl-interpreter</api>
+                <api>perl-less</api>
+                <api>perl-lib</api>
+                <api>perl-libnet</api>
+                <api>perl-libnetcfg</api>
+                <api>perl-libs</api>
+                <api>perl-locale</api>
+                <api>perl-macros</api>
+                <api>perl-meta-notation</api>
+                <api>perl-mro</api>
+                <api>perl-open</api>
+                <api>perl-overload</api>
+                <api>perl-overloading</api>
+                <api>perl-parent</api>
+                <api>perl-perlfaq</api>
+                <api>perl-ph</api>
+                <api>perl-podlators</api>
+                <api>perl-sigtrap</api>
+                <api>perl-sort</api>
+                <api>perl-subs</api>
+                <api>perl-threads</api>
+                <api>perl-threads-shared</api>
+                <api>perl-utils</api>
+                <api>perl-vars</api>
+                <api>perl-version</api>
+                <api>perl-vmsish</api>
+                <!-- demodularized is empty -->
+                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="src" sha256="829b584aa0f27e6242bed7228cd2f662520193fc8e4a0d8f65552948ec1cd183"/>
+                    <!-- (e.g. sha256) checksums are optional -->
+                <nevra name="perl" epoch="4" version="5.34.1" release="486.module_f37+14419+7d39a4ba" arch="x86_64" sha256="53d274c495a87c560fb50728eb340516ab1a627a8b5662e1e21419269c2341c0"/>
+                <!-- and other nevras would follow !-->
+            </build>
+            <default-profile modified="202205040810">
+                <intent> <!-- empty or missing @name means all variants -->
+                    <profile>common</profile>
+                </intent>
+            </default-profile>
+            <translation modified="1640998860">
+                <locale name="cs_CZ">
+                    <build summary="Praktický jazyk pro výtahy a zprávy" description="Perl je vysokoúrovňový jazyk s kořeny v C a skriptovování v sedu,&#10;awku a shellu. Perl je dobrý ve zacházení s procesy a soubory&#10;a obzvláště dobrý ve zpracování textu. Perl vyniká&#10;v praktičnosti a účinnosti. Ačkoliv se používá ke mnoha účelům,&#10;nejčastější použití Perlu jsou nástroje pro správu systému a programování&#10;webu."/>
+                    <profile name="common" description="Interepretr a všechny perlové moduly přibalené k upstreamovému Perlu."/>
+                    <profile name="minimal" description="Pouze interpretr jakožo samostaně spustitelný program."/>
+                </locale>
+            </translation>
+        </stream>
+        <default-stream modified="202205040810">
+            <intent name="" stream="5.34"/> <!-- empty @name means all variants -->
+        </default-stream>
+    </module>
+    <module name="perl-IO-Socket-SSL">
+        <stream name="2.068">
+            <obsolete modified="1646321280">
+                <eol when="1654041600" message="Module stream perl-IO-Socket-SSL:2.068 is no longer supported. Please switch to perl-IO-Socket-SSL:2.074"> <!-- no @context means all contexts -->
+                    <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+                </eol>
+            </obsolete>
+            <obsolete modified="1646323140" context="7b91f26c">
+                <eol message="Module stream perl-IO-Socket-SSL:2.068 does not work with OpenSSL 3. Please switch to perl-IO-Socket-SSL:2.074."> <!-- no @when means now -->
+                    <replacement module="perl-IO-Socket-SSL" stream="2.074"/>
+                </eol>
+            </obsolete>
+            <translation modified="1640998860">
+                <locale name="cs_CZ">
+                    <obsolete message="Proud modulů perl-IO-Socket-SSL:2.068 již není podporován. Prosím, přepněte na perl-IO-Socket-SSL:2.074"/>
+                    <obsolete context="7b91f26c" message="Proud modulů perl-IO-Socket-SSL:2.068 nefunguje s OpenSSL 3. Prosím, přepněte na perl-IO-Socket-SSL:2.074."/>
+                </locale>
+            </translation>
+        </stream>
+    </module>
+</index>

@@ -1,0 +1,11 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="b">
+        <stream name="a">
+            <translation modified="0">
+                <locale name="">
+                    <build/>
+                </locale>
+            </translation>
+        </stream>
+    </module>
+</index>

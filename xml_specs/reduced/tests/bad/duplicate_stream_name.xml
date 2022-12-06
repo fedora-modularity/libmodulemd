@@ -1,0 +1,6 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="perl">
+        <stream name="5.26"/>
+        <stream name="5.26"/>
+    </module>
+</index>

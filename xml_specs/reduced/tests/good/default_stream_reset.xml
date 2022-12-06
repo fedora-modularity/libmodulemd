@@ -1,0 +1,14 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="perl">
+        <default-stream modified="0">
+            <intent name="workstation" stream=""/>
+            <intent name="server" stream="5.26"/>
+        </default-stream>
+    </module>
+    <module name="python">
+        <default-stream modified="0">
+            <intent/>
+            <intent name="server" stream="3.8"/>
+        </default-stream>
+    </module>
+</index>

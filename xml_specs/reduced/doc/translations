@@ -1,0 +1,14 @@
+RFC 1766 was obsoleted by RFC 5646 which allows 3-letter codes and
+many other subtags. XML formats (xml:lang etc.) use this hyphen-delimeted format.
+
+Glibc uses ISO 639 language (2- and 3-letter) codes, optionally followed by an
+ISO 3166 (2-letter) country code, followed by modifiers (like "sr@Latn";
+compare to RFC 5646 "sr-Latn").
+
+DECISION
+========
+
+Because RFC 5646 format is more difficult to parse, because YAML libmodulemd
+already uses glibc format, and because comps group also use glibc format
+(despite written in XML), XML module format will use glibc format.
+

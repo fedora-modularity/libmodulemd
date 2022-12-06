@@ -1,0 +1,11 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="a">
+        <stream name="b">
+            <build version="1" context="c" static="true" arch="x86_64" summary="a&#x0a;b" description="">
+                <license>
+                    <module>MIT</module>
+                </license>
+            </build>
+        </stream>
+    </module>
+</index>

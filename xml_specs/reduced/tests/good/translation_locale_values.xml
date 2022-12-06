@@ -1,0 +1,20 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="b">
+        <stream name="a">
+            <translation modified="0">
+                <locale name="sr">
+                    <build/>
+                </locale>
+                <locale name="sr_RS">
+                    <build/>
+                </locale>
+                <locale name="sr@latin">
+                    <build/>
+                </locale>
+                <locale name="sr_RS@latin">
+                    <build/>
+                </locale>
+            </translation>
+        </stream>
+    </module>
+</index>

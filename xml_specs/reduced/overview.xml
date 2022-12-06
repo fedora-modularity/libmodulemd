@@ -1,0 +1,68 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="" revision="">
+    <module name="">
+        <stream name=""> <!-- DNF wants versions and contexts to differ in @summary etc. -->
+            <build version="" context="" static="" arch="" summary="" description="">
+                                    <!-- @static defaults to false. -->
+                <dependencies-or>   <!-- This level not supported by modulemd-packager-v3
+                                         Never seen in the wild. Not implemented by DNF. -->
+                    <dependencies-and>
+                        <dependency name="">
+                            <requires></requires> <!-- Only one for modulemd-packager-v3 -->
+                            <conflicts></conflicts> <!-- Not supported by modulemd-packager-v3 -->
+                        </dependency>
+                    </dependencies-and>
+                    <dependencies-and>
+                        <dependency name=""/> <!-- An unspecified stream.
+                                                   Not supported by modulemd-packager-v3. -->
+                    </dependencies-and>
+                </dependencies-or>
+                <servicelevel name="" end=""/>
+                <license>
+                    <module></module>
+                    <content></content>
+                </license>
+                <references comunity="" documentation="" tracker=""/>
+                <profile name="" description="">
+                    <package></package>
+                </profile>
+                <api></api>
+                <demodularized></demodularized>
+                <nevra name="" epoch="" version="" release="" arch="" sha256=""/>
+                    <!-- @sha256 is unused now. -->
+            </build>
+
+            <default-profile modified=""> <!-- @modified could be renamed to version -->
+                <intent name="">    <!-- Missing @name means intentless global default -->
+                    <profile></profile> <!-- With a value replaces, missing unsets. -->
+                </intent>
+            </default-profile>
+
+            <obsolete modified="" context=""> <!-- @modified in seconds since the epoch.
+                        Missing or empty @context means all contexts. -->
+                <eol when="" message=""> <!-- Missing element means unsetting. -->
+                        <!-- @when in seconds since the epoch, missing means now. -->
+                    <replacement module="" stream=""/>
+                </eol>
+            </obsolete>
+
+            <translation modified=""> <!-- @modified could be renamed to version -->
+                <locale name=""> <!-- Each of the child is optional, but there
+                                      must be at least one. -->
+                    <build summary="" description=""/>  <!-- missing @summary, @description unsets -->
+                    <profile name="" description=""/>   <!-- missing @description unsets -->
+                    <obsolete context="" message=""/>   <!-- missing or empty @context means
+                            all contexts,
+                            missing @message unsets, unsupported in YAML. -->
+                </locale>
+            </translation>
+        </stream>
+
+        <default-stream modified=""> <!-- @modified could be renamed to version -->
+            <intent name="" stream=""/> <!-- Missing or empty @name means an intentless
+                                             global default. -->
+                                        <!-- Existing @stream sets a default,
+                                             missing or empty unsets. -->
+        </default-stream>
+    </module>
+
+</index>

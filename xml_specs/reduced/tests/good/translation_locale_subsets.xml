@@ -1,0 +1,79 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="b">
+        <stream name="a">
+            <translation modified="1">
+                <locale name="aa">
+                    <build/>
+                </locale>
+                <locale name="ab">
+                    <profile name="c"/>
+                </locale>
+                <locale name="ae">
+                    <obsolete/>
+                </locale>
+                <locale name="af">
+                    <build/>
+                    <profile name="c"/>
+                </locale>
+                <locale name="ak">
+                    <build/>
+                    <profile name="c"/>
+                    <profile name="d"/>
+                </locale>
+                <locale name="am">
+                    <build/>
+                    <obsolete/>
+                </locale>
+                <locale name="an">
+                    <build/>
+                    <obsolete/>
+                    <obsolete context="e"/>
+                </locale>
+                <locale name="ar">
+                    <profile name="c"/>
+                    <obsolete/>
+                </locale>
+                <locale name="as">
+                    <profile name="c"/>
+                    <profile name="d"/>
+                    <obsolete/>
+                </locale>
+                <locale name="av">
+                    <profile name="c"/>
+                    <obsolete/>
+                    <obsolete context="e"/>
+                </locale>
+                <locale name="ay">
+                    <profile name="c"/>
+                    <profile name="d"/>
+                    <obsolete/>
+                    <obsolete context="e"/>
+                </locale>
+                <locale name="az">
+                    <build/>
+                    <profile name="c"/>
+                    <obsolete/>
+                </locale>
+                <locale name="ba">
+                    <build/>
+                    <profile name="c"/>
+                    <profile name="d"/>
+                    <obsolete context="e"/>
+                </locale>
+                <locale name="be">
+                    <build/>
+                    <profile name="c"/>
+                    <obsolete/>
+                    <obsolete context="e"/>
+                </locale>
+                <locale name="bg">
+                    <build/>
+                    <profile name="c"/>
+                    <profile name="d"/>
+                    <obsolete/>
+                    <obsolete context="e"/>
+                </locale>
+            </translation>
+        </stream>
+    </module> 
+</index>

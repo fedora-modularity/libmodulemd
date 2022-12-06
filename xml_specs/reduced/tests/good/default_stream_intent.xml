@@ -1,0 +1,7 @@
+<index xmlns="http://fedoraproject.org/metadata/moduleindex" version="1" revision="0">
+    <module name="python">
+        <default-stream modified="0">
+            <intent name="A Workstation Role" stream="3.11"/>
+        </default-stream>
+    </module>
+</index>

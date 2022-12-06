@@ -111,28 +111,6 @@
         <restriction base="mi:identifier"/>
     </simpleType>
 
-    <simpleType name="sha256Type">
-        <annotation>
-            <documentation xml:lang="en">
-                An SHA-256 digest.
-            </documentation>
-        </annotation>
-        <restriction base="hexBinary">
-            <length value="32"/>
-        </restriction>
-    </simpleType>
-
-    <simpleType name="sha512Type">
-        <annotation>
-            <documentation xml:lang="en">
-                An SHA-512 digest.
-            </documentation>
-        </annotation>
-        <restriction base="hexBinary">
-            <length value="64"/>
-        </restriction>
-    </simpleType>
-
     <simpleType name="contextOrEmptyType">
         <annotation>
             <documentation xml:lang="en">
@@ -367,22 +345,6 @@
                 <documentation xml:lang="en">
                     An architecture of the RPM package. Source packages
                     have a distinct value.
-                </documentation>
-            </annotation>
-        </attribute>
-        <attribute name="sha256" type="mi:sha256Type">
-            <annotation>
-                <documentation xml:lang="en">
-                    An optional SHA-256 digest of a content of the RPM package
-                    file.
-                </documentation>
-            </annotation>
-        </attribute>
-        <attribute name="sha512" type="mi:sha512Type">
-            <annotation>
-                <documentation xml:lang="en">
-                    An optional SHA-512 digest of a content of the RPM package
-                    file.
                 </documentation>
             </annotation>
         </attribute>

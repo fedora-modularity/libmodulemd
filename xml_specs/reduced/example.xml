@@ -40,13 +40,9 @@
         </stream>
         <stream name="5.34">
             <build version="3720220503131308" context="f37" static="1" arch="x86_64" summary="Practical Extraction and Report Language" description="Perl is a high-level programming language with roots in C, sed, awk and shell&#10;scripting. Perl is good at handling processes and files, and is especially good&#10;at handling text. Perl's hallmarks are practicality and efficiency. While it is&#10;used to do a lot of different things, Perl's most common applications are system&#10;administration utilities and web programming.&#10;">
-                <dependencies-or>
-                    <dependencies-and>
-                        <dependency name="platform">
-                            <requires>f37</requires>
-                        </dependency>
-                    </dependencies-and>
-                </dependencies-or>
+                <dependency name="platform">
+                    <requires>f37</requires>
+                </dependency>
                 <servicelevel name="bug_fixes" end="1685656799"/>
                 <license>
                     <module>MIT</module>

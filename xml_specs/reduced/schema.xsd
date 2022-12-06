@@ -250,29 +250,6 @@
         </attribute>
     </complexType>
 
-    <complexType name="dependencies-andType">
-        <annotation>
-            <documentation xml:lang="en">
-                A module build must satisfy all dependencies listed here.
-            </documentation>
-        </annotation>
-        <sequence>
-            <element name="dependency" type="mi:dependencyType" maxOccurs="unbounded"/>
-        </sequence>
-    </complexType>
-
-    <complexType name="dependencies-orType">
-        <annotation>
-            <documentation xml:lang="en">
-                A module build must satisfy at least one dependencies-and set
-                of dependencies.
-            </documentation>
-        </annotation>
-        <sequence>
-            <element name="dependencies-and" type="mi:dependencies-andType" maxOccurs="unbounded"/>
-        </sequence>
-    </complexType>
-
     <complexType name="servicelevelType">
         <annotation>
             <documentation xml:lang="en">
@@ -442,7 +419,7 @@
             </documentation>
         </annotation>
         <sequence>
-            <element name="dependencies-or" type="mi:dependencies-orType" minOccurs="0"/>
+            <element name="dependency" type="mi:dependencyType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="servicelevel" type="mi:servicelevelType" minOccurs="0" maxOccurs="unbounded"/>
             <element name="license" type="mi:licenseType">
                 <unique name="licenseModule">

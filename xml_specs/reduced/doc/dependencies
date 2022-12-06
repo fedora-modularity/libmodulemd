@@ -1,0 +1,17 @@
+YAML format allows multiple sets of dependencies. MBS splits them in stream
+expansion phase and output modules have probably only a single set of
+dependencies. Though specification does not prevent from having multiple sets
+in the output modulemd document which is put to a repository. These multiple
+sets have a logical OR releation and make modular dependencies algebraically
+complete.
+
+DNF: We do not implement the OR level. And we do not want to implement it.
+
+
+DECISION
+========
+
+Remove OR-level of dependencies. Keep only and AND-level.
+For the sake of simplicity, "dependencies-and" end "dependencies-or" elements
+will be removed and "dependency" elements moved to "dependencies-or" level.
+

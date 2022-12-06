@@ -3,19 +3,12 @@
         <stream name=""> <!-- DNF wants versions and contexts to differ in @summary etc. -->
             <build version="" context="" static="" arch="" summary="" description="">
                                     <!-- @static defaults to false. -->
-                <dependencies-or>   <!-- This level not supported by modulemd-packager-v3
-                                         Never seen in the wild. Not implemented by DNF. -->
-                    <dependencies-and>
-                        <dependency name="">
-                            <requires></requires> <!-- Only one for modulemd-packager-v3 -->
-                            <conflicts></conflicts> <!-- Not supported by modulemd-packager-v3 -->
-                        </dependency>
-                    </dependencies-and>
-                    <dependencies-and>
-                        <dependency name=""/> <!-- An unspecified stream.
-                                                   Not supported by modulemd-packager-v3. -->
-                    </dependencies-and>
-                </dependencies-or>
+                <dependency name="">
+                    <requires></requires>   <!-- Only one for modulemd-packager-v3 -->
+                    <conflicts></conflicts> <!-- Not supported by modulemd-packager-v3 -->
+                </dependency>
+                <dependency name=""/>   <!-- An unspecified stream.
+                                             Not supported by modulemd-packager-v3. -->
                 <servicelevel name="" end=""/>
                 <license>
                     <module></module>

@@ -494,6 +494,8 @@
                     The only exception are RPM packages (nevra elements) which
                     are gathered over all versions of the given stream,
                     context, and architecture.
+                    To speed up processing, producers are advised to sort
+                    builds by version in numerical, descending order.
                 </documentation>
             </annotation>
         </attribute>
@@ -987,7 +989,15 @@
                 <element name="module" type="mi:moduleType" minOccurs="0" maxOccurs="unbounded">
                     <unique name="streamName">
                         <selector xpath="mi:stream"/>
-                        <field xpath="@name"/>
+                        <field xpath="@name">
+                            <annotation>
+                                <documentation xml:lang="en">
+                                    To speed up processing, producers are
+                                    advised to sort streams by names in
+                                    lexicographical, ascending order.
+                                </documentation>
+                            </annotation>
+                        </field>
                     </unique>
                 </element>
             </sequence>
@@ -1022,7 +1032,15 @@
         </complexType>
         <unique name="moduleName">
             <selector xpath="mi:module"/>
-            <field xpath="@name"/>
+            <field xpath="@name">
+                <annotation>
+                    <documentation xml:lang="en">
+                        To speed up processing, producers are
+                        advised to sort modules by names in
+                        lexicographical, ascending order.
+                    </documentation>
+                </annotation>
+            </field>
         </unique>
     </element>
 </schema>

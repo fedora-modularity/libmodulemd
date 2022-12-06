@@ -1,0 +1,50 @@
+Index                                                   Obsoleted contexts
+--------------------------------------------------------A B---------------
+<obsolete modified="0"><eol/></obsolete>                1 1
+<obsolete modified="1"></obsolete>                      0 0
+<obsolete modified="2" context="A"><eol/></obsolete>    1 0
+<obsolete modified="3" context="B"><eol/></obsolete>    1 1
+<obsolete modified="4" context="A"></obsolete>          0 1
+<obsolete modified="5"><eol/></obsolete>                1 1
+<obsolete modified="6" context="A"></obsolete>          1 1
+
+Should context-less obsolete be independend from context obsolete?
+If independent, which does take precedence?
+
+Global-obsolete after a context-obsolete: Should it overlay replacement? Yes.
+Global-reset after a context-obsolete: Should it unobsolete the context?
+Context-reset after global-obsolete: Should it unobsolete the context?
+
+Models:
+
+(1) Global set and reset apply per context:
+Global-obsolete after a context-obsolete: Does it overlay replacement? Yes.
+Global-reset after a context-obsolete: Does it unobsolete the context? Yes.
+Context-reset after global-obsolete: Does it unobsolete the context? Yes.
+
+(2) Global set applies per context, global reset takes precedence:
+Global-obsolete after a context-obsolete: Does it overlay replacement? Yes.
+Global-reset after a context-obsolete: Does it unobsolete the context? Yes.
+Context-reset after global-obsolete: Does it unobsolete the context? No.
+
+(3) Independent, global set takes precedence:
+Global-obsolete after a context-obsolete: Does it overlay replacement? Yes.
+Global-reset after a context-obsolete: Does it unobsolete the context? No.
+Context-reset after global-obsolete: Does it unobsolete the context? No.
+
+(4) YAML implementation:
+Any reset resets everything.
+Context-obsolete overlays a global-obsolete.
+Global-obsolete overlays everything.
+Context-reset resets only that context, previous global-obsolete remains valid
+for other contexts.
+
+
+DECISION
+========
+
+The rules will follow YAML implementation. An obsoleteness is a per-context
+property. A set always sets the property, a reset always unsets the property.
+Always per context. A contextless obsolete (set or reset) is only a shortcut
+for naming all contexts.
+

@@ -1,0 +1,11 @@
+Are stream summaries and obsolete messages multiline?
+Pros: Compatible with YAML.
+Cons: Single-line summary is akin to an RPM summary.
+DNF: They can be single-line.
+DNF: They can be empty.
+DNF: A details specification for obsoletes should have mcurlej.
+
+DECISION
+========
+A build summary and license are single-line. Other free-form texts are
+multi-line.

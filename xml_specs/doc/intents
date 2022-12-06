@@ -1,0 +1,14 @@
+Alphabet (e.g. a white space) for intent identifiers?
+Ask Anaconda: What is the grammar, meaning, who does define them?
+Anaconda: We get "system purpose" data from a subscription manager, user
+selects one, we push the selection back into the manager. Ask DNF where they
+get intents from. We install packages and modules with DNF.
+DNF: We do not implement it, we don't want to detect intents.
+Anaconda: Anaconda/subscription manager allows setting a system purpose as an
+arbitrary string. Currently the value is also a display string. Without
+localization. Some values are in /etc/rhsm/syspurpose/valid_fields.json.
+
+DECISION
+========
+- Allow an arbitrary string. An empty string equals to undefined value.
+

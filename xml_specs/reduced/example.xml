@@ -60,7 +60,7 @@
                     <content>MIT</content>
                     <content>TTWL</content>
                 </license>
-                <references comunity="https://www.perl.org/" documentation="https://www.perl.org/docs.html" tracker="https://bugzilla.redhat.com/buglist.cgi?classification=Fedora&amp;product=Fedora%20Modules&amp;component=perl"/>
+                <references community="https://www.perl.org/" documentation="https://www.perl.org/docs.html" tracker="https://bugzilla.redhat.com/buglist.cgi?classification=Fedora&amp;product=Fedora%20Modules&amp;component=perl"/>
                 <profile name="common" description="Interpreter and all Perl modules bundled within upstream Perl.">
                     <package>perl</package>
                 </profile>

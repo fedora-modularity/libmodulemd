@@ -330,7 +330,7 @@
                 Links to (usually upstream) places pertaining the packaged software.
             </documentation>
         </annotation>
-        <attribute name="comunity" type="anyURI">
+        <attribute name="community" type="anyURI">
             <annotation>
                 <documentation xml:lang="en">A home page.</documentation>
             </annotation>

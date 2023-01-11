@@ -1061,7 +1061,7 @@ custom_string_read_handler (void *data,
       return 1;
     }
 
-  if (size > (size_t)(end - custom->current))
+  if (size > (size_t) (end - custom->current))
     {
       size = end - custom->current;
     }

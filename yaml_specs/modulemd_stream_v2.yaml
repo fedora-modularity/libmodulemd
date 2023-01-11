@@ -172,7 +172,8 @@ data:
         #
         # Type: AUTOMATIC
         #
-        # Mandatory for module metadata in a yum/dnf repository.
+        # Mandatory for module metadata in a yum/dnf repository if the
+        # module contains any artifacts.
         content:
             - ASL 2.0
             - GPL+ or Artistic

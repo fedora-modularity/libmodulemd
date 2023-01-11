@@ -375,7 +375,8 @@ modulemd_buildopts_parse_yaml (yaml_parser_t *parser,
                   return NULL;
                 }
             }
-          else if (g_str_equal (event.data.scalar.value, "arches"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "arches"))
             {
               g_hash_table_unref (buildopts->arches);
               buildopts->arches =
@@ -446,7 +447,8 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
                 error, event, "Missing mapping in buildopts rpms entry");
             }
 
-          if (g_str_equal (event.data.scalar.value, "whitelist"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value,
+                           "whitelist"))
             {
               g_hash_table_unref (buildopts->whitelist);
               buildopts->whitelist =
@@ -460,7 +462,8 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
                     nested_error->message);
                 }
             }
-          else if (g_str_equal (event.data.scalar.value, "macros"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "macros"))
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)

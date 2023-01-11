@@ -659,7 +659,7 @@ modulemd_obsoletes_parse_obsoleted_by (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "module"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "module"))
             {
               if (modulemd_obsoletes_get_obsoleted_by_module_name (o))
                 {
@@ -686,7 +686,7 @@ modulemd_obsoletes_parse_obsoleted_by (yaml_parser_t *parser,
               g_clear_pointer (&value, g_free);
             }
 
-          if (g_str_equal (event.data.scalar.value, "stream"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "stream"))
             {
               if (modulemd_obsoletes_get_obsoleted_by_module_stream (o))
                 {
@@ -783,7 +783,7 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "module"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "module"))
             {
               if (!g_str_equal (modulemd_obsoletes_get_module_name (o),
                                 O_PLACEHOLDER_STRING))
@@ -811,7 +811,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_module_name (o, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "stream"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "stream"))
             {
               if (!g_str_equal (modulemd_obsoletes_get_module_stream (o),
                                 O_PLACEHOLDER_STRING))
@@ -832,7 +833,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_module_stream (o, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "context"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "context"))
             {
               if (modulemd_obsoletes_get_module_context (o))
                 {
@@ -852,7 +854,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_module_context (o, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "modified"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "modified"))
             {
               value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (nested_error)
@@ -877,7 +880,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_modified (o, modified);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "eol_date"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "eol_date"))
             {
               value = modulemd_yaml_parse_string (&parser, &nested_error);
               if (nested_error)
@@ -903,7 +907,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_eol_date (o, eol_date);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "reset"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "reset"))
             {
               reset = modulemd_yaml_parse_bool (&parser, &nested_error);
               if (nested_error)
@@ -917,7 +922,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
               modulemd_obsoletes_set_reset (o, reset);
             }
-          else if (g_str_equal (event.data.scalar.value, "message"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "message"))
             {
               if (!g_str_equal (modulemd_obsoletes_get_message (o),
                                 O_PLACEHOLDER_STRING))
@@ -938,7 +944,8 @@ modulemd_obsoletes_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_obsoletes_set_message (o, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "obsoleted_by"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "obsoleted_by"))
             {
               if (!modulemd_obsoletes_parse_obsoleted_by (
                     &parser, o, &nested_error))

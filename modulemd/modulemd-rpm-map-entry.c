@@ -396,7 +396,7 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "name"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "name"))
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
@@ -410,7 +410,8 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
               modulemd_rpm_map_entry_set_name (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "epoch"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "epoch"))
             {
               epoch = modulemd_yaml_parse_uint64 (parser, &nested_error);
               if (nested_error)
@@ -424,7 +425,8 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
               modulemd_rpm_map_entry_set_epoch (entry, epoch);
               seen_epoch = TRUE;
             }
-          else if (g_str_equal (event.data.scalar.value, "version"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "version"))
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
@@ -438,7 +440,8 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
               modulemd_rpm_map_entry_set_version (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "release"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "release"))
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
@@ -452,7 +455,8 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
               modulemd_rpm_map_entry_set_release (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "arch"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "arch"))
             {
               scalar = modulemd_yaml_parse_string (parser, &nested_error);
               if (!scalar)
@@ -466,7 +470,8 @@ modulemd_rpm_map_entry_parse_yaml (yaml_parser_t *parser,
               modulemd_rpm_map_entry_set_arch (entry, scalar);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "nevra"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "nevra"))
             {
               nevra = modulemd_yaml_parse_string (parser, &nested_error);
               if (!nevra)

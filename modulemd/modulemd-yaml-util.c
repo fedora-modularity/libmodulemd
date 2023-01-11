@@ -979,7 +979,8 @@ modulemd_yaml_parse_document_type_internal (
               return FALSE;
             }
 
-          if (depth == 1 && g_str_equal (event.data.scalar.value, "document"))
+          if (depth == 1 &&
+              g_str_equal ((const gchar *)event.data.scalar.value, "document"))
             {
               if (doctype != MODULEMD_YAML_DOC_UNKNOWN)
                 {
@@ -1032,7 +1033,8 @@ modulemd_yaml_parse_document_type_internal (
               g_clear_pointer (&doctype_scalar, g_free);
             }
           else if (depth == 1 &&
-                   g_str_equal (event.data.scalar.value, "version"))
+                   g_str_equal ((const gchar *)event.data.scalar.value,
+                                "version"))
             {
               if (mdversion != 0)
                 {
@@ -1056,7 +1058,9 @@ modulemd_yaml_parse_document_type_internal (
                   return FALSE;
                 }
             }
-          else if (depth == 1 && g_str_equal (event.data.scalar.value, "data"))
+          else if (depth == 1 &&
+                   g_str_equal ((const gchar *)event.data.scalar.value,
+                                "data"))
             {
               had_data = TRUE;
             }

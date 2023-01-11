@@ -578,7 +578,7 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "module"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "module"))
             {
               if (!g_str_equal (modulemd_defaults_get_module_name (
                                   MODULEMD_DEFAULTS (defaults)),
@@ -609,7 +609,8 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                                  scalar);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "modified"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "modified"))
             {
               modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
@@ -625,7 +626,8 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                               modified);
             }
 
-          else if (g_str_equal (event.data.scalar.value, "stream"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "stream"))
             {
               if (modulemd_defaults_v1_get_default_stream (defaults, NULL))
                 {
@@ -648,7 +650,8 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_defaults_v1_set_default_stream (defaults, scalar, NULL);
               g_clear_pointer (&scalar, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "profiles"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "profiles"))
             {
               if (!modulemd_defaults_v1_parse_yaml_profiles (
                     &parser, defaults->profile_defaults, &nested_error))
@@ -657,7 +660,8 @@ modulemd_defaults_v1_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                   return NULL;
                 }
             }
-          else if (g_str_equal (event.data.scalar.value, "intents"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "intents"))
             {
               if (!modulemd_defaults_v1_parse_intents (
                     &parser, defaults, strict, &nested_error))
@@ -899,7 +903,7 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
               MMD_YAML_ERROR_EVENT_EXIT_BOOL (
                 error, event, "Missing mapping in intent data");
             }
-          if (g_str_equal (event.data.scalar.value, "stream"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "stream"))
             {
               if (default_stream)
                 {
@@ -921,7 +925,8 @@ modulemd_defaults_v1_parse_intent (yaml_parser_t *parser,
                     nested_error->message);
                 }
             }
-          else if (g_str_equal (event.data.scalar.value, "profiles"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "profiles"))
             {
               if (!modulemd_defaults_v1_parse_yaml_profiles (
                     parser, profile_defaults, &nested_error))

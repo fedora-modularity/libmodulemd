@@ -515,7 +515,7 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "module"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "module"))
             {
               if (!g_str_equal (modulemd_translation_get_module_name (t),
                                 T_PLACEHOLDER_STRING))
@@ -536,7 +536,8 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_translation_set_module_name (t, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "stream"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "stream"))
             {
               if (!g_str_equal (modulemd_translation_get_module_stream (t),
                                 T_PLACEHOLDER_STRING))
@@ -557,7 +558,8 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
               modulemd_translation_set_module_stream (t, value);
               g_clear_pointer (&value, g_free);
             }
-          else if (g_str_equal (event.data.scalar.value, "modified"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "modified"))
             {
               modified = modulemd_yaml_parse_uint64 (&parser, &nested_error);
               if (nested_error)
@@ -571,7 +573,8 @@ modulemd_translation_parse_yaml (ModulemdSubdocumentInfo *subdoc,
 
               modulemd_translation_set_modified (t, modified);
             }
-          else if (g_str_equal (event.data.scalar.value, "translations"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "translations"))
             {
               entries = modulemd_translation_parse_yaml_entries (
                 &parser, strict, &nested_error);

@@ -219,13 +219,15 @@ modulemd_subdocument_info_get_data_parser (ModulemdSubdocumentInfo *self,
         case YAML_SCALAR_EVENT:
           if (depth == 0)
             {
-              if (g_str_equal (event.data.scalar.value, "data"))
+              if (g_str_equal ((const gchar *)event.data.scalar.value, "data"))
                 {
                   /* We have arrived at the "data". Return. */
                   return TRUE;
                 }
-              if (g_str_equal (event.data.scalar.value, "document") ||
-                  g_str_equal (event.data.scalar.value, "version"))
+              if (g_str_equal ((const gchar *)event.data.scalar.value,
+                               "document") ||
+                  g_str_equal ((const gchar *)event.data.scalar.value,
+                               "version"))
                 {
                   /* Always kip over the contents of document and version,
                    * since it was already parsed when we created this subdoc.

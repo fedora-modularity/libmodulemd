@@ -332,11 +332,12 @@ modulemd_build_config_parse_yaml (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "context"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "context"))
             MMD_SET_PARSED_YAML_STRING (
               parser, error, modulemd_build_config_set_context, buildconfig);
 
-          else if (g_str_equal (event.data.scalar.value, "platform"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "platform"))
             MMD_SET_PARSED_YAML_STRING (
               parser, error, modulemd_build_config_set_platform, buildconfig);
 

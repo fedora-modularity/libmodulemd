@@ -412,7 +412,8 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "buildrequires"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value,
+                           "buildrequires"))
             {
               g_hash_table_unref (d->buildtime_deps);
               d->buildtime_deps =
@@ -426,7 +427,8 @@ modulemd_dependencies_parse_yaml (yaml_parser_t *parser,
                     nested_error->message);
                 }
             }
-          else if (g_str_equal (event.data.scalar.value, "requires"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "requires"))
             {
               g_hash_table_unref (d->runtime_deps);
               d->runtime_deps =

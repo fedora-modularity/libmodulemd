@@ -368,7 +368,7 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
         case YAML_MAPPING_END_EVENT: done = TRUE; break;
 
         case YAML_SCALAR_EVENT:
-          if (g_str_equal (event.data.scalar.value, "rpms"))
+          if (g_str_equal ((const gchar *)event.data.scalar.value, "rpms"))
             {
               g_hash_table_unref (p->rpms);
               p->rpms = modulemd_yaml_parse_string_set (parser, &nested_error);
@@ -382,7 +382,8 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
                 }
             }
 
-          else if (g_str_equal (event.data.scalar.value, "description"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "description"))
             {
               value = modulemd_yaml_parse_string (parser, &nested_error);
               if (!value)
@@ -397,7 +398,8 @@ modulemd_profile_parse_yaml (yaml_parser_t *parser,
               g_clear_pointer (&value, g_free);
             }
 
-          else if (g_str_equal (event.data.scalar.value, "default"))
+          else if (g_str_equal ((const gchar *)event.data.scalar.value,
+                                "default"))
             {
               is_default = modulemd_yaml_parse_bool (parser, &nested_error);
               if (nested_error)

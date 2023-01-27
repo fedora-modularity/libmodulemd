@@ -8,7 +8,7 @@ if with_py3
       check: false)
 
     if ret.returncode() != 0
-      error('Failed to determine Python 3 pygobject overridedir:', ret.stderr())
+      error('Failed to determine Python 3 pygobject overridedir: @0@'.format(ret.stderr()))
     else
       gobject_overrides_dir_py3 = ret.stdout().strip()
     endif
@@ -24,7 +24,7 @@ if with_py2
       check: false)
 
     if ret2.returncode() != 0
-      error('Failed to determine Python 2 pygobject overridedir:', ret2.stderr())
+      error('Failed to determine Python 2 pygobject overridedir: @0@'.format(ret2.stderr()))
     else
       gobject_overrides_dir_py2 = ret2.stdout().strip()
     endif

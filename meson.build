@@ -15,7 +15,7 @@ project(
 version : '2.14.1',
 default_options : ['buildtype=debugoptimized', 'c_std=c11', 'warning_level=1', 'b_asneeded=true'],
 license : 'MIT',
-meson_version : '>=0.47.0'
+meson_version : '>=0.55.0'
 )
 
 libmodulemd_version = meson.project_version()
@@ -58,7 +58,7 @@ rpm = dependency('rpm', required : with_rpmio)
 magic = cc.find_library('magic', required : with_libmagic)
 
 glib = dependency('glib-2.0')
-glib_prefix = glib.get_pkgconfig_variable('prefix')
+glib_prefix = glib.get_variable(pkgconfig: 'prefix')
 
 bash = find_program('bash')
 sed = find_program('sed')
@@ -73,14 +73,14 @@ if with_docs
   ret = run_command ([test, '-e', glib_index_path],
     check: false)
   if ret.returncode() != 0
-    error('Missing documentation for GLib:', glib_index_path)
+    error('Missing documentation for GLib: @0@'.format(glib_index_path))
   endif
 
   gobject_index_path = join_paths(glib_docpath, 'gobject/index.html')
   ret = run_command ([test, '-e', gobject_index_path],
     check: false)
   if ret.returncode() != 0
-    error('Missing documentation for GObject:', gobject_index_path)
+    error('Missing documentation for GObject: @0@'.format(gobject_index_path))
   endif
 endif
 
@@ -133,7 +133,7 @@ if with_py3
     # Verify Python version <https://github.com/mesonbuild/meson/issues/11057>.
     python3_version = python3.language_version()
     if not python3_version.startswith('3.')
-      error('Python3 interpreter has an unexpected version:', python3_version)
+      error('Python3 interpreter has an unexpected version: @0@'.format(python3_version))
     endif
 else
     python3 = disabler()

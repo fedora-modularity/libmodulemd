@@ -15,7 +15,7 @@ project(
 version : '2.14.1',
 default_options : ['buildtype=debugoptimized', 'c_std=c11', 'warning_level=1', 'b_asneeded=true'],
 license : 'MIT',
-meson_version : '>=0.47.0'
+meson_version : '>=0.58.0'
 )
 
 libmodulemd_version = meson.project_version()
@@ -58,7 +58,7 @@ rpm = dependency('rpm', required : with_rpmio)
 magic = cc.find_library('magic', required : with_libmagic)
 
 glib = dependency('glib-2.0')
-glib_prefix = glib.get_pkgconfig_variable('prefix')
+glib_prefix = glib.get_variable(pkgconfig: 'prefix')
 
 bash = find_program('bash')
 sed = find_program('sed')

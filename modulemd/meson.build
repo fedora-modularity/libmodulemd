@@ -286,9 +286,9 @@ endif
 # Test env with release values
 test_release_env = environment()
 test_release_env.set('LC_ALL', 'C')
-test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
-test_release_env.set ('MESON_BUILD_ROOT', meson.build_root())
-test_release_env.set ('TEST_DATA_PATH', meson.source_root() + '/modulemd/tests/test_data')
+test_release_env.set ('MESON_SOURCE_ROOT', meson.project_source_root())
+test_release_env.set ('MESON_BUILD_ROOT', meson.project_build_root())
+test_release_env.set ('TEST_DATA_PATH', meson.project_source_root() + '/modulemd/tests/test_data')
 
 # Test env with fatal warnings and criticals
 test_env = test_release_env
@@ -304,9 +304,9 @@ py_test_env = test_env
 if not test_installed_lib
     # If we're testing an installed version, we want to use the default
     # locations for these paths.
-    py_test_env.set ('GI_TYPELIB_PATH', meson.build_root() + '/modulemd')
-    py_test_env.set ('LD_LIBRARY_PATH', meson.build_root() + '/modulemd')
-    py_test_env.set ('PYTHONPATH', meson.source_root())
+    py_test_env.set ('GI_TYPELIB_PATH', meson.project_build_root() + '/modulemd')
+    py_test_env.set ('LD_LIBRARY_PATH', meson.project_build_root() + '/modulemd')
+    py_test_env.set ('PYTHONPATH', meson.project_source_root())
 
     # This test is just to catch whether we are accidentally not testing
     # the built version.
@@ -558,5 +558,3 @@ test('test_import_headers', import_header_script,
       args : modulemd_hdrs,
       timeout : 300,
       suite : ['smoketest', 'ci'])
-
-

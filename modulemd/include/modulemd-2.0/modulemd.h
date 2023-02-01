@@ -317,6 +317,9 @@ modulemd_get_version (void);
  * initialized with the content from @yaml_file. Returns NULL and sets @error
  * if the file is not completely valid.
  *
+ * Support for compressed YAML files is deprecated. In the future this
+ * function will only support uncompressed YAML files.
+ *
  * Since: 2.10
  */
 ModulemdModuleIndex *

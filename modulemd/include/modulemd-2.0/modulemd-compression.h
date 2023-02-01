@@ -14,14 +14,19 @@
 #pragma once
 
 #include <glib.h>
+#include "modulemd-deprecated.h"
 
 G_BEGIN_DECLS
 
 /**
  * SECTION: modulemd-compression
  * @title: Modulemd Compression Helpers
- * @stability: stable
+ * @stability: unstable
  * @short_description: Utility functions for working with compressed files.
+ *
+ * Direct support for handling compressed YAML documents is scheduled for removal.
+ * If you work with compressed documents, first uncompress them and then pass
+ * the raw YAML documents to this library.
  */
 
 
@@ -37,6 +42,7 @@ G_BEGIN_DECLS
  * @MODULEMD_COMPRESSION_TYPE_SENTINEL: Enum list terminator
  *
  * Since: 2.8
+ * Deprecated: 2.14.1: Support for compressed documents is scheduled for removal.
  */
 typedef enum
 {
@@ -62,8 +68,9 @@ typedef enum
  * a known type.
  *
  * Since: 2.8
+ * Deprecated: 2.14.1: Support for compressed documents is scheduled for removal.
  */
-ModulemdCompressionTypeEnum
+MMD_DEPRECATED ModulemdCompressionTypeEnum
 modulemd_compression_type (const gchar *name);
 
 

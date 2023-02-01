@@ -166,66 +166,64 @@ srpm_cdata.set('BUILDFLAG', '-bs')
 subdir('modulemd')
 subdir('bindings/python')
 
-if meson.version().version_compare('>=0.53')
-    if magic.found()
-        if with_libmagic.enabled()
-            magic_status = 'Enabled'
-        elif with_libmagic.auto()
-            magic_status = 'Enabled (autodetected)'
-        else
-            error('libmagic state is unknown')
-        endif
+if magic.found()
+    if with_libmagic.enabled()
+        magic_status = 'Enabled'
+    elif with_libmagic.auto()
+        magic_status = 'Enabled (autodetected)'
     else
-        if with_libmagic.disabled()
-            magic_status = 'Disabled'
-        elif with_libmagic.auto()
-            magic_status = 'Disabled (autodetection could not locate libmagic)'
-        else
-            error('libmagic state is unknown')
-        endif
+        error('libmagic state is unknown')
     endif
-
-    if rpm.found()
-        if with_rpmio.enabled()
-            rpmio_status = 'Enabled'
-        elif with_rpmio.auto()
-            rpmio_status = 'Enabled (autodetected)'
-        else
-            error('rpmio state is unknown')
-        endif
+else
+    if with_libmagic.disabled()
+        magic_status = 'Disabled'
+    elif with_libmagic.auto()
+        magic_status = 'Disabled (autodetection could not locate libmagic)'
     else
-        if with_rpmio.disabled()
-            rpmio_status = 'Disabled'
-        elif with_rpmio.auto()
-            rpmio_status = 'Disabled (autodetection could not locate librpm)'
-        else
-            error('rpmio state is unknown')
-        endif
+        error('libmagic state is unknown')
     endif
-
-    if with_manpages
-        manpages_status = 'Enabled'
-    else
-        manpages_status = 'Disabled'
-    endif
-
-    summary({'prefix': get_option('prefix'),
-             'bindir': get_option('bindir'),
-             'libdir': get_option('libdir'),
-             'datadir': get_option('datadir'),
-             'Python 2 GObject Overrides': gobject_overrides_dir_py2,
-             'Python 3 GObject Overrides': gobject_overrides_dir_py3,
-            }, section: 'Directories')
-
-    summary({'libmagic Support': magic_status,
-             'Custom Python': get_option('python_name'),
-             'RPMIO Support': rpmio_status,
-             'Generate Manual Pages': manpages_status,
-             'Generate HTML Documentation': get_option('with_docs'),
-             'Python 2 Support': get_option('with_py2'),
-             'Python 3 Support': get_option('with_py3'),
-             'Skip Introspection': get_option('skip_introspection'),
-             'Accept overflowed buildorder': get_option('accept_overflowed_buildorder'),
-             'Test Installed Library': get_option('test_installed_lib'),
-            }, section: 'Build Configuration')
 endif
+
+if rpm.found()
+    if with_rpmio.enabled()
+        rpmio_status = 'Enabled'
+    elif with_rpmio.auto()
+        rpmio_status = 'Enabled (autodetected)'
+    else
+        error('rpmio state is unknown')
+    endif
+else
+    if with_rpmio.disabled()
+        rpmio_status = 'Disabled'
+    elif with_rpmio.auto()
+        rpmio_status = 'Disabled (autodetection could not locate librpm)'
+    else
+        error('rpmio state is unknown')
+    endif
+endif
+
+if with_manpages
+    manpages_status = 'Enabled'
+else
+    manpages_status = 'Disabled'
+endif
+
+summary({'prefix': get_option('prefix'),
+         'bindir': get_option('bindir'),
+         'libdir': get_option('libdir'),
+         'datadir': get_option('datadir'),
+         'Python 2 GObject Overrides': gobject_overrides_dir_py2,
+         'Python 3 GObject Overrides': gobject_overrides_dir_py3,
+        }, section: 'Directories')
+
+summary({'libmagic Support': magic_status,
+         'Custom Python': get_option('python_name'),
+         'RPMIO Support': rpmio_status,
+         'Generate Manual Pages': manpages_status,
+         'Generate HTML Documentation': get_option('with_docs'),
+         'Python 2 Support': get_option('with_py2'),
+         'Python 3 Support': get_option('with_py3'),
+         'Skip Introspection': get_option('skip_introspection'),
+         'Accept overflowed buildorder': get_option('accept_overflowed_buildorder'),
+         'Test Installed Library': get_option('test_installed_lib'),
+        }, section: 'Build Configuration')

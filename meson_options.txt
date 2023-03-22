@@ -17,8 +17,8 @@ option('accept_overflowed_buildorder', type : 'boolean', value: 'false',
 option('verbose_tests', type : 'boolean', value : true,
        description : 'Tests that are run under the "debug" configuration will print all debug messages. Disable this option for valgrind checks, as it speeds it up substantially.')
 
-option('libmagic', type : 'feature', value : 'enabled',
-       description : 'Enables the use of libmagic to detect compression of YAML files.')
+option('libmagic', type : 'feature', value : 'auto',
+       description : 'This option is ignored and will be removed in the future.')
 
 option('python_name', type : 'string',
        description : 'The name of the Python 3 interpreter to use for generating Python bindings and running tests. If left blank, it defaults to the version of Python 3 being used to run meson.')

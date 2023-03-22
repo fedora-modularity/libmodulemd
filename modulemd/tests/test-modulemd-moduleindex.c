@@ -1399,7 +1399,6 @@ test_module_index_read_compressed (void)
   g_autofree gchar *compressed_text = NULL;
 
 #ifdef HAVE_RPMIO
-#ifdef HAVE_LIBMAGIC
   struct expected_compressed_read_t expected[] = {
     {
       .filename = "bzipped",
@@ -1415,29 +1414,6 @@ test_module_index_read_compressed (void)
     { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
     { .filename = NULL }
   };
-#else /* HAVE_LIBMAGIC */
-  struct expected_compressed_read_t expected[] = {
-    { .filename = "bzipped",
-      .succeeds = FALSE,
-      .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
-    {
-      .filename = "bzipped.yaml.bz2",
-      .succeeds = TRUE,
-    },
-    { .filename = "gzipped",
-      .succeeds = FALSE,
-      .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
-    { .filename = "gzipped.yaml.gz", .succeeds = TRUE },
-    { .filename = "xzipped",
-      .succeeds = FALSE,
-      .error_domain = MODULEMD_YAML_ERROR,
-      .error_code = MMD_YAML_ERROR_UNPARSEABLE },
-    { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
-    { .filename = NULL }
-  };
-#endif /* HAVE_LIBMAGIC */
 
 #else /* HAVE_RPMIO */
   struct expected_compressed_read_t expected[] = {

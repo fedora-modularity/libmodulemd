@@ -34,7 +34,6 @@ BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  pkgconfig(gtk-doc)
 BuildRequires:  glib2-doc
 BuildRequires:  rpm-devel
-BuildRequires:  file-devel
 %if %{build_python2}
 BuildRequires:  python2-devel
 BuildRequires:  python-gobject-base

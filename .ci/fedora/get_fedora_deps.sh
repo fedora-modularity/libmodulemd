@@ -16,7 +16,6 @@ dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
     "libmodulemd >= 2.3" \
     curl \
     elinks \
-    file-devel \
     gcc \
     gcc-c++ \
     git-core \

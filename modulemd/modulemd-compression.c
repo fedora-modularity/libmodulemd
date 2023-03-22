@@ -28,18 +28,10 @@
 #include "private/modulemd-compression-private.h"
 #include "private/modulemd-util.h"
 
-#ifdef HAVE_LIBMAGIC
-#include <magic.h>
-G_DEFINE_AUTO_CLEANUP_FREE_FUNC (magic_t, magic_close, NULL)
-#endif
-
 
 ModulemdCompressionTypeEnum
 modulemd_detect_compression (const gchar *filename, int fd, GError **error)
 {
-  ModulemdCompressionTypeEnum type =
-    MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION;
-
   g_return_val_if_fail (filename, MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED);
   g_return_val_if_fail (!error || *error == NULL,
                         MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED);
@@ -78,101 +70,69 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
       return MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION;
     }
 
-#ifdef HAVE_LIBMAGIC
-  /* No known suffix? Try using libmagic from file-utils */
-  const char *mime_type;
-  g_auto (magic_t) magic = NULL;
-  int magic_fd = fcntl (fd, F_DUPFD_CLOEXEC, 0);
-  int err = errno;
-  if (magic_fd < 0)
+  /* No known suffix? Inspect magic bytes in the content. */
+  unsigned char buffer[6]; /* gzip, bzip2 have a 4-byte header.
+                                    xz has a 6-byte header. */
+  size_t filled = 0;
+  ssize_t retval = 0;
+  do
+    {
+      retval = read (fd, buffer + filled, sizeof (buffer) - filled);
+      if (retval == -1 && errno != EAGAIN && errno != EWOULDBLOCK)
+        {
+          g_set_error (error,
+                       MODULEMD_ERROR,
+                       MMD_ERROR_MAGIC,
+                       "Could not read from file %s: %s",
+                       filename,
+                       g_strerror (errno));
+          lseek (fd, 0, SEEK_SET);
+          return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
+        }
+      else if (retval > 0)
+        filled += retval;
+    }
+  while (retval != 0 && filled < sizeof (buffer));
+
+  /* Reset the file descriptor to the start of the file */
+  if ((off_t)-1 == lseek (fd, 0, SEEK_SET))
     {
       g_set_error (error,
                    MODULEMD_ERROR,
                    MMD_ERROR_MAGIC,
-                   "Could not dup() the file descriptor: %s",
-                   g_strerror (err));
+                   "Could not reset a position in %s file: %s",
+                   filename,
+                   g_strerror (errno));
       return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
     }
 
-  magic = magic_open (MAGIC_MIME);
-  if (magic == NULL)
+  /* Classify files shorter than the buffer as a plain text */
+  if (filled < sizeof (buffer))
     {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MMD_ERROR_MAGIC,
-                   "magic_open() failed: Cannot allocate the magic cookie");
-      close (magic_fd);
-      return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
+      g_debug ("%s: File %s is too short (%zu B) to be compressed",
+               __func__,
+               filename,
+               filled);
+      return MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION;
     }
 
-  if (magic_load (magic, NULL) == -1)
-    {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MMD_ERROR_MAGIC,
-                   "magic_load() failed: %s",
-                   magic_error (magic));
-      close (magic_fd);
-      return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
-    }
+  /* Now inspect the file content */
+  if (buffer[0] == 0x1f && buffer[1] == 0x8b)
+    /* RFC 1952. */
+    return MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION;
+  if (buffer[0] == 'B' && buffer[1] == 'Z' && buffer[2] == 'h')
+    /* bzip2 and libbzip2, version 1.0.8: A program and library for data compression. */
+    return MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION;
+  if (buffer[0] == 0xfd && buffer[1] == '7' && buffer[2] == 'z' &&
+      buffer[3] == 'X' && buffer[4] == 'Z' && buffer[5] == 0x00)
+    /* The .xz File Format, Version 1.1.0 (2022-12-11). */
+    return MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
 
-  mime_type = magic_descriptor (magic, magic_fd);
-  close (magic_fd);
-  /* Reset the file descriptor to the start of the file, if it has moved */
-  lseek (fd, 0, SEEK_SET);
-
-  if (mime_type)
-    {
-      g_debug (
-        "%s: Detected mime type: %s (%s)", __func__, mime_type, filename);
-
-      if (g_str_has_prefix (mime_type, "application/x-gzip") ||
-          g_str_has_prefix (mime_type, "application/gzip") ||
-          g_str_has_prefix (mime_type, "application/gzip-compressed") ||
-          g_str_has_prefix (mime_type, "application/gzipped") ||
-          g_str_has_prefix (mime_type, "application/x-gzip-compressed") ||
-          g_str_has_prefix (mime_type, "application/x-compress") ||
-          g_str_has_prefix (mime_type, "application/x-gzip") ||
-          g_str_has_prefix (mime_type, "application/x-gunzip") ||
-          g_str_has_prefix (mime_type, "multipart/x-gzip"))
-        {
-          type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION;
-        }
-
-      else if (g_str_has_prefix (mime_type, "application/x-bzip2") ||
-               g_str_has_prefix (mime_type, "application/x-bz2") ||
-               g_str_has_prefix (mime_type, "application/bzip2") ||
-               g_str_has_prefix (mime_type, "application/bz2"))
-        {
-          type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION;
-        }
-
-      else if (g_str_has_prefix (mime_type, "application/x-xz"))
-        {
-          type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
-        }
-
-      else if (g_str_has_prefix (mime_type, "text/plain") ||
-               g_str_has_prefix (mime_type, "text/x-yaml") ||
-               g_str_has_prefix (mime_type, "application/x-yaml"))
-        {
-          type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION;
-        }
-    }
-  else
-    {
-      g_set_error (error,
-                   MODULEMD_ERROR,
-                   MMD_ERROR_MAGIC,
-                   "mime_type() detection failed: %s",
-                   magic_error (magic));
-      return MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED;
-    }
-  /* Reset the file descriptor to the start of the file, if it has moved */
-  lseek (fd, 0, SEEK_SET);
-#endif /* HAVE_LIBMAGIC */
-
-  return type;
+  /* Fall back to no compression. YAML parser will error later on a binary
+   * garbage. YAML 1.2.2 requires to support UTF-8, UTF-16, UTF-32, with and
+   * without a byte-order mark. There is no reliable detection except of
+   * reading the complete file and validating the UTF encoding. */
+  return MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION;
 }
 
 ModulemdCompressionTypeEnum

@@ -142,7 +142,6 @@ enums = gnome.mkenums_simple ('modulemd-enums', sources : modulemd_hdrs)
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
 cdata.set('HAVE_RPMIO', rpm.found())
-cdata.set('HAVE_LIBMAGIC', magic.found())
 cdata.set('HAVE_GDATE_AUTOPTR', has_gdate_autoptr)
 cdata.set('HAVE_EXTEND_AND_STEAL', has_extend_and_steal)
 cdata.set('HAVE_G_SPAWN_CHECK_WAIT_STATUS', has_g_spawn_check_wait_status)
@@ -158,7 +157,6 @@ modulemd_lib = library(
     include_directories : include_dirs,
     dependencies : [
         gobject,
-        magic,
         rpm,
         yaml,
         build_lib,
@@ -200,7 +198,6 @@ else
         include_directories : include_dirs,
         dependencies : [
             gobject,
-            magic,
             rpm,
             yaml,
             modulemd_dep

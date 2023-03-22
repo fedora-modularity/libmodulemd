@@ -80,8 +80,7 @@ test_modulemd_detect_compression (void)
       .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION },
     { .filename = "uncompressed.yaml",
       .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
-    { .filename = "empty",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
+    { .filename = "empty", .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
     { .filename = NULL }
   };
 
@@ -104,8 +103,7 @@ test_modulemd_detect_compression (void)
     }
 
 
-    /* == Test detection by libmagic == */
-#ifdef HAVE_LIBMAGIC
+  /* == Test detection by content == */
   struct expected_compression_t expected_magic[] = {
     { .filename = "bzipped",
       .type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION },
@@ -115,25 +113,9 @@ test_modulemd_detect_compression (void)
       .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION },
     { .filename = "uncompressed",
       .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
-    { .filename = "empty",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
+    { .filename = "empty", .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
     { .filename = NULL }
   };
-#else
-  struct expected_compression_t expected_magic[] = {
-    { .filename = "bzipped",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
-    { .filename = "gzipped",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
-    { .filename = "xzipped",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
-    { .filename = "uncompressed",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
-    { .filename = "empty",
-      .type = MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION },
-    { .filename = NULL }
-  };
-#endif
 
   for (size_t j = 0; expected_magic[j].filename; j++)
     {

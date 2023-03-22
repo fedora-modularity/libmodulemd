@@ -306,7 +306,6 @@ jobs:
               createrepo_c
               curl
               elinks
-              file-devel
               gcc
               gcc-c++
               git-core
@@ -387,7 +386,6 @@ jobs:
                  clang-tools
                  createrepo_c
                  elinks
-                 file-devel
                  gcc
                  gcc-c++
                  git-core

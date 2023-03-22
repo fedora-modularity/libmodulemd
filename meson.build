@@ -51,11 +51,13 @@ pkg = import('pkgconfig')
 gobject = dependency('gobject-2.0')
 yaml = dependency('yaml-0.1')
 
-with_rpmio = get_option('rpmio')
 with_libmagic = get_option('libmagic')
+if with_libmagic.enabled() or with_libmagic.disabled()
+    warning('libmagic option is obsolete. libmodulemd can detect compression formats without a magic library now. Please stop using this option. It will be removed in the future and will cause a meson failure.')
+endif
 
+with_rpmio = get_option('rpmio')
 rpm = dependency('rpm', required : with_rpmio)
-magic = cc.find_library('magic', required : with_libmagic)
 
 glib = dependency('glib-2.0')
 glib_prefix = glib.get_variable(pkgconfig: 'prefix')
@@ -166,24 +168,6 @@ srpm_cdata.set('BUILDFLAG', '-bs')
 subdir('modulemd')
 subdir('bindings/python')
 
-if magic.found()
-    if with_libmagic.enabled()
-        magic_status = 'Enabled'
-    elif with_libmagic.auto()
-        magic_status = 'Enabled (autodetected)'
-    else
-        error('libmagic state is unknown')
-    endif
-else
-    if with_libmagic.disabled()
-        magic_status = 'Disabled'
-    elif with_libmagic.auto()
-        magic_status = 'Disabled (autodetection could not locate libmagic)'
-    else
-        error('libmagic state is unknown')
-    endif
-endif
-
 if rpm.found()
     if with_rpmio.enabled()
         rpmio_status = 'Enabled'
@@ -216,8 +200,7 @@ summary({'prefix': get_option('prefix'),
          'Python 3 GObject Overrides': gobject_overrides_dir_py3,
         }, section: 'Directories')
 
-summary({'libmagic Support': magic_status,
-         'Custom Python': get_option('python_name'),
+summary({'Custom Python': get_option('python_name'),
          'RPMIO Support': rpmio_status,
          'Generate Manual Pages': manpages_status,
          'Generate HTML Documentation': get_option('with_docs'),

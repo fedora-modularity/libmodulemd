@@ -9,7 +9,7 @@ set -e
 set -x
 
 os=fedora
-release=32
+release=latest
 repository=quay.io
 image=fedora/fedora:${release}-$(uname -m)
 

@@ -10,7 +10,7 @@ set -x
 
 modulemd_version=${1:-latest}
 os=fedora
-release=32
+release=latest
 repository=quay.io
 image=fedora/fedora:${release}-$(uname -m)
 

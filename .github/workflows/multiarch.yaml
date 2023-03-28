@@ -3,11 +3,11 @@ on: [push, pull_request]
 
 jobs:
   multiarch:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: ${{ matrix.distro }} on ${{ matrix.arch }}
     continue-on-error: true
 
-    # Run steps on a matrix of 3 arch/distro combinations
+    # Run steps on a matrix of 2 arch/distro combinations
     strategy:
       matrix:
         include:

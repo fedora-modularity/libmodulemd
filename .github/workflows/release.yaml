@@ -6,7 +6,7 @@ on:
 jobs:
   docs:
     name: Publish Documentation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     continue-on-error: false
     if: github.repository == 'fedora-modularity/libmodulemd'
     steps:

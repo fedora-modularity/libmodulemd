@@ -11,7 +11,7 @@ set -x
 os=fedora
 release=latest
 repository=quay.io
-image=fedora/fedora:${release}-$(uname -m)
+image=fedora/fedora:${release}
 
 # Override the standard tests with auto-formatting
 mmd_run_docker_tests \

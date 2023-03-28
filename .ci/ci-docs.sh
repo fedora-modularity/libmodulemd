@@ -12,7 +12,7 @@ modulemd_version=${1:-latest}
 os=fedora
 release=latest
 repository=quay.io
-image=fedora/fedora:${release}-$(uname -m)
+image=fedora/fedora:${release}
 
 # Override the standard tests with the doc generation template
 mmd_run_docker_tests \

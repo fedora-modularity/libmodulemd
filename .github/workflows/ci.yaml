@@ -24,10 +24,6 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Checkout code
@@ -78,10 +74,6 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.stable) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Install git
@@ -138,10 +130,6 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.development) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Checkout code
@@ -191,10 +179,6 @@ jobs:
         release: ${{ fromJson(needs.get_fedora_releases.outputs.development) }}
     container:
       image: quay.io/fedora/fedora:${{ matrix.release }}-x86_64
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Install git
@@ -247,10 +231,6 @@ jobs:
     continue-on-error: true
     container:
       image: docker.io/library/archlinux:base
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
 
     steps:
       - name: Install the standard pacman config
@@ -369,10 +349,6 @@ jobs:
     continue-on-error: true
     container:
       image: registry.opensuse.org/opensuse/tumbleweed
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
     steps:
       - name: Enable docs in container
         run:
@@ -445,10 +421,6 @@ jobs:
     continue-on-error: true
     container:
       image: docker.io/openmandriva/cooker
-      # Disable seccomp until a container manager in GitHub recognizes
-      # clone3() syscall,
-      # <https://github.com/actions/virtual-environments/issues/3812>.
-      options: --security-opt seccomp=unconfined
     outputs:
       meson_version: ${{ steps.scanbuild.outputs.available }}
     steps:

@@ -457,7 +457,6 @@ jobs:
           CXX: clang++
         run:
           meson setup --buildtype=debugoptimized -Dwith_docs=false
-                      -Dlibmagic=disabled
                       ci $GITHUB_WORKSPACE
 
       - name: Compile the code
@@ -468,5 +467,5 @@ jobs:
 
       - name: Run clang static analysis tests
         run: |
-          meson setup --buildtype=debug -Dwith_docs=false -Dlibmagic=disabled -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
+          meson setup --buildtype=debug -Dwith_docs=false -Dskip_introspection=true -Dwith_py3=false ci_scanbuild
           ninja -C ci_scanbuild scan-build; if [ $? -ne 0 ]; then elinks -dump ci_scanbuild/meson-logs/scanbuild/*/index.html; fi

@@ -63,6 +63,10 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     {
       return MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
     }
+  if (g_str_has_suffix (filename, ".zst"))
+    {
+      return MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION;
+    }
   if (g_str_has_suffix (filename, ".yaml") ||
       g_str_has_suffix (filename, ".yml") ||
       g_str_has_suffix (filename, ".txt"))
@@ -71,7 +75,7 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
     }
 
   /* No known suffix? Inspect magic bytes in the content. */
-  unsigned char buffer[6]; /* gzip, bzip2 have a 4-byte header.
+  unsigned char buffer[6]; /* gzip, bzip2, zstd have a 4-byte header.
                                     xz has a 6-byte header. */
   size_t filled = 0;
   ssize_t retval = 0;
@@ -127,6 +131,14 @@ modulemd_detect_compression (const gchar *filename, int fd, GError **error)
       buffer[3] == 'X' && buffer[4] == 'Z' && buffer[5] == 0x00)
     /* The .xz File Format, Version 1.1.0 (2022-12-11). */
     return MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION;
+  if (/* Zstandard frame */
+      (buffer[0] == 0x28 && buffer[1] == 0xb5 && buffer[2] == 0x2f &&
+       buffer[3] == 0xfd) ||
+      /* Skippable frame */
+      ((buffer[0] & 0xf0) == 0x50 && buffer[1] == 0x2a && buffer[2] == 0x4d &&
+       buffer[3] == 0x18))
+    /* RFC 8878. */
+    return MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION;
 
   /* Fall back to no compression. YAML parser will error later on a binary
    * garbage. YAML 1.2.2 requires to support UTF-8, UTF-16, UTF-32, with and
@@ -162,6 +174,10 @@ modulemd_compression_type (const gchar *name)
     {
       type = MODULEMD_COMPRESSION_TYPE_ZCK_COMPRESSION;
     }
+  if (!g_strcmp0 (name, "zstd"))
+    {
+      type = MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION;
+    }
 
   return type;
 }
@@ -174,6 +190,7 @@ modulemd_compression_suffix (ModulemdCompressionTypeEnum comtype)
     case MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION: return ".gz";
     case MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION: return ".bz2";
     case MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION: return ".xz";
+    case MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION: return ".zst";
     default: return NULL;
     }
 }
@@ -194,6 +211,8 @@ get_comtype_string (ModulemdCompressionTypeEnum comtype)
     case MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION: return "bzdio"; break;
 
     case MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION: return "xzdio"; break;
+
+    case MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION: return "zstdio"; break;
 
     default:
       g_info ("Unknown compression type: %d", comtype);

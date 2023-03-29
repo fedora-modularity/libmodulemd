@@ -34,12 +34,14 @@ G_BEGIN_DECLS
  * @MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION: bzip2 compression
  * @MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION: LZMA compression
  * @MODULEMD_COMPRESSION_TYPE_ZCK_COMPRESSION: zchunk compression
+ * @MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION: Zstandard compression; since 2.15
  * @MODULEMD_COMPRESSION_TYPE_SENTINEL: Enum list terminator
  *
  * Since: 2.8
  */
 typedef enum
 {
+  MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION = -3,
   MODULEMD_COMPRESSION_TYPE_DETECTION_FAILED = -2,
   MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION,
   MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION,
@@ -54,7 +56,7 @@ typedef enum
 /**
  * modulemd_compression_type:
  * @name: (in): The name of the compression type. Valid options are:
- * "gz", "gzip", "bz2", "bzip2", "xz" and "zck".
+ * "gz", "gzip", "bz2", "bzip2", "xz", "zck", and "zstd".
  *
  * Returns: The #ModulemdCompressionTypeEnum value corresponding to the
  * provided string if available or

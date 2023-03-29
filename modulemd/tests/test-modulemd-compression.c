@@ -45,6 +45,10 @@ test_modulemd_compression_type (void)
                    ==,
                    MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION);
 
+  g_assert_cmpint (modulemd_compression_type ("zstd"),
+                   ==,
+                   MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION);
+
   g_assert_cmpint (modulemd_compression_type ("garbage"),
                    ==,
                    MODULEMD_COMPRESSION_TYPE_UNKNOWN_COMPRESSION);
@@ -78,6 +82,8 @@ test_modulemd_detect_compression (void)
       .type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION },
     { .filename = "xzipped.yaml.xz",
       .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION },
+    { .filename = "zstded.yaml.zst",
+      .type = MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION },
     { .filename = "uncompressed.yaml",
       .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
     { .filename = "empty", .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
@@ -111,6 +117,8 @@ test_modulemd_detect_compression (void)
       .type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION },
     { .filename = "xzipped",
       .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION },
+    { .filename = "zstded",
+      .type = MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION },
     { .filename = "uncompressed",
       .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
     { .filename = "empty", .type = MODULEMD_COMPRESSION_TYPE_NO_COMPRESSION },
@@ -152,6 +160,7 @@ test_modulemd_compression_suffix (void)
     { .type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION, .suffix = ".gz" },
     { .type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION, .suffix = ".bz2" },
     { .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION, .suffix = ".xz" },
+    { .type = MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION, .suffix = ".zst" },
     { .type = MODULEMD_COMPRESSION_TYPE_SENTINEL, .suffix = NULL }
   };
 
@@ -181,6 +190,7 @@ test_modulemd_get_rpmio_fmode (void)
     { .type = MODULEMD_COMPRESSION_TYPE_GZ_COMPRESSION, .suffix = "gzdio" },
     { .type = MODULEMD_COMPRESSION_TYPE_BZ2_COMPRESSION, .suffix = "bzdio" },
     { .type = MODULEMD_COMPRESSION_TYPE_XZ_COMPRESSION, .suffix = "xzdio" },
+    { .type = MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION, .suffix = "zstdio" },
     { .type = MODULEMD_COMPRESSION_TYPE_SENTINEL, .suffix = NULL }
   };
 

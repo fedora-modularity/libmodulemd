@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: uraimo/run-on-arch-action@v2.0.7
+      - uses: uraimo/run-on-arch-action@v2
         name: Perform upstream tests
 
         with:

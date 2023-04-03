@@ -30,14 +30,14 @@ jobs:
           ./.ci/ci-docs.sh $version
 
       - name: Commit documentation
-        uses: EndBug/add-and-commit@v6
+        uses: EndBug/add-and-commit@v9
         with:
-          branch: main
+          new_branch: main
           token: ${{ secrets.DOC_TOKEN }}
           cwd: fedora-modularity.github.io
           author_name: Libmodulemd CI
           author_email: github-actions@github.com
           message: libmodulemd docs for ${{ env.version }}
           add: libmodulemd/${{ env.version }}
-          signoff: true
+          commit: --signoff
           push: true

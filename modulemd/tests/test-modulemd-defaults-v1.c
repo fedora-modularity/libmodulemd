@@ -632,7 +632,7 @@ defaults_test_emit_yaml (void)
                    "  module: foo\n"
                    "  stream: \"latest\"\n"
                    "  profiles:\n"
-                   "    \"libonly\": []\n"
+                   "    libonly: []\n"
                    "...\n");
 
   /* Add a real profile default and emit again */
@@ -653,8 +653,8 @@ defaults_test_emit_yaml (void)
                    "  module: foo\n"
                    "  stream: \"latest\"\n"
                    "  profiles:\n"
-                   "    \"latest\": [bar]\n"
-                   "    \"libonly\": []\n"
+                   "    latest: [bar]\n"
+                   "    libonly: []\n"
                    "...\n");
 
   /* Add another real profile default to the same stream and emit again */
@@ -675,8 +675,8 @@ defaults_test_emit_yaml (void)
                    "  module: foo\n"
                    "  stream: \"latest\"\n"
                    "  profiles:\n"
-                   "    \"latest\": [bar, baz]\n"
-                   "    \"libonly\": []\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
                    "...\n");
 
 
@@ -697,8 +697,8 @@ defaults_test_emit_yaml (void)
                    "  module: foo\n"
                    "  stream: \"latest\"\n"
                    "  profiles:\n"
-                   "    \"latest\": [bar, baz]\n"
-                   "    \"libonly\": []\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
                    "  intents:\n"
                    "    intense:\n"
                    "      stream: \"earliest\"\n"
@@ -722,13 +722,13 @@ defaults_test_emit_yaml (void)
                    "  module: foo\n"
                    "  stream: \"latest\"\n"
                    "  profiles:\n"
-                   "    \"latest\": [bar, baz]\n"
-                   "    \"libonly\": []\n"
+                   "    latest: [bar, baz]\n"
+                   "    libonly: []\n"
                    "  intents:\n"
                    "    intense:\n"
                    "      stream: \"earliest\"\n"
                    "      profiles:\n"
-                   "        \"earliest\": [client]\n"
+                   "        earliest: [client]\n"
                    "...\n");
 }
 

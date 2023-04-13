@@ -309,6 +309,45 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 }
 
 
+/**
+ * mmd_string_is_empty_or_a_number
+ * @string (in) (nullable)
+ *
+ * Returns: True if the @string is %NULL, empty, or looks like a decimal
+ * number. False otherwise (looks like a string).
+ *
+ * Since 2.15
+ */
+static gboolean
+string_is_empty_or_a_number (const gchar *string)
+{
+  if (string == NULL)
+    return TRUE;
+  if (string[0] == '\0')
+    return TRUE;
+  if (string[0] >= '0' && string[0] <= '9')
+    return TRUE;
+  if ((string[0] == '+' || string[0] == '-' || string[0] == '.') &&
+      (string[1] >= '0' && string[1] <= '9'))
+    return TRUE;
+  return FALSE;
+}
+
+
+gboolean
+mmd_emitter_scalar_string (yaml_emitter_t *emitter,
+                           const gchar *scalar,
+                           GError **error)
+{
+  return mmd_emitter_scalar (emitter,
+                             scalar,
+                             string_is_empty_or_a_number (scalar) ?
+                               YAML_DOUBLE_QUOTED_SCALAR_STYLE :
+                               YAML_PLAIN_SCALAR_STYLE,
+                             error);
+}
+
+
 gboolean
 mmd_emitter_strv (yaml_emitter_t *emitter,
                   yaml_sequence_style_t seq_style,

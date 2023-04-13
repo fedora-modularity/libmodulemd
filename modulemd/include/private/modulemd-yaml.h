@@ -620,6 +620,25 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
 
 
 /**
+ * mmd_emitter_scalar_string:
+ * @emitter: (inout): A libyaml emitter object that is positioned at the start
+ * of where a scalar will be written.
+ * @scalar: (in) (nullable): The scalar string to be written. If the string
+ * looks like a number or is empty or undefined, it will be explicitly quoted.
+ * @error: (out): A #GError that will return the reason for any error.
+ *
+ * Returns: TRUE if the YAML scalar was written successfully. Returns FALSE if
+ * an error occurred and sets @error appropriately.
+ *
+ * Since: 2.15
+ */
+gboolean
+mmd_emitter_scalar_string (yaml_emitter_t *emitter,
+                           const gchar *scalar,
+                           GError **error);
+
+
+/**
  * mmd_emitter_strv:
  * @emitter: (inout): A libyaml emitter object positioned at the start of where
  * a string sequence will be written.
@@ -1050,6 +1069,36 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
   EMIT_SCALAR_FULL (emitter, error, value, YAML_PLAIN_SCALAR_STYLE)
 
 /**
+ * EMIT_SCALAR_STRING:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits a string @value. Using style `YAML_DOUBLE_QUOTED_SCALAR_STYLE` style
+ * if the @value is empty or looks like a number. Otherwise, using
+ * `YAML_PLAIN_SCALAR_STYLE` style. This autoquoting of number-like
+ * strings is in place to prevent other YAML applications from trimming
+ * trailing null digits and to force them handle the values as a string (e.g.
+ * "1.0" will be serialized as "1.0" instead of 1.0 which some applications
+ * interpret as 1. We do not always quote to keep the YAML file concise and
+ * similar to previous serialization styles.
+ *
+ * Returns: Continues on if the YAML scalar was written successfully. Returns
+ * FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.15
+ */
+#define EMIT_SCALAR_STRING(emitter, error, value)                             \
+  do                                                                          \
+    {                                                                         \
+      if (!mmd_emitter_scalar_string ((emitter), (value), (error)))           \
+        return FALSE;                                                         \
+    }                                                                         \
+  while (0)
+
+
+/**
  * EMIT_KEY_VALUE_FULL:
  * @emitter: (inout): A libyaml emitter object positioned where a scalar
  * belongs in the YAML document.
@@ -1430,10 +1479,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
         modulemd_ordered_str_keys (table, modulemd_strcmp_sort);              \
       for (i = 0; i < keys->len; i++)                                         \
         {                                                                     \
-          EMIT_SCALAR_FULL (emitter,                                          \
-                            error,                                            \
-                            g_ptr_array_index (keys, i),                      \
-                            YAML_DOUBLE_QUOTED_SCALAR_STYLE);                 \
+          EMIT_SCALAR_STRING (emitter, error, g_ptr_array_index (keys, i));   \
         }                                                                     \
       EMIT_SEQUENCE_END (emitter, error);                                     \
     }                                                                         \

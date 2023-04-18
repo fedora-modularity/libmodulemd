@@ -733,6 +733,82 @@ defaults_test_emit_yaml (void)
 }
 
 
+static void
+defaults_test_quoting (void)
+{
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdDefaultsV1) defaults = NULL;
+
+  /* Module name which does not need quoting. */
+  defaults = modulemd_defaults_v1_new ("unquoted");
+  modulemd_defaults_v1_set_default_stream (defaults, "alwaysquoted", NULL);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (modulemd_defaults_v1_emit_yaml (defaults, &emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_nonnull (yaml_string->str);
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: unquoted\n"
+                   "  stream: \"alwaysquoted\"\n"
+                   "...\n");
+
+  g_clear_object (&defaults);
+
+  /* A module name which needs quoting. */
+  defaults = modulemd_defaults_v1_new ("1.0");
+  modulemd_defaults_v1_set_default_stream (defaults, "alwaysquoted", NULL);
+  modulemd_defaults_v1_set_empty_default_profiles_for_stream (
+    defaults, "unquoted", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults, "2.0", "unquoted", NULL);
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults, "2.0", "3.0", NULL);
+  modulemd_defaults_v1_set_default_stream (
+    defaults, "alwaysquoted", "unquoted");
+  modulemd_defaults_v1_set_empty_default_profiles_for_stream (
+    defaults, "unquoted", "unquoted");
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults, "2.0", "unquoted", "unquoted");
+  modulemd_defaults_v1_add_default_profile_for_stream (
+    defaults, "2.0", "3.0", "unquoted");
+  modulemd_defaults_v1_set_default_stream (defaults, "alwaysquoted", "4.0");
+
+  MMD_REINIT_YAML_STRING (&emitter, yaml_string);
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (modulemd_defaults_v1_emit_yaml (defaults, &emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_nonnull (yaml_string->str);
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-defaults\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: \"1.0\"\n"
+                   "  stream: \"alwaysquoted\"\n"
+                   "  profiles:\n"
+                   "    \"2.0\": [\"3.0\", unquoted]\n"
+                   "    unquoted: []\n"
+                   "  intents:\n"
+                   "    \"4.0\":\n"
+                   "      stream: \"alwaysquoted\"\n"
+                   "    unquoted:\n"
+                   "      stream: \"alwaysquoted\"\n"
+                   "      profiles:\n"
+                   "        \"2.0\": [\"3.0\", unquoted]\n"
+                   "        unquoted: []\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -763,6 +839,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/defaults/v1/yaml/emit",
                    defaults_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/defaults/v1/yaml/quoting",
+                   defaults_test_quoting);
 
   return g_test_run ();
 }

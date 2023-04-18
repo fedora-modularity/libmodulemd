@@ -369,8 +369,12 @@ mmd_emitter_strv (yaml_emitter_t *emitter,
 
   for (int i = 0; i < numentries; i++)
     {
-      ret = mmd_emitter_scalar (
-        emitter, list[i], YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      ret = mmd_emitter_scalar (emitter,
+                                list[i],
+                                string_is_empty_or_a_number (list[i]) ?
+                                  YAML_DOUBLE_QUOTED_SCALAR_STYLE :
+                                  YAML_PLAIN_SCALAR_STYLE,
+                                &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

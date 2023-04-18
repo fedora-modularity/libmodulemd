@@ -1015,10 +1015,9 @@ modulemd_defaults_v1_emit_yaml (ModulemdDefaultsV1 *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (
+  if (!mmd_emitter_scalar_string (
         emitter,
         modulemd_defaults_get_module_name (MODULEMD_DEFAULTS (self)),
-        YAML_PLAIN_SCALAR_STYLE,
         error))
     {
       return FALSE;
@@ -1092,7 +1091,7 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
                                     GError **error)
 {
   g_autoptr (GPtrArray) stream_names = NULL;
-  g_auto (GStrv) streams = NULL;
+  g_auto (GStrv) profiles = NULL;
   gchar *stream_name = NULL;
   GHashTable *profile_set = NULL;
 
@@ -1129,13 +1128,13 @@ modulemd_defaults_v1_emit_profiles (GHashTable *profile_table,
           return FALSE;
         }
 
-      streams = modulemd_ordered_str_keys_as_strv (profile_set);
+      profiles = modulemd_ordered_str_keys_as_strv (profile_set);
       if (!mmd_emitter_strv (
-            emitter, YAML_FLOW_SEQUENCE_STYLE, streams, error))
+            emitter, YAML_FLOW_SEQUENCE_STYLE, profiles, error))
         {
           return FALSE;
         }
-      g_clear_pointer (&streams, g_strfreev);
+      g_clear_pointer (&profiles, g_strfreev);
     }
 
   /* End the mapping for "profiles:" */
@@ -1200,8 +1199,7 @@ modulemd_defaults_v1_emit_intents (ModulemdDefaultsV1 *self,
       intent = g_ptr_array_index (intents, i);
 
       /* Emit the intent name */
-      if (!mmd_emitter_scalar (
-            emitter, intent, YAML_PLAIN_SCALAR_STYLE, error))
+      if (!mmd_emitter_scalar_string (emitter, intent, error))
         {
           return FALSE;
         }

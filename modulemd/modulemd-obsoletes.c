@@ -1010,11 +1010,11 @@ modulemd_obsoletes_emit_obsoleted_by (ModulemdObsoletes *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (emitter,
-                           modulemd_obsoletes_get_obsoleted_by_module_name (
-                             MODULEMD_OBSOLETES (self)),
-                           YAML_PLAIN_SCALAR_STYLE,
-                           error))
+  if (!mmd_emitter_scalar_string (
+        emitter,
+        modulemd_obsoletes_get_obsoleted_by_module_name (
+          MODULEMD_OBSOLETES (self)),
+        error))
     {
       return FALSE;
     }
@@ -1118,10 +1118,9 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (
+  if (!mmd_emitter_scalar_string (
         emitter,
         modulemd_obsoletes_get_module_name (MODULEMD_OBSOLETES (self)),
-        YAML_PLAIN_SCALAR_STYLE,
         error))
     {
       return FALSE;
@@ -1153,8 +1152,7 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
           return FALSE;
         }
 
-      if (!mmd_emitter_scalar (
-            emitter, module_context, YAML_PLAIN_SCALAR_STYLE, error))
+      if (!mmd_emitter_scalar_string (emitter, module_context, error))
         {
           return FALSE;
         }
@@ -1183,10 +1181,9 @@ modulemd_obsoletes_emit_yaml (ModulemdObsoletes *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (
+  if (!mmd_emitter_scalar_string (
         emitter,
         modulemd_obsoletes_get_message (MODULEMD_OBSOLETES (self)),
-        YAML_PLAIN_SCALAR_STYLE,
         error))
     {
       return FALSE;

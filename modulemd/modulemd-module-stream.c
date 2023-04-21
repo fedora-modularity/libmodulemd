@@ -1466,7 +1466,7 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
   if (modulemd_module_stream_get_module_name (self) != NULL &&
       !modulemd_module_stream_is_autogen_module_name (self))
     {
-      EMIT_KEY_VALUE (
+      EMIT_KEY_VALUE_STRING (
         emitter, error, "name", modulemd_module_stream_get_module_name (self));
     }
 
@@ -1485,7 +1485,7 @@ modulemd_module_stream_emit_yaml_base (ModulemdModuleStream *self,
     }
 
   EMIT_KEY_VALUE_IF_SET (emitter, error, "version", version_string);
-  EMIT_KEY_VALUE_IF_SET (
+  EMIT_KEY_VALUE_STRING_IF_SET (
     emitter, error, "context", modulemd_module_stream_get_context (self));
 
   /* The rest of the fields will be emitted by the version-specific emitters */

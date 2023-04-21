@@ -1157,6 +1157,43 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 
 
 /**
+ * EMIT_KEY_VALUE_STRING:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @key: (in): The key (string) to be written.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits key/value pair (@key: @value) using YAML_DOUBLE_QUOTED_SCALAR_STYLE
+ * style for number-like keys/values, YAML_PLAIN_SCALAR_STYLE otherwise.
+ *
+ * NOTE: This macro outputs both a key and a value for that key, thus it must
+ * only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if the YAML key/value pair was written successfully.
+ * Returns FALSE if an error occurred and sets @error appropriately.
+ *
+ * Since: 2.15
+ */
+#define EMIT_KEY_VALUE_STRING(emitter, error, key, value)                     \
+  do                                                                          \
+    {                                                                         \
+      if ((value) == NULL)                                                    \
+        {                                                                     \
+          g_set_error ((error),                                               \
+                       MODULEMD_YAML_ERROR,                                   \
+                       MMD_YAML_ERROR_EMIT,                                   \
+                       "Value for key %s was NULL on emit",                   \
+                       (key));                                                \
+          return FALSE;                                                       \
+        }                                                                     \
+      EMIT_SCALAR_STRING ((emitter), (error), (key));                         \
+      EMIT_SCALAR_STRING ((emitter), (error), (value));                       \
+    }                                                                         \
+  while (0)
+
+
+/**
  * EMIT_KEY_VALUE_IF_SET:
  * @emitter: (inout): A libyaml emitter object positioned where a scalar
  * belongs in the YAML document.
@@ -1164,7 +1201,8 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
  * @key: (in): The key (string) to be written.
  * @value: (in): The scalar (string) to be written.
  *
- * Emits key/value pair (@key: @value) only if @value is not NULL.
+ * Emits key/value pair (@key: @value) only if @value is not NULL. The
+ * emission is performed in YAML_PLAIN_SCALAR_STYLE style.
  *
  * NOTE: This macro outputs both a key and a value for that key, thus it must
  * only be used from within a YAML mapping.
@@ -1178,12 +1216,45 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 #define EMIT_KEY_VALUE_IF_SET(emitter, error, key, value)                     \
   do                                                                          \
     {                                                                         \
-      if (value != NULL)                                                      \
+      if ((value) != NULL)                                                    \
         {                                                                     \
-          EMIT_KEY_VALUE (emitter, error, key, value);                        \
+          EMIT_KEY_VALUE ((emitter), (error), (key), (value));                \
         }                                                                     \
     }                                                                         \
   while (0)
+
+
+/**
+ * EMIT_KEY_VALUE_STRING_IF_SET:
+ * @emitter: (inout): A libyaml emitter object positioned where a scalar
+ * belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason for an output error.
+ * @key: (in): The key (string) to be written.
+ * @value: (in): The scalar (string) to be written.
+ *
+ * Emits key/value pair (@key: @value) only if @value is not NULL. The
+ * emission is performed in YAML_DOUBLE_QUOTED_SCALAR_STYLE style if the
+ * key/value looks like a number, otherwise in YAML_PLAIN_SCALAR_STYLE style.
+ *
+ * NOTE: This macro outputs both a key and a value for that key, thus it must
+ * only be used from within a YAML mapping.
+ *
+ * Returns: Continues on if @value is NULL or the YAML key/value pair was
+ * written successfully. Returns FALSE if an error occurred and sets @error
+ * appropriately.
+ *
+ * Since: 2.15
+ */
+#define EMIT_KEY_VALUE_STRING_IF_SET(emitter, error, key, value)              \
+  do                                                                          \
+    {                                                                         \
+      if ((value) != NULL)                                                    \
+        {                                                                     \
+          EMIT_KEY_VALUE_STRING ((emitter), (error), (key), (value));         \
+        }                                                                     \
+    }                                                                         \
+  while (0)
+
 
 /**
  * EMIT_MAPPING_START_WITH_STYLE:
@@ -1472,7 +1543,7 @@ skip_unknown_yaml (yaml_parser_t *parser, GError **error);
 #define EMIT_STRING_SET_FULL(emitter, error, key, table, sequence_style)      \
   do                                                                          \
     {                                                                         \
-      EMIT_SCALAR (emitter, error, key);                                      \
+      EMIT_SCALAR_STRING (emitter, error, key);                               \
       EMIT_SEQUENCE_START_WITH_STYLE (emitter, error, sequence_style);        \
       gsize i;                                                                \
       g_autoptr (GPtrArray) keys =                                            \

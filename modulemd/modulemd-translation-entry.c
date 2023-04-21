@@ -526,8 +526,8 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
   g_hash_table_iter_init (&iter, self->profile_descriptions);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      ret = mmd_emitter_scalar (
-        emitter, (const gchar *)key, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      ret =
+        mmd_emitter_scalar_string (emitter, (const gchar *)key, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (error,
@@ -536,8 +536,8 @@ modulemd_translation_entry_emit_yaml_profiles (ModulemdTranslationEntry *self,
           return FALSE;
         }
 
-      ret = mmd_emitter_scalar (
-        emitter, (const gchar *)value, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+      ret = mmd_emitter_scalar_string (
+        emitter, (const gchar *)value, &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (error,
@@ -568,10 +568,8 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
   g_autoptr (GError) nested_error = NULL;
   MMD_INIT_YAML_EVENT (event);
   /* Emit the Translation Entry Locale */
-  ret = mmd_emitter_scalar (emitter,
-                            modulemd_translation_entry_get_locale (self),
-                            YAML_PLAIN_SCALAR_STYLE,
-                            &nested_error);
+  ret = mmd_emitter_scalar_string (
+    emitter, modulemd_translation_entry_get_locale (self), &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (error,
@@ -604,10 +602,8 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
           return FALSE;
         }
 
-      ret = mmd_emitter_scalar (emitter,
-                                modulemd_translation_entry_get_summary (self),
-                                YAML_PLAIN_SCALAR_STYLE,
-                                &nested_error);
+      ret = mmd_emitter_scalar_string (
+        emitter, modulemd_translation_entry_get_summary (self), &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (
@@ -630,11 +626,10 @@ modulemd_translation_entry_emit_yaml (ModulemdTranslationEntry *self,
           return FALSE;
         }
 
-      ret =
-        mmd_emitter_scalar (emitter,
-                            modulemd_translation_entry_get_description (self),
-                            YAML_PLAIN_SCALAR_STYLE,
-                            &nested_error);
+      ret = mmd_emitter_scalar_string (
+        emitter,
+        modulemd_translation_entry_get_description (self),
+        &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

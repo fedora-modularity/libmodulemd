@@ -796,7 +796,7 @@ module_stream_test_v2_yaml (void)
     "                rationale: We need this to demonstrate stuff.\n"
     "                repository: https://pagure.io/bar.git\n"
     "                cache: https://example.com/cache\n"
-    "                ref: 26ca0c0\n"
+    "                ref: \"26ca0c0\"\n"
     "            baz:\n"
     "                rationale: This one is here to demonstrate other stuff.\n"
     "            xxx:\n"
@@ -2595,7 +2595,7 @@ module_stream_v1_test_parse_dump (void)
     "        rationale: We need this to demonstrate stuff.\n"
     "        repository: https://pagure.io/bar.git\n"
     "        cache: https://example.com/cache\n"
-    "        ref: 26ca0c0\n"
+    "        ref: \"26ca0c0\"\n"
     "      baz:\n"
     "        rationale: This one is here to demonstrate other stuff.\n"
     "      xxx:\n"
@@ -2787,7 +2787,7 @@ module_stream_v2_test_parse_dump (void)
     "        name: bar-real\n"
     "        repository: https://pagure.io/bar.git\n"
     "        cache: https://example.com/cache\n"
-    "        ref: 26ca0c0\n"
+    "        ref: \"26ca0c0\"\n"
     "      baz:\n"
     "        rationale: Demonstrate updating the buildroot contents.\n"
     "        buildroot: true\n"
@@ -2821,8 +2821,8 @@ module_stream_v2_test_parse_dump (void)
     "ee47083ed80146eb2c84e9a94d0836393912185dcda62b9d93ee0c2ea5dc795b:\n"
     "          name: bar\n"
     "          epoch: 0\n"
-    "          version: 1.23\n"
-    "          release: 1.module_deadbeef\n"
+    "          version: \"1.23\"\n"
+    "          release: \"1.module_deadbeef\"\n"
     "          arch: x86_64\n"
     "          nevra: bar-0:1.23-1.module_deadbeef.x86_64\n"
     "...\n");
@@ -3445,6 +3445,62 @@ module_stream_v2_test_obsoletes (void)
 }
 
 
+static void
+module_stream_v2_test_quoting (void)
+{
+  gboolean ret;
+  g_auto (GVariantBuilder) builder;
+  g_autoptr (GVariant) xmd = NULL;
+  GVariant *xmd_array = NULL;
+  g_autoptr (GVariantDict) xmd_dict = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdModuleIndex) index = modulemd_module_index_new ();
+  g_autofree gchar *yaml_str = NULL;
+
+  g_autoptr (ModulemdModuleStreamV2) stream =
+    modulemd_module_stream_v2_new ("0", "1");
+
+  modulemd_module_stream_v2_set_summary (stream, "2");
+  modulemd_module_stream_v2_set_description (stream, "3");
+  modulemd_module_stream_v2_add_module_license (stream, "4");
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+  g_variant_builder_add_value (&builder, g_variant_new_string ("5"));
+  xmd_array = g_variant_builder_end (&builder);
+
+  xmd_dict = g_variant_dict_new (NULL);
+  g_variant_dict_insert_value (xmd_dict, "6", g_steal_pointer (&xmd_array));
+  xmd = g_variant_ref_sink (g_variant_dict_end (xmd_dict));
+  modulemd_module_stream_v2_set_xmd (stream, xmd);
+
+  ret = modulemd_module_index_add_module_stream (
+    index, MODULEMD_MODULE_STREAM (stream), &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  yaml_str = modulemd_module_index_dump_to_string (index, &error);
+  g_assert_cmpstr (yaml_str,
+                   ==,
+                   "---\n"
+                   "document: modulemd\n"
+                   "version: 2\n"
+                   "data:\n"
+                   "  name: \"0\"\n"
+                   "  stream: \"1\"\n"
+                   "  summary: \"2\"\n"
+                   "  description: >-\n"
+                   "    3\n"
+                   "  license:\n"
+                   "    module:\n"
+                   "    - \"4\"\n"
+                   "  xmd:\n"
+                   "    \"6\":\n"
+                   "    - \"5\"\n"
+                   "...\n");
+  g_assert_no_error (error);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -3606,6 +3662,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/obsoletes",
                    module_stream_v2_test_obsoletes);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/quoting",
+                   module_stream_v2_test_quoting);
 
   return g_test_run ();
 }

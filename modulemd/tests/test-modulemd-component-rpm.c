@@ -394,6 +394,50 @@ component_rpm_test_emit_yaml (void)
 
 
 static void
+component_rpm_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdComponentRpm) r = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  r = modulemd_component_rpm_new ("0");
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (r), "1");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (r), 2);
+  modulemd_component_rpm_set_repository (r, "3");
+  modulemd_component_rpm_set_ref (r, "4");
+  modulemd_component_rpm_set_cache (r, "5");
+  modulemd_component_rpm_set_buildroot (r, TRUE);
+  modulemd_component_rpm_set_srpm_buildroot (r, TRUE);
+  modulemd_component_rpm_add_restricted_arch (r, "6");
+  modulemd_component_rpm_add_multilib_arch (r, "7");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_component_rpm_emit_yaml (r, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "\"0\":\n"
+                   "  rationale: \"1\"\n"
+                   "  repository: \"3\"\n"
+                   "  cache: \"5\"\n"
+                   "  ref: \"4\"\n"
+                   "  buildroot: true\n"
+                   "  srpm-buildroot: true\n"
+                   "  buildorder: 2\n"
+                   "  arches: [\"6\"]\n"
+                   "  multilib: [\"7\"]\n"
+                   "...\n");
+}
+
+
+static void
 component_rpm_test_parse_yaml (void)
 {
   g_autoptr (ModulemdComponentRpm) r = NULL;
@@ -576,6 +620,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/component/rpm/yaml/emit",
                    component_rpm_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/component/rpm/yaml/quoting",
+                   component_rpm_test_quoting_yaml);
 
   g_test_add_func ("/modulemd/v2/component/rpm/yaml/parse",
                    component_rpm_test_parse_yaml);

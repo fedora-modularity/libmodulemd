@@ -451,10 +451,8 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
   g_autoptr (GError) nested_error = NULL;
   MMD_INIT_YAML_EVENT (event);
 
-  ret = mmd_emitter_scalar (emitter,
-                            modulemd_profile_get_name (self),
-                            YAML_PLAIN_SCALAR_STYLE,
-                            &nested_error);
+  ret = mmd_emitter_scalar_string (
+    emitter, modulemd_profile_get_name (self), &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (error,
@@ -486,10 +484,8 @@ modulemd_profile_emit_yaml (ModulemdProfile *self,
           return FALSE;
         }
 
-      ret = mmd_emitter_scalar (emitter,
-                                modulemd_profile_get_description (self, NULL),
-                                YAML_PLAIN_SCALAR_STYLE,
-                                &nested_error);
+      ret = mmd_emitter_scalar_string (
+        emitter, modulemd_profile_get_description (self, NULL), &nested_error);
       if (!ret)
         {
           g_propagate_prefixed_error (

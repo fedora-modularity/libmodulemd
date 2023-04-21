@@ -566,6 +566,39 @@ translation_entry_test_emit_yaml (void)
 }
 
 
+static void
+translation_entry_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdTranslationEntry) te = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  te = modulemd_translation_entry_new ("0");
+  modulemd_translation_entry_set_summary (te, "1");
+  modulemd_translation_entry_set_description (te, "2");
+  modulemd_translation_entry_set_profile_description (te, "3", "4");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_translation_entry_emit_yaml (te, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "\"0\":\n"
+                   "  summary: \"1\"\n"
+                   "  description: \"2\"\n"
+                   "  profiles:\n"
+                   "    \"3\": \"4\"\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -599,6 +632,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/translationentry/yaml/emit",
                    translation_entry_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/translationentry/yaml/quoting",
+                   translation_entry_test_quoting_yaml);
 
   return g_test_run ();
 }

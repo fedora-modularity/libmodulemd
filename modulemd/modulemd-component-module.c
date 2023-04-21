@@ -263,10 +263,8 @@ modulemd_component_module_emit_yaml (ModulemdComponentModule *self,
           return FALSE;
         }
 
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_module_get_repository (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
+      if (!mmd_emitter_scalar_string (
+            emitter, modulemd_component_module_get_repository (self), error))
         {
           return FALSE;
         }
@@ -279,10 +277,8 @@ modulemd_component_module_emit_yaml (ModulemdComponentModule *self,
           return FALSE;
         }
 
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_module_get_ref (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
+      if (!mmd_emitter_scalar_string (
+            emitter, modulemd_component_module_get_ref (self), error))
         {
           return FALSE;
         }

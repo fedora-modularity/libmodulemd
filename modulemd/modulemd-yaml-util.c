@@ -316,6 +316,11 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
  * Returns: True if the @string is %NULL, empty, or looks like a decimal
  * number. False otherwise (looks like a string).
  *
+ * Note: This function is intentionally naive (i.e. it checks only the
+ * first character). It's fast. It does not dispute whether "0x01" is or is
+ * not a number. A purpose is to catch strings which could be mistaken with
+ * a number.
+ *
  * Since 2.15
  */
 static gboolean
@@ -1297,7 +1302,8 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
 
   if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING))
     {
-      EMIT_SCALAR (emitter, error, g_variant_get_string (variant, NULL));
+      EMIT_SCALAR_STRING (
+        emitter, error, g_variant_get_string (variant, NULL));
     }
   else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
     {
@@ -1342,7 +1348,7 @@ modulemd_yaml_emit_variant (yaml_emitter_t *emitter,
                 "Got unexpected type while processing XMD dictionary.");
               return FALSE;
             }
-          EMIT_SCALAR (emitter, error, g_ptr_array_index (keys, i));
+          EMIT_SCALAR_STRING (emitter, error, g_ptr_array_index (keys, i));
           if (!modulemd_yaml_emit_variant (emitter, value, error))
             {
               return FALSE;

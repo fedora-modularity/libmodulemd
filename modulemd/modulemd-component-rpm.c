@@ -574,13 +574,14 @@ modulemd_component_rpm_emit_yaml (ModulemdComponentRpm *self,
       return FALSE;
     }
 
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "name", self->override_name);
+  EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "name", self->override_name);
 
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "repository", self->repository);
+  EMIT_KEY_VALUE_STRING_IF_SET (
+    emitter, error, "repository", self->repository);
 
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "cache", self->cache);
+  EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "cache", self->cache);
 
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "ref", self->ref);
+  EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "ref", self->ref);
 
   /* Only output buildroot if it's TRUE */
   if (modulemd_component_rpm_get_buildroot (self))

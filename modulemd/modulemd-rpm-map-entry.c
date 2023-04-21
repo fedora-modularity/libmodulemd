@@ -569,12 +569,12 @@ modulemd_rpm_map_entry_emit_yaml (ModulemdRpmMapEntry *self,
 
   EMIT_MAPPING_START_WITH_STYLE (emitter, error, YAML_BLOCK_MAPPING_STYLE);
 
-  EMIT_KEY_VALUE (emitter, error, "name", self->name);
+  EMIT_KEY_VALUE_STRING (emitter, error, "name", self->name);
   EMIT_KEY_VALUE (emitter, error, "epoch", epoch);
-  EMIT_KEY_VALUE (emitter, error, "version", self->version);
-  EMIT_KEY_VALUE (emitter, error, "release", self->release);
-  EMIT_KEY_VALUE (emitter, error, "arch", self->arch);
-  EMIT_KEY_VALUE (emitter, error, "nevra", nevra);
+  EMIT_KEY_VALUE_STRING (emitter, error, "version", self->version);
+  EMIT_KEY_VALUE_STRING (emitter, error, "release", self->release);
+  EMIT_KEY_VALUE_STRING (emitter, error, "arch", self->arch);
+  EMIT_KEY_VALUE_STRING (emitter, error, "nevra", nevra);
 
   EMIT_MAPPING_END (emitter, &nested_error);
 

@@ -220,8 +220,8 @@ test_emit_yaml_valid (void)
     "---\n"
     "name: baz\n"
     "epoch: 2\n"
-    "version: 2.18\n"
-    "release: 3.module_baddad\n"
+    "version: \"2.18\"\n"
+    "release: \"3.module_baddad\"\n"
     "arch: s390x\n"
     "nevra: baz-2:2.18-3.module_baddad.s390x\n"
     "...\n";
@@ -263,6 +263,39 @@ test_emit_yaml_invalid (void)
   g_assert_error (error, MODULEMD_ERROR, MMD_ERROR_VALIDATE);
 }
 
+
+static void
+test_emit_yaml_quoting (void)
+{
+  g_autoptr (ModulemdRpmMapEntry) entry = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  const gchar *baseline =
+    "---\n"
+    "name: \"0\"\n"
+    "epoch: 1\n"
+    "version: \"2\"\n"
+    "release: \"3\"\n"
+    "arch: \"4\"\n"
+    "nevra: \"0-1:2-3.4\"\n"
+    "...\n";
+
+  entry = modulemd_rpm_map_entry_new ("0", 1, "2", "3", "4");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (modulemd_rpm_map_entry_emit_yaml (entry, &emitter, &error));
+  g_assert_no_error (error);
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str, ==, baseline);
+
+  g_clear_pointer (&yaml_string, modulemd_yaml_string_free);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -289,6 +322,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/invalid",
                    test_emit_yaml_invalid);
+
+  g_test_add_func ("/modulemd/v2/rpm_map/yaml/emit/quoting",
+                   test_emit_yaml_quoting);
 
   return g_test_run ();
 }

@@ -700,10 +700,8 @@ modulemd_translation_emit_yaml (ModulemdTranslation *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (emitter,
-                           modulemd_translation_get_module_name (self),
-                           YAML_PLAIN_SCALAR_STYLE,
-                           error))
+  if (!mmd_emitter_scalar_string (
+        emitter, modulemd_translation_get_module_name (self), error))
     {
       return FALSE;
     }

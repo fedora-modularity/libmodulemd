@@ -365,6 +365,47 @@ translation_test_emit_yaml (void)
                    "...\n");
 }
 
+
+static void
+translation_test_quoting (void)
+{
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdTranslation) t = NULL;
+  g_autoptr (ModulemdTranslationEntry) te = NULL;
+
+  t = modulemd_translation_new (1, "0", "1", 42);
+
+  te = modulemd_translation_entry_new ("2");
+  modulemd_translation_entry_set_summary (te, "3");
+  modulemd_translation_entry_set_description (te, "4");
+  modulemd_translation_entry_set_profile_description (te, "5", "6");
+  modulemd_translation_set_translation_entry (t, te);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (modulemd_translation_emit_yaml (t, &emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_nonnull (yaml_string->str);
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-translations\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  module: \"0\"\n"
+                   "  stream: \"1\"\n"
+                   "  modified: 42\n"
+                   "  translations:\n"
+                   "    \"2\":\n"
+                   "      summary: \"3\"\n"
+                   "      description: \"4\"\n"
+                   "      profiles:\n"
+                   "        \"5\": \"6\"\n"
+                   "...\n");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -394,6 +435,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/translation/yaml/emit",
                    translation_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/translation/yaml/quoting",
+                   translation_test_quoting);
 
   return g_test_run ();
 }

@@ -449,6 +449,43 @@ obsoletes_test_emit_yaml (void)
                    "...\n");
 }
 
+static void
+obsoletes_test_quoting (void)
+{
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  g_autoptr (GError) error = NULL;
+  g_autoptr (ModulemdObsoletes) e = NULL;
+  e = modulemd_obsoletes_new (
+    MD_OBSOLETES_VERSION_LATEST, 202001012020, "0", "1", "2");
+  modulemd_obsoletes_set_module_context (e, "3");
+  modulemd_obsoletes_set_eol_date (e, 202001010000);
+  modulemd_obsoletes_set_obsoleted_by (e, "4", "5");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (modulemd_obsoletes_emit_yaml (e, &emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_nonnull (yaml_string->str);
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "document: modulemd-obsoletes\n"
+                   "version: 1\n"
+                   "data:\n"
+                   "  modified: 2020-01-01T20:20Z\n"
+                   "  module: \"0\"\n"
+                   "  stream: \"1\"\n"
+                   "  context: \"3\"\n"
+                   "  eol_date: 2020-01-01T00:00Z\n"
+                   "  message: \"2\"\n"
+                   "  obsoleted_by:\n"
+                   "    module: \"4\"\n"
+                   "    stream: \"5\"\n"
+                   "...\n");
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -481,6 +518,8 @@ main (int argc, char *argv[])
                    obsoletes_test_parse_yaml);
   g_test_add_func ("/modulemd/v2/obsoletes/yaml/emit",
                    obsoletes_test_emit_yaml);
+  g_test_add_func ("/modulemd/v2/obsoletes/yaml/quoting",
+                   obsoletes_test_quoting);
 
   return g_test_run ();
 }

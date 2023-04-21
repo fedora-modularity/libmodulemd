@@ -759,6 +759,48 @@ buildconfig_test_emit_yaml (void)
 }
 
 static void
+buildconfig_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdBuildConfig) bc = NULL;
+  g_autoptr (ModulemdBuildopts) opts = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  bc = modulemd_build_config_new ();
+  modulemd_build_config_set_context (bc, "0");
+  modulemd_build_config_set_platform (bc, "1");
+
+  opts = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (opts, "2");
+  modulemd_build_config_set_buildopts (bc, opts);
+
+  modulemd_build_config_add_buildtime_requirement (bc, "3", "4");
+  modulemd_build_config_add_runtime_requirement (bc, "5", "6");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (modulemd_build_config_emit_yaml (bc, &emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "context: \"0\"\n"
+                   "platform: \"1\"\n"
+                   "buildrequires:\n"
+                   "  \"3\": [\"4\"]\n"
+                   "requires:\n"
+                   "  \"5\": [\"6\"]\n"
+                   "buildopts:\n"
+                   "  rpms:\n"
+                   "    macros: >-\n"
+                   "      2\n"
+                   "...\n");
+}
+
+static void
 buildconfig_test_comparison (void)
 {
   g_autoptr (ModulemdBuildConfig) bc_1 = NULL;
@@ -1098,6 +1140,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/buildconfig/yaml/emit",
                    buildconfig_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/buildconfig/yaml/quoting",
+                   buildconfig_test_quoting_yaml);
 
   g_test_add_func ("/modulemd/v2/buildconfig/comparison",
                    buildconfig_test_comparison);

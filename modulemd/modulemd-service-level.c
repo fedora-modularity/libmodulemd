@@ -411,10 +411,8 @@ modulemd_service_level_emit_yaml (ModulemdServiceLevel *self,
   MMD_INIT_YAML_EVENT (event);
 
   /* Emit the Service Level Name */
-  ret = mmd_emitter_scalar (emitter,
-                            modulemd_service_level_get_name (self),
-                            YAML_PLAIN_SCALAR_STYLE,
-                            &nested_error);
+  ret = mmd_emitter_scalar_string (
+    emitter, modulemd_service_level_get_name (self), &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (error,

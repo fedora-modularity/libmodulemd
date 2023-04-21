@@ -799,7 +799,7 @@ data:
                 rationale: We need this to demonstrate stuff.
                 repository: https://pagure.io/bar.git
                 cache: https://example.com/cache
-                ref: 26ca0c0
+                ref: "26ca0c0"
             baz:
                 rationale: This one is here to demonstrate other stuff.
             xxx:
@@ -1039,7 +1039,7 @@ data:
                 rationale: We need this to demonstrate stuff.
                 repository: https://pagure.io/bar.git
                 cache: https://example.com/cache
-                ref: 26ca0c0
+                ref: "26ca0c0"
             baz:
                 rationale: This one is here to demonstrate other stuff.
             xxx:
@@ -1543,7 +1543,7 @@ data:
         rationale: Javascript runtime and npm package manager.
         repository: git://pkgs.fedoraproject.org/rpms/nodejs
         cache: http://pkgs.fedoraproject.org/repo/pkgs/nodejs
-        ref: 8
+        ref: "8"
         buildorder: 10
   artifacts:
     rpms:

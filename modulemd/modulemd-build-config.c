@@ -441,8 +441,8 @@ modulemd_build_config_emit_yaml (ModulemdBuildConfig *self,
       return FALSE;
     }
 
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "context", self->context);
-  EMIT_KEY_VALUE_IF_SET (emitter, error, "platform", self->platform);
+  EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "context", self->context);
+  EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "platform", self->platform);
 
   if (!modulemd_build_config_emit_deptable (
         self->buildrequires, "buildrequires", emitter, error))
@@ -526,8 +526,7 @@ modulemd_build_config_emit_deptable (GHashTable *deptable,
         nested_set, g_strdup (module_name), g_steal_pointer (&stream_table));
     }
 
-  ret = mmd_emitter_scalar (
-    emitter, table_key, YAML_PLAIN_SCALAR_STYLE, &nested_error);
+  ret = mmd_emitter_scalar_string (emitter, table_key, &nested_error);
   if (!ret)
     {
       g_propagate_prefixed_error (error,

@@ -533,6 +533,39 @@ profile_test_emit_yaml (void)
 }
 
 
+static void
+profile_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdProfile) p = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  p = modulemd_profile_new ("0");
+  modulemd_profile_set_description (p, "1");
+  modulemd_profile_add_rpm (p, "2");
+  modulemd_profile_set_default (p);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_profile_emit_yaml (p, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "\"0\":\n"
+                   "  description: \"1\"\n"
+                   "  rpms:\n"
+                   "  - \"2\"\n"
+                   "  default: true\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -561,6 +594,9 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/profile/yaml/parse", profile_test_parse_yaml);
 
   g_test_add_func ("/modulemd/v2/profile/yaml/emit", profile_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/profile/yaml/quoting",
+                   profile_test_quoting_yaml);
 
   return g_test_run ();
 }

@@ -582,6 +582,42 @@ dependencies_test_emit_yaml (void)
                    "...\n");
 }
 
+
+static void
+dependencies_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdDependencies) d = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  d = modulemd_dependencies_new ();
+  modulemd_dependencies_add_buildtime_stream (d, "0", "1");
+  modulemd_dependencies_set_empty_buildtime_dependencies_for_module (d, "2");
+  modulemd_dependencies_add_runtime_stream (d, "3", "4");
+  modulemd_dependencies_set_empty_runtime_dependencies_for_module (d, "5");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_sequence (&emitter, YAML_BLOCK_SEQUENCE_STYLE, &error));
+  g_assert_true (modulemd_dependencies_emit_yaml (d, &emitter, &error));
+  g_assert_true (mmd_emitter_end_sequence (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "- buildrequires:\n"
+                   "    \"0\": [\"1\"]\n"
+                   "    \"2\": []\n"
+                   "  requires:\n"
+                   "    \"3\": [\"4\"]\n"
+                   "    \"5\": []\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -611,6 +647,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/dependencies/yaml/emit",
                    dependencies_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/dependencies/yaml/quoting",
+                   dependencies_test_quoting_yaml);
 
   /*
   g_test_add_func ("/modulemd/v2/profile/copy",profile_test_copy);

@@ -620,8 +620,7 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
       return FALSE;
     }
 
-  if (!mmd_emitter_scalar (
-        emitter, priv->name, YAML_PLAIN_SCALAR_STYLE, error))
+  if (!mmd_emitter_scalar_string (emitter, priv->name, error))
     {
       return FALSE;
     }
@@ -639,10 +638,8 @@ modulemd_component_emit_yaml_start (ModulemdComponent *self,
           return FALSE;
         }
 
-      if (!mmd_emitter_scalar (emitter,
-                               modulemd_component_get_rationale (self),
-                               YAML_PLAIN_SCALAR_STYLE,
-                               error))
+      if (!mmd_emitter_scalar_string (
+            emitter, modulemd_component_get_rationale (self), error))
         {
           return FALSE;
         }

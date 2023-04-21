@@ -3083,9 +3083,9 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
       EMIT_KEY_VALUE (emitter, error, "static_context", "true");
     }
 
-  EMIT_KEY_VALUE_IF_SET (
+  EMIT_KEY_VALUE_STRING_IF_SET (
     emitter, error, "arch", modulemd_module_stream_v2_get_arch (self));
-  EMIT_KEY_VALUE (emitter, error, "summary", self->summary);
+  EMIT_KEY_VALUE_STRING (emitter, error, "summary", self->summary);
   EMIT_KEY_VALUE_FULL (emitter,
                        error,
                        "description",
@@ -3133,10 +3133,11 @@ modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
     {
       EMIT_SCALAR (emitter, error, "references");
       EMIT_MAPPING_START (emitter, error);
-      EMIT_KEY_VALUE_IF_SET (emitter, error, "community", self->community);
-      EMIT_KEY_VALUE_IF_SET (
+      EMIT_KEY_VALUE_STRING_IF_SET (
+        emitter, error, "community", self->community);
+      EMIT_KEY_VALUE_STRING_IF_SET (
         emitter, error, "documentation", self->documentation);
-      EMIT_KEY_VALUE_IF_SET (emitter, error, "tracker", self->tracker);
+      EMIT_KEY_VALUE_STRING_IF_SET (emitter, error, "tracker", self->tracker);
       EMIT_MAPPING_END (emitter, error);
     }
 

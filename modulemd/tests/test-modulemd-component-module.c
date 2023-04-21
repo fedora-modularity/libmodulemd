@@ -335,6 +335,40 @@ component_module_test_emit_yaml (void)
 
 
 static void
+component_module_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdComponentModule) m = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  m = modulemd_component_module_new ("0");
+  modulemd_component_set_rationale (MODULEMD_COMPONENT (m), "1");
+  modulemd_component_set_buildorder (MODULEMD_COMPONENT (m), 2);
+  modulemd_component_module_set_repository (m, "3");
+  modulemd_component_module_set_ref (m, "4");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_component_module_emit_yaml (m, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "\"0\":\n"
+                   "  rationale: \"1\"\n"
+                   "  repository: \"3\"\n"
+                   "  ref: \"4\"\n"
+                   "  buildorder: 2\n"
+                   "...\n");
+}
+
+
+static void
 component_module_test_parse_yaml (void)
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
@@ -398,6 +432,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/component/module/yaml/emit",
                    component_module_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/component/module/yaml/quoting",
+                   component_module_test_quoting_yaml);
 
   g_test_add_func ("/modulemd/v2/component/module/yaml/parse",
                    component_module_test_parse_yaml);

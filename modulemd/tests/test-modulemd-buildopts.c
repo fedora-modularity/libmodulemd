@@ -562,6 +562,40 @@ buildopts_test_emit_yaml (void)
 }
 
 
+static void
+buildopts_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdBuildopts) b = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  b = modulemd_buildopts_new ();
+  modulemd_buildopts_set_rpm_macros (b, "0");
+  modulemd_buildopts_add_rpm_to_whitelist (b, "1");
+  modulemd_buildopts_add_arch (b, "2");
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_buildopts_emit_yaml (b, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "rpms:\n"
+                   "  macros: >-\n"
+                   "    0\n"
+                   "  whitelist:\n"
+                   "  - \"1\"\n"
+                   "arches: [\"2\"]\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -593,6 +627,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/buildopts/yaml/emit",
                    buildopts_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/buildopts/yaml/quoting",
+                   buildopts_test_quoting_yaml);
 
   return g_test_run ();
 }

@@ -437,6 +437,35 @@ service_level_test_emit_yaml (void)
 }
 
 
+static void
+service_level_test_quoting_yaml (void)
+{
+  g_autoptr (ModulemdServiceLevel) sl = NULL;
+  g_autoptr (GError) error = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+
+  sl = modulemd_service_level_new ("0");
+  modulemd_service_level_set_eol_ymd (sl, 2018, 11, 13);
+
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (modulemd_service_level_emit_yaml (sl, &emitter, &error));
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  g_assert_cmpstr (yaml_string->str,
+                   ==,
+                   "---\n"
+                   "\"0\":\n"
+                   "  eol: 2018-11-13\n"
+                   "...\n");
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -466,6 +495,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/servicelevel/yaml/emit",
                    service_level_test_emit_yaml);
+
+  g_test_add_func ("/modulemd/v2/servicelevel/yaml/quoting",
+                   service_level_test_quoting_yaml);
 
   return g_test_run ();
 }

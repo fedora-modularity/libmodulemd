@@ -80,7 +80,7 @@ data:
         name: bar-real
         repository: https://pagure.io/bar.git
         cache: https://example.com/cache
-        ref: "26ca0c0"
+        ref: 26ca0c0
       baz:
         rationale: Demonstrate updating the buildroot contents.
         buildroot: true
@@ -157,7 +157,7 @@ data:
         name: bar-real
         repository: https://pagure.io/bar.git
         cache: https://example.com/cache
-        ref: "26ca0c0"
+        ref: 26ca0c0
       baz:
         rationale: Demonstrate updating the buildroot contents.
         buildroot: true

@@ -313,29 +313,99 @@ mmd_emitter_scalar (yaml_emitter_t *emitter,
  * mmd_string_is_empty_or_a_number
  * @string (in) (nullable)
  *
- * Returns: True if the @string is %NULL, empty, or looks like a decimal
- * number. False otherwise (looks like a string).
+ * A purpose is to catch the strings which could be mistaken with a number.
  *
- * Note: This function is intentionally naive (i.e. it checks only the
- * first character). It's fast. It does not dispute whether "0x01" is or is
- * not a number. A purpose is to catch strings which could be mistaken with
- * a number.
+ * Returns: True if the @string is %NULL, empty, or looks like a number.
+ * False otherwise (looks like a string).
  *
  * Since 2.15
  */
 static gboolean
 string_is_empty_or_a_number (const gchar *string)
 {
+  int fractional = 0;
+  int exponent = 0;
+  int hexadecimal = 0;
+  int octal = 0;
+
   if (string == NULL)
     return TRUE;
   if (string[0] == '\0')
     return TRUE;
-  if (string[0] >= '0' && string[0] <= '9')
-    return TRUE;
-  if ((string[0] == '+' || string[0] == '-' || string[0] == '.') &&
-      (string[1] >= '0' && string[1] <= '9'))
-    return TRUE;
-  return FALSE;
+
+  if (!g_strcmp0 (string, ".nan"))
+    return TRUE; /* not a number symbol */
+  if (string[0] == '+' || string[0] == '-')
+    string++; /* accept a leading sign */
+  if (!g_strcmp0 (string, ".inf"))
+    return TRUE; /* infinity symbol */
+  if (string[0] == '.')
+    {
+      fractional = 1; /* accept a leading decimal point */
+      string++;
+    }
+  else if (string[0] == '0' && string[1] == 'x')
+    {
+      hexadecimal = 1;
+      string += 2;
+    }
+  else if (string[0] == '0' && string[1] == 'o')
+    {
+      octal = 1;
+      string += 2;
+    }
+  if (string[0] == '\0')
+    return FALSE; /* incomplete notation */
+
+  for (const gchar *character = string; *character != '\0'; character++)
+    {
+      if (hexadecimal)
+        {
+          if (!((*character >= '0' && *character <= '9') ||
+                (*character >= 'a' && *character <= 'f') ||
+                (*character >= 'A' && *character <= 'F')))
+            return FALSE;
+          continue;
+        }
+      else if (octal)
+        {
+          if (!(*character >= '0' && *character <= '7'))
+            return FALSE;
+          continue;
+        }
+      else /* decimal */
+        {
+          if (*character == '.')
+            {
+              if (fractional)
+                return FALSE; /* multiple decimal points */
+              else
+                {
+                  fractional = 1;
+                  continue;
+                }
+            }
+          if (fractional && (*character == 'e' || *character == 'E'))
+            {
+              if (exponent)
+                return FALSE; /* multiple franctional exponent */
+              else
+                {
+                  exponent = 1;
+                  continue;
+                }
+            }
+          if (exponent == 1 && (*character == '+' || *character == '-'))
+            {
+              exponent = 2; /* a sign of the exponent */
+              continue;
+            }
+          if (*character < '0' || *character > '9')
+            return FALSE;
+        }
+    }
+
+  return TRUE;
 }
 
 

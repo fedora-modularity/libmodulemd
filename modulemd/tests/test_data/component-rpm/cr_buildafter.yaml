@@ -5,7 +5,7 @@ bar:
     cache: https://example.com/cache
     buildafter:
         - foo
-    ref: "26ca0c0"
+    ref: 26ca0c0
     buildroot: true
     srpm-buildroot: true
     arches: [i686, x86_64]

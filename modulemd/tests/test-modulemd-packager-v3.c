@@ -387,7 +387,7 @@ validate_yaml (ModulemdPackagerV3 *packager)
     "        name: bar-real\n"
     "        repository: https://pagure.io/bar.git\n"
     "        cache: https://example.com/cache\n"
-    "        ref: \"26ca0c0\"\n"
+    "        ref: 26ca0c0\n"
     "      baz:\n"
     "        rationale: Demonstrate updating the buildroot contents.\n"
     "        buildroot: true\n"

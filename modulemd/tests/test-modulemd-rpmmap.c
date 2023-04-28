@@ -221,7 +221,7 @@ test_emit_yaml_valid (void)
     "name: baz\n"
     "epoch: 2\n"
     "version: \"2.18\"\n"
-    "release: \"3.module_baddad\"\n"
+    "release: 3.module_baddad\n"
     "arch: s390x\n"
     "nevra: baz-2:2.18-3.module_baddad.s390x\n"
     "...\n";
@@ -279,7 +279,7 @@ test_emit_yaml_quoting (void)
     "version: \"2\"\n"
     "release: \"3\"\n"
     "arch: \"4\"\n"
-    "nevra: \"0-1:2-3.4\"\n"
+    "nevra: 0-1:2-3.4\n"
     "...\n";
 
   entry = modulemd_rpm_map_entry_new ("0", 1, "2", "3", "4");

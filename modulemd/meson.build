@@ -363,6 +363,7 @@ c_tests = {
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
 'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
+'quoting'             : [ 'tests/test-modulemd-quoting.c' ],
 }
 
 foreach name, sources : c_tests

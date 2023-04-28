@@ -502,7 +502,7 @@ data:
                 # is assumed.
                 #
                 # Type: AUTOMATIC
-                ref: "26ca0c0"
+                ref: 26ca0c0
 
                 # buildafter:
                 # Use the "buildafter" value to specify that this component

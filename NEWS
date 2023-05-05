@@ -1,5 +1,54 @@
 Release history for libmodulemd
 
+2.15.0      2023-05-10
+
+Enhancements:
+- Add a support for decompressing Zstandard-compressed YAML files.
+  modulemd_detect_compression() function now recognizes files with "zst" file
+  name extension and files with Zstandard magic bytes and returns
+  MODULEMD_COMPRESSION_TYPE_ZSTD_COMPRESSION constant for them.
+  modulemd_module_index_update_from_file() can load Zstandard-compressed YAML
+  files now.
+- Remove a dependency on "file" library (libmagic). libmodulemd now implements
+  its own detection of supported compression formats. This saves roughly 9 MB
+  from a minimal system installation.
+- An XML specification for in-YUM-repository metadata is available in
+  "xml_specs" directory. This new format aspires for replacing modulemd-v2,
+  modulemd-defaults-v1 and modulemd-translations-v1 YAML formats. A motivation
+  is to unify with other XML files in YUM repositories. Please note that this
+  specification is not yet implemented.
+
+Incompatible changes:
+- Meson minimal version increased to 0.55.
+
+Deprecation:
+- Deprecate intents in modulemd-defaults specification. System intents, which
+  parameterize a default stream and default profiles of a module, were never
+  implemented in the package managers (e.g. DNF). Users are discouraged from
+  using this feature. Future libmodulmed versions might deprecate and later
+  remove parts of an API pertaining the intents.
+
+Fixes:
+- Fix a crash when converting a modulemd-packager object with a default
+  profile and without a module name or stream to a module index.
+- Fix parsing empty profiles. Previously a profile with an empty rpms list was
+  misparsed as a list with a single, empty package name.
+- A specification for modulemd-v2 format was corrected to require a "content"
+  license subtree only if the module build contains artifacts.
+- Double-quote strings in scalar YAML values when they look like a number.
+  Most of the fields in the YAML files are required to be interpreted as
+  strings. Unaware third-party parsers could misinterpret number-like strings
+  (e.g. 2.30) as floats (i.e. 2.3), leading to mismatching string
+  representations. This is now prevented by quoting these values (i.e.
+  "2.30").
+- A build script now correctly asserts a requested Python version. Previously
+  Python 3 /usr/bin/python program could be mistaken with Python 2
+  interpreter.
+- meson-0.64.0 warnings about "check" option of run_command() were fixed.
+- Warnings from g_str_equal() macro of glib2 about passing an unsigned
+  char * to strcmp() were fixed.
+
+
 2.14.0      2022-02-04
 
 This release is fully compatible with the previous version 2.13.0 except

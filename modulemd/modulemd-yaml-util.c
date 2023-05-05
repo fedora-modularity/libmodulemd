@@ -388,7 +388,7 @@ string_is_empty_or_a_number (const gchar *string)
           if (fractional && (*character == 'e' || *character == 'E'))
             {
               if (exponent)
-                return FALSE; /* multiple franctional exponent */
+                return FALSE; /* multiple franctional exponents */
               else
                 {
                   exponent = 1;

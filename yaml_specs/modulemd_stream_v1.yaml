@@ -74,8 +74,8 @@ data:
         # A list of licenses used by the packages in the module.
         # This should be populated by build tools, not the module author.
         content:
-            - ASL 2.0
-            - GPL+ or Artistic
+            - Apache-2.0
+            - GPL-1.0-or-later OR Artistic-1.0-Perl
     # Extensible metadata block
     # A dictionary of user-defined keys and values.
     # Optional.  Defaults to an empty dictionary.

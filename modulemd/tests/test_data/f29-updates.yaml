@@ -15143,7 +15143,7 @@ data:
     CRI-O is the Kubernetes Container Runtime Interface for OCI-based containers.
   license:
     module:
-    - ASL 2.0
+    - Apache-2.0
     content:
     - MIT
   xmd:
@@ -15228,7 +15228,7 @@ data:
     CRI-O is the Kubernetes Container Runtime Interface for OCI-based containers.
   license:
     module:
-    - ASL 2.0
+    - Apache-2.0
     content:
     - MIT
   xmd:
@@ -15303,7 +15303,7 @@ data:
     CRI-O is the Kubernetes Container Runtime Interface for OCI-based containers.
   license:
     module:
-    - ASL 2.0
+    - Apache-2.0
     content:
     - MIT
   xmd:

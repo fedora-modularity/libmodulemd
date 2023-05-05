@@ -37,26 +37,25 @@
                 </dependency>
                 <license>
                     <module>MIT</module>
-                    <content>(Copyright only) and (Artistic or GPL+)</content>
-                    <content>(GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT</content>
-                    <content>(GPL+ or Artistic) and Artistic 2.0 and UCD</content>
-                    <content>(GPL+ or Artistic) and BSD</content>
-                    <content>(GPL+ or Artistic) and BSD and HSRL and MIT and UCD and Public domain</content>
-                    <content>(GPL+ or Artistic) and CC0 and Public Domain</content>
-                    <content>(GPL+ or Artistic) and FSFAP</content>
-                    <content>(GPL+ or Artistic) and MIT</content>
-                    <content>(GPL+ or Artistic) and Public Domain</content>
-                    <content>(GPL+ or Artistic) and RSA</content>
-                    <content>(GPL+ or Artistic) and UCD</content>
-                    <content>(GPL+ or Artistic) and UCD and Public Domain</content>
-                    <content>(GPL+ or Artistic) and Unicode</content>
-                    <content>(GPL+ or Artistic) and zlib</content>
-                    <content>ASL 2.0</content>
-                    <content>CC0</content>
-                    <content>GPL+</content>
-                    <content>GPL+ or Artistic</content>
-                    <content>GPLv2+ or Artistic</content>
-                    <content>GPLv3+</content>
+                    <content>Apache-2.0</content>
+                    <content>CC0-1.0</content>
+                    <content>GPL-1.0-or-later</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Artistic-2.0 AND Unicode-DFS-2016</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND BSD-3-Clause</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND CC0-1.0 AND LicenseRef-Fedora-Public-Domain</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND FSFAP</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND (GPL-2.0-or-later OR Artistic-1.0-Perl) and MIT</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND LicenseRef-Fedora-Public-Domain</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Martin-Birgmeier AND Spencer-86 AND MIT AND Unicode-DFS-2016 AND LicenseRef-Fedora-Public-Domain</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND MIT</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND RSA-MD</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Unicode-DFS-2015</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Unicode-DFS-2016 AND LicenseRef-Fedora-Public-Domain</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Unicode-DFS-2016</content>
+                    <content>(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Zlib</content>
+                    <content>GPL-1.0-or-later OR Artistic-1.0-Perl</content>
+                    <content>GPL-2.0-or-later OR Artistic-1.0-Perl</content>
+                    <content>GPL-3.0-or-later</content>
                     <content>MIT</content>
                     <content>TTWL</content>
                 </license>

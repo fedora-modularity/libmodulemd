@@ -175,8 +175,8 @@ data:
         # Mandatory for module metadata in a yum/dnf repository if the
         # module contains any artifacts.
         content:
-            - ASL 2.0
-            - GPL+ or Artistic
+            - Apache-2.0
+            - GPL-1.0-or-later OR Artistic-1.0-Perl
 
     # xmd:
     # Extensible metadata block

@@ -3,7 +3,7 @@ document: modulemd
 version: 2
 data:
   name: testmodule
-  stream: master
+  stream: main
   version: 20180405123256
   context: c2c572ec
   arch: x86_64
@@ -61,7 +61,7 @@ data:
         rationale: A dependency of tangerine.
         repository: git://pkgs.fedoraproject.org/rpms/perl-List-Compare
         cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-List-Compare
-        ref: master
+        ref: main
       perl-Tangerine:
         rationale: Provides API for this module and is a dependency of tangerine.
         repository: git://pkgs.fedoraproject.org/rpms/perl-Tangerine
@@ -71,7 +71,7 @@ data:
         rationale: Provides API for this module.
         repository: git://pkgs.fedoraproject.org/rpms/tangerine
         cache: http://pkgs.fedoraproject.org/repo/pkgs/tangerine
-        ref: master
+        ref: main
         buildorder: 10
   artifacts:
     rpms:
@@ -84,7 +84,7 @@ document: modulemd
 version: 2
 data:
   name: stratis
-  stream: master
+  stream: main
   version: 20180726133047
   context: b33445dc
   arch: x86_64
@@ -140,7 +140,7 @@ data:
 '
         repository: git://pkgs.fedoraproject.org/rpms/stratisd
         cache: http://pkgs.fedoraproject.org/repo/pkgs/stratisd
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - stratisd-0:0.5.4-3.module_1955+a3f37153.x86_64
@@ -771,195 +771,195 @@ data:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-aho-corasick
         cache: https://src.fedoraproject.org/repo/pkgs/rust-aho-corasick
-        ref: master
+        ref: main
         buildorder: 30
       rust-ansi_term:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-ansi_term
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ansi_term
-        ref: master
+        ref: main
         buildorder: 10
       rust-arrayvec:
         rationale: Dependency of rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-arrayvec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-arrayvec
-        ref: master
+        ref: main
         buildorder: 70
       rust-atty:
         rationale: Dependency of rust-clap, rust-env_logger.
         repository: git+https://src.fedoraproject.org/rpms/rust-atty
         cache: https://src.fedoraproject.org/repo/pkgs/rust-atty
-        ref: master
+        ref: main
         buildorder: 20
       rust-backtrace:
         rationale: Dependency of rust-error-chain.
         repository: git+https://src.fedoraproject.org/rpms/rust-backtrace
         cache: https://src.fedoraproject.org/repo/pkgs/rust-backtrace
-        ref: master
+        ref: main
         buildorder: 140
       rust-backtrace-sys:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-backtrace-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-backtrace-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-bitflags:
         rationale: Dependency of rust-clap, rust-devicemapper, rust-nix.
         repository: git+https://src.fedoraproject.org/rpms/rust-bitflags
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bitflags
-        ref: master
+        ref: main
         buildorder: 10
       rust-build_const:
         rationale: Dependency of rust-crc.
         repository: git+https://src.fedoraproject.org/rpms/rust-build_const
         cache: https://src.fedoraproject.org/repo/pkgs/rust-build_const
-        ref: master
+        ref: main
         buildorder: 10
       rust-byteorder:
         rationale: Dependency of rust-bytes, rust-uuid, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-byteorder
         cache: https://src.fedoraproject.org/repo/pkgs/rust-byteorder
-        ref: master
+        ref: main
         buildorder: 10
       rust-bytes:
         rationale: Dependency of rust-nix.
         repository: git+https://src.fedoraproject.org/rpms/rust-bytes
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bytes
-        ref: master
+        ref: main
         buildorder: 80
       rust-cc:
         rationale: Dependency of rust-backtrace-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-cc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cc
-        ref: master
+        ref: main
         buildorder: 120
       rust-cfg-if:
         rationale: Dependency of rust-backtrace, rust-cpp_demangle, rust-crossbeam-epoch0.5,
           rust-log, rust-memchr, rust-nix, rust-tempfile, rust-uuid.
         repository: git+https://src.fedoraproject.org/rpms/rust-cfg-if
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cfg-if
-        ref: master
+        ref: main
         buildorder: 10
       rust-chrono:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-chrono
         cache: https://src.fedoraproject.org/repo/pkgs/rust-chrono
-        ref: master
+        ref: main
         buildorder: 90
       rust-clap:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-clap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-clap
-        ref: master
+        ref: main
         buildorder: 90
       rust-cpp_demangle:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-cpp_demangle
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cpp_demangle
-        ref: master
+        ref: main
         buildorder: 20
       rust-crc:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-crc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crc
-        ref: master
+        ref: main
         buildorder: 20
       rust-crossbeam-deque0.4:
         rationale: Dependency of rust-rayon, rust-rayon-core.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-deque0.4
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-deque0.4
-        ref: master
+        ref: main
         buildorder: 90
       rust-crossbeam-epoch0.5:
         rationale: Dependency of rust-crossbeam-deque0.4.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-epoch0.5
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-epoch0.5
-        ref: master
+        ref: main
         buildorder: 80
       rust-crossbeam-utils:
         rationale: Dependency of rust-crossbeam-deque0.4, rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-utils
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-utils
-        ref: master
+        ref: main
         buildorder: 10
       rust-dbus:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-dbus
         cache: https://src.fedoraproject.org/repo/pkgs/rust-dbus
-        ref: master
+        ref: main
         buildorder: 30
       rust-devicemapper:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-devicemapper
         cache: https://src.fedoraproject.org/repo/pkgs/rust-devicemapper
-        ref: master
+        ref: main
         buildorder: 160
       rust-either:
         rationale: Dependency of rust-bytes, rust-rayon, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-either
         cache: https://src.fedoraproject.org/repo/pkgs/rust-either
-        ref: master
+        ref: main
         buildorder: 70
       rust-env_logger:
         rationale: Dependency of rust-quickcheck0.6, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-env_logger
         cache: https://src.fedoraproject.org/repo/pkgs/rust-env_logger
-        ref: master
+        ref: main
         buildorder: 80
       rust-errno:
         rationale: Dependency of rust-loopdev.
         repository: git+https://src.fedoraproject.org/rpms/rust-errno
         cache: https://src.fedoraproject.org/repo/pkgs/rust-errno
-        ref: master
+        ref: main
         buildorder: 20
       rust-error-chain:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-error-chain
         cache: https://src.fedoraproject.org/repo/pkgs/rust-error-chain
-        ref: master
+        ref: main
         buildorder: 150
       rust-glob:
         rationale: Dependency of rust-cpp_demangle.
         repository: git+https://src.fedoraproject.org/rpms/rust-glob
         cache: https://src.fedoraproject.org/repo/pkgs/rust-glob
-        ref: master
+        ref: main
         buildorder: 10
       rust-heapsize:
         rationale: Dependency of rust-linked-hash-map.
         repository: git+https://src.fedoraproject.org/rpms/rust-heapsize
         cache: https://src.fedoraproject.org/repo/pkgs/rust-heapsize
-        ref: master
+        ref: main
         buildorder: 10
       rust-humantime:
         rationale: Dependency of rust-env_logger.
         repository: git+https://src.fedoraproject.org/rpms/rust-humantime
         cache: https://src.fedoraproject.org/repo/pkgs/rust-humantime
-        ref: master
+        ref: main
         buildorder: 20
       rust-indexmap:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-indexmap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-indexmap
-        ref: master
+        ref: main
         buildorder: 70
       rust-iovec:
         rationale: Dependency of rust-bytes.
         repository: git+https://src.fedoraproject.org/rpms/rust-iovec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-iovec
-        ref: master
+        ref: main
         buildorder: 20
       rust-itoa:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-itoa
         cache: https://src.fedoraproject.org/repo/pkgs/rust-itoa
-        ref: master
+        ref: main
         buildorder: 10
       rust-lazy_static:
         rationale: Dependency of rust-crossbeam-epoch0.5, rust-nix, rust-rayon-core,
           rust-thread_local, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-lazy_static
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lazy_static
-        ref: master
+        ref: main
         buildorder: 20
       rust-libc:
         rationale: Dependency of rust-atty, rust-backtrace, rust-backtrace-sys, rust-dbus,
@@ -969,254 +969,254 @@ data:
           rust-timerfd, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-libc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libc
-        ref: master
+        ref: main
         buildorder: 10
       rust-libdbus-sys:
         rationale: Dependency of rust-dbus.
         repository: git+https://src.fedoraproject.org/rpms/rust-libdbus-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libdbus-sys
-        ref: master
+        ref: main
         buildorder: 20
       rust-libmount:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-libmount
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libmount
-        ref: master
+        ref: main
         buildorder: 120
       rust-libudev:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-libudev
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libudev
-        ref: master
+        ref: main
         buildorder: 30
       rust-libudev-sys:
         rationale: Dependency of rust-libudev.
         repository: git+https://src.fedoraproject.org/rpms/rust-libudev-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libudev-sys
-        ref: master
+        ref: main
         buildorder: 20
       rust-linked-hash-map:
         rationale: Dependency of rust-yaml-rust0.3.
         repository: git+https://src.fedoraproject.org/rpms/rust-linked-hash-map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-linked-hash-map
-        ref: master
+        ref: main
         buildorder: 70
       rust-log:
         rationale: Dependency of rust-env_logger, rust-quickcheck0.6, rust-rand, rust-time,
           stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-log
         cache: https://src.fedoraproject.org/repo/pkgs/rust-log
-        ref: master
+        ref: main
         buildorder: 70
       rust-loopdev:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-loopdev
         cache: https://src.fedoraproject.org/repo/pkgs/rust-loopdev
-        ref: master
+        ref: main
         buildorder: 30
       rust-macro-attr:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-macro-attr
         cache: https://src.fedoraproject.org/repo/pkgs/rust-macro-attr
-        ref: master
+        ref: main
         buildorder: 40
       rust-md5:
         rationale: Dependency of rust-uuid.
         repository: git+https://src.fedoraproject.org/rpms/rust-md5
         cache: https://src.fedoraproject.org/repo/pkgs/rust-md5
-        ref: master
+        ref: main
         buildorder: 10
       rust-memchr:
         rationale: Dependency of rust-aho-corasick, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-memchr
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memchr
-        ref: master
+        ref: main
         buildorder: 20
       rust-memoffset:
         rationale: Dependency of rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-memoffset
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memoffset
-        ref: master
+        ref: main
         buildorder: 10
       rust-newtype_derive:
         rationale: Dependency of rust-devicemapper.
         repository: git+https://src.fedoraproject.org/rpms/rust-newtype_derive
         cache: https://src.fedoraproject.org/repo/pkgs/rust-newtype_derive
-        ref: master
+        ref: main
         buildorder: 90
       rust-nix:
         rationale: Dependency of rust-devicemapper, rust-libmount, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-nix
         cache: https://src.fedoraproject.org/repo/pkgs/rust-nix
-        ref: master
+        ref: main
         buildorder: 110
       rust-no-panic:
         rationale: Dependency of rust-ryu.
         repository: git+https://src.fedoraproject.org/rpms/rust-no-panic
         cache: https://src.fedoraproject.org/repo/pkgs/rust-no-panic
-        ref: master
+        ref: main
         buildorder: 50
       rust-nodrop:
         rationale: Dependency of rust-arrayvec.
         repository: git+https://src.fedoraproject.org/rpms/rust-nodrop
         cache: https://src.fedoraproject.org/repo/pkgs/rust-nodrop
-        ref: master
+        ref: main
         buildorder: 10
       rust-num-integer:
         rationale: Dependency of rust-chrono.
         repository: git+https://src.fedoraproject.org/rpms/rust-num-integer
         cache: https://src.fedoraproject.org/repo/pkgs/rust-num-integer
-        ref: master
+        ref: main
         buildorder: 20
       rust-num-traits:
         rationale: Dependency of rust-chrono, rust-num-integer.
         repository: git+https://src.fedoraproject.org/rpms/rust-num-traits
         cache: https://src.fedoraproject.org/repo/pkgs/rust-num-traits
-        ref: master
+        ref: main
         buildorder: 10
       rust-num_cpus:
         rationale: Dependency of rust-rayon-core.
         repository: git+https://src.fedoraproject.org/rpms/rust-num_cpus
         cache: https://src.fedoraproject.org/repo/pkgs/rust-num_cpus
-        ref: master
+        ref: main
         buildorder: 20
       rust-packaging:
         rationale: Something needs to orchestrate build of all stuff below.
         repository: git+https://src.fedoraproject.org/rpms/rust-packaging
         cache: https://src.fedoraproject.org/repo/pkgs/rust-packaging
-        ref: master
+        ref: main
       rust-pkg-config:
         rationale: Dependency of rust-libdbus-sys, rust-libudev-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-pkg-config
         cache: https://src.fedoraproject.org/repo/pkgs/rust-pkg-config
-        ref: master
+        ref: main
         buildorder: 10
       rust-proc-macro2:
         rationale: Dependency of rust-no-panic, rust-quote, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-proc-macro2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-proc-macro2
-        ref: master
+        ref: main
         buildorder: 20
       rust-quick-error:
         rationale: Dependency of rust-humantime, rust-libmount.
         repository: git+https://src.fedoraproject.org/rpms/rust-quick-error
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quick-error
-        ref: master
+        ref: main
         buildorder: 10
       rust-quickcheck0.6:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-quickcheck0.6
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quickcheck0.6
-        ref: master
+        ref: main
         buildorder: 90
       rust-quote:
         rationale: Dependency of rust-no-panic, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-quote
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quote
-        ref: master
+        ref: main
         buildorder: 30
       rust-rand:
         rationale: Dependency of rust-tempfile.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand
-        ref: master
+        ref: main
         buildorder: 90
       rust-rand0.4:
         rationale: Dependency of rust-nix, rust-quickcheck0.6, rust-rustc-serialize,
           rust-uuid, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand0.4
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand0.4
-        ref: master
+        ref: main
         buildorder: 20
       rust-rand_core:
         rationale: Dependency of rust-rand_core0.2.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core
-        ref: master
+        ref: main
         buildorder: 70
       rust-rand_core0.2:
         rationale: Dependency of rust-rand.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core0.2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core0.2
-        ref: master
+        ref: main
         buildorder: 80
       rust-rayon:
         rationale: Dependency of rust-cc.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon
-        ref: master
+        ref: main
         buildorder: 110
       rust-rayon-core:
         rationale: Dependency of rust-rayon.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon-core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon-core
-        ref: master
+        ref: main
         buildorder: 100
       rust-regex:
         rationale: Dependency of rust-env_logger.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex
-        ref: master
+        ref: main
         buildorder: 40
       rust-regex-syntax:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex-syntax
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex-syntax
-        ref: master
+        ref: main
         buildorder: 20
       rust-remove_dir_all:
         rationale: Dependency of rust-tempfile.
         repository: git+https://src.fedoraproject.org/rpms/rust-remove_dir_all
         cache: https://src.fedoraproject.org/repo/pkgs/rust-remove_dir_all
-        ref: master
+        ref: main
         buildorder: 10
       rust-rustc-demangle:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc-demangle
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc-demangle
-        ref: master
+        ref: main
         buildorder: 10
       rust-rustc-serialize:
         rationale: Dependency of rust-backtrace, rust-chrono, rust-macro-attr, rust-time.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc-serialize
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc-serialize
-        ref: master
+        ref: main
         buildorder: 30
       rust-rustc_version:
         rationale: Dependency of rust-newtype_derive.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc_version
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc_version
-        ref: master
+        ref: main
         buildorder: 80
       rust-ryu:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-ryu
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ryu
-        ref: master
+        ref: main
         buildorder: 60
       rust-same-file:
         rationale: Dependency of rust-walkdir.
         repository: git+https://src.fedoraproject.org/rpms/rust-same-file
         cache: https://src.fedoraproject.org/repo/pkgs/rust-same-file
-        ref: master
+        ref: main
         buildorder: 10
       rust-scopeguard:
         rationale: Dependency of rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-scopeguard
         cache: https://src.fedoraproject.org/repo/pkgs/rust-scopeguard
-        ref: master
+        ref: main
         buildorder: 10
       rust-semver:
         rationale: Dependency of rust-rustc_version.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver
-        ref: master
+        ref: main
         buildorder: 70
       rust-semver-parser0.7:
         rationale: Dependency of rust-semver.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver-parser0.7
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver-parser0.7
-        ref: master
+        ref: main
         buildorder: 10
       rust-serde:
         rationale: Dependency of rust-arrayvec, rust-backtrace, rust-bytes, rust-chrono,
@@ -1225,146 +1225,146 @@ data:
           rust-sha1, rust-uuid, rust-vec_map, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde
-        ref: master
+        ref: main
         buildorder: 60
       rust-serde_derive:
         rationale: Dependency of rust-backtrace, rust-rand, rust-rand_core, rust-serde,
           stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_derive
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_derive
-        ref: master
+        ref: main
         buildorder: 50
       rust-serde_json:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_json
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_json
-        ref: master
+        ref: main
         buildorder: 80
       rust-serde_test:
         rationale: Dependency of rust-uuid.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_test
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_test
-        ref: master
+        ref: main
         buildorder: 70
       rust-sha1:
         rationale: Dependency of rust-uuid.
         repository: git+https://src.fedoraproject.org/rpms/rust-sha1
         cache: https://src.fedoraproject.org/repo/pkgs/rust-sha1
-        ref: master
+        ref: main
         buildorder: 70
       rust-strsim:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-strsim
         cache: https://src.fedoraproject.org/repo/pkgs/rust-strsim
-        ref: master
+        ref: main
         buildorder: 10
       rust-syn:
         rationale: Dependency of rust-no-panic, rust-serde_derive.
         repository: git+https://src.fedoraproject.org/rpms/rust-syn
         cache: https://src.fedoraproject.org/repo/pkgs/rust-syn
-        ref: master
+        ref: main
         buildorder: 40
       rust-tempfile:
         rationale: Dependency of rust-devicemapper, rust-nix, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-tempfile
         cache: https://src.fedoraproject.org/repo/pkgs/rust-tempfile
-        ref: master
+        ref: main
         buildorder: 100
       rust-term_size:
         rationale: Dependency of rust-clap, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-term_size
         cache: https://src.fedoraproject.org/repo/pkgs/rust-term_size
-        ref: master
+        ref: main
         buildorder: 20
       rust-termcolor:
         rationale: Dependency of rust-env_logger.
         repository: git+https://src.fedoraproject.org/rpms/rust-termcolor
         cache: https://src.fedoraproject.org/repo/pkgs/rust-termcolor
-        ref: master
+        ref: main
         buildorder: 10
       rust-textwrap:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-textwrap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-textwrap
-        ref: master
+        ref: main
         buildorder: 30
       rust-thread_local:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-thread_local
         cache: https://src.fedoraproject.org/repo/pkgs/rust-thread_local
-        ref: master
+        ref: main
         buildorder: 30
       rust-time:
         rationale: Dependency of rust-chrono.
         repository: git+https://src.fedoraproject.org/rpms/rust-time
         cache: https://src.fedoraproject.org/repo/pkgs/rust-time
-        ref: master
+        ref: main
         buildorder: 80
       rust-timerfd:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-timerfd
         cache: https://src.fedoraproject.org/repo/pkgs/rust-timerfd
-        ref: master
+        ref: main
         buildorder: 20
       rust-ucd-util:
         rationale: Dependency of rust-regex-syntax.
         repository: git+https://src.fedoraproject.org/rpms/rust-ucd-util
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ucd-util
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-width:
         rationale: Dependency of rust-clap, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-width
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-width
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-xid:
         rationale: Dependency of rust-proc-macro2, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-xid
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-xid
-        ref: master
+        ref: main
         buildorder: 10
       rust-utf8-ranges:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-utf8-ranges
         cache: https://src.fedoraproject.org/repo/pkgs/rust-utf8-ranges
-        ref: master
+        ref: main
         buildorder: 10
       rust-uuid:
         rationale: Dependency of rust-devicemapper, stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-uuid
         cache: https://src.fedoraproject.org/repo/pkgs/rust-uuid
-        ref: master
+        ref: main
         buildorder: 80
       rust-vec_map:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-vec_map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-vec_map
-        ref: master
+        ref: main
         buildorder: 70
       rust-version_check:
         rationale: Dependency of rust-lazy_static, rust-memchr.
         repository: git+https://src.fedoraproject.org/rpms/rust-version_check
         cache: https://src.fedoraproject.org/repo/pkgs/rust-version_check
-        ref: master
+        ref: main
         buildorder: 10
       rust-void:
         rationale: Dependency of rust-nix.
         repository: git+https://src.fedoraproject.org/rpms/rust-void
         cache: https://src.fedoraproject.org/repo/pkgs/rust-void
-        ref: master
+        ref: main
         buildorder: 10
       rust-walkdir:
         rationale: Dependency of stratisd.
         repository: git+https://src.fedoraproject.org/rpms/rust-walkdir
         cache: https://src.fedoraproject.org/repo/pkgs/rust-walkdir
-        ref: master
+        ref: main
         buildorder: 20
       rust-yaml-rust0.3:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-yaml-rust0.3
         cache: https://src.fedoraproject.org/repo/pkgs/rust-yaml-rust0.3
-        ref: master
+        ref: main
         buildorder: 80
       stratis-cli:
         rationale: Main component.
@@ -1640,7 +1640,7 @@ document: modulemd
 version: 2
 data:
   name: ripgrep
-  stream: master
+  stream: main
   version: 20180804140932
   context: b33445dc
   arch: x86_64
@@ -1676,7 +1676,7 @@ data:
       platform: []
   references:
     community: https://github.com/BurntSushi/ripgrep
-    documentation: https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md
+    documentation: https://github.com/BurntSushi/ripgrep/blob/6afdf15d85579bb759f5311d867cf5003064e594/FAQ.md
     tracker: https://github.com/BurntSushi/ripgrep/issues
   profiles:
     default:
@@ -1691,7 +1691,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/rust-ripgrep
         cache: http://pkgs.fedoraproject.org/repo/pkgs/rust-ripgrep
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - ripgrep-0:0.9.0-1.module_1969+efa3f7be.x86_64
@@ -1911,7 +1911,7 @@ data:
       platform: [f29]
   references:
     community: https://github.com/BurntSushi/ripgrep
-    documentation: https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md
+    documentation: https://github.com/BurntSushi/ripgrep/blob/6afdf15d85579bb759f5311d867cf5003064e594/FAQ.md
     tracker: https://github.com/BurntSushi/ripgrep/issues
   profiles:
     default:
@@ -2236,203 +2236,203 @@ data:
         rationale: Dependency of rust-globset, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-aho-corasick
         cache: https://src.fedoraproject.org/repo/pkgs/rust-aho-corasick
-        ref: master
+        ref: main
         buildorder: 30
       rust-ansi_term:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-ansi_term
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ansi_term
-        ref: master
+        ref: main
         buildorder: 10
       rust-arrayvec:
         rationale: Dependency of rust-crossbeam-epoch, rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-arrayvec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-arrayvec
-        ref: master
+        ref: main
         buildorder: 70
       rust-atty:
         rationale: Dependency of rust-clap, rust-grep-cli.
         repository: git+https://src.fedoraproject.org/rpms/rust-atty
         cache: https://src.fedoraproject.org/repo/pkgs/rust-atty
-        ref: master
+        ref: main
         buildorder: 20
       rust-base64:
         rationale: Dependency of rust-grep-printer.
         repository: git+https://src.fedoraproject.org/rpms/rust-base64
         cache: https://src.fedoraproject.org/repo/pkgs/rust-base64
-        ref: master
+        ref: main
         buildorder: 20
       rust-bitflags:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-bitflags
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bitflags
-        ref: master
+        ref: main
         buildorder: 10
       rust-bytecount:
         rationale: Dependency of rust-grep-searcher.
         repository: git+https://src.fedoraproject.org/rpms/rust-bytecount
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bytecount
-        ref: master
+        ref: main
         buildorder: 10
       rust-byteorder:
         rationale: Dependency of rust-base64.
         repository: git+https://src.fedoraproject.org/rpms/rust-byteorder
         cache: https://src.fedoraproject.org/repo/pkgs/rust-byteorder
-        ref: master
+        ref: main
         buildorder: 10
       rust-cc:
         rationale: Dependency of rust-pcre2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-cc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cc
-        ref: master
+        ref: main
         buildorder: 120
       rust-cfg-if:
         rationale: Dependency of rust-crossbeam-epoch, rust-crossbeam-epoch0.5, rust-encoding_rs,
           rust-log, rust-memchr.
         repository: git+https://src.fedoraproject.org/rpms/rust-cfg-if
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cfg-if
-        ref: master
+        ref: main
         buildorder: 10
       rust-clap:
         rationale: Dependency of rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-clap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-clap
-        ref: master
+        ref: main
         buildorder: 90
       rust-crossbeam-channel:
         rationale: Dependency of rust-ignore.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-channel
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-channel
-        ref: master
+        ref: main
         buildorder: 120
       rust-crossbeam-deque0.4:
         rationale: Dependency of rust-rayon, rust-rayon-core.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-deque0.4
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-deque0.4
-        ref: master
+        ref: main
         buildorder: 90
       rust-crossbeam-epoch:
         rationale: Dependency of rust-crossbeam-channel.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-epoch
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-epoch
-        ref: master
+        ref: main
         buildorder: 80
       rust-crossbeam-epoch0.5:
         rationale: Dependency of rust-crossbeam-deque0.4.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-epoch0.5
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-epoch0.5
-        ref: master
+        ref: main
         buildorder: 80
       rust-crossbeam-utils:
         rationale: Dependency of rust-crossbeam-channel, rust-crossbeam-deque0.4,
           rust-crossbeam-epoch, rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-utils
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-utils
-        ref: master
+        ref: main
         buildorder: 10
       rust-either:
         rationale: Dependency of rust-rayon.
         repository: git+https://src.fedoraproject.org/rpms/rust-either
         cache: https://src.fedoraproject.org/repo/pkgs/rust-either
-        ref: master
+        ref: main
         buildorder: 70
       rust-encoding_rs:
         rationale: Dependency of rust-encoding_rs_io, rust-grep-searcher.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding_rs
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding_rs
-        ref: master
+        ref: main
         buildorder: 70
       rust-encoding_rs_io:
         rationale: Dependency of rust-grep-searcher.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding_rs_io
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding_rs_io
-        ref: master
+        ref: main
         buildorder: 80
       rust-fnv:
         rationale: Dependency of rust-globset.
         repository: git+https://src.fedoraproject.org/rpms/rust-fnv
         cache: https://src.fedoraproject.org/repo/pkgs/rust-fnv
-        ref: master
+        ref: main
         buildorder: 10
       rust-globset:
         rationale: Dependency of rust-grep-cli, rust-ignore.
         repository: git+https://src.fedoraproject.org/rpms/rust-globset
         cache: https://src.fedoraproject.org/repo/pkgs/rust-globset
-        ref: master
+        ref: main
         buildorder: 80
       rust-grep:
         rationale: Dependency of rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep
-        ref: master
+        ref: main
         buildorder: 160
       rust-grep-cli:
         rationale: Dependency of rust-grep.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-cli
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-cli
-        ref: master
+        ref: main
         buildorder: 90
       rust-grep-matcher:
         rationale: Dependency of rust-grep, rust-grep-pcre2, rust-grep-printer, rust-grep-regex,
           rust-grep-searcher.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-matcher
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-matcher
-        ref: master
+        ref: main
         buildorder: 30
       rust-grep-pcre2:
         rationale: Dependency of rust-grep.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-pcre2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-pcre2
-        ref: master
+        ref: main
         buildorder: 150
       rust-grep-printer:
         rationale: Dependency of rust-grep.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-printer
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-printer
-        ref: master
+        ref: main
         buildorder: 100
       rust-grep-regex:
         rationale: Dependency of rust-grep.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-regex
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-regex
-        ref: master
+        ref: main
         buildorder: 80
       rust-grep-searcher:
         rationale: Dependency of rust-grep, rust-grep-printer.
         repository: git+https://src.fedoraproject.org/rpms/rust-grep-searcher
         cache: https://src.fedoraproject.org/repo/pkgs/rust-grep-searcher
-        ref: master
+        ref: main
         buildorder: 90
       rust-heapsize:
         rationale: Dependency of rust-linked-hash-map.
         repository: git+https://src.fedoraproject.org/rpms/rust-heapsize
         cache: https://src.fedoraproject.org/repo/pkgs/rust-heapsize
-        ref: master
+        ref: main
         buildorder: 10
       rust-ignore:
         rationale: Dependency of rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-ignore
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ignore
-        ref: master
+        ref: main
         buildorder: 130
       rust-indexmap:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-indexmap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-indexmap
-        ref: master
+        ref: main
         buildorder: 70
       rust-itoa:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-itoa
         cache: https://src.fedoraproject.org/repo/pkgs/rust-itoa
-        ref: master
+        ref: main
         buildorder: 10
       rust-lazy_static:
         rationale: Dependency of rust-crossbeam-epoch, rust-crossbeam-epoch0.5, rust-grep-cli,
           rust-ignore, rust-rayon-core, rust-ripgrep, rust-thread_local.
         repository: git+https://src.fedoraproject.org/rpms/rust-lazy_static
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lazy_static
-        ref: master
+        ref: main
         buildorder: 20
       rust-libc:
         rationale: Dependency of rust-atty, rust-memchr, rust-memmap, rust-num_cpus,
@@ -2440,207 +2440,207 @@ data:
           rust-term_size.
         repository: git+https://src.fedoraproject.org/rpms/rust-libc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libc
-        ref: master
+        ref: main
         buildorder: 10
       rust-linked-hash-map:
         rationale: Dependency of rust-yaml-rust0.3.
         repository: git+https://src.fedoraproject.org/rpms/rust-linked-hash-map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-linked-hash-map
-        ref: master
+        ref: main
         buildorder: 70
       rust-lock_api:
         rationale: Dependency of rust-parking_lot.
         repository: git+https://src.fedoraproject.org/rpms/rust-lock_api
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lock_api
-        ref: master
+        ref: main
         buildorder: 30
       rust-log:
         rationale: Dependency of rust-globset, rust-grep-cli, rust-grep-regex, rust-grep-searcher,
           rust-ignore, rust-pcre2, rust-rand, rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-log
         cache: https://src.fedoraproject.org/repo/pkgs/rust-log
-        ref: master
+        ref: main
         buildorder: 70
       rust-memchr:
         rationale: Dependency of rust-aho-corasick, rust-globset, rust-grep-matcher,
           rust-grep-searcher, rust-ignore, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-memchr
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memchr
-        ref: master
+        ref: main
         buildorder: 20
       rust-memmap:
         rationale: Dependency of rust-grep-searcher.
         repository: git+https://src.fedoraproject.org/rpms/rust-memmap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memmap
-        ref: master
+        ref: main
         buildorder: 20
       rust-memoffset:
         rationale: Dependency of rust-crossbeam-epoch, rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-memoffset
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memoffset
-        ref: master
+        ref: main
         buildorder: 10
       rust-no-panic:
         rationale: Dependency of rust-ryu.
         repository: git+https://src.fedoraproject.org/rpms/rust-no-panic
         cache: https://src.fedoraproject.org/repo/pkgs/rust-no-panic
-        ref: master
+        ref: main
         buildorder: 50
       rust-nodrop:
         rationale: Dependency of rust-arrayvec.
         repository: git+https://src.fedoraproject.org/rpms/rust-nodrop
         cache: https://src.fedoraproject.org/repo/pkgs/rust-nodrop
-        ref: master
+        ref: main
         buildorder: 10
       rust-num_cpus:
         rationale: Dependency of rust-rayon-core, rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-num_cpus
         cache: https://src.fedoraproject.org/repo/pkgs/rust-num_cpus
-        ref: master
+        ref: main
         buildorder: 20
       rust-owning_ref:
         rationale: Dependency of rust-lock_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-owning_ref
         cache: https://src.fedoraproject.org/repo/pkgs/rust-owning_ref
-        ref: master
+        ref: main
         buildorder: 20
       rust-packaging:
         rationale: Something needs to orchestrate build of all stuff below.
         repository: git+https://src.fedoraproject.org/rpms/rust-packaging
         cache: https://src.fedoraproject.org/repo/pkgs/rust-packaging
-        ref: master
+        ref: main
       rust-parking_lot:
         rationale: Dependency of rust-crossbeam-channel.
         repository: git+https://src.fedoraproject.org/rpms/rust-parking_lot
         cache: https://src.fedoraproject.org/repo/pkgs/rust-parking_lot
-        ref: master
+        ref: main
         buildorder: 110
       rust-parking_lot_core:
         rationale: Dependency of rust-parking_lot.
         repository: git+https://src.fedoraproject.org/rpms/rust-parking_lot_core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-parking_lot_core
-        ref: master
+        ref: main
         buildorder: 100
       rust-pcre2:
         rationale: Dependency of rust-grep-pcre2.
         repository: git+https://src.fedoraproject.org/rpms/rust-pcre2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-pcre2
-        ref: master
+        ref: main
         buildorder: 140
       rust-pcre2-sys:
         rationale: Dependency of rust-pcre2.
         repository: git+https://src.fedoraproject.org/rpms/rust-pcre2-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-pcre2-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-pkg-config:
         rationale: Dependency of rust-pcre2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-pkg-config
         cache: https://src.fedoraproject.org/repo/pkgs/rust-pkg-config
-        ref: master
+        ref: main
         buildorder: 10
       rust-proc-macro2:
         rationale: Dependency of rust-no-panic, rust-quote, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-proc-macro2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-proc-macro2
-        ref: master
+        ref: main
         buildorder: 20
       rust-quote:
         rationale: Dependency of rust-no-panic, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-quote
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quote
-        ref: master
+        ref: main
         buildorder: 30
       rust-rand:
         rationale: Dependency of rust-crossbeam-channel, rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand
-        ref: master
+        ref: main
         buildorder: 90
       rust-rand_core:
         rationale: Dependency of rust-rand_core0.2.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core
-        ref: master
+        ref: main
         buildorder: 70
       rust-rand_core0.2:
         rationale: Dependency of rust-rand.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core0.2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core0.2
-        ref: master
+        ref: main
         buildorder: 80
       rust-rayon:
         rationale: Dependency of rust-cc.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon
-        ref: master
+        ref: main
         buildorder: 110
       rust-rayon-core:
         rationale: Dependency of rust-rayon.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon-core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon-core
-        ref: master
+        ref: main
         buildorder: 100
       rust-regex:
         rationale: Dependency of rust-globset, rust-grep-cli, rust-grep-regex, rust-ignore,
           rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex
-        ref: master
+        ref: main
         buildorder: 40
       rust-regex-syntax:
         rationale: Dependency of rust-grep-regex, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex-syntax
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex-syntax
-        ref: master
+        ref: main
         buildorder: 20
       rust-ripgrep:
         rationale: Main component.
         repository: git+https://src.fedoraproject.org/rpms/rust-ripgrep
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ripgrep
-        ref: master
+        ref: main
         buildorder: 170
       rust-rustc_version:
         rationale: Dependency of rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc_version
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc_version
-        ref: master
+        ref: main
         buildorder: 80
       rust-ryu:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-ryu
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ryu
-        ref: master
+        ref: main
         buildorder: 60
       rust-safemem:
         rationale: Dependency of rust-base64.
         repository: git+https://src.fedoraproject.org/rpms/rust-safemem
         cache: https://src.fedoraproject.org/repo/pkgs/rust-safemem
-        ref: master
+        ref: main
         buildorder: 10
       rust-same-file:
         rationale: Dependency of rust-grep-cli, rust-ignore, rust-walkdir.
         repository: git+https://src.fedoraproject.org/rpms/rust-same-file
         cache: https://src.fedoraproject.org/repo/pkgs/rust-same-file
-        ref: master
+        ref: main
         buildorder: 10
       rust-scopeguard:
         rationale: Dependency of rust-crossbeam-epoch, rust-crossbeam-epoch0.5, rust-lock_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-scopeguard
         cache: https://src.fedoraproject.org/repo/pkgs/rust-scopeguard
-        ref: master
+        ref: main
         buildorder: 10
       rust-semver:
         rationale: Dependency of rust-rustc_version.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver
-        ref: master
+        ref: main
         buildorder: 70
       rust-semver-parser0.7:
         rationale: Dependency of rust-semver.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver-parser0.7
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver-parser0.7
-        ref: master
+        ref: main
         buildorder: 10
       rust-serde:
         rationale: Dependency of rust-arrayvec, rust-either, rust-encoding_rs, rust-grep-printer,
@@ -2648,128 +2648,128 @@ data:
           rust-ripgrep, rust-semver, rust-serde_json, rust-smallvec, rust-vec_map.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde
-        ref: master
+        ref: main
         buildorder: 60
       rust-serde_derive:
         rationale: Dependency of rust-grep-printer, rust-rand, rust-rand_core, rust-ripgrep,
           rust-serde.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_derive
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_derive
-        ref: master
+        ref: main
         buildorder: 50
       rust-serde_json:
         rationale: Dependency of rust-grep-printer, rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_json
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_json
-        ref: master
+        ref: main
         buildorder: 80
       rust-smallvec:
         rationale: Dependency of rust-crossbeam-channel, rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-smallvec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-smallvec
-        ref: master
+        ref: main
         buildorder: 70
       rust-stable_deref_trait:
         rationale: Dependency of rust-owning_ref.
         repository: git+https://src.fedoraproject.org/rpms/rust-stable_deref_trait
         cache: https://src.fedoraproject.org/repo/pkgs/rust-stable_deref_trait
-        ref: master
+        ref: main
         buildorder: 10
       rust-strsim:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-strsim
         cache: https://src.fedoraproject.org/repo/pkgs/rust-strsim
-        ref: master
+        ref: main
         buildorder: 10
       rust-syn:
         rationale: Dependency of rust-no-panic, rust-serde_derive.
         repository: git+https://src.fedoraproject.org/rpms/rust-syn
         cache: https://src.fedoraproject.org/repo/pkgs/rust-syn
-        ref: master
+        ref: main
         buildorder: 40
       rust-term_size:
         rationale: Dependency of rust-clap, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-term_size
         cache: https://src.fedoraproject.org/repo/pkgs/rust-term_size
-        ref: master
+        ref: main
         buildorder: 20
       rust-termcolor:
         rationale: Dependency of rust-grep-cli, rust-grep-printer, rust-ripgrep.
         repository: git+https://src.fedoraproject.org/rpms/rust-termcolor
         cache: https://src.fedoraproject.org/repo/pkgs/rust-termcolor
-        ref: master
+        ref: main
         buildorder: 10
       rust-textwrap:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-textwrap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-textwrap
-        ref: master
+        ref: main
         buildorder: 30
       rust-thread_local:
         rationale: Dependency of rust-grep-regex, rust-ignore, rust-pcre2, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-thread_local
         cache: https://src.fedoraproject.org/repo/pkgs/rust-thread_local
-        ref: master
+        ref: main
         buildorder: 30
       rust-ucd-util:
         rationale: Dependency of rust-regex-syntax.
         repository: git+https://src.fedoraproject.org/rpms/rust-ucd-util
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ucd-util
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-width:
         rationale: Dependency of rust-clap, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-width
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-width
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-xid:
         rationale: Dependency of rust-proc-macro2, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-xid
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-xid
-        ref: master
+        ref: main
         buildorder: 10
       rust-unreachable:
         rationale: Dependency of rust-smallvec.
         repository: git+https://src.fedoraproject.org/rpms/rust-unreachable
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unreachable
-        ref: master
+        ref: main
         buildorder: 20
       rust-utf8-ranges:
         rationale: Dependency of rust-grep-regex, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-utf8-ranges
         cache: https://src.fedoraproject.org/repo/pkgs/rust-utf8-ranges
-        ref: master
+        ref: main
         buildorder: 10
       rust-vec_map:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-vec_map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-vec_map
-        ref: master
+        ref: main
         buildorder: 70
       rust-version_check:
         rationale: Dependency of rust-lazy_static, rust-memchr.
         repository: git+https://src.fedoraproject.org/rpms/rust-version_check
         cache: https://src.fedoraproject.org/repo/pkgs/rust-version_check
-        ref: master
+        ref: main
         buildorder: 10
       rust-void:
         rationale: Dependency of rust-unreachable.
         repository: git+https://src.fedoraproject.org/rpms/rust-void
         cache: https://src.fedoraproject.org/repo/pkgs/rust-void
-        ref: master
+        ref: main
         buildorder: 10
       rust-walkdir:
         rationale: Dependency of rust-ignore.
         repository: git+https://src.fedoraproject.org/rpms/rust-walkdir
         cache: https://src.fedoraproject.org/repo/pkgs/rust-walkdir
-        ref: master
+        ref: main
         buildorder: 20
       rust-yaml-rust0.3:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-yaml-rust0.3
         cache: https://src.fedoraproject.org/repo/pkgs/rust-yaml-rust0.3
-        ref: master
+        ref: main
         buildorder: 80
   artifacts:
     rpms:
@@ -9487,7 +9487,7 @@ data:
         rationale: Needed for HTTP2 support
         repository: git+https://src.fedoraproject.org/rpms/nghttp2
         cache: https://src.fedoraproject.org/repo/pkgs/nghttp2
-        ref: master
+        ref: main
       nodejs:
         rationale: Javascript runtime and npm package manager.
         repository: git+https://src.fedoraproject.org/rpms/nodejs
@@ -9584,7 +9584,7 @@ data:
         rationale: Needed for HTTP2 support
         repository: git+https://src.fedoraproject.org/rpms/nghttp2
         cache: https://src.fedoraproject.org/repo/pkgs/nghttp2
-        ref: master
+        ref: main
       nodejs:
         rationale: Javascript runtime and npm package manager.
         repository: git+https://src.fedoraproject.org/rpms/nodejs
@@ -9609,7 +9609,7 @@ document: modulemd
 version: 2
 data:
   name: ninja
-  stream: master
+  stream: main
   version: 20180816141421
   context: 6c81f848
   arch: x86_64
@@ -9661,7 +9661,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/ninja-build
         cache: http://pkgs.fedoraproject.org/repo/pkgs/ninja-build
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - ninja-build-0:1.8.2-4.module_1991+4e5efe2f.x86_64
@@ -9980,7 +9980,7 @@ document: modulemd
 version: 2
 data:
   name: meson
-  stream: master
+  stream: main
   version: 20180816151613
   context: 06d0a27d
   arch: x86_64
@@ -10035,7 +10035,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/meson
         cache: http://pkgs.fedoraproject.org/repo/pkgs/meson
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - meson-0:0.47.1-5.module_1993+7c0a4d1e.noarch
@@ -10773,7 +10773,7 @@ data:
     - lizardfs-cgiserv-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-chunkserver-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-client-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
-    - lizardfs-master-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
+    - lizardfs-server-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-metalogger-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-uraft-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
 ...
@@ -10965,7 +10965,7 @@ data:
       - origin-dockerregistry
       - origin-excluder
       - origin-federation-services
-      - origin-master
+      - origin-server
       - origin-node
       - origin-pod
       - origin-sdn-ovs
@@ -10996,7 +10996,7 @@ data:
     - origin-dockerregistry-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-excluder-0:3.10.0-1.module_2135+dcc9a197.noarch
     - origin-federation-services-0:3.10.0-1.module_2135+dcc9a197.x86_64
-    - origin-master-0:3.10.0-1.module_2135+dcc9a197.x86_64
+    - origin-server-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-node-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-pod-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-sdn-ovs-0:3.10.0-1.module_2135+dcc9a197.x86_64
@@ -11056,7 +11056,7 @@ data:
       - kubernetes
       - kubernetes-client
       - kubernetes-kubeadm
-      - kubernetes-master
+      - kubernetes-server
       - kubernetes-node
   api:
     rpms:
@@ -11078,7 +11078,7 @@ data:
     - kubernetes-client-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-devel-0:1.10.3-1.module_2132+faf1362b.noarch
     - kubernetes-kubeadm-0:1.10.3-1.module_2132+faf1362b.x86_64
-    - kubernetes-master-0:1.10.3-1.module_2132+faf1362b.x86_64
+    - kubernetes-server-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-node-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-unit-test-0:1.10.3-1.module_2132+faf1362b.x86_64
 ...
@@ -11762,7 +11762,7 @@ document: modulemd
 version: 2
 data:
   name: gcsf
-  stream: master
+  stream: main
   version: 20180804153258
   context: b33445dc
   arch: x86_64
@@ -11800,7 +11800,7 @@ data:
       platform: []
   references:
     community: https://github.com/harababurel/gcsf
-    documentation: https://github.com/harababurel/gcsf/blob/master/README.md
+    documentation: https://github.com/harababurel/gcsf/blob/ad5d8bbd6d55254eb94a056292e9872662bb65c5/README.md
     tracker: https://github.com/harababurel/gcsf/issues
   profiles:
     default:
@@ -11815,7 +11815,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/rust-gcsf
         cache: http://pkgs.fedoraproject.org/repo/pkgs/rust-gcsf
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - gcsf-0:0.1.17-1.module_1970+c9821572.x86_64
@@ -14647,12 +14647,12 @@ data:
         rationale: Set up build root for flatpak RPMS
         repository: git+https://src.fedoraproject.org/rpms/flatpak-rpm-macros
         cache: https://src.fedoraproject.org/repo/pkgs/flatpak-rpm-macros
-        ref: master
+        ref: main
       flatpak-runtime-config:
         rationale: Runtime configuration files
         repository: git+https://src.fedoraproject.org/rpms/flatpak-runtime-config
         cache: https://src.fedoraproject.org/repo/pkgs/flatpak-runtime-config
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - flatpak-rpm-macros-0:27-6.module_2021+15e5e3e7.noarch
@@ -14663,7 +14663,7 @@ document: modulemd
 version: 2
 data:
   name: eog
-  stream: master
+  stream: main
   version: 20180821163756
   context: 775baa8e
   arch: x86_64
@@ -16625,91 +16625,91 @@ data:
         rationale: Dependency of rust-miniz_oxide.
         repository: git+https://src.fedoraproject.org/rpms/rust-adler32
         cache: https://src.fedoraproject.org/repo/pkgs/rust-adler32
-        ref: master
+        ref: main
         buildorder: 10
       rust-aho-corasick:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-aho-corasick
         cache: https://src.fedoraproject.org/repo/pkgs/rust-aho-corasick
-        ref: master
+        ref: main
         buildorder: 30
       rust-ansi_colours:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-ansi_colours
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ansi_colours
-        ref: master
+        ref: main
         buildorder: 130
       rust-ansi_term:
         rationale: Dependency of rust-bat, rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-ansi_term
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ansi_term
-        ref: master
+        ref: main
         buildorder: 10
       rust-arrayvec:
         rationale: Dependency of rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-arrayvec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-arrayvec
-        ref: master
+        ref: main
         buildorder: 70
       rust-atty:
         rationale: Dependency of rust-bat, rust-clap, rust-console.
         repository: git+https://src.fedoraproject.org/rpms/rust-atty
         cache: https://src.fedoraproject.org/repo/pkgs/rust-atty
-        ref: master
+        ref: main
         buildorder: 20
       rust-backtrace:
         rationale: Dependency of rust-error-chain.
         repository: git+https://src.fedoraproject.org/rpms/rust-backtrace
         cache: https://src.fedoraproject.org/repo/pkgs/rust-backtrace
-        ref: master
+        ref: main
         buildorder: 140
       rust-backtrace-sys:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-backtrace-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-backtrace-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-base64:
         rationale: Dependency of rust-plist.
         repository: git+https://src.fedoraproject.org/rpms/rust-base64
         cache: https://src.fedoraproject.org/repo/pkgs/rust-base64
-        ref: master
+        ref: main
         buildorder: 20
       rust-bat:
         rationale: Main component.
         repository: git+https://src.fedoraproject.org/rpms/rust-bat
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bat
-        ref: master
+        ref: main
         buildorder: 170
       rust-bincode:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-bincode
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bincode
-        ref: master
+        ref: main
         buildorder: 70
       rust-bitflags:
         rationale: Dependency of rust-clap, rust-git2, rust-onig, rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-bitflags
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bitflags
-        ref: master
+        ref: main
         buildorder: 10
       rust-build_const:
         rationale: Dependency of rust-crc.
         repository: git+https://src.fedoraproject.org/rpms/rust-build_const
         cache: https://src.fedoraproject.org/repo/pkgs/rust-build_const
-        ref: master
+        ref: main
         buildorder: 10
       rust-byteorder:
         rationale: Dependency of rust-base64, rust-bincode, rust-bytes, rust-plist.
         repository: git+https://src.fedoraproject.org/rpms/rust-byteorder
         cache: https://src.fedoraproject.org/repo/pkgs/rust-byteorder
-        ref: master
+        ref: main
         buildorder: 10
       rust-bytes:
         rationale: Dependency of rust-tokio-io.
         repository: git+https://src.fedoraproject.org/rpms/rust-bytes
         cache: https://src.fedoraproject.org/repo/pkgs/rust-bytes
-        ref: master
+        ref: main
         buildorder: 80
       rust-cc:
         rationale: Dependency of rust-ansi_colours, rust-backtrace-sys, rust-curl-sys,
@@ -16717,207 +16717,207 @@ data:
           rust-onig_sys, rust-openssl-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-cc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cc
-        ref: master
+        ref: main
         buildorder: 120
       rust-cfg-if:
         rationale: Dependency of rust-backtrace, rust-cpp_demangle, rust-crossbeam-epoch0.5,
           rust-log, rust-memchr.
         repository: git+https://src.fedoraproject.org/rpms/rust-cfg-if
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cfg-if
-        ref: master
+        ref: main
         buildorder: 10
       rust-clap:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-clap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-clap
-        ref: master
+        ref: main
         buildorder: 90
       rust-clicolors-control:
         rationale: Dependency of rust-console.
         repository: git+https://src.fedoraproject.org/rpms/rust-clicolors-control
         cache: https://src.fedoraproject.org/repo/pkgs/rust-clicolors-control
-        ref: master
+        ref: main
         buildorder: 30
       rust-console:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-console
         cache: https://src.fedoraproject.org/repo/pkgs/rust-console
-        ref: master
+        ref: main
         buildorder: 120
       rust-content_inspector:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-content_inspector
         cache: https://src.fedoraproject.org/repo/pkgs/rust-content_inspector
-        ref: master
+        ref: main
         buildorder: 30
       rust-cpp_demangle:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-cpp_demangle
         cache: https://src.fedoraproject.org/repo/pkgs/rust-cpp_demangle
-        ref: master
+        ref: main
         buildorder: 20
       rust-crc:
         rationale: Dependency of rust-miniz_oxide_c_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-crc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crc
-        ref: master
+        ref: main
         buildorder: 20
       rust-crossbeam-deque0.4:
         rationale: Dependency of rust-rayon, rust-rayon-core.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-deque0.4
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-deque0.4
-        ref: master
+        ref: main
         buildorder: 90
       rust-crossbeam-epoch0.5:
         rationale: Dependency of rust-crossbeam-deque0.4.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-epoch0.5
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-epoch0.5
-        ref: master
+        ref: main
         buildorder: 80
       rust-crossbeam-utils:
         rationale: Dependency of rust-crossbeam-deque0.4, rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-crossbeam-utils
         cache: https://src.fedoraproject.org/repo/pkgs/rust-crossbeam-utils
-        ref: master
+        ref: main
         buildorder: 10
       rust-curl-sys:
         rationale: Dependency of rust-libgit2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-curl-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-curl-sys
-        ref: master
+        ref: main
         buildorder: 140
       rust-directories:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-directories
         cache: https://src.fedoraproject.org/repo/pkgs/rust-directories
-        ref: master
+        ref: main
         buildorder: 20
       rust-either:
         rationale: Dependency of rust-bytes, rust-rayon.
         repository: git+https://src.fedoraproject.org/rpms/rust-either
         cache: https://src.fedoraproject.org/repo/pkgs/rust-either
-        ref: master
+        ref: main
         buildorder: 70
       rust-encoding:
         rationale: Dependency of rust-bat, rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding
-        ref: master
+        ref: main
         buildorder: 20
       rust-encoding-index-japanese:
         rationale: Dependency of rust-encoding.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding-index-japanese
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding-index-japanese
-        ref: master
+        ref: main
         buildorder: 10
       rust-encoding-index-korean:
         rationale: Dependency of rust-encoding.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding-index-korean
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding-index-korean
-        ref: master
+        ref: main
         buildorder: 10
       rust-encoding-index-simpchinese:
         rationale: Dependency of rust-encoding.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding-index-simpchinese
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding-index-simpchinese
-        ref: master
+        ref: main
         buildorder: 10
       rust-encoding-index-singlebyte:
         rationale: Dependency of rust-encoding.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding-index-singlebyte
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding-index-singlebyte
-        ref: master
+        ref: main
         buildorder: 10
       rust-encoding-index-tradchinese:
         rationale: Dependency of rust-encoding.
         repository: git+https://src.fedoraproject.org/rpms/rust-encoding-index-tradchinese
         cache: https://src.fedoraproject.org/repo/pkgs/rust-encoding-index-tradchinese
-        ref: master
+        ref: main
         buildorder: 10
       rust-error-chain:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-error-chain
         cache: https://src.fedoraproject.org/repo/pkgs/rust-error-chain
-        ref: master
+        ref: main
         buildorder: 150
       rust-flate2:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-flate2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-flate2
-        ref: master
+        ref: main
         buildorder: 140
       rust-fnv:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-fnv
         cache: https://src.fedoraproject.org/repo/pkgs/rust-fnv
-        ref: master
+        ref: main
         buildorder: 10
       rust-futures0.1:
         rationale: Dependency of rust-flate2, rust-tokio-io.
         repository: git+https://src.fedoraproject.org/rpms/rust-futures0.1
         cache: https://src.fedoraproject.org/repo/pkgs/rust-futures0.1
-        ref: master
+        ref: main
         buildorder: 10
       rust-git2:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-git2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-git2
-        ref: master
+        ref: main
         buildorder: 160
       rust-glob:
         rationale: Dependency of rust-cpp_demangle.
         repository: git+https://src.fedoraproject.org/rpms/rust-glob
         cache: https://src.fedoraproject.org/repo/pkgs/rust-glob
-        ref: master
+        ref: main
         buildorder: 10
       rust-heapsize:
         rationale: Dependency of rust-linked-hash-map, rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-heapsize
         cache: https://src.fedoraproject.org/repo/pkgs/rust-heapsize
-        ref: master
+        ref: main
         buildorder: 10
       rust-humantime:
         rationale: Dependency of rust-plist.
         repository: git+https://src.fedoraproject.org/rpms/rust-humantime
         cache: https://src.fedoraproject.org/repo/pkgs/rust-humantime
-        ref: master
+        ref: main
         buildorder: 20
       rust-idna:
         rationale: Dependency of rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-idna
         cache: https://src.fedoraproject.org/repo/pkgs/rust-idna
-        ref: master
+        ref: main
         buildorder: 80
       rust-indexmap:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-indexmap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-indexmap
-        ref: master
+        ref: main
         buildorder: 70
       rust-iovec:
         rationale: Dependency of rust-bytes.
         repository: git+https://src.fedoraproject.org/rpms/rust-iovec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-iovec
-        ref: master
+        ref: main
         buildorder: 20
       rust-itoa:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-itoa
         cache: https://src.fedoraproject.org/repo/pkgs/rust-itoa
-        ref: master
+        ref: main
         buildorder: 10
       rust-lazy_static:
         rationale: Dependency of rust-bat, rust-clicolors-control, rust-console, rust-crossbeam-epoch0.5,
           rust-onig, rust-rayon-core, rust-syntect, rust-thread_local.
         repository: git+https://src.fedoraproject.org/rpms/rust-lazy_static
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lazy_static
-        ref: master
+        ref: main
         buildorder: 20
       rust-lazycell:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-lazycell
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lazycell
-        ref: master
+        ref: main
         buildorder: 10
       rust-libc:
         rationale: Dependency of rust-atty, rust-backtrace, rust-backtrace-sys, rust-clicolors-control,
@@ -16928,283 +16928,283 @@ data:
           rust-termios.
         repository: git+https://src.fedoraproject.org/rpms/rust-libc
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libc
-        ref: master
+        ref: main
         buildorder: 10
       rust-libgit2-sys:
         rationale: Dependency of rust-git2.
         repository: git+https://src.fedoraproject.org/rpms/rust-libgit2-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libgit2-sys
-        ref: master
+        ref: main
         buildorder: 150
       rust-libssh2-sys:
         rationale: Dependency of rust-libgit2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-libssh2-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libssh2-sys
-        ref: master
+        ref: main
         buildorder: 140
       rust-libz-sys:
         rationale: Dependency of rust-curl-sys, rust-flate2, rust-libgit2-sys, rust-libssh2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-libz-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-libz-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-linked-hash-map:
         rationale: Dependency of rust-yaml-rust, rust-yaml-rust0.3.
         repository: git+https://src.fedoraproject.org/rpms/rust-linked-hash-map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-linked-hash-map
-        ref: master
+        ref: main
         buildorder: 70
       rust-lock_api:
         rationale: Dependency of rust-parking_lot.
         repository: git+https://src.fedoraproject.org/rpms/rust-lock_api
         cache: https://src.fedoraproject.org/repo/pkgs/rust-lock_api
-        ref: master
+        ref: main
         buildorder: 30
       rust-log:
         rationale: Dependency of rust-git2, rust-rand, rust-tokio-io.
         repository: git+https://src.fedoraproject.org/rpms/rust-log
         cache: https://src.fedoraproject.org/repo/pkgs/rust-log
-        ref: master
+        ref: main
         buildorder: 70
       rust-matches:
         rationale: Dependency of rust-idna, rust-unicode-bidi, rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-matches
         cache: https://src.fedoraproject.org/repo/pkgs/rust-matches
-        ref: master
+        ref: main
         buildorder: 10
       rust-memchr:
         rationale: Dependency of rust-aho-corasick, rust-content_inspector, rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-memchr
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memchr
-        ref: master
+        ref: main
         buildorder: 20
       rust-memoffset:
         rationale: Dependency of rust-crossbeam-epoch0.5.
         repository: git+https://src.fedoraproject.org/rpms/rust-memoffset
         cache: https://src.fedoraproject.org/repo/pkgs/rust-memoffset
-        ref: master
+        ref: main
         buildorder: 10
       rust-miniz-sys:
         rationale: Dependency of rust-flate2.
         repository: git+https://src.fedoraproject.org/rpms/rust-miniz-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-miniz-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-miniz_oxide:
         rationale: Dependency of rust-miniz_oxide_c_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-miniz_oxide
         cache: https://src.fedoraproject.org/repo/pkgs/rust-miniz_oxide
-        ref: master
+        ref: main
         buildorder: 20
       rust-miniz_oxide_c_api:
         rationale: Dependency of rust-flate2.
         repository: git+https://src.fedoraproject.org/rpms/rust-miniz_oxide_c_api
         cache: https://src.fedoraproject.org/repo/pkgs/rust-miniz_oxide_c_api
-        ref: master
+        ref: main
         buildorder: 130
       rust-no-panic:
         rationale: Dependency of rust-ryu.
         repository: git+https://src.fedoraproject.org/rpms/rust-no-panic
         cache: https://src.fedoraproject.org/repo/pkgs/rust-no-panic
-        ref: master
+        ref: main
         buildorder: 50
       rust-nodrop:
         rationale: Dependency of rust-arrayvec.
         repository: git+https://src.fedoraproject.org/rpms/rust-nodrop
         cache: https://src.fedoraproject.org/repo/pkgs/rust-nodrop
-        ref: master
+        ref: main
         buildorder: 10
       rust-num_cpus:
         rationale: Dependency of rust-rayon-core.
         repository: git+https://src.fedoraproject.org/rpms/rust-num_cpus
         cache: https://src.fedoraproject.org/repo/pkgs/rust-num_cpus
-        ref: master
+        ref: main
         buildorder: 20
       rust-onig:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-onig
         cache: https://src.fedoraproject.org/repo/pkgs/rust-onig
-        ref: master
+        ref: main
         buildorder: 140
       rust-onig_sys:
         rationale: Dependency of rust-onig.
         repository: git+https://src.fedoraproject.org/rpms/rust-onig_sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-onig_sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-openssl-probe:
         rationale: Dependency of rust-git2.
         repository: git+https://src.fedoraproject.org/rpms/rust-openssl-probe
         cache: https://src.fedoraproject.org/repo/pkgs/rust-openssl-probe
-        ref: master
+        ref: main
         buildorder: 10
       rust-openssl-sys:
         rationale: Dependency of rust-curl-sys, rust-git2, rust-libgit2-sys, rust-libssh2-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-openssl-sys
         cache: https://src.fedoraproject.org/repo/pkgs/rust-openssl-sys
-        ref: master
+        ref: main
         buildorder: 130
       rust-owning_ref:
         rationale: Dependency of rust-lock_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-owning_ref
         cache: https://src.fedoraproject.org/repo/pkgs/rust-owning_ref
-        ref: master
+        ref: main
         buildorder: 20
       rust-packaging:
         rationale: Something needs to orchestrate build of all stuff below.
         repository: git+https://src.fedoraproject.org/rpms/rust-packaging
         cache: https://src.fedoraproject.org/repo/pkgs/rust-packaging
-        ref: master
+        ref: main
       rust-parking_lot:
         rationale: Dependency of rust-console.
         repository: git+https://src.fedoraproject.org/rpms/rust-parking_lot
         cache: https://src.fedoraproject.org/repo/pkgs/rust-parking_lot
-        ref: master
+        ref: main
         buildorder: 110
       rust-parking_lot_core:
         rationale: Dependency of rust-parking_lot.
         repository: git+https://src.fedoraproject.org/rpms/rust-parking_lot_core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-parking_lot_core
-        ref: master
+        ref: main
         buildorder: 100
       rust-percent-encoding:
         rationale: Dependency of rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-percent-encoding
         cache: https://src.fedoraproject.org/repo/pkgs/rust-percent-encoding
-        ref: master
+        ref: main
         buildorder: 10
       rust-pkg-config:
         rationale: Dependency of rust-curl-sys, rust-libgit2-sys, rust-libssh2-sys,
           rust-libz-sys, rust-onig_sys, rust-openssl-sys.
         repository: git+https://src.fedoraproject.org/rpms/rust-pkg-config
         cache: https://src.fedoraproject.org/repo/pkgs/rust-pkg-config
-        ref: master
+        ref: main
         buildorder: 10
       rust-plist:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-plist
         cache: https://src.fedoraproject.org/repo/pkgs/rust-plist
-        ref: master
+        ref: main
         buildorder: 70
       rust-proc-macro2:
         rationale: Dependency of rust-no-panic, rust-quote, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-proc-macro2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-proc-macro2
-        ref: master
+        ref: main
         buildorder: 20
       rust-quick-error:
         rationale: Dependency of rust-humantime.
         repository: git+https://src.fedoraproject.org/rpms/rust-quick-error
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quick-error
-        ref: master
+        ref: main
         buildorder: 10
       rust-quote:
         rationale: Dependency of rust-no-panic, rust-serde_derive, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-quote
         cache: https://src.fedoraproject.org/repo/pkgs/rust-quote
-        ref: master
+        ref: main
         buildorder: 30
       rust-rand:
         rationale: Dependency of rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand
-        ref: master
+        ref: main
         buildorder: 90
       rust-rand0.4:
         rationale: Dependency of rust-rustc-serialize.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand0.4
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand0.4
-        ref: master
+        ref: main
         buildorder: 20
       rust-rand_core:
         rationale: Dependency of rust-rand_core0.2.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core
-        ref: master
+        ref: main
         buildorder: 70
       rust-rand_core0.2:
         rationale: Dependency of rust-rand.
         repository: git+https://src.fedoraproject.org/rpms/rust-rand_core0.2
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rand_core0.2
-        ref: master
+        ref: main
         buildorder: 80
       rust-rayon:
         rationale: Dependency of rust-cc.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon
-        ref: master
+        ref: main
         buildorder: 110
       rust-rayon-core:
         rationale: Dependency of rust-rayon.
         repository: git+https://src.fedoraproject.org/rpms/rust-rayon-core
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rayon-core
-        ref: master
+        ref: main
         buildorder: 100
       rust-regex:
         rationale: Dependency of rust-console.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex
-        ref: master
+        ref: main
         buildorder: 40
       rust-regex-syntax:
         rationale: Dependency of rust-regex, rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-regex-syntax
         cache: https://src.fedoraproject.org/repo/pkgs/rust-regex-syntax
-        ref: master
+        ref: main
         buildorder: 20
       rust-rustc-demangle:
         rationale: Dependency of rust-backtrace.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc-demangle
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc-demangle
-        ref: master
+        ref: main
         buildorder: 10
       rust-rustc-serialize:
         rationale: Dependency of rust-backtrace, rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc-serialize
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc-serialize
-        ref: master
+        ref: main
         buildorder: 30
       rust-rustc_version:
         rationale: Dependency of rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-rustc_version
         cache: https://src.fedoraproject.org/repo/pkgs/rust-rustc_version
-        ref: master
+        ref: main
         buildorder: 80
       rust-ryu:
         rationale: Dependency of rust-serde_json.
         repository: git+https://src.fedoraproject.org/rpms/rust-ryu
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ryu
-        ref: master
+        ref: main
         buildorder: 60
       rust-safemem:
         rationale: Dependency of rust-base64.
         repository: git+https://src.fedoraproject.org/rpms/rust-safemem
         cache: https://src.fedoraproject.org/repo/pkgs/rust-safemem
-        ref: master
+        ref: main
         buildorder: 10
       rust-same-file:
         rationale: Dependency of rust-walkdir.
         repository: git+https://src.fedoraproject.org/rpms/rust-same-file
         cache: https://src.fedoraproject.org/repo/pkgs/rust-same-file
-        ref: master
+        ref: main
         buildorder: 10
       rust-scopeguard:
         rationale: Dependency of rust-crossbeam-epoch0.5, rust-lock_api.
         repository: git+https://src.fedoraproject.org/rpms/rust-scopeguard
         cache: https://src.fedoraproject.org/repo/pkgs/rust-scopeguard
-        ref: master
+        ref: main
         buildorder: 10
       rust-semver:
         rationale: Dependency of rust-rustc_version.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver
-        ref: master
+        ref: main
         buildorder: 70
       rust-semver-parser0.7:
         rationale: Dependency of rust-semver.
         repository: git+https://src.fedoraproject.org/rpms/rust-semver-parser0.7
         cache: https://src.fedoraproject.org/repo/pkgs/rust-semver-parser0.7
-        ref: master
+        ref: main
         buildorder: 10
       rust-serde:
         rationale: Dependency of rust-arrayvec, rust-backtrace, rust-bincode, rust-bytes,
@@ -17213,188 +17213,188 @@ data:
           rust-syntect, rust-unicode-bidi, rust-vec_map.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde
-        ref: master
+        ref: main
         buildorder: 60
       rust-serde0.8:
         rationale: Dependency of rust-unicode-bidi, rust-url.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde0.8
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde0.8
-        ref: master
+        ref: main
         buildorder: 10
       rust-serde_derive:
         rationale: Dependency of rust-backtrace, rust-rand, rust-rand_core, rust-serde,
           rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_derive
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_derive
-        ref: master
+        ref: main
         buildorder: 50
       rust-serde_json:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-serde_json
         cache: https://src.fedoraproject.org/repo/pkgs/rust-serde_json
-        ref: master
+        ref: main
         buildorder: 80
       rust-shell-words:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-shell-words
         cache: https://src.fedoraproject.org/repo/pkgs/rust-shell-words
-        ref: master
+        ref: main
         buildorder: 10
       rust-smallvec:
         rationale: Dependency of rust-parking_lot_core.
         repository: git+https://src.fedoraproject.org/rpms/rust-smallvec
         cache: https://src.fedoraproject.org/repo/pkgs/rust-smallvec
-        ref: master
+        ref: main
         buildorder: 70
       rust-stable_deref_trait:
         rationale: Dependency of rust-owning_ref.
         repository: git+https://src.fedoraproject.org/rpms/rust-stable_deref_trait
         cache: https://src.fedoraproject.org/repo/pkgs/rust-stable_deref_trait
-        ref: master
+        ref: main
         buildorder: 10
       rust-strsim:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-strsim
         cache: https://src.fedoraproject.org/repo/pkgs/rust-strsim
-        ref: master
+        ref: main
         buildorder: 10
       rust-syn:
         rationale: Dependency of rust-no-panic, rust-serde_derive.
         repository: git+https://src.fedoraproject.org/rpms/rust-syn
         cache: https://src.fedoraproject.org/repo/pkgs/rust-syn
-        ref: master
+        ref: main
         buildorder: 40
       rust-syntect:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-syntect
         cache: https://src.fedoraproject.org/repo/pkgs/rust-syntect
-        ref: master
+        ref: main
         buildorder: 150
       rust-term_size:
         rationale: Dependency of rust-clap, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-term_size
         cache: https://src.fedoraproject.org/repo/pkgs/rust-term_size
-        ref: master
+        ref: main
         buildorder: 20
       rust-termios:
         rationale: Dependency of rust-console.
         repository: git+https://src.fedoraproject.org/rpms/rust-termios
         cache: https://src.fedoraproject.org/repo/pkgs/rust-termios
-        ref: master
+        ref: main
         buildorder: 20
       rust-textwrap:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-textwrap
         cache: https://src.fedoraproject.org/repo/pkgs/rust-textwrap
-        ref: master
+        ref: main
         buildorder: 30
       rust-thread_local:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-thread_local
         cache: https://src.fedoraproject.org/repo/pkgs/rust-thread_local
-        ref: master
+        ref: main
         buildorder: 30
       rust-tokio-io:
         rationale: Dependency of rust-flate2.
         repository: git+https://src.fedoraproject.org/rpms/rust-tokio-io
         cache: https://src.fedoraproject.org/repo/pkgs/rust-tokio-io
-        ref: master
+        ref: main
         buildorder: 90
       rust-ucd-util:
         rationale: Dependency of rust-regex-syntax.
         repository: git+https://src.fedoraproject.org/rpms/rust-ucd-util
         cache: https://src.fedoraproject.org/repo/pkgs/rust-ucd-util
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-bidi:
         rationale: Dependency of rust-idna.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-bidi
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-bidi
-        ref: master
+        ref: main
         buildorder: 70
       rust-unicode-normalization:
         rationale: Dependency of rust-idna.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-normalization
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-normalization
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-width:
         rationale: Dependency of rust-clap, rust-console, rust-textwrap.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-width
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-width
-        ref: master
+        ref: main
         buildorder: 10
       rust-unicode-xid:
         rationale: Dependency of rust-proc-macro2, rust-syn.
         repository: git+https://src.fedoraproject.org/rpms/rust-unicode-xid
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unicode-xid
-        ref: master
+        ref: main
         buildorder: 10
       rust-unreachable:
         rationale: Dependency of rust-smallvec.
         repository: git+https://src.fedoraproject.org/rpms/rust-unreachable
         cache: https://src.fedoraproject.org/repo/pkgs/rust-unreachable
-        ref: master
+        ref: main
         buildorder: 20
       rust-url:
         rationale: Dependency of rust-git2.
         repository: git+https://src.fedoraproject.org/rpms/rust-url
         cache: https://src.fedoraproject.org/repo/pkgs/rust-url
-        ref: master
+        ref: main
         buildorder: 90
       rust-utf8-ranges:
         rationale: Dependency of rust-regex.
         repository: git+https://src.fedoraproject.org/rpms/rust-utf8-ranges
         cache: https://src.fedoraproject.org/repo/pkgs/rust-utf8-ranges
-        ref: master
+        ref: main
         buildorder: 10
       rust-vec_map:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-vec_map
         cache: https://src.fedoraproject.org/repo/pkgs/rust-vec_map
-        ref: master
+        ref: main
         buildorder: 70
       rust-version_check:
         rationale: Dependency of rust-lazy_static, rust-memchr.
         repository: git+https://src.fedoraproject.org/rpms/rust-version_check
         cache: https://src.fedoraproject.org/repo/pkgs/rust-version_check
-        ref: master
+        ref: main
         buildorder: 10
       rust-void:
         rationale: Dependency of rust-unreachable.
         repository: git+https://src.fedoraproject.org/rpms/rust-void
         cache: https://src.fedoraproject.org/repo/pkgs/rust-void
-        ref: master
+        ref: main
         buildorder: 10
       rust-walkdir:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-walkdir
         cache: https://src.fedoraproject.org/repo/pkgs/rust-walkdir
-        ref: master
+        ref: main
         buildorder: 20
       rust-wild:
         rationale: Dependency of rust-bat.
         repository: git+https://src.fedoraproject.org/rpms/rust-wild
         cache: https://src.fedoraproject.org/repo/pkgs/rust-wild
-        ref: master
+        ref: main
         buildorder: 10
       rust-xml-rs:
         rationale: Dependency of rust-plist.
         repository: git+https://src.fedoraproject.org/rpms/rust-xml-rs
         cache: https://src.fedoraproject.org/repo/pkgs/rust-xml-rs
-        ref: master
+        ref: main
         buildorder: 10
       rust-yaml-rust:
         rationale: Dependency of rust-syntect.
         repository: git+https://src.fedoraproject.org/rpms/rust-yaml-rust
         cache: https://src.fedoraproject.org/repo/pkgs/rust-yaml-rust
-        ref: master
+        ref: main
         buildorder: 80
       rust-yaml-rust0.3:
         rationale: Dependency of rust-clap.
         repository: git+https://src.fedoraproject.org/rpms/rust-yaml-rust0.3
         cache: https://src.fedoraproject.org/repo/pkgs/rust-yaml-rust0.3
-        ref: master
+        ref: main
         buildorder: 80
   artifacts:
     rpms:
@@ -17467,7 +17467,7 @@ data:
         rationale: Framework with tools and libraries for Automated Testing
         repository: git://pkgs.fedoraproject.org/rpms/python-avocado
         cache: http://pkgs.fedoraproject.org/repo/pkgs/python-avocado
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - python-avocado-examples-0:52.1-7.module_1939+1f9e88da.noarch

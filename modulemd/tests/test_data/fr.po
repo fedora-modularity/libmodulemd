@@ -148,7 +148,7 @@ msgstr ""
 msgid "Dynamic window manager for X"
 msgstr "Gestionnaire dynamique de fenêtres pour X."
 
-#: eog;master;description:2
+#: eog;main;description:2
 msgid ""
 "The Eye of GNOME image viewer (eog) is the official image viewer for the "
 "GNOME desktop. It can view single image files in a variety of formats, as "
@@ -159,11 +159,11 @@ msgstr ""
 "fichier image dans une multitude de formats qu'une importante galerie "
 "d'images.\n"
 
-#: eog;master;summary:1
+#: eog;main;summary:1
 msgid "Eye of GNOME Application Module"
 msgstr "Module d'application \"Eye of GNOME\"."
 
-#: feedreader;master;description:2
+#: feedreader;main;description:2
 msgid ""
 "FeedReader is a modern desktop application designed to complement existing "
 "web-based RSS accounts. It combines all the advantages of web based services "
@@ -175,7 +175,7 @@ msgstr ""
 "en ligne comme la synchronisation de tous vos périphériques avec tout ce que "
 "l'on peut attendre d'une application moderne de bureau."
 
-#: feedreader;master;summary:1
+#: feedreader;main;summary:1
 msgid "RSS desktop client"
 msgstr "Client RSS de bureau"
 
@@ -210,7 +210,7 @@ msgstr ""
 msgid "Flatpak Runtime"
 msgstr "L'environnement d'exécution Flatpak"
 
-#: gcsf;master;description:2
+#: gcsf;main;description:2
 msgid ""
 "GCSF is a virtual filesystem that allows users to mount their\n"
 "Google Drive account locally and interact with it as a\n"
@@ -222,7 +222,7 @@ msgstr ""
 "partition\n"
 "normale.\n"
 
-#: gcsf;master;summary:1
+#: gcsf;main;summary:1
 msgid "FUSE file system based on Google Drive"
 msgstr "Système de fichiers FUSE basé sur Google Drive"
 
@@ -255,11 +255,11 @@ msgstr ""
 msgid "GIMP"
 msgstr "GIMP"
 
-#: gnome-clocks;master;description:2 gnome-clocks;master;summary:1
+#: gnome-clocks;main;description:2 gnome-clocks;main;summary:1
 msgid "Clock application designed for GNOME 3"
 msgstr "Application \"Horloge\" conçue pour GNOME 3"
 
-#: gnome-tetravex;master;description:2
+#: gnome-tetravex;main;description:2
 msgid ""
 "A puzzle game where you have to match a grid of tiles together. The skill "
 "level ranges from the simple two by two up to the seriously mind-bending six "
@@ -269,7 +269,7 @@ msgstr ""
 "niveau de difficulté va du simple deux par deux jusqu'à l'infernal \"tord-"
 "méninges\" de la grille six par six."
 
-#: gnome-tetravex;master;summary:1
+#: gnome-tetravex;main;summary:1
 msgid "GNOME Tetravex game"
 msgstr "Jeu GNOME Tetravex "
 
@@ -421,7 +421,7 @@ msgstr ""
 msgid "Java project management and project comprehension tool"
 msgstr "Outil de conception de projets et de gestion de projets Java"
 
-#: meson;master;description:2
+#: meson;main;description:2
 msgid ""
 "Meson is an open source build system meant to be both extremely fast, and, "
 "even more importantly, as user friendly as possible.\n"
@@ -436,7 +436,7 @@ msgstr ""
 "une seconde de perdue. Idem pour chaque seconde passé à attendre que le "
 "système de compilation démarre effectivement à compiler le code."
 
-#: meson;master;summary:1
+#: meson;main;summary:1
 msgid "The Meson Build system"
 msgstr "Le système de compilation Meson"
 
@@ -488,7 +488,7 @@ msgstr ""
 msgid "MySQL Module"
 msgstr "Module MySQL"
 
-#: ninja;master;description:2
+#: ninja;main;description:2
 msgid ""
 "This module includes Ninja build system. Ninja is a small build system with "
 "a focus on speed. It differs from other build systems in two major respects: "
@@ -501,7 +501,7 @@ msgstr ""
 "d'entrée générés par un système de compilation de plus haut niveau, et pour "
 "exécuter les compilations aussi vite que possible."
 
-#: ninja;master;summary:1
+#: ninja;main;summary:1
 msgid "Small build system with a focus on speed"
 msgstr "Petit système de compilation axé sur la vitesse"
 
@@ -623,7 +623,7 @@ msgstr ""
 msgid "A web-based code review tool"
 msgstr "Un outil web de revues de code"
 
-#: ripgrep;latest;description:2 ripgrep;master;description:2
+#: ripgrep;latest;description:2 ripgrep;main;description:2
 msgid ""
 "Line oriented search tool using Rust's regex library. Combines\n"
 "the raw performance of grep with the usability of the silver searcher.\n"
@@ -632,12 +632,12 @@ msgstr ""
 "Combine la performance brute du grep avec la facilité d'utilisation du "
 "chercheur d'argent.\n"
 
-#: ripgrep;latest;summary:1 ripgrep;master;summary:1
+#: ripgrep;latest;summary:1 ripgrep;main;summary:1
 msgid "Line oriented search tool using Rust's regex library"
 msgstr ""
 "Outil de recherche orienté ligne utilisant la bibliothèque regex de Rust"
 
-#: ruby;master;description:2 ruby;private-jaruga-master;description:2
+#: ruby;main;description:2 ruby;private-jaruga-main;description:2
 msgid ""
 "Ruby is the interpreted scripting language for quick and easy object-"
 "oriented programming.  It has many features to process text files and to do "
@@ -649,7 +649,7 @@ msgstr ""
 "traiter les fichiers texte et pour effectuer des tâches de gestion du "
 "système (comme dans Perl).  Il est simple, direct et extensible."
 
-#: ruby;master;summary:1 ruby;private-jaruga-master;summary:1
+#: ruby;main;summary:1 ruby;private-jaruga-main;summary:1
 msgid "An interpreter of object-oriented scripting language"
 msgstr "Un interpréteur de langage de script orienté objet"
 
@@ -735,15 +735,15 @@ msgstr ""
 msgid "Planetarium software for the advanced amateur astronomer"
 msgstr "Logiciel de planétarium pour l'astronome amateur avancé"
 
-#: stratis;1;description:2 stratis;master;description:2
+#: stratis;1;description:2 stratis;main;description:2
 msgid "Easy to use local storage management."
 msgstr "Gestion du stockage local facile à utiliser."
 
-#: stratis;1;summary:1 stratis;master;summary:1
+#: stratis;1;summary:1 stratis;main;summary:1
 msgid "Stratis Storage"
 msgstr "Stockage Stratis"
 
-#: testmodule;master;description:2
+#: testmodule;main;description:2
 msgid ""
 "This module demonstrates how to write simple modulemd files And can be used "
 "for testing the build and release pipeline."
@@ -752,7 +752,7 @@ msgstr ""
 "utilisé pour tester la chaîne de construction et de sorties de nouvelles "
 "versions."
 
-#: testmodule;master;summary:1
+#: testmodule;main;summary:1
 msgid "A test module in all its beautiful beauty"
 msgstr "Un mode de test dans toute sa splendeur"
 

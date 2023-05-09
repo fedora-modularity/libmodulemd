@@ -45,11 +45,11 @@ data:
         ref: 1
       http-parser:
         rationale: Needed for parsing HTTP requests
-        ref: master
+        ref: main
         arches: [ppc64le, x86_64]
       nghttp2:
         rationale: Needed for HTTP2 support
-        ref: master
+        ref: main
       nodejs:
         rationale: Javascript runtime and npm package manager.
         ref: 10

@@ -3,7 +3,7 @@ document: modulemd
 version: 2
 data:
   name: testmodule
-  stream: master
+  stream: main
   version: 20180405123256
   context: c2c572ec
   arch: x86_64
@@ -62,7 +62,7 @@ data:
         rationale: A dependency of tangerine.
         repository: git://pkgs.fedoraproject.org/rpms/perl-List-Compare
         cache: http://pkgs.fedoraproject.org/repo/pkgs/perl-List-Compare
-        ref: master
+        ref: main
       perl-Tangerine:
         rationale: Provides API for this module and is a dependency of tangerine.
         repository: git://pkgs.fedoraproject.org/rpms/perl-Tangerine
@@ -72,7 +72,7 @@ data:
         rationale: Provides API for this module.
         repository: git://pkgs.fedoraproject.org/rpms/tangerine
         cache: http://pkgs.fedoraproject.org/repo/pkgs/tangerine
-        ref: master
+        ref: main
         buildorder: 10
   artifacts:
     rpms:
@@ -85,7 +85,7 @@ document: modulemd
 version: 2
 data:
   name: stratis
-  stream: master
+  stream: main
   version: 20180726133047
   context: b33445dc
   arch: x86_64
@@ -141,7 +141,7 @@ data:
 '
         repository: git://pkgs.fedoraproject.org/rpms/stratisd
         cache: http://pkgs.fedoraproject.org/repo/pkgs/stratisd
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - stratisd-0:0.5.4-3.module_1955+a3f37153.x86_64
@@ -379,7 +379,7 @@ document: modulemd
 version: 2
 data:
   name: ripgrep
-  stream: master
+  stream: main
   version: 20180804140932
   context: b33445dc
   arch: x86_64
@@ -415,7 +415,7 @@ data:
       platform: []
   references:
     community: https://github.com/BurntSushi/ripgrep
-    documentation: https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md
+    documentation: https://github.com/BurntSushi/ripgrep/blob/e86d3d95c2de788818c0673622043542b3e8f06d/FAQ.md
     tracker: https://github.com/BurntSushi/ripgrep/issues
   profiles:
     default:
@@ -430,7 +430,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/rust-ripgrep
         cache: http://pkgs.fedoraproject.org/repo/pkgs/rust-ripgrep
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - ripgrep-0:0.9.0-1.module_1969+efa3f7be.x86_64
@@ -7127,7 +7127,7 @@ data:
         rationale: Needed for HTTP2 support
         repository: git+https://src.fedoraproject.org/rpms/nghttp2
         cache: https://src.fedoraproject.org/repo/pkgs/nghttp2
-        ref: master
+        ref: main
       nodejs:
         rationale: Javascript runtime and npm package manager.
         repository: git+https://src.fedoraproject.org/rpms/nodejs
@@ -7152,7 +7152,7 @@ document: modulemd
 version: 2
 data:
   name: ninja
-  stream: master
+  stream: main
   version: 20180816141421
   context: 6c81f848
   arch: x86_64
@@ -7204,7 +7204,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/ninja-build
         cache: http://pkgs.fedoraproject.org/repo/pkgs/ninja-build
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - ninja-build-0:1.8.2-4.module_1991+4e5efe2f.x86_64
@@ -7523,7 +7523,7 @@ document: modulemd
 version: 2
 data:
   name: meson
-  stream: master
+  stream: main
   version: 20180816151613
   context: 06d0a27d
   arch: x86_64
@@ -7578,7 +7578,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/meson
         cache: http://pkgs.fedoraproject.org/repo/pkgs/meson
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - meson-0:0.47.1-5.module_1993+7c0a4d1e.noarch
@@ -8237,7 +8237,7 @@ data:
     - lizardfs-cgiserv-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-chunkserver-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-client-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
-    - lizardfs-master-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
+    - lizardfs-server-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-metalogger-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
     - lizardfs-uraft-0:3.13.0-0.rc1r1.module_1987+e7db591a.x86_64
 ...
@@ -8429,7 +8429,7 @@ data:
       - origin-dockerregistry
       - origin-excluder
       - origin-federation-services
-      - origin-master
+      - origin-server
       - origin-node
       - origin-pod
       - origin-sdn-ovs
@@ -8460,7 +8460,7 @@ data:
     - origin-dockerregistry-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-excluder-0:3.10.0-1.module_2135+dcc9a197.noarch
     - origin-federation-services-0:3.10.0-1.module_2135+dcc9a197.x86_64
-    - origin-master-0:3.10.0-1.module_2135+dcc9a197.x86_64
+    - origin-server-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-node-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-pod-0:3.10.0-1.module_2135+dcc9a197.x86_64
     - origin-sdn-ovs-0:3.10.0-1.module_2135+dcc9a197.x86_64
@@ -8520,7 +8520,7 @@ data:
       - kubernetes
       - kubernetes-client
       - kubernetes-kubeadm
-      - kubernetes-master
+      - kubernetes-server
       - kubernetes-node
   api:
     rpms:
@@ -8542,7 +8542,7 @@ data:
     - kubernetes-client-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-devel-0:1.10.3-1.module_2132+faf1362b.noarch
     - kubernetes-kubeadm-0:1.10.3-1.module_2132+faf1362b.x86_64
-    - kubernetes-master-0:1.10.3-1.module_2132+faf1362b.x86_64
+    - kubernetes-server-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-node-0:1.10.3-1.module_2132+faf1362b.x86_64
     - kubernetes-unit-test-0:1.10.3-1.module_2132+faf1362b.x86_64
 ...
@@ -8970,7 +8970,7 @@ document: modulemd
 version: 2
 data:
   name: gcsf
-  stream: master
+  stream: main
   version: 20180804153258
   context: b33445dc
   arch: x86_64
@@ -9008,7 +9008,7 @@ data:
       platform: []
   references:
     community: https://github.com/harababurel/gcsf
-    documentation: https://github.com/harababurel/gcsf/blob/master/README.md
+    documentation: https://github.com/harababurel/gcsf/blob/ad5d8bbd6d55254eb94a056292e9872662bb65c5/README.md
     tracker: https://github.com/harababurel/gcsf/issues
   profiles:
     default:
@@ -9023,7 +9023,7 @@ data:
         rationale: Main component.
         repository: git://pkgs.fedoraproject.org/rpms/rust-gcsf
         cache: http://pkgs.fedoraproject.org/repo/pkgs/rust-gcsf
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - gcsf-0:0.1.17-1.module_1970+c9821572.x86_64
@@ -11855,12 +11855,12 @@ data:
         rationale: Set up build root for flatpak RPMS
         repository: git+https://src.fedoraproject.org/rpms/flatpak-rpm-macros
         cache: https://src.fedoraproject.org/repo/pkgs/flatpak-rpm-macros
-        ref: master
+        ref: main
       flatpak-runtime-config:
         rationale: Runtime configuration files
         repository: git+https://src.fedoraproject.org/rpms/flatpak-runtime-config
         cache: https://src.fedoraproject.org/repo/pkgs/flatpak-runtime-config
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - flatpak-rpm-macros-0:27-6.module_2021+15e5e3e7.noarch
@@ -11871,7 +11871,7 @@ document: modulemd
 version: 2
 data:
   name: eog
-  stream: master
+  stream: main
   version: 20180821163756
   context: 775baa8e
   arch: x86_64
@@ -13043,7 +13043,7 @@ data:
         rationale: Framework with tools and libraries for Automated Testing
         repository: git://pkgs.fedoraproject.org/rpms/python-avocado
         cache: http://pkgs.fedoraproject.org/repo/pkgs/python-avocado
-        ref: master
+        ref: main
   artifacts:
     rpms:
     - python-avocado-examples-0:52.1-7.module_1939+1f9e88da.noarch

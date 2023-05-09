@@ -403,7 +403,7 @@ data:
                 # will be used.  If no ref is given, the build system is
                 # permitted to make reasonable assumptions about the correct
                 # default value. Otherwise, the fall-back is the default branch
-                # for the git repository (commonly 'master').
+                # for the git repository (commonly 'main').
                 #
                 # Type: AUTOMATIC
                 ref: 26ca0c0

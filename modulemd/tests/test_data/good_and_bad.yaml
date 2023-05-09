@@ -152,7 +152,7 @@ data:
         rationale: Needed for HTTP2 support
         repository: git+https://src.fedoraproject.org/rpms/nghttp2
         cache: https://src.fedoraproject.org/repo/pkgs/nghttp2
-        ref: master
+        ref: main
       nodejs:
         rationale: Javascript runtime and npm package manager.
         repository: git+https://src.fedoraproject.org/rpms/nodejs

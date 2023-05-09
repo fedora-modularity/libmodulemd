@@ -48,11 +48,11 @@ data:
         buildorder: 0
       http-parser:
         rationale: Needed for parsing HTTP requests
-        ref: master
+        ref: main
         buildorder: 0
       nghttp2:
         rationale: Needed for HTTP2 support
-        ref: master
+        ref: main
         buildorder: 0
       nodejs:
         rationale: Javascript runtime and npm package manager.

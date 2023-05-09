@@ -87,7 +87,8 @@ G_DECLARE_FINAL_TYPE (
  * The number of written bytes should be set to the @size_read variable.
  *
  * This handler is identical to a
- * [yaml_read_handler_t](https://github.com/yaml/libyaml/blob/master/include/yaml.h#L988)
+ * [yaml_read_handler_t in yaml.h header of
+ * libyaml](https://github.com/yaml/libyaml/blob/2c891fc7a770e8ba2fec34fc6b545c672beb37e6/include/yaml.h#L988)
  * but is included here to avoid depending on yaml.h in modulemd headers.
  *
  * Returns: On success, the handler must return 1. If the handler failed,
@@ -115,7 +116,8 @@ typedef gint (*ModulemdReadHandler) (void *data,
  * @buffer to the output.
  *
  * This handler is identical to a
- * [yaml_write_handler_t](https://github.com/yaml/libyaml/blob/master/include/yaml.h#L1478)
+ * [yaml_write_handler_t in yaml.h header of
+ * libyaml](https://github.com/yaml/libyaml/blob/2c891fc7a770e8ba2fec34fc6b545c672beb37e6/include/yaml.h#L1478)
  * but is included here to avoid depending on yaml.h in modulemd headers.
  *
  * Returns: On success, the handler must return 1. If the handler failed,

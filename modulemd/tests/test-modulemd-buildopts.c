@@ -30,7 +30,7 @@ static void
 buildopts_test_construct (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
-  g_auto (GStrv) whitelist = NULL;
+  g_auto (GStrv) allowed_build_names = NULL;
   g_auto (GStrv) arches = NULL;
 
   /* Test that the new() function works */
@@ -38,9 +38,9 @@ buildopts_test_construct (void)
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -230,17 +230,17 @@ buildopts_test_copy (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
   g_autoptr (ModulemdBuildopts) b_copy = NULL;
-  g_auto (GStrv) whitelist = NULL;
+  g_auto (GStrv) allowed_build_names = NULL;
   g_auto (GStrv) arches = NULL;
 
   b = modulemd_buildopts_new ();
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -250,10 +250,10 @@ buildopts_test_copy (void)
   g_assert_nonnull (b_copy);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_copy));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b_copy));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b_copy);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -267,10 +267,10 @@ buildopts_test_copy (void)
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_cmpstr (modulemd_buildopts_get_rpm_macros (b), ==, "a test");
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -280,10 +280,10 @@ buildopts_test_copy (void)
   g_assert_nonnull (b_copy);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_copy));
   g_assert_cmpstr (modulemd_buildopts_get_rpm_macros (b_copy), ==, "a test");
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b_copy);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -297,11 +297,11 @@ buildopts_test_copy (void)
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 1);
-  g_assert_cmpstr (whitelist[0], ==, "testrpm");
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 1);
+  g_assert_cmpstr (allowed_build_names[0], ==, "testrpm");
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -311,11 +311,11 @@ buildopts_test_copy (void)
   g_assert_nonnull (b_copy);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_copy));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b_copy));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 1);
-  g_assert_cmpstr (whitelist[0], ==, "testrpm");
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 1);
+  g_assert_cmpstr (allowed_build_names[0], ==, "testrpm");
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b_copy);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 0);
@@ -329,10 +329,10 @@ buildopts_test_copy (void)
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 1);
@@ -343,10 +343,10 @@ buildopts_test_copy (void)
   g_assert_nonnull (b_copy);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b_copy));
   g_assert_null (modulemd_buildopts_get_rpm_macros (b_copy));
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
-  g_assert_nonnull (whitelist);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b_copy);
+  g_assert_nonnull (allowed_build_names);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
   arches = modulemd_buildopts_get_arches_as_strv (b_copy);
   g_assert_nonnull (arches);
   g_assert_cmpint (g_strv_length (arches), ==, 1);
@@ -390,37 +390,37 @@ static void
 buildopts_test_whitelist (void)
 {
   g_autoptr (ModulemdBuildopts) b = NULL;
-  g_auto (GStrv) whitelist = NULL;
+  g_auto (GStrv) allowed_build_names = NULL;
 
   b = modulemd_buildopts_new ();
   g_assert_nonnull (b);
   g_assert_true (MODULEMD_IS_BUILDOPTS (b));
 
   /* Assert we start with 0 rpms */
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 0);
-  g_clear_pointer (&whitelist, g_strfreev);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 0);
+  g_clear_pointer (&allowed_build_names, g_strfreev);
 
-  /* Whitelist some rpms */
+  /* Allow some rpms */
   modulemd_buildopts_add_rpm_to_whitelist (b, "test2");
   modulemd_buildopts_add_rpm_to_whitelist (b, "test3");
   modulemd_buildopts_add_rpm_to_whitelist (b, "test1");
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 3);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 3);
   // They should be sorted
-  g_assert_cmpstr (whitelist[0], ==, "test1");
-  g_assert_cmpstr (whitelist[1], ==, "test2");
-  g_assert_cmpstr (whitelist[2], ==, "test3");
-  g_clear_pointer (&whitelist, g_strfreev);
+  g_assert_cmpstr (allowed_build_names[0], ==, "test1");
+  g_assert_cmpstr (allowed_build_names[1], ==, "test2");
+  g_assert_cmpstr (allowed_build_names[2], ==, "test3");
+  g_clear_pointer (&allowed_build_names, g_strfreev);
 
   /* Remove some rpms */
   modulemd_buildopts_remove_rpm_from_whitelist (b, "test2");
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 2);
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 2);
   // They should be sorted
-  g_assert_cmpstr (whitelist[0], ==, "test1");
-  g_assert_cmpstr (whitelist[1], ==, "test3");
-  g_clear_pointer (&whitelist, g_strfreev);
+  g_assert_cmpstr (allowed_build_names[0], ==, "test1");
+  g_assert_cmpstr (allowed_build_names[1], ==, "test3");
+  g_clear_pointer (&allowed_build_names, g_strfreev);
 }
 
 static void
@@ -468,7 +468,7 @@ buildopts_test_parse_yaml (void)
   g_autoptr (GError) error = NULL;
   MMD_INIT_YAML_PARSER (parser);
   g_autofree gchar *yaml_path = NULL;
-  g_auto (GStrv) whitelist = NULL;
+  g_auto (GStrv) allowed_build_names = NULL;
   g_auto (GStrv) arches = NULL;
   g_autoptr (FILE) yaml_stream = NULL;
   yaml_path = g_strdup_printf ("%s/b.yaml", g_getenv ("TEST_DATA_PATH"));
@@ -488,12 +488,12 @@ buildopts_test_parse_yaml (void)
                    ==,
                    "%demomacro 1\n"
                    "%demomacro2 %{demomacro}23\n");
-  whitelist = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
-  g_assert_cmpint (g_strv_length (whitelist), ==, 4);
-  g_assert_cmpstr (whitelist[0], ==, "fooscl-1-bar");
-  g_assert_cmpstr (whitelist[1], ==, "fooscl-1-baz");
-  g_assert_cmpstr (whitelist[2], ==, "xxx");
-  g_assert_cmpstr (whitelist[3], ==, "xyz");
+  allowed_build_names = modulemd_buildopts_get_rpm_whitelist_as_strv (b);
+  g_assert_cmpint (g_strv_length (allowed_build_names), ==, 4);
+  g_assert_cmpstr (allowed_build_names[0], ==, "fooscl-1-bar");
+  g_assert_cmpstr (allowed_build_names[1], ==, "fooscl-1-baz");
+  g_assert_cmpstr (allowed_build_names[2], ==, "xxx");
+  g_assert_cmpstr (allowed_build_names[3], ==, "xyz");
   arches = modulemd_buildopts_get_arches_as_strv (b);
   g_assert_cmpint (g_strv_length (arches), ==, 2);
   g_assert_cmpstr (arches[0], ==, "ppc64le");

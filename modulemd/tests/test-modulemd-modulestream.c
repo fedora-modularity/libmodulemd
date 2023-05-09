@@ -678,7 +678,7 @@ module_stream_test_v2_yaml (void)
 
   ModulemdBuildopts *buildopts = NULL;
   g_autofree gchar *buildopts_rpm_macros_prop = NULL;
-  g_auto (GStrv) buildopts_rpm_whitelist = NULL;
+  g_auto (GStrv) buildopts_rpm_allowed_build_names = NULL;
   g_auto (GStrv) buildopts_arches = NULL;
 
   GVariant *tmp_variant = NULL;
@@ -940,18 +940,18 @@ module_stream_test_v2_yaml (void)
                    ==,
                    "%demomacro 1\n%demomacro2 %{demomacro}23\n");
 
-  buildopts_rpm_whitelist =
+  buildopts_rpm_allowed_build_names =
     modulemd_buildopts_get_rpm_whitelist_as_strv (buildopts);
   buildopts_arches = modulemd_buildopts_get_arches_as_strv (buildopts);
 
   g_assert_true (g_strv_contains (
-    (const gchar *const *)buildopts_rpm_whitelist, "fooscl-1-bar"));
+    (const gchar *const *)buildopts_rpm_allowed_build_names, "fooscl-1-bar"));
   g_assert_true (g_strv_contains (
-    (const gchar *const *)buildopts_rpm_whitelist, "fooscl-1-baz"));
-  g_assert_true (
-    g_strv_contains ((const gchar *const *)buildopts_rpm_whitelist, "xxx"));
-  g_assert_true (
-    g_strv_contains ((const gchar *const *)buildopts_rpm_whitelist, "xyz"));
+    (const gchar *const *)buildopts_rpm_allowed_build_names, "fooscl-1-baz"));
+  g_assert_true (g_strv_contains (
+    (const gchar *const *)buildopts_rpm_allowed_build_names, "xxx"));
+  g_assert_true (g_strv_contains (
+    (const gchar *const *)buildopts_rpm_allowed_build_names, "xyz"));
   g_assert_true (
     g_strv_contains ((const gchar *const *)buildopts_arches, "i686"));
   g_assert_true (
@@ -1051,7 +1051,7 @@ module_stream_test_v2_yaml (void)
   g_clear_pointer (&profile_names, g_strfreev);
 
   g_clear_pointer (&buildopts_rpm_macros_prop, g_free);
-  g_clear_pointer (&buildopts_rpm_whitelist, g_strfreev);
+  g_clear_pointer (&buildopts_rpm_allowed_build_names, g_strfreev);
   g_clear_pointer (&buildopts_arches, g_strfreev);
 
 

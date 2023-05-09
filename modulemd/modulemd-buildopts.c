@@ -28,7 +28,7 @@ struct _ModulemdBuildopts
 
   gchar *rpm_macros;
 
-  GHashTable *whitelist;
+  GHashTable *allowed_build_names;
   GHashTable *arches;
 };
 
@@ -68,8 +68,8 @@ modulemd_buildopts_equals (ModulemdBuildopts *self_1,
       return FALSE;
     }
 
-  if (!modulemd_hash_table_sets_are_equal (self_1->whitelist,
-                                           self_2->whitelist))
+  if (!modulemd_hash_table_sets_are_equal (self_1->allowed_build_names,
+                                           self_2->allowed_build_names))
     {
       return FALSE;
     }
@@ -112,8 +112,8 @@ modulemd_buildopts_compare (ModulemdBuildopts *self_1,
       return cmp;
     }
 
-  cmp =
-    modulemd_hash_table_compare (self_1->whitelist, self_2->whitelist, NULL);
+  cmp = modulemd_hash_table_compare (
+    self_1->allowed_build_names, self_2->allowed_build_names, NULL);
   if (cmp != 0)
     {
       return cmp;
@@ -147,7 +147,7 @@ modulemd_buildopts_copy (ModulemdBuildopts *self)
   modulemd_buildopts_set_rpm_macros (copy,
                                      modulemd_buildopts_get_rpm_macros (self));
 
-  MODULEMD_REPLACE_SET (copy->whitelist, self->whitelist);
+  MODULEMD_REPLACE_SET (copy->allowed_build_names, self->allowed_build_names);
   MODULEMD_REPLACE_SET (copy->arches, self->arches);
 
   return g_steal_pointer (&copy);
@@ -160,7 +160,7 @@ modulemd_buildopts_finalize (GObject *object)
   ModulemdBuildopts *self = (ModulemdBuildopts *)object;
 
   g_clear_pointer (&self->rpm_macros, g_free);
-  g_clear_pointer (&self->whitelist, g_hash_table_unref);
+  g_clear_pointer (&self->allowed_build_names, g_hash_table_unref);
   g_clear_pointer (&self->arches, g_hash_table_unref);
 
   G_OBJECT_CLASS (modulemd_buildopts_parent_class)->finalize (object);
@@ -194,7 +194,7 @@ modulemd_buildopts_add_rpm_to_whitelist (ModulemdBuildopts *self,
                                          const gchar *rpm)
 {
   g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
-  g_hash_table_add (self->whitelist, g_strdup (rpm));
+  g_hash_table_add (self->allowed_build_names, g_strdup (rpm));
 }
 
 
@@ -203,14 +203,14 @@ modulemd_buildopts_remove_rpm_from_whitelist (ModulemdBuildopts *self,
                                               const gchar *rpm)
 {
   g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
-  g_hash_table_remove (self->whitelist, rpm);
+  g_hash_table_remove (self->allowed_build_names, rpm);
 }
 
 void
 modulemd_buildopts_clear_rpm_whitelist (ModulemdBuildopts *self)
 {
   g_return_if_fail (MODULEMD_IS_BUILDOPTS (self));
-  g_hash_table_remove_all (self->whitelist);
+  g_hash_table_remove_all (self->allowed_build_names);
 }
 
 
@@ -219,7 +219,7 @@ modulemd_buildopts_get_rpm_whitelist_as_strv (ModulemdBuildopts *self)
 {
   g_return_val_if_fail (MODULEMD_IS_BUILDOPTS (self), NULL);
 
-  return modulemd_ordered_str_keys_as_strv (self->whitelist);
+  return modulemd_ordered_str_keys_as_strv (self->allowed_build_names);
 }
 
 
@@ -316,7 +316,7 @@ modulemd_buildopts_class_init (ModulemdBuildoptsClass *klass)
 static void
 modulemd_buildopts_init (ModulemdBuildopts *self)
 {
-  self->whitelist =
+  self->allowed_build_names =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
   self->arches = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 }
@@ -450,10 +450,10 @@ modulemd_buildopts_parse_rpm_buildopts (yaml_parser_t *parser,
           if (g_str_equal ((const gchar *)event.data.scalar.value,
                            "whitelist"))
             {
-              g_hash_table_unref (buildopts->whitelist);
-              buildopts->whitelist =
+              g_hash_table_unref (buildopts->allowed_build_names);
+              buildopts->allowed_build_names =
                 modulemd_yaml_parse_string_set (parser, &nested_error);
-              if (buildopts->whitelist == NULL)
+              if (buildopts->allowed_build_names == NULL)
                 {
                   MMD_YAML_ERROR_EVENT_EXIT_BOOL (
                     error,
@@ -559,7 +559,7 @@ modulemd_buildopts_emit_yaml (ModulemdBuildopts *self,
         }
     }
 
-  if (g_hash_table_size (self->whitelist) != 0)
+  if (g_hash_table_size (self->allowed_build_names) != 0)
     {
       ret = mmd_emitter_scalar (
         emitter, "whitelist", YAML_PLAIN_SCALAR_STYLE, &nested_error);

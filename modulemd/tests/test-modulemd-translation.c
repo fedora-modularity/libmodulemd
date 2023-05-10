@@ -43,7 +43,7 @@ static void
 translation_test_construct (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
-  g_auto (GStrv) locales;
+  g_auto (GStrv) locales = NULL;
   guint64 translation_version = 1;
   guint64 modified = 3;
 
@@ -137,7 +137,7 @@ translation_test_copy (void)
   g_autoptr (ModulemdTranslation) t = NULL;
   g_autoptr (ModulemdTranslation) t_copy = NULL;
   ModulemdTranslationEntry *te = NULL;
-  g_auto (GStrv) locales;
+  g_auto (GStrv) locales = NULL;
 
   t = modulemd_translation_new (1, "testmod", "teststr", 5);
   g_assert_nonnull (t);

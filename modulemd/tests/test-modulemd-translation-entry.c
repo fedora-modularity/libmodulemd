@@ -38,7 +38,7 @@ static void
 translation_entry_test_construct (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
-  g_auto (GStrv) profile_names;
+  g_auto (GStrv) profile_names = NULL;
 
   /* Test that the new() function works */
   te = modulemd_translation_entry_new ("en_US");
@@ -146,7 +146,7 @@ translation_entry_test_copy (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autoptr (ModulemdTranslationEntry) te_copy = NULL;
-  g_auto (GStrv) profile_names;
+  g_auto (GStrv) profile_names = NULL;
 
   /* Test copying an empty translation entry */
   te = modulemd_translation_entry_new ("en_GB");
@@ -426,7 +426,7 @@ static void
 translation_entry_test_profile_descriptions (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
-  g_auto (GStrv) profile_names;
+  g_auto (GStrv) profile_names = NULL;
 
   te = modulemd_translation_entry_new ("en_US");
   g_assert_nonnull (te);

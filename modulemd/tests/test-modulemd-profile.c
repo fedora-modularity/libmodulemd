@@ -38,7 +38,7 @@ static void
 profile_test_construct (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
-  g_auto (GStrv) rpms;
+  g_auto (GStrv) rpms = NULL;
 
   /* Test that the new() function works */
   p = modulemd_profile_new ("testprofile");

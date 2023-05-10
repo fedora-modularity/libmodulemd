@@ -395,7 +395,7 @@ modulemd_translation_entry_parse_yaml (yaml_parser_t *parser,
   MMD_INIT_YAML_EVENT (event);
   gboolean done = FALSE;
   gboolean in_map = FALSE;
-  g_autofree gchar *value;
+  g_autofree gchar *value = NULL;
   GHashTable *profiles = NULL;
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_autoptr (GError) nested_error = NULL;

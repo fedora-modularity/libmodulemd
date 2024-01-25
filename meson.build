@@ -69,21 +69,6 @@ test = find_program('test')
 with_docs = get_option('with_docs')
 if with_docs
   gtkdoc = dependency('gtk-doc')
-  glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
-
-  glib_index_path = join_paths(glib_docpath, 'glib/index.html')
-  ret = run_command ([test, '-e', glib_index_path],
-    check: false)
-  if ret.returncode() != 0
-    error('Missing documentation for GLib: @0@'.format(glib_index_path))
-  endif
-
-  gobject_index_path = join_paths(glib_docpath, 'gobject/index.html')
-  ret = run_command ([test, '-e', gobject_index_path],
-    check: false)
-  if ret.returncode() != 0
-    error('Missing documentation for GObject: @0@'.format(gobject_index_path))
-  endif
 endif
 
 # Keep with_manpages option a tristate feature for backward compatibility.

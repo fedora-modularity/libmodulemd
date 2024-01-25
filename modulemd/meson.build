@@ -265,10 +265,6 @@ if with_docs
         dependencies : [
             modulemd_dep,
         ],
-        fixxref_args: [
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
-                   ],
         install : true,
     )
 endif

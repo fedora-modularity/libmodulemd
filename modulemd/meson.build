@@ -256,6 +256,10 @@ configure_file(
 # --- Documenatation --- #
 
 if with_docs
+    fixxref_args = []
+    foreach path : gtk_doc_referred_paths
+      fixxref_args += [ '--extra-dir=@0@'.format(path) ]
+    endforeach
     gnome.gtkdoc(
         'modulemd-2.0',
         install_dir: 'modulemd-2.0',
@@ -265,10 +269,7 @@ if with_docs
         dependencies : [
             modulemd_dep,
         ],
-        fixxref_args: [
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
-                     '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
-                   ],
+        fixxref_args: [ fixxref_args ],
         install : true,
     )
 endif

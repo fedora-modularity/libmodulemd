@@ -67,23 +67,21 @@ sed = find_program('sed')
 test = find_program('test')
 
 with_docs = get_option('with_docs')
+gtk_doc_referred_paths = []
 if with_docs
   gtkdoc = dependency('gtk-doc')
   glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
 
-  glib_index_path = join_paths(glib_docpath, 'glib/index.html')
-  ret = run_command ([test, '-e', glib_index_path],
-    check: false)
-  if ret.returncode() != 0
-    error('Missing documentation for GLib: @0@'.format(glib_index_path))
-  endif
-
-  gobject_index_path = join_paths(glib_docpath, 'gobject/index.html')
-  ret = run_command ([test, '-e', gobject_index_path],
-    check: false)
-  if ret.returncode() != 0
-    error('Missing documentation for GObject: @0@'.format(gobject_index_path))
-  endif
+  foreach referred_module : [ 'glib', 'gobject' ]
+    doc_module_path = join_paths(glib_docpath, referred_module)
+    doc_index_file = join_paths(doc_module_path, 'index.html')
+    ret = run_command ([test, '-e', doc_index_file],
+      check: false)
+    if ret.returncode() != 0
+      error('Missing GTK documentation for @0@: @1@'.format(referred_module, doc_index_file))
+    endif
+    gtk_doc_referred_paths += [ doc_module_path ]
+  endforeach
 endif
 
 # Keep with_manpages option a tristate feature for backward compatibility.
@@ -198,6 +196,7 @@ summary({'prefix': get_option('prefix'),
          'datadir': get_option('datadir'),
          'Python 2 GObject Overrides': gobject_overrides_dir_py2,
          'Python 3 GObject Overrides': gobject_overrides_dir_py3,
+         'GTK-Doc Referred Paths': gtk_doc_referred_paths,
         }, section: 'Directories')
 
 summary({'Custom Python': get_option('python_name'),

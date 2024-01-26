@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
@@ -80,7 +80,7 @@ jobs:
         run: dnf -y install git-core
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
@@ -185,7 +185,7 @@ jobs:
         run: dnf -y install git-core
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: $GITHUB_WORKSPACE/.ci/fedora/get_fedora_deps.sh
@@ -240,7 +240,7 @@ jobs:
         run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-docs gobject-introspection gtk-doc jq libyaml meson python-gobject python-six valgrind
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up the build directory
         run:
@@ -319,7 +319,7 @@ jobs:
               wget
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up the build directory
         run: meson setup --buildtype=debugoptimized ci $GITHUB_WORKSPACE
@@ -387,7 +387,7 @@ jobs:
                  valgrind
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up the build directory
         run: meson setup --buildtype=debugoptimized ci $GITHUB_WORKSPACE
@@ -445,7 +445,7 @@ jobs:
               elinks
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up the build directory
         env:

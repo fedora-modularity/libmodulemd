@@ -10,7 +10,7 @@ jobs:
     if: github.repository == 'fedora-modularity/libmodulemd'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Coverity Scan
         env:
@@ -25,10 +25,10 @@ jobs:
     if: github.repository == 'fedora-modularity/libmodulemd'
     steps:
       - name: Checkout code repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Checkout documentation repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: fedora-modularity/fedora-modularity.github.io
           ref: main

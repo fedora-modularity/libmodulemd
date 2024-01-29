@@ -10,7 +10,13 @@ set -x
 
 modulemd_version=${1:-latest}
 os=fedora
-release=latest
+# glib-2.79.0 available since Fedora ≥ 40 changed a documentation format
+# references in libmodulemd documentation do not resolve to glib
+# documentation. Use older Fedora release to have an on-line documentation
+# with the hyperlinks. See
+# <https://github.com/fedora-modularity/libmodulemd/pull/612>.
+#release=latest
+release=39
 repository=quay.io
 image=fedora/fedora:${release}
 

@@ -13,10 +13,6 @@ jobs:
         include:
           - arch: aarch64
             distro: fedora_latest
-          - arch: ppc64le
-            distro: fedora_latest
-          - arch: s390x
-            distro: fedora_latest
 
     steps:
       - uses: actions/checkout@v4

@@ -102,7 +102,7 @@ document: modulemd
 version: 2
 data:
   name: foo
-  stream: "latest"
+  stream: "older"
   context: CTX2
   summary: An example module
   description: >-

@@ -188,9 +188,13 @@ data:
             # Type: OPTIONAL
             arches: [i686, x86_64]
 
-        # Alternate example with no dependencies
+        # Alternate example with no dependencies, but a different stream name.
         - context: CTX2
           platform: f33
+          # stream:
+          # An override to the stream name defined by the module (or the
+          # buildsystem, if not specified in data.stream).
+          stream: "older"
 
     # references:
     # References to external resources, typically upstream

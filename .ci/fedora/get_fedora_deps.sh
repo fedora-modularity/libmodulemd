@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 pushd $SCRIPT_DIR
 
 dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
-       --nogpgcheck --skip-broken --quiet install \
+       --nogpgcheck --quiet install --skip-broken \
     python3-black \
     clang \
     clang-analyzer \

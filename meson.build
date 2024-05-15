@@ -73,12 +73,19 @@ if with_docs
 
   if glib.version().version_compare('<2.79.0')
     glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
+    glib_modules = ['glib', 'gobject' ]
   else
-    glib_docpath = join_paths(glib_prefix, 'share', 'doc', 'glib-2.0')
     warning('glib >= 2.79.0 documention might not be properly referred from libmodulemd documentation.')
+    if glib.version().version_compare('<2.80.1')
+      glib_docpath = join_paths(glib_prefix, 'share', 'doc', 'glib-2.0')
+      glib_modules = ['glib', 'gobject' ]
+    else
+      glib_docpath = join_paths(glib_prefix, 'share', 'doc')
+      glib_modules = ['glib-2.0', 'gobject-2.0' ]
+    endif
   endif
 
-  foreach referred_module : [ 'glib', 'gobject' ]
+  foreach referred_module : glib_modules
     doc_module_path = join_paths(glib_docpath, referred_module)
     doc_index_file = join_paths(doc_module_path, 'index.html')
     ret = run_command ([test, '-e', doc_index_file],

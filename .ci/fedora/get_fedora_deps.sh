@@ -31,9 +31,6 @@ dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
     packit \
     pkgconf \
     popt-devel \
-    python2-devel \
-    python2-six \
-    python2-gobject-base \
     python3-autopep8 \
     python3-devel \
     python3-GitPython \

@@ -6,6 +6,10 @@ set -x
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 pushd $SCRIPT_DIR
 
+# Work around a DNF5 bug with resetting tsflags
+# <https://github.com/rpm-software-management/dnf5/issues/1331>.
+sed -i -e 's/\<nodocs\>//' /etc/dnf/dnf.conf
+
 dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
        --nogpgcheck --quiet install --skip-broken \
     python3-black \

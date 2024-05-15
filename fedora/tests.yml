@@ -10,7 +10,7 @@
     - classic
   tasks:
   - name: Make sure fedpkg and selinux bindings are installed
-    shell: dnf -y install --skip-broken fedpkg python{2,3}-libselinux libmodulemd-devel
+    shell: dnf -y install --skip-broken fedpkg python3-libselinux libmodulemd-devel
   - name: Copy spec file to remote machine
     copy:
       src: "{{ playbook_dir }}/../libmodulemd.spec"

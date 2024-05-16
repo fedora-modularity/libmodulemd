@@ -16,7 +16,7 @@
       src: "{{ playbook_dir }}/../libmodulemd.spec"
       dest: /tmp/libmodulemd.spec
   - name: Install build deps
-    shell: dnf -y build-dep /tmp/libmodulemd.spec
+    shell: dnf -y builddep /tmp/libmodulemd.spec
 
 - hosts: localhost
   tags:

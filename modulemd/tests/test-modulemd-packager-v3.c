@@ -347,6 +347,7 @@ validate_yaml (ModulemdPackagerV3 *packager)
     "      arches: [i686, x86_64]\n"
     "  - context: CTX2\n"
     "    platform: f33\n"
+    "    stream: \"older\"\n"
     "  references:\n"
     "    community: http://www.example.com/\n"
     "    documentation: http://www.example.com/\n"
@@ -508,7 +509,7 @@ packager_test_convert_to_index_with_name_stream_default_profile (void)
   g_assert_no_error (error);
   g_assert_nonnull (yaml_str);
 
-  g_debug ("YAML dump of index from PackageV3 to Index mapping:\n%s",
+  g_debug ("YAML dump of index from PackagerV3 to Index mapping:\n%s",
            yaml_str);
 
   expected_path = g_strdup_printf ("%s/upgrades/packager_v3_to_index.yaml",
@@ -518,6 +519,8 @@ packager_test_convert_to_index_with_name_stream_default_profile (void)
     g_file_get_contents (expected_path, &expected_str, NULL, &error));
   g_assert_no_error (error);
   g_assert_nonnull (expected_str);
+
+  g_debug ("YAML dump of the expected string:\n%s", expected_str);
 
   g_assert_cmpstr (expected_str, ==, yaml_str);
 

@@ -11,7 +11,7 @@
 #
 # REMEMBER TO UPDATE THE SUMMARY() IN meson.build when adding options here
 
-option('accept_overflowed_buildorder', type : 'boolean', value: 'false',
+option('accept_overflowed_buildorder', type : 'boolean', value: false,
        description : 'Accept overflowed 18446744073709551615 buildorder as -1. This breaks a specification, but some RHEL 8 module builds look like that.')
 
 option('verbose_tests', type : 'boolean', value : true,

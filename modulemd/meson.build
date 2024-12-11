@@ -284,13 +284,15 @@ endif
 # Test env with release values
 test_release_env = environment()
 test_release_env.set('LC_ALL', 'C')
-if meson.version().version_compare('< 0.56.0')
-    project_source_root = meson.source_root()
-    project_build_root = meson.build_root()
-else
+
+if meson.version().version_compare('>=0.56.0')
     project_source_root = meson.project_source_root()
     project_build_root = meson.project_build_root()
+else
+    project_source_root = meson.source_root()
+    project_build_root = meson.build_root()
 endif
+
 test_release_env.set ('MESON_SOURCE_ROOT', project_source_root)
 test_release_env.set ('MESON_BUILD_ROOT', project_build_root)
 test_release_env.set ('TEST_DATA_PATH', project_source_root + '/modulemd/tests/test_data')

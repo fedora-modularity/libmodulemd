@@ -6,7 +6,7 @@ downstream_package_name: libmodulemd
 actions:
   get-current-version: ./get_version.sh
 
-synced_files:
+files_to_sync:
   - fedora/
   - .packit.yaml
 

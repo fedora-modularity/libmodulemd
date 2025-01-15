@@ -5,7 +5,11 @@ FROM __IMAGE__
 MAINTAINER Stephen Gallagher <sgallagh@redhat.com>
 
 RUN yum -y install epel-release \
-ifelse(eval(cosrelease >= 8), 1, `dnl
+ifelse(eval(cosrelease >= 9), 1, `dnl
+    && yum -y install dnf-plugins-core \
+    && yum config-manager --enable crb \
+')dnl
+ifelse(eval(cosrelease == 8), 1, `dnl
     && yum -y install dnf-plugins-core \
     && yum config-manager --enable powertools \
 ')dnl

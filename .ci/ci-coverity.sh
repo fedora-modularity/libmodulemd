@@ -9,7 +9,7 @@ set -e
 set -x
 
 os=centos
-release=stream8
+release=stream9
 repository=quay.io/centos
 
 # Override the standard tests with the Coverity scan

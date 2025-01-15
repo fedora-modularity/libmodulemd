@@ -26,7 +26,8 @@ struct _ModulemdBuildConfig
 
   gchar *context;
   gchar *platform;
-  GHashTable *requires; /* hashtable<string, string> */
+  GHashTable *
+    requires; /* hashtable<string, string> */
   GHashTable *buildrequires; /* hashtable<string, string> */
   ModulemdBuildopts *buildopts;
 };
@@ -64,8 +65,9 @@ modulemd_build_config_class_init (ModulemdBuildConfigClass *klass)
 static void
 modulemd_build_config_init (ModulemdBuildConfig *self)
 {
-  self->requires =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  self->
+    requires
+  = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   self->buildrequires =
     g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 }
@@ -559,7 +561,9 @@ modulemd_build_config_replace_runtime_deps (ModulemdBuildConfig *self,
   if (deps)
     {
       g_clear_pointer (&self->requires, g_hash_table_unref);
-      self->requires = modulemd_hash_table_deep_str_copy (deps);
+      self->
+        requires
+      = modulemd_hash_table_deep_str_copy (deps);
     }
   else
     {

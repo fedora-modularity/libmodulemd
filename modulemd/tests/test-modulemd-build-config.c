@@ -26,7 +26,9 @@ static void
 buildconfig_test_construct (void)
 {
   g_autoptr (ModulemdBuildConfig) bc = NULL;
-  g_auto (GStrv) requires = NULL;
+  g_auto (GStrv)
+    requires
+  = NULL;
 
 
   /* == Test that the new() function works == */

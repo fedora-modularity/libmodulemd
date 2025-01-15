@@ -29,8 +29,12 @@ ifelse(eval(cosrelease == 8), 1, `dnl
         meson \
         ninja-build \
         pkgconfig \
+ifelse(eval(cosrelease < 9), 1, `dnl
         python2-devel \
         python2-six \
+',`dnl
+        python3-six \
+')dnl
 ifelse(eval(cosrelease < 8), 1, `dnl
         python-gobject-base \
         python36-gobject-base \

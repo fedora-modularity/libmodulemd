@@ -55,6 +55,6 @@ dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' \
 
 dnf -y clean all
 
-ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; print(gi._overridesdir)")/Modulemd.py
+ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; import os; os.makedirs(gi._overridesdir, exist_ok=True); print(gi._overridesdir)")/Modulemd.py
 
 popd

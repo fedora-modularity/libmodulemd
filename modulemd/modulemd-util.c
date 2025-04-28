@@ -361,6 +361,12 @@ destroy_variant_data (gpointer data)
 GVariant *
 modulemd_variant_deep_copy (GVariant *variant)
 {
+  // g_variant_store will not accept NULL from 2.84.1
+  if (variant == NULL)
+    {
+      return g_variant_ref_sink (g_variant_new_maybe (G_VARIANT_TYPE_VARIANT, NULL));
+    }
+
   const GVariantType *data_type = g_variant_get_type (variant);
   gsize data_size = g_variant_get_size (variant);
   gpointer data = g_malloc0 (data_size);

@@ -363,9 +363,13 @@ modulemd_variant_deep_copy (GVariant *variant)
 {
   const GVariantType *data_type = g_variant_get_type (variant);
   gsize data_size = g_variant_get_size (variant);
-  gpointer data = g_malloc0 (data_size);
+  gpointer data = NULL;
 
-  g_variant_store (variant, data);
+  if (data_size > 0)
+    {
+      data = g_malloc0 (data_size);
+      g_variant_store (variant, data);
+    }
 
   return g_variant_ref_sink (g_variant_new_from_data (
     data_type, data, data_size, FALSE, destroy_variant_data, data));

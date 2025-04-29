@@ -365,6 +365,7 @@ c_tests = {
 'service_level'       : [ 'tests/test-modulemd-service-level.c' ],
 'translation'         : [ 'tests/test-modulemd-translation.c' ],
 'translation_entry'   : [ 'tests/test-modulemd-translation-entry.c' ],
+'variant_deep_copy'   : [ 'tests/test-modulemd-variant_deep_copy.c' ],
 'obsoletes'           : [ 'tests/test-modulemd-obsoletes.c' ],
 'quoting'             : [ 'tests/test-modulemd-quoting.c' ],
 }

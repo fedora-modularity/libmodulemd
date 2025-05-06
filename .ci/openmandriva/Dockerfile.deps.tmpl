@@ -21,7 +21,6 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
     'python3dist(autopep8)' \
     'python3dist(pygobject)' \
     git-core \
-    elinks \
     && dnf -y clean all
 
 RUN ln -sf /builddir/bindings/python/gi/overrides/Modulemd.py $(python3 -c "import gi; import os; os.makedirs(gi._overridesdir, exist_ok=True); print(gi._overridesdir)")/Modulemd.py

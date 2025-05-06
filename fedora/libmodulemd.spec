@@ -108,7 +108,7 @@ export LC_CTYPE=C.utf8
 
 # Don't run tests on ARM for now. There are problems with
 # performance on the builders and often these time out.
-%ifnarch %{arm} aarch64
+%ifnarch %{arm}
 # The tests sometimes time out in CI, so give them a little extra time
 %{__meson} test -C %{_vpath_builddir} %{?_smp_mesonflags} --print-errorlogs -t 5
 %endif

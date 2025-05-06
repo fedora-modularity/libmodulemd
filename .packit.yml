@@ -19,6 +19,11 @@ jobs:
   metadata:
     targets:
     - fedora-all
+    - fedora-rawhide-aarch64
+    - fedora-rawhide-i386
+    - fedora-rawhide-ppc64le
+    # fedora-rawhide-x86_64 is included in fedora-all
+    # fedora-rawhide-s390x has too long wait queue
     - epel-7
     - epel-8
     - centos-stream-9

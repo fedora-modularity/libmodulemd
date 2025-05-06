@@ -22,3 +22,4 @@ jobs:
     - epel-7
     - epel-8
     - centos-stream-9
+    - centos-stream-10

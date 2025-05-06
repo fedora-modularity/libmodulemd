@@ -14,13 +14,12 @@ RUN dnf -y --setopt=install_weak_deps=False --setopt=tsflags='' install \
     valgrind \
     wget \
     task-devel \
-    'pkgconfig(zlib)' \
+    'pkgconfig(glib-2.0)' \
     'pkgconfig(gobject-introspection-1.0)' \
+    'pkgconfig(rpm)' \
+    'pkgconfig(yaml-0.1)' \
     'python3dist(autopep8)' \
     'python3dist(pygobject)' \
-    'pkgconfig(yaml-0.1)' \
-    'pkgconfig(rpm)' \
-    magic-devel \
     git-core \
     elinks \
     && dnf -y clean all

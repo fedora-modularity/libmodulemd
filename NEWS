@@ -1,5 +1,17 @@
 Release history for libmodulemd
 
+2.15.1      2025-05-09
+
+Fixes:
+- A new "g_variant_store: assertion 'data != NULL' failed" warning added to
+  GLib 2.84.1 when processing modulemd YAML documents with /data/xmd field with
+  an empty flow map ({}) value was fixed.
+- Building documentation now works with GLib 2.80.1 at the expense of missing
+  cross links from libmodulemd to GLib. If it still fails you, you can disable
+  building the documentation with "-Dwith_docs=false" meson option.
+- A number of warnings printed by recent Meson was reduced.
+
+
 2.15.0      2023-05-10
 
 Enhancements:

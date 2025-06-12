@@ -11,13 +11,18 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "config.h"
+
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
 #include <signal.h>
 #include <yaml.h>
 
-#include "config.h"
+#ifdef HAVE_RPMIO
+#include <rpm/rpmio.h>
+#endif
+
 #include "modulemd.h"
 #include "modulemd-defaults.h"
 #include "modulemd-obsoletes.h"
@@ -1377,6 +1382,10 @@ module_index_test_dump_empty_index (void)
 struct expected_compressed_read_t
 {
   const gchar *filename;
+#ifdef HAVE_RPMIO
+  /* Determines a compression type */
+  const gchar *rpmio_mode;
+#endif
 
   /* Whether this should succeed at reading */
   gboolean succeeds;
@@ -1385,6 +1394,33 @@ struct expected_compressed_read_t
   GQuark error_domain;
   int error_code;
 };
+
+#ifdef HAVE_RPMIO
+/* Probe whether rpmio library supports that type of compression.
+ * @file_path is a file name to open
+ * @compression_type is rpmio mode string specifying the desired compression
+ * format.
+ * It assumes that an uncompressed content of the file starts with "---\n"
+ * string and checks the first chararter is '-'. That's because rpmio library
+ * silenty returns original, undecompressed, content if it does not support
+ * the compression format. */
+static gboolean
+rpmio_can_read_compressed_file (const gchar *file_path,
+                                const gchar *compression_type)
+{
+  FD_t rpmfd;
+  ssize_t read;
+  unsigned char buffer;
+
+  rpmfd = Fopen ((const char *)file_path, (const char *)compression_type);
+  g_assert_nonnull (rpmfd);
+  read = Fread (&buffer, sizeof (buffer), 1, rpmfd);
+  Fclose (rpmfd);
+  g_assert_cmpint (read, ==, 1);
+
+  return (buffer == (unsigned char)'-');
+}
+#endif
 
 static void
 test_module_index_read_compressed (void)
@@ -1402,16 +1438,22 @@ test_module_index_read_compressed (void)
   struct expected_compressed_read_t expected[] = {
     {
       .filename = "bzipped",
+      .rpmio_mode = "r.bzdio",
       .succeeds = TRUE,
     },
     {
       .filename = "bzipped.yaml.bz2",
+      .rpmio_mode = "r.bzdio",
       .succeeds = TRUE,
     },
-    { .filename = "gzipped", .succeeds = TRUE },
-    { .filename = "gzipped.yaml.gz", .succeeds = TRUE },
-    { .filename = "xzipped", .succeeds = TRUE },
-    { .filename = "xzipped.yaml.xz", .succeeds = TRUE },
+    { .filename = "gzipped", .rpmio_mode = "r.gzdio", .succeeds = TRUE },
+    { .filename = "gzipped.yaml.gz",
+      .rpmio_mode = "r.gzdio",
+      .succeeds = TRUE },
+    { .filename = "xzipped", .rpmio_mode = "r.xzdio", .succeeds = TRUE },
+    { .filename = "xzipped.yaml.xz",
+      .rpmio_mode = "r.xzdio",
+      .succeeds = TRUE },
     { .filename = NULL }
   };
 
@@ -1474,6 +1516,19 @@ test_module_index_read_compressed (void)
                                    g_getenv ("TEST_DATA_PATH"),
                                    expected[i].filename);
       g_assert_nonnull (file_path);
+
+#ifdef HAVE_RPMIO
+      /* Support for various compression formats in RPMIO is optional. Probe
+       * the support first and set expected success/error accordingly. */
+      if (!rpmio_can_read_compressed_file (file_path, expected[i].rpmio_mode))
+        {
+          g_debug ("rpmio library does not support %s compression mode",
+                   expected[i].rpmio_mode);
+          expected[i].succeeds = FALSE;
+          expected[i].error_domain = MODULEMD_YAML_ERROR;
+          expected[i].error_code = MMD_YAML_ERROR_UNPARSEABLE;
+        }
+#endif
 
       g_debug ("Processing %s, expecting %s",
                file_path,

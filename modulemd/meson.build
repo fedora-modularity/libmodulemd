@@ -377,6 +377,7 @@ foreach name, sources : c_tests
         sources,
         dependencies : [
             modulemd_dep,
+            rpm,
         ],
         link_with : [
             test_utils_lib,

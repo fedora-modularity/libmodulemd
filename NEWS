@@ -1,5 +1,13 @@
 Release history for libmodulemd
 
+2.15.2      2025-06-18
+
+Fixes:
+- module_index test now passes if RPM library is built without bzip2 or xz
+  compression support and libmodulemd is configured to support decompression
+  using the RPM library.
+
+
 2.15.1      2025-05-09
 
 Fixes:

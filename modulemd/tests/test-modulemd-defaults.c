@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-defaults-v1.h"
 #include "modulemd-defaults.h"
@@ -24,7 +23,7 @@
 #include "private/test-utils.h"
 
 static void
-defaults_test_construct (void)
+defaults_test_construct_regular (void)
 {
   g_autoptr (ModulemdDefaults) defaults = NULL;
 
@@ -34,30 +33,51 @@ defaults_test_construct (void)
   g_assert_true (MODULEMD_IS_DEFAULTS (defaults));
   g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults));
   g_clear_object (&defaults);
+}
 
-  /* Test new() with a zero mdversion */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  defaults = modulemd_defaults_new (0, "foo");
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_assert_null (defaults);
 
-  /* Test new() with a too-high mdversion */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_LATEST + 1, "foo");
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_assert_null (defaults);
+/* Test new() with a zero mdversion */
+static void
+defaults_test_construct_zero_mdversion (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaults) defaults = NULL;
+      defaults = modulemd_defaults_new (0, "foo");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* Test new() with a NULL module_name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  /* If we trap the error, defaults actually returns a value here, so free
-   * it
-   */
-  g_clear_object (&defaults);
+
+/* Test new() with a too-high mdversion */
+static void
+defaults_test_construct_too_high_mdversion (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaults) defaults = NULL;
+      defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_LATEST + 1, "foo");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+/* Test new() with a NULL module_name */
+static void
+defaults_test_new_with_null_module_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaults) defaults = NULL;
+      defaults = modulemd_defaults_new (MD_DEFAULTS_VERSION_ONE, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -203,7 +223,14 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/defaults/construct", defaults_test_construct);
+  g_test_add_func ("/modulemd/v2/defaults/construct/regular",
+                   defaults_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/defaults/construct/zero_mdversion",
+                   defaults_test_construct_zero_mdversion);
+  g_test_add_func ("/modulemd/v2/defaults/construct/too_high_mdversion",
+                   defaults_test_construct_too_high_mdversion);
+  g_test_add_func ("/modulemd/v2/defaults/new/with_null_module_name",
+                   defaults_test_new_with_null_module_name);
 
   g_test_add_func ("/modulemd/v2/defaults/copy", defaults_test_copy);
 

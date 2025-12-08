@@ -16,6 +16,7 @@
 #include <glib.h>
 #include <locale.h>
 #include <yaml.h>
+#include "glib-extensions.h"
 
 G_BEGIN_DECLS
 

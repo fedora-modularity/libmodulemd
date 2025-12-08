@@ -23,6 +23,10 @@
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (GDate, g_date_free)
 #endif
 
+/* G_TEST_SUBPROCESS_DEFAULT was added in Glib 2.74. */
+#ifndef HAVE_G_TEST_SUBPROCESS_DEFAULT
+#define G_TEST_SUBPROCESS_DEFAULT 0
+#endif
 
 #ifndef HAVE_EXTEND_AND_STEAL
 

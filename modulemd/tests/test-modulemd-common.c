@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd.h"
 
@@ -83,7 +82,7 @@ test_modulemd_load_file (void)
 
 
 static void
-test_modulemd_load_string (void)
+test_modulemd_load_string_regular (void)
 {
   const gchar *yaml_string = NULL;
   g_autoptr (GError) error = NULL;
@@ -122,16 +121,6 @@ test_modulemd_load_string (void)
   g_assert_nonnull (output);
 
 
-  /* NULL string should raise an exception */
-  g_clear_error (&error);
-  g_clear_object (&idx);
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  idx = modulemd_load_string (NULL, &error);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_assert_null (idx);
-
-
   /* An empty string is valid YAML, so it returns a non-NULL but empty index. */
   g_clear_error (&error);
   g_clear_object (&idx);
@@ -148,6 +137,22 @@ test_modulemd_load_string (void)
   idx = modulemd_load_string (yaml_string, &error);
   g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE);
   g_assert_null (idx);
+}
+
+
+/* NULL string should raise an exception */
+static void
+test_modulemd_load_string_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (GError) error = NULL;
+      g_autoptr (ModulemdModuleIndex) idx = NULL;
+      idx = modulemd_load_string (NULL, &error);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -353,7 +358,7 @@ test_packager_read_file (void)
 
 
 static void
-test_packager_read_string (void)
+test_packager_read_string_regular (void)
 {
   const gchar *yaml_string = NULL;
   g_autoptr (GError) error = NULL;
@@ -531,16 +536,6 @@ test_packager_read_string (void)
     ==,
     "streamname-override");
 
-  /* NULL string should raise an exception */
-  g_clear_error (&error);
-  g_clear_object (&object);
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  otype = modulemd_read_packager_string (NULL, &object, &error);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_assert_cmpint (otype, ==, G_TYPE_INVALID);
-  g_assert_null (object);
-
   /* An empty string is not a valid packager format */
   g_clear_error (&error);
   g_clear_object (&object);
@@ -558,6 +553,21 @@ test_packager_read_string (void)
   g_assert_null (object);
 }
 
+
+/* NULL string should raise an exception */
+static void
+test_packager_read_string_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (GError) error = NULL;
+      g_autoptr (GObject) object = NULL;
+      (void)modulemd_read_packager_string (NULL, &object, &error);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 /*
  * Empty profiles are legal. Parser misinterpreted them as a list of one
@@ -617,13 +627,17 @@ main (int argc, char *argv[])
                    test_modulemd_get_version);
 
   g_test_add_func ("/modulemd/v2/common/load_file", test_modulemd_load_file);
-  g_test_add_func ("/modulemd/v2/common/load_string",
-                   test_modulemd_load_string);
+  g_test_add_func ("/modulemd/v2/common/load_string/regular",
+                   test_modulemd_load_string_regular);
+  g_test_add_func ("/modulemd/v2/common/load_string/null",
+                   test_modulemd_load_string_null);
 
   g_test_add_func ("/modulemd/v2/common/packager/read_file",
                    test_packager_read_file);
-  g_test_add_func ("/modulemd/v2/common/packager/read_string",
-                   test_packager_read_string);
+  g_test_add_func ("/modulemd/v2/common/packager/read_string/regular",
+                   test_packager_read_string_regular);
+  g_test_add_func ("/modulemd/v2/common/packager/read_string/null",
+                   test_packager_read_string_null);
 
   g_test_add_func ("/modulemd/v2/common/empty_profile", test_empty_profile);
 

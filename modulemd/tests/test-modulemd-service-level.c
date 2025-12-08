@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-service-level.h"
 #include "private/glib-extensions.h"
@@ -26,16 +25,8 @@ typedef struct _ServiceLevelFixture
 {
 } ServiceLevelFixture;
 
-gboolean signaled = FALSE;
-
 static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
-
-static void
-service_level_test_construct (void)
+service_level_test_construct_regular (void)
 {
   g_autoptr (ModulemdServiceLevel) sl = NULL;
 
@@ -59,34 +50,55 @@ service_level_test_construct (void)
   g_assert_cmpstr (modulemd_service_level_get_name (sl), ==, "bar");
   g_assert_null (modulemd_service_level_get_eol (sl));
   g_clear_object (&sl);
+}
 
 
-  /* Test that we abort if we call new() with a NULL name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  sl = modulemd_service_level_new (NULL);
-  g_assert_true (signaled);
-  g_clear_object (&sl);
+/* Test that we abort if we call new() with a NULL name */
+static void
+service_level_test_construct_new_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdServiceLevel) sl = NULL;
+      sl = modulemd_service_level_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 
-  /* Test that we abort if we instatiate without a name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  sl = g_object_new (MODULEMD_TYPE_SERVICE_LEVEL, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&sl);
+/* Test that we abort if we instatiate without a name */
+static void
+service_level_test_construct_init_no_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdServiceLevel) sl = NULL;
+      sl = g_object_new (MODULEMD_TYPE_SERVICE_LEVEL, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 
-  /* Test that we abort if we instatiate with a NULL name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  sl = g_object_new (MODULEMD_TYPE_SERVICE_LEVEL,
-                     "name", NULL,
-                     NULL);
-  // clang-format on
-  g_assert_true (signaled);
-  g_clear_object (&sl);
+/* Test that we abort if we instatiate with a NULL name */
+static void
+service_level_test_construct_init_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdServiceLevel) sl = NULL;
+      // clang-format off
+      sl = g_object_new (MODULEMD_TYPE_SERVICE_LEVEL,
+                         "name", NULL,
+                         NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -249,19 +261,25 @@ service_level_test_get_name (void)
                 NULL);
   // clang-format on
   g_assert_cmpstr (name, ==, "foo");
+}
 
 
-  /* Test that trying to set the name by object properties fails.
-   * The name must be immutable for the life of the object.
-   */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  g_object_set (sl,
-                "name", "bar",
-                NULL);
-  // clang-format on
-  g_assert_true (signaled);
+/*
+ * Test that trying to set the name by object properties fails.
+ * The name must be immutable for the life of the object.
+ */
+static void
+service_level_test_name_is_immutable (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdServiceLevel) sl = NULL;
+      sl = modulemd_service_level_new ("foo");
+      g_object_set (sl, "name", "bar", NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -476,11 +494,20 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/servicelevel/construct",
-                   service_level_test_construct);
+  g_test_add_func ("/modulemd/v2/servicelevel/construct/regular",
+                   service_level_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/servicelevel/construct/new_null",
+                   service_level_test_construct_new_null);
+  g_test_add_func ("/modulemd/v2/servicelevel/construct/init_no_name",
+                   service_level_test_construct_init_no_name);
+  g_test_add_func ("/modulemd/v2/servicelevel/construct/init_null_name",
+                   service_level_test_construct_init_null_name);
 
   g_test_add_func ("/modulemd/v2/servicelevel/get_set_name",
                    service_level_test_get_name);
+
+  g_test_add_func ("/modulemd/v2/servicelevel/name_is_immutable",
+                   service_level_test_name_is_immutable);
 
   g_test_add_func ("/modulemd/v2/servicelevel/equals",
                    service_level_test_equals);

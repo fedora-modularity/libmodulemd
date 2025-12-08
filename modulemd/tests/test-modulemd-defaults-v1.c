@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-defaults-v1.h"
 #include "private/glib-extensions.h"
@@ -26,7 +25,7 @@
 
 
 static void
-defaults_test_construct (void)
+defaults_test_construct_regular (void)
 {
   g_autoptr (ModulemdDefaultsV1) defaults = NULL;
 
@@ -35,13 +34,6 @@ defaults_test_construct (void)
   g_assert_nonnull (defaults);
   g_assert_true (MODULEMD_IS_DEFAULTS (defaults));
   g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults));
-  g_clear_object (&defaults);
-
-  /* Test new() with a NULL module_name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  defaults = modulemd_defaults_v1_new (NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
   g_clear_object (&defaults);
 
 
@@ -55,26 +47,57 @@ defaults_test_construct (void)
   g_assert_true (MODULEMD_IS_DEFAULTS (defaults));
   g_assert_true (MODULEMD_IS_DEFAULTS_V1 (defaults));
   g_clear_object (&defaults);
+}
 
-  /* Test object instantiation with a NULL module name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  // clang-format off
-  defaults = g_object_new (MODULEMD_TYPE_DEFAULTS_V1,
-                           "module-name", NULL,
-                           NULL);
-  // clang-format on
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_clear_object (&defaults);
 
-  /* Test object instantiation without specifying the module name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  // clang-format off
-  defaults = g_object_new (MODULEMD_TYPE_DEFAULTS_V1, NULL);
-  // clang-format on
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_clear_object (&defaults);
+/* Test new() with a NULL module_name */
+static void
+defaults_test_construct_new_null_module_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaultsV1) defaults = NULL;
+      defaults = modulemd_defaults_v1_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+/* Test object instantiation without specifying the module name */
+static void
+defaults_test_construct_init_no_module_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaultsV1) defaults = NULL;
+      // clang-format off
+      defaults = g_object_new (MODULEMD_TYPE_DEFAULTS_V1, NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+/* Test object instantiation with a NULL module name */
+static void
+defaults_test_construct_init_null_module_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDefaultsV1) defaults = NULL;
+      // clang-format off
+      defaults = g_object_new (MODULEMD_TYPE_DEFAULTS_V1,
+                               "module-name", NULL,
+                               NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -820,8 +843,14 @@ main (int argc, char *argv[])
   // Define the tests.
   g_test_add_func ("/modulemd/v2/defaults/v1/equals", defaults_test_equals);
 
-  g_test_add_func ("/modulemd/v2/defaults/v1/construct",
-                   defaults_test_construct);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct/regular",
+                   defaults_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct/new_null_module_name",
+                   defaults_test_construct_new_null_module_name);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct/init_no_module_name",
+                   defaults_test_construct_init_no_module_name);
+  g_test_add_func ("/modulemd/v2/defaults/v1/construct/init_null_module_name",
+                   defaults_test_construct_init_null_module_name);
 
   g_test_add_func ("/modulemd/v2/defaults/v1/copy", defaults_test_copy);
 

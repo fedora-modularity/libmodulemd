@@ -29,6 +29,18 @@ except ImportError:
 from base import TestBase
 
 
+def _instantiate_without_locale():
+    Modulemd.TranslationEntry()
+
+
+def _instantiate_with_none_local():
+    Modulemd.TranslationEntry(locale=None)
+
+
+def _set_locale(te):
+    te.props.locale = "en_GB"
+
+
 class TestTranslationEntry(TestBase):
     def test_constructors(self):
         # Test that the new() function works
@@ -118,12 +130,10 @@ class TestTranslationEntry(TestBase):
             assert "does not allow None as a value" in e.__str__()
 
         # Test that we fail if object is instantiated without a locale
-        with self.expect_signal():
-            Modulemd.TranslationEntry()
+        self.assertProcessFailure(_instantiate_without_locale)
 
         # Test that we fail if object is instantiated with a None locale
-        with self.expect_signal():
-            Modulemd.TranslationEntry(locale=None)
+        self.assertProcessFailure(_instantiate_with_none_local)
 
     def test_copy(self):
         te_orig = Modulemd.TranslationEntry(locale="en_US")
@@ -162,8 +172,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_locale() == "en_US"
         assert te.props.locale == "en_US"
 
-        with self.expect_signal():
-            te.props.locale = "en_GB"
+        self.assertProcessFailure(_set_locale, te)
 
     def test_get_set_summary(self):
         te = Modulemd.TranslationEntry(locale="en_US")

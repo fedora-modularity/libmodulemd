@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-component-module.h"
 #include "modulemd-component.h"
@@ -28,16 +27,8 @@ typedef struct _ComponentModuleFixture
 {
 } ComponentModuleFixture;
 
-gboolean signaled = FALSE;
-
 static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
-
-static void
-component_module_test_construct (void)
+component_module_test_construct_regular (void)
 {
   g_autoptr (ModulemdComponentModule) m = NULL;
   ModulemdComponent *mc = NULL;
@@ -84,29 +75,49 @@ component_module_test_construct (void)
     modulemd_component_module_get_repository (m), ==, "somerepo");
   mc = NULL;
   g_clear_object (&m);
-
-  /* Test that we abort with a NULL name to new() */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  m = modulemd_component_module_new (NULL);
-  g_assert_true (signaled);
-  g_clear_object (&m);
-
-  /* Test that init fails without name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  m = g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&m);
-
-  /* Test that init fails with a NULL name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  m = g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, "name", NULL, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&m);
 }
 
+/* Test that we abort with a NULL name to new() */
+static void
+component_module_test_construct_new_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdComponentModule) m = NULL;
+      m = modulemd_component_module_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+/* Test that init fails without name */
+static void
+component_module_test_construct_init_without_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdComponentModule) m = NULL;
+      m = g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+/* Test that init fails with a NULL name */
+static void
+component_module_test_construct_init_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdComponentModule) m = NULL;
+      m = g_object_new (MODULEMD_TYPE_COMPONENT_MODULE, "name", NULL, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 static void
 component_module_test_equals (void)
@@ -421,8 +432,17 @@ main (int argc, char *argv[])
   g_test_bug_base ("https://bugzilla.redhat.com/show_bug.cgi?id=");
 
   // Define the tests.
-  g_test_add_func ("/modulemd/v2/component/module/construct",
-                   component_module_test_construct);
+  g_test_add_func ("/modulemd/v2/component/module/construct/regular",
+                   component_module_test_construct_regular);
+
+  g_test_add_func ("/modulemd/v2/component/module/construct/new_null_name",
+                   component_module_test_construct_new_null_name);
+
+  g_test_add_func ("/modulemd/v2/component/module/construct/init_without_name",
+                   component_module_test_construct_init_without_name);
+
+  g_test_add_func ("/modulemd/v2/component/module/construct/init_null_name",
+                   component_module_test_construct_init_null_name);
 
   g_test_add_func ("/modulemd/v2/component/module/equals",
                    component_module_test_equals);

@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-dependencies.h"
 #include "private/glib-extensions.h"
@@ -26,14 +25,6 @@
 typedef struct _DependenciesFixture
 {
 } DependenciesFixture;
-
-gboolean signaled = FALSE;
-
-static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
 
 static void
 dependencies_test_construct (void)
@@ -60,7 +51,7 @@ dependencies_test_construct (void)
 
 
 static void
-dependencies_test_dependencies (void)
+dependencies_test_dependencies_regular (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_auto (GStrv) list = NULL;
@@ -72,10 +63,6 @@ dependencies_test_dependencies (void)
   list = modulemd_dependencies_get_buildtime_modules_as_strv (d);
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 0);
-  g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_buildtime_streams_as_strv (d, "buildmod1");
-  g_assert_null (list);
   g_clear_pointer (&list, g_strfreev);
 
   /* Add some deps */
@@ -102,10 +89,6 @@ dependencies_test_dependencies (void)
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 0);
   g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_runtime_streams_as_strv (d, "buildmod1");
-  g_assert_null (list);
-  g_clear_pointer (&list, g_strfreev);
 
   list = modulemd_dependencies_get_runtime_modules_as_strv (d);
   g_assert_nonnull (list);
@@ -117,16 +100,63 @@ dependencies_test_dependencies (void)
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 0);
   g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_runtime_streams_as_strv (d, "buildmod1");
-  g_assert_null (list);
-  g_clear_pointer (&list, g_strfreev);
   list = modulemd_dependencies_get_runtime_streams_as_strv (d, "runmod1");
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 2);
   g_assert_cmpstr (list[0], ==, "stream1");
   g_assert_cmpstr (list[1], ==, "stream2");
   g_clear_pointer (&list, g_strfreev);
+}
+
+
+static void
+dependencies_test_dependencies_nonexistent_buildtime_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDependencies) d = NULL;
+      g_auto (GStrv) list = NULL;
+
+      d = modulemd_dependencies_new ();
+      g_assert_nonnull (d);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+      list =
+        modulemd_dependencies_get_buildtime_streams_as_strv (d, "buildmod1");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+static void
+dependencies_test_dependencies_nonexistent_runtime_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDependencies) d = NULL;
+      g_auto (GStrv) list = NULL;
+
+      d = modulemd_dependencies_new ();
+      g_assert_nonnull (d);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+      /* Add some deps */
+      modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream2");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream1");
+      modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+        d, "defbuild");
+      modulemd_dependencies_set_empty_runtime_dependencies_for_module (
+        d, "defrun");
+
+      list =
+        modulemd_dependencies_get_runtime_streams_as_strv (d, "buildmod1");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -298,7 +328,7 @@ dependencies_test_equals (void)
 
 
 static void
-dependencies_test_copy (void)
+dependencies_test_copy_regular (void)
 {
   g_autoptr (ModulemdDependencies) d = NULL;
   g_autoptr (ModulemdDependencies) d_copy = NULL;
@@ -311,10 +341,6 @@ dependencies_test_copy (void)
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 0);
   g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_buildtime_streams_as_strv (d, "module1");
-  g_assert_null (list);
-  g_clear_pointer (&list, g_strfreev);
 
   d_copy = modulemd_dependencies_copy (d);
   g_assert_nonnull (d_copy);
@@ -322,10 +348,6 @@ dependencies_test_copy (void)
   list = modulemd_dependencies_get_buildtime_modules_as_strv (d_copy);
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 0);
-  g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_buildtime_streams_as_strv (d, "module1");
-  g_assert_null (list);
   g_clear_pointer (&list, g_strfreev);
   g_clear_object (&d_copy);
 
@@ -347,11 +369,7 @@ dependencies_test_copy (void)
   g_assert_cmpstr (list[0], ==, "builddef");
   g_assert_cmpstr (list[1], ==, "buildmod1");
   g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list = modulemd_dependencies_get_buildtime_streams_as_strv (d_copy,
-                                                              "nosuchmodule");
-  g_assert_null (list);
-  g_clear_pointer (&list, g_strfreev);
+
   list =
     modulemd_dependencies_get_buildtime_streams_as_strv (d_copy, "buildmod1");
   g_assert_nonnull (list);
@@ -371,11 +389,6 @@ dependencies_test_copy (void)
   g_assert_cmpstr (list[0], ==, "rundef");
   g_assert_cmpstr (list[1], ==, "runmod1");
   g_clear_pointer (&list, g_strfreev);
-  signal (SIGTRAP, sigtrap_handler);
-  list =
-    modulemd_dependencies_get_runtime_streams_as_strv (d_copy, "nosuchmodule");
-  g_assert_null (list);
-  g_clear_pointer (&list, g_strfreev);
   list = modulemd_dependencies_get_runtime_streams_as_strv (d_copy, "runmod1");
   g_assert_nonnull (list);
   g_assert_cmpint (g_strv_length (list), ==, 2);
@@ -387,6 +400,101 @@ dependencies_test_copy (void)
   g_assert_cmpint (g_strv_length (list), ==, 0);
   g_clear_pointer (&list, g_strfreev);
 }
+
+
+static void
+dependencies_test_copy_empty_nonexsitent_buildtime_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDependencies) d = NULL;
+      g_autoptr (ModulemdDependencies) d_copy = NULL;
+      g_auto (GStrv) list = NULL;
+
+      d = modulemd_dependencies_new ();
+      g_assert_nonnull (d);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+      d_copy = modulemd_dependencies_copy (d);
+      g_assert_nonnull (d_copy);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d_copy));
+
+      list =
+        modulemd_dependencies_get_buildtime_streams_as_strv (d, "module1");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+static void
+dependencies_test_copy_full_nonexsitent_buildtime_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDependencies) d = NULL;
+      g_autoptr (ModulemdDependencies) d_copy = NULL;
+      g_auto (GStrv) list = NULL;
+
+      d = modulemd_dependencies_new ();
+      g_assert_nonnull (d);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+      modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream2");
+      modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
+      modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+        d, "builddef");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream3");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream4");
+      modulemd_dependencies_set_empty_runtime_dependencies_for_module (
+        d, "rundef");
+
+      d_copy = modulemd_dependencies_copy (d);
+      g_assert_nonnull (d_copy);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d_copy));
+      list = modulemd_dependencies_get_buildtime_streams_as_strv (
+        d_copy, "nosuchmodule");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+static void
+dependencies_test_copy_full_nonexsitent_runtime_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdDependencies) d = NULL;
+      g_autoptr (ModulemdDependencies) d_copy = NULL;
+      g_auto (GStrv) list = NULL;
+
+      d = modulemd_dependencies_new ();
+      g_assert_nonnull (d);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d));
+
+      modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream2");
+      modulemd_dependencies_add_buildtime_stream (d, "buildmod1", "stream1");
+      modulemd_dependencies_set_empty_buildtime_dependencies_for_module (
+        d, "builddef");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream3");
+      modulemd_dependencies_add_runtime_stream (d, "runmod1", "stream4");
+      modulemd_dependencies_set_empty_runtime_dependencies_for_module (
+        d, "rundef");
+
+      d_copy = modulemd_dependencies_copy (d);
+      g_assert_nonnull (d_copy);
+      g_assert_true (MODULEMD_IS_DEPENDENCIES (d_copy));
+      list = modulemd_dependencies_get_runtime_streams_as_strv (
+        d_copy, "nosuchmodule");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
 
 static void
 dependencies_test_parse_yaml (void)
@@ -631,13 +739,29 @@ main (int argc, char *argv[])
   g_test_add_func ("/modulemd/v2/dependencies/construct",
                    dependencies_test_construct);
 
-  g_test_add_func ("/modulemd/v2/dependencies/dependencies",
-                   dependencies_test_dependencies);
+  g_test_add_func ("/modulemd/v2/dependencies/dependencies/regular",
+                   dependencies_test_dependencies_regular);
+  g_test_add_func (
+    "/modulemd/v2/dependencies/dependencies/nonexistent_buildtime_stream",
+    dependencies_test_dependencies_nonexistent_buildtime_stream);
+  g_test_add_func (
+    "/modulemd/v2/dependencies/dependencies/nonexistent_runtime_stream",
+    dependencies_test_dependencies_nonexistent_runtime_stream);
 
   g_test_add_func ("/modulemd/v2/dependencies/equals",
                    dependencies_test_equals);
 
-  g_test_add_func ("/modulemd/v2/dependencies/copy", dependencies_test_copy);
+  g_test_add_func ("/modulemd/v2/dependencies/copy/regular",
+                   dependencies_test_copy_regular);
+  g_test_add_func (
+    "/modulemd/v2/dependencies/copy/empty_nonexsitent_buildtime_stream",
+    dependencies_test_copy_empty_nonexsitent_buildtime_stream);
+  g_test_add_func (
+    "/modulemd/v2/dependencies/copy/full_nonexsitent_buildtime_stream",
+    dependencies_test_copy_full_nonexsitent_buildtime_stream);
+  g_test_add_func (
+    "/modulemd/v2/dependencies/copy/full_nonexsitent_rundtime_stream",
+    dependencies_test_copy_full_nonexsitent_runtime_stream);
 
   g_test_add_func ("/modulemd/v2/dependencies/yaml/parse",
                    dependencies_test_parse_yaml);

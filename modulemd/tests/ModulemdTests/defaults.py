@@ -29,6 +29,20 @@ except ImportError:
 from base import TestBase
 
 
+def _zero_mdversion():
+    defs = Modulemd.Defaults.new(0, "foo")
+
+
+def _unknown_mdversion():
+    defs = Modulemd.Defaults.new(
+        Modulemd.DefaultsVersionEnum.LATEST + 1, "foo"
+    )
+
+
+def _set_module_name_to_none(defs):
+    defs.props.module_name = None
+
+
 class TestDefaults(TestBase):
     def test_constructors(self):
         # Test that the new() function works
@@ -48,16 +62,14 @@ class TestDefaults(TestBase):
             Modulemd.Defaults()
 
         # Test with a zero mdversion
-        with self.assertRaisesRegex(TypeError, "constructor returned NULL"):
-            with self.expect_signal():
-                defs = Modulemd.Defaults.new(0, "foo")
+        self.assertRaisesRegexOrDies(
+            _zero_mdversion, TypeError, "constructor returned NULL"
+        )
 
         # Test with an unknown mdversion
-        with self.assertRaisesRegex(TypeError, "constructor returned NULL"):
-            with self.expect_signal():
-                defs = Modulemd.Defaults.new(
-                    Modulemd.DefaultsVersionEnum.LATEST + 1, "foo"
-                )
+        self.assertRaisesRegexOrDies(
+            _unknown_mdversion, TypeError, "constructor returned NULL"
+        )
 
         # Test with no name
         with self.assertRaisesRegex(
@@ -99,8 +111,7 @@ class TestDefaults(TestBase):
         assert defs.get_module_name() == "foo"
 
         # Ensure we cannot set the module_name
-        with self.expect_signal():
-            defs.props.module_name = None
+        self.assertProcessFailure(_set_module_name_to_none, defs)
 
     def test_modified(self):
         defs = Modulemd.Defaults.new(

@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-profile.h"
 #include "private/glib-extensions.h"
@@ -26,16 +25,8 @@ typedef struct _ProfileFixture
 {
 } ProfileFixture;
 
-gboolean signaled = FALSE;
-
 static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
-
-static void
-profile_test_construct (void)
+profile_test_construct_regular (void)
 {
   g_autoptr (ModulemdProfile) p = NULL;
   g_auto (GStrv) rpms = NULL;
@@ -56,27 +47,52 @@ profile_test_construct (void)
   g_assert_true (MODULEMD_IS_PROFILE (p));
   g_assert_cmpstr (modulemd_profile_get_name (p), ==, "testprofile");
   g_clear_object (&p);
+}
 
-  /* Test that we abort with a NULL name to new() */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  p = modulemd_profile_new (NULL);
-  g_assert_true (signaled);
-  g_clear_object (&p);
 
-  /* Test that we abort if we instantiate without a name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  p = g_object_new (MODULEMD_TYPE_PROFILE, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&p);
+/* Test that we abort with a NULL name to new() */
+static void
+profile_test_construct_new_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdProfile) p = NULL;
+      p = modulemd_profile_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* test that we abort if we instantiate with a NULL name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  p = g_object_new (MODULEMD_TYPE_PROFILE, "name", NULL, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&p);
+
+/* Test that we abort if we instantiate without a name */
+static void
+profile_test_construct_init_no_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdProfile) p = NULL;
+      p = g_object_new (MODULEMD_TYPE_PROFILE, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+/* Test that we abort if we instantiate with a NULL name */
+static void
+profile_test_construct_init_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdProfile) p = NULL;
+
+      p = g_object_new (MODULEMD_TYPE_PROFILE, "name", NULL, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -353,12 +369,23 @@ profile_test_get_name (void)
 
   g_object_get (p, "name", &name, NULL);
   g_assert_cmpstr (name, ==, "testprofile");
+}
 
-  /* Test that name is immutable */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  g_object_set (p, "name", "notatest", NULL);
-  g_assert_true (signaled);
+
+/* Test that name is immutable */
+static void
+profile_test_name_is_immutable (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdProfile) p = NULL;
+      p = modulemd_profile_new ("testprofile");
+
+      g_object_set (p, "name", "notatest", NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -576,13 +603,23 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/profile/construct", profile_test_construct);
+  g_test_add_func ("/modulemd/v2/profile/construct/regular",
+                   profile_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/profile/construct/new_null",
+                   profile_test_construct_new_null);
+  g_test_add_func ("/modulemd/v2/profile/construct/init_no_name",
+                   profile_test_construct_init_no_name);
+  g_test_add_func ("/modulemd/v2/profile/construct/init_null_name",
+                   profile_test_construct_init_null_name);
 
   g_test_add_func ("/modulemd/v2/profile/equals", profile_test_equals);
 
   g_test_add_func ("/modulemd/v2/profile/copy", profile_test_copy);
 
   g_test_add_func ("/modulemd/v2/profile/get_name", profile_test_get_name);
+
+  g_test_add_func ("/modulemd/v2/profile/name_is_immutable",
+                   profile_test_name_is_immutable);
 
   g_test_add_func ("/modulemd/v2/profile/get_set_description",
                    profile_test_get_set_description);

@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-subdocument-info.h"
 #include "modulemd-translation-entry.h"
@@ -30,17 +29,9 @@ typedef struct _TranslationFixture
 {
 } TranslationFixture;
 
-gboolean signaled = FALSE;
 
 static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
-
-
-static void
-translation_test_construct (void)
+translation_test_construct_regular (void)
 {
   g_autoptr (ModulemdTranslation) t = NULL;
   g_auto (GStrv) locales = NULL;
@@ -94,41 +85,64 @@ translation_test_construct (void)
   g_assert_cmpstr (modulemd_translation_get_module_stream (t), ==, "teststr");
   g_assert_cmpint (modulemd_translation_get_modified (t), ==, modified);
   g_clear_object (&t);
+}
 
-  /* Test that object_new does not work without a version */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "module_name", "testmod",
-                    "module_stream", "teststr",
-                    NULL);
-  // clang-format on
-  g_assert_true (signaled);
-  g_clear_object (&t);
+/* Test that object_new does not work without a version */
+static void
+translation_test_construct_no_version (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdTranslation) t = NULL;
+      // clang-format off
+      t = g_object_new (MODULEMD_TYPE_TRANSLATION,
+                        "module_name", "testmod",
+                        "module_stream", "teststr",
+                        NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* Test that object_new does not work without a name */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "version", translation_version,
-                    "module_stream", "teststr", NULL);
-  // clang-format on
-  g_assert_true (signaled);
-  g_clear_object (&t);
+/* Test that object_new does not work without a name */
+static void
+translation_test_construct_no_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      guint64 translation_version = 1;
+      g_autoptr (ModulemdTranslation) t = NULL;
+      // clang-format off
+      t = g_object_new (MODULEMD_TYPE_TRANSLATION,
+                        "version", translation_version,
+                        "module_stream", "teststr", NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* Test that object_new does not work without a stream */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  t = g_object_new (MODULEMD_TYPE_TRANSLATION,
-                    "version", translation_version,
-                    "module_name", "testmod",
-                    NULL);
-  // clang-format on
-  g_assert_true (signaled);
-  g_clear_object (&t);
+/* Test that object_new does not work without a stream */
+static void
+translation_test_construct_no_stream (void)
+{
+  if (g_test_subprocess ())
+    {
+      guint64 translation_version = 1;
+      g_autoptr (ModulemdTranslation) t = NULL;
+      // clang-format off
+      t = g_object_new (MODULEMD_TYPE_TRANSLATION,
+                        "version", translation_version,
+                        "module_name", "testmod",
+                        NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 static void
@@ -416,8 +430,14 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/translation/construct",
-                   translation_test_construct);
+  g_test_add_func ("/modulemd/v2/translation/construct/regular",
+                   translation_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/translation/construct/no_version",
+                   translation_test_construct_no_version);
+  g_test_add_func ("/modulemd/v2/translation/construct/no_name",
+                   translation_test_construct_no_name);
+  g_test_add_func ("/modulemd/v2/translation/construct/no_stream",
+                   translation_test_construct_no_stream);
 
   g_test_add_func ("/modulemd/v2/translation/copy", translation_test_copy);
 

@@ -52,6 +52,21 @@ class TestBase(unittest.TestCase):
         elif self._caught_signal and not expect_signal:
             raise AssertionError("Signal caught in non-warning state")
 
+    def assertProcessFailure(self, callable, *args):
+        """Calls the callable in a subprocess and checks whether the process was
+        killed with a signal depending on Glib warning fatality."""
+        pid = os.fork()
+        if pid == 0:
+            callable(*args)
+            os._exit(0)
+        _, status = os.waitpid(pid, 0)
+        if self.warnings_fatal:
+            if not os.WIFSIGNALED(status):
+                raise AssertionError("Child process was not aborted")
+        else:
+            if os.WIFSIGNALED(status):
+                raise AssertionError("Child process was unexpectedly aborted")
+
     @property
     def warnings_fatal(self):
         gdebug = os.getenv("G_DEBUG", "").split(",")
@@ -67,3 +82,13 @@ class TestBase(unittest.TestCase):
             return super(TestBase, self).assertRaisesRegex(*args, **kwargs)
         except AttributeError:
             return self.assertRaisesRegexp(*args, **kwargs)
+
+    def assertRaisesRegexOrDies(self, callable, *args, **kwargs):
+        """Checks that the callable terminates a process if Glib warnings are
+        fatal. Otherwise, that the callable raised a given exception type with
+        the given value matching a regular expression."""
+        if self.warnings_fatal:
+            self.assertProcessFailure(callable)
+        else:
+            with self.assertRaisesRegex(*args, **kwargs):
+                callable()

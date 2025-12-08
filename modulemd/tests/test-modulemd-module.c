@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-defaults.h"
 #include "modulemd-module-index-merger.h"
@@ -38,7 +37,7 @@ typedef struct _ModuleFixture
 
 
 static void
-module_test_construct (void)
+module_test_construct_regular (void)
 {
   g_autoptr (ModulemdModule) m = NULL;
   g_autoptr (GPtrArray) list = NULL;
@@ -66,27 +65,51 @@ module_test_construct (void)
   g_assert_true (MODULEMD_IS_MODULE (m));
   g_assert_cmpstr (modulemd_module_get_module_name (m), ==, "testmodule");
   g_clear_object (&m);
+}
 
-  /* Test that we abort with a NULL name to new() */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  m = modulemd_module_new (NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_clear_object (&m);
 
-  /* Test that we abort if we instantiate without a name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  m = g_object_new (MODULEMD_TYPE_MODULE, NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_clear_object (&m);
+/* Test that we abort with a NULL name to new() */
+static void
+module_test_construct_new_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdModule) m = NULL;
+      m = modulemd_module_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* test that we abort if we instantiate with a NULL name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  m = g_object_new (MODULEMD_TYPE_MODULE, "module-name", NULL, NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  g_clear_object (&m);
+
+/* Test that we abort if we instantiate without a name */
+static void
+module_test_construct_init_no_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdModule) m = NULL;
+      m = g_object_new (MODULEMD_TYPE_MODULE, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
+/* test that we abort if we instantiate with a NULL name */
+static void
+module_test_construct_init_null_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdModule) m = NULL;
+      m = g_object_new (MODULEMD_TYPE_MODULE, "module-name", NULL, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -801,7 +824,14 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/module/construct", module_test_construct);
+  g_test_add_func ("/modulemd/v2/module/construct/regular",
+                   module_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/module/construct/new_null_name",
+                   module_test_construct_new_null_name);
+  g_test_add_func ("/modulemd/v2/module/construct/init_no_name",
+                   module_test_construct_init_no_name);
+  g_test_add_func ("/modulemd/v2/module/construct/init_null_name",
+                   module_test_construct_init_null_name);
 
   g_test_add_func ("/modulemd/v2/module/defaults", module_test_defaults);
 

@@ -30,6 +30,18 @@ from base import TestBase
 import datetime
 
 
+def _construct_without_arguments():
+    Modulemd.ServiceLevel()
+
+
+def _construct_with_none_name():
+    Modulemd.ServiceLevel(name=None)
+
+
+def _set_props_name(modulemd_servicelevel, value):
+    modulemd_servicelevel.props.name = value
+
+
 class TestServiceLevel(TestBase):
     def test_constructors(self):
         # Test that the new() function works
@@ -56,12 +68,10 @@ class TestServiceLevel(TestBase):
             assert "does not allow None as a value" in e.__str__()
 
         # Test that we fail if object is instantiated without a name
-        with self.expect_signal():
-            sl = Modulemd.ServiceLevel()
+        self.assertProcessFailure(_construct_without_arguments)
 
         # Test that we fail if object is instantiated with a None name
-        with self.expect_signal():
-            sl = Modulemd.ServiceLevel(name=None)
+        self.assertProcessFailure(_construct_with_none_name)
 
     def test_copy(self):
         sl = Modulemd.ServiceLevel.new("foo")
@@ -93,8 +103,7 @@ class TestServiceLevel(TestBase):
         assert sl.props.name == "foo"
 
         # This property is not writable, make sure it fails to attempt it
-        with self.expect_signal():
-            sl.props.name = "bar"
+        self.assertProcessFailure(_set_props_name, sl, "bar")
 
     def test_get_set_eol(self):
         sl = Modulemd.ServiceLevel.new("foo")

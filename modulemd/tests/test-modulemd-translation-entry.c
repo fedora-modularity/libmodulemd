@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-translation-entry.h"
 #include "private/glib-extensions.h"
@@ -26,16 +25,8 @@ typedef struct _TranslationEntryFixture
 {
 } TranslationEntryFixture;
 
-gboolean signaled = FALSE;
-
 static void
-sigtrap_handler (int UNUSED (sig_num))
-{
-  signaled = TRUE;
-}
-
-static void
-translation_entry_test_construct (void)
+translation_entry_test_construct_regular (void)
 {
   g_autoptr (ModulemdTranslationEntry) te = NULL;
   g_auto (GStrv) profile_names = NULL;
@@ -110,34 +101,55 @@ translation_entry_test_construct (void)
   g_assert_cmpstr (
     modulemd_translation_entry_get_description (te), ==, "jumped");
   g_clear_object (&te);
+}
 
 
-  /* Test that we abort if we call new() with a NULL locale */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  te = modulemd_translation_entry_new (NULL);
-  g_assert_true (signaled);
-  g_clear_object (&te);
+/* Test that we abort if we call new() with a NULL locale */
+static void
+translation_entry_test_construct_new_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdTranslationEntry) te = NULL;
+      te = modulemd_translation_entry_new (NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 
-  /* Test that we abort if we instatiate without a locale */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  te = g_object_new (MODULEMD_TYPE_TRANSLATION_ENTRY, NULL);
-  g_assert_true (signaled);
-  g_clear_object (&te);
+/* Test that we abort if we instatiate without a locale */
+static void
+translation_entry_test_construct_init_no_locale (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdTranslationEntry) te = NULL;
+      te = g_object_new (MODULEMD_TYPE_TRANSLATION_ENTRY, NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
 
-  /* Test that we abort if we instatiate with a NULL locale */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  // clang-format off
-  te = g_object_new (MODULEMD_TYPE_TRANSLATION_ENTRY,
-                     "locale", NULL,
-                     NULL);
-  // clang-format on
-  g_assert_true (signaled);
-  g_clear_object (&te);
+/* Test that we abort if we instatiate with a NULL locale */
+static void
+translation_entry_test_construct_init_null_locale (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdTranslationEntry) te = NULL;
+      // clang-format off
+      te = g_object_new (MODULEMD_TYPE_TRANSLATION_ENTRY,
+                         "locale", NULL,
+                         NULL);
+      // clang-format on
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -334,12 +346,26 @@ translation_entry_test_get_locale (void)
 
   g_object_get (te, "locale", &locale, NULL);
   g_assert_cmpstr (locale, ==, "en_US");
+}
 
-  /* Test that locale is immutable */
-  signaled = FALSE;
-  signal (SIGTRAP, sigtrap_handler);
-  g_object_set (te, "locale", "en_GB", NULL);
-  g_assert_true (signaled);
+
+/* Test that locale is immutable */
+static void
+translation_entry_test_locale_is_immutable (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdTranslationEntry) te = NULL;
+
+      te = modulemd_translation_entry_new ("en_US");
+      g_assert_nonnull (te);
+      g_assert_true (MODULEMD_IS_TRANSLATION_ENTRY (te));
+
+      g_object_set (te, "locale", "en_GB", NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 
@@ -609,14 +635,23 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/translationentry/construct",
-                   translation_entry_test_construct);
+  g_test_add_func ("/modulemd/v2/translationentry/construct/regular",
+                   translation_entry_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/translationentry/construct/new_null",
+                   translation_entry_test_construct_new_null);
+  g_test_add_func ("/modulemd/v2/translationentry/construct/init_no_locale",
+                   translation_entry_test_construct_init_no_locale);
+  g_test_add_func ("/modulemd/v2/translationentry/construct/init_null_locale",
+                   translation_entry_test_construct_init_null_locale);
 
   g_test_add_func ("/modulemd/v2/translationentry/copy",
                    translation_entry_test_copy);
 
   g_test_add_func ("/modulemd/v2/translationentry/get_locale",
                    translation_entry_test_get_locale);
+
+  g_test_add_func ("/modulemd/v2/translationentry/locale_is_immutable",
+                   translation_entry_test_locale_is_immutable);
 
   g_test_add_func ("/modulemd/v2/translationentry/get_set_summary",
                    translation_entry_test_get_set_summary);

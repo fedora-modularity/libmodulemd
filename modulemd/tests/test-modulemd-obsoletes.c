@@ -14,7 +14,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <locale.h>
-#include <signal.h>
 
 #include "modulemd-subdocument-info.h"
 #include "modulemd-obsoletes.h"
@@ -26,7 +25,7 @@
 #include "private/test-utils.h"
 
 static void
-obsoletes_test_construct (void)
+obsoletes_test_construct_regular (void)
 {
   g_autoptr (ModulemdObsoletes) e = NULL;
 
@@ -39,33 +38,51 @@ obsoletes_test_construct (void)
   g_assert_cmpstr (modulemd_obsoletes_get_module_stream (e), ==, "teststream");
   g_assert_cmpstr (modulemd_obsoletes_get_message (e), ==, "testmessage");
   g_clear_object (&e);
+}
 
-  /* Test new() with a NULL module_name */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  e = modulemd_obsoletes_new (
-    MD_OBSOLETES_VERSION_ONE, 2, NULL, "teststream", "testmessage");
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  /* If we trap the error, obsoletes actually returns a value here, so free it */
-  g_clear_object (&e);
+/* Test new() with a NULL module_name */
+static void
+obsoletes_test_construct_null_module_name (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdObsoletes) e = NULL;
+      e = modulemd_obsoletes_new (
+        MD_OBSOLETES_VERSION_ONE, 2, NULL, "teststream", "testmessage");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* Test new() with a NULL module_context */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  e = modulemd_obsoletes_new (
-    MD_OBSOLETES_VERSION_ONE, 2, "testmodule", NULL, "testmessage");
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  /* If we trap the error, obsoletes actually returns a value here, so free it */
-  g_clear_object (&e);
+/* Test new() with a NULL module_context */
+static void
+obsoletes_test_construct_null_module_context (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdObsoletes) e = NULL;
+      e = modulemd_obsoletes_new (
+        MD_OBSOLETES_VERSION_ONE, 2, "testmodule", NULL, "testmessage");
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
 
-  /* Test new() with a NULL message */
-  modulemd_test_signal = 0;
-  signal (SIGTRAP, modulemd_test_signal_handler);
-  e = modulemd_obsoletes_new (
-    MD_OBSOLETES_VERSION_ONE, 2, "testmodule", "teststream", NULL);
-  g_assert_cmpint (modulemd_test_signal, ==, SIGTRAP);
-  /* If we trap the error, obsoletes actually returns a value here, so free it */
-  g_clear_object (&e);
+/* Test new() with a NULL message */
+static void
+obsoletes_test_construct_null_message (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdObsoletes) e = NULL;
+      e = modulemd_obsoletes_new (
+        MD_OBSOLETES_VERSION_ONE, 2, "testmodule", "teststream", NULL);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
 }
 
 static void
@@ -496,8 +513,14 @@ main (int argc, char *argv[])
 
   // Define the tests.
 
-  g_test_add_func ("/modulemd/v2/obsoletes/construct",
-                   obsoletes_test_construct);
+  g_test_add_func ("/modulemd/v2/obsoletes/construct/regular",
+                   obsoletes_test_construct_regular);
+  g_test_add_func ("/modulemd/v2/obsoletes/construct/null_module_name",
+                   obsoletes_test_construct_null_module_name);
+  g_test_add_func ("/modulemd/v2/obsoletes/construct/null_module_context",
+                   obsoletes_test_construct_null_module_context);
+  g_test_add_func ("/modulemd/v2/obsoletes/construct/null_message",
+                   obsoletes_test_construct_null_message);
 
   g_test_add_func ("/modulemd/v2/obsoletes/copy", obsoletes_test_copy);
 

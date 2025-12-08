@@ -28,6 +28,18 @@ except ImportError:
 from base import TestBase
 
 
+def construct_without_arguments():
+    Modulemd.Profile()
+
+
+def construct_with_none_name():
+    Modulemd.Profile(name=None)
+
+
+def _set_props_name(modulemd_profile, value):
+    modulemd_profile.props.name = value
+
+
 class TestProfile(TestBase):
     def test_constructor(self):
         # Test that the new() function works
@@ -51,11 +63,9 @@ class TestProfile(TestBase):
             Modulemd.Profile.new(None)
         assert "does not allow None as a value" in cm.exception.__str__()
 
-        with self.expect_signal():
-            Modulemd.Profile()
+        self.assertProcessFailure(construct_without_arguments)
 
-        with self.expect_signal():
-            Modulemd.Profile(name=None)
+        self.assertProcessFailure(construct_with_none_name)
 
     def test_copy(self):
         p_orig = Modulemd.Profile(name="testprofile")
@@ -84,8 +94,7 @@ class TestProfile(TestBase):
         assert p.get_name() == "testprofile"
         assert p.props.name == "testprofile"
 
-        with self.expect_signal():
-            p.props.name = "notadrill"
+        self.assertProcessFailure(_set_props_name, p, "notadrill")
 
     def test_get_set_description(self):
         p = Modulemd.Profile(name="testprofile")

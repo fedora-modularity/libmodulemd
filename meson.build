@@ -128,6 +128,14 @@ has_g_spawn_check_wait_status = cc.has_function(
     'g_spawn_check_wait_status',
     dependencies : [ glib ])
 
+# Check whether glib2 has G_TEST_SUBPROCESS_DEFAULT enum member.
+has_g_test_subprocess_default = cc.compiles(
+    '''#include <glib.h>
+    int foo = G_TEST_SUBPROCESS_DEFAULT;
+    ''',
+    dependencies : [ glib ],
+    name : 'G_TEST_SUBPROCESS_DEFAULT')
+
 with_py3 = get_option('with_py3')
 if with_py3
     if get_option('skip_introspection')

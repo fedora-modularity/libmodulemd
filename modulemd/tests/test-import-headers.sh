@@ -32,22 +32,34 @@ EOF
 
   echo "gcc \`pkg-config --cflags gobject-2.0\` \
             \`pkg-config --cflags yaml-0.1\` \
+            ${CPPFLAGS} \
+            ${CFLAGS} \
+            ${LDFLAGS} \
             -I `dirname $arg` \
             -o $header.out \
             $header.c"
   gcc `pkg-config --cflags gobject-2.0` \
       `pkg-config --cflags yaml-0.1` \
+      ${CPPFLAGS} \
+      ${CFLAGS} \
+      ${LDFLAGS} \
       -I `dirname $arg` \
       -o $header.out \
       $header.c
 
   echo "g++ \`pkg-config --cflags gobject-2.0\` \
             \`pkg-config --cflags yaml-0.1\` \
+            ${CPPFLAGS} \
+            ${CXXFLAGS} \
+            ${LDFLAGS} \
             -I `dirname $arg` \
             -o $header.out \
             $header.c"
   g++ `pkg-config --cflags gobject-2.0` \
       `pkg-config --cflags yaml-0.1` \
+      ${CPPFLAGS} \
+      ${CXXFLAGS} \
+      ${LDFLAGS} \
       -I `dirname $arg` \
       -o $header.out \
       $header.c

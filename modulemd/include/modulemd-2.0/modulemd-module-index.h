@@ -165,6 +165,9 @@ modulemd_module_index_new (void);
  * @failures appropriately if any of the YAML subdocuments were invalid or
  * sets @error if there was a fatal parse error.
  *
+ * Support for compressed YAML files is deprecated. In the future this
+ * function will only support uncompressed YAML files.
+ *
  * Since: 2.0
  */
 gboolean

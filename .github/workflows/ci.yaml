@@ -352,8 +352,8 @@ jobs:
     steps:
       - name: Enable docs in container
         run:
-          sed -i /etc/zypp/zypp.conf
-              -e "s/rpm.install.excludedocs = yes/rpm.install.excludedocs = no/"
+          printf '[main]\nrpm.install.excludedocs = no\n'
+              > /etc/zypp/zypp.conf.d/excludedocs.conf
 
       - name: Install dependencies
         run:

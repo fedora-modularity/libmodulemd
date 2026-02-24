@@ -103,7 +103,7 @@ class TestServiceLevel(TestBase):
         assert sl.props.name == "foo"
 
         # This property is not writable, make sure it fails to attempt it
-        self.assertProcessFailure(_set_props_name, sl, "bar")
+        self.assertTypeExceptionOrProcessFailure(_set_props_name, sl, "bar")
 
     def test_get_set_eol(self):
         sl = Modulemd.ServiceLevel.new("foo")

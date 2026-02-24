@@ -67,6 +67,36 @@ class TestBase(unittest.TestCase):
             if os.WIFSIGNALED(status):
                 raise AssertionError("Child process was unexpectedly aborted")
 
+    def assertTypeExceptionOrProcessFailure(self, callable, *args):
+        """Calls the callable in a subprocess and checks that the process
+        raised a TypeError exception, or was killed depending on Glib warning
+        fatality.
+
+        Since pygobject-3.55.0 setting a G_PARAM_CONSTRUCT_ONLY property
+        raises a Python exception. Old pygobject continues down to Glib
+        which kills the process if Glib warnings a fatal, otherwise Glib
+        warning is printed and the code continues.
+        """
+        pid = os.fork()
+        if pid == 0:
+            try:
+                callable(*args)
+            except TypeError:
+                os._exit(1)
+            os._exit(0)
+        _, status = os.waitpid(pid, 0)
+        if os.WIFEXITED(status) and os.WEXITSTATUS(status) == 1:
+            return
+        if self.warnings_fatal:
+            if not os.WIFSIGNALED(status):
+                raise AssertionError(
+                    "Child process did not raise TypeError "
+                    "exception or was not aborted"
+                )
+        else:
+            if os.WIFSIGNALED(status):
+                raise AssertionError("Child process was unexpectedly aborted")
+
     @property
     def warnings_fatal(self):
         gdebug = os.getenv("G_DEBUG", "").split(",")

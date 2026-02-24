@@ -94,7 +94,9 @@ class TestProfile(TestBase):
         assert p.get_name() == "testprofile"
         assert p.props.name == "testprofile"
 
-        self.assertProcessFailure(_set_props_name, p, "notadrill")
+        self.assertTypeExceptionOrProcessFailure(
+            _set_props_name, p, "notadrill"
+        )
 
     def test_get_set_description(self):
         p = Modulemd.Profile(name="testprofile")

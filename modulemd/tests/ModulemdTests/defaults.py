@@ -111,7 +111,9 @@ class TestDefaults(TestBase):
         assert defs.get_module_name() == "foo"
 
         # Ensure we cannot set the module_name
-        self.assertProcessFailure(_set_module_name_to_none, defs)
+        self.assertTypeExceptionOrProcessFailure(
+            _set_module_name_to_none, defs
+        )
 
     def test_modified(self):
         defs = Modulemd.Defaults.new(

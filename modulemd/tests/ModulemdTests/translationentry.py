@@ -172,7 +172,7 @@ class TestTranslationEntry(TestBase):
         assert te.get_locale() == "en_US"
         assert te.props.locale == "en_US"
 
-        self.assertProcessFailure(_set_locale, te)
+        self.assertTypeExceptionOrProcessFailure(_set_locale, te)
 
     def test_get_set_summary(self):
         te = Modulemd.TranslationEntry(locale="en_US")

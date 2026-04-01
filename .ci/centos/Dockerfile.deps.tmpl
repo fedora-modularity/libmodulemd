@@ -31,11 +31,9 @@ ifelse(eval(cosrelease == 8), 1, `dnl
         pkgconfig \
 ifelse(eval(cosrelease < 9), 1, `dnl
         python2-devel \
-        python2-six \
         python36-devel \
 ',`dnl
         python3-devel \
-        python3-six \
 ')dnl
 ifelse(eval(cosrelease < 8), 1, `dnl
         python-gobject-base \

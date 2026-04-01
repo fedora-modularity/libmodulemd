@@ -237,7 +237,7 @@ jobs:
         run: sed -i -e '\| usr/share/gtk-doc/|d' -e '\| usr/share/doc/|d' /etc/pacman.conf
 
       - name: Install dependencies
-        run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-devel glib2-docs gobject-introspection gtk-doc jq libyaml meson python-gobject python-six valgrind
+        run: pacman -Syu --needed --noconfirm base-devel file git glib2 glib2-devel glib2-docs gobject-introspection gtk-doc jq libyaml meson python-gobject valgrind
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -300,7 +300,6 @@ jobs:
               openssl
               pkgconf
               popt-devel
-              python3-six
               python3-autopep8
               python3-devel
               python3-gitpython

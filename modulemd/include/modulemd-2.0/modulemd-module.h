@@ -326,7 +326,7 @@ modulemd_module_get_obsoletes (ModulemdModule *self);
  * @context: (in) (nullable): The stream context to look up obsoletes for.
  *
  * Returns: (transfer none): The newest active obsoletes attached to this module with
- * specified stream and context (when eol_date is not set or it already occured
+ * specified stream and context (when eol_date is not set or it already occurred
  * the obsoletes is active). If no context is passed it matches obsoletes without context.
  *
  * Since: 2.10

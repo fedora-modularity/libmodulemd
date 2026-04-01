@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 /**
  * MMD_MAXCONTEXTLEN:
  *
- * The ModuleStream v3 specification defines the maximum lenth of the context
+ * The ModuleStream v3 specification defines the maximum length of the context
  * field.
  *
  * Since: 2.10

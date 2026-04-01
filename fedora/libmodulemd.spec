@@ -56,7 +56,6 @@ more details.
 Summary: Python 2 bindings for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: python-gobject-base
-Requires: python-six
 
 %description -n python2-%{name}
 Python 2 bindings for %{name}
@@ -67,13 +66,6 @@ Python 2 bindings for %{name}
 Summary: Python 3 bindings for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: python%{python3_pkgversion}-gobject-base
-
-%if (0%{?rhel} && 0%{?rhel} <= 7)
-# The py3_dist macro on EPEL 7 doesn't work right at the moment
-Requires: python3.6dist(six)
-%else
-Requires: %{py3_dist six}
-%endif
 
 %description -n python%{python3_pkgversion}-%{name}
 Python %{python3_pkgversion} bindings for %{name}

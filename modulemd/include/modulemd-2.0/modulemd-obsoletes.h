@@ -246,8 +246,8 @@ modulemd_obsoletes_get_modified (ModulemdObsoletes *self);
  * @self: (in): This #ModulemdObsoletes object.
  *
  * Returns: If this #ModulemdObsoletes object has eol_date set and the
- * date has not occured yet it returns false otherwise it returns true.
- * (When eol_date is not set or it already occured the obsoletes is active.)
+ * date has not occurred yet it returns false otherwise it returns true.
+ * (When eol_date is not set or it already occurred the obsoletes is active.)
  *
  * Since: 2.10
  */

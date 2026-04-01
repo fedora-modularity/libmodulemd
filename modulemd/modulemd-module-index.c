@@ -1618,7 +1618,7 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
 
           if (obsoletes)
             {
-              /* Add obsoletes, overriding if we enounter one with
+              /* Add obsoletes, overriding if we encounter one with
                * identical module, stream, context and modified time.
                */
               if (!modulemd_module_index_add_obsoletes (

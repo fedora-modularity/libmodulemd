@@ -1,7 +1,19 @@
-specfile_path: fedora/libmodulemd.spec
-upstream_package_name: libmodulemd
-upstream_project_url: https://github.com/fedora-modularity/libmodulemd
-downstream_package_name: libmodulemd
+_:
+  project_settings: &project_settings
+    upstream_package_name: libmodulemd
+    upstream_project_url: https://github.com/fedora-modularity/libmodulemd
+    downstream_package_name: libmodulemd
+    specfile_path: fedora/libmodulemd.spec
+
+packages:
+  libmodulemd:
+    << : *project_settings
+    version_suffix: "^{PACKIT_PROJECT_SNAPSHOTID}"
+    update_release: false
+
+  # rpmbuild doesn't allow '^' in version on rhel 7, don't use caret notation
+  libmodulemd-epel7:
+    << : *project_settings
 
 actions:
   get-current-version: ./get_version.sh
@@ -16,6 +28,7 @@ jobs:
 
 - job: copr_build
   trigger: pull_request
+  packages: [libmodulemd]
   metadata:
     targets:
     - fedora-all
@@ -24,7 +37,13 @@ jobs:
     - fedora-rawhide-ppc64le
     # fedora-rawhide-x86_64 is included in fedora-all
     # fedora-rawhide-s390x has too long wait queue
-    - epel-7
     - epel-8
     - centos-stream-9
     - centos-stream-10
+
+- job: copr_build
+  trigger: pull_request
+  packages: [libmodulemd-epel7]
+  metadata:
+    targets:
+    - epel-7

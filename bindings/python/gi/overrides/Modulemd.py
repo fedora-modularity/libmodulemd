@@ -16,10 +16,15 @@ from ..overrides import override
 
 import functools
 
-from six import text_type
 from gi.repository import GLib
 
 import datetime
+import sys
+
+if sys.version_info[0] >= 3:
+    text_type = str
+else:
+    text_type = unicode  # noqa: F821
 
 Modulemd = get_introspection_module("Modulemd")
 

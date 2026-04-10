@@ -64,7 +64,7 @@ fi
 arch=$(uname -m)
 mkdir -p rpmbuild/RPMS/
 pushd rpmbuild/RPMS/
-packit --debug build locally ../..
+packit --debug build locally -p libmodulemd ../..
 createrepo_c $arch
 
 $RETRY_CMD dnf -y install --nogpgcheck \

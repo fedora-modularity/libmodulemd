@@ -1442,6 +1442,16 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
       return FALSE;
     }
 
+  if (!modulemd_translation_get_module_stream (translation))
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MMD_ERROR_MISSING_REQUIRED,
+                   "The translation requries a module stream when adding to "
+                   "ModuleIndex.");
+      return FALSE;
+    }
+
   modulemd_module_add_translation (
     get_or_create_module (self,
                           modulemd_translation_get_module_name (translation)),

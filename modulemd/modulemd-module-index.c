@@ -1427,10 +1427,20 @@ modulemd_module_index_upgrade_defaults (ModulemdModuleIndex *self,
 gboolean
 modulemd_module_index_add_translation (ModulemdModuleIndex *self,
                                        ModulemdTranslation *translation,
-                                       GError **UNUSED (error))
+                                       GError **error)
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_TRANSLATION (translation), FALSE);
+
+  if (!modulemd_translation_get_module_name (translation))
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MMD_ERROR_MISSING_REQUIRED,
+                   "The translation requries a module name when adding to "
+                   "ModuleIndex.");
+      return FALSE;
+    }
 
   modulemd_module_add_translation (
     get_or_create_module (self,

@@ -1430,6 +1430,7 @@ modulemd_module_index_add_translation (ModulemdModuleIndex *self,
                                        GError **UNUSED (error))
 {
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
+  g_return_val_if_fail (MODULEMD_IS_TRANSLATION (translation), FALSE);
 
   modulemd_module_add_translation (
     get_or_create_module (self,

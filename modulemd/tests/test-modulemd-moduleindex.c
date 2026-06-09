@@ -1980,6 +1980,23 @@ test_module_index_search_rpms (void)
 }
 
 
+/* NULL translation should be rejected */
+static void
+test_module_index_add_translation_null (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autoptr (ModulemdModuleIndex) index = NULL;
+      g_autoptr (GError) error = NULL;
+      index = modulemd_module_index_new ();
+      modulemd_module_index_add_translation (index, NULL, &error);
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -2041,6 +2058,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/module/index/search_rpms",
                    test_module_index_search_rpms);
+
+  g_test_add_func ("/modulemd/v2/module/index/add_translation/null",
+                   test_module_index_add_translation_null);
 
   return g_test_run ();
 }

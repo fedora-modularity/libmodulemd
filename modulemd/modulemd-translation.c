@@ -103,7 +103,15 @@ modulemd_translation_copy (ModulemdTranslation *self)
 gboolean
 modulemd_translation_validate (ModulemdTranslation *self, GError **error)
 {
-  g_return_val_if_fail (MODULEMD_IS_TRANSLATION (self), FALSE);
+  if (!MODULEMD_IS_TRANSLATION (self))
+    {
+      g_set_error_literal (error,
+                           MODULEMD_ERROR,
+                           MMD_ERROR_VALIDATE,
+                           "The object is not ModulemdTranslation type.");
+      g_return_val_if_fail (MODULEMD_IS_TRANSLATION (self), FALSE);
+      return FALSE;
+    }
 
   if (g_str_equal (modulemd_translation_get_module_name (self),
                    T_PLACEHOLDER_STRING))

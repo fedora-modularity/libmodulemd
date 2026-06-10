@@ -379,10 +379,18 @@ modulemd_variant_deep_copy (GVariant *variant)
 gboolean
 modulemd_validate_nevra (const gchar *nevra)
 {
-  g_autofree gchar *tmp = g_strdup (nevra);
-  gsize len = strlen (nevra);
+  g_autofree gchar *tmp = NULL;
+  gsize len;
   gchar *i;
   gchar *endptr;
+
+  if (!nevra)
+    {
+      return FALSE;
+    }
+
+  tmp = g_strdup (nevra);
+  len = strlen (nevra);
 
   /* Since the "name" portion of a NEVRA can have an infinite number of
    * hyphens, we need to parse from the end backwards.

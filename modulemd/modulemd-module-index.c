@@ -1289,6 +1289,16 @@ modulemd_module_index_add_obsoletes (ModulemdModuleIndex *self,
   g_return_val_if_fail (MODULEMD_IS_MODULE_INDEX (self), FALSE);
   g_return_val_if_fail (MODULEMD_IS_OBSOLETES (obsoletes), FALSE);
 
+  if (!modulemd_obsoletes_get_module_name (obsoletes))
+    {
+      g_set_error (error,
+                   MODULEMD_ERROR,
+                   MMD_ERROR_MISSING_REQUIRED,
+                   "The obsoletes requries a module name when adding to "
+                   "ModuleIndex.");
+      return FALSE;
+    }
+
   modulemd_module_add_obsoletes (
     get_or_create_module (self,
                           modulemd_obsoletes_get_module_name (obsoletes)),

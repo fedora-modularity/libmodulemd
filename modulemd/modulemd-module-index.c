@@ -1540,10 +1540,17 @@ modulemd_module_index_merge (ModulemdModuleIndex *from,
           if (!modulemd_module_index_add_module_stream (
                 into, stream, &nested_error))
             {
-              g_info ("Could not add stream %s due to %s",
-                      nsvca,
-                      nested_error->message);
-              g_clear_error (&nested_error);
+              if (nested_error)
+                {
+                  g_info ("Could not add stream %s due to %s",
+                          nsvca,
+                          nested_error->message);
+                  g_clear_error (&nested_error);
+                }
+              else
+                {
+                  g_info ("Could not add stream %s", nsvca);
+                }
             }
           g_clear_pointer (&nsvca, g_free);
         }

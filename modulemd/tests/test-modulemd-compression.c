@@ -96,6 +96,7 @@ test_modulemd_detect_compression (void)
       filename = g_strdup_printf ("%s/compression/%s",
                                   g_getenv ("TEST_DATA_PATH"),
                                   expected[i].filename);
+      g_assert_nonnull (filename);
       g_debug ("Getting compression type for %s", filename);
       filestream = g_fopen (filename, "rbe");
       g_assert_nonnull (filestream);
@@ -130,6 +131,7 @@ test_modulemd_detect_compression (void)
       filename = g_strdup_printf ("%s/compression/%s",
                                   g_getenv ("TEST_DATA_PATH"),
                                   expected_magic[j].filename);
+      g_assert_nonnull (filename);
       g_debug ("Getting compression type for %s", filename);
       filestream = g_fopen (filename, "rbe");
       g_assert_nonnull (filestream);

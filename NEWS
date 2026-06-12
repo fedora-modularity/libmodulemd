@@ -1,5 +1,25 @@
 Release history for libmodulemd
 
+2.15.3      2026-06-12
+
+Fixes:
+- Fix null-pointer dereferences at various places in the library
+  (modulemd_module_index_add_translation(), modulemd_module_index_merge(),
+  modulemd_module_index_add_obsoletes(), modulemd_translation_parse_yaml(),
+  modulemd_validate_nevra()), typically when passing an invalid input to it.
+- Adapt tests to changes in GLib 2.87.0.
+- Adapt tests to changes in PyGObject 3.55.0.
+- Honor CPPFLAGS, CFLAGS, CXXFLAGS, and LDFLAGS environment variables in
+  the test-import-headers test.
+
+Enhancements:
+- Remove a dependency on Python six module.
+
+Announcement:
+- The next libmodulemd release will be signed with
+  10E1B1BC73B4796EE25B9CA42D20EEFCA8895F65 OpenPGP key.
+
+
 2.15.2      2025-06-18
 
 Fixes:

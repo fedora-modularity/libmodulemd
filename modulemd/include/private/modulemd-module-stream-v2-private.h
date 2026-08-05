@@ -112,6 +112,24 @@ modulemd_module_stream_v2_parse_yaml (ModulemdSubdocumentInfo *subdoc,
                                       GError **error);
 
 /**
+ * modulemd_module_stream_v2_emit_rpm_map:
+ * @self: (in) This #ModulemdModuleStreamV2 object.
+ * @emitter: (inout): A libyaml emitter object positioned where the "rpm-map"
+ * element of #ModulemdModuleStreamV2 belongs in the YAML document.
+ * @error: (out): A #GError that will return the reason why the emission
+ * failed.
+ *
+ * Return: TRUE if the "rpm-map" YAML element was successfully serialized.
+ * Otherwise, FALSE and sets @error appropriately.
+ *
+ * Since: 2.2.0
+ */
+gboolean
+modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
+                                        yaml_emitter_t *emitter,
+                                        GError **error);
+
+/**
  * modulemd_module_stream_v2_emit_yaml:
  * @self: This #ModulemdModuleStreamV2 object.
  * @emitter: (inout): A libyaml emitter object positioned where the data

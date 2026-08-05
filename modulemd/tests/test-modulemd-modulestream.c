@@ -3105,6 +3105,96 @@ module_stream_v2_test_rpm_map (void)
 }
 
 
+/* Use a number of hash types different from a number of hashes to exhibit
+ * loop nesting in modulemd_module_stream_v2_emit_rpm_map(). */
+static void
+module_stream_v2_test_rpm_map_serialize (void)
+{
+  g_autoptr (ModulemdModuleStreamV2) stream = NULL;
+  g_autoptr (ModulemdRpmMapEntry) entry = NULL;
+  MMD_INIT_YAML_EMITTER (emitter);
+  MMD_INIT_YAML_STRING (&emitter, yaml_string);
+  g_autoptr (GError) error = NULL;
+
+  /* Build a stream document with non-trivial "rpm-map" entries. */
+  stream = modulemd_module_stream_v2_new ("test", "a");
+  g_assert_nonnull (stream);
+
+  entry = modulemd_rpm_map_entry_new ("bar", 0, "0", "0", "x86_64");
+  g_assert_nonnull (entry);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream,
+    entry,
+    "sha256",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  g_clear_object (&entry);
+
+  entry = modulemd_rpm_map_entry_new ("foo", 0, "0", "0", "x86_64");
+  g_assert_nonnull (entry);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream,
+    entry,
+    "sha256",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  g_clear_object (&entry);
+
+  entry = modulemd_rpm_map_entry_new ("bar", 0, "0", "0", "x86_64");
+  g_assert_nonnull (entry);
+  modulemd_module_stream_v2_set_rpm_artifact_map_entry (
+    stream,
+    entry,
+    "sha512",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  g_clear_object (&entry);
+
+  /* Serialize the "rpm-map" entry */
+  g_assert_true (mmd_emitter_start_stream (&emitter, &error));
+  g_assert_true (mmd_emitter_start_document (&emitter, &error));
+  g_assert_true (
+    mmd_emitter_start_mapping (&emitter, YAML_BLOCK_MAPPING_STYLE, &error));
+  g_assert_true (
+    modulemd_module_stream_v2_emit_rpm_map (stream, &emitter, &error));
+  g_assert_no_error (error);
+  g_assert_true (mmd_emitter_end_mapping (&emitter, &error));
+  g_assert_true (mmd_emitter_end_document (&emitter, &error));
+  g_assert_true (mmd_emitter_end_stream (&emitter, &error));
+
+  /* Check that it was serialized correctly */
+  g_assert_cmpstr (
+    yaml_string->str,
+    ==,
+    "---\n"
+    "rpm-map:\n"
+    "  sha256:\n"
+    "    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:\n"
+    "      name: bar\n"
+    "      epoch: 0\n"
+    "      version: \"0\"\n"
+    "      release: \"0\"\n"
+    "      arch: x86_64\n"
+    "      nevra: bar-0:0-0.x86_64\n"
+    "    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:\n"
+    "      name: foo\n"
+    "      epoch: 0\n"
+    "      version: \"0\"\n"
+    "      release: \"0\"\n"
+    "      arch: x86_64\n"
+    "      nevra: foo-0:0-0.x86_64\n"
+    "  sha512:\n"
+    "    "
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:\n"
+    "      name: bar\n"
+    "      epoch: 0\n"
+    "      version: \"0\"\n"
+    "      release: \"0\"\n"
+    "      arch: x86_64\n"
+    "      nevra: bar-0:0-0.x86_64\n"
+    "...\n");
+}
+
+
 static void
 module_stream_test_unicode_desc (void)
 {
@@ -3638,6 +3728,9 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_map",
                    module_stream_v2_test_rpm_map);
+
+  g_test_add_func ("/modulemd/v2/modulestream/v2/rpm_map_serialize",
+                   module_stream_v2_test_rpm_map_serialize);
 
   g_test_add_func ("/modulemd/v2/modulestream/v1/community",
                    module_stream_v1_test_community);

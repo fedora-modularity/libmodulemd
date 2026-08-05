@@ -3061,11 +3061,6 @@ modulemd_module_stream_v2_parse_rpm_map_digest (
 
 
 gboolean
-modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
-                                        yaml_emitter_t *emitter,
-                                        GError **error);
-
-gboolean
 modulemd_module_stream_v2_emit_yaml (ModulemdModuleStreamV2 *self,
                                      yaml_emitter_t *emitter,
                                      GError **error)
@@ -3265,7 +3260,7 @@ modulemd_module_stream_v2_emit_rpm_map (ModulemdModuleStreamV2 *self,
       checksums =
         modulemd_ordered_str_keys (digest_table, modulemd_strcmp_sort);
 
-      for (guint j = 0; j < digests->len; j++)
+      for (guint j = 0; j < checksums->len; j++)
         {
           checksum = g_ptr_array_index (checksums, j);
           EMIT_SCALAR (emitter, error, checksum);

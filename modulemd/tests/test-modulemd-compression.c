@@ -14,7 +14,11 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 
+#include "config.h"
 #include "modulemd-compression.h"
+#ifdef HAVE_RPMIO
+#include "modulemd-module-index.h"
+#endif
 #include "private/modulemd-compression-private.h"
 #include "private/modulemd-yaml.h"
 #include "private/test-utils.h"
@@ -224,6 +228,40 @@ test_modulemd_get_rpmio_fmode (void)
 }
 
 
+#ifdef HAVE_RPMIO
+/* A compressed file smaller than 64 MiB / 64 which decompresses to
+ * more than 64 MiB should be rejected. */
+static void
+test_modulemd_minimal_limit (void)
+{
+  if (g_test_subprocess ())
+    {
+      g_autofree const gchar *filename = NULL;
+      g_autoptr (ModulemdModuleIndex) index = NULL;
+      g_autoptr (GPtrArray) failures = NULL;
+      g_autoptr (GError) error = NULL;
+
+      filename = g_strdup_printf ("%s/compression/small_bomb.yaml.gz",
+                                  g_getenv ("TEST_DATA_PATH"));
+      g_assert_nonnull (filename);
+      index = modulemd_module_index_new ();
+      g_assert_nonnull (index);
+      modulemd_module_index_update_from_file (
+        index, filename, TRUE, &failures, &error);
+      /* TODO: Check for false return value and set error, once libmodulemd
+       * supports reporting YAML reader callback errors.  Until then we need
+       * to wrap this modulemd_module_index_update_from_file() call into
+       * a subprocess because the "safety limit" warning in the callback
+       * aborts the tests when G_DEBUG=fatal-warning environment variable is
+       * set. */
+      return;
+    }
+  g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
+  g_test_trap_assert_failed ();
+}
+#endif
+
+
 int
 main (int argc, char *argv[])
 {
@@ -243,6 +281,11 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/modulemd/compression/rmpio/fmode",
                    test_modulemd_get_rpmio_fmode);
+
+#ifdef HAVE_RPMIO
+  g_test_add_func ("/modulemd/compression/limit/minimum",
+                   test_modulemd_minimal_limit);
+#endif
 
   return g_test_run ();
 }

@@ -19,6 +19,8 @@
 
 #ifdef HAVE_RPMIO
 #include <rpm/rpmio.h>
+#include <stdint.h>
+#include <sys/stat.h>
 #endif
 
 #include "modulemd.h"
@@ -641,8 +643,24 @@ modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
    * suite of tools to deal with it. We need to construct a special "mode"
    * argument to pass to Fdopen().
    */
-  FD_t rpmio_fd = NULL;
+  modulemd_decompressor_context context = {
+    .rpmio_fd = NULL, .decompressed = 0, .limit = 1 << 26, /* 64 MB */
+  };
   g_auto (FD_t) fd_dup = NULL;
+  struct stat statbuf;
+
+  /* Scale the decompression limit according to a compressed size.
+   * A compression ratio of XZ on typical modulemd data is 1:30.
+   * Giving a leeway of factor 2 and rounding it to a power of 2 yields
+   * a factor limit of 64 (2^6). */
+  if (0 == fstat (fd, &statbuf) && statbuf.st_size > 0)
+    {
+      size_t scaled_limit = (statbuf.st_size <= SIZE_MAX >> 6) ?
+                              (size_t)statbuf.st_size << 6 :
+                              SIZE_MAX;
+      if (scaled_limit > context.limit)
+        context.limit = scaled_limit;
+    }
 
   fmode = modulemd_get_rpmio_fmode ("r", comtype);
   if (!fmode)
@@ -674,9 +692,9 @@ modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
     }
 
   g_debug ("Calling rpmio::Fdopen (%p, %s)", fd_dup, fmode);
-  rpmio_fd = Fdopen (fd_dup, fmode);
+  context.rpmio_fd = Fdopen (fd_dup, fmode);
 
-  if (!rpmio_fd)
+  if (!context.rpmio_fd)
     {
       g_set_error_literal (
         error,
@@ -689,7 +707,7 @@ modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
   g_debug ("rpmio::Fdopen (%p, %s) succeeded", fd_dup, fmode);
 
   return modulemd_module_index_update_from_custom (
-    self, compressed_stream_read_fn, rpmio_fd, strict, failures, error);
+    self, compressed_stream_read_fn, &context, strict, failures, error);
 
 #else /* HAVE_RPMIO */
   g_set_error_literal (

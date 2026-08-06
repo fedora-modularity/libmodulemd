@@ -33,6 +33,26 @@
 
 #ifdef HAVE_RPMIO
 /**
+ * modulemd_decompressor_context:
+ * @rpmio_fd: RPM I/O file descriptor.
+ * @decompressed: How many decompressed bytes have been read so far.
+ * @limit: Maximum number of bytes allowed to be decompressed.
+ * #
+ * #modulemd_decompressor_context wraps file descriptor and axuliary metadata
+ * about a file to be decompressed.
+ *
+ * Since 2.15.4
+ */
+typedef struct _modulemd_decompressor_context
+{
+  FD_t rpmio_fd;
+  size_t decompressed;
+  size_t limit;
+
+} modulemd_decompressor_context;
+
+
+/**
  * mmd_Fclose:
  * @fd: (in): A FD_t from rpmio.h to be closed
  *

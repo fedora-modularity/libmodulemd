@@ -161,6 +161,12 @@ modulemd_module_index_new (void);
  * %NULL (if you don't care) or a pointer to %NULL (if you want to know the
  * error). On output, it will become allocated only if an error occured.
  *
+ * If libmodulemd is built with RPM I/O support, the YAML file might be
+ * compressed with a compression algorithm supported by RPM I/O. Then
+ * a content of the YAML file will be transparently decompressed. To prevent
+ * compression bomb attacks, a limit is imposed on the decompressed size:
+ * 64 MiB for small files and 64 times the compressed size for large files.
+ *
  * Returns: %TRUE if the update was successful. Returns %FALSE and sets
  * @failures appropriately if any of the YAML subdocuments were invalid or
  * sets @error if there was a fatal parse error.

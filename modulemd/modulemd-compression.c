@@ -20,6 +20,7 @@
 
 #ifdef HAVE_RPMIO
 #include <rpm/rpmio.h>
+#include <stdint.h>
 #endif
 
 #include "modulemd-compression.h"
@@ -251,17 +252,36 @@ compressed_stream_read_fn (void *data,
                            size_t size,
                            size_t *size_read)
 {
-  FD_t rpmio_fd = (FD_t)data;
-  ssize_t read = Fread (buffer, sizeof (*buffer), size, rpmio_fd);
+  struct _modulemd_decompressor_context *context =
+    (struct _modulemd_decompressor_context *)data;
+  ssize_t read = Fread (buffer, sizeof (*buffer), size, context->rpmio_fd);
 
   if (read < 0)
     {
-      g_warning ("Got error [%d] reading the file", Ferror (rpmio_fd));
+      g_warning ("Got error [%d] reading the file",
+                 Ferror (context->rpmio_fd));
+      return 0;
+    }
+  context->decompressed += read;
+  if (context->decompressed < (size_t)read)
+    {
+      /* Handle integer overflow */
+      context->decompressed = SIZE_MAX;
+    }
+
+  if (context->decompressed > context->limit)
+    {
+      g_warning (
+        "A safety limit (%zu B) exceeded while decompressing the file",
+        context->limit);
+      // TODO: Store this reason into the context and pick it up from there
+      // whenever libmodulemd sets "Parser error" GError message after
+      // returning from yaml_parser_parse(). libyaml sets
+      // parser.error=YAML_READER_ERROR on any error from the reader callback.
       return 0;
     }
 
   *size_read = read;
-
   return 1;
 }
 #else

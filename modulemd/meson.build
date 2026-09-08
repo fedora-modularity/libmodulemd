@@ -16,6 +16,7 @@ skip_introspection = get_option('skip_introspection')
 verbose_tests = get_option('verbose_tests')
 accept_overflowed_buildorder = get_option('accept_overflowed_buildorder')
 clang_simple_version_script = find_program ('clang_simple_version.sh')
+recursion_limit = get_option('recursion_limit')
 
 
 # -- Library -- #
@@ -147,6 +148,7 @@ cdata.set('HAVE_EXTEND_AND_STEAL', has_extend_and_steal)
 cdata.set('HAVE_G_SPAWN_CHECK_WAIT_STATUS', has_g_spawn_check_wait_status)
 cdata.set('HAVE_G_TEST_SUBPROCESS_DEFAULT', has_g_test_subprocess_default)
 cdata.set('HAVE_OVERFLOWED_BUILDORDER', accept_overflowed_buildorder)
+cdata.set('LIBMODULEMD_RECURSION_LIMIT', recursion_limit)
 configure_file(
   output : 'config.h',
   configuration : cdata
@@ -355,6 +357,7 @@ c_tests = {
 'defaults'            : [ 'tests/test-modulemd-defaults.c' ],
 'defaultsv1'          : [ 'tests/test-modulemd-defaults-v1.c' ],
 'dependencies'        : [ 'tests/test-modulemd-dependencies.c' ],
+'limits'              : [ 'tests/test-modulemd-limits.c' ],
 'module'              : [ 'tests/test-modulemd-module.c' ],
 'module_index'        : [ 'tests/test-modulemd-moduleindex.c' ],
 'module_index_merger' : [ 'tests/test-modulemd-merger.c' ],

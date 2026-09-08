@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <glib.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <yaml.h>
 
 
@@ -1085,7 +1086,14 @@ modulemd_yaml_parse_document_type_internal (
             {
               return FALSE;
             }
-          depth++;
+          if (depth == INT_MAX || ++depth > LIBMODULEMD_RECURSION_LIMIT)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT_BOOL (
+                error,
+                event,
+                "YAML document depth limit %d exceeded.",
+                LIBMODULEMD_RECURSION_LIMIT);
+            }
           break;
 
         case YAML_SCALAR_EVENT:

@@ -23,6 +23,9 @@ option('libmagic', type : 'feature', value : 'auto',
 option('python_name', type : 'string',
        description : 'The name of the Python 3 interpreter to use for generating Python bindings and running tests. If left blank, it defaults to the version of Python 3 being used to run meson.')
 
+option('recursion_limit', type : 'integer', min : 16, value : 64,
+       description : 'Maximal depth of accepted recusive structures, like mappings in YAML documents.')
+
 option('rpmio', type : 'feature', value : 'enabled',
        description : 'Use the rpmio library to automatically decompress gzip, bzip2 and xz YAML streams.')
 

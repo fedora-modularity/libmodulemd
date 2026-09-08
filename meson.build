@@ -228,5 +228,6 @@ summary({'Custom Python': get_option('python_name'),
          'Python 3 Support': get_option('with_py3'),
          'Skip Introspection': get_option('skip_introspection'),
          'Accept overflowed buildorder': get_option('accept_overflowed_buildorder'),
+         'Recursion limit': get_option('recursion_limit'),
          'Test Installed Library': get_option('test_installed_lib'),
         }, section: 'Build Configuration')

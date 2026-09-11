@@ -125,6 +125,174 @@ module_limits_test_parse_document_type_oversized (void)
 }
 
 
+/* Return an XMD YAML document with a mapping of @depth depth. */
+static GString *
+build_xmd_mapping_document (int depth)
+{
+  g_autoptr (GString) string = g_string_new (NULL);
+  for (int i = 1; i < depth; i++)
+    g_string_append (string, "a: {");
+  for (int i = 1; i < depth; i++)
+    g_string_append (string, "}");
+  g_string_append (string, "\n");
+
+  return g_steal_pointer (&string);
+}
+
+
+static void
+module_limits_test_mmd_parse_xmd_mapping_exact (void)
+{
+  g_autoptr (GString) yaml_string = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  int yaml_ret;
+  g_autoptr (GVariant) xmd = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Build a document with a depth matching, i.e. fitting, the recursion limit. */
+  yaml_string = build_xmd_mapping_document (LIBMODULEMD_RECURSION_LIMIT);
+
+  /* Advance the parser to the first document element */
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string->str, yaml_string->len);
+  /* The first event must be the stream start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
+  yaml_event_delete (&event);
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
+  /* Parse it and exhibit the recursion limit */
+  xmd = mmd_parse_xmd (&parser, &error);
+  g_assert_nonnull (xmd);
+  g_assert_null (error);
+}
+
+
+static void
+module_limits_test_mmd_parse_xmd_mapping_oversized (void)
+{
+  g_autoptr (GString) yaml_string = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  int yaml_ret;
+  g_autoptr (GVariant) xmd = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Build a document with a depth exceeding the recursion limit. */
+  yaml_string = build_xmd_mapping_document (LIBMODULEMD_RECURSION_LIMIT + 1);
+
+  /* Advance the parser to the first document element */
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string->str, yaml_string->len);
+  /* The first event must be the stream start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
+  yaml_event_delete (&event);
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
+  /* Parse it and exhibit the recursion limit */
+  xmd = mmd_parse_xmd (&parser, &error);
+  g_assert_null (xmd);
+  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE);
+}
+
+
+/* Return an XMD YAML document with a recursive sequence of @depth depth. */
+static GString *
+build_xmd_sequence_document (int depth)
+{
+  g_autoptr (GString) string = g_string_new (NULL);
+  /* mmd_parse_xmd() requires the top-level element to be a mapping. */
+  g_string_append (string, "a: ");
+  for (int i = 1; i < depth; i++)
+    g_string_append (string, "[");
+  for (int i = 1; i < depth; i++)
+    g_string_append (string, "]");
+  g_string_append (string, "\n");
+
+  return g_steal_pointer (&string);
+}
+
+
+static void
+module_limits_test_mmd_parse_xmd_sequence_exact (void)
+{
+  g_autoptr (GString) yaml_string = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  int yaml_ret;
+  g_autoptr (GVariant) xmd = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Build a document with a depth matching, i.e. fitting, the recursion limit. */
+  yaml_string = build_xmd_sequence_document (LIBMODULEMD_RECURSION_LIMIT);
+
+  /* Advance the parser to the first document element */
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string->str, yaml_string->len);
+  /* The first event must be the stream start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
+  yaml_event_delete (&event);
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
+  /* Parse it and exhibit the recursion limit */
+  xmd = mmd_parse_xmd (&parser, &error);
+  g_assert_nonnull (xmd);
+  g_assert_null (error);
+}
+
+
+static void
+module_limits_test_mmd_parse_xmd_sequence_oversized (void)
+{
+  g_autoptr (GString) yaml_string = NULL;
+  MMD_INIT_YAML_EVENT (event);
+  MMD_INIT_YAML_PARSER (parser);
+  int yaml_ret;
+  g_autoptr (GVariant) xmd = NULL;
+  g_autoptr (GError) error = NULL;
+
+  /* Build a document with a depth matching, i.e. fitting, the recursion limit. */
+  yaml_string = build_xmd_sequence_document (LIBMODULEMD_RECURSION_LIMIT + 1);
+
+  /* Advance the parser to the first document element */
+  yaml_parser_set_input_string (
+    &parser, (const unsigned char *)yaml_string->str, yaml_string->len);
+  /* The first event must be the stream start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_STREAM_START_EVENT);
+  yaml_event_delete (&event);
+  /* The second event must be the document start */
+  yaml_ret = yaml_parser_parse (&parser, &event);
+  g_assert_true (yaml_ret);
+  g_assert_cmpint (event.type, ==, YAML_DOCUMENT_START_EVENT);
+  yaml_event_delete (&event);
+
+  /* Parse it and exhibit the recursion limit */
+  xmd = mmd_parse_xmd (&parser, &error);
+  g_assert_null (xmd);
+  g_assert_error (error, MODULEMD_YAML_ERROR, MMD_YAML_ERROR_PARSE);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -136,6 +304,16 @@ main (int argc, char *argv[])
                    module_limits_test_parse_document_type_exact);
   g_test_add_func ("/modulemd/v2/limits/parse_document_type/oversized",
                    module_limits_test_parse_document_type_oversized);
+
+  g_test_add_func ("/modulemd/v2/limits/mmd_parse_xmd/mapping/exact",
+                   module_limits_test_mmd_parse_xmd_mapping_exact);
+  g_test_add_func ("/modulemd/v2/limits/mmd_parse_xmd/mapping/oversized",
+                   module_limits_test_mmd_parse_xmd_mapping_oversized);
+
+  g_test_add_func ("/modulemd/v2/limits/mmd_parse_xmd/sequence/exact",
+                   module_limits_test_mmd_parse_xmd_sequence_exact);
+  g_test_add_func ("/modulemd/v2/limits/mmd_parse_xmd/sequence/oversized",
+                   module_limits_test_mmd_parse_xmd_sequence_oversized);
 
   return g_test_run ();
 }

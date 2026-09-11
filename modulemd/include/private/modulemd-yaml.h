@@ -913,6 +913,7 @@ mmd_variant_from_scalar (const gchar *scalar);
 /**
  * mmd_variant_from_mapping:
  * @parser: (inout): A YAML parser positioned just after a `MAPPING_START`
+ * @depth: Current YAML depth in the XMD document
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
  * Returns: (transfer full): A new, floating #GVariant representing a hash
@@ -921,12 +922,13 @@ mmd_variant_from_scalar (const gchar *scalar);
  * Since: 2.0
  */
 GVariant *
-mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
+mmd_variant_from_mapping (yaml_parser_t *parser, int depth, GError **error);
 
 
 /**
  * mmd_variant_from_sequence:
  * @parser: (inout): A YAML parser positioned just after a `SEQUENCE_START`
+ * @depth: Current YAML depth in the XMD document
  * @error: (out): A #GError that will return the reason for failing to parse.
  *
  * Returns: (transfer full): A new, floating #GVariant representing a list of
@@ -935,7 +937,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error);
  * Since: 2.0
  */
 GVariant *
-mmd_variant_from_sequence (yaml_parser_t *parser, GError **error);
+mmd_variant_from_sequence (yaml_parser_t *parser, int depth, GError **error);
 
 
 /**

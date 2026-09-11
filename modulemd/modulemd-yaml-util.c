@@ -1496,7 +1496,7 @@ mmd_variant_from_scalar (const gchar *scalar)
 
 
 GVariant *
-mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
+mmd_variant_from_mapping (yaml_parser_t *parser, int depth, GError **error)
 {
   MODULEMD_INIT_TRACE ();
   gboolean done = FALSE;
@@ -1540,7 +1540,16 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
               break;
 
             case YAML_MAPPING_START_EVENT:
-              value = mmd_variant_from_mapping (parser, &nested_error);
+              if (depth == INT_MAX || depth + 1 > LIBMODULEMD_RECURSION_LIMIT)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "XMD YAML document depth limit %d exceeded.",
+                    LIBMODULEMD_RECURSION_LIMIT);
+                }
+              value =
+                mmd_variant_from_mapping (parser, depth + 1, &nested_error);
               if (!value)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1549,7 +1558,16 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
               break;
 
             case YAML_SEQUENCE_START_EVENT:
-              value = mmd_variant_from_sequence (parser, &nested_error);
+              if (depth == INT_MAX || depth + 1 > LIBMODULEMD_RECURSION_LIMIT)
+                {
+                  MMD_YAML_ERROR_EVENT_EXIT (
+                    error,
+                    event,
+                    "XMD YAML document depth limit %d exceeded.",
+                    LIBMODULEMD_RECURSION_LIMIT);
+                }
+              value =
+                mmd_variant_from_sequence (parser, depth + 1, &nested_error);
               if (!value)
                 {
                   g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1590,7 +1608,7 @@ mmd_variant_from_mapping (yaml_parser_t *parser, GError **error)
 
 
 GVariant *
-mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
+mmd_variant_from_sequence (yaml_parser_t *parser, int depth, GError **error)
 {
   MODULEMD_INIT_TRACE ();
   gboolean done = FALSE;
@@ -1625,7 +1643,15 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_MAPPING_START_EVENT:
-          value = mmd_variant_from_mapping (parser, &nested_error);
+          if (depth == INT_MAX || depth + 1 > LIBMODULEMD_RECURSION_LIMIT)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "XMD YAML document depth limit %d exceeded.",
+                LIBMODULEMD_RECURSION_LIMIT);
+            }
+          value = mmd_variant_from_mapping (parser, depth + 1, &nested_error);
           if (!value)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1634,7 +1660,15 @@ mmd_variant_from_sequence (yaml_parser_t *parser, GError **error)
           break;
 
         case YAML_SEQUENCE_START_EVENT:
-          value = mmd_variant_from_sequence (parser, &nested_error);
+          if (depth == INT_MAX || depth + 1 > LIBMODULEMD_RECURSION_LIMIT)
+            {
+              MMD_YAML_ERROR_EVENT_EXIT (
+                error,
+                event,
+                "XMD YAML document depth limit %d exceeded.",
+                LIBMODULEMD_RECURSION_LIMIT);
+            }
+          value = mmd_variant_from_sequence (parser, depth + 1, &nested_error);
           if (!value)
             {
               g_propagate_error (error, g_steal_pointer (&nested_error));
@@ -1685,6 +1719,7 @@ mmd_parse_xmd (yaml_parser_t *parser, GError **error)
   MMD_INIT_YAML_EVENT (event);
   GVariant *variant = NULL;
   g_autoptr (GError) nested_error = NULL;
+  int depth = 0;
 
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
@@ -1702,7 +1737,20 @@ mmd_parse_xmd (yaml_parser_t *parser, GError **error)
       break;
 
     case YAML_MAPPING_START_EVENT:
-      variant = mmd_variant_from_mapping (parser, &nested_error);
+      if (depth == INT_MAX || depth + 1 > LIBMODULEMD_RECURSION_LIMIT)
+        {
+          MMD_YAML_ERROR_EVENT_EXIT (
+            error,
+            event,
+            "XMD YAML document depth limit %d exceeded.",
+            LIBMODULEMD_RECURSION_LIMIT);
+        }
+      variant = mmd_variant_from_mapping (parser, depth + 1, &nested_error);
+      if (!variant)
+        {
+          g_propagate_error (error, g_steal_pointer (&nested_error));
+          return NULL;
+        }
       break;
 
     default:

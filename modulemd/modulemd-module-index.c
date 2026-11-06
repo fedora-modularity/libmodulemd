@@ -644,7 +644,9 @@ modulemd_module_index_update_from_file_ext (ModulemdModuleIndex *self,
    * argument to pass to Fdopen().
    */
   modulemd_decompressor_context context = {
-    .rpmio_fd = NULL, .decompressed = 0, .limit = 1 << 26, /* 64 MB */
+    .rpmio_fd = NULL,
+    .decompressed = 0,
+    .limit = 1 << 26, /* 64 MB */
   };
   g_auto (FD_t) fd_dup = NULL;
   struct stat statbuf;

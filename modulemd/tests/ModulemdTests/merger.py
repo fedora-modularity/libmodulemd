@@ -268,9 +268,7 @@ data:
     module: python
     stream: %s
 ...
-""" % (
-                stream
-            )
+""" % (stream)
 
             index = Modulemd.ModuleIndex()
             index.update_from_string(default, strict=True)

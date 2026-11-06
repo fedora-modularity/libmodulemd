@@ -35,7 +35,7 @@
 #define MMD_TEST_DOC_PROP "documentation"
 #define MMD_TEST_COM_PROP "community"
 #define MMD_TEST_DOC_UNICODE_TEXT                                             \
-  "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                           \
+  "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)"                                                     \
   "═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
 #define MMD_TEST_TRACKER_PROP "tracker"
 #define MMD_TEST_DESC_TEXT "A different description"

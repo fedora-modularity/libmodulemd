@@ -360,9 +360,7 @@ class TestModuleStream(TestBase):
             assert stream.get_documentation() is None
 
             # Test unicode characters
-            unicode_test_str = (
-                "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
-            )
+            unicode_test_str = "À϶￥🌭∮⇒⇔¬β∀₂⌀ıəˈ⍳⍴V)═€ίζησθლბშიнстемองจึองታሽ።ደለᚢᛞᚦᚹ⠳⠞⠊⠎▉▒▒▓😃"
 
             stream.props.documentation = unicode_test_str
             assert stream.props.documentation == unicode_test_str

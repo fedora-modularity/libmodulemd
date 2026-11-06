@@ -1,5 +1,40 @@
 Release history for libmodulemd
 
+2.15.4      2026-11-06
+
+Possibly incompatible fixes:
+- Compressed YAML files which decompress to much are rejected
+  (CVE-2026-92823). If libmodulemd is built with "rpmio" feature,
+  modulemd_module_index_update_from_file() decompresses compressed input
+  files. Small compressed files can decompress to very large data. Then
+  processing the large data consumes unexpectedly large amount of memory. This
+  amplification of use of resources can be interpreted as a denial of service.
+  To avoid it, a limit for decompressed data was imposed. The limit is
+  a maximum of 64 MiB and 64 times the compressed size of the input file. When
+  the limit is reached, a Glib warning is emitted and
+  modulemd_module_index_update_from_file() returns FALSE. This flaw was added
+  with aad63a59ca02be2cc7afb6e6c8a0c3bd5a036dd6 commit ("Add helpers for
+  reading compressed files") and first released in 2.8.0 version.
+
+- Introduce a recursion limit for YAML documents (CVE-2026-92822). Parsing
+  a modulemd document with "xmd" YAML tree with enormously nested nodes may
+  exhaust all heap or stack memory when duplicating subdocuments in
+  modulemd_yaml_parse_document_type_internal(). This is fixed by adding
+  a "recursion_limit" build-time option defining a maximal depth of acceptable
+  YAML documents. Default is 64. This flaw was confirmed in current 2.15.3
+  version and back to 1.4.0 version. Earlier versions might be affected as well.
+
+Other fixes:
+- Iterating over checksums in modulemd_module_stream_v2_emit_rpm_map() was
+  fixed (CVE-2026-92824). When serializing a module index into a YAML string
+  where a number of hash types was different from a number of hashes of
+  a particular type in "rpm-map" modulemd-v2 YAML element, not all hashes were
+  serialized or an invalid memory was read. This flaw was introduced with
+  b5abf3bbedd211a403122fccfec192581e2bbe8f commit ("Add rpm-map to
+  ModuleStreamV2") and first released in 2.2.0 version.
+- Harden modulemd_module_add_translation() against null-pointer dereferences.
+- Harden modulemd_module_add_obsoletes() against null-pointer dereferences.
+
 2.15.3      2026-06-12
 
 Fixes:

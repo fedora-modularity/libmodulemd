@@ -13,6 +13,7 @@ test_installed_lib = get_option('test_installed_lib')
 skip_introspection = get_option('skip_introspection')
 developer_build = get_option('developer_build')
 test_dirty_git = get_option('test_dirty_git')
+recursion_limit = get_option('recursion_limit')
 
 clang_format = find_program('clang-format', required: developer_build)
 if not clang_format.found()
@@ -120,6 +121,7 @@ test_srcs = files(
     'tests/test-modulemd-defaults.c',
     'tests/test-modulemd-dependencies.c',
     'tests/test-modulemd-intent.c',
+    'tests/test-modulemd-limits.c',
     'tests/test-modulemd-module.c',
     'tests/test-modulemd-modulestream.c',
     'tests/test-modulemd-regressions.c',
@@ -266,6 +268,20 @@ test('test_modulemd_intent', test_modulemd_intent,
 test('test_release_modulemd_intent', test_modulemd_intent,
      env : test_release_env)
 valgrind_tests += 'test_modulemd_intent'
+
+test_modulemd_limits = executable(
+    'test_modulemd_limits',
+    'tests/test-modulemd-limits.c',
+    dependencies : [
+        modulemd_dep,
+    ],
+    install : false,
+)
+test('test_modulemd_limits', test_modulemd_limits,
+     env : test_env)
+test('test_release_modulemd_limits', test_modulemd_limits,
+     env : test_release_env)
+valgrind_tests += 'test_modulemd_limits'
 
 test_modulemd_module = executable(
     'test_modulemd_module',
@@ -501,6 +517,7 @@ endif
 
 cdata = configuration_data()
 cdata.set_quoted('LIBMODULEMD_VERSION', libmodulemd_version)
+cdata.set('LIBMODULEMD_RECURSION_LIMIT', recursion_limit)
 configure_file(
   output : 'config.h',
   configuration : cdata

@@ -14,4 +14,6 @@ option('test_dirty_git', type : 'boolean', value : false)
 option('test_installed_lib', type : 'boolean', value : false)
 option('skip_introspection', type : 'boolean', value : false)
 option('python_name', type : 'string')
+option('recursion_limit', type : 'integer', min : 16, value : 64,
+       description : 'Maximal depth of accepted recusive structures, like mappings in YAML documents.')
 option('with_docs', type : 'boolean', value : true)

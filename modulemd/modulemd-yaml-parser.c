@@ -11,10 +11,12 @@
  * For more information on free software, see <https://www.gnu.org/philosophy/free-sw.en.html>.
  */
 
+#include "config.h"
 #include "modulemd.h"
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <yaml.h>
 #include <errno.h>
 #include "private/modulemd-yaml.h"
@@ -537,7 +539,17 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
         case YAML_DOCUMENT_END_EVENT: done = TRUE; break;
 
         case YAML_SEQUENCE_START_EVENT:
-        case YAML_MAPPING_START_EVENT: depth++; break;
+        case YAML_MAPPING_START_EVENT:
+          if (depth == INT_MAX || ++depth > LIBMODULEMD_RECURSION_LIMIT)
+            {
+              g_clear_error(&error);
+              MMD_YAML_ERROR_EVENT_RETURN (
+                &error,
+                event,
+                "YAML document depth limit %d exceeded.",
+                LIBMODULEMD_RECURSION_LIMIT);
+            }
+          break;
 
         case YAML_SEQUENCE_END_EVENT:
         case YAML_MAPPING_END_EVENT: depth--; break;
@@ -589,7 +601,17 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                       switch (value_event.type)
                         {
                         case YAML_SEQUENCE_START_EVENT:
-                        case YAML_MAPPING_START_EVENT: depth++; break;
+                        case YAML_MAPPING_START_EVENT:
+                          if (depth == INT_MAX || ++depth > LIBMODULEMD_RECURSION_LIMIT)
+                            {
+                              g_clear_error(&error);
+                              MMD_YAML_ERROR_EVENT_RETURN (
+                                &error,
+                                event,
+                                "YAML document depth limit %d exceeded.",
+                                LIBMODULEMD_RECURSION_LIMIT);
+                            }
+                          break;
 
                         case YAML_SEQUENCE_END_EVENT:
                         case YAML_MAPPING_END_EVENT: depth--; break;
@@ -704,7 +726,17 @@ _read_yaml_and_type (yaml_parser_t *parser, ModulemdSubdocument **subdocument)
                       switch (value_event.type)
                         {
                         case YAML_SEQUENCE_START_EVENT:
-                        case YAML_MAPPING_START_EVENT: depth++; break;
+                        case YAML_MAPPING_START_EVENT:
+                          if (depth == INT_MAX || ++depth > LIBMODULEMD_RECURSION_LIMIT)
+                            {
+                              g_clear_error(&error);
+                              MMD_YAML_ERROR_EVENT_RETURN (
+                                &error,
+                                event,
+                                "YAML document depth limit %d exceeded.",
+                                LIBMODULEMD_RECURSION_LIMIT);
+                            }
+                          break;
 
                         case YAML_SEQUENCE_END_EVENT:
                         case YAML_MAPPING_END_EVENT: depth--; break;
